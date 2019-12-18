@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUti
 import org.orbeon.oxf.xml.Dom4j
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 object URLGeneratorBase {
 
@@ -47,8 +48,8 @@ object URLGeneratorBase {
     lastModifiedOrNull : jl.Long
   ): ju.Map[String, Array[String]] = {
 
-    val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) ⇒ (k, v.to[Array]) }} getOrElse Map.empty[String, Array[String]]
-    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to[List]
+    val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) ⇒ (k, v.to(Array)) }} getOrElse Map.empty[String, Array[String]]
+    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to(List)
 
     headersOrEmpty ++ newHeaderAsList
   }.asJava
@@ -57,7 +58,7 @@ object URLGeneratorBase {
   def collectHeaders(connectionResult: ConnectionResult, readHeader: ju.List[String]): List[(String, String)] =
     if ((readHeader ne null) && ! readHeader.isEmpty) {
       for {
-        nameMaybeMixed ← readHeader.asScala.to[List]
+        nameMaybeMixed ← readHeader.asScala.to(List)
         list           = connectionResult.getHeaderIgnoreCase(nameMaybeMixed)
         if list.nonEmpty // only support headers with one value
         value          = list.head

@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XForm
 
 import scala.util.Try
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.

@@ -17,6 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon
+import scala.collection.compat._
 
 object Whitespace  {
 
@@ -24,7 +25,7 @@ object Whitespace  {
   object Policy extends Enum[Policy] {
 
     val values     = findValues
-    val valuesList = values.to[List]
+    val valuesList = values.to(List)
 
     case object Preserve  extends Policy
     case object Normalize extends Policy // like XML Schema's collapse and XPath's normalize-space()

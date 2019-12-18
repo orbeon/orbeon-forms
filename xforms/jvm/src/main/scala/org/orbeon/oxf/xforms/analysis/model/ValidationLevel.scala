@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.model
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.List
+import scala.collection.compat._
 
 
 sealed abstract class ValidationLevel(override val entryName: String) extends EnumEntry
@@ -29,7 +30,7 @@ object ValidationLevel extends Enum[ValidationLevel] {
   case object WarningLevel extends ValidationLevel("warning")
   case object InfoLevel    extends ValidationLevel("info")
 
-  val LevelsByPriority = values.to[List]
+  val LevelsByPriority = values.to(List)
   val LevelByName      = LevelsByPriority map (l ⇒ l.entryName → l) toMap
 
   implicit object ValidationLevelOrdering extends Ordering[ValidationLevel] {

@@ -37,6 +37,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.{xml ⇒ sx}
+import scala.collection.compat._
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
@@ -68,7 +69,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // - writes are destructive: they remove all xf:alert, alert resources, and validations for the control
     // - we don't allow editing the validation id, but we preserve it when possible
 
-    val validationElemsSeq = validationElems.to[List]
+    val validationElemsSeq = validationElems.to(List)
 
     // Extract from XML
     val allValidations = {
@@ -612,7 +613,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
         // Try to find an existing resource for the given index if present, otherwise assume a blank value for
         // the language
-        val alertsByLang = alertResourcesForAllLangs.to[List] map {
+        val alertsByLang = alertResourcesForAllLangs.to(List) map {
           case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
         }
 

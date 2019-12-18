@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xml.dom4j
 
 import org.orbeon.dom.Element
-import collection.{breakOut, immutable}
+import collection.immutable
+import scala.collection.compat._
 
 /**
  * LocationData information with additional information.
@@ -71,7 +72,7 @@ class ExtendedLocationData private (
   def getDescription               = description.orNull
   def getElementString             = getElementDebugString
   def getElementDebugString        = elementString.orNull
-  def getParameters: Array[String] = params.flatMap(p ⇒ Array(p._1, p._2))(breakOut)
+  def getParameters: Array[String] = params.iterator.flatMap(p ⇒ Array(p._1, p._2)).to(Array)
 
   override def toString = {
 

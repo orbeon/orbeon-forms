@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 trait FormBuilderPermissionsOps {
 
@@ -50,8 +51,8 @@ trait FormBuilderPermissionsOps {
       <apps has-roles="false"/>
     } else {
       <apps has-roles="true">{
-        formBuilderPermissions(configurationOpt, incomingRoleNames).to[List].sortBy(_._1) map { case (app, forms) ⇒
-          <app name={app}>{ forms.to[List].sorted map { form ⇒ <form name={form}/> } }</app>
+        formBuilderPermissions(configurationOpt, incomingRoleNames).to(List).sortBy(_._1) map { case (app, forms) ⇒
+          <app name={app}>{ forms.to(List).sorted map { form ⇒ <form name={form}/> } }</app>
         }
       }</apps>
     }

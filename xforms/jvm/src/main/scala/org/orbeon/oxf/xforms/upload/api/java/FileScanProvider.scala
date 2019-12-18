@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.upload.api.java
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.Try
+import scala.collection.compat._
 
 abstract class FileScanProvider extends api.FileScanProvider {
 
@@ -42,7 +43,7 @@ abstract class FileScanProvider extends api.FileScanProvider {
     Try(
       startStream(
         fileName,
-        mutable.LinkedHashMap(headers map { case (k, v) ⇒ k → v.to[Array] }: _*).asJava
+        mutable.LinkedHashMap(headers map { case (k, v) ⇒ k → v.to(Array) }: _*).asJava
       )
     ) map (new FileScanWrapper(_))
 }

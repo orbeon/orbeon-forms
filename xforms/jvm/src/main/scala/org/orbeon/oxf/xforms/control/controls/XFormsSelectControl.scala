@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import scala.collection.{mutable, Set ⇒ CSet}
+import scala.collection.compat._
 
 /**
  * Represents an xf:select control.
@@ -132,7 +133,7 @@ class XFormsSelectControl(
           } yield
             item
 
-        intersection.to[List]
+        intersection.to(List)
       }
   }
 

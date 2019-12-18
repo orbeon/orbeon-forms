@@ -27,6 +27,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 trait BindingOps {
 
@@ -59,7 +60,7 @@ trait BindingOps {
           // type to `date`, we don't want the appearance to reset, so we use the passed `desiredAppearance`.
           // If the appearance doesn't match, then no appearance is marked as current. The UI will pick the
           // first appearance listed as current.
-          appearancesForSelection = if (isInitialLoad) appearanceOpt.to[Set] else Set(desiredAppearance),
+          appearancesForSelection = if (isInitialLoad) appearanceOpt.to(Set) else Set(desiredAppearance),
           lang                    = lang,
           bindings                = ctx.componentBindings
         )
@@ -116,7 +117,7 @@ trait BindingOps {
   ): Seq[(Option[String], String, Option[String], String)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]) =
-      bindingOpt.to[List] flatMap bindingMetadata headOption
+      bindingOpt.to(List) flatMap bindingMetadata headOption
 
     possibleAppearancesWithBindings(elemName, datatype, bindings) map {
       case (appearanceOpt, bindingOpt, _) ⇒
@@ -172,13 +173,13 @@ trait BindingOps {
     val allAttributes = {
 
       val typeFromDatatype =
-        for (elem ← datatypeMetadataOpt.to[List])
+        for (elem ← datatypeMetadataOpt.to(List))
         yield
           (elem, QName("type"), elem.stringValue)
 
       val bindAttributes = {
         for {
-          elem ← bindMetadataOpt.to[List]
+          elem ← bindMetadataOpt.to(List)
           att  ← elem /@ @*
         } yield
           (elem, QName(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)

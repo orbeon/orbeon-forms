@@ -22,6 +22,7 @@ import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 object Permissions {
 
@@ -46,7 +47,7 @@ object Permissions {
         groupname    = Option(metadataFromDB).map(_.child("groupname").stringValue),
         organization = Option(metadataFromDB).map(metadataEl ⇒ {
           val levelsEls = metadataEl.child("organization").child("level").map(_.stringValue)
-          Organization(levelsEls.to[List])
+          Organization(levelsEls.to(List))
         })
       )
       PermissionsAuthorization.authorizedOperations(permissions, currentUser, checkWithDataUser)

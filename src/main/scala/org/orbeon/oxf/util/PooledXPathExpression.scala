@@ -27,6 +27,7 @@ import org.orbeon.scaxon.Implicits
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: List[(String, XPathVariable)]) {
 
@@ -121,7 +122,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     }
 
   private def scalaIteratorToJavaList[T](i: Iterator[T]): ju.List[T] =
-    new ju.ArrayList(i.to[mutable.ArrayBuffer].asJava)
+    new ju.ArrayList(i.to(mutable.ArrayBuffer).asJava)
 
   private def itemToJavaKeepNodeInfoOrNull(item: Item) = item match {
     case v: AtomicValue ⇒ Value.convertToJava(v)

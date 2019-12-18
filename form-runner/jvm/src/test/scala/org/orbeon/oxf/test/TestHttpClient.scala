@@ -60,7 +60,7 @@ object TestHttpClient {
     val Host             = "localhost"
     val ContextPath      = "/orbeon"
     var OrbeonTokenValue = SecureUtils.randomHexId
-    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() + (OrbeonTokenLower → OrbeonTokenValue)
+    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() += (OrbeonTokenLower → OrbeonTokenValue)
     val sessions         = mutable.HashMap[String, Session]()
   }
 

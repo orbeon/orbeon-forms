@@ -32,6 +32,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
+import scala.collection.compat._
 
 trait IndexableBinding {
   def selectors        : List[Selector]
@@ -97,7 +98,7 @@ case class AbstractBinding(
     }
   }
 
-  val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.to[Set]
+  val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.to(Set)
 
   val labelFor                   : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
   val formatOpt                  : Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)

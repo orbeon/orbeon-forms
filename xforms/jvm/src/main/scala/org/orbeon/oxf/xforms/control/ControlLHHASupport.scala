@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.LHHASupport._
 import org.orbeon.oxf.xforms.control.XFormsControl._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import scala.collection.compat._
 
 trait ControlLHHASupport {
 
@@ -152,7 +153,7 @@ object LHHASupport {
       def nonEmptyOption[T](l: List[T]) = l.nonEmpty option l
 
       def alertsMatchingValidations = {
-        val failedValidationsIds = control.failedValidations.map(_.id).to[Set]
+        val failedValidationsIds = control.failedValidations.map(_.id).to(Set)
         nonEmptyOption(staticAlerts filter (_.forValidations intersect failedValidationsIds nonEmpty))
       }
 

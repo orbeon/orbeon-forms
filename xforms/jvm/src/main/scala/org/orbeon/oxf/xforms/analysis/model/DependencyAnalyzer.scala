@@ -20,6 +20,7 @@ import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableRefere
 import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
+import scala.collection.compat._
 
 // Analyze a tree of binds to determine expressions dependencies based on references to MIP variables,
 // that is to binds which have a `name` attribute. The result is an evaluation order which satisfies
@@ -51,7 +52,7 @@ object DependencyAnalyzer {
 
       val referencedVariableNamesIt = iterateExternalVariableReferences(expr) filter validBindNames
 
-      BindDetails(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to[Set])
+      BindDetails(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to(Set))
     }
   }
 
@@ -62,7 +63,7 @@ object DependencyAnalyzer {
     }
 
   def findMissingVariableReferences(expr: Expression, validBindNames: scala.collection.Set[String]): Set[String] =
-    (iterateExternalVariableReferences(expr) filterNot validBindNames).to[Set]
+    (iterateExternalVariableReferences(expr) filterNot validBindNames).to(Set)
 
   def containsVariableReference(expr: Expression, name: String): Boolean =
     iterateExternalVariableReferences(expr) contains name
@@ -92,7 +93,7 @@ object DependencyAnalyzer {
       val bindsIt   = iterateBinds(tree.topLevelBinds)
       val detailsIt = bindsIt flatMap (b ⇒ BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
-      detailsIt.to[List]
+      detailsIt.to(List)
     }
 
     // The algorithm requires all vertices so create all the ones which are referenced by name by expressions, but

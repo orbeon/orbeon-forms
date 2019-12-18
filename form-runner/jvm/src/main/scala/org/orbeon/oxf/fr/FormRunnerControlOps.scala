@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
+import scala.collection.compat._
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -146,7 +147,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             item       = contextItem,
             expr       = path map (_.value) mkString "/",
             namespaces = namespaces
-          ).asInstanceOf[Seq[NodeInfo]].to[List]
+          ).asInstanceOf[Seq[NodeInfo]].to(List)
         }
       )
     }

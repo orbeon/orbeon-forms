@@ -25,6 +25,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 // CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to
 // elements. Namely, we can bind:
@@ -69,7 +70,7 @@ object BindingDescriptor {
       findVirtualNameAndAppearance(oldElemName, oldDatatype, oldAppearances, descriptors)
 
     val newTuple =
-      findStaticNameAndAppearance(virtualName, newDatatype, newAppearanceOpt.to[Set], descriptors)
+      findStaticNameAndAppearance(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
 
     val oldTuple = (oldElemName, oldAppearances.headOption)
 

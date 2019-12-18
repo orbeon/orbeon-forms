@@ -25,9 +25,9 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
-import scala.collection.breakOut
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
+import scala.collection.compat._
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -82,9 +82,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     super.init(config)
     settingsOpt = Some(
       PortletSettings(
-        forwardHeaders     = config.getInitParameter("forward-headers").tokenizeToSet.map(name ⇒ name.toLowerCase → name)(breakOut),
+        forwardHeaders     = config.getInitParameter("forward-headers").tokenizeToSet.iterator.map(name ⇒ name.toLowerCase → name).toMap,
         forwardParams      = config.getInitParameter("forward-parameters").tokenizeToSet,
-        forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.map(name ⇒ name.toLowerCase → name)(breakOut),
+        forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.iterator.map(name ⇒ name.toLowerCase → name).toMap,
         keepParams         = config.getInitParameter("keep-parameters").tokenizeToSet,
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
@@ -353,7 +353,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       } yield
         name → values
 
-    val portletReqHeaders = portletRequestHeadersIt.to[List]
+    val portletReqHeaders = portletRequestHeadersIt.to(List)
 
     // Language information
     // NOTE: Format returned is e.g. "en_US" or "fr_FR".
@@ -379,7 +379,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       APISupport.headersToForward(portletReqHeaders, settings.forwardProperties ++ userHeadersToForward) ++
       languageHeader
 
-    val paramsToSet = keepFromPortalQueryIt(request, settings.forwardParams).to[List]
+    val paramsToSet = keepFromPortalQueryIt(request, settings.forwardParams).to(List)
 
     APISupport.Logger.debug(s"outgoing request headers: $headersToSet")
     APISupport.Logger.debug(s"outgoing request parameters: $paramsToSet")
@@ -388,7 +388,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       content = content,
       url     = url,
       path    = path,
-      headers = headersToSet.to[List],
+      headers = headersToSet.to(List),
       params  = paramsToSet
     )
   }

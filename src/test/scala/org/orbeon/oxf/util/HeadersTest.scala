@@ -18,6 +18,7 @@ import org.junit.Test
 import org.orbeon.oxf.http.Headers
 import Headers._
 import org.scalatestplus.junit.AssertionsForJUnit
+import scala.collection.compat._
 
 class HeadersTest extends AssertionsForJUnit {
 
@@ -37,7 +38,7 @@ class HeadersTest extends AssertionsForJUnit {
     val toFilterInRequest  = RequestHeadersToRemove  map (_ → List("NOT!"))
     val toFilterInResponse = ResponseHeadersToRemove map (_ → List("NOT!"))
 
-    assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) ⇒ k → v.to[List]}))
+    assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) ⇒ k → v.to(List)}))
     assert(lists === proxyAndCapitalizeHeaders(lists, request = true))
     assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
     assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))

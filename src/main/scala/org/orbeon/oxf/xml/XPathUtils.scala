@@ -27,6 +27,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 // These are older XPath utilities used by XPL. Don't expand on this as it's kept mostly for legacy purposes.
 object XPathUtils {
@@ -122,7 +123,7 @@ object XPathUtils {
       )
 
     val resultWithJava =
-      resultWithItemsIt.collect(itemToJavaUnwrap).to[List]
+      resultWithItemsIt.collect(itemToJavaUnwrap).to(List)
 
     if (resultWithJava.isEmpty)
       null

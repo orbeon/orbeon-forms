@@ -30,6 +30,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.oxf.util.CoreUtils._
+import scala.collection.compat._
 
 trait ContainerOps extends ControlOps {
 
@@ -127,7 +128,7 @@ trait ContainerOps extends ControlOps {
     controls flatMap controlElementsToDelete foreach (delete(_))
 
     // Update templates
-    updateTemplatesCheckContainers(findAncestorRepeatNames(containerElem).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(containerElem).to(Set))
 
     // Adjust selected td if needed
     newCellToSelectOpt foreach selectCell
@@ -212,7 +213,7 @@ trait ContainerOps extends ControlOps {
       case Direction.Left  ⇒ canDeleteContainer(container) && findAncestorContainersLeafToRoot(container).lengthCompare(if (IsSection(container)) 2 else 3) >= 0
     }
 
-  val ContainerDirectionCheck: List[(Direction, NodeInfo ⇒ Boolean)] = Direction.values.to[List] map { d ⇒
+  val ContainerDirectionCheck: List[(Direction, NodeInfo ⇒ Boolean)] = Direction.values.to(List) map { d ⇒
     d → (canContainerMove(_, d))
   }
 
@@ -288,7 +289,7 @@ trait ContainerOps extends ControlOps {
 
         // Update existing templates
         // NOTE: Could skip if top-level repeat
-        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to(Set))
 
         // Ensure new template rooted at iteration
         ensureTemplateReplaceContent(
@@ -316,7 +317,7 @@ trait ContainerOps extends ControlOps {
         findTemplateInstance(inDoc, controlName) foreach (delete(_))
 
         // Update existing templates
-        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(control).to(Set))
 
       } else if (repeat) {
         // Template should already exists an should have already been renamed if needed
@@ -325,7 +326,7 @@ trait ContainerOps extends ControlOps {
         val newInitialIterationsAttribute = getInitialIterationsAttribute(control)
 
         if (oldInitialIterationsAttribute != newInitialIterationsAttribute)
-          updateTemplatesCheckContainers(findAncestorRepeatNames(control, includeSelf = true).to[Set])
+          updateTemplatesCheckContainers(findAncestorRepeatNames(control, includeSelf = true).to(Set))
 
       } else if (! repeat) {
         // Template should not exist

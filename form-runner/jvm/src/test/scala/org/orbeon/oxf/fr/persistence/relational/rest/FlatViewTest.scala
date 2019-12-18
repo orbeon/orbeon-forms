@@ -19,6 +19,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.collection.compat._
 
 class FlatViewTest extends ResourceManagerTestBase with XMLSupport with AssertionsForJUnit {
 
@@ -34,7 +35,7 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
 
     val result = fixupDuplicates(values.iterator, List("qux"), values map (_.length) max)
 
-    assert(expected === result.to[List])
+    assert(expected === result.to(List))
   }
 
   @Test def extractPathsColsTest(): Unit = {

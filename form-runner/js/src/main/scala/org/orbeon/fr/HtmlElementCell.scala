@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.ClientNames._
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
+import scala.collection.compat._
 
 // This contains grid/cell operations acting on `html.Element`, which is on the output of the form
 // as seen in the browser.
@@ -26,7 +27,7 @@ object HtmlElementCell {
   implicit object HtmlElementCellOps extends CellOps[html.Element] {
 
     def attValueOpt    (u: html.Element, name: String): Option[String]     = Option(u.getAttribute(name))
-    def children       (u: html.Element, name: String): List[html.Element] = u.children.to[List].asInstanceOf[List[html.Element]]
+    def children       (u: html.Element, name: String): List[html.Element] = u.children.to(List).asInstanceOf[List[html.Element]]
     def parent         (u: Element)                   : Element            = u.parentElement
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 

@@ -42,6 +42,7 @@ import org.orbeon.xbl.ErrorSummary
 
 import scala.language.postfixOps
 import scala.util.Try
+import scala.collection.compat._
 
 trait FormRunnerActions {
 
@@ -279,7 +280,7 @@ trait FormRunnerActions {
 
       val pdfTiffParams =
         for {
-          format    ← RenderedFormat.values.to[List]
+          format    ← RenderedFormat.values.to(List)
           (path, _) ← pdfOrTiffPathOpt(
               urlsInstanceRootElem = findUrlsInstanceRootElem.get,
               format               = format,
@@ -494,7 +495,7 @@ trait FormRunnerActions {
 
     val newParams =
       for {
-        (name, values) ← inScopeContainingDocument.getRequestParameters.to[List]
+        (name, values) ← inScopeContainingDocument.getRequestParameters.to(List)
         if ! ParamsToExcludeUponModeChange(name)
         value          ← values
       } yield

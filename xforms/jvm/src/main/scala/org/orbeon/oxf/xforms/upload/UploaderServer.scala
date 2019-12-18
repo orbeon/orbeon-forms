@@ -43,6 +43,7 @@ import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 // Separate checking logic for sanity and testing
 trait UploadCheckerLogic {
@@ -108,7 +109,7 @@ object AllowedMediatypes {
     else if (mediatypeRanges contains WildcardMediatypeRange)
       Some(AllowedAnyMediatype)
     else
-      Some(AllowedSomeMediatypes(mediatypeRanges.to[Set]))
+      Some(AllowedSomeMediatypes(mediatypeRanges.to(Set)))
   }
 }
 
@@ -347,8 +348,8 @@ object UploaderServer {
     }
 
     def convertFileItemHeaders(headers: FileItemHeaders) =
-      for (name ← headers.getHeaderNames.asScala.to[List])
-        yield name → headers.getHeaders(name).asScala.to[List]
+      for (name ← headers.getHeaderNames.asScala.to(List))
+        yield name → headers.getHeaders(name).asScala.to(List)
 
     // The file will expire with the request
     // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first

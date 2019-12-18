@@ -16,6 +16,7 @@ package org.orbeon.datatypes
 import org.orbeon.datatypes.Mediatype.TypeOrSubtype._
 import org.orbeon.datatypes.Mediatype._
 import org.orbeon.datatypes.MediatypeRange._
+import scala.collection.compat._
 
 
 // Concrete mediatype, as opposed to `MediatypeRange` below
@@ -62,7 +63,7 @@ object MediatypeRange {
   case class  SingletonMediatypeRange   (mediatype: Mediatype) extends MediatypeRange { override def toString = mediatype.toString }
 
   def unapply(s: String): Option[MediatypeRange] = {
-    s.split("/", -1).to[List] match {
+    s.split("/", -1).to(List) match {
       case TypeOrSubtype(WildcardType)      :: TypeOrSubtype(WildcardType)          :: Nil ⇒ Some(WildcardMediatypeRange)
       case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(WildcardType)          :: Nil ⇒ Some(WildcardTypeMediatypeRange(typ))
       case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(subtype: SpecificType) :: Nil ⇒ Some(SingletonMediatypeRange(Mediatype(typ, subtype)))

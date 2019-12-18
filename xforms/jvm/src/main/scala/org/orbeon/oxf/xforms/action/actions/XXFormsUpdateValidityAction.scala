@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
+import scala.collection.compat._
 
 class XXFormsUpdateValidityAction extends XFormsAction {
 
@@ -28,7 +29,7 @@ class XXFormsUpdateValidityAction extends XFormsAction {
     val recurse = resolveBooleanAVT("recurse", default = false)
     synchronizeAndRefreshIfNeeded(context)
 
-    resolveStringAVT("control").to[List] flatMap
+    resolveStringAVT("control").to(List) flatMap
       (_.splitTo[List]())                flatMap
       resolveControl                     foreach
       (XXFormsUpdateValidityAction.updateValidity(_, recurse))

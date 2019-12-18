@@ -43,6 +43,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
+import scala.collection.compat._
 
 // The Form Runner function library
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -300,7 +301,7 @@ private object FormRunnerFunctions {
           }
         }
 
-      ArrayFunctions.createValue(allItems.to[Vector])
+      ArrayFunctions.createValue(allItems.to(Vector))
     }
   }
 

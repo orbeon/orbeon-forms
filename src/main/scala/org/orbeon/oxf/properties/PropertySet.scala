@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.compat._
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
 
@@ -99,7 +100,7 @@ class PropertySet {
         .replaceAllLiterally("\n", "\\n")
 
     val jsonProperties =
-      for ((name, prop) ← exactProperties.to[List].sortBy(_._1))
+      for ((name, prop) ← exactProperties.to(List).sortBy(_._1))
         yield
           s"""|  "$name": {
               |    "type": "${escapeJavaScript(prop.typ.toString)}",

@@ -36,8 +36,8 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 import scala.collection.JavaConverters._
-import scala.collection.generic.CanBuildFrom
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 /**
  * Connection to a URL.
@@ -90,7 +90,7 @@ class Connection(
             contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
 
           val headers =
-            urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to[List] } toMap
+            urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to(List) } toMap
 
           val headersWithContentType =
             headers ++ contentTypeHeader.toList
@@ -129,7 +129,7 @@ class Connection(
 
             val capitalizedHeaders =
               for {
-                (name, values) ← headers.to[List]
+                (name, values) ← headers.to(List)
                 if values ne null
                 value ← values
                 if value ne null
@@ -485,12 +485,12 @@ object Connection extends Logging {
   private def getPropertyHandleCustom(propertyName: String) = {
     val propertySet = Properties.instance.getPropertySet
 
-    propertySet.getNonBlankString(propertyName).to[List] ++
-      propertySet.getNonBlankString(propertyName + ".private").to[List] mkString " "
+    propertySet.getNonBlankString(propertyName).to(List) ++
+      propertySet.getNonBlankString(propertyName + ".private").to(List) mkString " "
   }
 
-  private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =
-    value.trimAllToOpt map (_.splitTo[T]()) getOrElse cbf().result()
+  private def valueAs[T[_]](value: String)(implicit cbf: Factory[String, T[String]]): T[String] =
+    value.trimAllToOpt map (_.splitTo[T]()) getOrElse cbf.newBuilder.result()
 
   // Get a Set of header names to forward from the configuration properties
   def headersToForwardFromProperty: Set[String] =
@@ -525,7 +525,7 @@ object Connection extends Logging {
     }
 
     for {
-      nameCapitalized ← headerNamesCapitalized.to[List]
+      nameCapitalized ← headerNamesCapitalized.to(List)
       nameLower       = nameCapitalized.toLowerCase
       values          ← getHeader(nameLower)
       if canForwardHeader(nameLower)
@@ -541,7 +541,7 @@ object Connection extends Logging {
 
   def getHeaderFromRequest(request: ExternalContext.Request): String ⇒ Option[List[String]] =
     Option(request) match {
-        case Some(request) ⇒ name ⇒ request.getHeaderValuesMap.asScala.get(name) map (_.to[List])
+        case Some(request) ⇒ name ⇒ request.getHeaderValuesMap.asScala.get(name) map (_.to(List))
         case None          ⇒ _    ⇒ None
       }
 

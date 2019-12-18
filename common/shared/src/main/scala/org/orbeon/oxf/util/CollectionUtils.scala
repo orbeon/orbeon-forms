@@ -15,10 +15,10 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.CoreUtils._
 
-import scala.collection.generic.CanBuildFrom
 import scala.collection.{AbstractIterator, IterableLike, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
+import scala.collection.compat._
 
 object CollectionUtils {
 
@@ -26,11 +26,11 @@ object CollectionUtils {
   // The caller can specify the type of the resulting values, e.g.:
   // - combineValues[String, AnyRef, Array]
   // - combineValues[String, String, List]
-  def combineValues[Key, U, T[_]](parameters: Seq[(Key, U)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(Key, T[U])] = {
+  def combineValues[Key, U, T[_]](parameters: Seq[(Key, U)])(implicit cbf: Factory[U, T[U]]): Seq[(Key, T[U])] = {
     val result = mutable.LinkedHashMap[Key, mutable.Builder[U, T[U]]]()
 
     for ((name, value) ← parameters)
-      result.getOrElseUpdate(name, cbf()) += value
+      result.getOrElseUpdate(name, cbf.newBuilder) += value
 
     result map { case (k, v) ⇒ k → v.result } toList
   }
@@ -91,11 +91,11 @@ object CollectionUtils {
 
   implicit class IterableLikeOps[A, Repr](private val t: IterableLike[A, Repr]) extends AnyVal {
 
-    def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
+    def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: Factory[A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
       for (elem ← t) {
         val key = f(elem)
-        val bldr = m.getOrElseUpdate(key, cbf())
+        val bldr = m.getOrElseUpdate(key, cbf.newBuilder)
         bldr += elem
       }
       val b = List.newBuilder[(K, Repr)]
@@ -117,7 +117,7 @@ object CollectionUtils {
         }
       }
 
-      result.to[List]
+      result.to(List)
     }
 
     // Return duplicate values in the order in which they appear
@@ -131,7 +131,7 @@ object CollectionUtils {
         else
           seen += x
       }
-      result.to[List]
+      result.to(List)
     }
   }
 
@@ -141,7 +141,7 @@ object CollectionUtils {
 
   implicit class IntIteratorOps(private val i: Iterator[Int]) extends AnyVal {
     def codePointsToString = {
-      val a = i.to[Array]
+      val a = i.to(Array)
       new String(a, 0, a.length)
     }
   }

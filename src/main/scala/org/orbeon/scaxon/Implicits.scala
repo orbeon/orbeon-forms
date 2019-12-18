@@ -20,6 +20,7 @@ import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
 import scala.collection.JavaConverters._
 import scala.collection.{Iterator, Seq}
+import scala.collection.compat._
 
 object Implicits {
 
@@ -81,5 +82,5 @@ object Implicits {
     def hasNext = current ne null
   }
 
-  implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).to[List]
+  implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).to(List)
 }

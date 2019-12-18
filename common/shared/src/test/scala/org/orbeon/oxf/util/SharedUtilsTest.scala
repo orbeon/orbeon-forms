@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
+import scala.collection.compat._
 
 class SharedUtilsTest extends AnyFunSpec {
 
@@ -104,7 +105,7 @@ class SharedUtilsTest extends AnyFunSpec {
     assert(expectedAsList   === combineValues[String, String, List](parameters))
     assert(expectedAsVector === combineValues[String, String, Vector](parameters))
     assert(expectedAsSet    === combineValues[String, String, Set](parameters))
-    assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
+    assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to(List)}))
   }
 
   describe("The `trimAllToOpt` function") {
@@ -156,9 +157,9 @@ class SharedUtilsTest extends AnyFunSpec {
     for ((desc, in, out) ← expected) {
       it(s"must pass $desc") {
         assert(out === in.splitTo[List]())
-        assert(out === in.splitTo[Array]().to[List])
-        assert(out.to[Set] === in.splitTo[Set]())
-        assert(out.to[mutable.LinkedHashSet].to[List] === in.splitTo[mutable.LinkedHashSet]().to[List])
+        assert(out === in.splitTo[Array]().to(List))
+        assert(out.to(Set) === in.splitTo[Set]())
+        assert(out.to(mutable.LinkedHashSet).to(List) === in.splitTo[mutable.LinkedHashSet]().to(List))
       }
     }
   }

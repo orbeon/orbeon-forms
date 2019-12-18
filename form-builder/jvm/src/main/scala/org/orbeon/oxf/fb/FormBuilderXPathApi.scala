@@ -36,6 +36,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import scala.collection.compat._
 
 object FormBuilderXPathApi {
 
@@ -48,7 +49,7 @@ object FormBuilderXPathApi {
 
     FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlName)) foreach { controlElem ⇒
       assert(FormRunner.isRepeat(controlElem))
-      updateTemplatesCheckContainers(FormRunner.findAncestorRepeatNames(controlElem).to[Set])
+      updateTemplatesCheckContainers(FormRunner.findAncestorRepeatNames(controlElem).to(Set))
     }
   }
 
@@ -134,7 +135,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def selectCellForControlId(controlId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).to[List] flatMap
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).to(List) flatMap
       (_ parent CellTest) foreach selectCell
   }
 
@@ -434,7 +435,7 @@ object FormBuilderXPathApi {
       isInitialLoad,
       builtinDatatype,
       desiredAppearance
-    )(FormBuilderDocContext()).to[Array]
+    )(FormBuilderDocContext()).to(Array)
 
   //@XPathFunction
   def isValidListOfMediatypeRanges(s: String): Boolean = {
@@ -560,7 +561,7 @@ object FormBuilderXPathApi {
     import spray.json._
 
     val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
-    rolesJsonOpt.to[List].flatMap(_.parseJson.convertTo[List[String]])
+    rolesJsonOpt.to(List).flatMap(_.parseJson.convertTo[List[String]])
   }
 
   //@XPathFunction

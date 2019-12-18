@@ -17,6 +17,7 @@ import org.orbeon.xforms.{$, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalatest.funspec.AnyFunSpec
+import scala.collection.compat._
 
 
 class ClientFormRunnerApiTest extends AnyFunSpec {
@@ -167,7 +168,7 @@ class ClientFormRunnerApiTest extends AnyFunSpec {
 
     it("must find the correct iterations for the `name` controls") {
       assert(
-        List(List(1), List(2)) === (FormRunnerAPI.findControlsByName("name").to[List] map (e ⇒ XFormsId.fromEffectiveId(e.id).iterations))
+        List(List(1), List(2)) === (FormRunnerAPI.findControlsByName("name").to(List) map (e ⇒ XFormsId.fromEffectiveId(e.id).iterations))
       )
     }
   }

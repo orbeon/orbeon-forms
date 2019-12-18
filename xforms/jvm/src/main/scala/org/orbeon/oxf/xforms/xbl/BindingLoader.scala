@@ -24,7 +24,9 @@ import org.orbeon.oxf.xml.{Dom4j, XMLParsing}
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
+import scala.collection.compat._
+import org.orbeon.oxf.util.CollectionUtils._
 
 trait BindingLoader extends Logging {
 
@@ -107,7 +109,7 @@ trait BindingLoader extends Logging {
         import XBLAssets._
 
         def collectUniqueReferenceElements(getHeadElements : AbstractBinding ⇒ Seq[HeadElement]) =
-          (orderedHeadElements(baselineBindings, getHeadElements).collect{ case e: ReferenceElement ⇒ e.src }(breakOut): mutable.LinkedHashSet[String]).to[List]
+          (orderedHeadElements(baselineBindings, getHeadElements).iterator.collect{ case e: ReferenceElement ⇒ e.src }.to(mutable.LinkedHashSet).to(List))
 
         (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles), allCheckedPaths)
       }
@@ -237,7 +239,7 @@ trait BindingLoader extends Logging {
 
     val newBindings =
       for {
-        elem       ← elements.to[List]
+        elem       ← elements.to(List)
         newBinding ← extractXBLBindings(None, -1, elem)
       } yield
         newBinding
@@ -250,12 +252,12 @@ trait BindingLoader extends Logging {
 
   private def extractAndIndexFromPaths(
     index : BindingIndex[IndexableBinding],
-    paths : TraversableOnce[String]
+    paths : IterableOnce[String]
   ): (BindingIndex[IndexableBinding], List[AbstractBinding]) = {
 
     val newBindings =
       for {
-        xblPath              ← paths.to[List]
+        xblPath              ← paths.to(List)
         (elem, lastModified) = readXBLResource(xblPath)
         newBinding           ← extractXBLBindings(Some(xblPath), lastModified, elem)
       } yield
@@ -381,7 +383,7 @@ trait BindingLoader extends Logging {
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement ← Dom4j.elements(xblElement, XBL_BINDING_QNAME).to[List]
+      bindingElement ← Dom4j.elements(xblElement, XBL_BINDING_QNAME).to(List)
       _              ← Option(bindingElement.attributeValue(ELEMENT_QNAME))
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)

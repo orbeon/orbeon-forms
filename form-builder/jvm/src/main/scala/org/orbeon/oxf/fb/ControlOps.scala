@@ -46,6 +46,7 @@ import org.orbeon.xforms.XFormsId
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import scala.collection.compat._
 
 /*
  * Form Builder: operations on controls.
@@ -60,7 +61,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v ⇒ v.localName → v) toMap
 
   private val PossibleResourcePointerNames: Set[String] =
-    (LHHA.values map (_.entryName)).to[Set] ++
+    (LHHA.values map (_.entryName)).to(Set) ++
       FRResourceElemLocalNamesToQNames.keys +
       "itemset"
 
@@ -190,7 +191,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       controlElementsToDelete(controlElem) foreach (delete(_))
 
       if (updateTemplates)
-        self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to[Set])(FormBuilderDocContext())
+        self.updateTemplatesCheckContainers(findAncestorRepeatNames(cellElem).to(Set))(FormBuilderDocContext())
 
       undo
     }
@@ -230,7 +231,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       renameTemplate(oldName, newName)
 
       findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl ⇒
-        updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to[Set])
+        updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to(Set))
       }
 
       renameControlReferences(oldName, newName)
@@ -571,7 +572,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
 
   def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
-    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)).to[Set]
+    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)).to(Set)
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =

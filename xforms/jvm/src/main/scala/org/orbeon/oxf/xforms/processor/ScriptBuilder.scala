@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocu
 import org.orbeon.xforms.{EventNames, rpc}
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.compat._
 
 object ScriptBuilder {
 
@@ -210,7 +211,7 @@ object ScriptBuilder {
           } yield
             delayedEvent.toServerEvent(currentTime),
         userScripts =
-          for (script ← containingDocument.getScriptsToRun.to[List] collect { case Right(s) ⇒ s })
+          for (script ← containingDocument.getScriptsToRun.to(List) collect { case Right(s) ⇒ s })
             yield
               rpc.UserScript(
                 functionName = script.script.shared.clientName,

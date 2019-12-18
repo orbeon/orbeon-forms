@@ -19,6 +19,7 @@ import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 // This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition
 // as seen in Form Builder.
@@ -32,7 +33,7 @@ object NodeInfoCell {
   implicit object NodeInfoCellOps extends CellOps[NodeInfo] {
 
     def attValueOpt    (u: NodeInfo, name: String): Option[String] = u attValueOpt name
-    def children       (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
+    def children       (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to(List)
     def parent         (u: NodeInfo)              : NodeInfo       = u.parentUnsafe
     def hasChildElement(u: NodeInfo)              : Boolean        = u.hasChildElement
 
@@ -69,7 +70,7 @@ object NodeInfoCell {
         1
 
     ArrayFunctions.createValue(
-      allRowCells.cells.to[Vector] map { row ⇒
+      allRowCells.cells.to(Vector) map { row ⇒
         new SequenceExtent(
             row collect {
               case Cell(u, None, x, y, h, w) ⇒
@@ -96,7 +97,7 @@ object NodeInfoCell {
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to[Vector] map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row ⇒
         new SequenceExtent(
           row collect {
             case Cell(u, None, x, y, h, w) ⇒

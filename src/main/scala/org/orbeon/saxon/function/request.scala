@@ -22,6 +22,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits._
+import scala.collection.compat._
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
@@ -101,7 +102,7 @@ class UserGroup extends DefaultFunctionSupport with RuntimeDependentFunction {
 
 class UserRoles extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    stringSeqToSequenceIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
+    stringSeqToSequenceIterator(NetUtils.getExternalContext.getRequest.credentials.to(List) flatMap (_.roles map (_.roleName)))
 }
 
 class UserOrganizations extends DefaultFunctionSupport with RuntimeDependentFunction {

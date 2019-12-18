@@ -15,7 +15,6 @@ package org.orbeon.oxf.http
 
 import org.orbeon.oxf.util.{DateUtils, NumericUtils}
 
-import scala.collection.breakOut
 
 object Headers {
 
@@ -220,5 +219,5 @@ object Headers {
     "X-XSS-Protection"
   )
 
-  private val lowercaseToCommonCapitalization: Map[String, String] = CommonHeaders.map(name ⇒ name.toLowerCase → name)(breakOut)
+  private val lowercaseToCommonCapitalization: Map[String, String] = CommonHeaders.iterator.map(name ⇒ name.toLowerCase → name).toMap
 }

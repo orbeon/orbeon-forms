@@ -34,7 +34,9 @@ import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
+
+import scala.collection.compat._
 
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait
@@ -434,7 +436,7 @@ object XFormsModelSubmissionBase {
           List(e)
         } else {
           e.attributes.asScala.filter(isLocallyNonRelevant) ++:
-            (e.elements.asScala.flatMap(processElement)(breakOut): List[Node])
+            e.elements.asScala.to(List).flatMap(processElement)
         }
 
       processElement(doc.getRootElement) foreach (_.detach())

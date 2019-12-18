@@ -18,6 +18,7 @@ import java.net.{URLDecoder, URLEncoder}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
 import spray.json._
+import scala.collection.compat._
 
 sealed trait UserRole   { def roleName: String }
 case class   SimpleRole      (roleName: String)                           extends UserRole
@@ -149,7 +150,7 @@ object Credentials {
               case _               ⇒ deserializationError("string value expected")
             }
 
-          Organization(levels = levels.to[List])
+          Organization(levels = levels.to(List))
         case _ ⇒ deserializationError("array value expected")
       }
 
@@ -193,8 +194,8 @@ object Credentials {
             Credentials(
               username      = username,
               group         = groupOpt,
-              roles         = roles.to[List],
-              organizations = organizations.to[List]
+              roles         = roles.to(List),
+              organizations = organizations.to(List)
             )
           )
 

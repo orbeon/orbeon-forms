@@ -32,6 +32,7 @@ import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 object SimpleDataMigration {
 
@@ -290,7 +291,7 @@ object SimpleDataMigration {
 
                   processLevel(
                     parents          = nodes,
-                    binds            = bind.children.to[List],
+                    binds            = bind.children.to(List),
                     templateRootElem = newTemplateRootElem getOrElse templateRootElem,
                     path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
                   )
@@ -306,7 +307,7 @@ object SimpleDataMigration {
       findFormBindsRoot(enclosingModel).toList flatMap { bind ⇒
         processLevel(
           parents          = List(dataToMigrateRootElem),
-          binds            = bind.children.to[List],
+          binds            = bind.children.to(List),
           templateRootElem = templateInstanceRootElem,
           path             = Nil
         )

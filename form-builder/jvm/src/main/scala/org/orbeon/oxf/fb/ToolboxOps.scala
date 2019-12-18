@@ -39,6 +39,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable
+import scala.collection.compat._
 
 
 object ToolboxOps {
@@ -148,7 +149,7 @@ object ToolboxOps {
           insert(into = bind, origin = findBindAttributesTemplate(binding))
 
           // This can impact templates
-          updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to[Set])
+          updateTemplatesCheckContainers(findAncestorRepeatNames(gridTd).to(Set))
 
           Undo.pushUserUndoAction(InsertControl(newControlElem.id))
 
@@ -236,7 +237,7 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to(Set))
 
       // Select first grid cell
       if (withGrid)
@@ -947,7 +948,7 @@ object ToolboxOps {
     }
 
     // Update ancestor templates if any
-    updateTemplatesCheckContainers(findAncestorRepeatNames(intoContainerElem, includeSelf = true).to[Set])
+    updateTemplatesCheckContainers(findAncestorRepeatNames(intoContainerElem, includeSelf = true).to(Set))
 
     // Make sure new grids and cells are annotated
     annotateGridsAndCells(newContainerElem)
@@ -1060,7 +1061,7 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).to[Set])
+      updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).to(Set))
 
       InsertControl(newControlElem.id)
     }
@@ -1069,7 +1070,7 @@ object ToolboxOps {
   private object Private {
 
     // This is for `insertNewControl`
-    val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.to[Set] - LHHA.Alert) map (_.entryName)
+    val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.to(Set) - LHHA.Alert) map (_.entryName)
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =

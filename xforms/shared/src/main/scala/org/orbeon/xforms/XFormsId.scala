@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils._
+import scala.collection.compat._
 
 // Structured representation of an id
 case class XFormsId(staticId: String, containers: List[String], iterations: List[Int])
@@ -26,8 +27,8 @@ object XFormsId {
   def fromEffectiveId(effectiveId: String): XFormsId =
     XFormsId(
       getStaticIdFromId(effectiveId),
-      getEffectiveIdPrefixParts(effectiveId).to[List],
-      getEffectiveIdSuffixParts(effectiveId).to[List]
+      getEffectiveIdPrefixParts(effectiveId).to(List),
+      getEffectiveIdSuffixParts(effectiveId).to(List)
     )
 
   /**

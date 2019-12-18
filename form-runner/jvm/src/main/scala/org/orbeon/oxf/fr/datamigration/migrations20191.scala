@@ -30,6 +30,7 @@ import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.{Failure, Success}
+import scala.collection.compat._
 
 case class Migration20191(
   containerPath : List[PathElem],
@@ -71,7 +72,7 @@ object MigrationOps20191 extends MigrationOps {
           containerPath = containerNames map PathElem.apply,
           newGridElem   = PathElem(gridName),
           afterElem     = afterElem flatMap getControlNameOpt map PathElem.apply,
-          content       = (findNestedControls(gridElem) map getControlName map PathElem.apply).to[List],
+          content       = (findNestedControls(gridElem) map getControlName map PathElem.apply).to(List),
           topLevel      = topLevel
         )
 
@@ -86,7 +87,7 @@ object MigrationOps20191 extends MigrationOps {
         updateWithBindingPath = updateWithBindingPath
       )
 
-    migrations.nonEmpty option MigrationSet20191(migrations.to[List])
+    migrations.nonEmpty option MigrationSet20191(migrations.to(List))
   }
 
   def encodeMigrationsToJson(

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
+import scala.collection.compat._
 
 object FormRunnerSupport {
   private val FindUUIDInHTMLBodyRE = """(?s).+name="\$uuid"\s+value="([^"]+)".+""".r
@@ -63,7 +64,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     mode        : String,
     formVersion : String  = "", // not used yet
     document    : String  = "", // not used yet
-    query       : TraversableOnce[(String, String)] = Nil,
+    query       : IterableOnce[(String, String)] = Nil,
     initialize  : Boolean = true,
     content     : Option[StreamedContent] = None
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {

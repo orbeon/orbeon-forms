@@ -31,6 +31,7 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.|
 import scala.util.Try
+import scala.collection.compat._
 
 class OrbeonClientTest extends AsyncFunSpec {
 
@@ -166,7 +167,7 @@ class OrbeonClientTest extends AsyncFunSpec {
         // https://github.com/hmil/RosHTTP/issues/68
         val setCookieHeaders =
           res.headers.asInstanceOf[fr.hmil.roshttp.util.HeaderMap[Any]].get("Set-Cookie").toList flatMap
-            (_.asInstanceOf[js.Array[String]].to[List])
+            (_.asInstanceOf[js.Array[String]].to(List))
 
         val HeaderStart = s"JSESSIONID=$serverPrefix~"
 

@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.embedding.FormRunnerMode
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
+import scala.collection.compat._
 
 object API {
 
@@ -45,7 +46,7 @@ object API {
       proxyPage(
         settings.formRunnerURL,
         path,
-        Option(headers) map (_.asScala.to[List]) getOrElse Nil
+        Option(headers) map (_.asScala.to(List)) getOrElse Nil
       )
     }
 

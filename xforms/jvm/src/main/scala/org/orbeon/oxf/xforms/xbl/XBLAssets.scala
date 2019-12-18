@@ -17,7 +17,8 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
+import scala.collection.compat._
 
 object XBLAssets {
 
@@ -61,7 +62,7 @@ object XBLAssets {
     bindings        : Iterable[AbstractBinding],
     getHeadElements : AbstractBinding ⇒ Seq[HeadElement]
   ): List[HeadElement] =
-    ((bindings.to[List] sortBy (_.cssName)).flatMap(getHeadElements)(breakOut): mutable.LinkedHashSet[HeadElement]).to[List]
+    (bindings.to(List) sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
 
   // Output baseline, remaining, and inline resources
   def outputResources(
@@ -73,7 +74,7 @@ object XBLAssets {
   ): Unit = {
 
     // For now, actual builtin resources always include the baseline builtin resources
-    val builtinBaseline: mutable.LinkedHashSet[String] = builtin.map(_.assetPath(minimal))(breakOut)
+    val builtinBaseline: mutable.LinkedHashSet[String] = builtin.iterator.map(_.assetPath(minimal)).to(mutable.LinkedHashSet)
     val allBaseline = builtinBaseline ++ xblBaseline
 
     // Output baseline resources with a CSS class
@@ -82,8 +83,8 @@ object XBLAssets {
     // This is in the order defined by XBLBindings.orderedHeadElements
     val xbl = headElements
 
-    val builtinUsed: mutable.LinkedHashSet[String] = builtin.map(_.assetPath(minimal))(breakOut)
-    val xblUsed: List[String] = xbl.collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
+    val builtinUsed: mutable.LinkedHashSet[String] = builtin.iterator.map(_.assetPath(minimal)).to(mutable.LinkedHashSet)
+    val xblUsed: List[String] = xbl.iterator.collect({ case e: ReferenceElement ⇒ e.src }).to(List)
 
     // Output remaining resources if any, with no CSS class
     builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))

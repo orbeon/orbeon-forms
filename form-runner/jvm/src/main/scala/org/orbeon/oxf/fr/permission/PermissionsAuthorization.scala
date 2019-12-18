@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.permission
 
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.util.NetUtils
+import scala.collection.compat._
 
 object PermissionsAuthorization {
 
@@ -83,7 +84,7 @@ object PermissionsAuthorization {
         }
       case RolesAnyOf(permissionRoles) ⇒
         permissionRoles.exists(permissionRoleName ⇒
-          currentUser.to[List] flatMap (_.roles) exists {
+          currentUser.to(List) flatMap (_.roles) exists {
             case SimpleRole(userRoleName) ⇒
               userRoleName == permissionRoleName
             case ParametrizedRole(userRoleName, userOrganizationName) ⇒

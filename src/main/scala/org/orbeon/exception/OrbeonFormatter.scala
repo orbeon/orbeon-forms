@@ -18,6 +18,7 @@ import org.orbeon.errorified._
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import scala.collection.compat._
 
 // Orbeon-specific exception formatter
 object OrbeonFormatter extends Formatter {
@@ -49,7 +50,7 @@ object OrbeonFormatter extends Formatter {
         filterLineCol(locationData.line),
         filterLineCol(locationData.col),
         description,
-        params.to[List]
+        params.to(List)
       )
     }
 }

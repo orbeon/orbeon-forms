@@ -20,6 +20,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.{mutable ⇒ m}
+import scala.collection.compat._
 
 class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName ⇒ Boolean) {
 
@@ -59,7 +60,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
       for (bindElement ← bindElements)
         yield new StaticBind(bindTree, bindElement, model, preceding)
 
-    staticBinds.to[List]
+    staticBinds.to(List)
   }
 
   def hasBinds = topLevelBinds.nonEmpty

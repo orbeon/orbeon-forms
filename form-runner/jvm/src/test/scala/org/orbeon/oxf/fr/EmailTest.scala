@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import scala.collection.compat._
 
 class EmailTest
   extends DocumentTestBase
@@ -48,7 +49,7 @@ class EmailTest
         searchResult map { case ControlBindPathHoldersResources(_, _, path, _, _) ⇒ path map (_.value) mkString "/" } distinct
 
       val values =
-        searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to[List]
+        searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to(List)
 
       (values, distinctPaths)
     }

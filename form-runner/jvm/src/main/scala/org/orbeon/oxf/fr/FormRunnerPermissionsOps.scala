@@ -29,6 +29,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 trait FormRunnerPermissionsOps {
 
@@ -196,7 +197,7 @@ trait FormRunnerPermissionsOps {
   }
 
   def orbeonRolesFromCurrentRequest: Set[String] =
-    NetUtils.getExternalContext.getRequest.credentials.to[List].flatMap(_.roles).map(_.roleName).to[Set]
+    NetUtils.getExternalContext.getRequest.credentials.to(List).flatMap(_.roles).map(_.roleName).to(Set)
 
   //@XPathFunction
   def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =

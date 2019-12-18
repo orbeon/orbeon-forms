@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
@@ -96,7 +97,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     val namesWithContainers =
       for {
-        container ← findAncestorContainersLeafToRoot(descendant, includeSelf).to[List]
+        container ← findAncestorContainersLeafToRoot(descendant, includeSelf).to(List)
         name      ← getControlNameOpt(container)
         if includeNonRepeatedGrids || ! (IsGrid(container) && ! isRepeat(container))
       } yield

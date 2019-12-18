@@ -20,6 +20,7 @@ import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
+import scala.collection.compat._
 
 // Companion for `fr:dnd-repeat`
 object DndRepeat {
@@ -91,7 +92,7 @@ object DndRepeat {
               yield nextAllItems(i)
 
           val excludedTargets = startLevelOpt match {
-            case Some(startLevel) ⇒ nextDndItemIt.takeWhile(e ⇒ findElemLevel(e).exists(_ > startLevel)).to[List]
+            case Some(startLevel) ⇒ nextDndItemIt.takeWhile(e ⇒ findElemLevel(e).exists(_ > startLevel)).to(List)
             case None             ⇒ Nil
           }
 

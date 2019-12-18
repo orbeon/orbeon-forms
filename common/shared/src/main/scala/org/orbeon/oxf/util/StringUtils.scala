@@ -15,9 +15,9 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.CoreUtils._
 
-import scala.collection.generic.CanBuildFrom
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
+import scala.collection.compat._
 
 @JSExportTopLevel("ORBEON.common.StringUtils")
 object StringUtils {
@@ -68,9 +68,9 @@ object StringUtils {
      * val result: Set[String]           = splitTo("a b")(breakOut)
      * val result: LinkedHashSet[String] = splitTo("a b")(breakOut)
      */
-    def splitTo[T[_]](sep: String = null, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
+    def splitTo[T[_]](sep: String = null, max: Int = 0)(implicit cbf: Factory[String, T[String]]): T[String] = {
 
-      val builder = cbf()
+      val builder = cbf.newBuilder
 
       if (s ne null) {
         val len = s.length

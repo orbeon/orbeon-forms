@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 object SearchOps {
 
@@ -36,7 +37,7 @@ object SearchOps {
     currentUser : Option[Credentials]
   ): List[String] = {
     val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
-    val userParametrizedRoles = currentUser.to[List].flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) ⇒ role }
+    val userParametrizedRoles = currentUser.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) ⇒ role }
     val usefulUserParametrizedRoles = userParametrizedRoles.filter(role ⇒ {
       val userWithJustThisRole = currentUser.map(_.copy(roles = List(role)))
       val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
@@ -63,7 +64,7 @@ object SearchOps {
       val organization = {
         val levels = Option(metadataOrNullEl)
           .flatMap(_.firstChildOpt("organization"))
-          .map(_.child("level").to[List].map(_.stringValue))
+          .map(_.child("level").to(List).map(_.stringValue))
         levels.map(Organization.apply)
       }
 

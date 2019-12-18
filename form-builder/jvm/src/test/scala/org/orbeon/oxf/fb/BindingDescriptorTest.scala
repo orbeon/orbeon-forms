@@ -25,6 +25,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import scala.collection.compat._
 
 class BindingDescriptorTest
   extends DocumentTestBase
@@ -126,7 +127,7 @@ class BindingDescriptorTest
           oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
           newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
         } locally {
-          assert(expected === newElementName(oldControlName, oldT, oldAppearance.to[Set], newT, newAppearance, Bindings))
+          assert(expected === newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
         }
       }
 

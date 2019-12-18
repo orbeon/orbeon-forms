@@ -32,6 +32,7 @@ import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
 
 import org.orbeon.oxf.util.CoreUtils._
+import scala.collection.compat._
 
 object Wizard {
 
@@ -94,7 +95,7 @@ object Wizard {
 
   //@XPathFunction
   def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
-    gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to[List]) map { sectionStatus ⇒
+    gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to(List)) map { sectionStatus ⇒
       MapFunctions.createValue(
         Map[AtomicValue, ValueRepresentation](
           (SaxonUtils.fixStringValue("name")                         , sectionStatus.name),

@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Try
+import scala.collection.compat._
 
 trait ClientXFormsTest extends AssertionsForJUnit with FormRunnerOps {
 
@@ -89,8 +90,8 @@ trait ClientXFormsTest extends AssertionsForJUnit with FormRunnerOps {
 
     def clickCheckbox() = clickElementByCSS("#hide-checkbox input")
 
-    def liGroupElements  = cssSelector("#group-begin-ul-group ~ li:not(.xforms-group-begin-end)").findAllElements.to[List]
-    def divGroupElements = cssSelector("#div-group > div").findAllElements.to[List]
+    def liGroupElements  = cssSelector("#group-begin-ul-group ~ li:not(.xforms-group-begin-end)").findAllElements.to(List)
+    def divGroupElements = cssSelector("#div-group > div").findAllElements.to(List)
 
     def checkNonRelevantClasses(elements: List[Element]) = {
       elements(0).classes should not contain ("class42")

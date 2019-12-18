@@ -28,6 +28,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import scala.collection.compat._
 
 case class Migration48(
   containerPath : List[PathElem],
@@ -64,7 +65,7 @@ object MigrationOps48 extends MigrationOps {
         updateWithBindingPath = updateWithBindingPath
       )
 
-    migrations.nonEmpty option MigrationSet48(migrations.to[List])
+    migrations.nonEmpty option MigrationSet48(migrations.to(List))
   }
 
   def encodeMigrationsToJson(
@@ -106,7 +107,7 @@ object MigrationOps48 extends MigrationOps {
           }
       }
 
-    MigrationSet48(migrations.flatten.to[List])
+    MigrationSet48(migrations.flatten.to(List))
   }
 
   def migrateDataFrom(
@@ -211,7 +212,7 @@ object MigrationOps48 extends MigrationOps {
 
         val containerBindElem = findBindByName(outerDocument, containerName).toList
 
-        val existingGridBindContent = (containerBindElem child *).to[List]
+        val existingGridBindContent = (containerBindElem child *).to(List)
 
         insert(
           into = containerBindElem,
@@ -294,7 +295,7 @@ object MigrationOps48 extends MigrationOps {
 
             // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
             // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
-            (parentNode, nodes.to[List], pathToChildNodes, iterationElem)
+            (parentNode, nodes.to(List), pathToChildNodes, iterationElem)
           }
       }
   }

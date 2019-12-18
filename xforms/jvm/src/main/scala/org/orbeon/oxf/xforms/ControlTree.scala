@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
+import scala.collection.compat._
 
 private class ControlIndex {
 
@@ -125,7 +126,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       val allControls = _controlIndex.effectiveIdsToControls.values
       if (state.isEmpty) {
         // Copy list because it can be modified concurrently as events are being dispatched and handled
-        val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.to[List]
+        val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.to(List)
         updateValueControls(controlIds)
         dispatchRefreshEvents(controlIds, isInitial = true)
       } else {

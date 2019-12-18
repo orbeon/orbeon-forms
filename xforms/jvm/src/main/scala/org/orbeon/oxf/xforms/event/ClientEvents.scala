@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.xforms.{EventNames, XFormsId}
+import scala.collection.compat._
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -72,7 +73,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       Nil
 
   def extractServerEventsElements(rootElement: Element): List[Element] =
-    Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME).to[List]
+    Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME).to(List)
 
   // Entry point called by the server: process a sequence of incoming client events.
   def processEvents(

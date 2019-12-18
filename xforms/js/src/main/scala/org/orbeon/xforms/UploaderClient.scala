@@ -26,6 +26,7 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.util.{Failure, Success}
+import scala.collection.compat._
 
 case class UploadEvent(form: html.Form, upload: Upload)
 
@@ -199,7 +200,7 @@ object UploaderClient {
           case FileExtractor(name, value) ⇒ name → value(0) // for now take the first file only
         }
 
-      it.to[List] match {
+      it.to(List) match {
         case l @ List(_, _) ⇒ // exactly two items
           val d = new dom.FormData
           l foreach { case (name, value) ⇒ d.append(name, value) }

@@ -21,6 +21,7 @@ import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.CollectionUtils
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 class AddOrbeonAuthHeadersFilter
   extends PortletFilter
@@ -79,7 +80,7 @@ object FormRunnerAuthFilter {
     val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
       userRoles  = req,
       session    = req.getPortletSession,
-      getHeader  = req.getProperties(_).asScala.to[List]
+      getHeader  = req.getProperties(_).asScala.to(List)
     ).toMap
 
     wrap(req, FormRunnerAuth.AllHeaderNamesLower, authHeaders)

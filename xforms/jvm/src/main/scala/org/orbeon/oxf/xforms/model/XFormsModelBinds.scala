@@ -35,6 +35,7 @@ import org.orbeon.scaxon.Implicits._
 import scala.collection.{mutable ⇒ m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 class XFormsModelBinds(protected val model: XFormsModel)
   extends RebuildBindOps
@@ -64,7 +65,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
     def hasSuccessfulErrorConstraints =
       bind.staticBind.constraintsByLevel.nonEmpty option {
-        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to[List] flatMap { mips ⇒
+        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips ⇒
           failedConstraintMIPs(mips, bindNode, collector)
         } isEmpty
       }

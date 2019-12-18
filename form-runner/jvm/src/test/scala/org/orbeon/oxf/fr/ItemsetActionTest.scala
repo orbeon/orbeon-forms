@@ -17,6 +17,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import scala.collection.compat._
 
 class ItemsetActionTest
   extends DocumentTestBase
@@ -99,7 +100,7 @@ class ItemsetActionTest
                 instanceRootElement child "*:metadata" descendantOrSelf * att "id" map (_.stringValue)
 
               val uniqueIdsInUse           = FormRunner.itemsetIdsInUse(instanceRootElement)
-              val uniqueMetadataItemsetIds = metadataItemsetIds.to[Set]
+              val uniqueMetadataItemsetIds = metadataItemsetIds.to(Set)
 
               assert(uniqueIdsInUse == uniqueMetadataItemsetIds)
             }

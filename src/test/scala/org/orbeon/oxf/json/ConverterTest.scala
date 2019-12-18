@@ -34,6 +34,7 @@ import spray.json._
 
 import scala.language.postfixOps
 import scala.xml.Elem
+import scala.collection.compat._
 
 object ConverterTest {
 
@@ -212,7 +213,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
 
   describe("Escaping of special characters") {
 
-    val codePointsToEscape           = ((0 to 0x1F).to[Set] + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
+    val codePointsToEscape           = ((0 to 0x1F).to(Set) + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
     val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
     val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${toHexString(Array(c.toByte))}") mkString

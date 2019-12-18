@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.{XMLReceiverHelper, Dom4j}
+import scala.collection.compat._
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
 
@@ -31,7 +32,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
   final def children = _children
 
   // NOTE: Should probably make it so that controls add themselves to their container upon creation
-  final def addChildren(children: TraversableOnce[ElementAnalysis]): Unit =
+  final def addChildren(children: IterableOnce[ElementAnalysis]): Unit =
     _children ++= children
 
   final def removeChild(child: ElementAnalysis): Unit =

@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 import org.orbeon.oxf.common.OXFException
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 trait ResourceManagerFactory {
   def makeInstance: ResourceManager
@@ -67,7 +68,7 @@ object ResourceManagerWrapper {
       else
         0
 
-    props.to[List].sortBy(_._1).collect{
+    props.to(List).sortBy(_._1).collect{
       case (key, value: String) ⇒ s""" "$key":${" " * (maxKeyLength + 1 - key.length)}"$value" """.trim
     }.mkString("{\n  ", ",\n  ", "\n}")
   }

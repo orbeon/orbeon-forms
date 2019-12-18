@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.$
 import org.scalajs.dom
 import org.scalajs.jquery.JQuery
+import scala.collection.compat._
 
 case class Block(
   el     : JQuery,
@@ -102,7 +103,7 @@ object BlockCache {
           } yield
             Block(grid)
 
-        sectionGridCache._elems = (gridsIt ++ sectionsIt).to[List]
+        sectionGridCache._elems = (gridsIt ++ sectionsIt).to(List)
       }
 
       locally {
@@ -111,7 +112,7 @@ object BlockCache {
           for (gridBody ← collectElems(s".fr-grid.fr-editable $GridBodySelector"))
             yield Block($(gridBody))
 
-        gridBodyCache._elems = gridBodiesIt.to[List]
+        gridBodyCache._elems = gridBodiesIt.to(List)
       }
 
       fbMainCache._elems = Block($(".fb-main-inner")) :: Nil
@@ -122,7 +123,7 @@ object BlockCache {
           for (cell ← collectElems(".fr-grid.fr-editable .fr-grid-td"))
             yield Block($(cell))
 
-        cellCache._elems = cellsIt.to[List]
+        cellCache._elems = cellsIt.to(List)
       }
     })
 

@@ -28,6 +28,7 @@ val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.0"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
+val ScalaCollectionCompatVersion  = "2.1.2"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
@@ -317,8 +318,9 @@ lazy val commonSettings = Seq(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalactic"     %%% "scalactic"             % ScalatTestVersion    % Test,
-    "org.scalatest"     %%% "scalatest"             % ScalatTestVersion    % Test
+    "org.scalactic"           %%% "scalactic"               % ScalatTestVersion    % Test,
+    "org.scalatest"           %%% "scalatest"               % ScalatTestVersion    % Test,
+    "org.scala-lang.modules"  %%% "scala-collection-compat" % ScalaCollectionCompatVersion
   ),
 
   // This is so that assets added to JAR files are made available to dependent projects.

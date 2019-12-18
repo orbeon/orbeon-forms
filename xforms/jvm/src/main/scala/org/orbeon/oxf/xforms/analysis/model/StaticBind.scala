@@ -19,6 +19,7 @@ import org.orbeon.oxf.{util ⇒ u}
 import scala.collection.JavaConverters._
 import scala.collection.immutable.List
 import scala.util.Try
+import scala.collection.compat._
 
 // Represent a static <xf:bind> element
 class StaticBind(
@@ -248,7 +249,7 @@ class StaticBind(
     //         (getElementId(elem), customMIPName, value)
 
     for {
-      (name, idNameValue) ← attributeCustomMIP.to[List] groupBy (_._2)
+      (name, idNameValue) ← attributeCustomMIP.to(List) groupBy (_._2)
       mips                = idNameValue flatMap {
         case (id, _, value) ⇒
           XPathMIP.createOrNone(id, name, ErrorLevel, value)
@@ -410,7 +411,7 @@ class StaticBind(
     // @ref analysis is handled by superclass
 
     // MIP analysis
-    for ((_, mips) ← allMIPNameToXPathMIP.to[List].sortBy(_._1); mip ← mips) {
+    for ((_, mips) ← allMIPNameToXPathMIP.to(List).sortBy(_._1); mip ← mips) {
       helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
       mip.analysis.toXML(helper)
       helper.endElement()

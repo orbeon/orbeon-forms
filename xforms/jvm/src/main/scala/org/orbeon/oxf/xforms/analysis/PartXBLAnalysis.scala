@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLBindings}
 import org.orbeon.xforms.{Constants, XFormsId}
 
 import scala.collection.mutable
+import scala.collection.compat._
 
 trait PartXBLAnalysis extends TransientState {
 
@@ -48,7 +49,7 @@ trait PartXBLAnalysis extends TransientState {
   def dumpScopes(): Unit = {
     println("scopes:")
     println(
-      prefixedIdToXBLScopeMap.to[List].map{
+      prefixedIdToXBLScopeMap.to(List).map{
         case (id, scope) ⇒ s"$id → ${scope.scopeId}"
       }.sorted.mkString("\n")
     )

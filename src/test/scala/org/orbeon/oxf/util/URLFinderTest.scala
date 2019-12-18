@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.junit.Test
 import org.scalatestplus.junit.AssertionsForJUnit
+import scala.collection.compat._
 
 class URLFinderTest extends AssertionsForJUnit {
 
@@ -45,7 +46,7 @@ class URLFinderTest extends AssertionsForJUnit {
     )
 
     for ((in, out) ← expected)
-      assert(out === findURLs(in).to[List])
+      assert(out === findURLs(in).to(List))
   }
 
   @Test def testReplaceURLs(): Unit = {

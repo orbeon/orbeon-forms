@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import spray.json._
+import scala.collection.compat._
 
 case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
 
@@ -102,7 +103,7 @@ object XFormsAssets {
         val css = collectFullMin("css", fields)
         val js  = collectFullMin("js",  fields)
 
-        XFormsAssets(css.to[List], js.to[List])
+        XFormsAssets(css.to(List), js.to(List))
 
       case _ ⇒ throw new IllegalArgumentException
     }

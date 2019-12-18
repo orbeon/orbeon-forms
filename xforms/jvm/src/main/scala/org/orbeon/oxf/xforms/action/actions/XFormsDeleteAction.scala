@@ -25,6 +25,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
 import scala.language.postfixOps
+import scala.collection.compat._
 
 /**
  * 9.3.6 The delete Element
@@ -132,12 +133,12 @@ object XFormsDeleteAction extends Logging {
     } else {
 
       val collectionToUpdateWithDefiniteSize =
-        if (collectionToUpdate.hasDefiniteSize) collectionToUpdate else collectionToUpdate.to[List]
+        if (collectionToUpdate.hasDefiniteSize) collectionToUpdate else collectionToUpdate.to(List)
 
       val deletionDescriptors =
         deleteIndexOpt match {
-          case Some(index) ⇒ doDeleteOneImpl(collectionToUpdateWithDefiniteSize(index - 1)).to[List]
-          case None        ⇒ collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to[List]
+          case Some(index) ⇒ doDeleteOneImpl(collectionToUpdateWithDefiniteSize(index - 1)).to(List)
+          case None        ⇒ collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to(List)
         }
 
       if (deletionDescriptors.nonEmpty && (containingDocument ne null)) {

@@ -31,6 +31,7 @@ import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import scala.collection.compat._
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
@@ -281,8 +282,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     def attributesValues(test: Test) =
       instance.rootElement descendantOrSelf * att test map (_.stringValue)
 
-    val uniqueIdsFromItemsetIds  = attributesValues(XMLNames.FRItemsetId).to[Set]
-    val uniqueIdsFromItemsetMaps = (attributesValues(XMLNames.FRItemsetMap) flatMap (mapValue ⇒ decodeSimpleQuery(mapValue) map (_._2))).to[Set]
+    val uniqueIdsFromItemsetIds  = attributesValues(XMLNames.FRItemsetId).to(Set)
+    val uniqueIdsFromItemsetMaps = (attributesValues(XMLNames.FRItemsetMap) flatMap (mapValue ⇒ decodeSimpleQuery(mapValue) map (_._2))).to(Set)
 
     uniqueIdsFromItemsetIds ++ uniqueIdsFromItemsetMaps
   }
@@ -345,7 +346,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
 
     val containerDetails =
-      containerDetailsString.splitTo[List]().grouped(3).to[List] map {
+      containerDetailsString.splitTo[List]().grouped(3).to(List) map {
         case name :: isRepeat :: position :: Nil ⇒ (name, isRepeat.toBoolean, PositionType.fromString(position))
         case _                                   ⇒ throw new IllegalArgumentException
       }

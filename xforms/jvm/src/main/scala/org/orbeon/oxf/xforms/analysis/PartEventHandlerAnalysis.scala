@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.xforms.EventNames
 
 import scala.collection.mutable
+import scala.collection.compat._
 
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
@@ -99,7 +100,7 @@ trait PartEventHandlerAnalysis {
         prefixedId        = analysis.prefixedId,
         scriptType        = scriptType,
         body              = body,
-        params            = params.to[List],
+        params            = params.to(List),
         shareableByDigest = shareableByDigest
       )
     }
@@ -108,7 +109,7 @@ trait PartEventHandlerAnalysis {
       scriptTypeFromElem(e, default) contains scriptType
 
     def findForActionIt(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
-      controlTypes.get(action).to[Iterator].flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
+      controlTypes.get(action).toIterator.flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
 
     def findForScriptTypeIt(scriptType: ScriptType) =
       findForActionIt(ActionActionName,  scriptType, None) ++
@@ -116,7 +117,7 @@ trait PartEventHandlerAnalysis {
       findForActionIt(ScriptActionName,  scriptType, Some(JavaScriptScriptType)) map
       (extractStaticScript(_, scriptType))
 
-    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).to[List]
+    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).to(List)
     val xpathScriptsIt = findForScriptTypeIt(XPathScriptType)
 
     _scriptsByPrefixedId ++=

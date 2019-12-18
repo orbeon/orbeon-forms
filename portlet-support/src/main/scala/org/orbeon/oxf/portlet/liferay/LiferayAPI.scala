@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest
 
 import scala.collection.JavaConverters._
 import scala.util.{Success, Try}
+import scala.collection.compat._
 
 // For https://github.com/orbeon/orbeon-forms/issues/2843
 // We must abstract over code which changed packages between Liferay 6.2 and 7.0. We achieve this using Java reflection.
@@ -87,10 +88,10 @@ trait LiferayAPI {
   // ]
   //
   def getUserOrganizations(userId: Long): List[OrganizationFacade] =
-    getUserOrganizationsMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[OrganizationFacade]].asScala.to[List]
+    getUserOrganizationsMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[OrganizationFacade]].asScala.to(List)
 
   def getUserGroupRoles(userId: Long): List[UserGroupRoleFacade] =
-    getUserGroupRolesMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[UserGroupRoleFacade]].asScala.to[List]
+    getUserGroupRolesMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[UserGroupRoleFacade]].asScala.to(List)
 
   def hasUserGroupRoleMethod(userId: Long, organizationGroupId: Long, roleName: String): Boolean =
     hasUserGroupRoleMethod.invoke(null, new jl.Long(userId), new jl.Long(organizationGroupId), roleName).asInstanceOf[jl.Boolean]

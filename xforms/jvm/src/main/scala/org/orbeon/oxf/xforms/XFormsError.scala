@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.trans.XPathException
 
 import scala.xml.Elem
+import scala.collection.compat._
 
 // Represent a non-fatal server XForms error
 case class ServerError(
@@ -75,13 +76,13 @@ object ServerError {
   def getDetailsAsUserMessage(error: ServerError): String =
     error.message :: collectList(error, description) mkString " "
 
-  def errorsAsHTMLElem(errors: TraversableOnce[ServerError]): Elem =
+  def errorsAsHTMLElem(errors: IterableOnce[ServerError]): Elem =
     <ul>{
       for (error ← errors)
         yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
     }</ul>
 
-  def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]): Elem =
+  def errorsAsXHTMLElem(errors: IterableOnce[ServerError]): Elem =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
       for (error ← errors)
         yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>

@@ -28,6 +28,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.annotation.tailrec
+import scala.collection.compat._
 
 class XXFormsResource extends XFormsFunction {
 
@@ -58,7 +59,7 @@ class XXFormsResource extends XFormsFunction {
               key.getStringValue → javaParamOpt.orNull
           }
 
-          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to[List], currentLocale)
+          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
 
         case None ⇒
           resourceOrTemplate

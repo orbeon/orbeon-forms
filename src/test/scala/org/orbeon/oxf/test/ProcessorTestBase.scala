@@ -38,6 +38,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.{FunSpec, FunSpecLike}
 
 import scala.util.control.NonFatal
+import scala.collection.compat._
 
 
 abstract class ProcessorTestBase(
@@ -189,11 +190,11 @@ abstract class ProcessorTestBase(
           groupOpt,
           processor,
           requestUrlOpt,
-          docsAndSerializers.to[List]
+          docsAndSerializers.to(List)
         )
       }
 
-    testDescriptors.to[List]
+    testDescriptors.to(List)
   }
 
 }

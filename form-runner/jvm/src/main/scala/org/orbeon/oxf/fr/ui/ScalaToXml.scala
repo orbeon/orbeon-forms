@@ -30,6 +30,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.util.{Failure, Success, Try}
+import scala.collection.compat._
 
 
 trait ScalaToXml {
@@ -91,7 +92,7 @@ trait ScalaToXml {
       simplifiedXmlDoc descendant * filter (e ⇒ mustConvertAdtType(e.localname))
 
     // `reverse` so that nested elements are moved first
-    elemsForAdtTypes.to[List].reverse foreach { elem ⇒
+    elemsForAdtTypes.to(List).reverse foreach { elem ⇒
 
       val parent   = elem.parentUnsafe
       val typeName = elem.localname
@@ -117,7 +118,7 @@ trait ScalaToXml {
     }
 
     // `reverse` so that nested elements are moved first
-    elemsWithNonStandardType.to[List].reverse foreach { elem ⇒
+    elemsWithNonStandardType.to(List).reverse foreach { elem ⇒
 
       val typeAtt  = elem /@ TypeQName
       val typeName = typeAtt.stringValue
@@ -130,7 +131,7 @@ trait ScalaToXml {
         into   = elem,
         origin = elementInfo(
           qName   = typeName,
-          content = NodeInfoFactory.attributeInfo(TypeQName, Symbols.Object) :: children.to[List]
+          content = NodeInfoFactory.attributeInfo(TypeQName, Symbols.Object) :: children.to(List)
         )
       )
     }

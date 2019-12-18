@@ -25,6 +25,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, StringValue, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.oxf.util.CollectionUtils._
+import scala.collection.compat._
 
 class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(context: XPathContext): BooleanValue =
@@ -68,7 +69,7 @@ class ProcessTemplate extends DefaultFunctionSupport {
               key.getStringValue → javaParamOpt.orNull
           }
 
-          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to[List], Configuration.getLocale(langArgument))
+          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), Configuration.getLocale(langArgument))
 
         case None ⇒
           resourceOrTemplate
@@ -121,6 +122,6 @@ object ProcessTemplate {
       })
 
     new MessageFormat(templateWithPositions, currentLocale)
-      .format(javaNamedParams.map(v ⇒ formatValue(v._2)).to[Array])
+      .format(javaNamedParams.map(v ⇒ formatValue(v._2)).to(Array))
   }
 }

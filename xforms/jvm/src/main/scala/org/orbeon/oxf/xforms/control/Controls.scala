@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 
 object Controls {
 
@@ -287,7 +288,7 @@ object Controls {
 
     val commonIndexes =
       for {
-        ancestorRepeatPrefixedId ← ancestorRepeatPrefixedIdOpt.to[List]
+        ancestorRepeatPrefixedId ← ancestorRepeatPrefixedIdOpt.to(List)
         index                    ← sourceParts.take(ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size + 1).reverse
       } yield
         index

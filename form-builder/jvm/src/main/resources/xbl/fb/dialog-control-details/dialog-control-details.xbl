@@ -241,29 +241,31 @@
                     </xf:action>
 
                     <!-- Add/remove attributes on the control to match those on the template -->
-                    <xf:var
-                        name="control-template"
-                        value="$xbl-binding/fb:metadata/fb:templates/fb:view/*"/>
-                    <xf:action iterate="$control-template/@*">
-                        <xf:var name="template-attribute" value="."/>
-                        <xf:insert
-                            if="empty($control/@*[local-name() = $template-attribute/local-name()])"
-                            context="$control"
-                            origin="$template-attribute"/>
-                    </xf:action>
-                    <xf:action iterate="$control/@*">
-                        <xf:var name="control-attribute" value="."/>
-                        <xf:delete
-                            if="not(
-                                    (: Always keep `id` and `bind` :)
-                                    $control-attribute/local-name() = ('id', 'bind')
-                                ) and
-                                empty(
-                                    $control-template/@*[
-                                        local-name() = $control-attribute/local-name()
-                                    ]
-                                )"
-                            ref="$control-attribute"/>
+                    <xf:action if="exists($new-appearance)">
+                        <xf:var
+                            name="control-template"
+                            value="$xbl-binding/fb:metadata/fb:templates/fb:view/*"/>
+                        <xf:action iterate="$control-template/@*">
+                            <xf:var name="template-attribute" value="."/>
+                            <xf:insert
+                                if="empty($control/@*[local-name() = $template-attribute/local-name()])"
+                                context="$control"
+                                origin="$template-attribute"/>
+                        </xf:action>
+                        <xf:action iterate="$control/@*">
+                            <xf:var name="control-attribute" value="."/>
+                            <xf:delete
+                                if="not(
+                                        (: Always keep `id` and `bind` :)
+                                        $control-attribute/local-name() = ('id', 'bind')
+                                    ) and
+                                    empty(
+                                        $control-template/@*[
+                                            local-name() = $control-attribute/local-name()
+                                        ]
+                                    )"
+                                ref="$control-attribute"/>
+                        </xf:action>
                     </xf:action>
 
                     <!-- Complete the custom form -->

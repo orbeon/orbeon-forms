@@ -360,8 +360,14 @@ object AjaxClient {
       }
 
       FutureUtils.withFutureSideEffects(
-        before = Page.getForm(requestFormId).loadingIndicator.requestStarted(),
-        after  = Page.getForm(requestFormId).loadingIndicator.requestEnded()
+        before = {
+          Globals.requestInProgress = true
+          Page.getForm(requestFormId).loadingIndicator.requestStarted()
+        },
+        after  = {
+          Globals.requestInProgress = false
+          Page.getForm(requestFormId).loadingIndicator.requestEnded()
+        }
       ) {
       Support.fetchText(
         url         = Page.getForm(requestFormId).xformsServerPath,

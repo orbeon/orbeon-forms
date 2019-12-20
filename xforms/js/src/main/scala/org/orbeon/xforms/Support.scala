@@ -13,7 +13,6 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.FutureUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
@@ -70,11 +69,7 @@ object Support {
     contentType : Option[String],
     formId      : String,
     abortSignal : Option[AbortSignal]
-  ): Future[(Int, String, Option[dom.Document])] =
-    FutureUtils.withFutureSideEffects(
-      before = Globals.requestInProgress = true,
-      after  = Globals.requestInProgress = false
-    ) {
+  ): Future[(Int, String, Option[dom.Document])] = {
 
       val fetchPromise =
         Fetch.fetch(

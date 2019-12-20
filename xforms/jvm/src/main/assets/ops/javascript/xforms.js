@@ -1274,8 +1274,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         }
     };
-
-    ORBEON.util.Properties.init();
 })();
 
 (function() {

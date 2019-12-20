@@ -152,7 +152,7 @@ object UploaderClient {
             requestBody = formData,
             contentType = None,
             formId      = requestFormId,
-            signal      = controller.signal.some
+            abortSignal = controller.signal.some
           )
 
         askForProgressUpdate()

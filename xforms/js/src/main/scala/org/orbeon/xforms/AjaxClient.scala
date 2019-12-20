@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events, Properties, Utils}
 import org.scalajs.dom
+import org.scalajs.dom.experimental.AbortController
 import org.scalajs.dom.ext._
 import org.scalajs.dom.{FormData, html}
 import org.scalajs.jquery.{JQueryCallback, JQueryEventObject}
@@ -349,6 +350,12 @@ object AjaxClient {
 
       Globals.requestTryCount += 1
 
+      // Timeout support using `AbortController`
+      val controller = new AbortController
+      js.timers.setTimeout(Properties.delayBeforeAjaxTimeout.get().millis) {
+        controller.abort()
+      }
+
       FutureUtils.withFutureSideEffects(
         before = Page.getForm(requestFormId).loadingIndicator.requestStarted(),
         after  = Page.getForm(requestFormId).loadingIndicator.requestEnded()
@@ -358,7 +365,7 @@ object AjaxClient {
         requestBody = requestBody,
         contentType = "application/xml".some,
         formId      = requestFormId,
-        signal      = None
+        abortSignal = controller.signal.some
       )
     } onComplete {
         case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒

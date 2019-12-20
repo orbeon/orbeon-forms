@@ -267,6 +267,7 @@ object AjaxClient {
         executeNextRequest(bypassRequestQueue = true)
       }
     }
+    // Used by heartbeat
     Globals.lastEventSentTime = new js.Date().getTime()
   }
 

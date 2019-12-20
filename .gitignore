@@ -4,6 +4,10 @@ tmp/
 target/
 build-local.properties
 .idea/
+.idea.bak*
+exist-data*
+_exist-data*
+lib/xerces-2.12-orbeon-jar/
 # SBT command history
 .target/.history
 src/resources-packaged-target/

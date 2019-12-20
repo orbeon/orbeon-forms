@@ -152,12 +152,11 @@ object AjaxClient {
   //
   // Public for `UploaderClient`
   def handleFailure(
-    responseText : Option[String],
-    responseXML  : Option[dom.Document],
+    response     : String Either dom.Document,
     formId       : String,
     requestBody  : String | FormData,
     ignoreErrors : Boolean
-  ): Unit = {
+  ): Boolean = {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
@@ -166,8 +165,8 @@ object AjaxClient {
       }
     }
 
-    (responseText, responseXML) match {
-      case (_, Some(responseXml)) if Support.getLocalName(responseXml.documentElement) == "error" ⇒
+    response match {
+      case Right(responseXml) if Support.getLocalName(responseXml.documentElement) == "error" ⇒
         // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
         // we show an error to users.
         //
@@ -181,7 +180,9 @@ object AjaxClient {
 
         showError(title, body, formId, ignoreErrors)
 
-      case (Some(LoginRegexpMatcher()), _) ⇒
+        true
+
+      case Left(LoginRegexpMatcher()) ⇒
 
          // It seems we got a login page back, so display dialog and reload form
         val dialogEl = $(s"$$$formId .xforms-login-detected-dialog")
@@ -213,8 +214,10 @@ object AjaxClient {
           val keyboard = false    // Can't use esc to close the dialog
         })
 
+        true
+
       case _ ⇒
-        retryRequestAfterDelay(() ⇒ asyncAjaxRequest(formId, requestBody, ignoreErrors))
+        false
     }
   }
 
@@ -372,14 +375,14 @@ object AjaxClient {
           // We ignore HTTP status and just check that we have a well-formed response document
           handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
         case Success((503, _, _)) ⇒
-          // I can't find a place were we use or document this but this is a standard HTTP status code to say that we may retry later, so
-          // it probably makes sense to read it as such.
+          // We return an explicit 503 when the Ajax server is still busy
           retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
         case Success((_, responseText, responseXmlOpt)) ⇒
-          handleFailure(responseText.some, responseXmlOpt, requestFormId, requestBody, ignoreErrors)
+          if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
+            retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
         case Failure(_) ⇒
           logAndShowError(_, requestFormId, ignoreErrors)
-          handleFailure(None, None, requestFormId, requestBody, ignoreErrors)
+          retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
       }
     }
 

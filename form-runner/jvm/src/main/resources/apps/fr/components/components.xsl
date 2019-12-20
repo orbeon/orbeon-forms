@@ -109,7 +109,7 @@
         as="xs:string"
         select="
             let $updates :=
-                for $update in ('fr', 'fb'[$is-form-builder])
+                for $update in ('fr', 'fb'[$is-form-builder and $is-detail])
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')
         "/>
@@ -511,7 +511,7 @@
                 )
             }}"
         >
-            
+
             <!-- Override if specified -->
             <xsl:copy-of select="@xxf:xpath-analysis"/>
             <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests -->

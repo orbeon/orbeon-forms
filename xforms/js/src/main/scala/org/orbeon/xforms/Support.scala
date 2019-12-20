@@ -69,7 +69,7 @@ object Support {
     requestBody : String | FormData,
     contentType : Option[String],
     formId      : String,
-    signal      : Option[AbortSignal]
+    abortSignal : Option[AbortSignal]
   ): Future[(Int, String, Option[dom.Document])] =
     FutureUtils.withFutureSideEffects(
       before = Globals.requestInProgress = true,
@@ -91,7 +91,7 @@ object Support {
             var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
             var integrity      : js.UndefOr[String]             = js.undefined
             var keepalive      : js.UndefOr[Boolean]            = js.undefined
-            var signal         : js.UndefOr[AbortSignal]        = signal map (js.defined.apply) getOrElse js.undefined
+            var signal         : js.UndefOr[AbortSignal]        = abortSignal map (js.defined.apply) getOrElse js.undefined
             var window         : js.UndefOr[Null]               = null
           }
         )

@@ -45,10 +45,14 @@ object InitSupport {
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())
 
-  // TODO: `opsXFormsProperties`, `xformsPageLoadedServer`.
+  // TODO: `xformsPageLoadedServer`
   // Called by form-specific dynamic initialization
   @JSExport
   def initializeFormWithInitData(initializationsString: String): Unit = {
+
+    // Only now are properties available
+    // TODO: pass `opsXFormsProperties` directly
+    Properties.init()
 
     val initializations =
       decode[rpc.Initializations](initializationsString) match {

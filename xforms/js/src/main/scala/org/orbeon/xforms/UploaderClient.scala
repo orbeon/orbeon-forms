@@ -166,13 +166,12 @@ object UploaderClient {
               // Are we done, or do we still need to handle events for other forms?
               continueWithRemainingEvents()
           case Success((_, responseText, responseXmlOpt)) ⇒
-            AjaxClient.handleFailure(responseText.some, responseXmlOpt, requestFormId, formData, ignoreErrors = false)
+            cancel(doAbort = false, EventNames.XXFormsUploadError)
+            AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
           case Failure(_) ⇒
             // NOTE: can be an `AbortError` (to verify)
             cancel(doAbort = false, EventNames.XXFormsUploadError)
-            // TODO: we are no supposed to retry uploads, are we? check with previous implementation.
             AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
-            AjaxClient.handleFailure(None, None, requestFormId, formData, ignoreErrors = false)
         }
       }
     }

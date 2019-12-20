@@ -285,10 +285,10 @@ object LHHAAnalysis {
     val SearchExpression =
       """
         not(
-        exists(
-          descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] |
-          descendant::*[@*[contains(., '{')]]
-        )
+          exists(
+            descendant-or-self::*[@ref or @nodeset or @bind or @value] |
+            descendant::*[@*[contains(., '{')]]
+          )
         )
       """
 

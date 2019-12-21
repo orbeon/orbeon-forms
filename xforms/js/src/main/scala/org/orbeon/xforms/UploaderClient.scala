@@ -165,6 +165,7 @@ object UploaderClient {
             // Are we done, or do we still need to handle events for other forms?
             continueWithRemainingEvents()
           case Success((_, responseText, responseXmlOpt)) =>
+            // Here we can at least get 413, 409, and 500 status codes at least as those are explicity set by the server
             cancel(doAbort = false, EventNames.XXFormsUploadError)
             AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
           case Failure(_) =>

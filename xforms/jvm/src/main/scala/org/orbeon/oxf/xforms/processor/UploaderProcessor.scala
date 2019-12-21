@@ -91,7 +91,7 @@ class UploaderProcessor extends ProcessorImpl {
               Multipart.quietlyDeleteFileItems(nameValues)
 
               t match {
-                case e: FileScanException =>
+                case _: FileScanException =>
                   throw HttpStatusCodeException(StatusCode.Conflict, throwable = someThrowable) // unclear which status code makes the most sense
                 case _: SizeLimitExceededException | _: FileSizeLimitExceededException =>
                   throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)

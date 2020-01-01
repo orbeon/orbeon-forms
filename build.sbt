@@ -59,7 +59,7 @@ val CoreLibraryDependencies = Seq(
   "commons-codec"               %  "commons-codec"                  % "1.6",    // 1.10
   "commons-collections"         %  "commons-collections"            % "3.2.2",
   "commons-digester"            %  "commons-digester"               % "1.5",    // 2.1
-  "commons-cli"                 %  "commons-cli"                    % "1.0",    // 1.3.1
+  "commons-cli"                 %  "commons-cli"                    % "1.4",    // 1.3.1
   "commons-discovery"           %  "commons-discovery"              % "0.4",    // 0.5
   "commons-fileupload"          %  "commons-fileupload"             % "1.3.2",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,

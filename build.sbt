@@ -54,7 +54,7 @@ val CoreLibraryDependencies = Seq(
   "joda-time"                   %  "joda-time"                      % "2.10.5",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
   "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5
-  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.3",  // 2.6.11, 2.10.4
+  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.13",
   "commons-collections"         %  "commons-collections"            % "3.2.2",

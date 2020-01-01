@@ -84,7 +84,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.commons"          % "commons-exec"                    % "1.1"             % Test, // 1.3
   "org.apache.commons"          % "commons-dbcp2"                   % "2.1.1"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.3.1"           % Test, // 2.8.0
-  "com.google.guava"            % "guava"                           % "13.0.1"          % Test, // 20.0
+  "com.google.guava"            % "guava"                           % "23.0"          % Test, // 20.0
   "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
   "mysql"                       % "mysql-connector-java"            % "8.0.15"          % Test,
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,

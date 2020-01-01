@@ -88,7 +88,7 @@ val CoreLibraryDependencies = Seq(
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.18"          % Test,
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc41" % Test,
-  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test,  // 3.0.1
+  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.53.1"          % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),

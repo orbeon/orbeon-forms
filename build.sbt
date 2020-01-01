@@ -38,8 +38,8 @@ val PortletApiVersion             = "2.0"
 val Slf4jVersion                  = "1.7.25"
 val HttpComponentsVersion         = "4.3.6"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.6"  // 2.5
-val FlyingSaucerVersion           = "9.1.18"
+val CommonsIoVersion              = "2.6"
+val FlyingSaucerVersion           = "9.1.19"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.1"
 

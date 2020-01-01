@@ -15,7 +15,7 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.0-RC3"
+val ScalatTestVersion             = "3.1.0"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.12.3"
 val EnumeratumVersion             = "1.5.15"

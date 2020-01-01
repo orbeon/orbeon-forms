@@ -56,7 +56,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.3",  // 2.6.11, 2.10.4
   "commons-beanutils"           %  "commons-beanutils"              % "1.5",    // 1.9.3
-  "commons-codec"               %  "commons-codec"                  % "1.6",    // 1.10
+  "commons-codec"               %  "commons-codec"                  % "1.13",    // 1.10
   "commons-collections"         %  "commons-collections"            % "3.2.2",
   "commons-digester"            %  "commons-digester"               % "1.5",    // 2.1
   "commons-cli"                 %  "commons-cli"                    % "1.0",    // 1.3.1

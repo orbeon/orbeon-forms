@@ -64,7 +64,7 @@ val CoreLibraryDependencies = Seq(
   "commons-fileupload"          %  "commons-fileupload"             % "1.3.3",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.4.0",  // 1.5.1
+  "commons-validator"           %  "commons-validator"              % "1.4.1",  // 1.5.1
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
   "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,

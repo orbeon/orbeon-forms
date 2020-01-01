@@ -69,7 +69,7 @@ val CoreLibraryDependencies = Seq(
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
   "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
-  "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.0",
+  "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,

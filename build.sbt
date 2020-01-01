@@ -78,7 +78,7 @@ val CoreLibraryDependencies = Seq(
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
   "log4j"                       % "log4j"                           % Log4jVersion,
-  "com.jcraft"                  % "jsch"                            % "0.1.42", // 0.1.54
+  "com.jcraft"                  % "jsch"                            % "0.1.55", // 0.1.54
   "jcifs"                       % "jcifs"                           % "1.3.17",
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.1"             % Test, // 1.3

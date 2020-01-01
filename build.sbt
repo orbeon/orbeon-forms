@@ -10,7 +10,7 @@ val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
 val ScalaJsDomVersion             = "0.9.7"
-val ScalaJsJQueryVersion          = "0.9.5"
+val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
@@ -18,7 +18,7 @@ val PerfolationVersion            = "1.1.5"
 val ScalatTestVersion             = "3.1.0-RC3"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.12.3"
-val EnumeratumVersion             = "1.5.13"
+val EnumeratumVersion             = "1.5.15"
 val EnumeratumCirceVersion        = "1.5.22"
 val ScalaXmlVersion               = "1.2.0"
 val ScalaAsyncVersion             = "0.10.0"
@@ -83,8 +83,8 @@ val CoreLibraryDependencies = Seq(
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.1"             % Test, // 1.3
   "org.apache.commons"          % "commons-dbcp2"                   % "2.1.1"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.3.1"           % Test, // 2.8.0
-  "com.google.guava"            % "guava"                           % "23.0"          % Test, // 20.0
+  "com.google.code.gson"        % "gson"                            % "2.8.9"           % Test,
+  "com.google.guava"            % "guava"                           % "23.0"            % Test,
   "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
   "mysql"                       % "mysql-connector-java"            % "8.0.15"          % Test,
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,

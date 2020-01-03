@@ -32,7 +32,7 @@ val ScalaCollectionCompatVersion  = "2.1.3"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val JodaConvertVersion            = "1.9.2"
+val JodaConvertVersion            = "2.2.1"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
 val Slf4jVersion                  = "1.7.25"

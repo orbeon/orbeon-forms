@@ -15,7 +15,7 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.0-RC3"
+val ScalatTestVersion             = "3.1.0"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.12.3"
 val EnumeratumVersion             = "1.5.15"
@@ -28,15 +28,15 @@ val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.0"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
-val ScalaCollectionCompatVersion  = "2.1.2"
+val ScalaCollectionCompatVersion  = "2.1.3"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val JodaConvertVersion            = "1.2"
+val JodaConvertVersion            = "1.9.2"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
 val Slf4jVersion                  = "1.7.25"
-val HttpComponentsVersion         = "4.3.5"  // 4.5.2
+val HttpComponentsVersion         = "4.3.6"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.6"  // 2.5
 val FlyingSaucerVersion           = "9.1.18"
@@ -73,7 +73,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpcore"                        % "4.3.2",
+  "org.apache.httpcomponents"   % "httpcore"                        % "4.3.3",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
@@ -81,7 +81,7 @@ val CoreLibraryDependencies = Seq(
   "com.jcraft"                  % "jsch"                            % "0.1.55", // 0.1.54
   "jcifs"                       % "jcifs"                           % "1.3.17",
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
-  "org.apache.commons"          % "commons-exec"                    % "1.1"             % Test, // 1.3
+  "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
   "com.google.guava"            % "guava"                           % "13.0.1"          % Test, // 20.0

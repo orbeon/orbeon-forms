@@ -61,7 +61,7 @@ val CoreLibraryDependencies = Seq(
   "commons-digester"            %  "commons-digester"               % "1.5",    // 2.1
   "commons-cli"                 %  "commons-cli"                    % "1.4",    // 1.3.1
   "commons-discovery"           %  "commons-discovery"              % "0.4",    // 0.5
-  "commons-fileupload"          %  "commons-fileupload"             % "1.3.3",
+  "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.4.1",  // 1.5.1

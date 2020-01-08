@@ -72,5 +72,4 @@ class CommandLineExternalContext() extends SimpleExternalContext {
     override def rewriteResourceURL(urlString: String, rewriteMode: Int) =
       URLRewriterUtils.rewriteURL(getRequest, urlString, rewriteMode)
   }
-
 }

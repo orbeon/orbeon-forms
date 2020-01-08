@@ -19,7 +19,6 @@ import java.{util ⇒ ju}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util.NumericUtils
 
 import scala.collection.JavaConverters._
 
@@ -181,12 +180,6 @@ object ExternalContext {
     def javaGetAttribute(name: String               , scope: SessionScope                     ): AnyRef = getAttribute(name, scope).orNull
     def javaSetAttribute(name: String, value: AnyRef                                          ): Unit   = setAttribute(name, value)
   }
-
-  trait RequestDispatcher {
-    def forward(request: Request, response: Response)
-    def include(request: Request, response: Response)
-    def isDefaultContext: Boolean
-  }
 }
 
 trait ExternalContext {
@@ -199,18 +192,6 @@ trait ExternalContext {
   // available a session even though no request or response is available.
   def getSession(create: Boolean): Session
   def getSessionOpt(create: Boolean): Option[Session] = Option(getSession(create))
-
-  /**
-    * Return a request dispatcher usable to perform forwards and includes.
-    *
-    * NOTE: When isContextRelative is false, assume that the first path element points to the context. E.g. /foo/bar
-    * resolves to a context mounted on /foo, and /bar is the resource pointed to in that context.
-    *
-    * @param path              path of the resource (must start with "/")
-    * @param isContextRelative if true, path is relative to the current context root, otherwise to the document root
-    * @return RequestDispatcher or null if cannot be found
-    */
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): RequestDispatcher
 
   def getRequest: Request
   def getResponse: Response

@@ -369,8 +369,6 @@ class TestExternalContext(
     session
   }
 
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): RequestDispatcher = null
-
   def getStartLoggerString = "Running test processor"
   def getEndLoggerString   = "Done running test processor"
 }

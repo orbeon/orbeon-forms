@@ -17,12 +17,11 @@ import java.io._
 import java.{util ⇒ ju}
 
 import org.orbeon.io.{CharsetNames, StringBuilderWriter}
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.{LoggerFactory, SecureUtils}
 
-import scala.collection.{immutable ⇒ i, mutable ⇒ m}
+import scala.collection.{mutable ⇒ m}
 
 /**
   * Simple implementation of the ExternalContext and related interfaces.
@@ -134,6 +133,4 @@ abstract class SimpleExternalContext extends ExternalContext {
 
   def getStartLoggerString                                                            = "Running processor"
   def getEndLoggerString                                                              = "Done running processor"
-
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): RequestDispatcher = null
 }

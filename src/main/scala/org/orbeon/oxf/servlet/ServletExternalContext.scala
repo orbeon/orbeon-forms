@@ -15,9 +15,8 @@ package org.orbeon.oxf.servlet
 
 import java.io._
 import java.{util ⇒ ju}
-import javax.servlet.ServletContext
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.InitUtils
@@ -356,40 +355,4 @@ class ServletExternalContext(
 
   def getStartLoggerString: String = getRequest.getRequestPath + " - Received request"
   def getEndLoggerString  : String = getRequest.getRequestPath
-
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = {
-    val servletContext = webAppContext.getNativeContext.asInstanceOf[ServletContext]
-    if (isContextRelative) {
-      // Path is relative to the current context root
-      val slashServletContext = servletContext.getContext("/")
-      new ServletToExternalContextRequestDispatcherWrapper(
-        servletContext.getRequestDispatcher(path),
-        slashServletContext eq servletContext
-      )
-    } else {
-      // Path is relative to the server document root
-      val otherServletContext = servletContext.getContext(path)
-      if (otherServletContext eq null)
-        return null
-
-      val slashServletContext = servletContext.getContext("/")
-
-      val (modifiedPath, isDefaultContext) =
-        if (slashServletContext ne otherServletContext) {
-          // Remove first path element
-          val newPath = NetUtils.removeFirstPathElement(path)
-          if (newPath eq null)
-            return null
-          newPath → false
-        }  else {
-          // No need to remove first path element because the servlet context is ""
-          path → true
-        }
-
-      new ServletToExternalContextRequestDispatcherWrapper(
-        otherServletContext.getRequestDispatcher(modifiedPath),
-        isDefaultContext
-      )
-    }
-  }
 }

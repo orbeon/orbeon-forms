@@ -26,6 +26,4 @@ class LocalExternalContext(val webAppContext: WebAppContext, request: Request, r
 
   def getStartLoggerString = getRequest.getRequestPath + " - Received request"
   def getEndLoggerString   = getRequest.getRequestPath
-
-  def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
 }

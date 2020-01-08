@@ -14,7 +14,6 @@
 package org.orbeon.oxf.externalcontext
 
 import javax.servlet.http.HttpSession
-
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.servlet.ServletSessionImpl
 
@@ -34,5 +33,4 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
   def getEndLoggerString = ""
   def getRequest = null
   def getResponse = null
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = null
 }

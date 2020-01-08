@@ -96,10 +96,10 @@ val CoreLibraryDependencies = Seq(
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.64"  // for `itext`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.64",  // for `itext`, also pulls `bcprov` and `bcpkix`
 
-//  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
-//  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
+  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
+  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
@@ -438,33 +438,36 @@ lazy val embedding = (project in file("embedding"))
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-embedding"
-  )
-  .settings(
+    name := "orbeon-embedding",
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
   )
 
 lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(portletSupport)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-full-portlet"
-  )
-  .settings(
-    libraryDependencies += "org.joda" % "joda-convert" % JodaConvertVersion % Provided
+    name := "orbeon-full-portlet",
+    libraryDependencies += "org.joda"      % "joda-convert"     % JodaConvertVersion % Provided,
+    libraryDependencies += "javax.portlet" %  "portlet-api"     % PortletApiVersion  % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .dependsOn(portletSupport)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-proxy-portlet"
+    name := "orbeon-proxy-portlet",
+    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
   )
 
 lazy val portletSupport = (project in file("portlet-support"))
   .dependsOn(embedding)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-portlet-support"
+    name := "orbeon-portlet-support",
+    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
@@ -496,7 +499,15 @@ lazy val formRunnerJVM = formRunner.jvm
     sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
     javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
+    libraryDependencies += "org.joda"      %  "joda-convert"     % JodaConvertVersion % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
+    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
+
+    libraryDependencies                ++= Seq(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % CirceVersion)
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -622,6 +633,8 @@ lazy val xformsJVM = xforms.jvm
   .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(
+
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided,
 
     // Because `Assets` doesn't check the `shared` directory
     unmanagedResourceDirectories in Assets += sharedAssetsDir(baseDirectory.value),

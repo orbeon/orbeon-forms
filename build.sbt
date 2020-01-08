@@ -91,7 +91,7 @@ val CoreLibraryDependencies = Seq(
   "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.18"          % Test,
-  "org.postgresql"              % "postgresql"                      % "9.3-1104-jdbc41" % Test,
+  "org.postgresql"              % "postgresql"                      % "9.4.1212" % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,

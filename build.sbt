@@ -58,7 +58,7 @@ val CoreLibraryDependencies = Seq(
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.14",
   "commons-collections"         %  "commons-collections"            % "3.2.2",
-  "commons-digester"            %  "commons-digester"               % "1.8.1",
+  "commons-digester"            %  "commons-digester"               % "2.1",
   "commons-cli"                 %  "commons-cli"                    % "1.4",
   "commons-discovery"           %  "commons-discovery"              % "0.5",
   "commons-fileupload"          %  "commons-fileupload"             % "1.4",

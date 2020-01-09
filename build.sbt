@@ -33,8 +33,6 @@ val ScalaCollectionCompatVersion  = "2.1.3"
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
 val JodaConvertVersion            = "2.2.1"
-val ServletApiVersion             = "3.0.1"
-val PortletApiVersion             = "2.0"
 val Slf4jVersion                  = "1.7.30"
 val HttpComponentsVersion         = "4.5.10"
 val Log4jVersion                  = "1.2.17"
@@ -44,6 +42,12 @@ val TinkVersion                   = "1.2.2"
 val JacksonVersion                = "2.10.2"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.1"
+
+// "Provided" Java libraries
+val ServletApiVersion             = "3.1.0"
+val PortletApiVersion             = "2.0"
+val LiferayPortalServiceVersion   = "6.1.1"
+val LiferayPortalKernelVersion    = "4.39.1"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -447,9 +451,12 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-full-portlet",
-    libraryDependencies += "org.joda"      % "joda-convert"     % JodaConvertVersion % Provided,
-    libraryDependencies += "javax.portlet" %  "portlet-api"     % PortletApiVersion  % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
+    libraryDependencies += "org.joda"           % "joda-convert"              % JodaConvertVersion          % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
+
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -457,8 +464,10 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-proxy-portlet",
-    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
+    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val portletSupport = (project in file("portlet-support"))
@@ -466,8 +475,10 @@ lazy val portletSupport = (project in file("portlet-support"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-portlet-support",
-    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
+    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))

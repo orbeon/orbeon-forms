@@ -16,7 +16,7 @@ package org.orbeon.oxf.servlet
 import java.io._
 import java.{util ⇒ ju}
 
-import javax.servlet.ServletInputStream
+import javax.servlet.{ReadListener, ServletInputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
@@ -137,6 +137,9 @@ private object ServletRequestWrapper {
     val is = newEmptyInputStream
     new ServletInputStream {
       def read() = is.read()
+      def isFinished: Boolean = true
+      def isReady: Boolean = false
+      def setReadListener(readListener: ReadListener): Unit = ()
     }
   }
 }

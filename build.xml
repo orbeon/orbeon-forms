@@ -166,10 +166,10 @@
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
 
-            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/provided/portlet-api_2.0.jar
-            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
+            -libraryjars lib/proguard/portlet-api_2.0.jar
+            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -218,10 +218,10 @@
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
 
-            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/provided/portlet-api_2.0.jar
-            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
+            -libraryjars lib/proguard/portlet-api_2.0.jar
+            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
@@ -272,10 +272,10 @@
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
 
-            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/provided/portlet-api_2.0.jar
-            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
+            -libraryjars lib/proguard/portlet-api_2.0.jar
+            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
 
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter {
                 public static *;

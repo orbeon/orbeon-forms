@@ -37,12 +37,12 @@ class OrbeonServletContextListener extends ServletContextListener {
   def logPrefix = "Context listener"
   def initParameters = Map()
 
-  def contextInitialized(event: ServletContextEvent): Unit =
+  override def contextInitialized(event: ServletContextEvent): Unit =
     withRootException("context creation", new ServletException(_)) {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context initialized.", InitProcessorPrefix, InitInputPrefix)
     }
 
-  def contextDestroyed(event: ServletContextEvent): Unit =
+  override def contextDestroyed(event: ServletContextEvent): Unit =
     withRootException("context destruction", new ServletException(_)) {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
       // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes

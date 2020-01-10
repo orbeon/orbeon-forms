@@ -36,7 +36,7 @@ class OrbeonXFormsFilter extends Filter {
 
   private var settingsOpt: Option[FilterSettings] = None
 
-  def init(filterConfig: FilterConfig): Unit =
+  override def init(filterConfig: FilterConfig): Unit =
     settingsOpt =
       Some(
         FilterSettings(
@@ -46,9 +46,9 @@ class OrbeonXFormsFilter extends Filter {
         )
       )
 
-  def destroy(): Unit = settingsOpt = None
+  override def destroy(): Unit = settingsOpt = None
 
-  def doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain) =
+  def doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain): Unit =
     settingsOpt foreach {
       case settings @ FilterSettings(servletContext, orbeonContextPathOpt, defaultEncoding) ⇒
 

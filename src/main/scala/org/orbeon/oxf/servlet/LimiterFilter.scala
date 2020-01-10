@@ -45,7 +45,7 @@ class LimiterFilter extends Filter {
 
   private var settingsOpt: Option[FilterSettings] = None
 
-  def init(config: FilterConfig): Unit = {
+  override def init(config: FilterConfig): Unit = {
 
     val limit = desiredParallelism(config.getInitParameter)
 
@@ -63,7 +63,7 @@ class LimiterFilter extends Filter {
     settingsOpt = Some(settings)
   }
 
-  def destroy(): Unit = {
+  override def destroy(): Unit = {
     info(s"destroying")
     settingsOpt = None
   }

@@ -40,7 +40,7 @@ class OrbeonSessionListener extends HttpSessionListener {
   def logPrefix = "Session listener"
   def initParameters = Map()
 
-  def sessionCreated(event: HttpSessionEvent): Unit =
+  override def sessionCreated(event: HttpSessionEvent): Unit =
     withRootException("session creation", new ServletException(_)) {
 
       val httpSession = event.getSession
@@ -59,7 +59,7 @@ class OrbeonSessionListener extends HttpSessionListener {
       )
     }
 
-  def sessionDestroyed(event: HttpSessionEvent): Unit =
+  override def sessionDestroyed(event: HttpSessionEvent): Unit =
     withRootException("session destruction", new ServletException(_)) {
       val httpSession = event.getSession
       if (httpSession ne null) {

@@ -37,8 +37,12 @@ import scala.collection.compat._
 // - by element name, a datatype, and a single `appearance` attribute
 //
 // `BindingDescriptor` is a minimal CSS selector descriptor able to hold the combinations above. It can in fact hold
-// more than that, such as binding by datatype only, or binding via attributes which are not `appearance`, but
-// those are not used or supported as of 2015-06-05.
+// more than that, such as:
+//
+// - binding by datatype only
+// - binding via attributes which are not `appearance`
+//
+// But those are not used or supported as of 2020-01-10.
 case class BindingDescriptor(
   elementName : Option[QName],
   datatype    : Option[QName],

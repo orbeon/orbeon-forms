@@ -3210,9 +3210,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         var originalInit = this.prototype.init;
                         this.prototype.init = function () {
                             if (! this.initialized) {
-                                var formId = ORBEON.xforms.Controls.getForm(this.container).id;
-                                var form   = ORBEON.xforms.Page.getForm(formId);
-                                form.xblInstances.push(this);
                                 originalInit.call(this);
                                 this.initialized = true;
                                 ORBEON.xforms.XBL.componentInitialized.fire(this);
@@ -3225,9 +3222,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         if (! _.isUndefined(originalDestroy))
                             originalDestroy.call(this);
                         $(this.container).data('xforms-xbl-object', null);
-                        var formId = ORBEON.xforms.Controls.getForm(this.container).id;
-                        var form   = ORBEON.xforms.Page.getForm(formId);
-                        form.xblInstances = _.without(form.xblInstances, this);
                     }
                 }
 
@@ -3247,6 +3241,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         instance = new xblClass(container);
                         instance.xblClass = xblClass;
                         instance.container = container;
+                        var formId = ORBEON.xforms.Controls.getForm(instance.container).id;
+                        var form   = ORBEON.xforms.Page.getForm(formId);
+                        form.xblInstances.push(instance);
                         if (hasInit) {
                             instance.initialized = false;
                             instance.init();

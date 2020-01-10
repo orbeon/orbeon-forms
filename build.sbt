@@ -46,7 +46,7 @@ val JavaActivationVersion         = "1.2.1"
 // "Provided" Java libraries
 val ServletApiVersion             = "3.1.0"
 val PortletApiVersion             = "3.0.1"
-val LiferayPortalServiceVersion   = "6.1.1"
+val LiferayPortalServiceVersion   = "6.2.5"
 val LiferayPortalKernelVersion    = "4.39.1"
 
 val CoreLibraryDependencies = Seq(

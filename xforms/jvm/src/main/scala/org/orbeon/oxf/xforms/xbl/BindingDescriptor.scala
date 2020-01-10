@@ -196,7 +196,7 @@ object BindingDescriptor {
 
       BindingDescriptor(
         Some(QName(localname, prefix, ns.mapping(prefix))),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
         None
       )(binding)
   }
@@ -240,7 +240,7 @@ object BindingDescriptor {
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
         Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
       )(binding)
   }

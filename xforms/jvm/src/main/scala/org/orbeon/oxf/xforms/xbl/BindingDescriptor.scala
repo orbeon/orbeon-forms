@@ -82,7 +82,7 @@ object BindingDescriptor {
   }
 
   // Find the virtual name and appearance for the control given its element name, datatype, and appearances.
-  // See `BindingDescriptorTest.testFindVirtualNameAndAppearance()` for examples.
+  // See `BindingDescriptorTest` for examples.
   //
   // The virtual name is the name the control would have if we natively supported datatype bindings. We don't support
   // support them because datatypes can change dynamically at runtime and that is a big change, see:

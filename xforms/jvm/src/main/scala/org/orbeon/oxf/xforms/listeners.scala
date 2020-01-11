@@ -24,20 +24,20 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 class ReplicationServletContextListener extends ServletContextListener {
 
-  def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
+  override def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
     if (XFormsProperties.isReplication) {
       Version.instance.requirePEFeature("State replication")
       withDebug("eagerly bootstrapping caches for replication")(Caches)(cache.Caches.Logger)
     }
 
-  def contextDestroyed(servletContextEvent: ServletContextEvent) = ()
+  override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit = ()
 }
 
 class XFormsServletContextListener extends HttpSessionListener {
 
-  def sessionCreated(httpSessionEvent: HttpSessionEvent): Unit =
+  override def sessionCreated(httpSessionEvent: HttpSessionEvent): Unit =
     XFormsStateManager.sessionCreated(new ServletSessionImpl(httpSessionEvent.getSession))
 
-  def sessionDestroyed(httpSessionEvent: HttpSessionEvent): Unit =
+  override def sessionDestroyed(httpSessionEvent: HttpSessionEvent): Unit =
     XFormsStateManager.sessionDestroyed(new ServletSessionImpl(httpSessionEvent.getSession))
 }

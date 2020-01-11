@@ -89,7 +89,7 @@ class ServletFilter extends Filter {
 
   private var settingsOpt: Option[EmbeddingSettings] = None
 
-  def init(config: FilterConfig): Unit = {
+  override def init(config: FilterConfig): Unit = {
     APISupport.Logger.info("initializing embedding servlet filter")
     settingsOpt =
       Some(
@@ -102,7 +102,7 @@ class ServletFilter extends Filter {
       )
   }
 
-  def destroy(): Unit = {
+  override def destroy(): Unit = {
     APISupport.Logger.info("destroying embedding servlet filter")
     settingsOpt foreach (_.httpClient.shutdown())
     settingsOpt = None

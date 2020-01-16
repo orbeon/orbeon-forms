@@ -1196,14 +1196,14 @@
                                     showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
                                     var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
                                     discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
+                                    var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
                                     if (delay == null) {
                                         // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of
                                         // server-events in the $server-events form field, which will be submitted to the server by POSTing the form.
-                                        serverEventsValue = ORBEON.util.Dom.getStringValue(serverEventsElement);
+                                        serverEventsValue = serverEvents;
                                     } else {
                                         // Case where we need to send those events to the server with a regular Ajax request
                                         // after the given delay.
-                                        var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
                                         AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
                                     }
                                     break;

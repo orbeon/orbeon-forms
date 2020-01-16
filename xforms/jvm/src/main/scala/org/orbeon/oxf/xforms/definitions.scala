@@ -104,8 +104,8 @@ case class DelayedEvent(
     import XMLReceiverSupport._
 
     element(
-      localName = "server-events",
-      prefix    = "xxf",
+      localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
+      prefix    = XXFORMS_SHORT_PREFIX,
       uri       = XXFORMS_NAMESPACE_URI,
       atts      = List(
         "delay"         → (time - currentTime).toString,

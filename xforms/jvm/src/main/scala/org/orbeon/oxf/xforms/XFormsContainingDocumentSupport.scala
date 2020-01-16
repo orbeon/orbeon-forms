@@ -360,11 +360,27 @@ trait ContainingDocumentMisc {
 
 trait ContainingDocumentEvent {
 
+  self: XBLContainer ⇒
+
   private var eventStack: List[XFormsEvent] = Nil
 
   def startHandleEvent(event: XFormsEvent): Unit                = eventStack ::= event
   def endHandleEvent()                    : Unit                = eventStack = eventStack.tail
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
+
+  def withOutermostActionHandler[T](block: ⇒ T): T = {
+    startOutermostActionHandler()
+    val r = block
+    endOutermostActionHandler()
+    r
+  }
+
+  def startOutermostActionHandler(): Unit = // Q: What about relevance?
+    allModels foreach (_.startOutermostActionHandler)
+
+  def endOutermostActionHandler(): Unit =
+    if (isRelevant)
+      synchronizeAndRefresh()
 }
 
 trait ContainingDocumentProperties {
@@ -667,11 +683,11 @@ trait ContainingDocumentRequest {
 
 trait ContainingDocumentDelayedEvents {
 
-  self: XBLContainer ⇒
+  self: XBLContainer with ContainingDocumentEvent ⇒
 
   private val _delayedEvents = m.ListBuffer[DelayedEvent]()
 
-  // Schedule an event for delayed execution, following xf:dispatch/@delay semantics
+  // Schedule an event for delayed execution, following `xf:dispatch/@delay` semantics
   def addDelayedEvent(
     eventName         : String,
     targetEffectiveId : String,
@@ -721,32 +737,30 @@ trait ContainingDocumentDelayedEvents {
 
         dueEvents foreach { dueEvent ⇒
 
-          startOutermostActionHandler()
-
-          self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
-            case eventTarget: XFormsEventTarget ⇒
-              ClientEvents.processEvent(
-                self.containingDocument,
-                XFormsEventFactory.createEvent(
-                  eventName  = dueEvent.eventName,
-                  target     = eventTarget,
-                  properties = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
-                  bubbles    = dueEvent.bubbles,
-                  cancelable = dueEvent.cancelable
+          withOutermostActionHandler {
+            self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
+              case eventTarget: XFormsEventTarget ⇒
+                ClientEvents.processEvent(
+                  self.containingDocument,
+                  XFormsEventFactory.createEvent(
+                    eventName  = dueEvent.eventName,
+                    target     = eventTarget,
+                    properties = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
+                    bubbles    = dueEvent.bubbles,
+                    cancelable = dueEvent.cancelable
+                  )
                 )
-              )
-            case _ ⇒
-              implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
-              debug(
-                "ignoring delayed event with invalid target id",
-                List(
-                  "target id"  → dueEvent.targetEffectiveId,
-                  "event name" → dueEvent.eventName
+              case _ ⇒
+                implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
+                debug(
+                  "ignoring delayed event with invalid target id",
+                  List(
+                    "target id"  → dueEvent.targetEffectiveId,
+                    "event name" → dueEvent.eventName
+                  )
                 )
-              )
+            }
           }
-
-          endOutermostActionHandler()
         }
 
         // Try again in case there are new events available

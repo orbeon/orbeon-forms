@@ -67,10 +67,9 @@ trait XFormsSupport extends MockitoSugar {
     }
 
   def withAction[T](body: ⇒ T): T = {
-    document.startOutermostActionHandler()
-    val result = withScalaAction(mockActionInterpreter(inScopeContainingDocument))(_ ⇒ body)
-    document.endOutermostActionHandler()
-    result
+    document.withOutermostActionHandler {
+      withScalaAction(mockActionInterpreter(inScopeContainingDocument))(_ ⇒ body)
+    }
   }
 
   private def mockActionInterpreter(doc: XFormsContainingDocument) = {
@@ -114,9 +113,9 @@ trait XFormsSupport extends MockitoSugar {
 
   def setControlValue(controlEffectiveId: String, value: String): Unit = {
     // This stores the value without testing for readonly
-    document.startOutermostActionHandler()
-    getValueControl(controlEffectiveId).storeExternalValue(value)
-    document.endOutermostActionHandler()
+    document.withOutermostActionHandler {
+      getValueControl(controlEffectiveId).storeExternalValue(value)
+    }
   }
 
   def setControlValueWithEventSearchNested(controlEffectiveId: String, value: String): Unit = {

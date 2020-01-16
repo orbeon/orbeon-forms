@@ -414,15 +414,15 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       //    need for this so we are removing this behavior.
 
       // Each event is within its own start/end outermost action handler
-      doc.startOutermostActionHandler()
+      doc.withOutermostActionHandler {
 
-      // Handle repeat iteration if the event target is in a repeat
-      if (XFormsId.hasEffectiveIdSuffix(targetEffectiveId))
-        dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(target, EmptyGetter))
+        // Handle repeat iteration if the event target is in a repeat
+        if (XFormsId.hasEffectiveIdSuffix(targetEffectiveId))
+          dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(target, EmptyGetter))
 
-      // Interpret event
-      dispatchEventCheckTarget(event)
-      doc.endOutermostActionHandler()
+        // Interpret event
+        dispatchEventCheckTarget(event)
+      }
     }
   }
 

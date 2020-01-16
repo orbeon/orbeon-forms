@@ -295,9 +295,9 @@ object XFormsStateManager extends XFormsStateLifecycle {
     // possible right now.
     documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl ⇒
       XFormsAPI.withContainingDocument(documentFromStore) {
-        documentFromStore.startOutermostActionHandler()
-        Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
-        documentFromStore.endOutermostActionHandler()
+        documentFromStore.withOutermostActionHandler {
+          Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+        }
       }
     }
 

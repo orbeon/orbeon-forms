@@ -247,13 +247,6 @@ trait RefreshSupport {
 
   self: XBLContainer ⇒
 
-  def startOutermostActionHandler(): Unit = // Q: What about relevance?
-    allModels foreach (_.startOutermostActionHandler)
-
-  def endOutermostActionHandler(): Unit =
-    if (isRelevant)
-      synchronizeAndRefresh()
-
   // Below we split RRR and Refresh in order to reduce the number of refreshes performed
 
   // This is fun. Say you have a single model requiring RRRR and you get here the first time:

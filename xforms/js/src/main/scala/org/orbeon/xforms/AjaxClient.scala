@@ -224,7 +224,7 @@ object AjaxClient {
   // Create a timer which after the specified delay will fire a server event
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedServerEvent")
   def createDelayedServerEvent(
-    serverEvents : String,
+    encodedEvent : String,
     delay        : Double, // for JavaScript caller
     showProgress : Boolean,
     discardable  : Boolean,
@@ -239,7 +239,7 @@ object AjaxClient {
           new AjaxEvent(
             js.Dictionary[js.Any](
               "form"         → form.elem,
-              "value"        → serverEvents,
+              "value"        → encodedEvent,
               "eventName"    → EventNames.XXFormsServerEvents,
               "showProgress" → showProgress
             )

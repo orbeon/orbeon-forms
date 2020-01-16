@@ -121,6 +121,6 @@ case class DelayedEvent(
       delay        = time - currentTime,
       discardable  = discardable,
       showProgress = showProgress,
-      event        = asEncodedDocument
+      encodedEvent = asEncodedDocument
     )
 }

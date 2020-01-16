@@ -414,9 +414,9 @@ object InitSupport {
       }
 
     def dispatchInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
-      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, event) ⇒
+      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, encodedEvent) ⇒
         AjaxClient.createDelayedServerEvent(
-          serverEvents = event,
+          encodedEvent = encodedEvent,
           delay        = delay.toDouble,
           showProgress = showProgress,
           discardable  = discardable,

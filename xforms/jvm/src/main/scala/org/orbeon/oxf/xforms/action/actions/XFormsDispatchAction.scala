@@ -108,7 +108,6 @@ object XFormsDispatchAction {
     delayOpt        : Option[Int],
     showProgress    : Boolean,
     allowDuplicates : Boolean
-
   ): Unit =
     delayOpt match {
       case Some(delay) if delay >= 0 ⇒

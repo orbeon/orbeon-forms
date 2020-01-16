@@ -698,10 +698,10 @@ trait ContainingDocumentDelayedEvents {
       )
   }
 
-  def delayedEvents =
+  def delayedEvents: List[DelayedEvent] =
     _delayedEvents.toList
 
-  def clearAllDelayedEvents() =
+  def clearAllDelayedEvents(): Unit =
     _delayedEvents.clear()
 
   def processDueDelayedEvents(): Unit = {

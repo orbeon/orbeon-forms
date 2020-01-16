@@ -33,20 +33,6 @@
     }
 
     /**
-     * Create a timer which after the specified delay will fire a server event.
-     */
-    AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, discardable, formID) {
-        var timerId = window.setTimeout(function () {
-            var event = new AjaxServer.Event(document.getElementById(formID), null,
-                    serverEvents, "xxforms-server-events", null, null, null, showProgress);
-            AjaxServer.fireEvents([event], false);
-        }, delay);
-        // Save timer id for this discardable timer
-        if (discardable)
-            ORBEON.xforms.Page.getForm(formID).addDiscardableTimerId(timerId);
-    };
-
-    /**
      * Process events in the DOM passed as parameter.
      *
      * @param responseXML       DOM containing events to process
@@ -1218,7 +1204,7 @@
                                         // Case where we need to send those events to the server with a regular Ajax request
                                         // after the given delay.
                                         var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                        AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, discardable, formID);
+                                        AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
                                     }
                                     break;
                                 }

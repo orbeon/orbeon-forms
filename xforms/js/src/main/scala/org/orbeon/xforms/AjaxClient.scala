@@ -221,6 +221,38 @@ object AjaxClient {
     }
   }
 
+  // Create a timer which after the specified delay will fire a server event
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedServerEvent")
+  def createDelayedServerEvent(
+    serverEvents : String,
+    delay        : Double, // for JavaScript caller
+    showProgress : Boolean,
+    discardable  : Boolean,
+    formId       : String
+  ): Unit = {
+
+    val form = Page.getForm(formId)
+
+    val timerId = timers.setTimeout(delay) {
+      fireEvents(
+        js.Array(
+          new AjaxEvent(
+            js.Dictionary[js.Any](
+              "form"         → form.elem,
+              "value"        → serverEvents,
+              "eventName"    → EventNames.XXFormsServerEvents,
+              "showProgress" → showProgress
+            )
+          )
+        ),
+        incremental = false
+      )
+    }
+
+    if (discardable)
+      form.addDiscardableTimerId(timerId)
+  }
+
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasEventsToProcess")
   def hasEventsToProcess(): Boolean =
     Globals.requestInProgress || Globals.eventQueue.nonEmpty

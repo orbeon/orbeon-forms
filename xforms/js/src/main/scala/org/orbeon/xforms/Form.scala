@@ -18,6 +18,8 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.scalajs.js.timers
+import scala.scalajs.js.timers.SetTimeoutHandle
 
 class Form(
   val uuid                          : String,
@@ -35,7 +37,7 @@ class Form(
   val xblInstances                  : js.Array[XBLCompanion]
 ) extends js.Object { // so that properties/methods can be accessed from JavaScript
 
-  private var discardableTimerIds: List[Int] = Nil
+  private var discardableTimerIds: List[SetTimeoutHandle] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
@@ -45,11 +47,11 @@ class Form(
   // for example, and it is global.
   val loadingIndicator = new LoadingIndicator
 
-  def addDiscardableTimerId(id: Int): Unit =
+  def addDiscardableTimerId(id: SetTimeoutHandle): Unit =
     discardableTimerIds ::= id
 
   def clearDiscardableTimerIds(): Unit = {
-    discardableTimerIds foreach dom.window.clearTimeout
+    discardableTimerIds foreach timers.clearTimeout
     discardableTimerIds = Nil
   }
 

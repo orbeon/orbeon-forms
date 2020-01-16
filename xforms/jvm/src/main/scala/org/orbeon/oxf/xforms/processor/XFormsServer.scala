@@ -17,7 +17,7 @@ import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
 import org.orbeon.dom
-import org.orbeon.dom.Document
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
@@ -84,42 +84,35 @@ object XFormsServer {
       withElement(localName = "event-response", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
 
         // Compute server events
-        var requireClientSubmission = false
-        var submissionServerEventsOpt: Option[String] = None
+        val submissionServerEventsOpt: Option[String] = {
 
-        locally {
           val activeSubmissionOpt = containingDocument.getClientActiveSubmissionFirstPass
           val portletLoadOpt      = containingDocument.getNonJavaScriptLoadsToRun find (isPortletLoadMatch(containingDocument, _))
 
-          if (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) {
+          (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) option {
             val eventsDocument = dom.Document()
             val eventsElement  = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
 
-            // Check for xxforms-submit event
+            def newEventElem(sourceControlId: String, eventName: String): Element =
+              eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
+                .addAttribute("source-control-id", sourceControlId)
+                .addAttribute("name", eventName)
+
+            // Check for `xxforms-submit` event
             activeSubmissionOpt foreach { activeSubmission ⇒
-              val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
-              eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId)
-              eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT)
-              requireClientSubmission = true
+              newEventElem(activeSubmission.getEffectiveId, XFormsEvents.XXFORMS_SUBMIT)
             }
 
             // Check for `xxforms-load` event (for portlet mode only!)
             portletLoadOpt foreach { load ⇒
               // We need to submit the event so that the portlet can load the new path
-              val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
-
-              // Dispatch to #document
-              eventElement.addAttribute("source-control-id", Constants.DocumentId)
-              eventElement.addAttribute("resource", load.resource)
-
               // NOTE: don't care about the target for portlets
-              eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD)
-              requireClientSubmission = true
+              newEventElem(Constants.DocumentId, XFormsEvents.XXFORMS_LOAD)
+                .addAttribute("resource", load.resource)
             }
 
             // Encode events so that the client cannot send back arbitrary events
-            if (requireClientSubmission)
-              submissionServerEventsOpt = Some(XFormsUtils.encodeXML(eventsDocument, false))
+            XFormsUtils.encodeXML(eventsDocument, false)
           }
         }
 
@@ -285,7 +278,7 @@ object XFormsServer {
             }
 
             // Check if we need to tell the client to perform a form submission
-            if (requireClientSubmission)
+            if (submissionServerEventsOpt.isDefined)
               outputSubmissionInfo(
                 containingDocument.getClientActiveSubmissionFirstPass,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,

@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.util
 
+import java.{util ⇒ ju}
+
+import cats.syntax.option._
 import org.mockito.Mockito
 import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod.{GET, POST}
-import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -32,7 +34,7 @@ class ConnectionTest
   def newMockExternalContext: ExternalContext = {
 
     val incomingRequest = new RequestAdapter {
-      override val getHeaderValuesMap = mutable.LinkedHashMap(
+      override val getHeaderValuesMap: ju.Map[String, Array[String]] = mutable.LinkedHashMap(
         "user-agent"    → Array("Mozilla 12.1"),
         "authorization" → Array("xsifj1skf3"),
         "host"          → Array("localhost"),
@@ -65,7 +67,7 @@ class ConnectionTest
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
           scheme            = UriScheme.Http,
-          method            = GET,
+          method            = HttpMethod.GET,
           hasCredentials    = false,
           mediatype         = null,
           encodingForSOAP   = CharsetNames.Utf8,
@@ -81,7 +83,7 @@ class ConnectionTest
           incomingRequest         = externalContext.getRequest,
           contextPath             = "/orbeon",
           pathQuery               = "/foo/bar",
-          method                  = GET,
+          method                  = HttpMethod.GET,
           headersMaybeCapitalized = headersCapitalized,
           content                 = None
         )
@@ -109,7 +111,7 @@ class ConnectionTest
     val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes(CharsetNames.Utf8)
 
     // POST configuration
-    val method = POST
+    val method = HttpMethod.POST
     val bodyMediaType = "application/x-www-form-urlencoded"
     val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
@@ -146,5 +148,42 @@ class ConnectionTest
     }
   }
 
-  // buildConnectionHeadersCapitalizedWithSOAPIfNeeded
+  describe("#4384: GET service must not send a `Content-Type` header") {
+
+    val externalContext = newMockExternalContext
+
+    val contentType = ContentTypes.XmlContentType
+
+    val Expected = List(
+      HttpMethod.GET     → None,
+      HttpMethod.POST    → contentType.some,
+      HttpMethod.PUT     → contentType.some,
+      HttpMethod.DELETE  → None,
+      HttpMethod.HEAD    → None,
+      HttpMethod.OPTIONS → None,
+      HttpMethod.TRACE   → None,
+      HttpMethod.LOCK    → contentType.some,
+      HttpMethod.UNLOCK  → contentType.some
+    )
+
+    for ((method, expectedHeaderValue) ← Expected) {
+      it(s"must ${if (expectedHeaderValue.isDefined) "" else "not " }include a `Content-Type` header when using the `${method.entryName}` method") {
+        val headersCapitalized =
+          Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
+            scheme           = UriScheme.Http,
+            method           = method,
+            hasCredentials   = false,
+            mediatype        = ContentTypes.XmlContentType,
+            encodingForSOAP  = CharsetNames.Utf8,
+            customHeaders    = Map.empty,
+            headersToForward = Set(),
+            getHeader        = _ ⇒ None)(
+            logger           = ResourceManagerTestBase.newIndentedLogger,
+            externalContext  = externalContext
+          )
+
+        assert(expectedHeaderValue == firstItemIgnoreCase(headersCapitalized, Headers.ContentType))
+      }
+    }
+  }
 }

@@ -301,7 +301,8 @@ object XFormsAssetServer {
         headersToForward = headersToForward,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = getHeader)(
-        logger           = logger
+        logger           = logger,
+        externalContext  = externalContext
       )
 
     val resource =

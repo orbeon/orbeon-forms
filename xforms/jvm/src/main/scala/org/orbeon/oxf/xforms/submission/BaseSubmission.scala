@@ -150,7 +150,8 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         customHeaders     = customHeaderNameValues,
         headersToForward  = Connection.headersToForwardFromProperty,
         getHeader         = containingDocument.headersGetter)(
-        logger            = indentedLogger
+        logger            = indentedLogger,
+        externalContext   = NetUtils.getExternalContext
       )
 
     val effectiveResourceURI =  {

@@ -155,12 +155,12 @@ class Connection(
 
           val response =
             client.connect(
-              effectiveConnectionUrlString,
-              credentials,
-              cookieStore,
-              method,
-              cleanCapitalizedHeaders,
-              content
+              url         = effectiveConnectionUrlString,
+              credentials = credentials,
+              cookieStore = cookieStore,
+              method      = method,
+              headers     = cleanCapitalizedHeaders,
+              content     = content
             )
 
           ifDebug {
@@ -350,7 +350,6 @@ object Connection extends Logging {
     logger            : IndentedLogger
   ): Connection = {
 
-
     val messageBody: Option[Array[Byte]] =
       if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
@@ -408,7 +407,8 @@ object Connection extends Logging {
     headersToForward : Set[String],
     cookiesToForward : List[String],
     getHeader        : String ⇒ Option[List[String]])(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    externalContext  : ExternalContext
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme))
       buildConnectionHeadersCapitalized(hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
@@ -416,7 +416,7 @@ object Connection extends Logging {
       EmptyHeaders
 
   // For Java callers
-  // 2019-10-07: 3 Java callers
+  // 2020-01-17: 3 Java callers
   def jBuildConnectionHeadersCapitalizedIfNeeded(
     scheme              : String,
     hasCredentials      : Boolean,
@@ -426,25 +426,27 @@ object Connection extends Logging {
     logger              : IndentedLogger
   ): Map[String, List[String]] =
     buildConnectionHeadersCapitalizedIfNeeded(
-      UriScheme.withName(scheme),
-      hasCredentials,
-      Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
-      valueAs[Set](headersToForward),
-      cookiesToForwardFromProperty,
-      getHeader)(
-      logger
+      scheme            = UriScheme.withName(scheme),
+      hasCredentials    = hasCredentials,
+      customHeaders     = Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
+      headersToForward  = valueAs[Set](headersToForward),
+      cookiesToForward  = cookiesToForwardFromProperty,
+      getHeader         = getHeader)(
+      logger            = logger,
+      externalContext   = NetUtils.getExternalContext
     )
 
   def buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
     scheme           : UriScheme,
     method           : HttpMethod,
     hasCredentials   : Boolean,
-    mediatype        : String,
+    mediatype        : String,// xxx Option[String]
     encodingForSOAP  : String,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
     getHeader        : String ⇒ Option[List[String]])(implicit
-    logger           : IndentedLogger
+    logger           : IndentedLogger,
+    externalContext  : ExternalContext
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme)) {
 
@@ -559,10 +561,9 @@ object Connection extends Logging {
     headersToForward         : Set[String],
     cookiesToForward         : List[String],
     getHeader                : String ⇒ Option[List[String]])(implicit
-    logger                   : IndentedLogger
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext
   ): Map[String, List[String]] = {
-
-    val externalContext = NetUtils.getExternalContext
 
     // 1. Caller-specified list of headers to forward based on a space-separated list of header names
     val headersToForwardCapitalized =

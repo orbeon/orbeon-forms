@@ -255,8 +255,10 @@ private object PersistenceProxyProcessor {
     headers        : Map[String, String]
   ): ConnectionResult = {
 
+    implicit val externalContext = NetUtils.getExternalContext
+
     val outgoingURL =
-      new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
+      new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
 
     val persistenceHeaders =
       for ((name, value) ← headers)

@@ -19,7 +19,6 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAda
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -27,18 +26,11 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class ConnectionTest
-  extends ResourceManagerSupport
+  extends ResourceManagerSupport // for properties in particular
      with AnyFunSpecLike {
 
-  describe("Connection headers") {
+  def newMockExternalContext: ExternalContext = {
 
-    // Custom headers
-    val customHeaderValuesMap = Map(
-      "My-Stuff"   → List("my-value"),
-      "Your-Stuff" → List("your-value-1", "your-value-2")
-    )
-
-    // Create request and wrapper
     val incomingRequest = new RequestAdapter {
       override val getHeaderValuesMap = mutable.LinkedHashMap(
         "user-agent"    → Array("Mozilla 12.1"),
@@ -55,11 +47,20 @@ class ConnectionTest
     Mockito when externalContext.getRequest thenReturn incomingRequest
     Mockito when externalContext.getWebAppContext thenReturn webAppContext
 
+    externalContext
+  }
+
+  describe("Connection headers") {
+
+    // Custom headers
+    val customHeaderValuesMap = Map(
+      "My-Stuff"   → List("my-value"),
+      "Your-Stuff" → List("your-value-1", "your-value-2")
+    )
+
     it("must process request and response headers") {
 
-      // Replace the `ExternalContext` provided by `ResourceManagerSupport`
-      // NOTE: Should instead use something like `withExternalContext()` or better an implicit parameter.
-      PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+      val externalContext = newMockExternalContext
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
@@ -71,7 +72,8 @@ class ConnectionTest
           customHeaders     = customHeaderValuesMap,
           headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
           getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
-          logger            = ResourceManagerTestBase.newIndentedLogger
+          logger            = ResourceManagerTestBase.newIndentedLogger,
+          externalContext   = externalContext
         )
 
       val request =
@@ -113,6 +115,8 @@ class ConnectionTest
 
     it("must combine them") {
 
+      val externalContext = newMockExternalContext
+
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
           scheme           = UriScheme.Http,
@@ -123,12 +127,13 @@ class ConnectionTest
           customHeaders    = explicitHeaders,
           headersToForward = Set(),
           getHeader        = _ ⇒ None)(
-          logger           = ResourceManagerTestBase.newIndentedLogger
+          logger           = ResourceManagerTestBase.newIndentedLogger,
+          externalContext  = externalContext
         )
 
       val wrapper =
         new LocalRequest(
-          incomingRequest         = NetUtils.getExternalContext.getRequest,
+          incomingRequest         = externalContext.getRequest,
           contextPath             = "/orbeon",
           pathQuery               = s"/foobar?$queryString",
           method                  = method,

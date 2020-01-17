@@ -88,8 +88,10 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
      outputStream    : OutputStream
   ): Unit = {
 
+    implicit val externalContext = NetUtils.getExternalContext
+
     val domDocument = readInputAsDOM(pipelineContext, input)
-    val requestOpt  = Option(NetUtils.getExternalContext) flatMap (ctx ⇒ Option(ctx.getRequest))
+    val requestOpt  = Option(externalContext) flatMap (ctx ⇒ Option(ctx.getRequest))
     val renderer    = new ITextRenderer(DefaultDotsPerPoint, DefaultDotsPerPixel)
 
     try {

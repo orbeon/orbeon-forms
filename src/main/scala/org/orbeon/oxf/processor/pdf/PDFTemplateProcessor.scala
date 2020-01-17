@@ -23,6 +23,7 @@ import com.lowagie.text.{Image, Rectangle}
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
@@ -32,7 +33,6 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.NamespaceMapping
@@ -327,6 +327,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
           val url = new URI(hrefAttribute)
 
+          val externalContext = NetUtils.getExternalContext
+
           val cxr =
             Connection(
               method          = GET,
@@ -339,8 +341,9 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                 customHeaders    = URLGeneratorBase.extractHeaders(context.element),
                 headersToForward = Connection.headersToForwardFromProperty,
                 cookiesToForward = Connection.cookiesToForwardFromProperty,
-                getHeader        = Connection.getHeaderFromRequest(NetUtils.getExternalContext.getRequest))(
-                logger           = context.logger
+                getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest))(
+                logger           = context.logger,
+                externalContext  = externalContext
               ),
               loadState       = true,
               logBody         = false)(

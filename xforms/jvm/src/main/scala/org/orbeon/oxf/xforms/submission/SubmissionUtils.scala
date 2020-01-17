@@ -97,7 +97,9 @@ object SubmissionUtils {
 
   def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
 
-    implicit val _logger = model.indentedLogger
+    implicit val _logger          = model.indentedLogger
+    implicit val _externalContext = NetUtils.getExternalContext
+
     val url = new URI(resolvedURL)
 
     Connection(

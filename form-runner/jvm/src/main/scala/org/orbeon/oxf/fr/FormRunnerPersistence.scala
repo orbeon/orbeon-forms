@@ -284,7 +284,8 @@ trait FormRunnerPersistence {
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
 
-    val request = NetUtils.getExternalContext.getRequest
+    implicit val externalContext = NetUtils.getExternalContext
+    val request = externalContext.getRequest
 
     val rewrittenURLString =
       URLRewriterUtils.rewriteServiceURL(

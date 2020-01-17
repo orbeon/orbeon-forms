@@ -21,7 +21,7 @@ import java.util.concurrent.Callable
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.StreamedContent
-import org.orbeon.oxf.util.{Connection, ConnectionResult}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
 
 /**
   * Regular remote submission going through a protocol handler.
@@ -52,7 +52,8 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         customHeaders    = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
         headersToForward = Connection.headersToForwardFromProperty,
         getHeader        = containingDocument.headersGetter)(
-        detailsLogger
+        logger           = detailsLogger,
+        externalContext  = NetUtils.getExternalContext
       )
 
     val submissionEffectiveId = submission.getEffectiveId

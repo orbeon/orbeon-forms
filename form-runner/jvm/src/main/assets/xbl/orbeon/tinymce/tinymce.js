@@ -54,6 +54,11 @@
                     YAHOO.xbl.fr.Tinymce.DefaultConfig;
                 return config;
             }).call(this);
+
+            // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
+            // TinyMCE tried to load `silver/theme.js`, which doesn't exist
+            tinyMceConfig.suffix = '.min';
+
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
             var tabindex = $(tinyMceDiv).attr('tabindex');
             this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig, tinymce.EditorManager);

@@ -451,7 +451,7 @@ object Connection extends Logging {
       // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
       // mediatype attribute"
       val headersWithContentTypeIfNeeded =
-        if (firstItemIgnoreCase(customHeaders, ContentType).isEmpty && mediatype != null)
+        if (requiresRequestBody(method) && firstItemIgnoreCase(customHeaders, ContentType).isEmpty && (mediatype ne null))
           customHeaders + (ContentType → List(mediatype))
         else
           customHeaders

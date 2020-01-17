@@ -16,13 +16,21 @@
 .xbl-fr-tinymce {
     &.xforms-readonly {
         .mce-top-part {
-            display: none;  // Hide the toolbar when readonly
+            display: none;              // Hide the toolbar when readonly
         }
     }
     .xbl-fr-tinymce-div {
-        min-width: 1px;     // So we can use jQuery's :visible selector
+        min-width: 1px;                 // So we can use jQuery's :visible selector
     }
     .mce-container {
         .box-shadow(none);
+    }
+
+    .tox .tox-tbtn {
+        height: 25px;                   // Make icons smaller
+        margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
+    }
+    .tox .tox-toolbar__primary {
+        border-bottom: 1px solid #ccc;  // Line below the icons, which other doesn't show with smaller icons
     }
 }

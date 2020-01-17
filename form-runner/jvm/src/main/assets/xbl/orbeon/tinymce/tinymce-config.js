@@ -12,5 +12,6 @@ YAHOO.xbl.fr.Tinymce.DefaultConfig = {
     "forced_root_block" : "div",
     "verify_html"       : true,
     "visual_table_class": "fr-tinymce-table", // Override default TinyMCE class on tables, which adds borders. We can't leave this just empty, otherwise TinyMCE puts its own CSS class.
-    "skin"              : false               // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    "skin"              : false,              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    "content_style"     : "body { font-size: 13px; margin: 8px 12px }"
 };

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
@@ -21,16 +20,17 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import org.scalatestplus.junit.AssertionsForJUnit
-import org.scalatestplus.mockito.MockitoSugar
 
-class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
+class ConnectionTest
+  extends ResourceManagerSupport
+     with AnyFunSpecLike {
 
-  @Test def forwardHeaders(): Unit = {
+  describe("Connection headers") {
 
     // Custom headers
     val customHeaderValuesMap = Map(
@@ -55,48 +55,53 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     Mockito when externalContext.getRequest thenReturn incomingRequest
     Mockito when externalContext.getWebAppContext thenReturn webAppContext
 
-    // NOTE: Should instead use withExternalContext()
-    PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-    val headersCapitalized =
-      Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme            = UriScheme.Http,
-        method            = GET,
-        hasCredentials    = false,
-        mediatype         = null,
-        encodingForSOAP   = CharsetNames.Utf8,
-        customHeaders     = customHeaderValuesMap,
-        headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
-        getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
-        logger            = ResourceManagerTestBase.newIndentedLogger
-      )
+    it("must process request and response headers") {
 
-    val request =
-      new LocalRequest(
-        incomingRequest         = externalContext.getRequest,
-        contextPath             = "/orbeon",
-        pathQuery               = "/foo/bar",
-        method                  = GET,
-        headersMaybeCapitalized = headersCapitalized,
-        content                 = None
-      )
+      // Replace the `ExternalContext` provided by `ResourceManagerSupport`
+      // NOTE: Should instead use something like `withExternalContext()` or better an implicit parameter.
+      PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
 
-    // Test standard headers received
-    // See #3135 regarding `LocalRequest` capitalization. We might want to change how this works.
-    val headerValuesMap = request.getHeaderValuesMap.asScala
+      val headersCapitalized =
+        Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
+          scheme            = UriScheme.Http,
+          method            = GET,
+          hasCredentials    = false,
+          mediatype         = null,
+          encodingForSOAP   = CharsetNames.Utf8,
+          customHeaders     = customHeaderValuesMap,
+          headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
+          getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
+          logger            = ResourceManagerTestBase.newIndentedLogger
+        )
 
-    assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
-    assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
-    assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
-    assert(None                                          === headerValuesMap.get("host"))
-    assert(None                                          === headerValuesMap.get("foobar"))
+      val request =
+        new LocalRequest(
+          incomingRequest         = externalContext.getRequest,
+          contextPath             = "/orbeon",
+          pathQuery               = "/foo/bar",
+          method                  = GET,
+          headersMaybeCapitalized = headersCapitalized,
+          content                 = None
+        )
 
-    // Test custom headers received
-    assert("my-value"                                    === headerValuesMap("my-stuff")(0))
-    assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
-    assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
+      // Test standard headers received
+      // See #3135 regarding `LocalRequest` capitalization. We might want to change how this works.
+      val headerValuesMap = request.getHeaderValuesMap.asScala
+
+      assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
+      assert("xsifj1skf3"                                  === headerValuesMap("authorization")(0))
+      assert("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" === headerValuesMap("cookie")(0))
+      assert(None                                          === headerValuesMap.get("host"))
+      assert(None                                          === headerValuesMap.get("foobar"))
+
+      // Test custom headers received
+      assert("my-value"                                    === headerValuesMap("my-stuff")(0))
+      assert("your-value-1"                                === headerValuesMap("your-stuff")(0))
+      assert("your-value-2"                                === headerValuesMap("your-stuff")(1))
+    }
   }
 
-  @Test def combinedParameters(): Unit = {
+  describe("Combining request parameters") {
 
     val queryString = "name1=value1a&name2=value2a&name3=value3"
     val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes(CharsetNames.Utf8)
@@ -106,30 +111,35 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     val bodyMediaType = "application/x-www-form-urlencoded"
     val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
-    val headersCapitalized =
-      Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme           = UriScheme.Http,
-        method           = method,
-        hasCredentials   = false,
-        mediatype        = bodyMediaType,
-        encodingForSOAP  = CharsetNames.Utf8,
-        customHeaders    = explicitHeaders,
-        headersToForward = Set(),
-        getHeader        = _ ⇒ None)(
-        logger           = ResourceManagerTestBase.newIndentedLogger
-      )
+    it("must combine them") {
 
-    val wrapper =
-      new LocalRequest(
-        incomingRequest         = NetUtils.getExternalContext.getRequest,
-        contextPath             = "/orbeon",
-        pathQuery               = s"/foobar?$queryString",
-        method                  = method,
-        headersMaybeCapitalized = headersCapitalized,
-        content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
-      )
+      val headersCapitalized =
+        Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
+          scheme           = UriScheme.Http,
+          method           = method,
+          hasCredentials   = false,
+          mediatype        = bodyMediaType,
+          encodingForSOAP  = CharsetNames.Utf8,
+          customHeaders    = explicitHeaders,
+          headersToForward = Set(),
+          getHeader        = _ ⇒ None)(
+          logger           = ResourceManagerTestBase.newIndentedLogger
+        )
 
-    val parameters = wrapper.getParameterMap
-    assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))
+      val wrapper =
+        new LocalRequest(
+          incomingRequest         = NetUtils.getExternalContext.getRequest,
+          contextPath             = "/orbeon",
+          pathQuery               = s"/foobar?$queryString",
+          method                  = method,
+          headersMaybeCapitalized = headersCapitalized,
+          content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
+        )
+
+      val parameters = wrapper.getParameterMap
+      assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))
+    }
   }
+
+  // buildConnectionHeadersCapitalizedWithSOAPIfNeeded
 }

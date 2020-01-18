@@ -48,6 +48,7 @@ package object tinymce {
     def hide(): Unit = js.native
     def focus(): Unit = js.native
     def getBody(): html.Element = js.native
+    def setMode(mode: String): Unit = js.native
   }
 
   @js.native

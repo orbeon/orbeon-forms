@@ -137,8 +137,8 @@ object TinyMCE {
       }
 
       override def xformsFocus(): Unit = { onInit(myEditor.focus) }
-      def readonly   (): Unit = { onInit(() ⇒ myEditor.getBody().contentEditable = "false" ) }
-      def readwrite  (): Unit = { onInit(() ⇒ myEditor.getBody().contentEditable = "true" ) }
+      def readonly   (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
+      def readwrite  (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
     }
   )
 }

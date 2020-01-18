@@ -47,7 +47,7 @@ val JavaActivationVersion         = "1.2.1"
 val ServletApiVersion             = "4.0.1"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
-val LiferayPortalKernelVersion    = "5.2.1"
+val LiferayPortalKernelVersion    = "5.2.2"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,

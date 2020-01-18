@@ -31,6 +31,7 @@ object FormRunnerApp extends App {
     xbl.HrefButton
     xbl.Select1Search
     xbl.AutosizeTextarea
+    xbl.TinyMCE
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI

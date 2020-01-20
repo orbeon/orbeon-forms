@@ -1,0 +1,11 @@
+body {
+    font-family      : "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size        : 13px;
+    margin           : 8px 12px;
+}
+
+/* When readonly, make background and text grey */
+body[contenteditable="false"] {
+    background-color : #eee;
+    color            : #555;
+}

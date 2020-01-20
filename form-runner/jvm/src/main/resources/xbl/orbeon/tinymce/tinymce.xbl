@@ -107,7 +107,7 @@
                         xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'
                     )"/>
 
-            <xf:group ref=".[$script]" xxf:element="div">
+            <xf:group ref="$binding[$script]" xxf:element="div">
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                     <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.serverToClient();</xf:action>

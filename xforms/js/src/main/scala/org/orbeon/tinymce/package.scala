@@ -57,24 +57,25 @@ package object tinymce {
   }
 
   trait TinyMceConfig extends js.Object {
-    var mode                     : js.UndefOr[String] = js.undefined
-    var language                 : js.UndefOr[String] = js.undefined
+    var mode                     : js.UndefOr[String]  = js.undefined
+    var language                 : js.UndefOr[String]  = js.undefined
     var statusbar                : js.UndefOr[Boolean] = js.undefined
     var menubar                  : js.UndefOr[Boolean] = js.undefined
-    var toolbar                  : js.UndefOr[String] = js.undefined
+    var toolbar                  : js.UndefOr[String]  = js.undefined
     var gecko_spellcheck         : js.UndefOr[Boolean] = js.undefined
-    var doctype                  : js.UndefOr[String] = js.undefined
-    var encoding                 : js.UndefOr[String] = js.undefined
-    var entity_encoding          : js.UndefOr[String] = js.undefined
-    var forced_root_block        : js.UndefOr[String] = js.undefined
+    var doctype                  : js.UndefOr[String]  = js.undefined
+    var encoding                 : js.UndefOr[String]  = js.undefined
+    var entity_encoding          : js.UndefOr[String]  = js.undefined
+    var forced_root_block        : js.UndefOr[String]  = js.undefined
     var verify_html              : js.UndefOr[Boolean] = js.undefined
-    var visual_table_class       : js.UndefOr[String] = js.undefined
+    var visual_table_class       : js.UndefOr[String]  = js.undefined
     var skin                     : js.UndefOr[Boolean] = js.undefined
-    var content_style            : js.UndefOr[String] = js.undefined
-    var plugins                  : js.UndefOr[String] = js.undefined
-    var autoresize_min_height    : js.UndefOr[Double] = js.undefined
-    var autoresize_bottom_margin : js.UndefOr[Double] = js.undefined
-    var suffix                   : js.UndefOr[String] = js.undefined
+    var content_style            : js.UndefOr[String]  = js.undefined
+    var content_css              : js.UndefOr[String]  = js.undefined
+    var plugins                  : js.UndefOr[String]  = js.undefined
+    var autoresize_min_height    : js.UndefOr[Double]  = js.undefined
+    var autoresize_bottom_margin : js.UndefOr[Double]  = js.undefined
+    var suffix                   : js.UndefOr[String]  = js.undefined
   }
 
   object TinyMceDefaultConfig extends TinyMceConfig {
@@ -93,6 +94,5 @@ package object tinymce {
     visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
                                             // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
     skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
-    content_style      = "body { font-size: 13px; margin: 8px 12px }"
   }
 }

@@ -54,7 +54,8 @@ object TinyMCE {
 
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
-        tinyMceConfig.suffix = ".min"
+        tinyMceConfig.suffix      = ".min"
+        tinyMceConfig.content_css = TinyMce.baseURL + "/../../content.css"
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tabindex = tinyMceDiv.getAttribute("tabindex")

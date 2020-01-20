@@ -57,27 +57,42 @@ package object tinymce {
   }
 
   trait TinyMceConfig extends js.Object {
-    var plugins: js.UndefOr[String]
-    var autoresize_min_height: js.UndefOr[Double] = js.undefined
-    var autoresize_bottom_margin: js.UndefOr[Double] = js.undefined
-    var suffix: js.UndefOr[String] = js.undefined
+    var mode                     : js.UndefOr[String] = js.undefined
+    var language                 : js.UndefOr[String] = js.undefined
+    var statusbar                : js.UndefOr[Boolean] = js.undefined
+    var menubar                  : js.UndefOr[Boolean] = js.undefined
+    var toolbar                  : js.UndefOr[String] = js.undefined
+    var gecko_spellcheck         : js.UndefOr[Boolean] = js.undefined
+    var doctype                  : js.UndefOr[String] = js.undefined
+    var encoding                 : js.UndefOr[String] = js.undefined
+    var entity_encoding          : js.UndefOr[String] = js.undefined
+    var forced_root_block        : js.UndefOr[String] = js.undefined
+    var verify_html              : js.UndefOr[Boolean] = js.undefined
+    var visual_table_class       : js.UndefOr[String] = js.undefined
+    var skin                     : js.UndefOr[Boolean] = js.undefined
+    var content_style            : js.UndefOr[String] = js.undefined
+    var plugins                  : js.UndefOr[String] = js.undefined
+    var autoresize_min_height    : js.UndefOr[Double] = js.undefined
+    var autoresize_bottom_margin : js.UndefOr[Double] = js.undefined
+    var suffix                   : js.UndefOr[String] = js.undefined
   }
 
   object TinyMceDefaultConfig extends TinyMceConfig {
-    var mode = "exact"
-    var language = "en"
-    var statusbar = false
-    var menubar            = false
-    override var plugins            = "lists link"
-    var toolbar            = "bold italic | bullist numlist outdent indent | link"
-    var gecko_spellcheck   = true
-    var doctype            = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-    var encoding           = "xml"
-    var entity_encoding    = "raw"
-    var forced_root_block  = "div"
-    var verify_html        = true
-    var visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders. We can't leave this just empty, otherwise TinyMCE puts its own CSS class.
-    var skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
-    var content_style      = "body { font-size: 13px; margin: 8px 12px }"
+    mode               = "exact"
+    language           = "en"
+    statusbar          = false
+    menubar            = false
+    plugins            = "lists link"
+    toolbar            = "bold italic | bullist numlist outdent indent | link"
+    gecko_spellcheck   = true
+    doctype            = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+    encoding           = "xml"
+    entity_encoding    = "raw"
+    forced_root_block  = "div"
+    verify_html        = true
+    visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
+                                            // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
+    skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    content_style      = "body { font-size: 13px; margin: 8px 12px }"
   }
 }

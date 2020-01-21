@@ -20,18 +20,21 @@ import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.JavaConverters._
-
 class XXFormsListInstances extends XFormsFunction {
 
-  override def iterate(xpathContext: XPathContext): SequenceIterator =
-    resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
-      case model: XFormsModel ⇒
-        for {
-          instance    ← model.getInstances.asScala
-          effectiveId = instance.getEffectiveId
-          absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
-        } yield
-          absoluteId
-    }
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+
+    val itOpt =
+      resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
+        case model: XFormsModel ⇒
+          for {
+            instance    ← model.instancesIterator
+            effectiveId = instance.getEffectiveId
+            absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
+          } yield
+            absoluteId
+      }
+
+    itOpt.getOrElse(Iterator.empty): Iterator[String]
+  }
 }

@@ -13,48 +13,36 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.{util ⇒ ju}
-
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{StructuredQName, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 
-abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model)
+abstract class XFormsModelBase
   extends Logging
-  with ListenersTrait {
+     with ListenersTrait {
+
+  selfModel: XFormsModel ⇒
 
   import Private._
 
   val containingDocument  = container.getContainingDocument
   val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 
-  implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
+  implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
 
   val deferredActionContext = new DeferredActionContext(container)
 
-  // TEMP: implemented in Java subclass until we move everything to Scala
-  def selfModel: XFormsModel
-  def resetAndEvaluateVariables(): Unit
-  def modelBindsOpt: Option[XFormsModelBinds]
-  def getInstances: ju.List[XFormsInstance]
-  def getInstance(instanceStaticId: String): XFormsInstance
-  def getDefaultEvaluationContext: BindingContext
-
-  def schemaValidator = _schemaValidator
-  def hasSchema = _schemaValidator.hasSchema
+  def schemaValidator: XFormsModelSchemaValidator = _schemaValidator
+  def hasSchema: Boolean = _schemaValidator.hasSchema
 
   def getSchemaURIs: Array[String] =
     if (hasSchema)
@@ -90,8 +78,6 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
   // Recalculate and revalidate are a combined operation
   // See https://github.com/orbeon/orbeon-forms/issues/1650
   def doRecalculateRevalidate(): Unit = {
-
-    val instances = getInstances.asScala
 
     // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
     // so we collect them here and dispatch them altogether once everything is done.
@@ -133,25 +119,20 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
     // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
     // algorithm below.
-    def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): Seq[XFormsEvent] = {
+    def createAndCommitValidationEvents(invalidInstancesIds: collection.Set[String]): List[XFormsEvent] = {
 
-      val changedInstances =
+      val changedInstancesIt =
         for {
-          instance           ← instances
+          instance           ← instancesIterator
           previouslyValid    = instance.valid
-          currentlyValid     = ! invalidInstancesIds(instance.getEffectiveId)
-          if previouslyValid != currentlyValid
-        } yield
-          instance
+          newlyValid         = ! invalidInstancesIds(instance.getEffectiveId)
+          if previouslyValid != newlyValid
+        } yield {
+          instance.valid = newlyValid // side-effect!
+          if (newlyValid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
+        }
 
-      // Update instance validity
-      for (instance ← changedInstances)
-        instance.valid = ! instance.valid
-
-      // Create events
-      for (instance ← changedInstances)
-      yield
-        if (instance.valid) new XXFormsValidEvent(instance) else new XXFormsInvalidEvent(instance)
+      changedInstancesIt.toList
     }
 
     val validationEvents =
@@ -218,13 +199,12 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     def doRevalidate(collector: XFormsEvent ⇒ Unit): collection.Set[String] =
       withDebug("performing revalidate", List("model" → effectiveId)) {
 
-        val instances = getInstances.asScala
         val invalidInstancesIds = m.LinkedHashSet[String]()
 
         // Clear schema validation state
         // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
         for {
-          instance ← instances
+          instance                       ← instancesIterator
           instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
           if instanceMightBeSchemaValidated
         } locally {
@@ -234,7 +214,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
         // Validate using schemas if needed
         if (hasSchema)
           for {
-            instance ← instances
+            instance ← instancesIterator
             if instance.isSchemaValidation                   // we don't support validating read-only instances
             if ! _schemaValidator.validateInstance(instance) // apply schema
           } locally {
@@ -251,7 +231,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
       }
 
     def bindsIfInstance: Option[XFormsModelBinds] =
-      if (getInstances.isEmpty)
+      if (instancesIterator.isEmpty)
         None
       else
         modelBindsOpt

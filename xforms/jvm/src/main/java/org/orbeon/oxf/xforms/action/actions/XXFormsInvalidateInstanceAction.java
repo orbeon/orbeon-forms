@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.orbeon.dom.Element;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -36,7 +34,7 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
         final String handleXIncludeString = actionInterpreter.resolveAVT(actionElement, "xinclude");
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
-        final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LoggingCategory());
 
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource

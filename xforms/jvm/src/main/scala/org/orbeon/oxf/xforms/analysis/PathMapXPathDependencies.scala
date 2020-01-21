@@ -334,7 +334,7 @@ class PathMapXPathDependencies(
     // Remove all references to concrete models and instances
     modelStates -= getOrCreateModelState(model).modelKey
 
-    for (instance ← model.getInstances.asScala if instance ne null)
+    for (instance ← model.instancesIterator)
       instancesByKey -= ModelOrInstanceKey(instance)
   }
 

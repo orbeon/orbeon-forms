@@ -374,7 +374,7 @@ class XFormsComponentControl(
     def findMirrorInstance: Option[XFormsInstance] = (
       nestedContainerOpt.toIterator
       flatMap (_.models.iterator)
-      flatMap (_.getInstances.asScala.iterator)
+      flatMap (_.instancesIterator)
       find    (_.instance.element.attributeValue("mirror") == "true")
     )
 

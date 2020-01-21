@@ -104,7 +104,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
           (_.getEffectiveId)
     }
 
-  def bindingContext = context.bindingContext
+  def bindingContext: BindingContext = context.bindingContext
 
   def getSourceEffectiveId: String =
     context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
@@ -293,7 +293,7 @@ object XFormsFunction {
     }
   }
 
-  def sourceElementAnalysis(pathMap: PathMap) =
+  def sourceElementAnalysis(pathMap: PathMap): SimpleElementAnalysis =
     pathMap.getPathMapContext match {
       case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
       case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")

@@ -490,16 +490,16 @@ trait ContainerResolver {
       None
 
   // Find the instance in this or descendant containers
-  def findInstanceInDescendantOrSelf(instanceStaticId: String) =
+  def findInstanceInDescendantOrSelf(instanceStaticId: String): Option[XFormsInstance] =
     if (isRelevant && models.nonEmpty)
-      allModels flatMap (_.getInstances.asScala) find (_.getId == instanceStaticId)
+      allModels flatMap (_.instancesIterator) find (_.getId == instanceStaticId)
     else
       None
 
   // For Java callers
   def findInstanceOrNull(instanceId: String) = findInstance(instanceId).orNull
 
-  protected def initializeNestedControls() = ()
+  protected def initializeNestedControls(): Unit = ()
 
   def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any

@@ -17,21 +17,18 @@ import com.typesafe.scalalogging.Logger
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.fr.FormRunner.formRunnerProperty
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.collection.JavaConverters._
 import scala.collection.compat._
 
 object SimpleDataMigration {
@@ -224,7 +221,7 @@ object SimpleDataMigration {
       val templateIterationNamesToRootElems =
         (
           for {
-            instance   ← enclosingModel.getInstances.iterator.asScala
+            instance   ← enclosingModel.instancesIterator
             instanceId = instance.getId
             if FormRunner.isTemplateId(instanceId)
           } yield

@@ -15,9 +15,7 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.http.StreamedContent;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.event.events.ErrorType$;
@@ -116,69 +114,69 @@ public class CacheableSubmission extends BaseSubmission {
                     final boolean[] status = { false , false};
                     try {
                         final DocumentInfo newDocumentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(
-                                staticInstance, instanceCaching, p2.isReadonly(),
-                                new XFormsServerSharedInstancesCache.Loader() {
-                                    public DocumentInfo load(String instanceSourceURI, boolean handleXInclude) {
+                                staticInstance,
+                                instanceCaching,
+                                p2.isReadonly(),
+                                (instanceSourceURI, handleXInclude) -> {
 
-                                        // Update status
-                                        status[0] = true;
+                                    // Update status
+                                    status[0] = true;
 
-                                        // Call regular submission
-                                        SubmissionResult submissionResult = null;
-                                        try {
-                                            // Run regular submission but force:
-                                            // - synchronous execution
-                                            // - readonly result
-                                            final SecondPassParameters updatedP2 = SecondPassParameters.amendForJava(p2, false, true);
+                                    // Call regular submission
+                                    SubmissionResult submissionResult = null;
+                                    try {
+                                        // Run regular submission but force:
+                                        // - synchronous execution
+                                        // - readonly result
+                                        final SecondPassParameters updatedP2 = SecondPassParameters.amendForJava(p2, false, true);
 
-                                            // For now support caching local portlet, request dispatcher, and regular submissions
-                                            final Submission[] submissions = new Submission[] {
-                                                new RegularSubmission(submission())
-                                            };
+                                        // For now support caching local portlet, request dispatcher, and regular submissions
+                                        final Submission[] submissions = new Submission[] {
+                                            new RegularSubmission(submission())
+                                        };
 
-                                            // Iterate through submissions and run the first match
-                                            for (final Submission submission : submissions) {
-                                                if (submission.isMatch(p, p2, sp)) {
+                                        // Iterate through submissions and run the first match
+                                        for (final Submission submission : submissions) {
+                                            if (submission.isMatch(p, p2, sp)) {
+                                                if (detailsLogger.isDebugEnabled())
+                                                    detailsLogger.startHandleOperation("", "connecting", "type", submission.getType());
+                                                try {
+                                                    submissionResult = submission.connect(p, updatedP2, sp);
+                                                    break;
+                                                } finally {
                                                     if (detailsLogger.isDebugEnabled())
-                                                        detailsLogger.startHandleOperation("", "connecting", "type", submission.getType());
-                                                    try {
-                                                        submissionResult = submission.connect(p, updatedP2, sp);
-                                                        break;
-                                                    } finally {
-                                                        if (detailsLogger.isDebugEnabled())
-                                                            detailsLogger.endHandleOperation();
-                                                    }
+                                                        detailsLogger.endHandleOperation();
                                                 }
                                             }
-
-                                            // Check if the connection returned a throwable
-                                            final Throwable throwable = submissionResult.getThrowable();
-                                            if (throwable != null) {
-                                                // Propagate
-                                                throw new ThrowableWrapper(throwable, submissionResult.connectionResult());
-                                            } else {
-                                                // There was no throwable
-                                                // We know that RegularSubmission returns a Replacer with an instance document
-                                                final Object documentOrDocumentInfo =
-                                                        ((InstanceReplacer) submissionResult.getReplacer()).resultingDocumentOrDocumentInfo();
-
-                                                // Update status
-                                                status[1] = true;
-
-                                                // load() requires an immutable TinyTree
-                                                // Since we forced readonly above, the result must also be a readonly instance7
-                                                assert documentOrDocumentInfo instanceof DocumentInfo;
-                                                assert ! (documentOrDocumentInfo instanceof VirtualNode);
-
-                                                return (DocumentInfo) documentOrDocumentInfo;
-                                            }
-                                        } catch (ThrowableWrapper throwableWrapper) {
-                                            // In case we just threw it above, just propagate
-                                            throw throwableWrapper;
-                                        } catch (Throwable throwable) {
-                                            // Exceptions are handled further down
-                                            throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.connectionResult() : null);
                                         }
+
+                                        // Check if the connection returned a throwable
+                                        final Throwable throwable = submissionResult.getThrowable();
+                                        if (throwable != null) {
+                                            // Propagate
+                                            throw new ThrowableWrapper(throwable, submissionResult.connectionResult());
+                                        } else {
+                                            // There was no throwable
+                                            // We know that RegularSubmission returns a Replacer with an instance document
+                                            final Object documentOrDocumentInfo =
+                                                    ((InstanceReplacer) submissionResult.getReplacer()).resultingDocumentOrDocumentInfo();
+
+                                            // Update status
+                                            status[1] = true;
+
+                                            // load() requires an immutable TinyTree
+                                            // Since we forced readonly above, the result must also be a readonly instance7
+                                            assert documentOrDocumentInfo instanceof DocumentInfo;
+                                            assert ! (documentOrDocumentInfo instanceof VirtualNode);
+
+                                            return (DocumentInfo) documentOrDocumentInfo;
+                                        }
+                                    } catch (ThrowableWrapper throwableWrapper) {
+                                        // In case we just threw it above, just propagate
+                                        throw throwableWrapper;
+                                    } catch (Throwable throwable) {
+                                        // Exceptions are handled further down
+                                        throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.connectionResult() : null);
                                     }
                                 },
                                 detailsLogger);

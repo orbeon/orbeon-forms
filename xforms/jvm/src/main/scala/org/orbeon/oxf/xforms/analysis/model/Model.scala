@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import java.util
+
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XXBLScope
@@ -123,7 +125,7 @@ trait ModelInstances {
   lazy val instances: collection.Map[String, Instance] =
     m.LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
 
-  def instancesMap = instances.asJava
+  def instancesMap: util.Map[String, Instance] = instances.asJava
 
   // General info about instances
   lazy val hasInstances = instances.nonEmpty
@@ -203,8 +205,7 @@ trait ModelSubmissions {
   self: Model ⇒
 
   // Submissions (they are all direct children)
-  lazy val submissions = children collect { case s: Submission ⇒ s }
-  def jSubmissions = submissions.asJava
+  lazy val submissions: Seq[Submission] = children collect { case s: Submission ⇒ s }
 }
 
 trait ModelEventHandlers {
@@ -212,10 +213,9 @@ trait ModelEventHandlers {
   self: Model ⇒
 
   // Event handlers, including on submissions and within nested actions
-  lazy val eventHandlers = descendants collect { case e: EventHandlerImpl ⇒ e }
-  def jEventHandlers = eventHandlers.asJava
+  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl ⇒ e }
 
-  def handlersToXML(helper: XMLReceiverHelper) =
+  def handlersToXML(helper: XMLReceiverHelper): Unit =
     eventHandlers foreach (_.toXML(helper))
 }
 

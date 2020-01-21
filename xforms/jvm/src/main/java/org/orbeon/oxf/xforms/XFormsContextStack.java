@@ -188,7 +188,7 @@ public class XFormsContextStack {
             for (final VariableAnalysisTrait variable : variables)
                 variableInfos.put(variable.name(), scopeVariable(variable, model.getEffectiveId(), true).value());
 
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory());
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("", "evaluated model variables", "count", Integer.toString(variableInfos.size()));
 

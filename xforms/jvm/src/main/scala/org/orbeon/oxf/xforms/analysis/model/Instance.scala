@@ -151,15 +151,17 @@ trait InstanceMetadata {
   def isStrictValidation = validation == "strict"
   def isSchemaValidation = isLaxValidation || isStrictValidation
 
-  val credentialsOrNull: Credentials = {
+  val credentials: Option[Credentials] = {
     // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
     def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
     def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
     def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
     def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
-    Option(username) map (Credentials(_, password, preemptiveAuth, domain)) orNull
+    Option(username) map (Credentials(_, password, preemptiveAuth, domain))
   }
+
+  def credentialsOrNull: Credentials = credentials.orNull
 
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
 

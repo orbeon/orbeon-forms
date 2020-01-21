@@ -27,10 +27,7 @@ object XFormsServerSharedInstancesCache {
 
   import Private._
 
-  // Equivalent to load: (String, Boolean) ⇒ DocumentInfo
-  trait Loader {
-    def load(instanceSourceURI: String, handleXInclude: Boolean): DocumentInfo
-  }
+  type InstanceLoader = (String, Boolean) ⇒ DocumentInfo
 
   // Try to find instance content in the cache but do not attempt to load it if not found
   def findContentOrNull(
@@ -47,12 +44,12 @@ object XFormsServerSharedInstancesCache {
       instance        : Instance,
       instanceCaching : InstanceCaching,
       readonly        : Boolean,
-      loader          : Loader)(implicit
+      loadInstance    : InstanceLoader)(implicit
       indentedLogger  : IndentedLogger
   ): DocumentInfo = {
 
     // Add an entry to the cache
-    def add(instanceContent: InstanceContent, timeToLive: Long) = {
+    def add(instanceContent: InstanceContent, timeToLive: Long): Unit = {
 
       debug("adding instance", instanceCaching.debugPairs)
 
@@ -63,7 +60,7 @@ object XFormsServerSharedInstancesCache {
     }
 
     // Load and cache new instance content
-    def loadAndCache() = {
+    def loadAndCache(): Option[DocumentInfo] = {
       // Note that this method is not synchronized. Scenario: if the method is synchronized, the resource URI may
       // reach an XForms page which itself needs to load a shared resource. The result would be a deadlock.
       // Without synchronization, what can happen is that two concurrent requests load the same URI at the same
@@ -72,7 +69,7 @@ object XFormsServerSharedInstancesCache {
       // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
       debug("loading instance into cache", instanceCaching.debugPairs)
 
-      val instanceContent = loader.load(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
+      val instanceContent = loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
       // NOTE: load() must always returns a TinyTree because we don't want to put in cache a mutable document
       assert(! instanceContent.isInstanceOf[VirtualNode], "load() must return a TinyTree")
 
@@ -118,7 +115,7 @@ object XFormsServerSharedInstancesCache {
     case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
 
     // Find instance content in cache
-    def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger) = {
+    def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
 
       val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
       val cacheKey = createCacheKey(instanceCaching)

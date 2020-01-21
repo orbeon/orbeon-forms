@@ -17,10 +17,9 @@ import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
+import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
@@ -167,7 +166,7 @@ class XFormsInstance(
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
       case _: XXFormsInstanceInvalidate ⇒
-        implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
+        implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
         _instanceCaching match {
           case Some(instanceCaching) ⇒
             XFormsServerSharedInstancesCache.remove(
@@ -469,12 +468,6 @@ object XFormsInstance extends Logging {
     case Right(documentInfo) ⇒ documentInfo
   }
 
-  def createDocumentInfoJava(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean): DocumentInfo = documentOrDocumentInfo match {
-    case dom4jDocument: Document    ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
-    case documentInfo: DocumentInfo ⇒ documentInfo
-    case _ ⇒ throw new OXFException("Invalid type for instance document: " + documentOrDocumentInfo.getClass.getName)
-  }
-
   def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo =
     if (readonly)
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
@@ -497,7 +490,7 @@ object XFormsInstance extends Logging {
   }
 
   // Restore an instance on the model, given InstanceState
-  def restoreInstanceFromState(model: XFormsModel, instanceState: InstanceState, loader: Loader): Unit = {
+  def restoreInstanceFromState(model: XFormsModel, instanceState: InstanceState, loader: InstanceLoader): Unit = {
 
     implicit val logger = model.indentedLogger
 

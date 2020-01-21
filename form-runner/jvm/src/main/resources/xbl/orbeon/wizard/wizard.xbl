@@ -814,7 +814,7 @@
                                                 )[1]"/>
 
                                             <xf:toggle
-                                                case="{{$last-available-and-visited-top-level-case-id}}"/>
+                                                case="{{xxf:instance('local')/current-case-id}}"/>
 
                                             <!-- Dispatch `fr-section-shown` the first time the body is shown if needed -->
                                             <xf:action if="xxf:instance('local')/show-body/data(.)">
@@ -852,7 +852,7 @@
                                                                     ref="xxf:instance('local')/current-case-id"
                                                                     value="$prev-case-id"/>
                                                                 <xf:toggle
-                                                                    case="{{$prev-case-id}}"/>
+                                                                    case="{{xxf:instance('local')/current-case-id}}"/>
                                                                 <xf:action if="$prev-case-id = $sections-with-paging-case-ids">
                                                                     <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($prev-case-id)"/>
                                                                     <xf:setindex
@@ -927,7 +927,7 @@
                                                                     ref="xxf:instance('local')/current-case-id"
                                                                     value="$next-case-id"/>
                                                                 <xf:toggle
-                                                                    case="{{$next-case-id}}"/>
+                                                                    case="{{xxf:instance('local')/current-case-id}}"/>
                                                                 <xf:action if="$next-case-id = $sections-with-paging-case-ids">
                                                                     <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($next-case-id)"/>
                                                                     <xf:setindex
@@ -1242,7 +1242,7 @@
                                         ref="xxf:instance('local')/current-case-id"
                                         value="'{$static-nav-section-id}-case'"/>
                                     <xf:toggle
-                                        case="{$static-nav-section-id}-case"/>
+                                        case="{{xxf:instance('local')/current-case-id}}"/>
 
                                     <xsl:if test="$use-paging">
                                         <xf:setindex

@@ -416,7 +416,7 @@ object Connection extends Logging {
       EmptyHeaders
 
   // For Java callers
-  // 2020-01-17: 3 Java callers
+  // 2020-01-21: 2 Java callers
   def jBuildConnectionHeadersCapitalizedIfNeeded(
     scheme              : String,
     hasCredentials      : Boolean,

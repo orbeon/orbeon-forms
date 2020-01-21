@@ -18,6 +18,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
@@ -223,10 +224,9 @@ trait ModelContainer {
   // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
   // slower than using an Iterator (profiler).
   def searchContainedModels(staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] =
-    if (isRelevant && models.nonEmpty)
-      models.iterator map (_.resolveObjectById(staticId, contextItemOpt)) find (_ ne null)
-    else
-      None
+    isRelevant && models.nonEmpty flatOption {
+      models.iterator flatMap (_.findObjectById(staticId, contextItemOpt)) nextOption()
+    }
 
   def restoreModelsState(deferRRR: Boolean): Unit = {
     // Handle this container only
@@ -316,11 +316,11 @@ trait ContainerResolver {
     partAnalysis.getModelsForScope(innerScope) exists (_.containsBind(bindId))
 
   // Get object with the effective id specified within this container or descendant containers
-  def getObjectByEffectiveId(effectiveId: String): XFormsObject =
-    allModels map (_.getObjectByEffectiveId(effectiveId)) find (_ ne null) orNull
+  final def getObjectByEffectiveId(effectiveId: String): XFormsObject =
+    findObjectByEffectiveId(effectiveId).orNull
 
   def findObjectByEffectiveId(effectiveId: String): Option[XFormsObject] =
-    Option(getObjectByEffectiveId(effectiveId))
+    allModels flatMap (_.findObjectByEffectiveId(effectiveId)) nextOption()
 
   /**
    * Return the current repeat index for the given xf:repeat id, -1 if the id is not found.
@@ -351,8 +351,8 @@ trait ContainerResolver {
       val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
 
       getPartAnalysis.findControlAnalysis(repeatPrefixedId) match {
-        case Some(repeat: RepeatControl) ⇒ Some(0)
-        case _                           ⇒ None
+        case Some(_: RepeatControl) ⇒ Some(0)
+        case _                      ⇒ None
       }
     }
 
@@ -469,32 +469,27 @@ trait ContainerResolver {
         Some(sourceEffectiveId)
     }
 
-  // Recursively find the instance containing the specified node
+  // For Java callers
   def getInstanceForNode(nodeInfo: NodeInfo): XFormsInstance =
-    if (isRelevant)
-      allModels map (_.getInstanceForNode(nodeInfo)) find (_ ne null) orNull
-    else
-      null
+    instanceForNodeOpt(nodeInfo).orNull
 
+  // Recursively find the instance containing the specified node
   def instanceForNodeOpt(nodeInfo: NodeInfo): Option[XFormsInstance] =
-    if (isRelevant)
-      allModels map (_.getInstanceForNode(nodeInfo)) find (_ ne null)
-    else
-      None
+    isRelevant flatOption {
+      allModels flatMap (_.findInstanceForNode(nodeInfo)) nextOption()
+    }
 
   // Locally find the instance with the specified id, searching in any relevant model
   def findInstance(instanceStaticId: String): Option[XFormsInstance] =
-    if (isRelevant && models.nonEmpty)
+    isRelevant && models.nonEmpty flatOption {
       models.iterator flatMap (_.findInstance(instanceStaticId)) nextOption()
-    else
-      None
+    }
 
   // Find the instance in this or descendant containers
   def findInstanceInDescendantOrSelf(instanceStaticId: String): Option[XFormsInstance] =
-    if (isRelevant && models.nonEmpty)
+    isRelevant && models.nonEmpty flatOption {
       allModels flatMap (_.instancesIterator) find (_.getId == instanceStaticId)
-    else
-      None
+    }
 
   // For Java callers
   def findInstanceOrNull(instanceId: String) = findInstance(instanceId).orNull

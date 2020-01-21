@@ -269,7 +269,7 @@ class XFormsComponentControl(
     _nestedContainerOpt map { nestedContainer ⇒
 
       val outerDocument = referenceNode.getDocumentRoot
-      val outerInstance = containingDocument.getInstanceForNode(outerDocument)
+      val outerInstance = containingDocument.instanceForNodeOpt(outerDocument).orNull // TODO: `Option`
 
       val newListenerWithCycleDetector = new ListenerCycleDetector
 

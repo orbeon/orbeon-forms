@@ -13,31 +13,19 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{StructuredQName, ValueRepresentation}
-import org.orbeon.saxon.value.SequenceExtent
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XXFormsInvalidEvent, XXFormsValidEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.{mutable ⇒ m}
 
-abstract class XFormsModelBase
-  extends Logging
-     with ListenersTrait {
+trait XFormsModelRebuildRecalculateRevalidate {
 
   selfModel: XFormsModel ⇒
 
   import Private._
-
-  val containingDocument  = container.getContainingDocument
-  val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
-
-  implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
 
   val deferredActionContext = new DeferredActionContext(container)
 
@@ -54,6 +42,34 @@ abstract class XFormsModelBase
     deferredActionContext.markStructuralChange(defaultsStrategy, instanceOpt map (_.getId))
     // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter.
     containingDocument.getXPathDependencies.markStructuralChange(selfModel, instanceOpt)
+  }
+
+  def markValueChange(nodeInfo: NodeInfo, isCalculate: Boolean): Unit = {
+    // Set the flags
+    deferredActionContext.markValueChange(isCalculate)
+    // Notify dependencies of the change
+    if (nodeInfo ne null)
+      containingDocument.getXPathDependencies.markValueChanged(selfModel, nodeInfo)
+  }
+
+  // NOP now that deferredActionContext is always created
+  def startOutermostActionHandler(): Unit = ()
+
+  def rebuildRecalculateRevalidateIfNeeded(): Unit = {
+    // Process deferred behavior
+    val currentDeferredActionContext = deferredActionContext
+
+    // NOTE: We used to clear `deferredActionContext`, but this caused events to be dispatched in a different
+    // order. So we are now leaving the flag as is, and waiting until they clear themselves.
+    if (currentDeferredActionContext.rebuild)
+      containingDocument.withOutermostActionHandler {
+        Dispatch.dispatchEvent(new XFormsRebuildEvent(selfModel))
+      }
+
+    if (currentDeferredActionContext.recalculateRevalidate)
+      containingDocument.withOutermostActionHandler {
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(selfModel))
+      }
   }
 
   def doRebuild(): Unit = {
@@ -143,7 +159,7 @@ abstract class XFormsModelBase
       Dispatch.dispatchEvent(event)
   }
 
-  def needRebuildRecalculateRevalidate =
+  def needRebuildRecalculateRevalidate: Boolean =
     deferredActionContext.rebuild || deferredActionContext.recalculateRevalidate
 
   // This is called in response to dispatching xforms-refresh to this model, whether using the xf:refresh
@@ -157,28 +173,9 @@ abstract class XFormsModelBase
     if (containingDocument.getControls.isRequireRefresh)
       container.synchronizeAndRefresh()
 
-  val variableResolver: (StructuredQName, XPathContext) ⇒ ValueRepresentation =
-    (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
-      staticModel.bindsByName.get(variableQName.getLocalName) match {
-        case Some(targetStaticBind) ⇒
-          // Variable value is a bind nodeset to resolve
-          BindVariableResolver.resolveClosestBind(
-            modelBinds          = modelBindsOpt.get, // TODO XXX
-            contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
-            targetStaticBind    = targetStaticBind
-          ) map (new SequenceExtent(_)) getOrElse
-            (throw new IllegalStateException)
-        case None ⇒
-          // Try top-level model variables
-          val modelVariables = getDefaultEvaluationContext.getInScopeVariables
-          // NOTE: With XPath analysis on, variable scope has been checked statically
-          Option(modelVariables.get(variableQName.getLocalName)) getOrElse
-            (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
-      }
-
   private object Private {
 
-    lazy val _schemaValidator =
+    lazy val _schemaValidator: XFormsModelSchemaValidator =
       new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
     def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit =

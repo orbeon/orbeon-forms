@@ -19,17 +19,13 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
-import org.orbeon.xforms.XFormsId
-
 import org.orbeon.scaxon.SimplePath._
-
+import org.orbeon.xforms.XFormsId
 import org.w3c.dom.Node._
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 
 class PathMapXPathDependencies(
@@ -73,7 +69,7 @@ class PathMapXPathDependencies(
       if (! hasStructuralChanges) {
 
         // Create instance/path combo
-        val instance = containingDocument.getInstanceForNode(node)
+        val instance = containingDocument.instanceForNodeOpt(node).orNull // TODO: `Option`
 
         def processNode(n: NodeInfo): Unit = {
           val path = createFingerprintedPath(n)
@@ -317,7 +313,7 @@ class PathMapXPathDependencies(
 
     // Caller must only call this for a mutable node belonging to the given model
     require(nodeInfo.isInstanceOf[VirtualNode])
-    require(model.getInstanceForNode(nodeInfo).model == model)
+    require(model.findInstanceForNode(nodeInfo) exists (_.model eq model))
 
     getOrCreateModelState(model).markValueChanged(nodeInfo)
   }

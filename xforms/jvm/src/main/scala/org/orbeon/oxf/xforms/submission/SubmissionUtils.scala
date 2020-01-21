@@ -188,7 +188,7 @@ object SubmissionUtils {
             uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
             node          ← uploadControl.boundNodeOpt
-            if instance eq instance.model.getInstanceForNode(node)
+            if (instance.model.findInstanceForNode(node) exists (_ eq instance))
           } yield
             uploadControl
 

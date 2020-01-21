@@ -180,7 +180,7 @@ public class XFormsContextStack {
     private Map<String, ValueRepresentation> evaluateModelVariables(XFormsModel model) {
         // TODO: Check dirty flag to prevent needless re-evaluation
         // All variables in the model are in scope for the nested binds and actions.
-        final List<VariableAnalysisTrait> variables = model.getStaticModel().jVariablesSeq();
+        final List<VariableAnalysisTrait> variables = model.staticModel().jVariablesSeq();
         if (! variables.isEmpty()) {
 
             final Map<String, ValueRepresentation> variableInfos = new HashMap<String, ValueRepresentation>();

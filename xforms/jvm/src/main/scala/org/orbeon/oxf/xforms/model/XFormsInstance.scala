@@ -152,7 +152,7 @@ class XFormsInstance(
   def getPrefixedId = XFormsId.getPrefixedId(getEffectiveId)
   def getEffectiveId = XFormsId.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
 
-  def scope = model.getStaticModel.scope
+  def scope = model.staticModel.scope
   def container = model.container
 
   def getLocationData =

@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import scala.Option;
 import scala.collection.Seq;
 
 import java.util.Collections;
@@ -356,19 +357,20 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
      * @param effectiveId   effective id of the target
      * @return              object, or null if not found
      */
-    public XFormsObject getObjectByEffectiveId(String effectiveId) {
+    @Override
+    public Option<XFormsObject> findObjectByEffectiveId(String effectiveId) {
 
         // Search in controls first because that's the fast way
         {
             final XFormsObject resultObject = getControlByEffectiveId(effectiveId);
             if (resultObject != null)
-                return resultObject;
+                return scala.Option.apply(resultObject);
         }
 
         // Search in parent (models and this)
         {
-            final XFormsObject resultObject = super.getObjectByEffectiveId(effectiveId);
-            if (resultObject != null)
+            final scala.Option<XFormsObject> resultObject = super.findObjectByEffectiveId(effectiveId);
+            if (resultObject.isDefined())
                 return resultObject;
         }
 
@@ -376,9 +378,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         // TODO: This should no longer be needed since we have a root control, right? In which case, the document would
         // no longer need to be an XFormsObject.
         if (effectiveId.equals(getEffectiveId()))
-            return this;
+            return scala.Option.apply(this);
 
-        return null;
+        return scala.Option.apply(null);
     }
 
     /**

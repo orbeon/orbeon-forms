@@ -586,7 +586,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Find a given static control by name
   def findStaticControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[ElementAnalysis] = {
     val model = getFormModel
-    val part = model.getStaticModel.part
+    val part = model.staticModel.part
     for {
       controlId ← findControlIdByName(ctx.formDefinitionRootElem, controlName)
       prefixedId = part.startScope.prefixedIdForStaticId(controlId)

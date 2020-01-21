@@ -18,7 +18,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.UriScheme
-import org.orbeon.oxf.externalcontext.Credentials
+import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
@@ -63,8 +63,9 @@ private[persistence] object HttpCall {
 
   def assertCall(
     actualRequest    : SolicitedRequest,
-    expectedResponse : ExpectedResponse)(
-    implicit logger  : IndentedLogger
+    expectedResponse : ExpectedResponse)(implicit
+    logger           : IndentedLogger,
+    externalContext : ExternalContext
   ): Unit = {
     useAndClose(
       request(
@@ -126,8 +127,9 @@ private[persistence] object HttpCall {
     stage           : Option[Stage],
     body            : Option[Body],
     credentials     : Option[Credentials],
-    timeout         : Option[Int] = None)(
-    implicit logger : IndentedLogger
+    timeout         : Option[Int] = None)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
   ): ClosableHttpResponse = {
 
     val documentURL = PersistenceBase + path
@@ -192,16 +194,43 @@ private[persistence] object HttpCall {
   def searchURLPrefix (provider: Provider) = s"search/${provider.entryName}/$FormName"
   def metadataURL     (provider: Provider) = s"form/${provider.entryName}/$FormName"
 
-  def post(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+  def post(
+    url             : String,
+    version         : Version,
+    body            : Body,
+    credentials     : Option[Credentials] = None)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Int =
     useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse.statusCode)
 
-  def put(url: String, version: Version, stage: Option[Stage], body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+  def put(
+    url             : String,
+    version         : Version,
+    stage           : Option[Stage],
+    body            : Body,
+    credentials     : Option[Credentials] = None)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Int =
     useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse.statusCode)
 
-  def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
+  def del(
+    url             : String,
+    version         : Version,
+    credentials     : Option[Credentials] = None)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Int =
     useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse.statusCode)
 
-  def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
+  def get(
+    url             : String,
+    version         : Version,
+    credentials     : Option[Credentials] = None)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
     useAndClose(request(url, GET, version, None, None, credentials)) { chr ⇒
 
       val httpResponse = chr.httpResponse
@@ -220,19 +249,31 @@ private[persistence] object HttpCall {
       (statusCode, headers, body)
     }
 
-  def lock(url: String, lockInfo: LockInfo, timeout: Int)(implicit logger: IndentedLogger): Int =
+  def lock(
+    url             : String,
+    lockInfo        : LockInfo,
+    timeout         : Int)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Int =
     Private.lockUnlock(LOCK, url, lockInfo, Some(timeout))
 
-  def unlock(url: String, lockInfo: LockInfo)(implicit logger: IndentedLogger): Int =
+  def unlock(
+    url             : String,
+    lockInfo        : LockInfo)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Int =
     Private.lockUnlock(UNLOCK, url, lockInfo, None)
 
   private object Private {
     def lockUnlock(
-      method   : HttpMethod,
-      url      : String,
-      lockInfo : LockInfo,
-      timeout  : Option[Int])(implicit
-      logger   : IndentedLogger
+      method          : HttpMethod,
+      url             : String,
+      lockInfo        : LockInfo,
+      timeout         : Option[Int])(implicit
+      logger          : IndentedLogger,
+      externalContext : ExternalContext
     ): Int = {
       val body = Some(XML(LockInfo.toDom4j(lockInfo)))
       useAndClose(request(url, method, Version.Unspecified, None, body, None, timeout))(_.httpResponse.statusCode)

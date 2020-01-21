@@ -33,7 +33,7 @@ class SearchTest
   describe("Search API") {
 
     it("returns an empty result when there are no documents") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { implicit externalContext ⇒
         Connect.withOrbeonTables("form definition") { (connection, provider) ⇒
 
           val FormURL   = HttpCall.crudURLPrefix  (provider) + "form/form.xhtml"

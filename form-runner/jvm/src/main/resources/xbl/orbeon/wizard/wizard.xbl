@@ -515,20 +515,23 @@
                                     name="relevant-nav-section-or-grid-ids"
                                     value="
                                         $nav-section-or-grid-ids[
-                                            xxf:is-control-relevant(.) and (
-                                                not(
-                                                    . = $sections-with-paging-section-ids and
-                                                    count(xxf:binding(.)/*) = 0
+                                            for $section-or-grid-bind in bind(frf:bindId(frf:controlNameFromId(.)))
+                                            return
+                                                xxf:relevant($section-or-grid-bind) and (
+                                                    not(
+                                                        . = $sections-with-paging-section-ids and
+                                                        empty($section-or-grid-bind/*)
+                                                    )
                                                 )
-                                            )
                                         ]"/>
 
-                                <!-- TODO: maybe use xxf:is-control-relevant(.) too -->
                                 <xf:var
                                     name="relevant-top-level-section-ids"
                                     value="
                                         $top-level-section-ids[
-                                            exists(xxf:binding(.)) and xxf:relevant(xxf:binding(.))
+                                            for $top-level-section-bind in bind(frf:bindId(frf:controlNameFromId(.)))
+                                            return
+                                                xxf:relevant($top-level-section-bind)
                                         ]"/>
 
                                 <xf:var

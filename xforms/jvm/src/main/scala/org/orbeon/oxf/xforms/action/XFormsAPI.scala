@@ -329,14 +329,14 @@ object XFormsAPI {
       (XFormsToggleAction.toggle(_, deferred))
 
   // xf:rebuild
-  def rebuild(modelId: String, deferred: Boolean = false): Unit =
+  def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false): Unit =
     resolveAs[XFormsModel](modelId) foreach
-      (RRRAction.rebuild(_, deferred))
+      (RRRAction.rebuild(_, mustHonorDeferredUpdateFlags))
 
   // xf:recalculate
-  def recalculate(modelId: String, deferred: Boolean = false, applyDefaults: Boolean = false): Unit =
+  def recalculate(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false, applyDefaults: Boolean = false): Unit =
     resolveAs[XFormsModel](modelId) foreach
-      (RRRAction.recalculate(_, deferred, applyDefaults))
+      (RRRAction.recalculate(_, mustHonorDeferredUpdateFlags, applyDefaults))
 
   // xf:refresh
   def refresh(modelId: String): Unit =
@@ -354,17 +354,17 @@ object XFormsAPI {
       (XXFormsHideAction.hideDialog(_, properties = properties))
 
   // xf:load
-  def load(url: String, target: Option[String] = None, progress: Boolean = true, deferred: Boolean = true): Unit =
+  def load(url: String, target: Option[String] = None, progress: Boolean = true, mustHonorDeferredUpdateFlags: Boolean = true): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
-      containingDocument = inScopeContainingDocument,
-      currentElem        = None,
-      doReplace          = true,
-      value              = NetUtils.encodeHRRI(url, true),
-      target             = target,
-      urlType            = UrlType.Render,
-      urlNorewrite       = false,
-      isShowProgress     = false,
-      deferred           = deferred
+      containingDocument           = inScopeContainingDocument,
+      currentElem                  = None,
+      doReplace                    = true,
+      value                        = NetUtils.encodeHRRI(url, true),
+      target                       = target,
+      urlType                      = UrlType.Render,
+      urlNorewrite                 = false,
+      isShowProgress               = false,
+      mustHonorDeferredUpdateFlags = mustHonorDeferredUpdateFlags
     )
 
   // xf:setfocus

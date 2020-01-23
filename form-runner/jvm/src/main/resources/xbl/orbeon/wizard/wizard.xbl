@@ -1048,6 +1048,125 @@
                                         </xf:group>
                                     </xh:div>
                                 </xh:div>
+
+                                <!--
+                                <xf:group>
+                                    <xf:label>Wizard Debugger</xf:label>
+                                    <xh:ul>
+                                        <xh:li>
+                                            nav-section-or-grid-ids (<xf:output value="count($nav-section-or-grid-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$nav-section-or-grid-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            nav-matching-top-level-section-ids (<xf:output value="count($nav-matching-top-level-section-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$nav-matching-top-level-section-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            top-level-section-ids (<xf:output value="count($top-level-section-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$top-level-section-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            sections-with-paging-section-ids (<xf:output value="count($sections-with-paging-section-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$sections-with-paging-section-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            sections-with-paging-case-ids (<xf:output value="count($sections-with-paging-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$sections-with-paging-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>validated-mode: <xf:output value="$validated-mode"/></xh:li>
+                                        <xh:li>separate-toc-mode: <xf:output value="$separate-toc-mode"/></xh:li>
+                                        <xh:li>
+                                            relevant-nav-section-or-grid-ids (<xf:output value="count($relevant-nav-section-or-grid-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$relevant-nav-section-or-grid-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            relevant-top-level-section-ids (<xf:output value="count($relevant-top-level-section-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$relevant-top-level-section-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            relevant-nav-case-ids (<xf:output value="count($relevant-nav-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$relevant-nav-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            relevant-top-level-case-ids (<xf:output value="count($relevant-top-level-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$relevant-top-level-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>current-top-level-case-id: <xf:output value="$current-top-level-case-id"/></xh:li>
+                                        <xh:li>current-nav-case-id: <xf:output value="$current-nav-case-id"/></xh:li>
+                                        <xh:li>nav-case-index: <xf:output value="$nav-case-index"/></xh:li>
+                                        <xh:li>top-level-case-index: <xf:output value="top-level-case-index"/></xh:li>
+                                        <xh:li>
+                                            prev-nav-case-ids (<xf:output value="count($prev-nav-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$prev-nav-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            next-nav-case-ids (<xf:output value="count($next-nav-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$next-nav-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
+                                            next-top-level-case-ids (<xf:output value="count($next-top-level-case-ids)"/>):
+                                            <xh:ul>
+                                                <xf:repeat ref="$next-top-level-case-ids">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>current-section-uses-paging: <xf:output value="$current-section-uses-paging"/></xh:li>
+                                        <xh:li>prev-repeat-id-and-index-opt: <xf:output value="$prev-repeat-id-and-index-opt"/></xh:li>
+                                        <xh:li>next-repeat-id-and-index-opt: <xf:output value="$next-repeat-id-and-index-opt"/></xh:li>
+                                        <xh:li>next-nested-case-id-opt: <xf:output value="$next-nested-case-id-opt"/></xh:li>
+                                        <xh:li>next-top-level-case-id-opt: <xf:output value="$next-top-level-case-id-opt"/></xh:li>
+                                        <xh:li>allow-prev: <xf:output value="$allow-prev"/></xh:li>
+                                        <xh:li>allow-next: <xf:output value="$allow-next"/></xh:li>
+                                        <xh:li>is-first-nav: <xf:output value="$is-first-nav"/></xh:li>
+                                        <xh:li>is-last-nav: <xf:output value="$is-last-nav"/></xh:li>
+                                    </xh:ul>
+                                </xf:group>
+                                -->
                             </xf:group>
                         </xf:group>
                         <!-- In case the view contains elements other than sections (like dialogs) -->

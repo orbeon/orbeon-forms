@@ -645,7 +645,7 @@
                                             ]
                                     "/>
 
-                                <!-- Wizard.scala uses this via the variable `id`-->
+                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-allow-prev"
                                     name="allow-prev"
@@ -654,7 +654,7 @@
                                         exists($prev-nav-case-ids)
                                     "/>
 
-                                <!-- Wizard.scala uses this via the variable `id`-->
+                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-allow-next"
                                     name="allow-next"

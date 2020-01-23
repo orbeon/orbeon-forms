@@ -131,6 +131,7 @@
                 <xf:instance id="local" xxf:expose-xpath-types="true">
                     <local>
                         <current-case-id/>
+                        <current-top-level-case-id/>
                         <show-toc/>
                         <show-body/>
                         <readwrite/>
@@ -329,13 +330,33 @@
 
                                         <xf:action event="xforms-select" target="#observer">
 
+                                            <!--
+                                                Keep `current-case-id` and `current-top-level-case-id` up to date.
+
+                                                NOTE: The `xforms-select` event is dispatched at the end of the `xf:toggle` but
+                                                before focus has been adjusted.
+                                            -->
                                             <xsl:if test="not($has-subsections-nav)">
-                                                <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
-                                                <!-- Q: Could we use `caseref`? -->
+                                                <!-- `current-case-id` is the same as `current-top-level-case-id` -->
                                                 <xf:setvalue
                                                     ref="xxf:instance('local')/current-case-id"
                                                     value="event('xxf:targetid')"/>
                                             </xsl:if>
+                                            <xsl:if test="$has-subsections-nav">
+                                                <!-- Either the top-level case doesn't change, and then the nexted
+                                                     switch's event handler sets this value; or the top-level case
+                                                     changed, and there is a chance that the nested switch didn't
+                                                     change its case, in which case we make sure we set it here. If
+                                                     the nested switch changed its case, it already set the value,
+                                                     but that's ok. -->
+                                                <xf:setvalue
+                                                    ref="xxf:instance('local')/current-case-id"
+                                                    value="case('{$static-section-id}-switch')"/>
+                                            </xsl:if>
+
+                                            <xf:setvalue
+                                                ref="xxf:instance('local')/current-top-level-case-id"
+                                                value="event('xxf:targetid')"/>
 
                                             <xf:dispatch name="fr-section-scroll" targetid="switch"/>
 
@@ -344,6 +365,7 @@
                                                 value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
                                                 xxbl:scope="inner"/>
 
+                                            <!-- NOTE: 2020-01-23: This is dispatched only for *top-level* pages. -->
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
                                                 <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
                                                 <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
@@ -392,11 +414,12 @@
                                                                         recurse="true"/>
                                                                     <xf:action event="xforms-select" target="#observer">
                                                                         <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
-                                                                        <!-- Q: Could we use `caseref`? -->
                                                                         <xf:setvalue
                                                                             ref="xxf:instance('local')/current-case-id"
                                                                             value="event('xxf:targetid')"/>
+
                                                                         <xf:dispatch name="fr-section-scroll" targetid="switch"/>
+
                                                                     </xf:action>
                                                                     <xf:group appearance="xxf:internal">
                                                                         <xsl:copy>
@@ -546,9 +569,10 @@
                                         for $section-id in $relevant-top-level-section-ids
                                         return concat($section-id, '-case')"/>
 
+                                <!-- HACK: Dependency bug, using `xf:random()` to force recalculation -->
                                 <xf:var
                                     name="current-top-level-case-id"
-                                    value="case('switch')"/>
+                                    value="(xxf:instance('local')/current-top-level-case-id/string(), xf:random())[1]"/>
 
                                 <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
                                 <xf:var
@@ -808,16 +832,25 @@
                                                 name="last-available-and-visited-top-level-case-id"
                                                 value="concat($last-available-and-visited-top-level-section-id, '-case')"/>
 
-                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
+                                            <xf:var
+                                                name="initial-case-id"
+                                                value="
+                                                    (
+                                                        Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1],
+                                                        $last-available-and-visited-top-level-case-id
+                                                    )[1]"/>
+
                                             <xf:setvalue
                                                 ref="xxf:instance('local')/current-case-id"
-                                                value="(
-                                                    Wizard:caseIdsForTopLevelSection($last-available-and-visited-top-level-section-id)[1],
-                                                    $last-available-and-visited-top-level-case-id
-                                                )[1]"/>
+                                                value="$initial-case-id"/>
 
+                                            <xf:setvalue
+                                                ref="xxf:instance('local')/current-top-level-case-id"
+                                                value="case('switch')"/>
+
+                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/3433 -->
                                             <xf:toggle
-                                                case="{{xxf:instance('local')/current-case-id}}"/>
+                                                case="{{$initial-case-id}}"/>
 
                                             <!-- Dispatch `fr-section-shown` the first time the body is shown if needed -->
                                             <xf:action if="xxf:instance('local')/show-body/data(.)">
@@ -851,11 +884,8 @@
                                                             </xf:action>
                                                             <xf:action if="empty($prev-repeat-id-and-index-opt)">
                                                                 <xf:var name="prev-case-id" value="$prev-nav-case-ids[last()]"/>
-                                                                <xf:setvalue
-                                                                    ref="xxf:instance('local')/current-case-id"
-                                                                    value="$prev-case-id"/>
                                                                 <xf:toggle
-                                                                    case="{{xxf:instance('local')/current-case-id}}"/>
+                                                                    case="{{$prev-case-id}}"/>
                                                                 <xf:action if="$prev-case-id = $sections-with-paging-case-ids">
                                                                     <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($prev-case-id)"/>
                                                                     <xf:setindex
@@ -926,11 +956,8 @@
                                                             </xf:action>
                                                             <xf:action if="empty($next-repeat-id-and-index-opt)">
                                                                 <xf:var name="next-case-id" value="$next-nav-case-ids[1]"/>
-                                                                <xf:setvalue
-                                                                    ref="xxf:instance('local')/current-case-id"
-                                                                    value="$next-case-id"/>
                                                                 <xf:toggle
-                                                                    case="{{xxf:instance('local')/current-case-id}}"/>
+                                                                    case="{{$next-case-id}}"/>
                                                                 <xf:action if="$next-case-id = $sections-with-paging-case-ids">
                                                                     <xf:var name="section-id" value="Wizard:sectionIdFromCaseIdOpt($next-case-id)"/>
                                                                     <xf:setindex
@@ -1241,11 +1268,8 @@
                                     "/>
 
                                     <!-- Remember where we are toggling to, toggle... -->
-                                    <xf:setvalue
-                                        ref="xxf:instance('local')/current-case-id"
-                                        value="'{$static-nav-section-id}-case'"/>
                                     <xf:toggle
-                                        case="{{xxf:instance('local')/current-case-id}}"/>
+                                        case="'{$static-nav-section-id}-case'"/>
 
                                     <xsl:if test="$use-paging">
                                         <xf:setindex

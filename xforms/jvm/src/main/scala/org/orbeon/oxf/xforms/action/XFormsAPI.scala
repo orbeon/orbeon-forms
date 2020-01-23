@@ -324,9 +324,9 @@ object XFormsAPI {
     inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
-  def toggle(caseId: String, deferred: Boolean = true): Unit =
+  def toggle(caseId: String, mustHonorDeferredUpdateFlags: Boolean = true): Unit =
     resolveAs[XFormsCaseControl](caseId) foreach
-      (XFormsToggleAction.toggle(_, deferred))
+      (XFormsToggleAction.toggle(_, mustHonorDeferredUpdateFlags))
 
   // xf:rebuild
   def rebuild(modelId: String, mustHonorDeferredUpdateFlags: Boolean = false): Unit =

@@ -727,4 +727,115 @@
         </output>
     </test>
 
+    <test description="#4392: Toggling a case should toggle the ancestor cases as well" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+
+                        <xf:action event="xforms-ready">
+
+                            <xf:var name="switches" value="'s1', 's1c1s1', 's1c2s1'"/>
+
+                            <xf:message value="string-join(for $s in $switches return case($s), ' ')"/>
+
+                            <xf:toggle case="s1c2"/>
+                            <xf:message value="string-join(for $s in $switches return case($s), ' ')"/>
+
+                            <xf:toggle case="s1c1"/>
+                            <xf:message value="string-join(for $s in $switches return case($s), ' ')"/>
+
+                            <xf:toggle case="s1c2s1c2"/>
+                            <xf:message value="string-join(for $s in $switches return case($s), ' ')"/>
+
+                            <xf:toggle case="s1c1s1c2"/>
+                            <xf:message value="string-join(for $s in $switches return case($s), ' ')"/>
+
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <xf:insert
+                        event="xforms-select xforms-deselect"
+                        context="instance()"
+                        ref="*"
+                        origin="xf:element(event('xxf:type'), xf:attribute('target', event('xxf:targetid')))"/>
+
+                    <xf:switch id="s1">
+                        <xf:case id="s1c1">
+                            <xf:switch id="s1c1s1">
+                                <xf:case id="s1c1s1c1"/>
+                                <xf:case id="s1c1s1c2"/>
+                            </xf:switch>
+                        </xf:case>
+                        <xf:case id="s1c2">
+                            <xf:switch id="s1c2s1">
+                                <xf:case id="s1c2s1c1"/>
+                                <xf:case id="s1c2s1c2"/>
+                            </xf:switch>
+                        </xf:case>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <xforms-deselect target="s1c1"/>
+                                    <xforms-select target="s1c2"/>
+                                    <xforms-deselect target="s1c2"/>
+                                    <xforms-select target="s1c1"/>
+                                    <xforms-deselect target="s1c2s1c1"/>
+                                    <xforms-select target="s1c2s1c2"/>
+                                    <xforms-deselect target="s1c1"/>
+                                    <xforms-select target="s1c2"/>
+                                    <xforms-deselect target="s1c1s1c1"/>
+                                    <xforms-select target="s1c1s1c2"/>
+                                    <xforms-deselect target="s1c2"/>
+                                    <xforms-select target="s1c1"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="s1" case-id="s1c1"/>
+                            <control effective-id="s1c1s1" case-id="s1c1s1c2"/>
+                            <control effective-id="s1c2s1" case-id="s1c2s1c2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="s1">
+                            <xxf:case id="s1c1" visibility="visible"/>
+                            <xxf:case id="s1c2" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="s1c1s1">
+                            <xxf:case id="s1c1s1c2" visibility="visible"/>
+                            <xxf:case id="s1c1s1c1" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="s1c2s1">
+                            <xxf:case id="s1c2s1c2" visibility="visible"/>
+                            <xxf:case id="s1c2s1c1" visibility="hidden"/>
+                        </xxf:control>
+                    </xxf:control-values>
+                    <xxf:message level="modal">s1c1 s1c1s1c1 s1c2s1c1</xxf:message>
+                    <xxf:message level="modal">s1c2 s1c1s1c1 s1c2s1c1</xxf:message>
+                    <xxf:message level="modal">s1c1 s1c1s1c1 s1c2s1c1</xxf:message>
+                    <xxf:message level="modal">s1c2 s1c1s1c1 s1c2s1c2</xxf:message>
+                    <xxf:message level="modal">s1c1 s1c1s1c2 s1c2s1c2</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -200,9 +200,10 @@ object Focus {
   }
 
   // Return all the ancestor-or-self hidden cases
-  def hiddenCases(control: XFormsControl): Iterator[XFormsCaseControl] = new AncestorOrSelfIterator(control.parent) collect {
-    case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
-  }
+  def ancestorOrSelfHiddenCases(control: XFormsControl): Iterator[XFormsCaseControl] =
+    new AncestorOrSelfIterator(control) collect {
+      case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
+    }
 
   // Dispatch DOMFocusOut and DOMFocusIn
   private def focusOut(control: XFormsControl): Unit = dispatch(control, DOM_FOCUS_OUT)

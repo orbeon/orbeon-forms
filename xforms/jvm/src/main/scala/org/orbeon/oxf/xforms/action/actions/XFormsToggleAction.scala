@@ -45,23 +45,31 @@ class XFormsToggleAction extends XFormsAction {
 
 object XFormsToggleAction {
 
-  def toggle(caseControl: XFormsCaseControl, deferred: Boolean = true): Unit = {
+  def toggle(
+    caseControl                  : XFormsCaseControl,
+    mustHonorDeferredUpdateFlags : Boolean = true
+  ): Unit = {
 
     val doc = XFormsAPI.inScopeContainingDocument
 
     // "This XForms Action begins by invoking the deferred update behavior."
-    if (deferred)
+    if (mustHonorDeferredUpdateFlags)
       doc.synchronizeAndRefresh()
 
-    if (caseControl.parent.isRelevant && ! caseControl.isSelected) {
-      // This case is in a relevant switch and not currently selected
+    // NOTE: The logic below doesn't handle showing ancestor `xxf:xforms11-switch="true"` cases yet.
+    if (caseControl.getSwitch.isRelevant) { // the `xf:switch` and consequently all ancestors are relevant
+
       val focusedBeforeOpt = doc.getControls.getFocusedControl
 
-      // Actually toggle the xf:case
-      caseControl.toggle()
+      val ancestorOrSelfHiddenCasesIt = Focus.ancestorOrSelfHiddenCases(caseControl)
+      val requireFocusUpdate          = ancestorOrSelfHiddenCasesIt.nonEmpty
 
-      // Handle focus changes
-      Focus.updateFocusWithEvents(focusedBeforeOpt, None)(doc)
+      // Q: Should we instead toggle from root to leaf?
+      ancestorOrSelfHiddenCasesIt foreach (_.toggle())
+
+      // Update the focus only if at least one `xf:case` requires toggling
+      if (requireFocusUpdate)
+        Focus.updateFocusWithEvents(focusedBeforeOpt, None)(doc)
     }
   }
 }

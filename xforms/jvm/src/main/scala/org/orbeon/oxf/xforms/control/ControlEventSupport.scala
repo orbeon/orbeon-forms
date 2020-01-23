@@ -56,13 +56,10 @@ trait ControlEventSupport extends ListenersTrait {
       event match {
         case focusEvent: XFormsFocusEvent ⇒
 
-          // Try to update hidden xf:case controls
+          // Try to update hidden `xf:case` controls
           // NOTE: We don't allow this behavior when events come from the client in ClientEvents
           // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
-          Focus.hiddenCases(this) foreach (_.toggle())
-
-          val allIt =
-            focusableControls filterNot Focus.isHidden
+          Focus.ancestorOrSelfHiddenCases(this.parent) foreach (_.toggle())
 
           val includes = focusEvent.includes
           val excludes = focusEvent.excludes
@@ -72,9 +69,11 @@ trait ControlEventSupport extends ListenersTrait {
             (includes.isEmpty || includes.contains(qName)) && ! excludes.contains(qName)
           }
 
-          val filteredIt = allIt find satisfiesIncludesAndExcludes
+          focusableControls              filterNot
+            Focus.isHidden               find
+            satisfiesIncludesAndExcludes foreach
+            Focus.focusWithEvents
 
-          filteredIt foreach Focus.focusWithEvents
         case _ ⇒
       }
 

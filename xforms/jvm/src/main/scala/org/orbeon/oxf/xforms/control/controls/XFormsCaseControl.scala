@@ -32,14 +32,14 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
   require(parent.isInstanceOf[XFormsSwitchControl])
 
   // We are relevant only if we are selected
-  override def computeRelevant =
+  override def computeRelevant: Boolean =
     super.computeRelevant && (! getSwitch.isXForms11Switch || isSelected)
 
   // Whether this is the currently selected case within the current switch.
-  def isSelected = getEffectiveId == getSwitch.getSelectedCaseEffectiveId
+  def isSelected: Boolean = getEffectiveId == getSwitch.getSelectedCaseEffectiveId
 
   // Whether to show this case.
-  def isVisible = isSelected || getSwitch.isStaticReadonly
+  def isVisible: Boolean = isSelected || getSwitch.isStaticReadonly
 
   // Toggle to this case and dispatch events if this causes a change in selected cases.
   def toggle(): Unit = {
@@ -53,5 +53,5 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
     getSwitch.setSelectedCase(this)
   }
 
-  def getSwitch = parent.asInstanceOf[XFormsSwitchControl]
+  def getSwitch: XFormsSwitchControl = parent.asInstanceOf[XFormsSwitchControl]
 }

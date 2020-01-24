@@ -498,14 +498,6 @@
         <class name="org.orbeon.oxf.processor.JavaProcessor"/>
     </processor>
 
-    <processor name="oxf:servlet-include-generator">
-        <class name="org.orbeon.oxf.processor.generator.ServletIncludeGenerator"/>
-    </processor>
-
-    <processor name="oxf:servlet-filter-generator">
-        <class name="org.orbeon.oxf.processor.ServletFilterGenerator"/>
-    </processor>
-
     <processor name="oxf:key-pair">
         <class name="org.orbeon.oxf.processor.generator.KeyPairGenerator"/>
     </processor>

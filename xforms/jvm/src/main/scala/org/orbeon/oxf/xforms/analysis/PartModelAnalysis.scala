@@ -38,8 +38,8 @@ trait PartModelAnalysis extends TransientState {
   def getModelByInstancePrefixedId(prefixedId: String): Model =
     modelByInstancePrefixedId.get(prefixedId).orNull
 
-  def getInstances(modelPrefixedId: String): ju.List[Instance] =
-    modelsByPrefixedId.get(modelPrefixedId).toSeq flatMap (_.instances.values) asJava
+  def getInstances(modelPrefixedId: String): Seq[Instance] =
+    modelsByPrefixedId.get(modelPrefixedId).toSeq flatMap (_.instances.values)
 
   def defaultModel: Option[Model] =
     getDefaultModelForScope(startScope)
@@ -66,7 +66,7 @@ trait PartModelAnalysis extends TransientState {
       for {
         scope ← Iterator.iterateOpt(startScope)(_.parent)
         model ← getModelsForScope(scope)
-        if model.instancesMap.containsKey(instanceStaticId)
+        if model.instances.contains(instanceStaticId)
       } yield
         scope.prefixedIdForStaticId(instanceStaticId)
 

@@ -44,9 +44,9 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
   protected val containingDocument = model.containingDocument
   protected val dependencies       = containingDocument.getXPathDependencies
-  protected val staticModel        = model.getStaticModel
+  protected val staticModel        = model.staticModel
 
-  protected implicit def logger = model.getIndentedLogger
+  protected implicit def logger = model.indentedLogger
   protected implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
 
   // Support for `xxf:evaluate-bind-property` function
@@ -107,7 +107,7 @@ object XFormsModelBinds {
 
   // Create an instance of XFormsModelBinds if the given model has xf:bind elements.
   def apply(model: XFormsModel): Option[XFormsModelBinds] =
-    model.getStaticModel.hasBinds option new XFormsModelBinds(model)
+    model.staticModel.hasBinds option new XFormsModelBinds(model)
 
   // Modified email validator which:
   //

@@ -16,8 +16,8 @@ package org.orbeon.oxf.processor;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
@@ -28,11 +28,13 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLParsing;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of a caching transformer output that assumes that an output depends on a set
@@ -404,12 +406,14 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 // Read connection into SAXStore
                 documentSAXStore = new SAXStore();
 
-                ConnectionResult.withSuccessConnection(connectionResult, true, new Function1Adapter<InputStream, Object>() {
-                    public Object apply(InputStream is) {
+                ConnectionResult.withSuccessConnection(
+                    connectionResult,
+                    true,
+                    is -> {
                         XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, XMLParsing.ParserConfiguration.PLAIN, true);
                         return null;
                     }
-                });
+                );
 
                 // Obtain last modified
                 lastModifiedLong = connectionResult.lastModifiedJava();

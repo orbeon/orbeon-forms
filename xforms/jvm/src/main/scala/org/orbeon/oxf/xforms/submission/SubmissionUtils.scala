@@ -97,7 +97,9 @@ object SubmissionUtils {
 
   def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
 
-    implicit val _logger = model.indentedLogger
+    implicit val _logger          = model.indentedLogger
+    implicit val _externalContext = NetUtils.getExternalContext
+
     val url = new URI(resolvedURL)
 
     Connection(
@@ -186,7 +188,7 @@ object SubmissionUtils {
             uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
             node          ← uploadControl.boundNodeOpt
-            if instance eq instance.model.getInstanceForNode(node)
+            if (instance.model.findInstanceForNode(node) exists (_ eq instance))
           } yield
             uploadControl
 

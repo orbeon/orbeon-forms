@@ -74,6 +74,7 @@
                         <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
                         <resource xml:lang="sv"><select>Välj:</select></resource>
                         <resource xml:lang="da"><select>Vælg:</select></resource>
+                        <resource xml:lang="pl"><select>Wybierz:</select></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

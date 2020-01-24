@@ -61,8 +61,8 @@ object LiferayURL {
       moveMagicResourceId(url.toString)
     }
 
-    def createPortletURL(
-      url                  : PortletURL,
+    def createPortletURL[T <: PortletURL](
+      url                  : T,
       portletMode          : Option[String],
       windowState          : Option[String],
       navigationParameters : ju.Map[String, Array[String]]

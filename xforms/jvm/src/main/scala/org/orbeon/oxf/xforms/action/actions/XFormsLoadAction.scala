@@ -70,7 +70,7 @@ class XFormsLoadAction extends XFormsAction {
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
           isShowProgress     = isShowProgress,
-          deferred           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
+          mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
         )
       case None ⇒
         actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
@@ -87,7 +87,7 @@ class XFormsLoadAction extends XFormsAction {
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
                   isShowProgress     = isShowProgress,
-                  deferred           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
+                  mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
                 )
               case None ⇒
                 if (interpreter.indentedLogger.isDebugEnabled)
@@ -122,18 +122,18 @@ object XFormsLoadAction {
   }
 
   def resolveStoreLoadValue(
-    containingDocument : XFormsContainingDocument,
-    currentElem        : Option[Element],
-    doReplace          : Boolean,
-    value              : String,
-    target             : Option[String],
-    urlType            : UrlType,
-    urlNorewrite       : Boolean,
-    isShowProgress     : Boolean,
-    deferred           : Boolean
+    containingDocument           : XFormsContainingDocument,
+    currentElem                  : Option[Element],
+    doReplace                    : Boolean,
+    value                        : String,
+    target                       : Option[String],
+    urlType                      : UrlType,
+    urlNorewrite                 : Boolean,
+    isShowProgress               : Boolean,
+    mustHonorDeferredUpdateFlags : Boolean
   ): Unit = {
 
-    if (deferred)
+    if (mustHonorDeferredUpdateFlags)
       containingDocument.synchronizeAndRefresh()
 
     val externalURL =

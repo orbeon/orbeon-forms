@@ -22,8 +22,8 @@ class TokenSecurityFilter extends Filter {
 
   private var servletContext: ServletContext = _
 
-  def init(config: FilterConfig) = servletContext = config.getServletContext
-  def destroy() = servletContext = null
+  override def init(config: FilterConfig): Unit = servletContext = config.getServletContext
+  override def destroy(): Unit = servletContext = null
 
   def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
     val httpReq = req.asInstanceOf[HttpServletRequest]

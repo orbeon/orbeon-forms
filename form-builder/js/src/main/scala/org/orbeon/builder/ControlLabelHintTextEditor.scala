@@ -19,6 +19,7 @@ import org.orbeon.builder.facade.JQueryTooltip._
 import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.tinymce.{TinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -250,15 +251,15 @@ object ControlLabelHintTextEditor {
 
         // Auto-size MCE height based on the content, with min height of 100px
         mceConfig.plugins                  += ",autoresize"
-        mceConfig.autoresize_min_height    = 100
-        mceConfig.autoresize_bottom_margin = 16 // Default padding for autoresize adds too much empty space at the bottom
+        mceConfig.autoresize_min_height    = 100.0
+        mceConfig.autoresize_bottom_margin = 16.0 // Default padding for autoresize adds too much empty space at the bottom
 
-        TinyMceDefaultEditorManager.baseURL = {
+        TinyMce.EditorManager.baseURL = {
           val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
           href.substring(0, href.length - s"$URLBaseMagic.js".length)
         }
 
-        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMceDefaultEditorManager)
+        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMce.EditorManager)
         tinyMceObject.render()
         afterTinyMCEInitialized((_) ⇒ {
           // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM

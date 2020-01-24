@@ -214,9 +214,7 @@ case class InstanceState(
       instance.valid)
 }
 
-case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState]) {
-  def instancesJava = instances.asJava
-}
+case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState])
 
 object DynamicState {
 
@@ -274,7 +272,7 @@ object DynamicState {
       focusedControl      = document.getControls.getFocusedControl map (_.getEffectiveId),
       pendingUploads      = toByteSeq(document.getPendingUploads.asScala.toSet),
       lastAjaxResponse    = toByteSeq(Option(document.getLastAjaxResponse)),
-      instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.getInstances.asScala.iterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+      instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
       controls            = toByteSeq(controlsToSerialize),
       initialClientScript = document.initialClientScript
     )

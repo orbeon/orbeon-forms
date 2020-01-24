@@ -57,6 +57,7 @@
                         <resource xml:lang="sv"><ask-to-type-word>Skriv ovanstående ord:</ask-to-type-word></resource>
                         <resource xml:lang="nl"><ask-to-type-word>Voer bovenstaand woord in:</ask-to-type-word></resource>
                         <resource xml:lang="pt"><ask-to-type-word>Insira a palavra na imagem:</ask-to-type-word></resource>
+                        <resource xml:lang="pl"><ask-to-type-word>Przepisz słowo z obrazka:</ask-to-type-word></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

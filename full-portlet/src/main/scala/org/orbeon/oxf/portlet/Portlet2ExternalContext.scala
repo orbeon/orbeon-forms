@@ -294,6 +294,4 @@ class Portlet2ExternalContext(
 
   def getStartLoggerString: String = getRequest.getRequestPath + " - Received request"
   def getEndLoggerString  : String = getRequest.getRequestPath
-
-  def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new NotImplementedError
 }

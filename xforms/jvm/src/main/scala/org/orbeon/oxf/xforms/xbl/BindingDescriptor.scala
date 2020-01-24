@@ -37,8 +37,12 @@ import scala.collection.compat._
 // - by element name, a datatype, and a single `appearance` attribute
 //
 // `BindingDescriptor` is a minimal CSS selector descriptor able to hold the combinations above. It can in fact hold
-// more than that, such as binding by datatype only, or binding via attributes which are not `appearance`, but
-// those are not used or supported as of 2015-06-05.
+// more than that, such as:
+//
+// - binding by datatype only
+// - binding via attributes which are not `appearance`
+//
+// But those are not used or supported as of 2020-01-10.
 case class BindingDescriptor(
   elementName : Option[QName],
   datatype    : Option[QName],
@@ -78,7 +82,7 @@ object BindingDescriptor {
   }
 
   // Find the virtual name and appearance for the control given its element name, datatype, and appearances.
-  // See `BindingDescriptorTest.testFindVirtualNameAndAppearance()` for examples.
+  // See `BindingDescriptorTest` for examples.
   //
   // The virtual name is the name the control would have if we natively supported datatype bindings. We don't support
   // support them because datatypes can change dynamically at runtime and that is a big change, see:
@@ -192,7 +196,7 @@ object BindingDescriptor {
 
       BindingDescriptor(
         Some(QName(localname, prefix, ns.mapping(prefix))),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
         None
       )(binding)
   }
@@ -236,7 +240,7 @@ object BindingDescriptor {
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, true)),
+        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
         Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
       )(binding)
   }

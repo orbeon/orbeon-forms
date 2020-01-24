@@ -269,7 +269,7 @@ class XFormsComponentControl(
     _nestedContainerOpt map { nestedContainer ⇒
 
       val outerDocument = referenceNode.getDocumentRoot
-      val outerInstance = containingDocument.getInstanceForNode(outerDocument)
+      val outerInstance = containingDocument.instanceForNodeOpt(outerDocument).orNull // TODO: `Option`
 
       val newListenerWithCycleDetector = new ListenerCycleDetector
 
@@ -374,7 +374,7 @@ class XFormsComponentControl(
     def findMirrorInstance: Option[XFormsInstance] = (
       nestedContainerOpt.toIterator
       flatMap (_.models.iterator)
-      flatMap (_.getInstances.asScala.iterator)
+      flatMap (_.instancesIterator)
       find    (_.instance.element.attributeValue("mirror") == "true")
     )
 

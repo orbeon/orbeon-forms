@@ -19,19 +19,19 @@ import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.oxf.util.FutureUtils._
 import org.orbeon.xforms.facade.AjaxServerTrait
-import org.orbeon.xforms.{AjaxClient, InitSupport, facade}
+import org.orbeon.xforms.{InitSupport, facade}
 import org.scalajs.dom
 import org.scalajs.dom.raw.Window
 import org.scalatest.funspec.AsyncFunSpec
 
 import scala.async.Async._
+import scala.collection.compat._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.|
 import scala.util.Try
-import scala.collection.compat._
 
 class OrbeonClientTest extends AsyncFunSpec {
 

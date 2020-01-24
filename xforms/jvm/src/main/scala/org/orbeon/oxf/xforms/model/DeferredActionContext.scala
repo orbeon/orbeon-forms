@@ -34,21 +34,21 @@ class DeferredActionContext(container: XBLContainer) {
       NoDefaultsStrategy
 
   private var _rebuild = false
-  def rebuild = _rebuild
+  def rebuild: Boolean = _rebuild
 
   private var _recalculateRevalidate = false
-  def recalculateRevalidate = _recalculateRevalidate
+  def recalculateRevalidate: Boolean = _recalculateRevalidate
 
   private var _defaultsStrategy: DefaultsStrategy = NoDefaultsStrategy
-  def defaultsStrategy = _defaultsStrategy
+  def defaultsStrategy: DefaultsStrategy = _defaultsStrategy
 
   private var _flaggedInstances = Set.empty[String]
-  def flaggedInstances = _flaggedInstances
+  def flaggedInstances: Set[String] = _flaggedInstances
 
-  def markRebuild()  = _rebuild = true
-  def resetRebuild() = _rebuild = false
+  def markRebuild(): Unit = _rebuild = true
+  def resetRebuild(): Unit = _rebuild = false
 
-  def markRecalculateRevalidate(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]) = {
+  def markRecalculateRevalidate(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]): Unit = {
     _recalculateRevalidate = true
     _defaultsStrategy      = winningStrategy(_defaultsStrategy, defaultsStrategy)
 
@@ -56,14 +56,11 @@ class DeferredActionContext(container: XBLContainer) {
       _flaggedInstances ++= instanceIdOpt
   }
 
-  def resetRecalculateRevalidate() = {
+  def resetRecalculateRevalidate(): Unit = {
     _recalculateRevalidate = false
     _defaultsStrategy      = NoDefaultsStrategy
     _flaggedInstances      = Set.empty
   }
-
-  def jMarkStructuralChange() =
-      markStructuralChange(NoDefaultsStrategy, None)
 
   def markStructuralChange(defaultsStrategy: DefaultsStrategy, instanceIdOpt: Option[String]): Unit = {
     // "XForms Actions that change the tree structure of instance data result in setting all four deferred update

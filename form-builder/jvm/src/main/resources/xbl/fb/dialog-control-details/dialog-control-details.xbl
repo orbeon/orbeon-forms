@@ -451,8 +451,7 @@
                             )"/>
                     <!--  Assume there is only one active appearance at a given time for now. At the XForms level there
                           can be multiple appearances. We do have fr:character-counter which could wrap a control with an
-                          appearance, for example we could have <xf:textarea appearance="fancy character-counter">, but we
-                          don't have a concrete case yet. -->
+                          appearance, for example we could have `<xf:textarea appearance="xxf:autosize character-counter">`. -->
                     <xf:setvalue
                         ref="$appearances/@selection"
                         value="($appearances/appearance[@current = 'true'], $appearances/appearance[1])[1]/value"/>

@@ -67,20 +67,11 @@ trait AjaxServerTrait extends js.Object {
 @js.native
 @JSGlobal("ORBEON.xforms.server.AjaxServer")
 object AjaxServer extends AjaxServerTrait {
-
   def handleResponseDom(
     responseXML                  : dom.Document,
     isResponseToBackgroundUpload : Boolean,
     formId                       : String,
     ignoreErrors                 : Boolean
-  ): Unit = js.native
-
-  def createDelayedServerEvent(
-    serverEvents : String,
-    delay        : Double,
-    showProgress : Boolean,
-    discardable  : Boolean,
-    formId       : String
   ): Unit = js.native
 }
 

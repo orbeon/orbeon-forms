@@ -1215,7 +1215,7 @@
         </output>
     </test>
 
-    <test description="#824: Setfocus on XBL with mode='focus' focuses on nested control" name="oxf:pipeline">
+    <test description="#824: Setfocus on XBL with `mode='focus'` doesn't focus on nested control" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -1225,7 +1225,7 @@
                             <value/>
                         </xf:instance>
 
-                        <xf:action ev:event="xforms-ready">
+                        <xf:action id="my-ready-handler" event="xforms-ready">
                             <xf:setfocus control="my-gaga"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <xf:setfocus control="my-toto"/>
@@ -1257,10 +1257,21 @@
                 <xh:body>
 
                     <!-- Record focus events -->
-                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" xxf:phantom="true" model="events-model" context="." ref="*"
-                        origin="xf:element('event',
-                                (xf:attribute('type', event('xxf:type')),
-                                 xf:attribute('target', event('xxf:absolute-targetid'))))"/>
+                    <xf:insert
+                        id="my-insert-handler"
+                        event="DOMFocusIn DOMFocusOut"
+                        xxf:phantom="true"
+                        model="events-model"
+                        context="."
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:absolute-targetid'))
+                                )
+                            )"/>
 
                     <fr:gaga id="my-gaga"/>
                     <fr:toto id="my-toto"/>
@@ -1279,7 +1290,7 @@
                                     <separator/>
                                     <event type="DOMFocusOut" target="|my-gaga|"/>
                                     <event type="DOMFocusIn" target="|my-toto|"/>
-                                    <event type="DOMFocusIn" target="|my-toto≡xf-9|"/>
+                                    <event type="DOMFocusIn" target="|my-toto≡xf-7|"/>
                                     <event type="DOMFocusIn" target="|my-toto≡toto-1|"/>
                                     <separator/>
                                 </events>

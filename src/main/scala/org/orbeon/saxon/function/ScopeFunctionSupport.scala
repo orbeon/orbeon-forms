@@ -30,7 +30,7 @@ import scala.util.control.NonFatal
 object ScopeFunctionSupport {
 
   def storeAttribute(put: (String, AnyRef) ⇒ Any, attributeName: String, item: Item): Unit = {
-    if (item == null) {
+    if (item eq null) {
       // Clear value
       // TODO: Shouldn't this use `remove()`?
       put(attributeName, null)

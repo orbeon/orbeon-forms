@@ -39,7 +39,7 @@ trait RebuildBindOps {
       // Clear all instances that might have InstanceData
       // Only need to do this after the first rebuild
       if (! _isFirstRebuildForModel)
-        for (instance ← model.getInstances.asScala) {
+        for (instance ← model.instancesIterator) {
           // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to
           // figure out the dependencies.
           // The reason is that clearing this state can take quite some time

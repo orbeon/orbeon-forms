@@ -28,7 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -47,6 +47,7 @@ import scala.xml.Elem
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
+
   val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete))
   val CanCreate           = SpecificOperations(List(Create))
   val CanRead             = SpecificOperations(List(Read))
@@ -61,8 +62,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   /**
    * Test form versioning for form definitions.
    */
-  @Test def formDefinitionVersionTest(): Unit = {
-    Connect.withOrbeonTables("form definition") { (connection, provider) ⇒
+  @Test def formDefinitionVersionTest(): Unit =
+    Connect.withOrbeonTables("form definition") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
 
       val FormURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
@@ -110,13 +113,15 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(fifth),  Operations.None, Some(2)))
       HttpAssert.get(FormURL, Specific(3), HttpAssert.ExpectedCode(404))
     }
-  }
 
   /**
    * Test form versioning for form data
    */
   @Test def formDataVersionStageTest(): Unit = {
     Connect.withOrbeonTables("form data version") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
+
       val FirstDataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
       // Storing for specific form version
@@ -151,6 +156,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def formForDataTest(): Unit = {
     Connect.withOrbeonTables("form data") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
+
       val FormURL       = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val FirstDataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val SecondDataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
@@ -195,6 +203,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def permissionsTest(): Unit = {
 
     Connect.withOrbeonTables("permissions") { (connection, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
 
       val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
@@ -261,6 +271,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def organizationPermissions(): Unit =
     Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) ⇒
 
+      implicit val externalContext = NetUtils.getExternalContext
+
       val formURL   = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
       // Users
@@ -296,7 +308,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   // Try uploading files of 1 KB, 1 MB
   @Test def attachmentsTest(): Unit = {
-    Connect.withOrbeonTables("attachments") { (connection, provider) ⇒
+    Connect.withOrbeonTables("attachments") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
+
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
         val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
         val url = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
@@ -308,7 +323,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   // Try uploading files of 1 KB, 1 MB
   @Test def largeXMLDocumentsTest(): Unit = {
-    Connect.withOrbeonTables("large XML documents") { (connection, provider) ⇒
+    Connect.withOrbeonTables("large XML documents") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
+
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
 
         val charArray = new Array[Char](size)
@@ -328,7 +346,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   @Test def draftsTest(): Unit = {
-    Connect.withOrbeonTables("drafts") { (connection, provider) ⇒
+    Connect.withOrbeonTables("drafts") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
+
       // Draft and non-draft are different
       val first  = HttpCall.XML(<gaga1/>)
       val second = HttpCall.XML(<gaga2/>)
@@ -342,7 +363,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   @Test def extractMetadata(): Unit =
-    Connect.withOrbeonTables("extract metadata") { (connection, provider) ⇒
+    Connect.withOrbeonTables("extract metadata") { (_, provider) ⇒
+
+      implicit val externalContext = NetUtils.getExternalContext
 
       val currentFormURL        = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val currentMetadataURL    = HttpCall.metadataURL(provider)

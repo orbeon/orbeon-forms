@@ -17,8 +17,8 @@ import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
 import org.orbeon.dom
-import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, LoggerFactory, NetUtils}
-import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -80,46 +80,39 @@ object XFormsServer {
     indentedLogger            : IndentedLogger
   ): Unit =
     withDocument {
-      xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
-      withElement(localName = "event-response", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
+      xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
+      withElement(localName = "event-response", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
 
         // Compute server events
-        var requireClientSubmission = false
-        var submissionServerEventsOpt: Option[String] = None
+        val submissionServerEventsOpt: Option[String] = {
 
-        locally {
           val activeSubmissionOpt = containingDocument.getClientActiveSubmissionFirstPass
           val portletLoadOpt      = containingDocument.getNonJavaScriptLoadsToRun find (isPortletLoadMatch(containingDocument, _))
 
-          if (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) {
+          (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) option {
             val eventsDocument = dom.Document()
-            val eventsElement  = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME)
+            val eventsElement  = eventsDocument.addElement(XXFORMS_EVENTS_QNAME)
 
-            // Check for xxforms-submit event
+            def newEventElem(sourceControlId: String, eventName: String): Element =
+              eventsElement.addElement(XXFORMS_EVENT_QNAME)
+                .addAttribute("source-control-id", sourceControlId)
+                .addAttribute("name", eventName)
+
+            // Check for `xxforms-submit` event
             activeSubmissionOpt foreach { activeSubmission ⇒
-              val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
-              eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId)
-              eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT)
-              requireClientSubmission = true
+              newEventElem(activeSubmission.getEffectiveId, XFormsEvents.XXFORMS_SUBMIT)
             }
 
             // Check for `xxforms-load` event (for portlet mode only!)
             portletLoadOpt foreach { load ⇒
               // We need to submit the event so that the portlet can load the new path
-              val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
-
-              // Dispatch to #document
-              eventElement.addAttribute("source-control-id", Constants.DocumentId)
-              eventElement.addAttribute("resource", load.resource)
-
               // NOTE: don't care about the target for portlets
-              eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD)
-              requireClientSubmission = true
+              newEventElem(Constants.DocumentId, XFormsEvents.XXFORMS_LOAD)
+                .addAttribute("resource", load.resource)
             }
 
             // Encode events so that the client cannot send back arbitrary events
-            if (requireClientSubmission)
-              submissionServerEventsOpt = Some(XFormsUtils.encodeXML(eventsDocument, false))
+            XFormsUtils.encodeXML(eventsDocument, false)
           }
         }
 
@@ -127,8 +120,8 @@ object XFormsServer {
         XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState ⇒
           element(
             localName = "dynamic-state",
-            prefix    = "xxf",
-            uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+            prefix    = XXFORMS_SHORT_PREFIX,
+            uri       = XXFORMS_NAMESPACE_URI,
             text      = dynamicState
           )
         }
@@ -148,12 +141,12 @@ object XFormsServer {
               )
             }
 
-          withElement(localName = "action", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
+          withElement(localName = "action", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
 
             val controls = containingDocument.getControls
 
             // Output new controls values and associated information
-            withElement(localName = "control-values", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
+            withElement(localName = "control-values", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
               initialContainingDocumentOpt match {
                 case Some(initialContainingDocument) ⇒
                   // All events
@@ -195,8 +188,8 @@ object XFormsServer {
               if (repeatHierarchy != newRepeatHierarchy) {
                 element(
                   localName = "repeat-hierarchy",
-                  prefix    = "xxf",
-                  uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+                  prefix    = XXFORMS_SHORT_PREFIX,
+                  uri       = XXFORMS_NAMESPACE_URI,
                   text      = XFormsUtils.escapeJavaScript(newRepeatHierarchy)
                 )
               }
@@ -222,11 +215,12 @@ object XFormsServer {
             }
 
             // Output server events
+
             submissionServerEventsOpt foreach { submissionServerEvents ⇒
               element(
-                localName = "server-events",
-                prefix    = "xxf",
-                uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+                localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
+                prefix    = XXFORMS_SHORT_PREFIX,
+                uri       = XXFORMS_NAMESPACE_URI,
                 text      = submissionServerEvents
               )
             }
@@ -285,7 +279,7 @@ object XFormsServer {
             }
 
             // Check if we need to tell the client to perform a form submission
-            if (requireClientSubmission)
+            if (submissionServerEventsOpt.isDefined)
               outputSubmissionInfo(
                 containingDocument.getClientActiveSubmissionFirstPass,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,
@@ -303,7 +297,7 @@ object XFormsServer {
         if (errors.nonEmpty)
           XFormsError.outputAjaxErrors(errors)
       }
-      xmlReceiver.endPrefixMapping("xxf")
+      xmlReceiver.endPrefixMapping(XXFORMS_SHORT_PREFIX)
     }
 
   def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
@@ -311,20 +305,20 @@ object XFormsServer {
     val uuid = XFormsStateManager.getRequestUUID(request) ensuring (_ ne null)
 
     val sequenceElement =
-      request.getRootElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) ensuring (_ ne null)
+      request.getRootElement.element(XXFORMS_SEQUENCE_QNAME) ensuring (_ ne null)
 
     val sequenceOpt =
       sequenceElement.getTextTrim.trimAllToOpt map (_.toLong)
 
     val encodedStaticStateOpt =
-      Option(request.getRootElement.element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME)) flatMap
+      Option(request.getRootElement.element(XXFORMS_STATIC_STATE_QNAME)) flatMap
         (_.getTextTrim.trimAllToOpt)
 
     val qName =
       if (isInitialState)
-        XFormsConstants.XXFORMS_INITIAL_DYNAMIC_STATE_QNAME
+        XXFORMS_INITIAL_DYNAMIC_STATE_QNAME
     else
-        XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME
+        XXFORMS_DYNAMIC_STATE_QNAME
 
     val encodedDynamicStateOpt =
       Option(request.getRootElement.element(qName)) flatMap
@@ -383,7 +377,7 @@ object XFormsServer {
             if (! found) {
               openElement(
                 localName = "repeat-indexes",
-                prefix    = "xxf",
+                prefix    = XXFORMS_SHORT_PREFIX,
                 uri       = XXFORMS_NAMESPACE_URI
               )
               found = true
@@ -391,7 +385,7 @@ object XFormsServer {
             // Make sure to namespace the id
             element(
               localName = "repeat-index",
-              prefix    = "xxf",
+              prefix    = XXFORMS_SHORT_PREFIX,
               uri       = XXFORMS_NAMESPACE_URI,
               atts      = List("id" → (ns + repeatId), "new-index" → newIndex.toString)
             )
@@ -400,7 +394,7 @@ object XFormsServer {
         if (found)
           closeElement(
             localName = "repeat-indexes",
-            prefix    = "xxf",
+            prefix    = XXFORMS_SHORT_PREFIX,
             uri       = XXFORMS_NAMESPACE_URI
           )
       }
@@ -423,7 +417,7 @@ object XFormsServer {
       val actionAtt =
         isPortletContainer list {
 
-          val SubmitUrl = XFormsConstants.XFORMS_SERVER_SUBMIT
+          val SubmitUrl = XFORMS_SERVER_SUBMIT
 
           val actionUrl =
             if (activeSubmissionOpt exists (_.getActiveSubmissionParameters.resolvedIsResponseResourceType))
@@ -437,8 +431,8 @@ object XFormsServer {
       // Signal that we want a POST to the XForms server
       element(
         localName = "submission",
-        prefix    = "xxf",
-        uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+        prefix    = XXFORMS_SHORT_PREFIX,
+        uri       = XXFORMS_NAMESPACE_URI,
         atts      = ("method" → HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
@@ -450,8 +444,8 @@ object XFormsServer {
       for (message ← messages)
         element(
           localName = "message",
-          prefix    = "xxf",
-          uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+          prefix    = XXFORMS_SHORT_PREFIX,
+          uri       = XXFORMS_NAMESPACE_URI,
           atts      = List("level" → message.level),
           text      = message.message
         )
@@ -463,8 +457,8 @@ object XFormsServer {
     : Unit =
       element(
         localName = "load",
-        prefix    = "xxf",
-        uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+        prefix    = XXFORMS_SHORT_PREFIX,
+        uri       = XXFORMS_NAMESPACE_URI,
         atts      =
           ("resource" → load.resource)                          ::
           (load.target.toList map ("target" → _))               :::
@@ -479,7 +473,7 @@ object XFormsServer {
     ): Unit =
       withElement(
         "script",
-        prefix = "xxf",
+        prefix = XXFORMS_SHORT_PREFIX,
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
           "name"        → scriptInvocation.script.shared.clientName,
@@ -491,13 +485,13 @@ object XFormsServer {
         for (value ← scriptInvocation.paramValues) {
           element(
             "param",
-            prefix = "xxf",
+            prefix = XXFORMS_SHORT_PREFIX,
             uri    = XXFORMS_NAMESPACE_URI,
             atts   = Nil,
             text   = value
           )
         }
-        }
+      }
 
     def outputFocusInfo(
       containingDocument      : XFormsContainingDocument,
@@ -507,7 +501,7 @@ object XFormsServer {
     ): Unit =
       element(
         localName = if (focus) "focus" else "blur",
-        prefix    = "xxf",
+        prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
         atts      = List("control-id" → XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId))
       )
@@ -519,7 +513,7 @@ object XFormsServer {
     ): Unit =
       element(
         localName = "help",
-        prefix    = "xxf",
+        prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
         atts      = List("control-id" → XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId))
       )
@@ -583,7 +577,7 @@ class XFormsServer extends ProcessorImpl {
       debug("ajax request", List("body" → requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
 
     // Get action
-    val actionElement = requestDocument.getRootElement.element(XFormsConstants.XXFORMS_ACTION_QNAME)
+    val actionElement = requestDocument.getRootElement.element(XXFORMS_ACTION_QNAME)
 
     // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
     // NOTE: If we don't have a receiver, this means that we are in the second pass of a submission with
@@ -616,7 +610,7 @@ class XFormsServer extends ProcessorImpl {
     val ignoreSequence = ! isAjaxRequest
 
     // Get files if any (those come from xforms-server-submit.xpl upon submission)
-    val filesElement = requestDocument.getRootElement.element(XFormsConstants.XXFORMS_FILES_QNAME)
+    val filesElement = requestDocument.getRootElement.element(XXFORMS_FILES_QNAME)
 
     // Gather server events containers if any
     val serverEventsElements = ClientEvents.extractServerEventsElements(requestDocument.getRootElement)

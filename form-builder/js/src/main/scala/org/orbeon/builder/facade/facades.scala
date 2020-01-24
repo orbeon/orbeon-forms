@@ -13,7 +13,6 @@
   */
 package org.orbeon.builder.facade
 
-import org.scalajs.dom
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
@@ -33,51 +32,6 @@ object JQueryTooltip {
 abstract class JQueryTooltipConfig extends js.Object {
   val title: String
 }
-
-abstract class TinyMceEditorManager extends js.Object
-
-@JSGlobal("tinymce.EditorManager")
-@js.native
-object TinyMceDefaultEditorManager extends TinyMceEditorManager {
-  var baseURL: String = js.native
-}
-
-@js.native
-@JSGlobal("tinymce.Editor")
-class TinyMceEditor(
-  containerId   : String,
-  config        : TinyMceConfig,
-  editorManager : TinyMceEditorManager
-) extends js.Object {
-  val initialized                                                   : js.UndefOr[Boolean] = js.native
-  val editorContainer                                               : dom.Element         = js.native
-  val container                                                     : dom.Element         = js.native
-  def on(name: String, callback: js.Function1[TinyMceEditor, Unit]) : Unit                = js.native
-  def render()                                                      : Unit                = js.native
-  def getWin()                                                      : dom.Window          = js.native
-  def getContent()                                                  : String              = js.native
-  def setContent(c: String)                                         : Unit                = js.native
-  def execCommand(c: String)                                        : Unit                = js.native
-  def show()                                                        : Unit                = js.native
-  def hide()                                                        : Unit                = js.native
-  def focus()                                                       : Unit                = js.native
-}
-
-@js.native
-trait TinyMceEvent extends js.Object {
-  def add(f: js.Function1[TinyMceEditor, Unit])
-}
-
-@js.native
-trait TinyMceConfig extends js.Object {
-  var plugins                  : String = js.native
-  var autoresize_min_height    : Double = js.native
-  var autoresize_bottom_margin : Double = js.native
-}
-
-@JSGlobal("YAHOO.xbl.fr.Tinymce.DefaultConfig")
-@js.native
-object TinyMceDefaultConfig extends TinyMceConfig
 
 @JSGlobal("_")
 @js.native

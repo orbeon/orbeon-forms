@@ -75,7 +75,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
             new EchoSubmission(this),
             new ClientGetAllSubmission(this),
             new CacheableSubmission(this),
-            new RequestDispatcherSubmission(this),
             new RegularSubmission(this)
         };
     }

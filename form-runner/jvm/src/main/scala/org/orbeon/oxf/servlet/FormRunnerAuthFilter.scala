@@ -28,14 +28,14 @@ class FormRunnerAuthFilter extends Filter {
 
   private var settingsOpt: Option[FilterSettings] = None
 
-  def init(filterConfig: FilterConfig): Unit = {
+  override def init(filterConfig: FilterConfig): Unit = {
     logger.info("initializing")
     val settings = FilterSettings(Option(filterConfig.getInitParameter("content-security-policy")) flatMap (_.trimAllToOpt))
     logger.info(s"configuring: $settings")
     settingsOpt = Some(settings)
   }
 
-  def destroy(): Unit = {
+  override def destroy(): Unit = {
     logger.info(s"destroying")
     settingsOpt = None
   }

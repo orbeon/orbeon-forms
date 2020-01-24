@@ -14,9 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLAssets}
 
 import scala.collection.JavaConverters._
+import scala.collection.{immutable ⇒ i}
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -55,7 +57,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   // Models
   def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))
-  def getInstances(modelPrefixedId: String) = collectInPartsJ(_.getInstances(modelPrefixedId)).asJava
+  def getInstances(modelPrefixedId: String): i.Seq[Instance] = collectInParts(_.getInstances(modelPrefixedId))
 
   def containingScope(prefixedId: String) = findInParts(_.containingScope(prefixedId)).orNull
   def scopeForPrefixedId(prefixedId: String) = findInParts(_.scopeForPrefixedId(prefixedId)).orNull

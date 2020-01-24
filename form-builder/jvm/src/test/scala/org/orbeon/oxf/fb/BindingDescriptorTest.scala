@@ -121,7 +121,7 @@ class BindingDescriptorTest
       newDatatype    : QName,
       newAppearance  : Option[String])(
       expected       : Option[(QName, Option[String])]
-    ) =
+    ): Unit =
       it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
         for {
           oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))

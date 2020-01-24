@@ -9,7 +9,7 @@ val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
-val ScalaJsDomVersion             = "0.9.7"
+val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
@@ -20,7 +20,7 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.12.3"
 val EnumeratumVersion             = "1.5.15"
 val EnumeratumCirceVersion        = "1.5.22"
-val ScalaXmlVersion               = "1.2.0"
+val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
@@ -32,16 +32,22 @@ val ScalaCollectionCompatVersion  = "2.1.3"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val JodaConvertVersion            = "1.9.2"
-val ServletApiVersion             = "3.0.1"
-val PortletApiVersion             = "2.0"
-val Slf4jVersion                  = "1.7.25"
-val HttpComponentsVersion         = "4.3.6"  // 4.5.2
+val JodaConvertVersion            = "2.2.1"
+val Slf4jVersion                  = "1.7.30"
+val HttpComponentsVersion         = "4.5.11"
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.6"  // 2.5
-val FlyingSaucerVersion           = "9.1.18"
+val CommonsIoVersion              = "2.6"
+val FlyingSaucerVersion           = "9.1.20"
+val TinkVersion                   = "1.2.2"
+val JacksonVersion                = "2.10.2"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.1"
+
+// "Provided" Java libraries
+val ServletApiVersion             = "4.0.1"
+val PortletApiVersion             = "3.0.1"
+val LiferayPortalServiceVersion   = "6.2.5"
+val LiferayPortalKernelVersion    = "5.3.0"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -53,18 +59,18 @@ val CoreLibraryDependencies = Seq(
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "joda-time"                   %  "joda-time"                      % "2.10.5",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5
-  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.3",  // 2.6.11, 2.10.4
-  "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",    // 1.9.3
-  "commons-codec"               %  "commons-codec"                  % "1.6",    // 1.10
+  "org.apache.commons"          %  "commons-lang3"                  % "3.9",
+  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
+  "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
+  "commons-codec"               %  "commons-codec"                  % "1.14",
   "commons-collections"         %  "commons-collections"            % "3.2.2",
-  "commons-digester"            %  "commons-digester"               % "1.5",    // 2.1
-  "commons-cli"                 %  "commons-cli"                    % "1.4",    // 1.3.1
-  "commons-discovery"           %  "commons-discovery"              % "0.4",    // 0.5
-  "commons-fileupload"          %  "commons-fileupload"             % "1.3.3",
+  "commons-digester"            %  "commons-digester"               % "2.1",
+  "commons-cli"                 %  "commons-cli"                    % "1.4",
+  "commons-discovery"           %  "commons-discovery"              % "0.5",
+  "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.4.1",  // 1.5.1
+  "commons-validator"           %  "commons-validator"              % "1.6",  // 1.5.1
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
   "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
@@ -73,29 +79,31 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpcore"                        % "4.3.3",
+  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.13",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
   "log4j"                       % "log4j"                           % Log4jVersion,
-  "com.jcraft"                  % "jsch"                            % "0.1.55", // 0.1.54
+  "com.jcraft"                  % "jsch"                            % "0.1.55",
   "jcifs"                       % "jcifs"                           % "1.3.17",
+  "com.google.crypto.tink"      % "tink"                            % TinkVersion,
+  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
-  "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test, // 1.3
-  "org.apache.commons"          % "commons-dbcp2"                   % "2.1.1"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test, // 2.8.0
-  "com.google.guava"            % "guava"                           % "13.0.1"          % Test, // 20.0
-  "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
-  "mysql"                       % "mysql-connector-java"            % "8.0.18"          % Test,
-  "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,
-  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test,  // 3.0.1
+  "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
+  "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
+  "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
+  "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
+  "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.19"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.9" % Test,
+  "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.60"  // for `itext`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.64",  // for `itext`, also pulls `bcprov` and `bcpkix`
 
-//  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
-//  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
+  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
+  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
@@ -434,33 +442,43 @@ lazy val embedding = (project in file("embedding"))
   .dependsOn(core)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-embedding"
-  )
-  .settings(
+    name := "orbeon-embedding",
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided
   )
 
 lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(portletSupport)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-full-portlet"
-  )
-  .settings(
-    libraryDependencies += "org.joda" % "joda-convert" % JodaConvertVersion % Provided
+    name := "orbeon-full-portlet",
+    libraryDependencies += "org.joda"           % "joda-convert"              % JodaConvertVersion          % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
+
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .dependsOn(portletSupport)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-proxy-portlet"
+    name := "orbeon-proxy-portlet",
+    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val portletSupport = (project in file("portlet-support"))
   .dependsOn(embedding)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-portlet-support"
+    name := "orbeon-portlet-support",
+    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
@@ -492,7 +510,15 @@ lazy val formRunnerJVM = formRunner.jvm
     sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
     javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
+    libraryDependencies += "org.joda"      %  "joda-convert"     % JodaConvertVersion % Provided,
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
+    libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
+
+    libraryDependencies                ++= Seq(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % CirceVersion)
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -618,6 +644,8 @@ lazy val xformsJVM = xforms.jvm
   .settings(commonScalaJvmSettings)
   .settings(jUnitTestOptions: _*)
   .settings(
+
+    libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided,
 
     // Because `Assets` doesn't check the `shared` directory
     unmanagedResourceDirectories in Assets += sharedAssetsDir(baseDirectory.value),
@@ -792,5 +820,3 @@ lazy val root = (project in file("."))
     sourceDirectory in ThisProject     := baseDirectory.value / "root", // until we have a more standard layout
     publishArtifact                    := false
   )
-
-sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

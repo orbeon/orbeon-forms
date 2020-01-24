@@ -30,7 +30,7 @@ public class XXFormsInvalidateInstancesAction extends XFormsAction {
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
-        final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LoggingCategory());
         XFormsServerSharedInstancesCache.removeAll(indentedLogger);
     }
 }

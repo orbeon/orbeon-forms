@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream
 
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
 
 /**
  * Test submission which just echoes the incoming document.
@@ -65,7 +65,8 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       customHeaders    = customHeaderNameValues,
       headersToForward = Connection.headersToForwardFromProperty,
       getHeader        = containingDocument.headersGetter)(
-      logger           = getDetailsLogger(p, p2)
+      logger           = getDetailsLogger(p, p2),
+      externalContext  = NetUtils.getExternalContext
     )
 
     // Do as if we are receiving a regular XML response

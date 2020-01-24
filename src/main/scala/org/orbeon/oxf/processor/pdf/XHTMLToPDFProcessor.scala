@@ -130,7 +130,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
             URLRewriterUtils.rewriteServiceURL(
               requestOpt.orNull,
               uri,
-              URLRewriter.REWRITE_MODE_ABSOLUTE | URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+              URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT
             )
 
           indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)

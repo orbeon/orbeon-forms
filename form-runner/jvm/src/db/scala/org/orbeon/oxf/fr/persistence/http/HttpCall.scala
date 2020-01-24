@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.http
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.net.URI
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
@@ -150,7 +151,7 @@ private[persistence] object HttpCall {
       val headers = (timeoutHeader.toList ++ versionHeader.toList ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.Http,
+        url              = new URI(documentURL),
         hasCredentials   = false,
         customHeaders    = headers,
         headersToForward = Connection.headersToForwardFromProperty,

@@ -18,7 +18,6 @@ import java.net.URI
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
@@ -40,8 +39,17 @@ object Authorizer extends Logging {
   private val AuthorizedKey = "org.orbeon.oxf.controller.service.authorized"
 
   // Whether the incoming request is authorized either with a token or via the delegate
-  def authorized(ec: ExternalContext)(implicit logger: IndentedLogger, propertySet: PropertySet) =
-    authorizedWithToken(ec) || (if (RememberAuthorization) authorizeIfNeededAndRemember(ec.getRequest) else authorizedWithDelegate(ec.getRequest))
+  def authorized(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean =
+    authorizedWithToken(ec) || (
+      if (RememberAuthorization)
+        authorizeIfNeededAndRemember(ec)
+      else
+        authorizedWithDelegate(ec)
+    )
 
   // Whether the incoming request is authorized with a token
   def authorizedWithToken(ec: ExternalContext): Boolean =
@@ -60,20 +68,26 @@ object Authorizer extends Logging {
 
   // Check the session to see if the request is already authorized. If not, try to authorize, and remember the
   // authorization if successful. Return whether the request is authorized.
-  def authorizeIfNeededAndRemember(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
+  private def authorizeIfNeededAndRemember(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean = {
 
-    def alreadyAuthorized =
+    val request = ec.getRequest
+
+    def alreadyAuthorized: Boolean =
       request.sessionOpt flatMap
       (_.getAttribute(AuthorizedKey)) collect
       { case value: JBoolean => value.booleanValue() } exists
       identity
 
-    def rememberAuthorized() =
+    def rememberAuthorized(): Unit =
       Option(request.getSession(true)) foreach
       (_.setAttribute(AuthorizedKey, JBoolean.TRUE))
 
     if (! alreadyAuthorized) {
-      val newlyAuthorized = authorizedWithDelegate(request)
+      val newlyAuthorized = authorizedWithDelegate(ec)
       if (newlyAuthorized)
         rememberAuthorized()
       newlyAuthorized
@@ -82,7 +96,13 @@ object Authorizer extends Logging {
   }
 
   // Authorize the given request with the given delegate service
-  def authorizedWithDelegate(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
+  private def authorizedWithDelegate(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean = {
+
+    val request = ec.getRequest
 
     def appendToURI(uri: URI, path: String, query: Option[String]) = {
 
@@ -129,13 +149,15 @@ object Authorizer extends Logging {
 
         val connection =
           Connection(
-            method      = method,
-            url         = newURL,
-            credentials = None,
-            content     = content,
-            headers     = allHeaders,
-            loadState   = true,
-            logBody     = false
+            method          = method,
+            url             = newURL,
+            credentials     = None,
+            content         = content,
+            headers         = allHeaders,
+            loadState       = true,
+            logBody         = false)(
+            logger          = logger,
+            externalContext = ec
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?

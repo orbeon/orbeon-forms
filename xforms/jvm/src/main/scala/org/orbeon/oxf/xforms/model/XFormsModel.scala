@@ -401,11 +401,13 @@ trait XFormsModelInstances {
 
   private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentInfo =
     SubmissionUtils.readTinyTree(
-      model          = selfModel,
-      resolvedURL    = URLRewriterUtils.rewriteServiceURL(
-        NetUtils.getExternalContext.getRequest,
-        pathOrAbsoluteURI,
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+      model               = selfModel,
+      resolvedAbsoluteUrl = new URI(
+        URLRewriterUtils.rewriteServiceURL(
+          NetUtils.getExternalContext.getRequest,
+          pathOrAbsoluteURI,
+          URLRewriter.REWRITE_MODE_ABSOLUTE
+        )
       ),
       handleXInclude = handleXInclude
     )
@@ -460,7 +462,12 @@ trait XFormsModelInstances {
     }
 
   private def resolveInstanceURL(instance: Instance): String =
-    XFormsUtils.resolveServiceURL(containingDocument, instance.element, instance.instanceSource.get, URLRewriter.REWRITE_MODE_ABSOLUTE)
+    XFormsUtils.resolveServiceURL(
+      containingDocument,
+      instance.element,
+      instance.instanceSource.get,
+      URLRewriter.REWRITE_MODE_ABSOLUTE
+    )
 
   private def loadInitialExternalInstanceFromCacheIfNeeded(instance: Instance): Unit = {
     val instanceResource = instance.instanceSource.get
@@ -522,7 +529,7 @@ trait XFormsModelInstances {
         implicit val ec: ExternalContext = NetUtils.getExternalContext
 
         val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-          scheme           = UriScheme.withName(absoluteResolvedUrl.getScheme),
+          url              = absoluteResolvedUrl,
           hasCredentials   = instance.credentials.isDefined,
           customHeaders    = Headers.EmptyHeaders,
           headersToForward = Connection.headersToForwardFromProperty,

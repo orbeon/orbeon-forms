@@ -23,8 +23,8 @@ import com.lowagie.text.{Image, Rectangle}
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
-import org.orbeon.io.{CharsetNames, UriScheme}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
@@ -336,7 +336,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
               credentials     = None,
               content         = None,
               headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-                scheme           = UriScheme.withName(url.getScheme),
+                url              = url,
                 hasCredentials   = false,
                 customHeaders    = URLGeneratorBase.extractHeaders(context.element),
                 headersToForward = Connection.headersToForwardFromProperty,
@@ -347,7 +347,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
               ),
               loadState       = true,
               logBody         = false)(
-              logger          = context.logger
+              logger          = context.logger,
+              externalContext = externalContext
             ).connect(
               saveState = true
             )

@@ -154,7 +154,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
           val url = new URI(resolvedURI)
           val headers =
             Connection.buildConnectionHeadersCapitalizedIfNeeded(
-              scheme           = UriScheme.withName(url.getScheme),
+              url              = url,
               hasCredentials   = false,
               customHeaders    = Map(Headers.OrbeonClient -> List("servlet")),
               headersToForward = Connection.headersToForwardFromProperty,
@@ -164,15 +164,18 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
           val cxr =
             Connection(
-              method      = HttpMethod.GET,
-              url         = url,
-              credentials = None,
-              content     = None,
-              headers     = headers,
-              loadState   = true,
-              logBody     = false)(
-              logger      = indentedLogger
-            ).connect(true)
+              method          = HttpMethod.GET,
+              url             = url,
+              credentials     = None,
+              content         = None,
+              headers         = headers,
+              loadState       = true,
+              logBody         = false)(
+              logger          = indentedLogger,
+              externalContext = externalContext
+            ).connect(
+              saveState = true
+            )
 
           ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {
             pipelineContext.addContextListener((_: Boolean) => cxr.close())

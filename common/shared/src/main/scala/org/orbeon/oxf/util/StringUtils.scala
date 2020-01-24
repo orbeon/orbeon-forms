@@ -210,6 +210,11 @@ object StringUtils {
         ""
     }
 
+    def substringAfterOpt(search: String): Option[String] = {
+      val index = s.indexOf(search)
+      index >= 0 option s.substring(index + search.length)
+    }
+
     def trimSuffixIfPresent(suffix: String): String =
       if (s.endsWith(suffix))
         s.substring(0, s.length - suffix.length)

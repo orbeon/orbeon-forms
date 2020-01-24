@@ -51,14 +51,15 @@ import scala.collection.compat._
  * - forwarding HTTP headers
  * - managing SOAP POST and GET a la XForms 1.1 (should this be here?)
  */
-class Connection(
-  method         : HttpMethod,
-  url            : URI,
-  credentials    : Option[Credentials],
-  content        : Option[StreamedContent],
-  headers        : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
-  logBody        : Boolean)(implicit
-  logger         : IndentedLogger
+class Connection private (
+  method          : HttpMethod,
+  normalizedUrl   : URI,
+  credentials     : Option[Credentials],
+  content         : Option[StreamedContent],
+  headers         : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
+  logBody         : Boolean)(implicit
+  logger          : IndentedLogger,
+  externalContext : ExternalContext
 ) extends ConnectionState with Logging {
 
   import org.orbeon.oxf.util.Connection._
@@ -66,16 +67,16 @@ class Connection(
   // Open the connection. This sends request headers, request body, and reads status and response headers.
   def connect(saveState: Boolean): ConnectionResult = {
 
-    val urlString = url.toString
+    val normalizedUrlString = normalizedUrl.toString
 
     try {
-      UriScheme.withName(url.getScheme) match {
-        case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(url) =>
+      UriScheme.withName(normalizedUrl.getScheme) match {
+        case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(normalizedUrl) =>
           throw new OXFException(s"URL scheme `${scheme.entryName}` not allowed")
         case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
 
           // Create URL connection object
-          val urlConnection = URLFactory.createURL(urlString).openConnection
+          val urlConnection = URLFactory.createURL(normalizedUrlString).openConnection
           urlConnection.connect()
 
           // NOTE: The data: scheme doesn't have a path but can have a content type in the URL. Do this for the
@@ -84,7 +85,7 @@ class Connection(
             if (scheme == UriScheme.Data) Option(urlConnection.getContentType) else None
 
           def contentTypeFromPath =
-            Option(url.getPath) flatMap Mediatypes.findMediatypeForPath
+            Option(normalizedUrl.getPath) flatMap Mediatypes.findMediatypeForPath
 
           def contentTypeHeader =
             contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
@@ -97,7 +98,7 @@ class Connection(
 
           // Create result
           val connectionResult = ConnectionResult(
-            url        = urlString,
+            url        = normalizedUrlString,
             statusCode = 200,
             headers    = headersWithContentType,
             content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
@@ -148,9 +149,9 @@ class Connection(
           cookieStoreOpt = Some(cookieStore)
 
           val (effectiveConnectionUrlString, client) =
-            findInternalURL(urlString) match {
+            findInternalUrl(normalizedUrl, isInternalPath) match {
               case Some(internalPath) => (internalPath, InternalHttpClient)
-              case _                  => (urlString,    PropertiesApacheHttpClient)
+              case _                  => (normalizedUrlString,    PropertiesApacheHttpClient)
             }
 
           val response =
@@ -196,7 +197,7 @@ class Connection(
 
           // Create result
           val connectionResult = ConnectionResult.apply(
-            url        = urlString,
+            url        = normalizedUrlString,
             statusCode = response.statusCode,
             headers    = response.headers,
             content    = response.content
@@ -217,7 +218,7 @@ class Connection(
           throw new OXFException(s"URL scheme `$scheme` not supported for method `$method`")
       }
     } catch {
-      case NonFatal(t) => throw new ValidationException(t, new LocationData(url.toString, -1, -1))
+      case NonFatal(t) => throw new ValidationException(t, new LocationData(normalizedUrlString, -1, -1))
     }
   }
 }
@@ -231,7 +232,7 @@ trait ConnectionState {
   private val stateScope = stateScopeFromProperty
   var cookieStoreOpt: Option[CookieStore] = None
 
-  def loadHttpState()(implicit logger: IndentedLogger): Unit = {
+  def loadHttpState()(implicit logger: IndentedLogger, externalContext: ExternalContext): Unit = {
     cookieStoreOpt =
       stateAttributes(createSession = false) flatMap
       (m => Option(m._1(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
@@ -239,7 +240,7 @@ trait ConnectionState {
     debugStore("loaded HTTP state", "did not load HTTP state")
   }
 
-  def saveHttpState()(implicit logger: IndentedLogger): Unit = {
+  def saveHttpState()(implicit logger: IndentedLogger, externalContext: ExternalContext): Unit = {
     cookieStoreOpt foreach { cookieStore =>
       stateAttributes(createSession = true) foreach
       (_._2(HttpCookieStoreAttribute, cookieStore))
@@ -262,8 +263,10 @@ trait ConnectionState {
       }
     }
 
-  private def stateAttributes(createSession: Boolean): Option[(String => AnyRef, (String, AnyRef) => Unit)] = {
-    val externalContext = NetUtils.getExternalContext
+  private def stateAttributes(
+    createSession   : Boolean)(implicit
+    externalContext : ExternalContext
+  ): Option[(String => AnyRef, (String, AnyRef) ⇒ Unit)] =
     stateScope match {
       case "request" =>
         val m = externalContext.getRequest.getAttributesMap
@@ -280,7 +283,6 @@ trait ConnectionState {
       case _ =>
         None
     }
-  }
 }
 
 private object ConnectionState {
@@ -313,14 +315,15 @@ object Connection extends Logging {
 
   // Create a new Connection
   def apply(
-    method      : HttpMethod,
-    url         : URI,
-    credentials : Option[Credentials],
-    content     : Option[StreamedContent],
-    headers     : Map[String, List[String]],
-    loadState   : Boolean,
-    logBody     : Boolean)(implicit
-    logger      : IndentedLogger
+    method          : HttpMethod,
+    url             : URI,
+    credentials     : Option[Credentials],
+    content         : Option[StreamedContent],
+    headers         : Map[String, List[String]],
+    loadState       : Boolean,
+    logBody         : Boolean)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
   ): Connection = {
 
     require(! requiresRequestBody(method) || content.isDefined)
@@ -347,7 +350,8 @@ object Connection extends Logging {
     headers           : Map[String, List[String]],
     loadState         : Boolean,
     logBody           : Boolean,
-    logger            : IndentedLogger
+    logger            : IndentedLogger,
+    externalContext   : ExternalContext
   ): Connection = {
 
     val messageBody: Option[Array[Byte]] =
@@ -357,14 +361,15 @@ object Connection extends Logging {
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
     apply(
-      method      = httpMethod,
-      url         = url,
-      credentials = Option(credentialsOrNull),
-      content     = content,
-      headers     = headers,
-      loadState   = loadState,
-      logBody     = logBody)(
-      logger      = logger
+      method          = httpMethod,
+      url             = url,
+      credentials     = Option(credentialsOrNull),
+      content         = content,
+      headers         = headers,
+      loadState       = loadState,
+      logBody         = logBody)(
+      logger          = logger,
+      externalContext = externalContext
     )
   }
 
@@ -376,19 +381,24 @@ object Connection extends Logging {
     r.pattern.matcher(path).matches()
   }
 
-  def findInternalURL(url: String): Option[String] = {
+  def findInternalUrl(
+    normalizedUrl : URI,
+    filter        : String ⇒ Boolean)(implicit
+    ec            : ExternalContext
+  ): Option[String] = {
+
+    val normalizedUrlString = normalizedUrl.toString
 
     val servicePrefix =
       URLRewriterUtils.rewriteServiceURL(
-        NetUtils.getExternalContext.getRequest,
+        ec.getRequest,
         "/",
         URLRewriter.REWRITE_MODE_ABSOLUTE
       )
 
     for {
-      pathQuery <- url.startsWith(servicePrefix) option url.substring(servicePrefix.size - 1)
-      pathOnly  = splitQuery(pathQuery)._1
-      if isInternalPath(pathOnly)
+      pathQuery <- normalizedUrlString.substringAfterOpt(servicePrefix) map (_.prependSlash)
+      if filter(splitQuery(pathQuery)._1)
     } yield
       pathQuery
   }
@@ -401,7 +411,7 @@ object Connection extends Logging {
 
   // Build all the connection headers
   def buildConnectionHeadersCapitalizedIfNeeded(
-    scheme           : UriScheme,
+    url              : URI, // scheme can be `null`; should we force a scheme, for example `http:/my/service`?
     hasCredentials   : Boolean,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
@@ -410,34 +420,35 @@ object Connection extends Logging {
     logger           : IndentedLogger,
     externalContext  : ExternalContext
   ): Map[String, List[String]] =
-    if (schemeRequiresHeaders(scheme))
-      buildConnectionHeadersCapitalized(hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
+    if ((url.getScheme eq null) || schemeRequiresHeaders(UriScheme.withName(url.getScheme)))
+      buildConnectionHeadersCapitalized(url.normalize, hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
     else
       EmptyHeaders
 
   // For Java callers
   // 2020-01-21: 2 Java callers
   def jBuildConnectionHeadersCapitalizedIfNeeded(
-    scheme              : String,
+    url                 : URI,
     hasCredentials      : Boolean,
     customHeadersOrNull : JMap[String, Array[String]],
     headersToForward    : String,
     getHeader           : String => Option[List[String]],
-    logger              : IndentedLogger
+    logger              : IndentedLogger,
+    externalContext     : ExternalContext
   ): Map[String, List[String]] =
     buildConnectionHeadersCapitalizedIfNeeded(
-      scheme            = UriScheme.withName(scheme),
+      url               = url,
       hasCredentials    = hasCredentials,
       customHeaders     = Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
       headersToForward  = valueAs[Set](headersToForward),
       cookiesToForward  = cookiesToForwardFromProperty,
       getHeader         = getHeader)(
       logger            = logger,
-      externalContext   = NetUtils.getExternalContext
+      externalContext   = externalContext
     )
 
   def buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-    scheme           : UriScheme,
+    url              : URI,
     method           : HttpMethod,
     hasCredentials   : Boolean,
     mediatype        : String,// xxx Option[String]
@@ -448,7 +459,7 @@ object Connection extends Logging {
     logger           : IndentedLogger,
     externalContext  : ExternalContext
   ): Map[String, List[String]] =
-    if (schemeRequiresHeaders(scheme)) {
+    if ((url.getScheme eq null) || schemeRequiresHeaders(UriScheme.withName(url.getScheme))) {
 
       // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
       // mediatype attribute"
@@ -466,6 +477,7 @@ object Connection extends Logging {
       // So we have: @serialization -> @mediatype ->  xf:header -> SOAP
       val connectionHeadersCapitalized =
         buildConnectionHeadersCapitalized(
+          url.normalize,
           hasCredentials,
           headersWithContentTypeIfNeeded,
           headersToForward,
@@ -556,6 +568,7 @@ object Connection extends Logging {
    * - a list of headers to forward
    */
   private def buildConnectionHeadersCapitalized(
+    normalizedUrl            : URI,
     hasCredentials           : Boolean,
     customHeadersCapitalized : Map[String, List[String]],
     headersToForward         : Set[String],
@@ -578,14 +591,15 @@ object Connection extends Logging {
       else
         None
 
-    // 4. Authorization token
-    val tokenHeaderCapitalized = {
+    // 4. Authorization token only for internal connections
+    // https://github.com/orbeon/orbeon-forms/issues/4388
+    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ ⇒ true).isDefined list {
 
       // Get token from web app scope
       val token =
         externalContext.getWebAppContext.attributes.getOrElseUpdate(OrbeonTokenLower, SecureUtils.randomHexId).asInstanceOf[String]
 
-      Seq(OrbeonToken -> List(token))
+      OrbeonToken -> List(token)
     }
 
     // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward

@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import java.net.URI
+
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms._
@@ -74,7 +77,11 @@ object InstanceCaching {
     InstanceCaching(
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
-      pathOrAbsoluteURI = Connection.findInternalURL(sourceURI) getOrElse sourceURI, // adjust for internal path so replication works
+      pathOrAbsoluteURI = Connection.findInternalUrl(
+        normalizedUrl = new URI(sourceURI).normalize,
+        filter        = isInternalPath)(
+        ec            = NetUtils.getExternalContext
+      ) getOrElse sourceURI, // adjust for internal path so replication works
       requestBodyHash   = Option(requestBodyHashOrNull)
     )
 }

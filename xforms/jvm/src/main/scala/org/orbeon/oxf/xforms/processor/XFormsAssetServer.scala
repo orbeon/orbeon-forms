@@ -285,7 +285,7 @@ object XFormsAssetServer {
 
     // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
     // an absolute URI.
-    val serviceURI = new URI(
+    val serviceAbsoluteUrl = new URI(
       URLRewriterUtils.rewriteServiceURL(
         NetUtils.getExternalContext.getRequest,
         uri,
@@ -295,7 +295,7 @@ object XFormsAssetServer {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.withName(serviceURI.getScheme),
+        url              = serviceAbsoluteUrl,
         hasCredentials   = false,
         customHeaders    = customHeaders,
         headersToForward = headersToForward,
@@ -306,7 +306,7 @@ object XFormsAssetServer {
       )
 
     val resource =
-      DynamicResource(serviceURI, filename, contentType, lastModified, outgoingHeaders)
+      DynamicResource(serviceAbsoluteUrl, filename, contentType, lastModified, outgoingHeaders)
 
     // Store mapping into session
     session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)

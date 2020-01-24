@@ -272,7 +272,7 @@ private object PersistenceProxyProcessor {
 
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.withName(outgoingURL.getScheme),
+        url              = outgoingURL,
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,
         headersToForward = Set(),                                   // handled by proxyAndCapitalizeHeaders()

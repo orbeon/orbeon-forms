@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayOutputStream
-import java.net.URLEncoder
+import java.net.{URI, URLEncoder}
 
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
@@ -164,17 +164,19 @@ object SerializationParameters {
             // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
 
             // NOTE: We support a relative path, in which case the path is resolved as a service URL
-            val resolvedURI =
-              XFormsUtils.resolveServiceURL(
-                submission.containingDocument,
-                submission.getSubmissionElement,
-                documentToSubmit.getRootElement.getStringValue,
-                URLRewriter.REWRITE_MODE_ABSOLUTE
+            val resolvedAbsoluteUrl =
+              new URI(
+                XFormsUtils.resolveServiceURL(
+                  submission.containingDocument,
+                  submission.getSubmissionElement,
+                  documentToSubmit.getRootElement.getStringValue,
+                  URLRewriter.REWRITE_MODE_ABSOLUTE
+                )
               )
 
             try {
               SerializationParameters(
-                messageBody            = SubmissionUtils.readByteArray(submission.getModel, resolvedURI),
+                messageBody            = SubmissionUtils.readByteArray(submission.getModel, resolvedAbsoluteUrl),
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )

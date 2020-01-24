@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.util
 
+import java.net.URI
 import java.{util => ju}
 
 import cats.syntax.option._
 import org.mockito.Mockito
 import org.orbeon.io.{CharsetNames, UriScheme}
+import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
@@ -66,16 +68,16 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          scheme            = UriScheme.Http,
-          method            = HttpMethod.GET,
-          hasCredentials    = false,
-          mediatype         = null,
-          encodingForSOAP   = CharsetNames.Utf8,
-          customHeaders     = customHeaderValuesMap,
-          headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
-          getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
-          logger            = ResourceManagerTestBase.newIndentedLogger,
-          externalContext   = externalContext
+          url              = new URI("/foo/bar"),
+          method           = HttpMethod.GET,
+          hasCredentials   = false,
+          mediatype        = null,
+          encodingForSOAP  = CharsetNames.Utf8,
+          customHeaders    = customHeaderValuesMap,
+          headersToForward = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
+          getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest))(
+          logger           = ResourceManagerTestBase.newIndentedLogger,
+          externalContext  = externalContext
         )
 
       val request =
@@ -121,13 +123,13 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          scheme           = UriScheme.Http,
+          url              = new URI("/foo/bar"),
           method           = method,
           hasCredentials   = false,
           mediatype        = bodyMediaType,
           encodingForSOAP  = CharsetNames.Utf8,
           customHeaders    = explicitHeaders,
-          headersToForward = Set(),
+          headersToForward = Set.empty,
           getHeader        = _ => None)(
           logger           = ResourceManagerTestBase.newIndentedLogger,
           externalContext  = externalContext
@@ -170,19 +172,56 @@ class ConnectionTest
       it(s"must ${if (expectedHeaderValue.isDefined) "" else "not " }include a `Content-Type` header when using the `${method.entryName}` method") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-            scheme           = UriScheme.Http,
+            url              = new URI("/foo/bar"),
             method           = method,
             hasCredentials   = false,
-            mediatype        = ContentTypes.XmlContentType,
+            mediatype        = contentType,
             encodingForSOAP  = CharsetNames.Utf8,
             customHeaders    = Map.empty,
-            headersToForward = Set(),
+            headersToForward = Set.empty,
             getHeader        = _ => None)(
             logger           = ResourceManagerTestBase.newIndentedLogger,
             externalContext  = externalContext
           )
 
         assert(expectedHeaderValue == firstItemIgnoreCase(headersCapitalized, Headers.ContentType))
+      }
+    }
+  }
+
+  describe("#4388: Don't send `Orbeon-Token` to external services") {
+
+    val externalContext = newMockExternalContext
+
+    val Expected = List(
+      "/foo/bar"                       -> true,
+      "/fr/service/custom/orbeon/echo" -> true,
+      "/exist/crud/"                   -> true,
+      "http://example.org/service"     -> false,
+      "https://example.org/service"    -> false
+    )
+
+    for {
+      (urlString, mustIncludeToken) <- Expected
+      httpMethod                    <- List(HttpMethod.GET, HttpMethod.POST)
+      serviceAbsoluteUrl            = URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, urlString, REWRITE_MODE_ABSOLUTE)
+    } locally {
+      it(s"call to `$urlString` with `$httpMethod` must ${if (mustIncludeToken) "" else "not " }include an `Orbeon-Token` header") {
+        val headersCapitalized =
+          Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
+            url              = new URI(serviceAbsoluteUrl),
+            method           = httpMethod,
+            hasCredentials   = false,
+            mediatype        = ContentTypes.XmlContentType,
+            encodingForSOAP  = CharsetNames.Utf8,
+            customHeaders    = Map.empty,
+            headersToForward = Set.empty,
+            getHeader        = _ ⇒ None)(
+            logger           = ResourceManagerTestBase.newIndentedLogger,
+            externalContext  = externalContext
+          )
+
+        assert(mustIncludeToken == firstItemIgnoreCase(headersCapitalized, Headers.OrbeonToken).isDefined)
       }
     }
   }

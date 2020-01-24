@@ -297,7 +297,7 @@ trait FormRunnerPersistence {
     val url = new URI(rewrittenURLString)
 
     val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-      scheme           = UriScheme.withName(url.getScheme),
+      url              = url,
       hasCredentials   = false,
       customHeaders    = Map(),
       headersToForward = Connection.headersToForwardFromProperty,

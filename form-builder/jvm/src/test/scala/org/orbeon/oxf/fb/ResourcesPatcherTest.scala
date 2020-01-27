@@ -23,9 +23,11 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import org.orbeon.oxf.util.CoreUtils._
 
 // NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
 class ResourcesPatcherTest
@@ -249,7 +251,7 @@ class ResourcesPatcherTest
               <login>
                   <title>[Form Runner Login]</title>
                   <username>[Username]</username>
-                  <password>[Password]</password>
+                  <password>Mot de passe</password>
                   <login>[Login]</login>
               </login>
             </authentication>
@@ -258,7 +260,15 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-      ResourcesPatcher.transform(initial, AppForm("*", "*"))(new PropertySet)
+      val props = new PropertySet |!>
+        (_.setProperty(
+          element     = null,
+          name        = "oxf.fr.resource.*.*.fr.authentication.login.password",
+          typ         = XS_STRING_QNAME,
+          stringValue = "Mot de passe"
+        ))
+
+      ResourcesPatcher.transform(initial, AppForm("*", "*"))(props)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }

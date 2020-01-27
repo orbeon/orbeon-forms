@@ -74,15 +74,13 @@ object ResourcesPatcher {
 
       val _ :: _ :: _ :: _ :: _ :: lang :: resourceTokens = propertyName.splitTo[List](".")
 
-      val pathString = filterPathForBackwardCompatibility(resourceTokens) mkString "/"
-
       // Property name with possible `*` replaced by actual app/form name
       val expandedPropertyName = Prefix :: appForm.toList ::: lang :: resourceTokens mkString "."
 
       // Had a case where value was null (more details would be useful)
       val value = properties.getNonBlankString(expandedPropertyName)
 
-      value.map((lang, pathString, _))
+      value.map((lang, filterPathForBackwardCompatibility(resourceTokens), _))
     }
 
     // Return all languages or the language specified if it exists
@@ -110,7 +108,7 @@ object ResourcesPatcher {
       lang                          ← findConcreteLanguages(langOrWildcard)
       rootForLang                   ← resourceElemsForLang(lang)
     } locally {
-      val elem = Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply)
+      val elem = Dom4j.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
     }
@@ -121,12 +119,12 @@ object ResourcesPatcher {
     def isBracketed(s: String) =
       s.startsWith("[") && s.endsWith("]")
 
-    resourceElems descendant * filter
-      (e ⇒ ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)) foreach { e ⇒
-
-      val elem = unsafeUnwrapElement(e)
-
-      elem.remove(elem.attribute("todo"))
+    for {
+      e <- resourceElems descendant *
+      if ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)
+      elem = unsafeUnwrapElement(e)
+    } locally {
+      elem.attributeOpt("todo") foreach elem.remove
       elem.setText(s"[${elem.getText}]")
     }
   }

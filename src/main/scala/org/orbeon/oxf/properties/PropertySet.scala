@@ -16,6 +16,7 @@ package org.orbeon.oxf.properties
 import java.net.URI
 import java.{lang ⇒ jl, util ⇒ ju}
 
+import cats.syntax.option._
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils
@@ -42,8 +43,8 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
 }
 
 private class PropertyNode {
-  var property: Property = null
-  var children: mutable.Map[String, PropertyNode] = null // token → property node
+  var property: Option[Property] = None
+  var children: Map[String, PropertyNode] = Map.empty
 }
 
 /**
@@ -78,14 +79,15 @@ class PropertySet {
     // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
     var currentNode = wildcardProperties
     for (currentToken ← name.splitTo[List](".")) {
-      if (currentNode.children eq null)
-        currentNode.children = mutable.LinkedHashMap[String, PropertyNode]()
-
-      currentNode = currentNode.children.getOrElseUpdate(currentToken, new PropertyNode)
+      currentNode = currentNode.children.getOrElse(currentToken, {
+        val newPropertyNode = new PropertyNode
+        currentNode.children += currentToken -> newPropertyNode
+        newPropertyNode
+      })
     }
 
     // Store value
-    currentNode.property = property
+    currentNode.property = property.some
   }
 
   def keySet: ju.Set[String] = exactProperties.keySet.asJava
@@ -135,9 +137,9 @@ class PropertySet {
       tokens.lift(currentTokenPosition) match {
         case x @ (Some("*") | None) ⇒
 
-          if (propertyNode.children == null && x.isEmpty)
+          if (propertyNode.children.isEmpty && x.isEmpty)
             result += consumed
-          else if (propertyNode.children ne null) {
+          else if (propertyNode.children.nonEmpty) {
             for ((key, value) ← propertyNode.children) {
               val newConsumed = appendToConsumed(key)
               processNode(value, newConsumed, tokens, currentTokenPosition + 1)
@@ -176,11 +178,11 @@ class PropertySet {
         case Some(propertyNode) ⇒
           tokens match {
             case Nil ⇒
-              Option(propertyNode.property)
+              propertyNode.property
             case head :: tail ⇒
               propertyNode.children match {
-                case null     ⇒ None
-                case children ⇒ wildcardSearch(children.get(head), tail) orElse wildcardSearch(children.get("*"), tail)
+                case c if c.isEmpty ⇒ None
+                case c              ⇒ wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get("*"), tail)
               }
           }
       }

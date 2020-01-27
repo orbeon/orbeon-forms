@@ -17,7 +17,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.io.UriScheme
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
@@ -27,7 +27,7 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
-import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xml.Dom4j
@@ -132,7 +132,7 @@ private[persistence] object HttpCall {
     externalContext : ExternalContext
   ): ClosableHttpResponse = {
 
-    val documentURL = PersistenceBase + path
+    val documentURL = PersistenceBase.appendSlash + path.dropStartingSlash
 
     val headersCapitalized = {
 

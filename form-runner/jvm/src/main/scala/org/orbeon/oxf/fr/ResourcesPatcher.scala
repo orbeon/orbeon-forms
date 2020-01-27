@@ -110,7 +110,9 @@ object ResourcesPatcher {
       lang                          ← findConcreteLanguages(langOrWildcard)
       rootForLang                   ← resourceElemsForLang(lang)
     } locally {
-      Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply).setText(value)
+      val elem = Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply)
+      elem.attributeOpt("todo") foreach elem.remove
+      elem.setText(value)
     }
 
     def hasTodo(e: NodeInfo) =

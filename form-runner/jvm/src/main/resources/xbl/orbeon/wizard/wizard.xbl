@@ -874,6 +874,14 @@
                                     <xf:label>Wizard Debugger</xf:label>
                                     <xh:ul>
                                         <xh:li>
+                                            available-top-level-sections:
+                                            <xh:ul>
+                                                <xf:repeat ref="xxf:split(xxf:instance('available-top-level-sections'))">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:li>
+                                        <xh:li>
                                             nav-section-or-grid-ids (<xf:output value="count($nav-section-or-grid-ids)"/>):
                                             <xh:ul>
                                                 <xf:repeat ref="$nav-section-or-grid-ids">

@@ -1195,7 +1195,7 @@
                                     var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
                                     showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
                                     var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
-                                    discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
+                                    discardable = ! YAHOO.lang.isNull(discardable) && discardable == "true";
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
                                     if (delay == null) {
                                         // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of

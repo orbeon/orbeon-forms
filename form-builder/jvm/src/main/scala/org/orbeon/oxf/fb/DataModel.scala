@@ -33,10 +33,10 @@ object DataModel {
 
     try {
       control.bind flatMap
-        (bind ⇒ evaluateBoundItem(bind.staticBind.namespaceMapping)) exists
+        (bind => evaluateBoundItem(bind.staticBind.namespaceMapping)) exists
           (XFormsControl.isAllowedBoundItem(control, _))
     } catch {
-      case NonFatal(_) ⇒ false
+      case NonFatal(_) => false
     }
   }
 
@@ -44,8 +44,8 @@ object DataModel {
   // Unused as of 2017-10-11
   def isAllowedBoundItem(controlName: String, itemOption: Option[Item])(implicit ctx: FormBuilderDocContext): Boolean = {
     for {
-      item    ← itemOption
-      control ← findStaticControlByName(controlName)
+      item    <- itemOption
+      control <- findStaticControlByName(controlName)
       if control.isInstanceOf[SingleNodeTrait]
       singleNodeTrait = control.asInstanceOf[SingleNodeTrait]
     } yield

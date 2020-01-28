@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport
 
 trait HandlerSupport extends XMLReceiverSupport {
 
-  def withFormattingPrefix[T](body: String ⇒ T)(implicit context: HandlerContext): T = {
+  def withFormattingPrefix[T](body: String => T)(implicit context: HandlerContext): T = {
     val formattingPrefix = context.findFormattingPrefixDeclare
     val result = body(formattingPrefix)
     context.findFormattingPrefixUndeclare(formattingPrefix)

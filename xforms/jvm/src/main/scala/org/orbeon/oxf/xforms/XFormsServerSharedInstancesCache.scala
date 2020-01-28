@@ -27,7 +27,7 @@ object XFormsServerSharedInstancesCache {
 
   import Private._
 
-  type InstanceLoader = (String, Boolean) ⇒ DocumentInfo
+  type InstanceLoader = (String, Boolean) => DocumentInfo
 
   // Try to find instance content in the cache but do not attempt to load it if not found
   def findContentOrNull(
@@ -89,7 +89,7 @@ object XFormsServerSharedInstancesCache {
     handleXInclude    : Boolean)(implicit
     indentedLogger    : IndentedLogger
   ): Unit = {
-    debug("removing instance", List("URI" → instanceSourceURI, "request hash" → requestBodyHash))
+    debug("removing instance", List("URI" -> instanceSourceURI, "request hash" -> requestBodyHash))
 
     val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
     val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
@@ -101,7 +101,7 @@ object XFormsServerSharedInstancesCache {
     val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
     val count = cache.removeAll()
 
-    debug("removed all instances", List("count" → count.toString))
+    debug("removed all instances", List("count" -> count.toString))
   }
 
   private object Private {
@@ -124,16 +124,16 @@ object XFormsServerSharedInstancesCache {
         cacheEntry.timeToLive >= 0 && ((cacheEntry.timestamp + cacheEntry.timeToLive) < System.currentTimeMillis)
 
       Option(cache.findValid(cacheKey, ConstantValidity).asInstanceOf[CacheEntry]) match {
-        case Some(cacheEntry) if isExpired(cacheEntry) ⇒
+        case Some(cacheEntry) if isExpired(cacheEntry) =>
           // Remove expired entry
           debug("expiring cached instance", instanceCaching.debugPairs)
           cache.remove(cacheKey)
           None
-        case Some(cacheEntry) ⇒
+        case Some(cacheEntry) =>
           // Instance was found
           debug("found cached instance", instanceCaching.debugPairs)
           Some(cacheEntry.instanceContent.documentInfo)
-        case _ ⇒
+        case _ =>
           // Not found
           debug("cached instance not found", instanceCaching.debugPairs)
           None

@@ -35,17 +35,17 @@ object XBLAssets {
       val rel     = e.attributeValueOpt("rel") getOrElse "" toLowerCase
 
       e.getName match {
-        case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒
+        case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
           ReferenceElement(href)
-        case "style" if (src ne null) && ((resType eq null) || resType == "text/css") ⇒
+        case "style" if (src ne null) && ((resType eq null) || resType == "text/css") =>
           ReferenceElement(src)
-        case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
+        case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") =>
           ReferenceElement(src)
-        case "style" if src eq null  ⇒
+        case "style" if src eq null  =>
           InlineElement(e.getStringValue)
-        case "script" if src eq null ⇒
+        case "script" if src eq null =>
           InlineElement(e.getStringValue)
-        case _ ⇒
+        case _ =>
           throw new IllegalArgumentException(
             s"Invalid element passed to HeadElement(): ${Dom4jUtils.elementToDebugString(e)}"
           )
@@ -60,13 +60,13 @@ object XBLAssets {
   // and "sorted" by <xbl:binding> instead (so no sorting). Now we wort by CSS name instead.
   def orderedHeadElements(
     bindings        : Iterable[AbstractBinding],
-    getHeadElements : AbstractBinding ⇒ Seq[HeadElement]
+    getHeadElements : AbstractBinding => Seq[HeadElement]
   ): List[HeadElement] =
     (bindings.to(List) sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
 
   // Output baseline, remaining, and inline resources
   def outputResources(
-    outputElement : (Option[String], Option[String], Option[String]) ⇒ Unit,
+    outputElement : (Option[String], Option[String], Option[String]) => Unit,
     builtin       : List[AssetPath],
     headElements  : Iterable[HeadElement],
     xblBaseline   : Iterable[String],
@@ -78,18 +78,18 @@ object XBLAssets {
     val allBaseline = builtinBaseline ++ xblBaseline
 
     // Output baseline resources with a CSS class
-    allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
+    allBaseline foreach (s => outputElement(Some(s), Some("xforms-baseline"), None))
 
     // This is in the order defined by XBLBindings.orderedHeadElements
     val xbl = headElements
 
     val builtinUsed: mutable.LinkedHashSet[String] = builtin.iterator.map(_.assetPath(minimal)).to(mutable.LinkedHashSet)
-    val xblUsed: List[String] = xbl.iterator.collect({ case e: ReferenceElement ⇒ e.src }).to(List)
+    val xblUsed: List[String] = xbl.iterator.collect({ case e: ReferenceElement => e.src }).to(List)
 
     // Output remaining resources if any, with no CSS class
-    builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))
+    builtinUsed ++ xblUsed -- allBaseline foreach (s => outputElement(Some(s), None, None))
 
     // Output inline XBL resources
-    xbl collect { case e: InlineElement ⇒ outputElement(None, None, Option(e.text)) }
+    xbl collect { case e: InlineElement => outputElement(None, None, Option(e.text)) }
   }
 }

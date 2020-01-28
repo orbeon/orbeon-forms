@@ -52,15 +52,15 @@ protected trait XmlToJsonAlgorithm {
 
     def unescapeString(s: String) =
       s.iterateCodePoints map {
-        case cp if cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F ⇒ cp - 0xE000
-        case cp                                                 ⇒ cp
+        case cp if cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F => cp - 0xE000
+        case cp                                                 => cp
       } codePointsToString
 
     def typeOpt (elem: XmlElem) = attValueOpt(elem, Symbols.Type)
     def elemName(elem: XmlElem) = attValueOpt(elem, Symbols.Name) map unescapeString getOrElse localname(elem)
 
-    def jsNullIfBlank(s: String, typ: String, convert: String ⇒ JsValue) =
-      s.trimAllToOpt map { trimmed ⇒
+    def jsNullIfBlank(s: String, typ: String, convert: String => JsValue) =
+      s.trimAllToOpt map { trimmed =>
         Try(convert(trimmed)) getOrElse {
           if (strict)
             throwError(s"""unable to parse $typ "$trimmed"""")
@@ -75,13 +75,13 @@ protected trait XmlToJsonAlgorithm {
 
     def processElement(elem: XmlElem): JsValue =
       typeOpt(elem) match {
-        case Some(Symbols.String) | None ⇒ JsString(unescapeString(stringValue(elem)))
-        case Some(Symbols.Number)        ⇒ jsNullIfBlank(stringValue(elem), "number",  v ⇒ JsNumber(v))
-        case Some(Symbols.Boolean)       ⇒ jsNullIfBlank(stringValue(elem), "boolean", v ⇒ JsBoolean(v.toBoolean))
-        case Some(Symbols.Null)          ⇒ JsNull
-        case Some(Symbols.Object)        ⇒ JsObject(childrenElem(elem) map (elem ⇒ elemName(elem) → processElement(elem)) toMap)
-        case Some(Symbols.Array)         ⇒ JsArray(childrenElem(elem)  map processElement toVector)
-        case Some(other)                 ⇒
+        case Some(Symbols.String) | None => JsString(unescapeString(stringValue(elem)))
+        case Some(Symbols.Number)        => jsNullIfBlank(stringValue(elem), "number",  v => JsNumber(v))
+        case Some(Symbols.Boolean)       => jsNullIfBlank(stringValue(elem), "boolean", v => JsBoolean(v.toBoolean))
+        case Some(Symbols.Null)          => JsNull
+        case Some(Symbols.Object)        => JsObject(childrenElem(elem) map (elem => elemName(elem) -> processElement(elem)) toMap)
+        case Some(Symbols.Array)         => JsArray(childrenElem(elem)  map processElement toVector)
+        case Some(other)                 =>
           if (strict)
             throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")
           JsNull

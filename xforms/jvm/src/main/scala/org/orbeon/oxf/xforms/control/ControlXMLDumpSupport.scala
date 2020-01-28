@@ -24,14 +24,14 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 
 trait ControlXMLDumpSupport extends DebugXML{
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
-  def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
+  def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: => Unit): Unit = {
 
     def itemToString(i: Item) = i match {
-      case atomic: AtomicValue ⇒ atomic.getStringValue
-      case node: NodeInfo ⇒ node.getDisplayName
-      case _ ⇒ throw new IllegalStateException
+      case atomic: AtomicValue => atomic.getStringValue
+      case node: NodeInfo => node.getDisplayName
+      case _ => throw new IllegalStateException
     }
 
     helper.startElement(localName, Array(

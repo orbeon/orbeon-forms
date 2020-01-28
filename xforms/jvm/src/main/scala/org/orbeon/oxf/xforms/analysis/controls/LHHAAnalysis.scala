@@ -41,7 +41,7 @@ class LHHAAnalysis(
    with OptionalSingleNode
    with AppearanceTrait {
 
-  self ⇒
+  self =>
 
   import LHHAAnalysis._
 
@@ -72,13 +72,13 @@ class LHHAAnalysis(
 
   // What we support for alert level/validation:
   //
-  // - <xf:alert>                                  → alert applies to all alert levels
-  // - <xf:alert level="foo">                      → same, unknown level is ignored [SHOULD WARN]
-  // - <xf:alert level="warning info">             → alert only applies to warning and info levels
-  // - <xf:alert level="warning" validation="">    → same, blank attribute is same as missing attribute [SHOULD WARN]
-  // - <xf:alert validation="c1 c2">               → alert only applies if either validation c1 or c2 fails
-  // - <xf:alert level="" validation="c1 c2">      → same, blank attribute is same as missing attribute [SHOULD WARN]
-  // - <xf:alert level="error" validation="c1 c2"> → same, level is ignored when a validation is present [SHOULD WARN]
+  // - <xf:alert>                                  -> alert applies to all alert levels
+  // - <xf:alert level="foo">                      -> same, unknown level is ignored [SHOULD WARN]
+  // - <xf:alert level="warning info">             -> alert only applies to warning and info levels
+  // - <xf:alert level="warning" validation="">    -> same, blank attribute is same as missing attribute [SHOULD WARN]
+  // - <xf:alert validation="c1 c2">               -> alert only applies if either validation c1 or c2 fails
+  // - <xf:alert level="" validation="c1 c2">      -> same, blank attribute is same as missing attribute [SHOULD WARN]
+  // - <xf:alert level="error" validation="c1 c2"> -> same, level is ignored when a validation is present [SHOULD WARN]
 
   val forValidations =
     if (localName == "alert")
@@ -96,7 +96,7 @@ class LHHAAnalysis(
   // of controls, namely text fields or text areas at this point.
   val isPlaceholder: Boolean =
     lhhaType match {
-      case LHHA.Label | LHHA.Hint ⇒
+      case LHHA.Label | LHHA.Hint =>
         hasLocalMinimalAppearance || (
           ! hasLocalFullAppearance &&
             staticStateContext.partAnalysis.staticState.staticStringProperty(
@@ -104,7 +104,7 @@ class LHHAAnalysis(
             )
           .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
         )
-      case _ ⇒ false
+      case _ => false
     }
 
   // Attach this LHHA to its target control if any
@@ -113,26 +113,26 @@ class LHHAAnalysis(
     val (targetControl, effectiveTargetControlOrPrefixedIdOpt) = {
 
       def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
-        part.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport ⇒ e}
+        part.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e}
 
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
         e match {
-          case xbl: ComponentControl ⇒
+          case xbl: ComponentControl =>
             xbl.abstractBinding.labelFor match {
-              case Some(nestedLabelForStaticId) ⇒
+              case Some(nestedLabelForStaticId) =>
                 searchLHHAControlInScope(xbl.bindingOrThrow.innerScope, nestedLabelForStaticId) match {
-                  case Some(nestedLabelForTarget) ⇒ searchXblLabelFor(nestedLabelForTarget) // recurse
-                  case None                       ⇒ Some(Right(xbl.bindingOrThrow.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
+                  case Some(nestedLabelForTarget) => searchXblLabelFor(nestedLabelForTarget) // recurse
+                  case None                       => Some(Right(xbl.bindingOrThrow.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
                 }
-              case None ⇒
+              case None =>
                 Some(Left(xbl))
             }
-          case _ ⇒
+          case _ =>
             Some(Left(e))
         }
 
       def initialElemFromForOpt =
-        forStaticIdOpt map  { forStaticId ⇒
+        forStaticIdOpt map  { forStaticId =>
           searchLHHAControlInScope(scope, forStaticId) getOrElse (
             throw new ValidationException(
               s"`for` attribute with value `$forStaticId` doesn't point to a control supporting label, help, hint or alert.",
@@ -143,8 +143,8 @@ class LHHAAnalysis(
 
       val initialElem = initialElemFromForOpt getOrElse {
         getParent match {
-          case e: StaticLHHASupport ⇒ e
-          case _ ⇒
+          case e: StaticLHHASupport => e
+          case _ =>
             throw new ValidationException(
               s"parent control must support label, help, hint or alert.",
               ElementAnalysis.createLocationData(element)
@@ -184,7 +184,7 @@ class LHHAAnalysis(
 
   def debugOut(): Unit =
     if (staticValue.isDefined)
-      println("static value for control " + prefixedId + " ⇒ " + staticValue.get)
+      println("static value for control " + prefixedId + " => " + staticValue.get)
 
   // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
   override protected def computeContextAnalysis = None
@@ -235,7 +235,7 @@ class LHHAAnalysis(
                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
             } else if (hostLanguageAVTs) {
               for {
-                attribute ← Dom4j.attributes(element)
+                attribute <- Dom4j.attributes(element)
                 attributeValue = attribute.getValue
                 if XFormsUtils.maybeAVT(attributeValue)
               } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet

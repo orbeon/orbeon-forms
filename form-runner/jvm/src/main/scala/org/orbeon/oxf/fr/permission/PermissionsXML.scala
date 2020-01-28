@@ -24,17 +24,17 @@ object PermissionsXML {
 
   def serialize(permissions: Permissions): Option[Elem] =
     permissions match {
-      case UndefinedPermissions ⇒
+      case UndefinedPermissions =>
         None
-      case DefinedPermissions(permissionsList) ⇒
+      case DefinedPermissions(permissionsList) =>
         Some(
           <permissions>
-            {permissionsList map (p ⇒
+            {permissionsList map (p =>
             <permission operations={Operations.serialize(p.operations).mkString(" ")}>
               {p.conditions map {
-              case Owner ⇒ <owner/>
-              case Group ⇒ <group-member/>
-              case RolesAnyOf(roles) ⇒
+              case Owner => <owner/>
+              case Group => <group-member/>
+              case RolesAnyOf(roles) =>
                 val escapedSpaces = roles.map(_.replaceAllLiterally(" ", "%20"))
                 val anyOfAttValue = escapedSpaces.mkString(" ")
                   <user-role any-of={anyOfAttValue}/>
@@ -47,9 +47,9 @@ object PermissionsXML {
 
   def parse(permissionsElOrNull: NodeInfo): Permissions =
     Option(permissionsElOrNull) match {
-      case None ⇒
+      case None =>
         UndefinedPermissions
-      case Some(permissionsEl) ⇒
+      case Some(permissionsEl) =>
         DefinedPermissions(permissionsEl.child("permission").toList.map(parsePermission))
     }
 
@@ -57,16 +57,16 @@ object PermissionsXML {
     val operations = Operations.parse(FormRunner.permissionOperations(permissionEl))
     val conditions =
       permissionEl.child(*).toList.map(
-        conditionEl ⇒
+        conditionEl =>
           conditionEl.localname match {
-            case "owner"        ⇒ Owner
-            case "group-member" ⇒ Group
-            case "user-role"    ⇒
+            case "owner"        => Owner
+            case "group-member" => Group
+            case "user-role"    =>
               val anyOfAttValue = conditionEl.attValue("any-of")
               val rawRoles      = anyOfAttValue.splitTo[List](" ")
               val roles         = rawRoles.map(_.replaceAllLiterally("%20", " "))
               RolesAnyOf(roles)
-            case _ ⇒ throw new RuntimeException("")
+            case _ => throw new RuntimeException("")
           }
       )
     Permission(conditions, operations)

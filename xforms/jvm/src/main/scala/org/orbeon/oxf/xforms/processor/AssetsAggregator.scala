@@ -14,7 +14,7 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import net.sf.ehcache.{Element ⇒ EhElement}
+import net.sf.ehcache.{Element => EhElement}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.URLRewriter
@@ -110,27 +110,27 @@ class AssetsAggregator extends ProcessorImpl {
 
                 // Gather resources that match
                 localname match {
-                  case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒
+                  case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
                     if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || media != "all" || isNorewrite || cssClasses == "xforms-standalone-resource")
                       preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                     else
                       (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href
                     filter = true
-                  case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
+                  case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") =>
                     if (isSeparatePath(src) || NetUtils.urlHasProtocol(src) || isNorewrite || cssClasses == "xforms-standalone-resource")
                       preservedJS += ReferenceElement(localname, new AttributesImpl(attributes))
                     else
                       (if (cssClasses == "xforms-baseline") baselineJS else supplementalJS) += src
                     filter = true
-                  case "style" ⇒
+                  case "style" =>
                     currentInlineElement = InlineElement(localname, new AttributesImpl(attributes))
                     preservedCSS += currentInlineElement
                     filter = true
-                  case "script" if src eq null ⇒
+                  case "script" if src eq null =>
                     currentInlineElement = InlineElement(localname, new AttributesImpl(attributes))
                     preservedJS += currentInlineElement
                     filter = true
-                  case _ ⇒
+                  case _ =>
                 }
               }
 
@@ -144,7 +144,7 @@ class AssetsAggregator extends ProcessorImpl {
               lazy val helper = new XMLReceiverHelper(xmlReceiver)
 
               // Configurable function to output an element
-              def outputElement(getAttributes: String ⇒ Array[String], elementName: String)(resource: String) = {
+              def outputElement(getAttributes: String => Array[String], elementName: String)(resource: String) = {
                 attributesImpl.clear()
                 XMLReceiverHelper.populateAttributes(attributesImpl, getAttributes(resource))
                 helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
@@ -167,10 +167,10 @@ class AssetsAggregator extends ProcessorImpl {
 
                 def appendPreservedElement(e: HeadElement) =
                   e match {
-                    case ref: ReferenceElement ⇒
+                    case ref: ReferenceElement =>
                       val srcHref = Option(ref.attributes.getValue("src")) getOrElse ref.attributes.getValue("href")
                       Some("""{"src":"""" + srcHref + """"}""")
-                    case inline: InlineElement ⇒
+                    case inline: InlineElement =>
                       inline.text map ("""{"text":"""" + JSON.quoteValue(_) + """"}""")
                   }
 
@@ -197,7 +197,7 @@ class AssetsAggregator extends ProcessorImpl {
               }
 
               def outputCSS() = {
-                val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
+                val outputCSSElement = outputElement(resource => Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
                 aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
                 aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCSS = true)
                 preservedCSS foreach outputPreservedElement
@@ -206,7 +206,7 @@ class AssetsAggregator extends ProcessorImpl {
               def outputJS() = {
                 val outputJSElement =
                   outputElement(
-                    resource ⇒ Array("type", "text/javascript", "src", resource , "defer", "defer"),
+                    resource => Array("type", "text/javascript", "src", resource , "defer", "defer"),
                     "script"
                   )(_)
 
@@ -262,7 +262,7 @@ object AssetsAggregator extends Logging {
   // Output combined resources
   def aggregate[T](
     resources               : scala.collection.Set[String],
-    outputElement           : String ⇒ T,
+    outputElement           : String => T,
     namespaceOpt            : Option[String],
     isCSS                   : Boolean
   ): Option[T] =
@@ -291,12 +291,12 @@ object AssetsAggregator extends Logging {
         "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
 
       debug("aggregating resources", Seq(
-        "isCSS"          → isCSS.toString,
-        "hasAppResource" → hasAppResource.toString,
-        "appVersion"     → appVersion,
-        "resourcesHash"  → resourcesHash,
-        "namespaceOpt"   → namespaceOpt.orNull,
-        "resources"      → (resources mkString " | ")
+        "isCSS"          -> isCSS.toString,
+        "hasAppResource" -> hasAppResource.toString,
+        "appVersion"     -> appVersion,
+        "resourcesHash"  -> resourcesHash,
+        "namespaceOpt"   -> namespaceOpt.orNull,
+        "resources"      -> (resources mkString " | ")
       ))
 
       outputElement(path)

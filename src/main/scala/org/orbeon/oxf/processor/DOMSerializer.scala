@@ -17,7 +17,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.DocumentInfo
-import org.w3c.dom.{Document ⇒ W3CDocument }
+import org.w3c.dom.{Document => W3CDocument }
 
 /**
  * Serializes the data input into a Document.

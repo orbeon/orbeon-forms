@@ -12,7 +12,7 @@ package org.orbeon.oxf.util
  *
  * This is important when the thread is handled by a third-party, such as a servlet container.
  */
-class DynamicVariable[T](initial: ⇒ Option[T] = None, isInheritable: Boolean = true) {
+class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = true) {
 
   protected val threadLocal =
     if (isInheritable)
@@ -25,15 +25,15 @@ class DynamicVariable[T](initial: ⇒ Option[T] = None, isInheritable: Boolean =
       }
 
   def value = threadLocal.get match {
-    case some @ Some(value) ⇒ some
-    case None ⇒
+    case some @ Some(value) => some
+    case None =>
       threadLocal.remove() // because get above creates the ThreadLocal if missing
       None
   }
 
   def value_=(value: T) = threadLocal set Some(value)
 
-  def withValue[S](value: T)(thunk: ⇒ S): S = {
+  def withValue[S](value: T)(thunk: => S): S = {
 
     val oldValue = threadLocal.get
     threadLocal set Some(value)
@@ -42,8 +42,8 @@ class DynamicVariable[T](initial: ⇒ Option[T] = None, isInheritable: Boolean =
       thunk
     finally
       oldValue match {
-        case some @ Some(_) ⇒ threadLocal set some
-        case None ⇒ threadLocal.remove()
+        case some @ Some(_) => threadLocal set some
+        case None => threadLocal.remove()
       }
   }
 

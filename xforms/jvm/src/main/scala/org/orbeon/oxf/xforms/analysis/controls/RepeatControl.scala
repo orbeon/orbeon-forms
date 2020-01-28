@@ -32,7 +32,7 @@ class RepeatControl(
 
   val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)
 
-  lazy val iteration: Option[RepeatIterationControl] = children collectFirst { case i: RepeatIterationControl ⇒ i }
+  lazy val iteration: Option[RepeatIterationControl] = children collectFirst { case i: RepeatIterationControl => i }
 
   val isAroundTableOrListElement: Boolean = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
@@ -42,7 +42,7 @@ class RepeatControl(
   val dndClasses: Option[String] =
     element.attributeValueOpt(XXFORMS_DND_QNAME) filter
       Set("vertical", "horizontal")              map
-      (dndType ⇒ s"xforms-dnd xforms-dnd-$dndType")
+      (dndType => s"xforms-dnd xforms-dnd-$dndType")
 
   private def findPositiveInt(attName: QName): Option[Int] =
     element.attributeValueOpt(attName) flatMap (_.trimAllToOpt) map (_.toInt) filter (_ > 0)

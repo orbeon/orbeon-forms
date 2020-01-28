@@ -69,10 +69,10 @@ trait RequestResponse extends Common {
       Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath, version = $version")
 
     requestPath match {
-      case CrudFormPath(provider, app, form, filename) ⇒
+      case CrudFormPath(provider, app, form, filename) =>
         val file = if (filename == "form.xhtml") None else Some(filename)
         Request(Provider.withName(provider), app, form, version, file, None)
-      case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
+      case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = headerValue(StageHeader.HeaderNameLower))
         Request(Provider.withName(provider), app, form, version, file, Some(dataPart))

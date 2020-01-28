@@ -16,13 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.sql.{PreparedStatement, Timestamp}
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
-import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport ⇒ _}
+import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport => _}
 
 trait CreateCols extends RequestResponse with Common {
 
-  type ParamSetterFunc = (PreparedStatement, Int) ⇒ Unit
-  def param[T](setter: PreparedStatement ⇒ (Int, T) ⇒ Unit, value: ⇒ T): ParamSetterFunc = {
-    (ps: PreparedStatement, i: Int) ⇒ setter(ps)(i, value)
+  type ParamSetterFunc = (PreparedStatement, Int) => Unit
+  def param[T](setter: PreparedStatement => (Int, T) => Unit, value: => T): ParamSetterFunc = {
+    (ps: PreparedStatement, i: Int) => setter(ps)(i, value)
   }
 
   case class Row(
@@ -56,7 +56,7 @@ trait CreateCols extends RequestResponse with Common {
     existingRow            : Option[Row],
     delete                 : Boolean,
     versionToSet           : Int,
-    currentUserOrganization: ⇒ Option[OrganizationId]
+    currentUserOrganization: => Option[OrganizationId]
   ): List[Col]  = {
 
     val xmlCol = "xml"
@@ -64,10 +64,10 @@ trait CreateCols extends RequestResponse with Common {
     val isFormDefinition = req.forForm && !req.forAttachment
     val now = new Timestamp(System.currentTimeMillis())
     val organizationToSet = req.forData match {
-      case false ⇒ None
-      case true  ⇒ existingRow match {
-        case Some(row) ⇒ row.organization.map(_._1)
-        case None ⇒ currentUserOrganization.map(_.underlying)
+      case false => None
+      case true  => existingRow match {
+        case Some(row) => row.organization.map(_._1)
+        case None => currentUserOrganization.map(_.underlying)
       }
     }
 

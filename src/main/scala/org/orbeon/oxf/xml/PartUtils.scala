@@ -36,9 +36,9 @@ object PartUtils {
   def getSAXSource(processor: Processor, pipelineContext: PipelineContext, href: String, base: String, contentType: String): SAXSource = {
     val processorOutput =
       Option(ProcessorImpl.getProcessorInputSchemeInputName(href)) match {
-        case Some(inputName) ⇒
+        case Some(inputName) =>
           processor.getInputByName(inputName).getOutput
-        case None ⇒
+        case None =>
           val urlGenerator =
             Option(contentType) map
             (new URLGenerator(URLFactory.createURL(base, href), _, true)) getOrElse

@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.{IllegalAddException, Node}
 
@@ -103,7 +103,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
 
   private def asNode(node: Any): Node =
     node match {
-      case node: Node ⇒ node
-      case o          ⇒ throw new IllegalAddException(s"This list must contain instances of Node. Invalid type: $o")
+      case node: Node => node
+      case o          => throw new IllegalAddException(s"This list must contain instances of Node. Invalid type: $o")
     }
 }

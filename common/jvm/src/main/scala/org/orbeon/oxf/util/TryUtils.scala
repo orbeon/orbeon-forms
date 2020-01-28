@@ -30,7 +30,7 @@ object TryUtils {
   }
 
   private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = {
-    case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t))
+    case NonFatal(t) => Failure(Exceptions.getRootThrowable(t))
   }
 
   implicit class TryOps[U](private val t: Try[U]) extends AnyVal {
@@ -45,12 +45,12 @@ object TryUtils {
         t
     }
 
-    def doEitherWay(f: ⇒ Any): Try[U] =
+    def doEitherWay(f: => Any): Try[U] =
       try t match {
-        case result @ Success(_) ⇒ f; result
-        case result @ Failure(_) ⇒ f; result
+        case result @ Success(_) => f; result
+        case result @ Failure(_) => f; result
       } catch {
-        case NonFatal(e) ⇒ Failure(e)
+        case NonFatal(e) => Failure(e)
       }
 
     def iterator: Iterator[U] = t.toOption.iterator

@@ -47,7 +47,7 @@ class XFormsDeleteAction extends XFormsAction {
 
       val deleteIndexOpt =
         atAttributeOpt match {
-          case Some(atAttribute) ⇒
+          case Some(atAttribute) =>
 
             // "The return value is processed according to the rules of the XPath function round()"
             val insertionIndexString =
@@ -67,7 +67,7 @@ class XFormsDeleteAction extends XFormsAction {
               if (insertionIndexString == "NaN") collectionToUpdate.size else insertionIndexString.toInt
 
             Some(tentativeDeleteIndex min collectionToUpdate.size max 1)
-          case None ⇒
+          case None =>
             // "If there is no delete location, each node in the Sequence Binding"
             None
         }
@@ -135,8 +135,8 @@ object XFormsDeleteAction extends Logging {
 
       val deletionDescriptors =
         deleteIndexOpt match {
-          case Some(index) ⇒ doDeleteOneImpl(collectionToUpdateWithDefiniteSize(index - 1)).to(List)
-          case None        ⇒ collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to(List)
+          case Some(index) => doDeleteOneImpl(collectionToUpdateWithDefiniteSize(index - 1)).to(List)
+          case None        => collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to(List)
         }
 
       if (deletionDescriptors.nonEmpty && (containingDocument ne null)) {
@@ -146,11 +146,11 @@ object XFormsDeleteAction extends Logging {
 
         debugAllowNull(
           "deleted nodes",
-          List("count" → deletionDescriptors.size.toString) ++ (modifiedInstanceOpt map ("instance" → _.getEffectiveId))
+          List("count" -> deletionDescriptors.size.toString) ++ (modifiedInstanceOpt map ("instance" -> _.getEffectiveId))
         )
 
         // Instance can be missing if document into which delete is performed is not in an instance!
-        modifiedInstanceOpt foreach { modifiedInstance ⇒
+        modifiedInstanceOpt foreach { modifiedInstance =>
 
           // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
           modifiedInstance.markModified()
@@ -171,7 +171,7 @@ object XFormsDeleteAction extends Logging {
     indentedLogger : IndentedLogger
   ): Option[DeletionDescriptor] =
     itemToRemove match {
-      case nodeInfoToRemove: NodeInfo ⇒
+      case nodeInfoToRemove: NodeInfo =>
 
         val nodeToRemove   = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CannotDeleteReadonlyMessage)
         val parentNodeInfo = nodeInfoToRemove.getParent // obtain *before* deletion
@@ -201,14 +201,14 @@ object XFormsDeleteAction extends Logging {
           Dom4jUtils.normalizeTextNodes(parentElement)
 
         Some(DeletionDescriptor(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate))
-      case _ ⇒
+      case _ =>
         debugAllowNull("ignoring attempt to delete atomic value")
         None
     }
 
   private def debugAllowNull(
-    message        : ⇒ String,
-    parameters     : ⇒ Seq[(String, String)] = Nil)(implicit
+    message        : => String,
+    parameters     : => Seq[(String, String)] = Nil)(implicit
     indentedLogger : IndentedLogger
   ) =
     if (indentedLogger ne null)

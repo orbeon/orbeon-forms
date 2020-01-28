@@ -67,7 +67,7 @@ object ControlLabelHintTextEditor {
       $(document).on(
         "click.orbeon.builder.resource-editor",
         LabelHintSelector,
-        (event: JQueryEventObject) ⇒ {
+        (event: JQueryEventObject) => {
 
           // Close current editor, if there is one open
           resourceEditorEndEdit()
@@ -90,7 +90,7 @@ object ControlLabelHintTextEditor {
         })
 
         // New control added
-        controlAdded.add((containerId: String) ⇒ {
+        controlAdded.add((containerId: String) => {
           val container = $(document.getElementById(containerId))
           resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
           val repeat = container.parents(".fr-repeat-single-row").first()
@@ -140,7 +140,7 @@ object ControlLabelHintTextEditor {
     def resourceEditorEndEdit(): Unit = {
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
       if (Private.container.is(":visible")) {
-        resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl ⇒
+        resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
           // Send value to server, handled in FB's model.xml
           val controlId   = resourceEditorCurrentControl.attr("id").get
           val newValue    = Private.getValue
@@ -193,12 +193,12 @@ object ControlLabelHintTextEditor {
          $(".fb-main").append(container)
 
         // Event handlers
-        textfield.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ asUnit {
+        textfield.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit {
           // End edit when users press enter
           if (e.which == 13)
             resourceEditorEndEdit()
         })
-        checkbox.on("click.orbeon.builder.lht-editor", () ⇒ asUnit {
+        checkbox.on("click.orbeon.builder.lht-editor", () => asUnit {
           // When checkbox clicked, set focus back on the text field, where it was before
           textfield.focus()
         })
@@ -222,10 +222,10 @@ object ControlLabelHintTextEditor {
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html(value)
         else                 resourceEditorCurrentLabelHint.text(value)
 
-      def afterTinyMCEInitialized(f: TinyMceEditor ⇒ Unit): Unit =
+      def afterTinyMCEInitialized(f: TinyMceEditor => Unit): Unit =
         tinyMceObject.initialized.toOption match {
-          case Some(true)  ⇒ f(tinyMceObject)
-          case _           ⇒ tinyMceObject.on("init", f)
+          case Some(true)  => f(tinyMceObject)
+          case _           => tinyMceObject.on("init", f)
         }
 
       def makeSpaceForMCE(): Unit = {
@@ -235,7 +235,7 @@ object ControlLabelHintTextEditor {
       }
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
-      val initTinyMCE: () ⇒ Unit = memoize0(() ⇒ {
+      val initTinyMCE: () => Unit = memoize0(() => {
 
         tinymceAnchor.show()
         tinymceAnchor.attr("id", Underscore.uniqueId())
@@ -261,7 +261,7 @@ object ControlLabelHintTextEditor {
 
         tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, TinyMce.EditorManager)
         tinyMceObject.render()
-        afterTinyMCEInitialized((_) ⇒ {
+        afterTinyMCEInitialized((_) => {
           // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM
           tinymceAnchor.detach()
           $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
@@ -292,7 +292,7 @@ object ControlLabelHintTextEditor {
 
       def setValue(newValue: String): Unit =
         if (labelOrHintOrText == "text") {
-            afterTinyMCEInitialized((_) ⇒ {
+            afterTinyMCEInitialized((_) => {
               tinyMceObject.setContent(newValue)
               // Workaround for resize not happening with empty values, see
               // https://twitter.com/avernet/status/580798585291177984
@@ -312,7 +312,7 @@ object ControlLabelHintTextEditor {
         if (labelOrHintOrText == "text") {
           setTinyMCEWidth()
           initTinyMCE()
-          afterTinyMCEInitialized((_) ⇒ {
+          afterTinyMCEInitialized((_) => {
             makeSpaceForMCE()
             tinyMceObject.show()
             tinyMceObject.focus()

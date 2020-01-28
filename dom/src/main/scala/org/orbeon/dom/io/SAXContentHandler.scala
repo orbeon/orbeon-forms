@@ -1,6 +1,6 @@
 package org.orbeon.dom.io
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom
 import org.orbeon.dom._
@@ -164,7 +164,7 @@ class SAXContentHandler(
       import breaks._
 
       breakable {
-        for (i ← 0 until textBuffer.length if ! Character.isWhitespace(textBuffer.charAt(i))) {
+        for (i <- 0 until textBuffer.length if ! Character.isWhitespace(textBuffer.charAt(i))) {
           whitespace = false
           break()
         }
@@ -203,7 +203,7 @@ class SAXContentHandler(
   // TODO: Change once everything is a concrete `Element`.
   private def addAttributes(element: Element, attributes: Attributes): Unit =
     element match {
-      case elem: ConcreteElement ⇒ elem.setAttributes(attributes, namespaceStack, noNamespaceAttributes = false)
-      case _                     ⇒ throw new IllegalStateException
+      case elem: ConcreteElement => elem.setAttributes(attributes, namespaceStack, noNamespaceAttributes = false)
+      case _                     => throw new IllegalStateException
     }
 }

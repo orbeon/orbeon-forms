@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
@@ -59,7 +59,7 @@ object AjaxClient {
 
     val result = Promise[Unit]()
 
-    lazy val callback: js.Function = () ⇒ {
+    lazy val callback: js.Function = () => {
       ajaxResponseReceived().asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
       result.success(())
     }
@@ -77,7 +77,7 @@ object AjaxClient {
     // When there is a request in progress, we need to wait for the response after the next response processed
     var skipNext = Globals.requestInProgress
 
-    lazy val callback: js.Function = () ⇒ {
+    lazy val callback: js.Function = () => {
       if (skipNext) {
         skipNext = false
       } else {
@@ -111,7 +111,7 @@ object AjaxClient {
       val serverSaysToKeepModelProgressPanelDisplayed =
         responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
           responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
-          (e ⇒ ! e.hasAttribute("target") && ! e.hasAttribute("show-progress"))
+          (e => ! e.hasAttribute("target") && ! e.hasAttribute("show-progress"))
 
       ! (eventQueueHasShowProgressEvent || serverSaysToKeepModelProgressPanelDisplayed)
     }
@@ -166,7 +166,7 @@ object AjaxClient {
     }
 
     response match {
-      case Right(responseXml) if Support.getLocalName(responseXml.documentElement) == "error" ⇒
+      case Right(responseXml) if Support.getLocalName(responseXml.documentElement) == "error" =>
         // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
         // we show an error to users.
         //
@@ -182,7 +182,7 @@ object AjaxClient {
 
         true
 
-      case Left(LoginRegexpMatcher()) ⇒
+      case Left(LoginRegexpMatcher()) =>
 
          // It seems we got a login page back, so display dialog and reload form
         val dialogEl = $(s"$$$formId .xforms-login-detected-dialog")
@@ -205,7 +205,7 @@ object AjaxClient {
             dialogEl.attr("aria-labelledby", titleId)
         }
 
-        dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) ⇒ {
+        dialogEl.find("button").one("click.xf", ((_: JQueryEventObject) => {
           // Reloading the page will redirect us to the login page if necessary
           dom.window.location.href = dom.window.location.href
         }): js.Function1[JQueryEventObject, js.Any])
@@ -216,7 +216,7 @@ object AjaxClient {
 
         true
 
-      case _ ⇒
+      case _ =>
         false
     }
   }
@@ -238,10 +238,10 @@ object AjaxClient {
         js.Array(
           new AjaxEvent(
             js.Dictionary[js.Any](
-              "form"         → form.elem,
-              "value"        → encodedEvent,
-              "eventName"    → EventNames.XXFormsServerEvents,
-              "showProgress" → showProgress
+              "form"         -> form.elem,
+              "value"        -> encodedEvent,
+              "eventName"    -> EventNames.XXFormsServerEvents,
+              "showProgress" -> showProgress
             )
           )
         ),
@@ -276,7 +276,7 @@ object AjaxClient {
       Globals.eventsFirstEventTime = currentTime
 
     // Store events to fire
-    events foreach { event ⇒
+    events foreach { event =>
       if (! event.targetIdOpt.contains("")) // Q: Why do we check this? We expect `None` or `Some(targetId)`
         Globals.eventQueue.push(event)
     }
@@ -311,8 +311,8 @@ object AjaxClient {
     // Because we catch errors in JavaScript right now in AjaxServer.js, and in JavaScript any object can be thrown,
     // we receive an `AnyRef` here.
     val message = e match {
-      case t: Throwable ⇒ t.getMessage
-      case r ⇒ r.toString
+      case t: Throwable => t.getMessage
+      case r => r.toString
     }
 
     // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
@@ -321,7 +321,7 @@ object AjaxClient {
     val sb = new StringBuilder("Exception in client-side code.")
 
     // We used to log `fileName` and `lineNumber` as well, but those are strictly Firefox features
-    Option(message) foreach { m ⇒
+    Option(message) foreach { m =>
       sb append "<ul><li>Message: "
       sb append m
       sb append "</li></ul>"
@@ -352,7 +352,7 @@ object AjaxClient {
 
     // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
     // a maximum delay.
-    def retryRequestAfterDelay(requestFunction: () ⇒ Unit): Unit = {
+    def retryRequestAfterDelay(requestFunction: () => Unit): Unit = {
       val delay = Math.min(Properties.retryDelayIncrement.get() * (Globals.requestTryCount - 1), Properties.retryMaxDelay.get())
       if (delay == 0)
         requestFunction()
@@ -369,7 +369,7 @@ object AjaxClient {
 
       if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
         findEventsToProcess match {
-          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) ⇒
+          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
             // which we have received the keyup corresponding to the keydown.
             // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
@@ -377,7 +377,7 @@ object AjaxClient {
             Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
             Globals.eventQueue        = eventsForOtherForms.toJSArray
             processEvents(currentForm, eventsForCurrentForm)
-          case None ⇒
+          case None =>
             Globals.eventQueue = js.Array()
         }
     }
@@ -410,18 +410,18 @@ object AjaxClient {
         abortSignal = controller.signal.some
       )
     } onComplete {
-        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
+        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
           // We ignore HTTP status and just check that we have a well-formed response document
           handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
-        case Success((503, _, _)) ⇒
+        case Success((503, _, _)) =>
           // We return an explicit 503 when the Ajax server is still busy
-          retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
-        case Success((_, responseText, responseXmlOpt)) ⇒
+          retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+        case Success((_, responseText, responseXmlOpt)) =>
           if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
-            retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
-        case Failure(_) ⇒
+            retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+        case Failure(_) =>
           logAndShowError(_, requestFormId, ignoreErrors)
-          retryRequestAfterDelay(() ⇒ asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+          retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
       }
     }
 
@@ -429,7 +429,7 @@ object AjaxClient {
 
       // Ignore events for form that are no longer part of the document
       def eventsForFormsInDocument(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        NonEmptyList.fromList(events.filter((event) ⇒ dom.document.contains(event.form)))
+        NonEmptyList.fromList(events.filter((event) => dom.document.contains(event.form)))
 
       // Coalesce value events for a given `targetId`, but only between boundaries of other events. We used to do this, more
       // or less, between those boundaries, but also including `XXFormsUploadProgress`, and allowing interleaving of `targetId`
@@ -442,18 +442,18 @@ object AjaxClient {
 
           val (single, remaining) =
             l.head.eventName match {
-              case eventName @ XXFormsValue ⇒
+              case eventName @ XXFormsValue =>
 
                 val targetIdOpt            = l.head.targetIdOpt
-                val (blockTail, remaining) = l.tail.span(e ⇒ e.eventName == eventName && e.targetIdOpt == targetIdOpt)
+                val (blockTail, remaining) = l.tail.span(e => e.eventName == eventName && e.targetIdOpt == targetIdOpt)
                 val block                  = l.head :: blockTail
 
                 (block.last, remaining)
-              case _ ⇒
+              case _ =>
                 (l.head, l.tail)
             }
 
-          NonEmptyList(single, NonEmptyList.fromList(remaining).toList flatMap (r ⇒ processBlock(r).toList))
+          NonEmptyList(single, NonEmptyList.fromList(remaining).toList flatMap (r => processBlock(r).toList))
         }
 
         processBlock(events)
@@ -462,15 +462,15 @@ object AjaxClient {
       // Keep only the last `XXFormsUploadProgress`. This makes sense because as of 2019-11-25, we only handle a
       // single upload at a time.
       def coalescedProgressEvents(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        events collect { case e if e.eventName == XXFormsUploadProgress ⇒ e } lastOption match {
-          case Some(lastProgressEvent) ⇒
+        events collect { case e if e.eventName == XXFormsUploadProgress => e } lastOption match {
+          case Some(lastProgressEvent) =>
             NonEmptyList.fromList(
               events collect {
-                case e if e.eventName != XXFormsUploadProgress ⇒ e
-                case e if e.eventName == XXFormsUploadProgress && (e eq lastProgressEvent) ⇒ e
+                case e if e.eventName != XXFormsUploadProgress => e
+                case e if e.eventName == XXFormsUploadProgress && (e eq lastProgressEvent) => e
               }
             )
-          case None ⇒
+          case None =>
             events.some
         }
 
@@ -480,26 +480,26 @@ object AjaxClient {
         val currentForm = oldestEvent.form
 
         val (eventsToSend, eventsForOtherForms) =
-          events.toList partition (event ⇒ event.form.isSameNode(currentForm))
+          events.toList partition (event => event.form.isSameNode(currentForm))
 
         (currentForm, NonEmptyList(oldestEvent, eventsToSend.tail), eventsForOtherForms)
       }
 
       for {
-        originalEvents           ← NonEmptyList.fromList(Globals.eventQueue.toList)
-        eventsForFormsInDocument ← eventsForFormsInDocument(originalEvents)
-        coalescedEvents          ← coalescedProgressEvents(coalesceValueEvents(eventsForFormsInDocument))
+        originalEvents           <- NonEmptyList.fromList(Globals.eventQueue.toList)
+        eventsForFormsInDocument <- eventsForFormsInDocument(originalEvents)
+        coalescedEvents          <- coalescedProgressEvents(coalesceValueEvents(eventsForFormsInDocument))
       } yield
         eventsForOldestEventForm(coalescedEvents)
     }
 
     def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      events.toList foreach { event ⇒
+      events.toList foreach { event =>
 
         // 2019-11-22: called by `LabelEditor`
         val updateProps: js.Function1[js.Dictionary[js.Any], Unit] =
-          properties ⇒ event.properties = properties
+          properties => event.properties = properties
 
         // 2019-11-22: `beforeSendingEvent` is undocumented but used
         beforeSendingEvent.fire(event, updateProps)
@@ -523,11 +523,11 @@ object AjaxClient {
       locally {
 
         val valueEventsGroupedByTargetId =
-          events collect { case e if e.eventName == XXFormsValue ⇒ e } groupByKeepOrder (_.targetIdOpt)
+          events collect { case e if e.eventName == XXFormsValue => e } groupByKeepOrder (_.targetIdOpt)
 
         valueEventsGroupedByTargetId foreach {
-          case (Some(targetId), events) ⇒ ServerValueStore.set(targetId, events.last.properties.get("value").get.asInstanceOf[String])
-          case _ ⇒
+          case (Some(targetId), events) => ServerValueStore.set(targetId, events.last.properties.get("value").get.asInstanceOf[String])
+          case _ =>
         }
       }
 
@@ -557,7 +557,7 @@ object AjaxClient {
       val requestDocumentString = new jl.StringBuilder
 
       def newLine(): Unit = requestDocumentString.append('\n')
-      def indent(l: Int): Unit = for (_ ← 0 to l) requestDocumentString.append(Indent)
+      def indent(l: Int): Unit = for (_ <- 0 to l) requestDocumentString.append(Indent)
 
       // Add entity declaration for nbsp. We are adding this as this entity is generated by the FCK editor.
       // The "unnecessary" concatenation is done to prevent IntelliJ from wrongly interpreting this
@@ -576,7 +576,7 @@ object AjaxClient {
       newLine()
 
       val mustIncludeSequence =
-        eventsToSend exists { event ⇒
+        eventsToSend exists { event =>
           event.eventName != XXFormsUploadProgress && event.eventName != EventNames.XXFormsSessionHeartbeat
         }
 
@@ -588,7 +588,7 @@ object AjaxClient {
         val currentSequenceNumber = StateHandling.getSequence(currentFormId)
         requestDocumentString.append(currentSequenceNumber)
 
-        lazy val incrementSequenceNumberCallback: js.Function = () ⇒ {
+        lazy val incrementSequenceNumberCallback: js.Function = () => {
           // Increment sequence number, now that we know the server processed our request
           // If we were to do this after the request was processed, we might fail to increment the sequence
           // if we were unable to process the response (i.e. JS error). Doing this here, before the
@@ -611,13 +611,13 @@ object AjaxClient {
       newLine()
 
       // Add events
-      eventsToSend.toList foreach { event ⇒
+      eventsToSend.toList foreach { event =>
 
         // Create `<xxf:event>` element
         indent(2)
         requestDocumentString.append("<xxf:event")
         requestDocumentString.append(s""" name="${event.eventName}"""")
-        event.targetIdOpt. foreach { targetId ⇒
+        event.targetIdOpt. foreach { targetId =>
           requestDocumentString.append(s""" source-control-id="${Page.deNamespaceIdIfNeeded(currentFormId, targetId)}"""")
         }
         requestDocumentString.append(">")
@@ -626,7 +626,7 @@ object AjaxClient {
           // Only add properties when we don"t have a value (in the future, the value should be
           // sent in a sub-element, so both a value and properties can be sent for the same event)
           newLine()
-          event.properties foreach { case (key, value) ⇒
+          event.properties foreach { case (key, value) =>
 
             val stringValue = value.toString // support number and boolean
 

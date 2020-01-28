@@ -176,7 +176,7 @@ class XHTMLHeadHandler(
   private def outputElement(
     xhtmlPrefix       : String,
     attributesImpl    : AttributesImpl,
-    getElementDetails : (Option[String], Option[String]) ⇒ (String, Array[String]))(
+    getElementDetails : (Option[String], Option[String]) => (String, Array[String]))(
     resource          : Option[String],
     cssClass          : Option[String],
     content           : Option[String])(implicit
@@ -208,10 +208,10 @@ class XHTMLHeadHandler(
       outputElement(
         xhtmlPrefix,
         attributesImpl,
-        (resource, cssClass) ⇒ resource match {
-          case Some(resource) ⇒
+        (resource, cssClass) => resource match {
+          case Some(resource) =>
             ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
-          case None ⇒
+          case None =>
             ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
         }
       )(_, _, _)
@@ -241,7 +241,7 @@ class XHTMLHeadHandler(
       outputElement(
         xhtmlPrefix,
         attributesImpl,
-        (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
+        (resource, cssClass) => ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
       )(_, _, _)
 
     // Output all JS

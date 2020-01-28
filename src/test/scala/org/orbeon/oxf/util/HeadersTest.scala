@@ -32,13 +32,13 @@ class HeadersTest extends AssertionsForJUnit {
 
   @Test def testFilterAndCapitalizeHeaders(): Unit = {
 
-    val arrays = List("Foo" → Array("foo1", "foo2"), "Bar" → Array("bar1", "bar2"))
-    val lists  = List("Foo" → List("foo1", "foo2"),  "Bar" → List("bar1", "bar2"))
+    val arrays = List("Foo" -> Array("foo1", "foo2"), "Bar" -> Array("bar1", "bar2"))
+    val lists  = List("Foo" -> List("foo1", "foo2"),  "Bar" -> List("bar1", "bar2"))
 
-    val toFilterInRequest  = RequestHeadersToRemove  map (_ → List("NOT!"))
-    val toFilterInResponse = ResponseHeadersToRemove map (_ → List("NOT!"))
+    val toFilterInRequest  = RequestHeadersToRemove  map (_ -> List("NOT!"))
+    val toFilterInResponse = ResponseHeadersToRemove map (_ -> List("NOT!"))
 
-    assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) ⇒ k → v.to(List)}))
+    assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) => k -> v.to(List)}))
     assert(lists === proxyAndCapitalizeHeaders(lists, request = true))
     assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
     assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))

@@ -56,12 +56,12 @@ class XFormsInputHandler(
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
-  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
+  private def controlHas(predicate: XFormsInputControl => Boolean) =
     predicate(currentControl.asInstanceOf[XFormsInputControl])
 
-  private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
-  private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
-  private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
+  private def isDateTime    = controlHas(c => c.getBuiltinTypeName == "dateTime")
+  private def isDateMinimal = controlHas(c => c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
+  private def isBoolean     = controlHas(c => c.getBuiltinTypeName == "boolean")
 
   override protected def handleControlStart(): Unit = {
     val inputControl = currentControl.asInstanceOf[XFormsInputControl]
@@ -141,8 +141,8 @@ class XFormsInputHandler(
             // Q: Not sure why we duplicate the appearances here. As of 2011-10-27, removing this
             // makes the minimal date picker fail on the client. We should be able to remove this.
             elementAnalysis match {
-              case a: AppearanceTrait ⇒ a.encodeAndAppendAppearances(inputClasses)
-              case _ ⇒
+              case a: AppearanceTrait => a.encodeAndAppendAppearances(inputClasses)
+              case _ =>
             }
           } else {
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
@@ -152,7 +152,7 @@ class XFormsInputHandler(
           inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
 
           // Add attribute even if the control is not concrete
-          placeHolderInfo foreach { placeHolderInfo ⇒
+          placeHolderInfo foreach { placeHolderInfo =>
             if (placeHolderInfo.value ne null) // unclear whether this can ever be null
               reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
           }
@@ -216,9 +216,9 @@ class XFormsInputHandler(
       } else {
         // Output static read-only value
         if (isRelevantControl) {
-          val atts = List("class" → "xforms-field")
+          val atts = List("class" -> "xforms-field")
           withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts) {
-            inputControl.getFormattedValue foreach { value ⇒
+            inputControl.getFormattedValue foreach { value =>
               xmlReceiver.characters(value.toCharArray, 0, value.length)
             }
           }

@@ -35,15 +35,15 @@ trait FormRunnerSectionTemplateOps {
     val bindingsForSectionTemplates =
       availableSectionTemplateXBLBindings(xblElems / fr.XMLNames.XBLBindingTest)
 
-    bindingsForSectionTemplates map { binding ⇒
-      FormRunner.bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
+    bindingsForSectionTemplates map { binding =>
+      FormRunner.bindingFirstURIQualifiedName(binding) -> extractAsMutableDocument(binding)
     } toMap
   }
 
   //@XPathFunction
   def findAppFromSectionTemplateUri(uri: String): Option[String] = uri match {
-    case MatchesComponentUriLibraryRegex(app) ⇒ Option(app)
-    case _ ⇒ None
+    case MatchesComponentUriLibraryRegex(app) => Option(app)
+    case _ => None
   }
 
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
@@ -53,10 +53,10 @@ trait FormRunnerSectionTemplateOps {
     // <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
     val sectionTemplateElementOpt =
       frSectionComponent.staticControl.descendants find
-      (c ⇒ matchesComponentURI(c.element.getNamespaceURI))
+      (c => matchesComponentURI(c.element.getNamespaceURI))
 
     sectionTemplateElementOpt flatMap
-      (e ⇒ frSectionComponent.resolve(e.staticId)) flatMap
+      (e => frSectionComponent.resolve(e.staticId)) flatMap
       collectByErasedType[XFormsComponentControl]
   }
 
@@ -67,7 +67,7 @@ trait FormRunnerSectionTemplateOps {
 
     val xblEls =
       for {
-        xblEl ← inDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
+        xblEl <- inDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
         componentNamespace = xblEl.namespaces.find(_.getLocalPart == "component")
         if componentNamespace.exists(_.getStringValue == sectionTemplateNamespaceUri)
       } yield
@@ -105,7 +105,7 @@ trait FormRunnerSectionTemplateOps {
   }
 
   def findComponentNodeForSection(sectionNode: NodeInfo): Option[NodeInfo] =
-    sectionNode child * find (e ⇒ matchesComponentURI(e.getURI))
+    sectionNode child * find (e => matchesComponentURI(e.getURI))
 
   def isSectionWithTemplateContent(containerElem: NodeInfo): Boolean =
     FormRunner.IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)

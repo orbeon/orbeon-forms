@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import net.sf.ehcache.{Element ⇒ EhElement}
+import net.sf.ehcache.{Element => EhElement}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
@@ -33,14 +33,14 @@ object EhcacheStateStore {
     assert(document.getStaticState.isServerStateHandling)
 
     if (! isInitialState)
-      LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" → document.getUUID))
+      LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" -> document.getUUID))
 
     val documentUUID = document.getUUID
 
     withDebug("storing document state", List(
-      "document UUID"             → documentUUID,
-      "store size before storing" → getCurrentSize.toString,
-      "replication"               → XFormsProperties.isReplication.toString
+      "document UUID"             -> documentUUID,
+      "store size before storing" -> getCurrentSize.toString,
+      "replication"               -> XFormsProperties.isReplication.toString
     )) {
       val staticStateDigest = document.getStaticState.digest
       val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
@@ -49,7 +49,7 @@ object EhcacheStateStore {
       def addOrReplaceOne(key: String, value: java.io.Serializable): Unit =
         Caches.stateCache.put(new EhElement(key, value, sequence))
 
-      // Mapping (UUID → static state key : dynamic state key
+      // Mapping (UUID -> static state key : dynamic state key
       addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
       // Static and dynamic states
@@ -70,8 +70,8 @@ object EhcacheStateStore {
       "xforms",
       "restore state",
       List(
-        "uuid" → documentUUID,
-        "backOrReload" → isInitialState.toString
+        "uuid" -> documentUUID,
+        "backOrReload" -> isInitialState.toString
       )
     ) {
 
@@ -80,7 +80,7 @@ object EhcacheStateStore {
       def findOne(key: String) = Option(Caches.stateCache.get(key)) map (_.getObjectValue)
 
       findOne(documentUUID) match {
-        case Some(keyString: String) ⇒
+        case Some(keyString: String) =>
 
           // Found the keys, split into parts
           val parts = keyString split ':'
@@ -93,13 +93,13 @@ object EhcacheStateStore {
 
           // Gather values from cache for both keys and return state only if both are non-null
           Stream(parts(0), dynamicStateKey) flatMap findOne filter (_ ne null) match {
-            case Stream(staticState: String, dynamicState: DynamicState) ⇒
+            case Stream(staticState: String, dynamicState: DynamicState) =>
               Some(XFormsState(Some(parts(0)), Some(staticState), Some(dynamicState)))
-            case _ ⇒
+            case _ =>
               None
           }
 
-        case _ ⇒
+        case _ =>
           None
       }
     }

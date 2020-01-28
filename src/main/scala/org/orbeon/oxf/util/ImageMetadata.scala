@@ -40,10 +40,10 @@ object ImageMetadata {
     // Support formats thar are supported by web browsers only
     // http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
     metadata.getDirectories.asScala.iterator collectFirst {
-      case _: JpegDirectory      ⇒ "image/jpeg"
-      case _: PngDirectory       ⇒ "image/png"
-      case _: GifHeaderDirectory ⇒ "image/gif"
-      case _: BmpHeaderDirectory ⇒ "image/bmp"
+      case _: JpegDirectory      => "image/jpeg"
+      case _: PngDirectory       => "image/png"
+      case _: GifHeaderDirectory => "image/gif"
+      case _: BmpHeaderDirectory => "image/bmp"
     }
   }
 
@@ -54,21 +54,21 @@ object ImageMetadata {
 
     val directoryIterator =
       for {
-        directory ← metadata.getDirectories.asScala.iterator
-        tags      = for (tag ← directory.getTags.asScala)
+        directory <- metadata.getDirectories.asScala.iterator
+        tags      = for (tag <- directory.getTags.asScala)
                 yield
-                  tag.getTagName → tag.getTagType
+                  tag.getTagName -> tag.getTagType
       } yield
-        directory → tags.toMap
+        directory -> tags.toMap
 
     directoryIterator collectFirst {
-      case (directory, map) if map.contains(name) ⇒ directory.getObject(map(name))
+      case (directory, map) if map.contains(name) => directory.getObject(map(name))
     }
   }
 
   private val KnownNamesToMetadataExtractorNames = Map(
-    "width"  → "Image Width",
-    "height" → "Image Height"
+    "width"  -> "Image Width",
+    "height" -> "Image Height"
   )
 
   // All known names

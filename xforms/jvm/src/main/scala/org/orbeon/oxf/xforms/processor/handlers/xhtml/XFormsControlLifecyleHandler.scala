@@ -82,13 +82,13 @@ abstract class XFormsControlLifecyleHandler(
       // redundant.
 
       // Process everything up to and including the control
-      for (current ← beforeAfterTokens._1)
+      for (current <- beforeAfterTokens._1)
         current match {
-          case "control" ⇒ handleControlStart()
-          case "label"   ⇒ if (hasLocalLabel) handleLabel()
-          case "alert"   ⇒ if (hasLocalAlert) handleAlert()
-          case "hint"    ⇒ if (hasLocalHint)  handleHint()
-          case "help"    ⇒ if (hasLocalHelp)  handleHelp()
+          case "control" => handleControlStart()
+          case "label"   => if (hasLocalLabel) handleLabel()
+          case "alert"   => if (hasLocalAlert) handleAlert()
+          case "hint"    => if (hasLocalHint)  handleHint()
+          case "help"    => if (hasLocalHelp)  handleHelp()
         }
     }
 
@@ -96,13 +96,13 @@ abstract class XFormsControlLifecyleHandler(
     if (isMustOutputControl(currentControl)) {
 
       // Process everything after the control has been shown
-      for (current ← beforeAfterTokens._2)
+      for (current <- beforeAfterTokens._2)
         current match {
-          case "control" ⇒ handleControlEnd()
-          case "label"   ⇒ if (hasLocalLabel) handleLabel()
-          case "alert"   ⇒ if (hasLocalAlert) handleAlert()
-          case "hint"    ⇒ if (hasLocalHint)  handleHint()
-          case "help"    ⇒ if (hasLocalHelp)  handleHelp()
+          case "control" => handleControlEnd()
+          case "label"   => if (hasLocalLabel) handleLabel()
+          case "alert"   => if (hasLocalAlert) handleAlert()
+          case "hint"    => if (hasLocalHint)  handleHint()
+          case "help"    => if (hasLocalHelp)  handleHelp()
         }
 
       // Close control element, usually `<span>`
@@ -215,8 +215,8 @@ abstract class XFormsControlLifecyleHandler(
 
     def hasLocalLHHA(lhhaType: LHHA): Boolean =
       xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId) match {
-        case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
-        case _                          ⇒ false
+        case support: StaticLHHASupport => support.hasLocal(lhhaType)
+        case _                          => false
       }
   }
 }

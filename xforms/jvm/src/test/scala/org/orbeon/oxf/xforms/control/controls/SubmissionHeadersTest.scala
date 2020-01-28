@@ -95,27 +95,27 @@ class SubmissionHeadersTest
 
       // Expected results per control
       val expected = List(
-        "output1" → List(
-          "Header1" → List("value1"),
-          "Header2" → List("value2"),
-          "Header3" → List("value3")
+        "output1" -> List(
+          "Header1" -> List("value1"),
+          "Header2" -> List("value2"),
+          "Header3" -> List("value3")
         ),
-        "output2" → List(
-          "Header1" → List("prepend2", "prepend1", "value1", "append2"),
-          "Header2" → List("prepend2", "value2", "append2", "append2"),
-          "Header3" → List("prepend2", "replace3", "append2"),
-          "Header4" → List("value4")
+        "output2" -> List(
+          "Header1" -> List("prepend2", "prepend1", "value1", "append2"),
+          "Header2" -> List("prepend2", "value2", "append2", "append2"),
+          "Header3" -> List("prepend2", "replace3", "append2"),
+          "Header4" -> List("value4")
         )
       )
 
     it("must be evaluated following prepend/append/replace rules") {
       assume(Version.isPE) // because of `xxf:xpath-analysis="true"`
-      withXFormsDocument(doc) { xfcd ⇒
+      withXFormsDocument(doc) { xfcd =>
         for {
-          (controlId, expectedHeaders) ← expected
+          (controlId, expectedHeaders) <- expected
           control       = xfcd.getObjectByEffectiveId(controlId).asInstanceOf[XFormsOutputControl]
           actualHeaders = control.evaluatedHeaders
-          (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
+          (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
         } locally {
           assert(expectedHeaderValues === actualHeaders(expectedHeaderName))
         }

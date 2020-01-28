@@ -34,7 +34,7 @@ import org.orbeon.xforms.Constants
 import org.scalactic.Equality
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 
 class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
@@ -54,8 +54,8 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
   case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: m.WrappedArray[Byte])
 
   def convertFileItemContent(a: AnyRef) = a match {
-    case f: FileItem ⇒ FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, inputStreamToByteArray(f.getInputStream))
-    case other       ⇒ other
+    case f: FileItem => FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, inputStreamToByteArray(f.getInputStream))
+    case other       => other
   }
 
   def newTrustedUploadContext(body: Array[Byte]) = new UploadContext {
@@ -85,7 +85,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         Some(
           new UploadProgressMultipartLifecycle(Some(body.length.toLong), uploadContext.getInputStream, session) {
             def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): (MaximumSize, AllowedMediatypes) =
-              MaximumSize.unapply(maxSize.toString).get → AllowedAnyMediatype
+              MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype
           }
         ),
         MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
@@ -93,7 +93,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         0
       )
 
-    (pairs map { case (a, b) ⇒ a → convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
+    (pairs map { case (a, b) => a -> convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
   }
 
   describe("Parsing a multipart request which doesn't exceed the maximum size specified") {
@@ -101,11 +101,11 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustSucceedWithLimits = List(-1L, 8326L, 10000L)
 
     val expectedPairs = List(
-      Constants.UuidFieldName → UUID,
-      FieldName               → FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables)
+      Constants.UuidFieldName -> UUID,
+      FieldName               -> FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables)
     )
 
-    for (limit ← MustSucceedWithLimits) {
+    for (limit <- MustSucceedWithLimits) {
       describe(s"with limit $limit") {
 
         val session = new SimpleSession(SecureUtils.randomHexId)
@@ -118,12 +118,12 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
           new Equality[UploadProgress] {
             def areEqual(a: UploadProgress, b: Any) =
               b match {
-                case b: UploadProgress ⇒
+                case b: UploadProgress =>
                   a.fieldName    == b.fieldName    &&
                   a.expectedSize == b.expectedSize &&
                   a.receivedSize == b.receivedSize &&
                   a.state.name   == b.state.name // only check on the state name for now as we can't compare the nested `DiskFileItem`
-                case _ ⇒ false
+                case _ => false
               }
           }
 
@@ -145,10 +145,10 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustFailWithLimits = List(0, 4097, 8000)// NOTE: any value under 4096 is the same as 4096 (buffer size)
 
     val expectedPairs = List(
-      Constants.UuidFieldName → UUID
+      Constants.UuidFieldName -> UUID
     )
 
-    for (limit ← MustFailWithLimits) {
+    for (limit <- MustFailWithLimits) {
       describe(s"with limit $limit") {
 
         val session = new SimpleSession(SecureUtils.randomHexId)

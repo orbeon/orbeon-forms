@@ -24,28 +24,28 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
   describe("Conversion of CSS to XPath") {
 
     val data = List(
-      "foo|a"                                     → "descendant-or-self::foo:a",
-      "foo|a foo|b"                               → "descendant-or-self::foo:a//foo:b",
-      "foo|a foo|b, bar|a bar|b"                  → "descendant-or-self::foo:a//foo:b|descendant-or-self::bar:a//bar:b",
-      "foo|a > foo|b"                             → "descendant-or-self::foo:a/foo:b",
-      "foo|a > foo|b, bar|a > bar|b"              → "descendant-or-self::foo:a/foo:b|descendant-or-self::bar:a/bar:b",
-      "> foo|a"                                   → "./foo:a",
-      ":root foo|a"                               → ".//foo:a",
-      "*:root foo|a"                              → ".//foo:a",
-      ":root > foo|a"                             → "./foo:a",
-      ":root > xf|label, :root > xf|help"         → "./xf:label|./xf:help"
+      "foo|a"                                     -> "descendant-or-self::foo:a",
+      "foo|a foo|b"                               -> "descendant-or-self::foo:a//foo:b",
+      "foo|a foo|b, bar|a bar|b"                  -> "descendant-or-self::foo:a//foo:b|descendant-or-self::bar:a//bar:b",
+      "foo|a > foo|b"                             -> "descendant-or-self::foo:a/foo:b",
+      "foo|a > foo|b, bar|a > bar|b"              -> "descendant-or-self::foo:a/foo:b|descendant-or-self::bar:a/bar:b",
+      "> foo|a"                                   -> "./foo:a",
+      ":root foo|a"                               -> ".//foo:a",
+      "*:root foo|a"                              -> ".//foo:a",
+      ":root > foo|a"                             -> "./foo:a",
+      ":root > xf|label, :root > xf|help"         -> "./xf:label|./xf:help"
       // NOTE: We can't support this as we would need current() (root() won't work from XBLTransformer)
-      // ":root :root foo|a"                         → "current()//current()//foo:a"
+      // ":root :root foo|a"                         -> "current()//current()//foo:a"
     )
 
-    for ((css, xpath) ← data)
+    for ((css, xpath) <- data)
       it(s"must convert `$css`") {
         assert(xpath === CSSParser.toXPath(css))
       }
   }
 
   def assertTransforms(data: List[(String, Elem, Elem, Elem)]): Unit =
-    for ((description, bound, shadow, expected) ← data)
+    for ((description, bound, shadow, expected) <- data)
       it(description) {
         assertXMLDocumentsIgnoreNamespacesInScope(
           elemToDom4j(expected),

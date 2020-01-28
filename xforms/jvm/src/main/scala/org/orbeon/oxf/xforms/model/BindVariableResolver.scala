@@ -36,7 +36,7 @@ object BindVariableResolver {
         modelBinds,
         contextBindNodeOpt,
         targetStaticBind
-      ) map { runtimeBindsIt ⇒
+      ) map { runtimeBindsIt =>
         runtimeBindsIt flatMap (_.items.asScala.iterator)
       }
     }
@@ -56,7 +56,7 @@ object BindVariableResolver {
     val targetAncestorOrSelf     = targetStaticBind.ancestorOrSelfBinds.reverse
 
     findStaticAncestry(contextAncestorOrSelfOpt, targetAncestorOrSelf) flatMap {
-      case (commonStaticAncestorOpt, childBindOnTargetBranch) ⇒
+      case (commonStaticAncestorOpt, childBindOnTargetBranch) =>
 
         // We found, from the root, the first static binds which are different. If both of
         // them are nested binds, they have a common parent. If at least one of them is a
@@ -72,8 +72,8 @@ object BindVariableResolver {
 
         val concreteAncestorIteration =
           for {
-            commonStaticAncestor ← commonStaticAncestorOpt
-            contextBindNode      ← contextBindNodeOpt
+            commonStaticAncestor <- commonStaticAncestorOpt
+            contextBindNode      <- contextBindNodeOpt
           } yield
             findConcreteAncestorOrSelfIteration(commonStaticAncestor, contextBindNode)
 
@@ -96,7 +96,7 @@ object BindVariableResolver {
 
   def findStaticAncestry(branch1Opt: Option[List[StaticBind]], branch2: List[StaticBind]) =
     branch1Opt match {
-      case Some(branch1) ⇒
+      case Some(branch1) =>
 
         // branch2 can start with branch1 but not the opposite
         require(! branch1.startsWith(branch2))
@@ -106,10 +106,10 @@ object BindVariableResolver {
           branch1.ensuring(_.nonEmpty).iterator zipAll (branch2.ensuring(_.nonEmpty).iterator, null, null)
 
         zipIterator collectFirst {
-          case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 ⇒
+          case (bindOnBranch1, bindOnBranch2) if bindOnBranch1 ne bindOnBranch2 =>
             (bindOnBranch2.parentBind, bindOnBranch2)
         }
-      case None ⇒
+      case None =>
         Some(None, branch2.head)
     }
 
@@ -117,7 +117,7 @@ object BindVariableResolver {
   // NOTE: This requires that descendantBindNode is a descendant of a runtime bind associated with ancestorStaticBind.
   def findConcreteAncestorOrSelfIteration(ancestorStaticBind: StaticBind, descendantBindNode: BindNode) =
     descendantBindNode.ancestorOrSelfBindNodes collectFirst {
-      case iteration: BindIteration if iteration.forStaticId == ancestorStaticBind.staticId ⇒ iteration
+      case iteration: BindIteration if iteration.forStaticId == ancestorStaticBind.staticId => iteration
     } get
 
   def hasAncestorIteration(ancestorIteration: BindIteration, descendantRuntimeBind: RuntimeBind) =
@@ -133,15 +133,15 @@ object BindVariableResolver {
     def isValidTarget(singleNodeTarget: RuntimeBind) =
       concreteAncestorIteration match {
         // The binds have a common static ancestor and the target is a descendant of the same iteration
-        case Some(ancestorIteration) if hasAncestorIteration(ancestorIteration, singleNodeTarget) ⇒ true
+        case Some(ancestorIteration) if hasAncestorIteration(ancestorIteration, singleNodeTarget) => true
         // The binds are disjoint so the target is valid
-        case None ⇒ true
+        case None => true
         // The binds have a common static ancestor but the runtime target is disjoint
-        case _ ⇒ false
+        case _ => false
       }
 
     for {
-      singleNodeTarget ← modelBinds.singleNodeContextBinds.get(targetBindId)
+      singleNodeTarget <- modelBinds.singleNodeContextBinds.get(targetBindId)
       if isValidTarget(singleNodeTarget)
     } yield
       Iterator(singleNodeTarget)
@@ -159,14 +159,14 @@ object BindVariableResolver {
       }
 
       path.tail match {
-        case Nil ⇒
+        case Nil =>
           // We are at a target: return all items
           Iterator(nextBind)//.items.asScala.iterator
-        case pathTail ⇒
+        case pathTail =>
           // We need to dig deeper to reach the target
           for {
-            nextBindNode ← nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
-            targetItem   ← nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
+            nextBindNode <- nextBind.bindNodes.iterator.asInstanceOf[Iterator[BindIteration]]
+            targetItem   <- nextNodes(nextBindNode.childrenBinds.iterator, pathTail)
           } yield
             targetItem
       }

@@ -33,10 +33,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
     // Initial headers
     val initialHeaders = Map(
-      "p1" → List("v1a", "v1b"),
+      "p1" -> List("v1a", "v1b"),
       // NOTE: Just use these header names because that's what's configured in the properties for the Liferay test
-      "Orbeon-Liferay-User-Email".toLowerCase → List("test@orbeon.com"),
-      "Orbeon-Liferay-User-Roles".toLowerCase → List("manager,employee")
+      "Orbeon-Liferay-User-Email".toLowerCase -> List("test@orbeon.com"),
+      "Orbeon-Liferay-User-Roles".toLowerCase -> List("manager,employee")
     )
 
     val sessionAttributes = mutable.Map[String, AnyRef]()
@@ -47,7 +47,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     }
     Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
-        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
+        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1)
     }
 
     // Request with initial headers
@@ -63,14 +63,14 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
     // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
     val expectedHeaders = initialHeaders ++ List(
-      Headers.OrbeonCredentialsLower → List("""{"username":"test%40orbeon.com","groups":[],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}"""),
-      Headers.OrbeonUsernameLower    → List("test@orbeon.com"),
-      Headers.OrbeonRolesLower       → List("manager", "employee")
+      Headers.OrbeonCredentialsLower -> List("""{"username":"test%40orbeon.com","groups":[],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}"""),
+      Headers.OrbeonUsernameLower    -> List("test@orbeon.com"),
+      Headers.OrbeonRolesLower       -> List("manager", "employee")
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics
     val actualHeaders = amendedRequest.getHeaderNames.asScala map
-      (n ⇒ n → amendedRequest.getHeaders(n).asScala.toList) toMap
+      (n => n -> amendedRequest.getHeaders(n).asScala.toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 import javax.xml.transform.SourceLocator
 
 import org.orbeon.oxf.util.StringUtils._

@@ -40,7 +40,7 @@ object LHHA extends Enum[LHHA] {
 
   val size = values.size
 
-  val QNameForValue = values map (value ⇒ value → QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
+  val QNameForValue = values map (value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
   val QNamesSet     = QNameForValue.values.to(Set)
 
   // By default all controls support HTML LHHA
@@ -70,14 +70,14 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
   // Because an LHHA might follow a control in the document, attachment must be deferred
   def attachLHHA(lhhaAnalysis: LHHAAnalysis): Unit =
     lhhaAnalysis.lhhaType match {
-      case LHHA.Alert ⇒ _alerts :+= lhhaAnalysis
-      case _          ⇒ _lhh     += lhhaAnalysis.lhhaType → lhhaAnalysis
+      case LHHA.Alert => _alerts :+= lhhaAnalysis
+      case _          => _lhh     += lhhaAnalysis.lhhaType -> lhhaAnalysis
     }
 
   def attachLHHABy(lhhaAnalysis: LHHAAnalysis): Unit =
     lhhaAnalysis.lhhaType match {
-      case LHHA.Alert ⇒ _alertsBy :+= lhhaAnalysis
-      case _          ⇒ _lhhBy     += lhhaAnalysis.lhhaType → lhhaAnalysis
+      case LHHA.Alert => _alertsBy :+= lhhaAnalysis
+      case _          => _lhhBy     += lhhaAnalysis.lhhaType -> lhhaAnalysis
     }
 
   def lhh(lhhaType: LHHA)  : Option[LHHAAnalysis] = _lhh.get(lhhaType)
@@ -98,8 +98,8 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
 
   def hasLHHAPlaceholder(lhhaType: LHHA): Boolean =
     lhh(lhhaType) match {
-      case Some(lhh) ⇒ lhh.isPlaceholder
-      case None      ⇒ false
+      case Some(lhh) => lhh.isPlaceholder
+      case None      => false
 
     }
 

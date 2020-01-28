@@ -52,7 +52,7 @@ class XFormsSendAction extends XFormsAction {
     } else {
       // "If there is a null search result for the target object and the source object is an XForms action such as
       // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-      warn("xf:send: submission does not refer to an existing xf:submission element, ignoring action", List("submission id" → submissionId))
+      warn("xf:send: submission does not refer to an existing xf:submission element, ignoring action", List("submission id" -> submissionId))
     }
   }
 }

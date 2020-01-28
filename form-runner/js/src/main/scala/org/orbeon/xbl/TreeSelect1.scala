@@ -61,7 +61,7 @@ object TreeSelect1 {
 
           this.currentValue = newValue ensuring (_ ne null)
 
-          val activatedNodeOpt = this.treeConfiguration flatMap (tree ⇒ Option(tree.activateKey(newValue)))
+          val activatedNodeOpt = this.treeConfiguration flatMap (tree => Option(tree.activateKey(newValue)))
 
           if (activatedNodeOpt.isEmpty)
             logDebug(s"no matching node for `$newValue`")
@@ -86,7 +86,7 @@ object TreeSelect1 {
 
           def convertItems(items: js.Array[Item]): js.Array[FancytreeJsonNode] =
             for {
-              item            ← items
+              item            <- items
               childrenOrUndef = item.children map convertItems
             } yield
               FancytreeJsonNode(
@@ -103,17 +103,17 @@ object TreeSelect1 {
           val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])
 
           this.treeConfiguration match {
-            case Some(tree) ⇒
+            case Some(tree) =>
               tree.reload(items)
-            case None ⇒
+            case None =>
               jTreeContainerDynamic.fancytree(new js.Object { val source = items })
               jTreeContainerDynamic.fancytree("option", "toggleEffect", false)
 
               // Always allow click on expanders but don't allow selection when readonly
-              val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) ⇒
+              val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
                 (data.targetType exists (_ == "expander")) || ! this.isReadonly
 
-              val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) ⇒
+              val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
                 if (! this.isReadonly) {
                   val newValue = data.node.key ensuring (_ ne null)
 

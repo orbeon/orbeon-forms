@@ -31,14 +31,14 @@ trait SelectAppearanceTrait extends AppearanceTrait {
     val size = initialAppearances.size
 
     initialAppearances match {
-      case _ if isMultiple && initialAppearances(XFORMS_MINIMAL_APPEARANCE_QNAME) ⇒
+      case _ if isMultiple && initialAppearances(XFORMS_MINIMAL_APPEARANCE_QNAME) =>
         // Select with minimal appearance is handled as a compact appearance
         initialAppearances - XFORMS_MINIMAL_APPEARANCE_QNAME + XFORMS_COMPACT_APPEARANCE_QNAME
-      case _ if size > 0 ⇒
+      case _ if size > 0 =>
         initialAppearances
-      case _ if isMultiple ⇒
+      case _ if isMultiple =>
         Set(XFORMS_COMPACT_APPEARANCE_QNAME) // default for xf:select
-      case _ ⇒
+      case _ =>
         Set(XFORMS_MINIMAL_APPEARANCE_QNAME) // default for xf:select1
     }
   }

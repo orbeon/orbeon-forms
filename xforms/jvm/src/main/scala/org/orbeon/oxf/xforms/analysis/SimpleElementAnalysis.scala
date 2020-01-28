@@ -37,7 +37,7 @@ class SimpleElementAnalysis(
   preceding
 ) {
 
-  self ⇒
+  self =>
 
   require(scope ne null)
 
@@ -62,7 +62,7 @@ class SimpleElementAnalysis(
   private def findContainingModel =
     // Check for local @model attribute
     element.attributeValue(XFormsConstants.MODEL_QNAME) match {
-      case localModelStaticId: String ⇒
+      case localModelStaticId: String =>
         // Get model prefixed id and verify it belongs to this scope
         val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
         val localModel = part.getModel(localModelPrefixedId)
@@ -70,20 +70,20 @@ class SimpleElementAnalysis(
           throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
 
         Some(localModel)
-      case _ ⇒
+      case _ =>
         // Use inherited model
         closestAncestorInScope match {
-          case Some(ancestor) ⇒ ancestor.model // there is an ancestor control in the same scope, use its model id
-          case None           ⇒ part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
+          case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
+          case None           => part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
         }
     }
 
   protected def computeContextAnalysis = {
     context match {
-      case Some(context) ⇒
+      case Some(context) =>
         // @context attribute, use the overridden in-scope context
         Some(analyzeXPath(getInScopeContext, context))
-      case None ⇒
+      case None =>
         // No @context attribute, use the original in-scope context
         getInScopeContext
     }
@@ -91,19 +91,19 @@ class SimpleElementAnalysis(
 
   protected def computeBindingAnalysis = {
     bind match {
-      case Some(bindStaticId) ⇒
+      case Some(bindStaticId) =>
         // Use @bind analysis directly from model
         val model = part.getModelByScopeAndBind(scope, bindStaticId)
         if (model eq null)
           throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
         model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
-      case None ⇒
+      case None =>
         // No @bind
         ref match {
-          case Some(ref) ⇒
+          case Some(ref) =>
             // New binding expression
             Some(analyzeXPath(getContextAnalysis, ref))
-          case None ⇒
+          case None =>
             // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
             getContextAnalysis
         }
@@ -115,14 +115,14 @@ class SimpleElementAnalysis(
 
   private def getInScopeContext: Option[XPathAnalysis] = {
     ElementAnalysis.getClosestAncestorInScopeModel(self, ScopeModel(scope, model)) match {
-      case Some(ancestor: ElementAnalysis) ⇒
+      case Some(ancestor: ElementAnalysis) =>
         // There is an ancestor in the same scope with same model, use its analysis as base
         ancestor.getChildrenContext
-      case None ⇒
+      case None =>
         // We are top-level in a scope/model combination
         model match {
-          case Some(containingModel) ⇒ containingModel.getChildrenContext // ask model
-          case None ⇒ None // no model
+          case Some(containingModel) => containingModel.getChildrenContext // ask model
+          case None => None // no model
         }
     }
   }
@@ -158,9 +158,9 @@ class SimpleElementAnalysis(
     // Return the analysis for the context in scope
     def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
 
-    // Return a map of static id ⇒ analysis for all the ancestor-or-self in scope.
+    // Return a map of static id => analysis for all the ancestor-or-self in scope.
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
-      LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis ⇒ elementAnalysis.staticId → elementAnalysis): _*)
+      LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*)
 
     // Return analysis for closest ancestor repeat in scope.
     def getInScopeRepeat = self.ancestorRepeatInScope

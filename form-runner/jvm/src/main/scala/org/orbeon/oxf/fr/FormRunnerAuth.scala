@@ -55,7 +55,7 @@ object FormRunnerAuth {
   def getCredentialsUseSession(
     userRoles  : UserRolesFacade,
     session    : SessionFacade,
-    getHeader  : String ⇒ List[String]
+    getHeader  : String => List[String]
   ): Option[Credentials] =
     ServletPortletRequest.findCredentialsInSession(session) orElse {
 
@@ -72,15 +72,15 @@ object FormRunnerAuth {
   def getCredentialsAsHeadersUseSession(
     userRoles  : UserRolesFacade,
     session    : SessionFacade,
-    getHeader  : String ⇒ List[String]
+    getHeader  : String => List[String]
   ): List[(String, Array[String])] = {
 
     getCredentialsUseSession(userRoles, session, getHeader) match {
-      case Some(credentials) ⇒
+      case Some(credentials) =>
         val result = Credentials.toHeaders(credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
         result
-      case None ⇒
+      case None =>
         // Don't set any headers in case there is no username
         Logger.warn(s"not setting credentials headers because credentials are not found")
         Nil
@@ -109,7 +109,7 @@ object FormRunnerAuth {
 
       val headerAsJSONStrings =
         headers map {
-          case (name, values) ⇒
+          case (name, values) =>
             val valuesAsString = values.map(XFormsUtils.escapeJavaScript).mkString("""["""", """", """", """"]""")
             s""""$name": $valuesAsString"""
         }
@@ -119,7 +119,7 @@ object FormRunnerAuth {
 
     def findCredentialsFromContainerOrHeaders(
       userRoles : UserRolesFacade,
-      getHeader : String ⇒ List[String]
+      getHeader : String => List[String]
     ): Option[Credentials] = {
 
       val propertySet = Properties.instance.getPropertySet
@@ -128,7 +128,7 @@ object FormRunnerAuth {
 
       AuthMethod.withNameOption(requestedAuthMethod) match {
 
-        case Some(authMethod @ AuthMethod.Container) ⇒
+        case Some(authMethod @ AuthMethod.Container) =>
 
           Logger.debug(s"using `$authMethod` method")
 
@@ -137,20 +137,20 @@ object FormRunnerAuth {
 
           Logger.debug(s"usernameOpt: `$usernameOpt`, roles property: `$rolesStringOpt`")
 
-          usernameOpt map { username ⇒
+          usernameOpt map { username =>
 
               // Wrap exceptions as Liferay throws if the role is not available instead of returning false
               def isUserInRole(role: String) =
                 try userRoles.isUserInRole(role)
-                catch { case NonFatal(_) ⇒ false}
+                catch { case NonFatal(_) => false}
 
               val rolesSplitRegex =
                 propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
               val rolesList =
                 for {
-                  rolesString ← rolesStringOpt.toList
-                  roleName    ← rolesString split rolesSplitRegex
+                  rolesString <- rolesStringOpt.toList
+                  roleName    <- rolesString split rolesSplitRegex
                   if isUserInRole(roleName)
                 } yield
                   SimpleRole(roleName)
@@ -163,7 +163,7 @@ object FormRunnerAuth {
               )
           }
 
-        case Some(authMethod @ AuthMethod.Header) ⇒
+        case Some(authMethod @ AuthMethod.Header) =>
 
           Logger.debug(s"using `$authMethod` method")
 
@@ -171,7 +171,7 @@ object FormRunnerAuth {
             propertySet.getNonBlankString(HeaderRolesPropertyNamePropertyName)
 
           def headerList(name: String) =
-            propertySet.getNonBlankString(name).toList flatMap (p ⇒ getHeader(p.toLowerCase))
+            propertySet.getNonBlankString(name).toList flatMap (p => getHeader(p.toLowerCase))
 
           val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
           def splitRoles(value: String) = value split rolesSplit
@@ -180,12 +180,12 @@ object FormRunnerAuth {
 
           // If configured, a header can have the form `name=value` where `name` is specified in a property
           def splitWithinRole(value: String) = headerPropertyName match {
-            case Some(propertyName) ⇒
+            case Some(propertyName) =>
               value match {
-                case NameValueMatch(`propertyName`, value) ⇒ List(value)
-                case _                                     ⇒ Nil
+                case NameValueMatch(`propertyName`, value) => List(value)
+                case _                                     => Nil
               }
-            case _ ⇒ List(value)
+            case _ => List(value)
           }
 
           import org.orbeon.oxf.util.CoreUtils._
@@ -194,11 +194,11 @@ object FormRunnerAuth {
           def fromCredentialsHeader =
             headerList(HeaderCredentialsPropertyName).headOption flatMap
             (Credentials.parseCredentials(_, decodeForHeader = true)) kestrel
-            (_ ⇒ Logger.debug(s"found from credential headers"))
+            (_ => Logger.debug(s"found from credential headers"))
 
           // Credentials coming from individual headers (requires at least the username)
           def fromIndividualHeaders =
-            headerList(HeaderUsernamePropertyName).headOption map { username ⇒
+            headerList(HeaderUsernamePropertyName).headOption map { username =>
 
               // Roles: all headers with the given name are used, each header value is split, and result combined
               // See also: https://github.com/orbeon/orbeon-forms/issues/1690
@@ -212,11 +212,11 @@ object FormRunnerAuth {
                 organizations = Nil
               )
             } kestrel
-            (_ ⇒ Logger.debug(s"found from individual headers"))
+            (_ => Logger.debug(s"found from individual headers"))
 
           fromCredentialsHeader orElse fromIndividualHeaders
 
-        case None ⇒
+        case None =>
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$requestedAuthMethod`")
       }
     }

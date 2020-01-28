@@ -82,11 +82,11 @@ class XFormsRepeatIterationControl(
     previousControlOpt       : Option[XFormsControl]
   ): Boolean =
     previousControlOpt match {
-      case Some(previousRepeatIterationControl: XFormsRepeatIterationControl) ⇒
+      case Some(previousRepeatIterationControl: XFormsRepeatIterationControl) =>
         // Ad-hoc comparison, because we basically only care about relevance changes. So we don't delegate
         // to `VisitableTrait` and `XFormsControl` implementations.
         ! mustSendIterationUpdate(Some(previousRepeatIterationControl))
-      case _ ⇒ false
+      case _ => false
     }
 
   private def mustSendIterationUpdate(previousRepeatIterationControlOpt: Option[XFormsRepeatIterationControl]) = {
@@ -100,7 +100,7 @@ class XFormsRepeatIterationControl(
 
   final override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],
-    content               : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content               : Option[XMLReceiverHelper => Unit])(implicit
     ch                    : XMLReceiverHelper
   ): Unit = {
     val repeatIterationControl1Opt = previousControlOpt.asInstanceOf[Option[XFormsRepeatIterationControl]]

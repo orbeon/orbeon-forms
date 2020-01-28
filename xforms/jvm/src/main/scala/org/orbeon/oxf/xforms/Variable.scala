@@ -56,10 +56,10 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
     handleNonFatal    : Boolean
   ): ValueRepresentation =
     staticVariable.expressionStringOpt match {
-      case None ⇒
+      case None =>
         // Inline constructor (for now, only textual content, but in the future, we could allow xf:output in it? more?)
         new StringValue(staticVariable.valueElement.getStringValue)
-      case Some(expression) ⇒
+      case Some(expression) =>
 
         // Push binding for evaluation, so that @context and @model are evaluated
         val pushContext = pushOuterContext || staticVariable.hasNestedValue
@@ -87,12 +87,12 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                 containingDocument.getRequestStats.getReporter
               )
             } catch {
-              case NonFatal(t) if handleNonFatal ⇒
+              case NonFatal(t) if handleNonFatal =>
                   // Don't consider this as fatal
                   // Default value is the empty sequence
                   XFormsError.handleNonFatalXPathError(contextStack.container, t)
                   EmptySequence.getInstance
-              case NonFatal(t) ⇒
+              case NonFatal(t) =>
                 throw new OXFException(t)
             }
           } else {

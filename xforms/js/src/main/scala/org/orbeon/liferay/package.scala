@@ -44,7 +44,7 @@ package object liferay {
 
     def allPortletsReadyF: Future[Unit] = {
       val promise = Promise[Unit]()
-      liferay.on("allPortletsReady", () ⇒ promise.success(()))
+      liferay.on("allPortletsReady", () => promise.success(()))
       promise.future
     }
 

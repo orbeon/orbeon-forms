@@ -34,7 +34,7 @@ import URIProcessorOutputImpl.URIReferences
  */
 class XIncludeProcessor extends ProcessorImpl {
 
-  self ⇒
+  self =>
 
   val AttributesInput = "attributes"
 
@@ -54,7 +54,7 @@ class XIncludeProcessor extends ProcessorImpl {
                 val propertyStore = PropertyStore.parse(preferencesDocument)
                 val propertySet = propertyStore.getGlobalPropertySet
 
-                propertySet.getBooleanProperties.asScala map { case (k, v) ⇒ k → v.booleanValue } toMap
+                propertySet.getBooleanProperties.asScala map { case (k, v) => k -> v.booleanValue } toMap
               }
             })
           } else

@@ -85,7 +85,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
               )
             }
 
-          () ⇒ withPipelineContext { pipelineContext ⇒
+          () => withPipelineContext { pipelineContext =>
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
             callable.call()
           }
@@ -120,7 +120,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         sessionKey(containingDocument)
       )
 
-    asynchronousSubmissionOpt filter (_.pendingCount > 0) foreach { asynchronousSubmission ⇒
+    asynchronousSubmissionOpt filter (_.pendingCount > 0) foreach { asynchronousSubmission =>
 
       withDebug("processing all background asynchronous submissions") {
         var processedCount = 0
@@ -139,7 +139,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             processedCount += 1
           }
         } finally
-          debugResults(List("processed" → processedCount.toString))
+          debugResults(List("processed" -> processedCount.toString))
       }
     }
   }
@@ -159,7 +159,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         sessionKey(containingDocument)
       )
 
-    asynchronousSubmissionsOpt filter (_.pendingCount > 0) foreach { asynchronousSubmissions ⇒
+    asynchronousSubmissionsOpt filter (_.pendingCount > 0) foreach { asynchronousSubmissions =>
       withDebug("processing completed background asynchronous submissions") {
         var processedCount = 0
         try {
@@ -180,8 +180,8 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         } finally
           debugResults(
             List(
-              "processed" → processedCount.toString,
-              "pending"  → asynchronousSubmissions.pendingCount.toString
+              "processed" -> processedCount.toString,
+              "pending"  -> asynchronousSubmissions.pendingCount.toString
             )
           )
       }
@@ -202,7 +202,7 @@ private object AsynchronousSubmissionManager {
       // (See §EE.5.21, page 146 of the Java EE 7 spec)
       InitialContext.doLookup[ManagedExecutorService]("java:comp/DefaultManagedExecutorService")
     } catch {
-      case _: NamingException ⇒
+      case _: NamingException =>
         // If no `ExecutorService` is provided by the app server (e.g. with Tomcat), use our global thread pool
         threadPool
     }
@@ -230,7 +230,7 @@ private object AsynchronousSubmissionManager {
     private var _pendingCount = 0
     def pendingCount = _pendingCount
 
-    def submit(task: () ⇒ SubmissionResult): Future[SubmissionResult] = {
+    def submit(task: () => SubmissionResult): Future[SubmissionResult] = {
 
       val future = completionService.submit(
         new Callable[SubmissionResult]() {
@@ -243,7 +243,7 @@ private object AsynchronousSubmissionManager {
     }
 
     def poll(): Option[Future[SubmissionResult]] =
-      Option(completionService.poll()) map { f ⇒
+      Option(completionService.poll()) map { f =>
         _pendingCount -= 1
         f
       }

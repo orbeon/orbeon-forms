@@ -29,14 +29,14 @@ class XXFormsItemset extends XFormsFunction {
 
     val jsonOrXMLOpt =
       for {
-        control        ← relevantControl(0)
-        valueControl   ← control.narrowTo[XFormsValueControl]
-        select1Control ← XXFormsItemset.findSelectionControl(valueControl)
+        control        <- relevantControl(0)
+        valueControl   <- control.narrowTo[XFormsValueControl]
+        select1Control <- XXFormsItemset.findSelectionControl(valueControl)
         itemset        = select1Control.getItemset
       } yield {
 
         val format   = stringArgument(1)
-        val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
+        val selected = argument.lift(2) exists (e => ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
 
         val controlValueForSelection = if (selected) select1Control.getValue else null
 
@@ -56,12 +56,12 @@ object XXFormsItemset {
 
   def findSelectionControl(control: XFormsControl): Option[XFormsSelect1Control] =
     control match {
-      case c: XFormsSelect1Control ⇒
+      case c: XFormsSelect1Control =>
         Some(c)
-      case c: XFormsComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection ⇒
+      case c: XFormsComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection =>
         // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
-        ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control ⇒ c }
-      case _ ⇒
+        ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control => c }
+      case _ =>
         None
     }
 }

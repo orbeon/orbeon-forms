@@ -142,14 +142,14 @@ def sharedAssetsDir(baseDirectory: File) =
   baseDirectory.getParentFile / "shared" / "src" / "main" / "assets"
 
 def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
-  files map (_.data) foreach { file ⇒
+  files map (_.data) foreach { file =>
     copyJarFile(file, ExplodedWarLibPath, _ contains "scalajs-", matchRawJarName = false)
   }
 
 def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
 
   val (prefix, optType) =
-    sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) ⇒ prefix → optType }
+    sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) => prefix -> optType }
 
   val jsdepsName    = s"$prefix-jsdeps${if (optType == "opt") ".min" else ""}.js"
   val sourceMapName = s"${sourceFile.name}.map"
@@ -157,10 +157,10 @@ def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
   val targetPath = pathPrefix + '/' + "scalajs"
 
   List(
-    sourceFile                                 → s"$prefix.js",
-    (sourceFile.getParentFile / jsdepsName)    → jsdepsName,
-    (sourceFile.getParentFile / sourceMapName) → sourceMapName
-  ) map { case (f, p) ⇒ f → (targetPath + '/' + p) }
+    sourceFile                                 -> s"$prefix.js",
+    (sourceFile.getParentFile / jsdepsName)    -> jsdepsName,
+    (sourceFile.getParentFile / sourceMapName) -> sourceMapName
+  ) map { case (f, p) => f -> (targetPath + '/' + p) }
 }
 
 def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File, pathPrefix: String): Unit = {
@@ -171,7 +171,7 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File, pathPrefix: 
   IO.createDirectory(targetDir)
 
   for {
-    (sourceFile, newPath) ← scalaJsFiles(sourceFile, pathPrefix)
+    (sourceFile, newPath) <- scalaJsFiles(sourceFile, pathPrefix)
     if sourceFile.exists()
   } locally {
     val targetFile = targetDir / newPath
@@ -206,7 +206,7 @@ def resourceManagerProperties(buildBaseDirectory: File): List[String] = {
 
   val props =
     for {
-      (dir, i)    ← TestResourceManagerPaths.zipWithIndex
+      (dir, i)    <- TestResourceManagerPaths.zipWithIndex
       absoluteDir = buildBaseDirectory / dir
     }
       yield
@@ -252,8 +252,8 @@ def jUnitTestOptions =
 
     testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((baseDirectory in ThisBuild).value): _*),
     testOptions       in Test          += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
-    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
-    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("ClientTest")),
+    testOptions       in Test          += Tests.Filter(s => s.endsWith("Test")),
+    testOptions       in Test          += Tests.Filter(s => s.endsWith("Test") && ! s.contains("ClientTest")),
     parallelExecution in Test          := false,
     fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
     javaOptions       in Test          ++= testJavaOptions((baseDirectory in ThisBuild).value),
@@ -399,7 +399,7 @@ lazy val assetsSettings = Seq(
     }
 
     (WebKeys.exportedMappings in Assets).value collect {
-      case (file, path) if includePath(path) ⇒ file → path.substring(FullWebJarPrefix.length)
+      case (file, path) if includePath(path) => file -> path.substring(FullWebJarPrefix.length)
     }
   }
 )
@@ -722,8 +722,8 @@ lazy val core = (project in file("src"))
 
     buildInfoPackage                   := "org.orbeon.oxf.common",
     buildInfoKeys                      := Seq[BuildInfoKey](
-      "orbeonVersion" → orbeonVersionFromProperties.value,
-      "orbeonEdition" → orbeonEditionFromProperties.value
+      "orbeonVersion" -> orbeonVersionFromProperties.value,
+      "orbeonEdition" -> orbeonEditionFromProperties.value
     ),
 
     defaultConfiguration               := Some(Compile),
@@ -776,7 +776,7 @@ lazy val orbeonWarJS = orbeonWar.js
     buildInfoPackage               := "org.orbeon.fr",
     buildInfoObject                := "TestParametersFromSbt",
     buildInfoKeys                  := Seq[BuildInfoKey](
-      "baseDirectory" → (baseDirectory  in ThisBuild).value.getAbsolutePath
+      "baseDirectory" -> (baseDirectory  in ThisBuild).value.getAbsolutePath
     ),
 
     libraryDependencies            ++= Seq(
@@ -792,7 +792,7 @@ lazy val orbeonWarJS = orbeonWar.js
     scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
 
     testOptions                     in Test +=
-      Tests.Setup(() ⇒ OrbeonSupport.dummyDependency((Keys.`package` in orbeonWarJVM).value))
+      Tests.Setup(() => OrbeonSupport.dummyDependency((Keys.`package` in orbeonWarJVM).value))
   )
 
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -52,26 +52,26 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
 
     val uriLocal =
       arg match {
-        case Left(uriLocal)    ⇒ uriLocal
-        case Right(namespaces) ⇒
+        case Left(uriLocal)    => uriLocal
+        case Right(namespaces) =>
           val propertyNameString = stringArgument(0)
           val qName = Dom4jUtils.extractTextValueQName(namespaces.asJava, propertyNameString, false)
           (qName.namespace.uri, qName.localName)
       }
 
     uriLocal match {
-      case (_, local) if local.toLowerCase.contains("password") ⇒
+      case (_, local) if local.toLowerCase.contains("password") =>
         // Never return any property containing the string "password" as a first line of defense
         null
-      case ("", VersionProperty) ⇒
+      case ("", VersionProperty) =>
         Version
-      case ("", ConformanceLevelProperty) ⇒
+      case ("", ConformanceLevelProperty) =>
         ConformanceLevel
-      case (XXFORMS_NAMESPACE_URI, local) ⇒
+      case (XXFORMS_NAMESPACE_URI, local) =>
         // Property in the xxforms namespace: return our properties
         Option(getContainingDocument(xpathContext).getProperty(local)) map
-          (v ⇒ SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
-      case (uri, local) ⇒
+          (v => SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
+      case (uri, local) =>
         throw new XPathException(s"Unknown property: property('${stringArgument(0)}')")
     }
   }
@@ -82,19 +82,19 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
     if (arg eq null) {
       val namespaceResolver = visitor.getStaticContext.getNamespaceResolver
       arg = arguments.head match {
-        case sl: StringLiteral ⇒
+        case sl: StringLiteral =>
           // This is the most common case where the parameter value is known at expression compilation time
           val (prefix, local) = parseQName(sl.getStringValue)
-          Left(namespaceResolver.getURIForPrefix(prefix, false) → local)
-        case _ ⇒
+          Left(namespaceResolver.getURIForPrefix(prefix, false) -> local)
+        case _ =>
           // NOTE: Event.java has the exact same code in Java
           val pairs =
             for {
-              prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[ju.Iterator[String]].asScala
+              prefix <- namespaceResolver.iteratePrefixes.asInstanceOf[ju.Iterator[String]].asScala
               if prefix != ""
               uri = namespaceResolver.getURIForPrefix(prefix, false)
             } yield
-              prefix → uri
+              prefix -> uri
 
           Right(pairs.toMap)
       }

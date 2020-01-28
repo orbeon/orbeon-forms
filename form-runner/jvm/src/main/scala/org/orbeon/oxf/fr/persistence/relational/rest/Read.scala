@@ -37,15 +37,15 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
     // Read before establishing a connection, so we don't use two simultaneous connections
     val formMetadataForDataRequestOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form))
 
-    RelationalUtils.withConnection { connection ⇒
+    RelationalUtils.withConnection { connection =>
 
       val badVersion =
         // For data, we don't need a version number, so accept we either accept no version being specified,
         // or if a form version if specified we'll later check that it matches the version number in the database.
         (req.forData && (req.version match {
-          case Unspecified ⇒ false
-          case Specific(_) ⇒ false
-          case           _ ⇒ true
+          case Unspecified => false
+          case Specific(_) => false
+          case           _ => true
         }))  ||
         // For form definition, everything is valid except Next
         (req.forForm && req.version == Next)
@@ -75,7 +75,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
             |""".stripMargin
       }
-      useAndClose(connection.prepareStatement(sql)) { ps ⇒
+      useAndClose(connection.prepareStatement(sql)) { ps =>
         val position = Iterator.from(1)
         ps.setString(position.next(), req.app)
         ps.setString(position.next(), req.form)
@@ -85,7 +85,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
         }
         if (req.forAttachment) ps.setString(position.next(), req.filename.get)
-        useAndClose(ps.executeQuery()) { resultSet ⇒
+        useAndClose(ps.executeQuery()) { resultSet =>
           if (resultSet.next()) {
 
             // We can't always return a 403 instead of a 410/404, so we decided it's OK to divulge to unauthorized
@@ -97,14 +97,14 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             // Check version if specified
             val dbFormVersion = resultSet.getInt("form_version")
             req.version match {
-              case Specific(reqFormVersion) ⇒
+              case Specific(reqFormVersion) =>
                 if (dbFormVersion != reqFormVersion)
                   throw HttpStatusCodeException(StatusCode.BadRequest)
-              case _ ⇒ // NOP; we're all good
+              case _ => // NOP; we're all good
             }
 
             // Check user can read and set Orbeon-Operations header
-            formMetadataForDataRequestOpt foreach { formMetadata ⇒
+            formMetadataForDataRequestOpt foreach { formMetadata =>
               val dataUser = CheckWithDataUser(
                 username     = Option(resultSet.getString("username")),
                 groupname    = Option(resultSet.getString("groupname")),
@@ -133,14 +133,14 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             // Write content (XML / file)
             if (req.forAttachment) {
               val stream = req.provider match {
-                case PostgreSQL ⇒ new ByteArrayInputStream(resultSet.getBytes("file_content"))
-                case _          ⇒ resultSet.getBlob("file_content").getBinaryStream
+                case PostgreSQL => new ByteArrayInputStream(resultSet.getBytes("file_content"))
+                case _          => resultSet.getBlob("file_content").getBinaryStream
               }
               NetUtils.copyStream(stream, httpResponse.getOutputStream)
             } else {
               val stream = req.provider match {
-                case PostgreSQL ⇒ new StringReader(resultSet.getString("xml"))
-                case _          ⇒ resultSet.getClob("xml").getCharacterStream
+                case PostgreSQL => new StringReader(resultSet.getString("xml"))
+                case _          => resultSet.getClob("xml").getCharacterStream
               }
               httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
 

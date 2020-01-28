@@ -46,12 +46,12 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
       try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext)(Logger)
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           // Log first
           Logger.error(OrbeonFormatter.format(t))
 
           // Try to start the error pipeline if the response has not been committed yet
-          Option(externalContext.getResponse) foreach  { response ⇒
+          Option(externalContext.getResponse) foreach  { response =>
             if (! response.isCommitted) {
               response.reset()
               serviceError(externalContext, t)
@@ -63,7 +63,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
   }
 
   private def serviceError(externalContext: ExternalContext, throwable: Throwable): Unit = errorProcessor match {
-    case Some(processor) ⇒
+    case Some(processor) =>
       val pipelineContext = new PipelineContext
 
       // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
@@ -75,11 +75,11 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
       try InitUtils.runProcessor(processor, externalContext, pipelineContext)(Logger)
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           Logger.error(OrbeonFormatter.format(t))
           serviceStaticError(externalContext, throwable)
       }
-    case None ⇒
+    case None =>
       serviceStaticError(externalContext, throwable)
   }
 
@@ -112,7 +112,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
       try {
         response.getWriter
       } catch {
-        case e: IllegalStateException ⇒
+        case e: IllegalStateException =>
           new PrintWriter(
             new BufferedWriter(
               new OutputStreamWriter(
@@ -142,7 +142,7 @@ object ProcessorService {
     Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
 
   // For InternalHttpClient
-  def withProcessorService[T](processorService: ProcessorService)(thunk: ⇒ T): T =
+  def withProcessorService[T](processorService: ProcessorService)(thunk: => T): T =
     currentProcessorService.withValue(processorService)(thunk)
 
   val currentProcessorService = new DynamicVariable[ProcessorService]

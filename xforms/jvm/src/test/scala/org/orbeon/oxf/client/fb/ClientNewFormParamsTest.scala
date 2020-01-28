@@ -23,30 +23,30 @@ trait ClientNewFormParamsTest extends AssertionsForJUnit with FormBuilderOps wit
 
   @Test def showNewFormDialogIfNoParameters(): Unit = {
     for {
-      _ ← loadOrbeonPage("/fr/orbeon/builder/new")
-      _ ← assert(elementByStaticId("fb-app-name-input").isDisplayed)
+      _ <- loadOrbeonPage("/fr/orbeon/builder/new")
+      _ <- assert(elementByStaticId("fb-app-name-input").isDisplayed)
     }()
   }
 
   @Test def showNewFormDialogIfInvalidParameter(): Unit = {
     for {
-      _ ← loadOrbeonPage("/fr/orbeon/builder/new?fr-app=acme&fr-form=o|rder&fr-title=This+is+a+great+form!&fr-description=Describe+me.")
-      _ ← assert("acme"                  === elementByStaticId("fb-app-name-input").fieldText)
-      _ ← assert("o|rder"                === elementByStaticId("fb-form-name-input").fieldText)
-      _ ← assert("This is a great form!" === elementByStaticId("fb-title-input").fieldText)
-      _ ← assert("Describe me."          === elementByStaticId("fb-description-textarea").fieldText)
+      _ <- loadOrbeonPage("/fr/orbeon/builder/new?fr-app=acme&fr-form=o|rder&fr-title=This+is+a+great+form!&fr-description=Describe+me.")
+      _ <- assert("acme"                  === elementByStaticId("fb-app-name-input").fieldText)
+      _ <- assert("o|rder"                === elementByStaticId("fb-form-name-input").fieldText)
+      _ <- assert("This is a great form!" === elementByStaticId("fb-title-input").fieldText)
+      _ <- assert("Describe me."          === elementByStaticId("fb-description-textarea").fieldText)
     }()
   }
 
   @Test def doNotShowNewFormDialogIfValidParameters(): Unit = {
     for {
-      _ ← loadOrbeonPage("/fr/orbeon/builder/new?fr-app=acme&fr-form=order&fr-title=This+is+a+great+form!&fr-description=Describe+me.")
-      _ ← assert(countAllToolboxControlButtons == ControlsCount)
-      _ ← openFormSettings()
-      _ ← assert("acme"                  === elementByStaticId("fb-app-name-input").fieldText)
-      _ ← assert("order"                 === elementByStaticId("fb-form-name-input").fieldText)
-      _ ← assert("This is a great form!" === elementByStaticId("fb-title-input").fieldText)
-      _ ← assert("Describe me."          === elementByStaticId("fb-description-textarea").fieldText)
+      _ <- loadOrbeonPage("/fr/orbeon/builder/new?fr-app=acme&fr-form=order&fr-title=This+is+a+great+form!&fr-description=Describe+me.")
+      _ <- assert(countAllToolboxControlButtons == ControlsCount)
+      _ <- openFormSettings()
+      _ <- assert("acme"                  === elementByStaticId("fb-app-name-input").fieldText)
+      _ <- assert("order"                 === elementByStaticId("fb-form-name-input").fieldText)
+      _ <- assert("This is a great form!" === elementByStaticId("fb-title-input").fieldText)
+      _ <- assert("Describe me."          === elementByStaticId("fb-description-textarea").fieldText)
     }()
   }
 }

@@ -64,7 +64,7 @@ class SimpleProcessTest
     }
 
     // a1-a20 successful actions which log a trace of their execution
-    override def extensionActions = 1 to 20 map ("a" + _) map (name ⇒ name → mySuccessAction(name) _)
+    override def extensionActions = 1 to 20 map ("a" + _) map (name => name -> mySuccessAction(name) _)
 
     private val _trace = ListBuffer[String]()
     def trace = _trace mkString " "
@@ -86,7 +86,7 @@ class SimpleProcessTest
       """if ("//secret = 42") then success-message(message = "yea") else error-message(message = "nay")"""
     )
 
-    for (p ← processes)
+    for (p <- processes)
       it(s"must pass with `$p`") {
         assert(normalize(p) === parse(p).serialize)
       }
@@ -98,7 +98,7 @@ class SimpleProcessTest
       """if ("xpath") a1 then a2"""
     )
 
-    for (p ← processes)
+    for (p <- processes)
       it(s"must pass with `$p`") {
         intercept[ParsingException](parse(p))
       }
@@ -109,11 +109,11 @@ class SimpleProcessTest
     val interpreter = new TestProcessInterpreter {
 
       val processes = Map(
-        "p1" → """a1 then a2 then suspend then a3""",
-        "p2" → """a1 then (a2 then (a3 then if (". = true()") then (a4 then suspend then (a5 then a6)) else (a7 then suspend then (a8 then a9)) then a10) then a11) then a12""",
-        "p3" → """a13 then if ("true()") then p2 else p1 then a14""",
-        "p4" → """a1 then suspend""",
-        "p5" → """a2 then p4 then a3"""
+        "p1" -> """a1 then a2 then suspend then a3""",
+        "p2" -> """a1 then (a2 then (a3 then if (". = true()") then (a4 then suspend then (a5 then a6)) else (a7 then suspend then (a8 then a9)) then a10) then a11) then a12""",
+        "p3" -> """a13 then if ("true()") then p2 else p1 then a14""",
+        "p4" -> """a1 then suspend""",
+        "p5" -> """a2 then p4 then a3"""
       )
 
       override def findProcessByName(scope: String, name: String) = processes.get(name)
@@ -128,9 +128,9 @@ class SimpleProcessTest
       ("p5", null,               """nop then a3""",                                               "a2 a1")
     )
 
-    for ((process, context, continuation, trace) ← expected) {
+    for ((process, context, continuation, trace) <- expected) {
       it(s"must pass with `$process/$context`") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           interpreter.xpathContext = context
           interpreter.runProcessByName("", process)
           assert(Some(ConstantProcessId + '|' + normalize(continuation)) === interpreter.savedProcess)
@@ -153,9 +153,9 @@ class SimpleProcessTest
         Map.empty,
         "en",
         List(
-          s"fr-$UsePdfTemplateParam" → "false",
-          "fr-remember-language"     → "false",
-          "fr-language"              → "en"
+          s"fr-$UsePdfTemplateParam" -> "false",
+          "fr-remember-language"     -> "false",
+          "fr-language"              -> "en"
         )
       ),
       (
@@ -166,7 +166,7 @@ class SimpleProcessTest
         Map.empty,
         "en",
         List(
-          s"fr-$UsePdfTemplateParam" → "true"
+          s"fr-$UsePdfTemplateParam" -> "true"
         )
       ),
       (
@@ -178,8 +178,8 @@ class SimpleProcessTest
         Map.empty,
         "fr",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateLangParam" → "fr"
+          s"fr-$UsePdfTemplateParam"  -> "true",
+          s"fr-$PdfTemplateLangParam" -> "fr"
         )
       ),
       (
@@ -189,12 +189,12 @@ class SimpleProcessTest
           <pdf name="" lang="fr">data:</pdf>
         </attachments>,
         Map(
-          Some(PdfTemplateLangParam) → "fr"
+          Some(PdfTemplateLangParam) -> "fr"
         ),
         "en",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateLangParam" → "fr"
+          s"fr-$UsePdfTemplateParam"  -> "true",
+          s"fr-$PdfTemplateLangParam" -> "fr"
         )
       ),
       (
@@ -206,13 +206,13 @@ class SimpleProcessTest
           <pdf name="bar" lang="fr">data:</pdf>
         </attachments>,
         Map(
-          Some(PdfTemplateNameParam) → "bar"
+          Some(PdfTemplateNameParam) -> "bar"
         ),
         "fr",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateNameParam" → "bar",
-          s"fr-$PdfTemplateLangParam" → "fr"
+          s"fr-$UsePdfTemplateParam"  -> "true",
+          s"fr-$PdfTemplateNameParam" -> "bar",
+          s"fr-$PdfTemplateLangParam" -> "fr"
         )
       ),
       (
@@ -224,14 +224,14 @@ class SimpleProcessTest
           <pdf name="bar" lang="fr">data:</pdf>
         </attachments>,
         Map(
-          Some(PdfTemplateLangParam) → "fr",
-          Some(PdfTemplateNameParam) → "bar"
+          Some(PdfTemplateLangParam) -> "fr",
+          Some(PdfTemplateNameParam) -> "bar"
         ),
         "en",
         List(
-          s"fr-$UsePdfTemplateParam"  → "true",
-          s"fr-$PdfTemplateNameParam" → "bar",
-          s"fr-$PdfTemplateLangParam" → "fr"
+          s"fr-$UsePdfTemplateParam"  -> "true",
+          s"fr-$PdfTemplateNameParam" -> "bar",
+          s"fr-$PdfTemplateLangParam" -> "fr"
         )
       ),
       (
@@ -242,14 +242,14 @@ class SimpleProcessTest
         Map.empty,
         "en",
         List(
-          s"fr-$UsePdfTemplateParam" → "false",
-          "fr-remember-language"     → "false",
-          "fr-language"              → "en"
+          s"fr-$UsePdfTemplateParam" -> "false",
+          "fr-remember-language"     -> "false",
+          "fr-language"              -> "en"
         )
       )
     )
 
-    for ((description, elem, params, defaultLang, expected) ← Tests)
+    for ((description, elem, params, defaultLang, expected) <- Tests)
       it(s"must pass with $description") {
         assert(
           expected ===

@@ -26,9 +26,9 @@ class XXFormsListInstances extends XFormsFunction {
 
     val itOpt =
       resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
-        case model: XFormsModel ⇒
+        case model: XFormsModel =>
           for {
-            instance    ← model.instancesIterator
+            instance    <- model.instancesIterator
             effectiveId = instance.getEffectiveId
             absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
           } yield

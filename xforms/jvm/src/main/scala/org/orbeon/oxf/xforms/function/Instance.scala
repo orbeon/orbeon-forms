@@ -44,7 +44,7 @@ class Instance extends XFormsFunction {
     // NOTE: Model can be null when there is no model in scope at all
     val iterator =
       XFormsFunction.context.modelOpt match {
-        case Some(model) ⇒
+        case Some(model) =>
 
           // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
           // exists statically. If it does exist statically only, we return an empty sequence, but we don't warn
@@ -54,26 +54,26 @@ class Instance extends XFormsFunction {
           // example with model variables.
 
           def dynamicInstanceOpt = instanceId match {
-            case Some(instanceId) ⇒ model.findInstance(instanceId)
-            case None             ⇒ model.defaultInstanceOpt
+            case Some(instanceId) => model.findInstance(instanceId)
+            case None             => model.defaultInstanceOpt
           }
 
           def staticInstanceOpt = instanceId match {
-            case Some(instanceId) ⇒ model.staticModel.instances.get(instanceId)
-            case None             ⇒ model.staticModel.defaultInstanceOpt
+            case Some(instanceId) => model.staticModel.instances.get(instanceId)
+            case None             => model.staticModel.defaultInstanceOpt
           }
 
-          def findDynamic = dynamicInstanceOpt map (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
+          def findDynamic = dynamicInstanceOpt map (instance => SingletonIterator.makeIterator(instance.rootElement))
           def findStatic  = staticInstanceOpt.isDefined option EmptyIterator.getInstance
 
           findDynamic orElse findStatic
-        case _ ⇒ None
+        case _ => None
       }
 
     iterator match {
-      case Some(iterator) ⇒
+      case Some(iterator) =>
         iterator
-      case None ⇒
+      case None =>
         XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logWarning("instance()", "instance not found", "instance id", instanceId.orNull)
         EmptyIterator.getInstance
     }

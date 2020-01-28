@@ -37,9 +37,9 @@ object LockSql {
          |  FROM orbeon_form_data_lease
          | WHERE document_id = ?
        """.stripMargin
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
       ps.setString(1, reqDataPart.documentId)
-      useAndClose(ps.executeQuery()) { resultSet ⇒
+      useAndClose(ps.executeQuery()) { resultSet =>
         if (resultSet.next()) {
           Some(Lease(
             timeout  = resultSet.getInt("timeout"),
@@ -70,7 +70,7 @@ object LockSql {
          |       expiration  = ${Provider.dateIn(provider)}
          | WHERE document_id = ?
        """.stripMargin
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
       ps.setString(1, username)
       ps.setString(2, groupname.orNull)
       ps.setInt   (3, timeout)
@@ -97,7 +97,7 @@ object LockSql {
          |       )
          |VALUES (?, ?, ?, ${Provider.dateIn(provider)})
        """.stripMargin
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
       ps.setString(1, reqDataPart.documentId)
       ps.setString(2, username)
       ps.setString(3, groupname.orNull)
@@ -116,7 +116,7 @@ object LockSql {
          | WHERE document_id = ?
          |
        """.stripMargin
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
       ps.setString(1, reqDataPart.documentId)
       ps.executeUpdate()
     }

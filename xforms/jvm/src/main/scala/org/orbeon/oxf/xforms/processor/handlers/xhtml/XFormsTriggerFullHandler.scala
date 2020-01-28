@@ -82,8 +82,8 @@ private object XFormsTriggerFullHandler {
   def addAttribute(atts: AttributesImpl, name: String, value: String): Unit =
     atts.addAttribute("", name, name, CDATA, value)
 
-  // Map appearances to Bootstrap classes, e.g. xxf:primary → btn-primary
+  // Map appearances to Bootstrap classes, e.g. xxf:primary -> btn-primary
   val BootstrapAppearances =
     Seq("primary", "info", "success", "warning", "danger", "inverse", "mini", "small", "large", "block") map
-      (name ⇒ QName(name, XXFORMS_NAMESPACE) → ("btn-" + name)) toMap
+      (name => QName(name, XXFORMS_NAMESPACE) -> ("btn-" + name)) toMap
 }

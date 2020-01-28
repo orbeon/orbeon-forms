@@ -33,7 +33,7 @@ class XXFormsComponentParam extends XFormsFunction {
 
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
 
-    findSourceComponent(XFormsFunction.context) flatMap { sourceComponent ⇒
+    findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
 
       val staticControl   = sourceComponent.staticControl
       val concreteBinding = staticControl.bindingOrThrow
@@ -74,14 +74,14 @@ object XXFormsComponentParam {
   // AVTs to support dependencies. Those should probably be stored lazily at the control
   // level.
   def fromElemAlsoTryAvt(
-     atts            : QName ⇒ Option[String],
-     evaluateAvt     : String ⇒ String,
+     atts            : QName => Option[String],
+     evaluateAvt     : String => String,
      paramName       : QName
    ): Option[StringValue] =
      atts(paramName) map evaluateAvt map stringToStringValue
 
   def fromElem(
-    atts            : QName ⇒ Option[String],
+    atts            : QName => Option[String],
     paramName       : QName
   ): Option[AtomicValue] =
     atts(paramName) map stringToStringValue
@@ -93,7 +93,7 @@ object XXFormsComponentParam {
   ): Option[AtomicValue] = {
 
     val propertyNameOpt =
-      findPropertyParts(directNameOpt, paramName) map { parts ⇒
+      findPropertyParts(directNameOpt, paramName) map { parts =>
         "oxf" :: "xforms" :: parts ::: paramSuffix mkString "."
       }
 
@@ -107,7 +107,7 @@ object XXFormsComponentParam {
 
   // For example `xbl.fr.number.decimal-separator`
   private def findPropertyParts(directNameOpt: Option[QName], paramName: QName): Option[List[String]] =
-    directNameOpt map { qName ⇒
+    directNameOpt map { qName =>
       XblLocalName :: qName.namespace.prefix :: qName.localName :: paramName.localName :: Nil
     }
 }

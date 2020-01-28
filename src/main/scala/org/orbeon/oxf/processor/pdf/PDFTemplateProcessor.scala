@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.pdf
 
 import java.io.{ByteArrayOutputStream, OutputStream}
 import java.net.URI
-import java.net.URLDecoder.{decode ⇒ decodeURL}
-import java.util.{List ⇒ JList}
+import java.net.URLDecoder.{decode => decodeURL}
+import java.util.{List => JList}
 
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
@@ -71,16 +71,16 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     val templateReader = {
       val templateHref = templateRoot.attributeValue("href")
       Option(ProcessorImpl.getProcessorInputSchemeInputName(templateHref)) match {
-        case Some(inputName) ⇒
+        case Some(inputName) =>
           val os = new ByteArrayOutputStream
           readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(os))
           new PdfReader(os.toByteArray)
-        case None ⇒
+        case None =>
           new PdfReader(URLFactory.createURL(templateHref))
       }
     }
 
-    useAndClose(new PdfStamper(templateReader, outputStream)) { stamper ⇒
+    useAndClose(new PdfStamper(templateReader, outputStream)) { stamper =>
 
       stamper.setFormFlattening(true)
 
@@ -106,30 +106,30 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         )
 
       // Add substitution fonts for Acrobat fields
-      for (element ← configRoot.elements("substitution-font").asScala) {
+      for (element <- configRoot.elements("substitution-font").asScala) {
         val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), CharsetNames.Utf8)
         val embed            = element.attributeValue("embed") == "true"
 
         try initialContext.acroFields.addSubstitutionFont(createFont(fontFamilyOrPath, embed))
         catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             warn("could not load font", Seq(
-              "font-family" → fontFamilyOrPath,
-              "embed"       → embed.toString,
-              "throwable"   → OrbeonFormatter.format(t)))(initialContext.logger)
+              "font-family" -> fontFamilyOrPath,
+              "embed"       -> embed.toString,
+              "throwable"   -> OrbeonFormatter.format(t)))(initialContext.logger)
         }
       }
 
       // Iterate through template pages
-      for (pageNumber ← 1 to templateReader.getNumberOfPages) {
+      for (pageNumber <- 1 to templateReader.getNumberOfPages) {
 
         val pageSize = templateReader.getPageSize(pageNumber)
 
         val variables = Map[String, ValueRepresentation](
-          "page-count"  → new Int64Value(templateReader.getNumberOfPages),
-          "page-number" → new Int64Value(pageNumber),
-          "page-width"  → new FloatValue(pageSize.getWidth),
-          "page-height" → new FloatValue(pageSize.getHeight)
+          "page-count"  -> new Int64Value(templateReader.getNumberOfPages),
+          "page-number" -> new Int64Value(pageNumber),
+          "page-width"  -> new FloatValue(pageSize.getWidth),
+          "page-height" -> new FloatValue(pageSize.getHeight)
         )
 
         // Context for the page
@@ -153,17 +153,17 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
   }
 
   // How to handle known elements
-  val Handlers = Map[String, ElementContext ⇒ Unit](
-    "group"   → handleGroup,
-    "repeat"  → handleRepeat,
-    "field"   → handleField,
-    "barcode" → handleBarcode,
-    "image"   → handleImage
+  val Handlers = Map[String, ElementContext => Unit](
+    "group"   -> handleGroup,
+    "repeat"  -> handleRepeat,
+    "field"   -> handleField,
+    "barcode" -> handleBarcode,
+    "image"   -> handleImage
   )
 
   def handleElements(context: ElementContext, statements: Seq[Element]): Unit =
     // Iterate through statements
-    for (element ← statements) {
+    for (element <- statements) {
 
       // Context for this element
       val newContext = context.copy(element = element)
@@ -180,14 +180,14 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
     val xpathContext =
       Option(context.att("ref")) match {
-        case Some(ref) ⇒
-          Option(context.evaluateSingle(ref).asInstanceOf[Item]) map (ref ⇒ (Seq(ref), 1))
-        case None ⇒
+        case Some(ref) =>
+          Option(context.evaluateSingle(ref).asInstanceOf[Item]) map (ref => (Seq(ref), 1))
+        case None =>
           Some(context.contextSeq, context.contextPosition)
       }
 
     // Handle group only if we have a context
-    xpathContext foreach { case (contextSeq, contextPosition) ⇒
+    xpathContext foreach { case (contextSeq, contextPosition) =>
       val newGroupContext =
         context.copy(
           contextSeq      = contextSeq,
@@ -206,7 +206,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     val ref = Option(context.att("ref")) getOrElse context.att("nodeset")
     val iterations = context.evaluate(ref)
 
-    for (iterationIndex ← 1 to iterations.size) {
+    for (iterationIndex <- 1 to iterations.size) {
 
       val offsetIncrementX = context.resolveFloat("offset-x", 0f, 0f)
       val offsetIncrementY = context.resolveFloat("offset-y", 0f, 0f)
@@ -231,12 +231,12 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
   def handleField(context: ElementContext): Unit =
     Option(context.att("acro-field-name")) match {
-      case Some(fieldNameExpr) ⇒
+      case Some(fieldNameExpr) =>
         // Acrobat field
         val fieldName = context.evaluateAsString(fieldNameExpr)
 
         if (findFieldPage(context.acroFields, fieldName) contains context.pageNumber) {
-          Option(context.acroFields.getFieldItem(fieldName)) foreach { item ⇒
+          Option(context.acroFields.getFieldItem(fieldName)) foreach { item =>
             // Field exists
             val exportValue = Option(context.att("export-value"))
             val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
@@ -250,13 +250,13 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
             val fieldType = context.acroFields.getFieldType(fieldName)
 
-            // export-value → set field types with values
-            // value        → set field types without values
+            // export-value -> set field types with values
+            // value        -> set field types without values
             if (exportValue.isDefined == FieldTypesWithValues(fieldType))
               context.acroFields.setField(fieldName, value)
           }
         }
-      case None ⇒
+      case None =>
         // Overlay text
         val leftPosition   = context.resolveAVT("left", "left-position")
         val topPosition    = context.resolveAVT("top", "top-position")
@@ -274,10 +274,10 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         val yPosition = context.pageHeight - (topPosition.toFloat + context.offsetY)
 
         // Get value from instance
-        Option(context.evaluateAsString(value)) foreach { text ⇒
+        Option(context.evaluateAsString(value)) foreach { text =>
           // Iterate over characters and print them
           val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
-          for (j ←  0 to len - 1)
+          for (j <-  0 to len - 1)
             context.contentByte.showTextAligned(
               PdfContentByte.ALIGN_CENTER,
               text.substring(j, j + 1),
@@ -319,11 +319,11 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     lazy val image = {
       val hrefAttribute = context.att("href")
       Option(ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute)) match {
-        case Some(inputName) ⇒
+        case Some(inputName) =>
           val os = new ByteArrayOutputStream
           readInputAsSAX(context.pipelineContext, inputName, new BinaryTextXMLReceiver(os))
           Image.getInstance(os.toByteArray)
-        case None ⇒
+        case None =>
 
           val url = new URI(hrefAttribute)
 
@@ -352,7 +352,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
               saveState = true
             )
 
-          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
             val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, Logger)
             // NOTE: iText's Image.getInstance() closes the local URL's InputStream
             Image.getInstance(URLFactory.createURL(tempURLString))
@@ -361,12 +361,12 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     }
 
     Option(context.att("acro-field-name")) match {
-      case Some(fieldNameStr) ⇒
+      case Some(fieldNameStr) =>
         // Acrobat field
         val fieldName = context.evaluateAsString(fieldNameStr)
 
         if (findFieldPage(context.acroFields, fieldName) contains context.pageNumber) {
-          Option(context.acroFields.getFieldPositions(fieldName)) foreach { positions ⇒
+          Option(context.acroFields.getFieldPositions(fieldName)) foreach { positions =>
 
             val rectangle = new Rectangle(positions(1), positions(2), positions(3), positions(4))
             image.scaleToFit(rectangle.getWidth, rectangle.getHeight)
@@ -381,16 +381,16 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             context.contentByte.addImage(image)
           }
         }
-      case None ⇒
+      case None =>
         // By position
         val xPosition = context.resolveAVT("left").toFloat + context.offsetX
         val yPosition = context.pageHeight - (context.resolveAVT("top").toFloat + context.offsetY)
 
         image.setAbsolutePosition(xPosition, yPosition)
         Option(context.resolveAVT("scale-percent")) foreach
-          (scalePercent ⇒ image.scalePercent(scalePercent.toFloat))
+          (scalePercent => image.scalePercent(scalePercent.toFloat))
 
-        Option(context.resolveAVT("dpi")) foreach { dpi ⇒
+        Option(context.resolveAVT("dpi")) foreach { dpi =>
           val dpiInt = dpi.toInt
           image.setDpi(dpiInt, dpiInt)
         }
@@ -412,20 +412,20 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     // 20-pixel lines and side legends
     contentByte.setFontAndSize(baseFont, 7f)
 
-    for (w ← 0f to (width, 20f))
-      for (h ← 0f to (height, 2f))
+    for (w <- 0f to (width, 20f))
+      for (h <- 0f to (height, 2f))
         contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
 
-    for (h ← 0f to (height, 20f))
-      for (w ← 0f to (width, 2f))
+    for (h <- 0f to (height, 20f))
+      for (w <- 0f to (width, 2f))
         contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
 
-    for (w ← 0f to (width, 20f)) {
+    for (w <- 0f to (width, 20f)) {
       contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, w.toString, w, height - topPosition, 0)
       contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, w.toString, w, topPosition, 0)
     }
 
-    for (h ← 0f to (height, 20f)) {
+    for (h <- 0f to (height, 20f)) {
       contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, h.toString, 5f, height - h, 0)
       contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, h.toString, width - 5f, height - h, 0)
     }
@@ -433,12 +433,12 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     // 10-pixel lines
     contentByte.setFontAndSize(baseFont, 3f)
 
-    for (w ← 10f to (width, 10f))
-      for (h ← 0f to (height, 2f))
+    for (w <- 10f to (width, 10f))
+      for (h <- 0f to (height, 2f))
         contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
 
-    for (h ← 10f to (height, 10f))
-      for (w ← 0f to (width, 2f))
+    for (h <- 10f to (height, 10f))
+      for (w <- 0f to (width, 2f))
         contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
 
     contentByte.endText()
@@ -451,10 +451,10 @@ object PDFTemplateProcessor {
   val PDFTemplateModelNamespaceURI = "http://www.orbeon.com/oxf/pdf-template/model"
 
   def createBarCode(barcodeType: String) = barcodeType match {
-    case "CODE39"  ⇒ new Barcode39
-    case "CODE128" ⇒ new Barcode128
-    case "EAN"     ⇒ new BarcodeEAN
-    case _         ⇒ new Barcode39
+    case "CODE39"  => new Barcode39
+    case "CODE128" => new Barcode128
+    case "EAN"     => new BarcodeEAN
+    case _         => new Barcode39
   }
 
   case class FontAttributes(fontPitch: Float, fontFamily: String, fontSize: Float, embed: Boolean)
@@ -598,7 +598,7 @@ object PDFTemplateProcessor {
 
   def findFieldPage(acroFields: AcroFields, fieldName: String): Option[Int] =
     for {
-      item ← Option(acroFields.getFieldItem(fieldName))
+      item <- Option(acroFields.getFieldItem(fieldName))
       if item.size > 0
       page = item.getPage(0).intValue
     } yield

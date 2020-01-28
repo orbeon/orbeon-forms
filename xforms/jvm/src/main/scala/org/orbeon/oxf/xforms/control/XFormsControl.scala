@@ -77,8 +77,8 @@ class XFormsControl(
   def visited = false
 
   parent match {
-    case container: XFormsContainerControl ⇒ container.addChild(this)
-    case _ ⇒
+    case container: XFormsContainerControl => container.addChild(this)
+    case _ =>
   }
 
   final def getId = staticControl.staticId
@@ -107,7 +107,7 @@ class XFormsControl(
       val parentSuffix = XFormsId.getEffectiveIdSuffix(parentEffectiveId)
       effectiveId = XFormsId.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
       if (_childrenActions.nonEmpty)
-        for (actionControl ← _childrenActions)
+        for (actionControl <- _childrenActions)
           actionControl.updateEffectiveId()
     }
   }
@@ -169,8 +169,8 @@ class XFormsControl(
 
   // Optional mediatype
   final def mediatype = staticControl match {
-    case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.mediatype
-    case _ ⇒ None
+    case appearanceTrait: AppearanceTrait => appearanceTrait.mediatype
+    case _ => None
   }
 
   def hasJavaScriptInitialization = false
@@ -191,18 +191,18 @@ class XFormsControl(
     previousControlOpt       : Option[XFormsControl]
   ): Boolean =
     previousControlOpt match {
-      case Some(other) ⇒
+      case Some(other) =>
         isRelevant == other.isRelevant &&
         compareLHHA(other)             &&
         compareExtensionAttributes(other)
-      case _ ⇒ false
+      case _ => false
     }
 
   // Evaluate the control's value and metadata
   final def evaluate(): Unit =
     try preEvaluateImpl(relevant = true, parentRelevant = true)
     catch {
-      case e: ValidationException ⇒
+      case e: ValidationException =>
         throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
     }
 
@@ -246,10 +246,10 @@ class XFormsControl(
   def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
-  def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
+  def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]) =
     staticControl match {
-      case withChildren: ChildrenBuilderTrait ⇒ Controls.buildChildren(this, withChildren.children, buildTree, idSuffix)
-      case _ ⇒
+      case withChildren: ChildrenBuilderTrait => Controls.buildChildren(this, withChildren.children, buildTree, idSuffix)
+      case _ =>
     }
 }
 
@@ -261,9 +261,9 @@ object XFormsControl {
   // Whether the given item is allowed as a binding item for the given control
   // TODO: don't like pattern matching here and revisit hierarchy
   def isAllowedBoundItem(control: XFormsControl, item: Item): Boolean = control.staticControl match {
-    case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
-    case _: RepeatControl            ⇒ DataModel.isAllowedBoundItem(item)
-    case _                           ⇒ false
+    case singleNode: SingleNodeTrait => singleNode.isAllowedBoundItem(item)
+    case _: RepeatControl            => DataModel.isAllowedBoundItem(item)
+    case _                           => false
   }
 
   // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
@@ -289,7 +289,7 @@ object XFormsControl {
         sb.append(localname)
         val attributeCount = attributes.getLength
 
-        for (i ← 0 until attributeCount) {
+        for (i <- 0 until attributeCount) {
           val currentName = attributes.getLocalName(i)
           val currentValue = attributes.getValue(i)
           sb.append(' ')
@@ -401,8 +401,8 @@ object XFormsControl {
 
   // Return the set of appearances for the given element, if any
   def appearances(elementAnalysis: ElementAnalysis): Set[QName] = elementAnalysis match {
-    case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.appearances
-    case _                                ⇒ Set.empty[QName]
+    case appearanceTrait: AppearanceTrait => appearanceTrait.appearances
+    case _                                => Set.empty[QName]
   }
 
   // Whether the given control has the text/html mediatype

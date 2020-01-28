@@ -43,8 +43,8 @@ object permissionsPart {
         sql = s"AND ($usernameGroupnameTest)",
         setters = {
           List[Option[Setter]](
-            permissions.authorizedIfUsername.map(username ⇒ _.setString(_, username)),
-            permissions.authorizedIfGroup.map(group ⇒ _.setString(_, group))
+            permissions.authorizedIfUsername.map(username => _.setString(_, username)),
+            permissions.authorizedIfGroup.map(group => _.setString(_, group))
           ).flatten
         }
       )

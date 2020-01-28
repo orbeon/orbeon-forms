@@ -30,10 +30,10 @@ class IdentityTransformerWithFixup(config: Configuration) extends Controller(con
 
       new Sender(pipelineConfig).send(source, cco, true)
     } catch {
-      case xpe: XPathException ⇒
+      case xpe: XPathException =>
         xpe.getException match {
-          case spe: SAXParseException if ! spe.getException.isInstanceOf[RuntimeException] ⇒ // NOP
-          case _ ⇒ reportFatalError(xpe)
+          case spe: SAXParseException if ! spe.getException.isInstanceOf[RuntimeException] => // NOP
+          case _ => reportFatalError(xpe)
         }
         throw xpe
     }

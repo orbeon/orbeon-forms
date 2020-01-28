@@ -34,9 +34,9 @@ class Context extends XFormsFunction with MatchSimpleAnalysis with DependsOnCont
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
     pathMap.getPathMapContext match {
-      case context: SimpleElementAnalysis#SimplePathMapContext ⇒
+      case context: SimpleElementAnalysis#SimplePathMapContext =>
         // Handle context
         matchSimpleAnalysis(pathMap, context.context)
-      case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
     }
 }

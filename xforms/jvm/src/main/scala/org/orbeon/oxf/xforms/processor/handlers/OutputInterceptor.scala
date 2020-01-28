@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.processor.handlers
 import org.orbeon.oxf.xml._
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, ContentHandler}
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 
 // Intercept SAX output and annotate resulting elements and/or text with classes and spans.
 class OutputInterceptor(
   output                     : XMLReceiver,
   spanQName                  : String,
-  beginDelimiterListener     : OutputInterceptor ⇒ Unit,
+  beginDelimiterListener     : OutputInterceptor => Unit,
   isAroundTableOrListElement : Boolean
 ) extends ForwardingXMLReceiver(output) {
 

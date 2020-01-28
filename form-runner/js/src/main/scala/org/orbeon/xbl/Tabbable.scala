@@ -75,7 +75,7 @@ object Tabbable {
               }
             )
 
-          newDrake.onDrag((el: Element, source: Element) ⇒ {
+          newDrake.onDrag((el: Element, source: Element) => {
 
             val jEl = $(el)
 
@@ -87,13 +87,13 @@ object Tabbable {
             )
           })
 
-          newDrake.onDragend((el: Element) ⇒ {
+          newDrake.onDragend((el: Element) => {
             dragState = None
           })
 
           // This is almost identical in `DndRepeat`. Should remove code duplication.
-          newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
-            dragState foreach { dragState ⇒
+          newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) => {
+            dragState foreach { dragState =>
 
               val jEl = $(el)
 
@@ -106,7 +106,7 @@ object Tabbable {
 
               if (dndStart != dndEnd) {
 
-                lazy val moveBack: js.Function = () ⇒ {
+                lazy val moveBack: js.Function = () => {
                   $(beforeEl).after(el)
                   // TODO: Fix this if we switch to `jquery-facade`
                   AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
@@ -127,8 +127,8 @@ object Tabbable {
                     eventName  = EventNames.XXFormsDnD,
                     targetId   = repeatId,
                     properties = Map(
-                      "dnd-start" → (dndStart + 1),
-                      "dnd-end"   → (dndEnd + 1)
+                      "dnd-start" -> (dndStart + 1),
+                      "dnd-end"   -> (dndEnd + 1)
                     )
                   )
                 )
@@ -144,7 +144,7 @@ object Tabbable {
         // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
         // support dynamically repeated tabs.
         $(containerElem).on("click.tabbable.data-api", "[data-toggle = 'tabbable']", {
-          (bound: html.Element, e: JQueryEventObject) ⇒ {
+          (bound: html.Element, e: JQueryEventObject) => {
 
             e.preventDefault()  // don"t allow anchor navigation
             e.stopPropagation() // prevent ancestor tab handlers from running

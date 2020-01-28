@@ -45,10 +45,10 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val attributes = new AttributesImpl
     val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override val customMIPs = Map(
-        "name1" → "value1",
-        "name2" → "value2",
-        "name3" → "value3",
-        "name4" → "value4"
+        "name1" -> "value1",
+        "name2" -> "value2",
+        "name3" -> "value3",
+        "name4" -> "value4"
       )
     }
     val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
@@ -57,12 +57,12 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
 
       override val customMIPs = Map(
         // leave as is
-        "name1" → "value1",
+        "name1" -> "value1",
         // remove name2
         // change value
-        "name3" → "newvalue3",
+        "name3" -> "newvalue3",
         // leave as is
-        "name4" → "value4"
+        "name4" -> "value4"
       )
     }
     XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, Some(control1), control2)
@@ -73,10 +73,10 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val attributes = new AttributesImpl
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override val customMIPs = Map(
-        "name1" → "value1",
-        "name2" → "value2",
-        "name3" → "value3",
-        "name4" → "value4"
+        "name1" -> "value1",
+        "name2" -> "value2",
+        "name3" -> "value3",
+        "name4" -> "value4"
       )
     }
     XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, None, control2)

@@ -69,25 +69,25 @@ class LimiterFilter extends Filter {
   }
 
   override def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-    settingsOpt foreach { case FilterSettings(semaphore, include, exclude) ⇒
+    settingsOpt foreach { case FilterSettings(semaphore, include, exclude) =>
 
       val httpReq = MinimalRequest(req.asInstanceOf[HttpServletRequest])
 
       httpReq.getRequestPath match {
-        case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches ⇒
+        case path if include.pattern.matcher(path).matches && ! exclude.pattern.matcher(path).matches =>
           LifecycleLogger.withEvent(httpReq, "limiter", "filter", Nil) {
             val timestamp = System.currentTimeMillis
             semaphore.acquire()
             try {
               // Log request details again in case wait takes a while
-              val logParams = LifecycleLogger.basicRequestDetails(httpReq) ::: List("wait" → LifecycleLogger.formatDelay(timestamp))
+              val logParams = LifecycleLogger.basicRequestDetails(httpReq) ::: List("wait" -> LifecycleLogger.formatDelay(timestamp))
               LifecycleLogger.withEvent(httpReq, "limiter", "chain", logParams) {
                 chain.doFilter(req, res)
               }
             } finally
               semaphore.release()
           }
-        case path ⇒
+        case path =>
           LifecycleLogger.withEvent(httpReq, "limiter", "nofilter", Nil) {
             chain.doFilter(req, res)
           }
@@ -96,15 +96,15 @@ class LimiterFilter extends Filter {
 
   // Inspired from Scala code so under Scala license http://www.scala-lang.org/license.html
   // https://github.com/scala/scala/blob/2.11.x/src/library/scala/concurrent/impl/ExecutionContextImpl.scala
-  private def desiredParallelism(param: String ⇒ String) = {
+  private def desiredParallelism(param: String => String) = {
 
     def stringParamWithDefault(name: String, default: String) =
       param(name).trimAllToOpt getOrElse default
 
     def getInt(name: String, default: String) =
       stringParamWithDefault(name, default) match {
-        case s if s.charAt(0) == 'x' ⇒ (Runtime.getRuntime.availableProcessors * s.substring(1).toDouble).ceil.toInt
-        case other                   ⇒ other.toInt
+        case s if s.charAt(0) == 'x' => (Runtime.getRuntime.availableProcessors * s.substring(1).toDouble).ceil.toInt
+        case other                   => other.toInt
       }
 
     def range(floor: Int, desired: Int, ceiling: Int) =

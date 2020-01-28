@@ -28,7 +28,7 @@ class ErrorSummaryTest
   describe("fr:error-summary") {
 
     it("#1689: show errors when placed before observed") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val doc = this setupDocument
           <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

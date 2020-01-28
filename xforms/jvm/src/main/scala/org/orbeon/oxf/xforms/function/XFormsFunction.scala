@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.util.{Locale, Iterator ⇒ JIterator}
+import java.util.{Locale, Iterator => JIterator}
 
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
@@ -35,7 +35,7 @@ import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 /**
  * Base class for all XForms functions.
@@ -69,7 +69,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     xpathContext       : XPathContext
   ): List[XFormsControl] =
     findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes) collect
-      { case control: XFormsControl if control.isRelevant ⇒ control }
+      { case control: XFormsControl if control.isRelevant => control }
 
   def findControls(i: Int, followIndexes: Boolean)(implicit xpathContext: XPathContext): List[XFormsControl] =
     findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpathContext).toString, followIndexes)
@@ -85,7 +85,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = context.container.findScopeRoot(sourcePrefixedId)
 
-    resolutionScopeContainer.resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt = None, followIndexes) collect { case c: XFormsControl ⇒ c }
+    resolutionScopeContainer.resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt = None, followIndexes) collect { case c: XFormsControl => c }
   }
 
   // Resolve an object by id
@@ -94,10 +94,10 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
   def resolveStaticOrAbsoluteId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
     staticIdExpr match {
-      case None ⇒
+      case None =>
         // If no argument is supplied, return the closest id (source id)
         Option(getSourceEffectiveId)
-      case Some(expr) ⇒
+      case Some(expr) =>
         // Otherwise resolve the id passed against the source id
         val staticOrAbsoluteId = expr.evaluateAsString(xpathContext).toString
         resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
@@ -133,7 +133,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
   def currentLocale(implicit xpathContext: XPathContext): Locale =
     currentLangOpt match {
-      case Some(lang) ⇒
+      case Some(lang) =>
         // Not sure how xml:lang should be parsed, see:
         //
         // XML spec points to:
@@ -153,7 +153,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
         // Use Saxon utility for now
         Configuration.getLocale(lang)
-      case None ⇒
+      case None =>
         Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
   }
 
@@ -163,13 +163,13 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
       qNameExpression.evaluateItem(xpathContext)
 
     evaluatedExpression match {
-      case qName: QNameValue ⇒
+      case qName: QNameValue =>
         // Directly got a QName so there is no need for namespace resolution
         qNameFromQNameValue(qName)
-      case atomic: AtomicValue ⇒
+      case atomic: AtomicValue =>
         // Must resolve prefix if present
         qNameFromStringValue(atomic.getStringValue, bindingContext)
-      case other ⇒
+      case other =>
         throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
     }
   }
@@ -188,10 +188,10 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     val inScopeVariables = bindingContext.getInScopeVariables
     val variableDeclarations =
       for {
-        (name, _) ← inScopeVariables.asScala.toList
+        (name, _) <- inScopeVariables.asScala.toList
         variable = staticContext.declareVariable("", name)
       } yield
-        name → variable
+        name -> variable
 
     // Create expression
     val pooledXPathExpression =
@@ -227,7 +227,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
       staticContext.setFunctionLibrary(env.getFunctionLibrary)
 
       for {
-        prefix ← namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
+        prefix <- namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
         if prefix.nonEmpty
         uri = namespaceResolver.getURIForPrefix(prefix, true)
       } locally {
@@ -245,7 +245,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
 
     val result = new PathMapNodeSet
-    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child ⇒
+    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child =>
       result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
     }
 
@@ -289,14 +289,14 @@ object XFormsFunction {
     def setProperty(name: String, value: Option[String]) = {
       if (_properties.isEmpty)
         _properties = Some(m.Map.empty[String, Option[String]])
-      _properties foreach (_ += name → value)
+      _properties foreach (_ += name -> value)
     }
   }
 
   def sourceElementAnalysis(pathMap: PathMap): SimpleElementAnalysis =
     pathMap.getPathMapContext match {
-      case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
-      case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+      case context: SimpleElementAnalysis#SimplePathMapContext => context.element
+      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
     }
 
   def context: Context =
@@ -309,32 +309,32 @@ object XFormsFunction {
 
   def parseQNameToQNameType(lexicalQName: String): QNameType =
     SaxonUtils.parseQName(lexicalQName) match {
-      case ("", local)     ⇒ UnprefixedName(local)
-      case (prefix, local) ⇒ PrefixedName(prefix, local)
+      case ("", local)     => UnprefixedName(local)
+      case (prefix, local) => PrefixedName(prefix, local)
     }
 
   def qNameFromQNameValue(value: QNameValue): dom.QName =
     parseQNameToQNameType(value.getStringValue) match {
-      case PrefixedName(prefix, local) ⇒ dom.QName(local, Namespace(prefix, value.getNamespaceURI))
-      case UnprefixedName(local)       ⇒ dom.QName(local)
+      case PrefixedName(prefix, local) => dom.QName(local, Namespace(prefix, value.getNamespaceURI))
+      case UnprefixedName(local)       => dom.QName(local)
     }
 
   def qNameFromStringValue(value: String, bindingContext: BindingContext): dom.QName =
     parseQNameToQNameType(value) match {
-      case PrefixedName(prefix, local) ⇒
+      case PrefixedName(prefix, local) =>
 
         def prefixNotInScope() =
           throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
 
         val namespaceMapping = context.data match {
-          case Some(bindNode: BindNode) ⇒
+          case Some(bindNode: BindNode) =>
             // Function was called from a bind
             bindNode.parentBind.staticBind.namespaceMapping
-          case _ if bindingContext.controlElement ne null ⇒
+          case _ if bindingContext.controlElement ne null =>
             // Function was called from a control
             // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
             context.container.getNamespaceMappings(bindingContext.controlElement)
-          case _ ⇒
+          case _ =>
             // Unclear which cases reach here!
             // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
             prefixNotInScope()
@@ -343,7 +343,7 @@ object XFormsFunction {
         val qNameURI = namespaceMapping.mapping.getOrElse(prefix, prefixNotInScope())
 
         dom.QName(local, Namespace(prefix, qNameURI))
-      case UnprefixedName(local) ⇒
+      case UnprefixedName(local) =>
         dom.QName(local)
     }
 }

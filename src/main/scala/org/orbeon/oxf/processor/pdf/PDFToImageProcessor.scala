@@ -18,9 +18,9 @@ import java.io.{File, OutputStream}
 import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.icepdf.core.pobjects.{Page, Document ⇒ ICEDocument}
+import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
-import org.orbeon.dom.{Element ⇒ DOM4JElement}
+import org.orbeon.dom.{Element => DOM4JElement}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
@@ -81,7 +81,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
               val scale  = floatValue(configElem.element("scale")) getOrElse 1f
               val format = elemValue(configElem.element("format")) getOrElse (throw new OXFException(s"No image format specified."))
 
-              val compression = Option(configElem.element("compression")) map { compressionElem ⇒
+              val compression = Option(configElem.element("compression")) map { compressionElem =>
                 val tpe     = elemValue(compressionElem.element("type"))
                 val quality = floatValue(compressionElem.element("quality"))
 
@@ -127,10 +127,10 @@ object PDFToImage {
   // The ImageIO API is supposed to allow discovery, but the results are inconsistent. We list below the formats we
   // want to support explicitly based on experimentation.
   val SupportedFormatCompressions = Map(
-    "gif"  → Set("LZW"),        // doesn't support disabling compression
-    "png"  → Set.empty[String], // uses DEFLATE, but API doesn't support setting it (`canWriteCompressed == false`)
-    "jpeg" → Set("JPEG"),       // doesn't support disabling compression
-    "tiff" → Set("CCITT RLE", "CCITT T.4", "CCITT T.6", "LZW", "JPEG", "ZLib", "PackBits", "Deflate", "EXIF JPEG") // supports disabling compression
+    "gif"  -> Set("LZW"),        // doesn't support disabling compression
+    "png"  -> Set.empty[String], // uses DEFLATE, but API doesn't support setting it (`canWriteCompressed == false`)
+    "jpeg" -> Set("JPEG"),       // doesn't support disabling compression
+    "tiff" -> Set("CCITT RLE", "CCITT T.4", "CCITT T.6", "LZW", "JPEG", "ZLib", "PackBits", "Deflate", "EXIF JPEG") // supports disabling compression
   )
 
   val SupportedFormats = SupportedFormatCompressions.keySet
@@ -176,17 +176,17 @@ object PDFToImage {
             }
 
             config.compression match {
-              case None | Some(Compression(None, None)) ⇒
+              case None | Some(Compression(None, None)) =>
                 defaultCompressionIfAny match {
-                  case Some(default) ⇒
+                  case Some(default) =>
                     newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
                     newParams.setCompressionType(default)
-                  case None ⇒
+                  case None =>
                     newParams.setCompressionMode(ImageWriteParam.MODE_DEFAULT)
                 }
-              case Some(Compression(Some("none"), _)) ⇒
+              case Some(Compression(Some("none"), _)) =>
                 newParams.setCompressionMode(ImageWriteParam.MODE_DISABLED)
-              case Some(Compression(tpe, quality)) ⇒
+              case Some(Compression(tpe, quality)) =>
                 newParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)
 
                 tpe orElse defaultCompressionIfAny foreach newParams.setCompressionType
@@ -213,7 +213,7 @@ object PDFToImage {
         if (canWriteSequence)
           imageWriter.prepareWriteSequence(null)
 
-        for (pageIndex ← 0 until numberOfPagesToWrite) {
+        for (pageIndex <- 0 until numberOfPagesToWrite) {
 
           val bufferedImage =
             iceDocument.getPageImage(
@@ -244,8 +244,8 @@ object PDFToImage {
             imageWriter.write(new IIOImage(imageToWrite, null, metadata))
 
           imageToWrite match {
-            case img: BufferedImage ⇒ img.flush() // unclear whether needed
-            case _ ⇒
+            case img: BufferedImage => img.flush() // unclear whether needed
+            case _ =>
           }
         }
 

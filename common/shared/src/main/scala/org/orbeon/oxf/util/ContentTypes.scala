@@ -38,7 +38,7 @@ object ContentTypes {
   private val JsonContentTypeSuffix = "+json"
 
   def isXMLMediatype(mediatype: String): Boolean =
-    mediatype.trimAllToOpt exists { trimmed ⇒
+    mediatype.trimAllToOpt exists { trimmed =>
       trimmed == XmlTextContentType || trimmed == XmlContentType || trimmed.endsWith(XmlContentTypeSuffix)
     }
 
@@ -46,12 +46,12 @@ object ContentTypes {
     getContentTypeMediaType(contentTypeOrNull) exists isXMLMediatype
 
   def isTextContentType(contentTypeOrNull: String): Boolean =
-    contentTypeOrNull.trimAllToOpt exists { trimmed ⇒
+    contentTypeOrNull.trimAllToOpt exists { trimmed =>
       trimmed.startsWith(TextContentTypePrefix)
     }
 
   def isJSONMediatype(mediatype: String): Boolean =
-    mediatype.trimAllToOpt exists { trimmed ⇒
+    mediatype.trimAllToOpt exists { trimmed =>
       trimmed == JsonContentType || trimmed.endsWith(JsonContentTypeSuffix)
     }
 
@@ -89,14 +89,14 @@ object ContentTypes {
 
     val result =
       for {
-        nameValue ← parametersIt
+        nameValue <- parametersIt
         equalIndex = nameValue.indexOf('=')
         if equalIndex >= 0
         name  = nameValue.substring(0, equalIndex).trimAllToEmpty
         value = nameValue.substring(equalIndex + 1).trimAllToEmpty
         if name.nonEmpty
       } yield
-        name → value
+        name -> value
 
     result.toMap
   }

@@ -54,7 +54,7 @@ object MigrationResult {
     if (value) MigrationResult.Some else MigrationResult.None
 }
 
-// This until we have Scala 3's dependent function types: `(ops: MigrationOps) ⇒ ops.M `! See:
+// This until we have Scala 3's dependent function types: `(ops: MigrationOps) => ops.M `! See:
 //
 //   https://dotty.epfl.ch/docs/reference/new-types/dependent-function-types.html
 //

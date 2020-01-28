@@ -63,7 +63,7 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
       </xh:html>
 
     // NOTE: Make the control invalid so that the alert message is not empty
-    for (lhha ← Seq("label", "help", "hint", "alert"))
+    for (lhha <- Seq("label", "help", "hint", "alert"))
       assert(getValueControl(lhha).getValue === "My " + lhha)
   }
 }

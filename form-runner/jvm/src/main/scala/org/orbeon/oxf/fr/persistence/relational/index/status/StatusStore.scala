@@ -27,19 +27,19 @@ object StatusStore {
 
     // Log status
     if (RelationalUtils.Logger.isDebugEnabled) {
-      def liftLog(log: (String, String) ⇒ Unit): (String ⇒ Unit) = log("Reindex status", _: String)
+      def liftLog(log: (String, String) => Unit): (String => Unit) = log("Reindex status", _: String)
       def logInfo  = liftLog(RelationalUtils.Logger.logInfo)
       def logDebug = liftLog(RelationalUtils.Logger.logDebug)
       status match {
-        case Status.Stopped                         ⇒ logInfo("Stopped" )
-        case Status.Starting(providers)             ⇒ logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
-        case Status.Stopping                        ⇒ logInfo("Stopping")
-        case Status.Indexing(provider, providerCount, maybeDocumentCount) ⇒
+        case Status.Stopped                         => logInfo("Stopped" )
+        case Status.Starting(providers)             => logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
+        case Status.Stopping                        => logInfo("Stopping")
+        case Status.Indexing(provider, providerCount, maybeDocumentCount) =>
           def providerInfo = s"$provider ${providerCount.current}/${providerCount.total}"
           maybeDocumentCount match {
-            case None                        ⇒ logInfo (s"Indexing $providerInfo")
-            case Some(dc) if dc.current == 0 ⇒ logInfo (s"Indexing $providerInfo, ${dc.total} documents")
-            case Some(dc) if dc.current != 0 ⇒ logDebug(s"Indexing $providerInfo, document ${dc.current}/${dc.total}")
+            case None                        => logInfo (s"Indexing $providerInfo")
+            case Some(dc) if dc.current == 0 => logInfo (s"Indexing $providerInfo, ${dc.total} documents")
+            case Some(dc) if dc.current != 0 => logDebug(s"Indexing $providerInfo, document ${dc.current}/${dc.total}")
           }
       }
     }

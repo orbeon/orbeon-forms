@@ -48,9 +48,9 @@ object UploaderClient {
     currentAbortControllerOpt = None
 
     NonEmptyList.fromList(remainingEvents) match {
-      case Some(nel) ⇒
+      case Some(nel) =>
         asyncUploadRequest(nel)
-      case None ⇒
+      case None =>
         executionQueuePromiseOpt.foreach (_.success(()))
         executionQueuePromiseOpt = None
     }
@@ -63,7 +63,7 @@ object UploaderClient {
   def askForProgressUpdate(): Unit =
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(Properties.delayBeforeUploadProgressRefresh.get()) {
-      currentEventOpt foreach { processingEvent ⇒
+      currentEventOpt foreach { processingEvent =>
         AjaxEvent.dispatchEvent(
           AjaxEvent(
             eventName    = EventNames.XXFormsUploadProgress,
@@ -84,7 +84,7 @@ object UploaderClient {
     if (doAbort)
       currentAbortControllerOpt foreach (_.abort())
 
-    currentEventOpt foreach { processingEvent ⇒
+    currentEventOpt foreach { processingEvent =>
       AjaxEvent.dispatchEvent(
           AjaxEvent(
             eventName = eventName,
@@ -124,7 +124,7 @@ object UploaderClient {
       // event is queued and the time it is processed, the event is gone from the DOM (repeat iteration removed, wizard
       // page toggled?). But we don't have a formal proof it can happen.
 
-      extractFormData(currentEvent.form, currentEvent.upload) foreach { formData ⇒
+      extractFormData(currentEvent.form, currentEvent.upload) foreach { formData =>
 
         val requestFormId = currentEvent.form.id
 
@@ -158,17 +158,17 @@ object UploaderClient {
         askForProgressUpdate()
 
         responseF.onComplete {
-          case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" ⇒
+          case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
               // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
               currentEvent.upload.clear()
               // The Ajax response typically contains information about each file (name, size, etc)
               AjaxClient.handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = true, ignoreErrors = false)
               // Are we done, or do we still need to handle events for other forms?
               continueWithRemainingEvents()
-          case Success((_, responseText, responseXmlOpt)) ⇒
+          case Success((_, responseText, responseXmlOpt)) =>
             cancel(doAbort = false, EventNames.XXFormsUploadError)
             AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
-          case Failure(_) ⇒
+          case Failure(_) =>
             // NOTE: can be an `AbortError` (to verify)
             cancel(doAbort = false, EventNames.XXFormsUploadError)
             AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
@@ -195,16 +195,16 @@ object UploaderClient {
 
       val it =
         form.elements.iterator collect[(String, js.Any)] {
-          case UuidExtractor(name, value) ⇒ name → value
-          case FileExtractor(name, value) ⇒ name → value(0) // for now take the first file only
+          case UuidExtractor(name, value) => name -> value
+          case FileExtractor(name, value) => name -> value(0) // for now take the first file only
         }
 
       it.to(List) match {
-        case l @ List(_, _) ⇒ // exactly two items
+        case l @ List(_, _) => // exactly two items
           val d = new dom.FormData
-          l foreach { case (name, value) ⇒ d.append(name, value) }
+          l foreach { case (name, value) => d.append(name, value) }
           d.some
-        case _ ⇒
+        case _ =>
           None
       }
     }

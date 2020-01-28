@@ -54,8 +54,8 @@ class LocationSAXWriter extends SAXWriter {
 
     _currentLocationData =
       element.getData match {
-        case locationData: LocationData ⇒ locationData
-        case _ ⇒ null
+        case locationData: LocationData => locationData
+        case _ => null
       }
 
     super.startElement(element)

@@ -31,13 +31,13 @@ object Upload {
 
   scribe.debug("init object")
 
-  Page.registerControlConstructor(() ⇒ new Upload, (e: html.Element) ⇒ $(e).hasClass("xforms-upload"))
+  Page.registerControlConstructor(() => new Upload, (e: html.Element) => $(e).hasClass("xforms-upload"))
 }
 
 // Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 class Upload {
 
-  self ⇒
+  self =>
 
   import Upload._
 
@@ -71,7 +71,7 @@ class Upload {
   // background  as soon as possible (pseudo-Ajax request).
   @JSExport
   def change(): Unit = {
-    scribe.debug("change → queueing")
+    scribe.debug("change -> queueing")
     UploaderClient.uploadEventQueue.add(
       UploadEvent(getAncestorForm, self),
       Properties.delayBeforeIncrementalRequest.get().millis,
@@ -86,13 +86,13 @@ class Upload {
   @JSExport
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
-      case "interrupted"                     ⇒
+      case "interrupted"                     =>
         UploaderClient.cancel(doAbort = true, XXFormsUploadError)
         scribe.debug("cancel")
-      case _ if self._yuiProgressBar ne null ⇒
+      case _ if self._yuiProgressBar ne null =>
         self._yuiProgressBar.set("value", 10 + 110 * received / expected)
         scribe.debug(s"update progress ${100 * received / expected}")
-      case _ ⇒
+      case _ =>
     }
 
   // Called by UploadServer when the upload for this control is finished.
@@ -100,7 +100,7 @@ class Upload {
 
     scribe.debug("done")
 
-    lazy val ajaxResponseProcessed: js.Function = () ⇒ {
+    lazy val ajaxResponseProcessed: js.Function = () => {
       scribe.debug("removing listener for ajaxResponseProcessed")
       Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
       // If progress indicator is still shown, this means some XForms reset the file name
@@ -125,7 +125,7 @@ class Upload {
     require(States(state), throw new IllegalArgumentException(s"Invalid state: `$state`"))
 
     // Switch class
-    for (s ← States)
+    for (s <- States)
       $(_container).removeClass(StateClassPrefix + s)
 
     $(_container).addClass(StateClassPrefix + state)

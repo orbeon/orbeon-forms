@@ -41,11 +41,11 @@ class SecureUtilsTest extends ResourceManagerTestBase with AssertionsForJUnit {
     }
 
     // Try multiple data sizes
-    for (size ← sizes)
+    for (size <- sizes)
       asserts(size)
 
     // Try in parallel
-    for (size ← sizes.par)
+    for (size <- sizes.par)
       asserts(size)
   }
 
@@ -70,19 +70,19 @@ class SecureUtilsTest extends ResourceManagerTestBase with AssertionsForJUnit {
     }
 
     // Try multiple algorithms, encodings, and data sizes
-    for (algorithm ← algorithms; encoding ← encodings; size ← sizes)
+    for (algorithm <- algorithms; encoding <- encodings; size <- sizes)
       asserts(algorithm, encoding, size)
 
     // Try in parallel
-    for (algorithm ← algorithms.par; encoding ← encodings; size ← sizes)
+    for (algorithm <- algorithms.par; encoding <- encodings; size <- sizes)
       asserts(algorithm, encoding, size)
 
     // Check that for a given algorithm/encoding, the digest has the same size for any size of input data
     def assertSameSize(algorithm: String, encoding: String) =
       sizes map randomBytes map (SecureUtils.digestBytes(_, algorithm, encoding)) map (_.size) sliding 2 foreach
-        { case Seq(s1, s2) ⇒ assert(s1 === s2) }
+        { case Seq(s1, s2) => assert(s1 === s2) }
 
-    for (algorithm ← algorithms; encoding ← encodings)
+    for (algorithm <- algorithms; encoding <- encodings)
       assertSameSize(algorithm, encoding)
   }
 

@@ -83,14 +83,14 @@ object Cell {
     val xy = Array.fill[Cell[Underlying]](xyGridHeight, xyGridWidth)(null)
 
     // Mark cells
-    rows.iterator.zipWithIndex foreach { case (tr, iy) ⇒
+    rows.iterator.zipWithIndex foreach { case (tr, iy) =>
 
       var ix = 0
 
-      ops.children(tr, TdTestName) foreach { td ⇒
+      ops.children(tr, TdTestName) foreach { td =>
 
         findStart(xy(iy), ix) match {
-          case Some(start) ⇒
+          case Some(start) =>
 
             val w = getNormalizedSizeAtt(td, "colspan")
             val h = getNormalizedSizeAtt(td, "rowspan")
@@ -98,8 +98,8 @@ object Cell {
             val newCell = Cell(Some(td), None, start + 1, iy + 1, h, w)
 
             for {
-              iy1 ← iy until ((iy + h) min xyGridHeight)
-              ix1 ← start until ((start + w) min xyGridWidth)
+              iy1 <- iy until ((iy + h) min xyGridHeight)
+              ix1 <- start until ((start + w) min xyGridWidth)
               isOriginCell = ix1 == start && iy1 == iy
             } locally {
               xy(iy1)(ix1) =
@@ -111,7 +111,7 @@ object Cell {
 
             ix = start + w
 
-            case None ⇒
+            case None =>
               ix = xyGridWidth // break
         }
       }
@@ -125,7 +125,7 @@ object Cell {
 
       // NOTE: Checking the first row should be enough if the grid is well-formed.
       val actualGridWidth = {
-        val widths = xy.iterator map (_.iterator filter (c ⇒ (c ne null) && ! c.missing) map (_.w) sum)
+        val widths = xy.iterator map (_.iterator filter (c => (c ne null) && ! c.missing) map (_.w) sum)
         if (widths.nonEmpty) widths.max else 0
       }
 
@@ -139,7 +139,7 @@ object Cell {
 
     // In most cases, there won't be holes as `<xh:tr>`/`<xh:td>` grids are supposed to be fully populated.
     fillHoles(xy, widthToTruncate)
-    widthToTruncate → xyToList(xy, widthToTruncate)
+    widthToTruncate -> xyToList(xy, widthToTruncate)
   }
 
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
@@ -151,12 +151,12 @@ object Cell {
     val cs  = ops.children(grid, CellTestName)
 
     // TODO: can it be 0?
-    val gridHeight = if (cs.nonEmpty) cs map (c ⇒ ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
+    val gridHeight = if (cs.nonEmpty) cs map (c => ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
 
     val xy = Array.fill[Cell[Underlying]](gridHeight, StandardGridWidth)(null)
 
     // Mark cells
-    cs foreach { c ⇒
+    cs foreach { c =>
 
       val x = ops.x(c).getOrElse(1)
       val y = ops.y(c).getOrElse(1)
@@ -166,8 +166,8 @@ object Cell {
       val newCell = Cell(Some(c), None, x, y, h, w)
 
       for {
-        iy ← (y - 1) until (y + h - 1)
-        ix ← (x - 1) until (x + w - 1)
+        iy <- (y - 1) until (y + h - 1)
+        ix <- (x - 1) until (x + w - 1)
         isOriginCell = ix == x - 1 && iy == y - 1
       } locally {
         xy(iy)(ix) =
@@ -188,17 +188,17 @@ object Cell {
 
   def originCells[Underlying](gridModel: GridModel[Underlying]): List[Cell[Underlying]] =
     gridModel.cells.iterator.flatten collect {
-      case c @ Cell(Some(_), None, _, _, _, _) ⇒ c
+      case c @ Cell(Some(_), None, _, _, _, _) => c
     } toList
 
   def findOriginCell[Underlying](gridModel: GridModel[Underlying], u: Underlying): Option[Cell[Underlying]] =
     gridModel.cells.iterator.flatten collectFirst {
-      case c @ Cell(Some(`u`), None, _, _, _, _) ⇒ c
+      case c @ Cell(Some(`u`), None, _, _, _, _) => c
     }
 
   def selfCellOrOrigin[Underlying](cell: Cell[Underlying]): Cell[Underlying] = cell match {
-    case c @ Cell(_, None, _, _, _, _)     ⇒ c
-    case Cell(_, Some(origin), _, _, _, _) ⇒ origin
+    case c @ Cell(_, None, _, _, _, _)     => c
+    case Cell(_, Some(origin), _, _, _, _) => origin
   }
 
   // Finds the neighbors on the given side of the given cell
@@ -208,10 +208,10 @@ object Cell {
     gridModel  : GridModel[Underlying]
   ): List[Cell[Underlying]] = {
     val (neighborX, neighborY) = side match {
-      case Direction.Left  ⇒ (originCell.x - 1           , originCell.y               )
-      case Direction.Right ⇒ (originCell.x + originCell.w, originCell.y               )
-      case Direction.Down  ⇒ (originCell.x               , originCell.y + originCell.h)
-      case Direction.Up    ⇒ (originCell.x               , originCell.y - 1           )
+      case Direction.Left  => (originCell.x - 1           , originCell.y               )
+      case Direction.Right => (originCell.x + originCell.w, originCell.y               )
+      case Direction.Down  => (originCell.x               , originCell.y + originCell.h)
+      case Direction.Up    => (originCell.x               , originCell.y - 1           )
     }
     val isCoordinateValid =
       neighborX >= 1 &&
@@ -220,10 +220,10 @@ object Cell {
       neighborY <= gridModel.cells.length
     isCoordinateValid.flatList {
       val (xs, ys) = side match {
-        case Direction.Left | Direction.Right ⇒ List(neighborX) → (originCell.y until originCell.y + originCell.h).toList
-        case Direction.Up   | Direction.Down  ⇒ (originCell.x until originCell.x + originCell.w).toList → List(neighborY)
+        case Direction.Left | Direction.Right => List(neighborX) -> (originCell.y until originCell.y + originCell.h).toList
+        case Direction.Up   | Direction.Down  => (originCell.x until originCell.x + originCell.w).toList -> List(neighborY)
       }
-      val neighborCells = xs.flatMap(x ⇒ ys.map(y ⇒ gridModel.cells(y - 1)(x - 1)))
+      val neighborCells = xs.flatMap(x => ys.map(y => gridModel.cells(y - 1)(x - 1)))
       neighborCells.map(selfCellOrOrigin).distinct
     }
   }
@@ -234,8 +234,8 @@ object Cell {
     direction: Direction
   ): List[Cell[Underlying]] = {
     def overflowsOriginCell(c: Cell[Underlying]) = direction match {
-      case Direction.Left | Direction.Right ⇒ c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
-      case Direction.Up   | Direction.Down  ⇒ c.x < originCell.x || c.x + c.w > originCell.x + originCell.w
+      case Direction.Left | Direction.Right => c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
+      case Direction.Up   | Direction.Down  => c.x < originCell.x || c.x + c.w > originCell.x + originCell.w
     }
     val neighborCells       = findOriginNeighbors(originCell, direction, cells)
     val originNeighborCells = neighborCells.map(selfCellOrOrigin).distinct
@@ -248,11 +248,11 @@ object Cell {
     neighbors : List[Cell[Underlying]]
   ): Option[Cell[Underlying]] = {
     neighbors match {
-      case Nil ⇒ None
-      case _   ⇒ Some(neighbors.minBy { neighbor ⇒
+      case Nil => None
+      case _   => Some(neighbors.minBy { neighbor =>
         Orientation.fromDirection(side) match {
-          case Orientation.Horizontal ⇒ neighbor.w
-          case Orientation.Vertical ⇒ neighbor.h
+          case Orientation.Horizontal => neighbor.w
+          case Orientation.Vertical => neighbor.h
         }
       })
     }
@@ -265,26 +265,26 @@ object Cell {
   ): List[(Direction, WallPosition)] = {
 
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
-    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
-      Direction.values.flatMap { direction ⇒
+    findOriginCell(cells, cellElem).toList.flatMap { originCell =>
+      Direction.values.flatMap { direction =>
         val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
         val smallestNeighborOpt = findSmallestNeighbor(direction, neighbors)
-        val directionWallPosition = smallestNeighborOpt.flatMap { smallestNeighbor ⇒
+        val directionWallPosition = smallestNeighborOpt.flatMap { smallestNeighbor =>
           val directionOK =
             Orientation.fromDirection(direction) match {
-              case Orientation.Horizontal ⇒ originCell.w > 1 || smallestNeighbor.w > 1
-              case Orientation.Vertical   ⇒ originCell.h > 1 || smallestNeighbor.h > 1
+              case Orientation.Horizontal => originCell.w > 1 || smallestNeighbor.w > 1
+              case Orientation.Vertical   => originCell.h > 1 || smallestNeighbor.h > 1
             }
           directionOK.option({
             val wallMiddle =
               Orientation.fromDirection(direction) match {
-                case Orientation.Horizontal ⇒ originCell.h == smallestNeighbor.h
-                case Orientation.Vertical   ⇒ originCell.w == smallestNeighbor.w
+                case Orientation.Horizontal => originCell.h == smallestNeighbor.h
+                case Orientation.Vertical   => originCell.w == smallestNeighbor.w
               }
             if (wallMiddle) WallPosition.Middle else WallPosition.Side
           })
         }
-        directionWallPosition.map(direction → _)
+        directionWallPosition.map(direction -> _)
       }
     }
   }
@@ -294,9 +294,9 @@ object Cell {
     implicit cellOps : CellOps[Underlying]
   ): List[Direction] = {
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
-    findOriginCell(cells, cellElem).toList.flatMap { originCell ⇒
+    findOriginCell(cells, cellElem).toList.flatMap { originCell =>
       val merge =
-        List(Direction.Right, Direction.Down) flatMap { direction ⇒
+        List(Direction.Right, Direction.Down) flatMap { direction =>
           val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
           val canExpand = neighbors.lengthCompare(1) == 0 && neighbors.head.u.exists(! cellOps.hasChildElement(_))
           canExpand.list(direction)
@@ -315,19 +315,19 @@ object Cell {
     implicit cellOps : CellOps[Underlying]
   ): Option[PossibleDropTargets] = {
     val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
-    findOriginCell(cells, cellElem).map { originCell ⇒
+    findOriginCell(cells, cellElem).map { originCell =>
 
       def insideCellPositions(cell: Cell[Underlying]): List[Int] =
         Orientation.fromDirection(startSide) match {
-          case Orientation.Horizontal ⇒ (cell.x until cell.x + cell.w - 1).toList
-          case Orientation.Vertical   ⇒ (cell.y until cell.y + cell.h - 1).toList
+          case Orientation.Horizontal => (cell.x until cell.x + cell.w - 1).toList
+          case Orientation.Vertical   => (cell.y until cell.y + cell.h - 1).toList
         }
 
       val statusQuoPosition   = startSide match {
-        case Direction.Left  ⇒ originCell.x - 1
-        case Direction.Right ⇒ originCell.x + originCell.w - 1
-        case Direction.Up    ⇒ originCell.y - 1
-        case Direction.Down  ⇒ originCell.y + originCell.h - 1
+        case Direction.Left  => originCell.x - 1
+        case Direction.Right => originCell.x + originCell.w - 1
+        case Direction.Up    => originCell.y - 1
+        case Direction.Down  => originCell.y + originCell.h - 1
       }
 
       val neighbors = findOriginNeighbors(originCell, startSide, cells)
@@ -347,13 +347,13 @@ object Cell {
     orientation : Orientation
   ): List[Boolean] = {
     val all = gridModel.cells.flatten
-    val withoutFirstRowColumn = all.filter(c ⇒ c.x != 1 && c.y != 1)
-    val indexGaps = withoutFirstRowColumn.map(c ⇒ orientation match {
-      case Orientation.Horizontal ⇒ c.y → ! c.missing
-      case Orientation.Vertical   ⇒ c.x → ! c.missing
+    val withoutFirstRowColumn = all.filter(c => c.x != 1 && c.y != 1)
+    val indexGaps = withoutFirstRowColumn.map(c => orientation match {
+      case Orientation.Horizontal => c.y -> ! c.missing
+      case Orientation.Vertical   => c.x -> ! c.missing
     }).groupBy(_._1)
-    indexGaps.map { case (index, hasGap) ⇒
-      index → hasGap.exists(_._2)
+    indexGaps.map { case (index, hasGap) =>
+      index -> hasGap.exists(_._2)
     }.toList.sortBy(_._1).map(_._2)
   }
 
@@ -361,7 +361,7 @@ object Cell {
 
     // Try to get a positive attribute value, returning 1 if that fails for any reason
     def getNormalizedSizeAtt[Underlying : CellOps](u: Underlying, attName: String): Int =
-      implicitly[CellOps[Underlying]].attValueOpt(u, attName) flatMap (s ⇒ Try(s.toInt).toOption) filter (_ > 0) getOrElse 1
+      implicitly[CellOps[Underlying]].attValueOpt(u, attName) flatMap (s => Try(s.toInt).toOption) filter (_ > 0) getOrElse 1
 
     def findStart[Underlying <: AnyRef](row: Seq[Underlying], from: Int): Option[Int] = {
       val index = row.indexWhere(_ eq null, from)
@@ -379,25 +379,25 @@ object Cell {
      // Fill holes with cells that can span columns (but not rows, to make things simpler)
     def fillHoles[Underlying](xy: Array[Array[Cell[Underlying]]], width: Int): Unit =
       for {
-        (rowFullLength, iy) ← xy.zipWithIndex
+        (rowFullLength, iy) <- xy.zipWithIndex
         row = rowFullLength take width
       } locally {
 
         def findRun(from: Int): Option[(Int, Int)] = {
-          findStart(row, from) map { x ⇒
-            x → (findEnd(row, x + 1) map (_ - 1) getOrElse (width - 1))
+          findStart(row, from) map { x =>
+            x -> (findEnd(row, x + 1) map (_ - 1) getOrElse (width - 1))
           }
         }
 
         var ix = 0
         while (ix < width) {
           findRun(ix) match {
-            case Some((start, endInclusive)) ⇒
+            case Some((start, endInclusive)) =>
 
               val newCell = Cell[Underlying](None, None, start + 1, iy + 1, 1, endInclusive - start + 1)
 
               for {
-                ix1 ← start to endInclusive
+                ix1 <- start to endInclusive
                 isOriginCell = ix1 == start
               } locally {
                 xy(iy)(ix1) =
@@ -408,7 +408,7 @@ object Cell {
               }
 
               ix = endInclusive + 1
-            case None ⇒
+            case None =>
               ix = width // break
           }
         }
@@ -424,13 +424,13 @@ object Cell {
         val Divisors = List(12, 6, 4, 3, 2)
 
         def gcd2(v1: Int, v2: Int): Int =
-          Divisors find (d ⇒ v1 % d == 0 && v2 % d == 0) getOrElse 1
+          Divisors find (d => v1 % d == 0 && v2 % d == 0) getOrElse 1
 
         val distinctValues =
           xy.iterator   flatMap
           (_.iterator)  filter
           (! _.missing) flatMap
-          (c ⇒ Iterator(c.x - 1, c.w)) toSet
+          (c => Iterator(c.x - 1, c.w)) toSet
 
         if (distinctValues.size == 1)
           distinctValues.head
@@ -439,7 +439,7 @@ object Cell {
       }
 
       if (gcd > 1)
-        GridModel(xy map (_ grouped gcd map (x ⇒ x.head) map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList)
+        GridModel(xy map (_ grouped gcd map (x => x.head) map (c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList)
       else
         xyToList(xy, StandardGridWidth)
     }
@@ -456,18 +456,18 @@ object Cell {
       val existingKeys   = existingMapping.keySet
       val existingValues = existingMapping.values.toSet
 
-      val distinctUs  = (gridModel.cells.flatten collect { case Cell(Some(u), None, _, _, _, _) ⇒ u } distinct) filterNot existingKeys
+      val distinctUs  = (gridModel.cells.flatten collect { case Cell(Some(u), None, _, _, _, _) => u } distinct) filterNot existingKeys
       val lettersIt   = Iterator.tabulate(26)('A'.toInt + _ toChar)                          filterNot existingValues
 
       existingMapping ++ (distinctUs.iterator zip lettersIt)
     }
 
     val charGrid =
-      gridModel.cells map { row ⇒
+      gridModel.cells map { row =>
         row map {
-          case Cell(Some(u), None,    _, _, _, _) ⇒ usToLetters(u)
-          case Cell(Some(u), Some(_), _, _, _, _) ⇒ usToLetters(u).toLower
-          case Cell(None,    _,       _, _, _, _) ⇒ ' '
+          case Cell(Some(u), None,    _, _, _, _) => usToLetters(u)
+          case Cell(Some(u), Some(_), _, _, _, _) => usToLetters(u).toLower
+          case Cell(None,    _,       _, _, _, _) => ' '
         }
       }
 

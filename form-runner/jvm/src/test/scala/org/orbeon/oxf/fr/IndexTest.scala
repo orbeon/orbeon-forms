@@ -357,8 +357,8 @@ class IndexTest
       )
 
     for {
-      (srcVersion, elem)     ← List(DataFormatVersion.V480 → formElem48, DataFormatVersion.V20191 → formElem20191)
-      (dstVersion, expected) ← List(DataFormatVersion.V400 → expected40, DataFormatVersion.V480 → expected48, DataFormatVersion.V20191 → expected20191)
+      (srcVersion, elem)     <- List(DataFormatVersion.V480 -> formElem48, DataFormatVersion.V20191 -> formElem20191)
+      (dstVersion, expected) <- List(DataFormatVersion.V400 -> expected40, DataFormatVersion.V480 -> expected48, DataFormatVersion.V20191 -> expected20191)
       if ! MigrationSupport.isMigrateUp(srcVersion, dstVersion)
     } locally {
       it(s"must find the expected indexed controls for source ${srcVersion.entryName} and destination ${dstVersion.entryName}") {

@@ -75,16 +75,16 @@ class XXFormsAttributeControl(
     // Rewrite URI attribute if needed
     val externalValue = getExternalValue()
     attributeName match {
-      case "src" ⇒
+      case "src" =>
         resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
-      case "href" if ! externalValue.startsWith("#") ⇒
+      case "href" if ! externalValue.startsWith("#") =>
         // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
         attributeControl.urlType match {
-          case "action"   ⇒ resolveActionURL  (containingDocument, element, externalValue)
-          case "resource" ⇒ resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
-          case _          ⇒ resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
+          case "action"   => resolveActionURL  (containingDocument, element, externalValue)
+          case "resource" => resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          case _          => resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
         }
-      case _ ⇒ externalValue
+      case _ => externalValue
     }
 
   }
@@ -99,12 +99,12 @@ class XXFormsAttributeControl(
 
   override def getNonRelevantEscapedExternalValue =
     attributeName match {
-      case "src" if forName == "img" ⇒
+      case "src" if forName == "img" =>
         // Return rewritten URL of dummy image URL
         resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, REWRITE_MODE_ABSOLUTE_PATH)
-      case "src" if forName == "script" ⇒
+      case "src" if forName == "script" =>
         DUMMY_SCRIPT_URI
-      case _ ⇒
+      case _ =>
         super.getNonRelevantEscapedExternalValue
     }
 
@@ -112,7 +112,7 @@ class XXFormsAttributeControl(
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
   ) = {
 
@@ -163,7 +163,7 @@ class XXFormsAttributeControl(
       val isNewlyVisibleSubtree = previousControl.isEmpty
 
       // The classes are stored as the control's value
-      val classes1 = previousControl flatMap (control ⇒ Option(control.getEscapedExternalValue)) getOrElse ""
+      val classes1 = previousControl flatMap (control => Option(control.getEscapedExternalValue)) getOrElse ""
       val classes2 = Option(attributeControl2.getEscapedExternalValue) getOrElse ""
 
       if (isNewlyVisibleSubtree || classes1 != classes2) {
@@ -191,9 +191,9 @@ object XXFormsAttributeControl {
   private def getExternalValueHandleSrc(controlValue: String, attributeName: String, forName: String): String =
     if (StringUtils.isBlank(controlValue)) {
       attributeName match {
-        case "src" if forName == "img"    ⇒ DUMMY_IMAGE_URI
-        case "src" if forName == "script" ⇒ DUMMY_SCRIPT_URI // IE8 ignores it; IE9+ loads JS properly
-        case _                            ⇒ ""
+        case "src" if forName == "img"    => DUMMY_IMAGE_URI
+        case "src" if forName == "script" => DUMMY_SCRIPT_URI // IE8 ignores it; IE9+ loads JS properly
+        case _                            => ""
       }
     } else {
       controlValue

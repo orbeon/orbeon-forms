@@ -34,16 +34,16 @@ object Mediatypes {
     }
 
     (
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) ⇒ mediatype   → m }).toMap,
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         ⇒ m.extension → m }).toMap
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) => mediatype   -> m }).toMap,
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         => m.extension -> m }).toMap
     )
   }
 
   def findMediatypeForPath(path: String): Option[String] =
     for {
-      extension ← findExtension(path.toLowerCase)
-      mappings  ← mappingsByExtension.get(extension)
-      mapping   ← mappings.headOption
+      extension <- findExtension(path.toLowerCase)
+      mappings  <- mappingsByExtension.get(extension)
+      mapping   <- mappings.headOption
     } yield
       mapping.mediatype
 
@@ -52,8 +52,8 @@ object Mediatypes {
 
   def findExtensionForMediatype(mediatype: String): Option[String] =
     for {
-      mappings  ← mappingsByMediatype.get(mediatype)
-      mapping   ← mappings.headOption
+      mappings  <- mappingsByMediatype.get(mediatype)
+      mapping   <- mappings.headOption
     } yield
       mapping.extension
 
@@ -77,9 +77,9 @@ object Mediatypes {
 
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
         localname match {
-          case NameElement    ⇒ state = NameState
-          case PatternElement ⇒ state = PatternState
-          case _              ⇒ state = DefaultState
+          case NameElement    => state = NameState
+          case PatternElement => state = PatternState
+          case _              => state = DefaultState
         }
 
       override def characters(chars: Array[Char], start: Int, length: Int): Unit =
@@ -88,10 +88,10 @@ object Mediatypes {
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
         localname match {
-          case NameElement     ⇒ name = builder.toString.trimAllToEmpty
-          case PatternElement  ⇒ buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
-          case MimeTypeElement ⇒ name = null
-          case _               ⇒
+          case NameElement     => name = builder.toString.trimAllToEmpty
+          case PatternElement  => buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
+          case MimeTypeElement => name = null
+          case _               =>
         }
         builder.setLength(0)
       }

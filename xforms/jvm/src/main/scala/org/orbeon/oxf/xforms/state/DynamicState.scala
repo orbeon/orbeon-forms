@@ -64,7 +64,7 @@ case class DynamicState(
   def decodeInstancesJava          = decodeInstances.asJava
   def decodeControlsJava           = decodeControls.asJava
 
-  def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
+  def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
 
   // Encode to a string representation
   def encodeToString(compress: Boolean, isForceEncryption: Boolean): String =
@@ -85,19 +85,19 @@ case class DynamicState(
     rootElement.addAttribute("sequence", sequence.toString)
 
     // Add request information
-    deploymentType foreach { value ⇒
+    deploymentType foreach { value =>
       rootElement.addAttribute("deployment-type", value)
     }
-    requestContextPath foreach { value ⇒
+    requestContextPath foreach { value =>
       rootElement.addAttribute("request-context-path", value)
     }
-    requestPath foreach { value ⇒
+    requestPath foreach { value =>
       rootElement.addAttribute("request-path", value)
     }
-    containerType foreach { value ⇒
+    containerType foreach { value =>
       rootElement.addAttribute("container-type", value)
     }
-    deploymentType foreach { value ⇒
+    deploymentType foreach { value =>
       rootElement.addAttribute("container-namespace", value)
     }
 
@@ -123,15 +123,15 @@ case class DynamicState(
           if (instanceState.readonly) att("readonly", "true")
 
           instanceState.cachingOrContent match {
-            case Left(caching)  ⇒ caching.writeAttributes(att)
-            case Right(content) ⇒ instanceElement.addText(content)
+            case Left(caching)  => caching.writeAttributes(att)
+            case Right(content) => instanceElement.addText(content)
 
           }
 
           instanceElement
         }
 
-        instanceStates foreach (instanceState ⇒ instancesElement.add(instanceToXML(instanceState)))
+        instanceStates foreach (instanceState => instancesElement.add(instanceToXML(instanceState)))
       }
     }
 
@@ -141,12 +141,12 @@ case class DynamicState(
       if (controls.nonEmpty) {
         val controlsElement = rootElement.addElement("controls")
         controls foreach {
-          case ControlState(effectiveId, visited, keyValues) ⇒
+          case ControlState(effectiveId, visited, keyValues) =>
             val controlElement = controlsElement.addElement("control")
             controlElement.addAttribute("effective-id", effectiveId)
             if (visited)
               controlElement.addAttribute("visited", "true")
-            for ((k, v) ← keyValues)
+            for ((k, v) <- keyValues)
               controlElement.addAttribute(k, v)
         }
       }
@@ -154,7 +154,7 @@ case class DynamicState(
 
     // Template and Ajax response
     List(("response", decodeLastAjaxResponse)) collect {
-      case (elementName, Some(saxStore)) ⇒
+      case (elementName, Some(saxStore)) =>
         val templateElement = rootElement.addElement(elementName)
         val document = TransformerUtils.saxStoreToDom4jDocument(saxStore)
         templateElement.add(document.getRootElement.detach())
@@ -226,9 +226,9 @@ object DynamicState {
   def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {
 
     val startContainerOpt = startOpt match {
-      case Some(componentControl: XFormsComponentControl) ⇒ componentControl.nestedContainerOpt
-      case Some(other)                                    ⇒ Some(other.container)
-      case None                                           ⇒ Some(document)
+      case Some(componentControl: XFormsComponentControl) => componentControl.nestedContainerOpt
+      case Some(other)                                    => Some(other.container)
+      case None                                           => Some(document)
     }
 
     // Serialize relevant controls that have data
@@ -239,10 +239,10 @@ object DynamicState {
     // - VisitableTrait controls serialize state if `visited == true`
     def controlsToSerialize =
       for {
-        start        ← startOpt.toList
-        control      ← ControlsIterator(start, includeSelf = false)
+        start        <- startOpt.toList
+        control      <- ControlsIterator(start, includeSelf = false)
         if control.isRelevant
-        controlState ← control.controlState
+        controlState <- control.controlState
       } yield
         controlState
 

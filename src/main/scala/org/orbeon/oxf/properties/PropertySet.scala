@@ -14,7 +14,7 @@
 package org.orbeon.oxf.properties
 
 import java.net.URI
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName}
@@ -33,7 +33,7 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
 
   private var _associatedValue: Option[Any] = None
 
-  def associatedValue[U](evaluate: Property ⇒ U): U = {
+  def associatedValue[U](evaluate: Property => U): U = {
     if (_associatedValue.isEmpty)
       _associatedValue = Option(evaluate(this))
     _associatedValue.get.asInstanceOf[U]
@@ -74,11 +74,11 @@ class PropertySet {
     val property = Property(typ, value, Dom4jUtils.getNamespaceContext(element).asScala.toMap)
 
     // Store exact property name anyway
-    exactProperties += name → property
+    exactProperties += name -> property
 
     // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
     var currentNode = wildcardProperties
-    for (currentToken ← name.splitTo[List](".")) {
+    for (currentToken <- name.splitTo[List](".")) {
       currentNode = currentNode.children.getOrElse(currentToken, {
         val newPropertyNode = new PropertyNode
         currentNode.children += currentToken -> newPropertyNode
@@ -102,7 +102,7 @@ class PropertySet {
         .replaceAllLiterally("\n", "\\n")
 
     val jsonProperties =
-      for ((name, prop) ← exactProperties.to(List).sortBy(_._1))
+      for ((name, prop) <- exactProperties.to(List).sortBy(_._1))
         yield
           s"""|  "$name": {
               |    "type": "${escapeJavaScript(prop.typ.toString)}",
@@ -116,11 +116,11 @@ class PropertySet {
   def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {
-        key          ← exactProperties.keys
-        value        ← getObjectOpt(key)
-        booleanValue ← CollectionUtils.collectByErasedType[java.lang.Boolean](value)
+        key          <- exactProperties.keys
+        value        <- getObjectOpt(key)
+        booleanValue <- CollectionUtils.collectByErasedType[java.lang.Boolean](value)
       } yield
-        key → booleanValue
+        key -> booleanValue
 
     tuples.toMap.asJava
   }
@@ -135,25 +135,25 @@ class PropertySet {
       def appendToConsumed(s: String) = if (consumed.isEmpty) s else consumed + "." + s
 
       tokens.lift(currentTokenPosition) match {
-        case x @ (Some("*") | None) ⇒
+        case x @ (Some("*") | None) =>
 
           if (propertyNode.children.isEmpty && x.isEmpty)
             result += consumed
           else if (propertyNode.children.nonEmpty) {
-            for ((key, value) ← propertyNode.children) {
+            for ((key, value) <- propertyNode.children) {
               val newConsumed = appendToConsumed(key)
               processNode(value, newConsumed, tokens, currentTokenPosition + 1)
             }
           }
 
-        case Some(token) ⇒
+        case Some(token) =>
           // Regular token
 
           // Find 1. property node with exact name 2. property node with *
           val newPropertyNodes = propertyNode.children.get(token) :: (matchWildcards list propertyNode.children.get("*"))
           for {
-            (newPropertyNodeOpt, index) ← newPropertyNodes.zipWithIndex
-            newPropertyNode             ← newPropertyNodeOpt
+            (newPropertyNodeOpt, index) <- newPropertyNodes.zipWithIndex
+            newPropertyNode             <- newPropertyNodeOpt
             actualToken                 = if (index == 0) token else "*"
             newConsumed                 = appendToConsumed(actualToken)
           } locally {
@@ -174,15 +174,15 @@ class PropertySet {
       tokens          : List[String]
     ): Option[Property] =
       propertyNodeOpt match {
-        case None               ⇒ None
-        case Some(propertyNode) ⇒
+        case None               => None
+        case Some(propertyNode) =>
           tokens match {
-            case Nil ⇒
+            case Nil =>
               propertyNode.property
-            case head :: tail ⇒
+            case head :: tail =>
               propertyNode.children match {
-                case c if c.isEmpty ⇒ None
-                case c              ⇒ wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get("*"), tail)
+                case c if c.isEmpty => None
+                case c              => wildcardSearch(c.get(head), tail) orElse wildcardSearch(c.get("*"), tail)
               }
           }
       }
@@ -224,19 +224,19 @@ class PropertySet {
 
   def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
     getObjectOpt(name) match {
-      case Some(p: String) ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
-      case Some(p: URI)    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
-      case None            ⇒ null
-      case _               ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
+      case Some(p: String) => if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
+      case Some(p: URI)    => if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
+      case None            => null
+      case _               => throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
     }
 
   def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false): Option[String] =
     getObjectOpt(name) flatMap {
-      case p: String if allowEmpty ⇒ Some(p.trimAllToEmpty)
-      case p: String               ⇒ p.trimAllToOpt
-      case p: URI    if allowEmpty ⇒ Some(p.toString.trimAllToEmpty)
-      case p: URI                  ⇒ p.toString.trimAllToOpt
-      case _                       ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
+      case p: String if allowEmpty => Some(p.trimAllToEmpty)
+      case p: String               => p.trimAllToOpt
+      case p: URI    if allowEmpty => Some(p.toString.trimAllToEmpty)
+      case p: URI                  => p.toString.trimAllToOpt
+      case _                       => throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.qualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.qualifiedName}`")
     }
 
   def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =

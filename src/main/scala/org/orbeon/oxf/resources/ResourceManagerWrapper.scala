@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.resources
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
 
@@ -36,18 +36,18 @@ object ResourceManagerWrapper {
   def init(props: ju.Map[String, AnyRef]): Unit = synchronized {
     _factory =
       props.get(FactoryProperty) match {
-        case factoryImpl: String ⇒
+        case factoryImpl: String =>
           try {
             val factoryClass = Class.forName(factoryImpl).asInstanceOf[Class[ResourceManagerFactory]]
             val constructor = factoryClass.getConstructor(classOf[ju.Map[_, _]])
             constructor.newInstance(props)
           } catch {
-            case e: ClassNotFoundException ⇒
+            case e: ClassNotFoundException =>
               throw new OXFException(s"Class `$factoryImpl` not found", e)
-            case e: Exception ⇒
+            case e: Exception =>
               throw new OXFException(s"Can't instantiate factory `$factoryImpl`", e)
           }
-        case _ ⇒
+        case _ =>
           throw new OXFException("Declaration of resource factory missing: no value declared for property '" + FactoryProperty + "'")
       }
   }
@@ -69,7 +69,7 @@ object ResourceManagerWrapper {
         0
 
     props.to(List).sortBy(_._1).collect{
-      case (key, value: String) ⇒ s""" "$key":${" " * (maxKeyLength + 1 - key.length)}"$value" """.trim
+      case (key, value: String) => s""" "$key":${" " * (maxKeyLength + 1 - key.length)}"$value" """.trim
     }.mkString("{\n  ", ",\n  ", "\n}")
   }
 }

@@ -49,14 +49,14 @@ trait ServletPortlet {
     _processorService = Some(createProcessorService)
 
     // Run listener if needed
-    processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
+    processor foreach { case (processorPrefix, inputPrefix) => runInitDestroyListenerProcessor(_, _) }
     ProcessorService.Logger.info(logPrefix + " initialized.")
   }
 
   // Destroy the servlet or portlet
   def destroy(processor: Option[(String, String)]): Unit = {
     // Run listener if needed
-    processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
+    processor foreach { case (processorPrefix, inputPrefix) => runInitDestroyListenerProcessor(_, _) }
     ProcessorService.Logger.info(logPrefix + " destroyed.")
 
      // Clean-up
@@ -66,7 +66,7 @@ trait ServletPortlet {
 
   private def runInitDestroyListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
     // Create and run processor if definition is found
-    searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
+    searchDefinition(processorPrefix, inputPrefix) foreach  { definition =>
       ProcessorService.Logger.info(logPrefix + " - About to run processor: " +  definition.toString)
 
       val processor = createProcessor(definition)
@@ -77,17 +77,17 @@ trait ServletPortlet {
 
   private def createProcessorService =
     searchDefinition(MainProcessorPropertyPrefix, MainProcessorInputPropertyPrefix) match {
-      case Some(definition) ⇒
+      case Some(definition) =>
         // Create and initialize service
         new ProcessorService(definition, searchDefinition(ErrorProcessorPropertyPrefix, ErrorProcessorInputPropertyPrefix))
-      case _ ⇒
+      case _ =>
         throw new OXFException("Unable to find main processor definition")
     }
 
   // Search a processor definition in order from: servlet/portlet parameters, properties, context parameters
   private def searchDefinition(processorPrefix: String, inputPrefix: String) = {
 
-    val functions: Iterator[(String, String) ⇒ Option[ProcessorDefinition]] =
+    val functions: Iterator[(String, String) => Option[ProcessorDefinition]] =
       Iterator(
         getDefinitionFromMap(initParameters, _, _),
         getDefinitionFromProperties _,
@@ -100,10 +100,10 @@ trait ServletPortlet {
 
 object ServletPortlet {
   // Run the body and log/rethrow the root cause of any Exception caught
-  def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit logger: Logger): T =
+  def withRootException[T](action: String, newException: Throwable => Exception)(body: => T)(implicit logger: Logger): T =
     try body
     catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(t))
         throw newException(Exceptions.getRootThrowable(t))
     }

@@ -30,7 +30,7 @@ object columnFilterPart {
               .filter(_.filterWith.nonEmpty)
               // Add index, used to refer the appropriate tf table
               .zipWithIndex
-              .map{ case (_, i) ⇒
+              .map{ case (_, i) =>
                 s"""AND tf$i.data_id    =    c.data_id
                    |AND tf$i.control    =    ?
                    |AND ${Provider.textContains(request.provider, s"tf$i.val")}
@@ -39,7 +39,7 @@ object columnFilterPart {
           setters =
             request.columns
               // Just consider the columns for which we have a filter
-              .collect { case Column(path, Some(filter)) ⇒
+              .collect { case Column(path, Some(filter)) =>
                 List[Setter](
                   _.setString(_, path),
                   _.setString(_, s"%${filter.toLowerCase}%")

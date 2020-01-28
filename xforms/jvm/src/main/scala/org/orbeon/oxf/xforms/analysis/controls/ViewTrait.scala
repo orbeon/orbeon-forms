@@ -30,6 +30,6 @@ trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
 
   // In the view, in-scope model variables are always first in scope
   override protected def getRootVariables =
-    model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map.empty }
+    model match { case Some(model) => model.variablesMap; case None => Map.empty }
     // NOTE: we could maybe optimize this to avoid prepending model variables every time, in case the previous element is in the same model
 }

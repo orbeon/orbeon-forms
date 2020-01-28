@@ -27,8 +27,8 @@ class Bind extends XFormsFunction with DependsOnContextItem {
     val bindId = stringArgument(0)
 
     XFormsFunction.context.container.searchContainedModelsInScope(getSourceEffectiveId, bindId, Option(xpathContext.getContextItem)) match {
-      case Some(bind: RuntimeBind) ⇒ new ListIterator(bind.items)
-      case _                       ⇒ EmptyIterator.getInstance
+      case Some(bind: RuntimeBind) => new ListIterator(bind.items)
+      case _                       => EmptyIterator.getInstance
     }
   }
 }

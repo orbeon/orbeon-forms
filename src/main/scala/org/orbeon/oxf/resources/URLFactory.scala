@@ -37,12 +37,12 @@ object URLFactory {
     createURL(context.trimAllToOpt map createURL orNull, spec)
 
   def createURL(context: URL, spec: String): URL = protocol(context, spec) match {
-    case "http" | "https"       ⇒ new URL(context, spec, HTTP)
-    case OXFHandler.PROTOCOL    ⇒ new URL(context, removeQueryString(spec), OXF)
-    case SystemHandler.PROTOCOL ⇒ new URL(context, removeQueryString(spec), System)
-    case "data"                 ⇒ new URL(context, removeQueryString(spec), DataHandler)
-    case "file"                 ⇒ new URL(context, removeQueryString(spec))
-    case _                      ⇒ new URL(context, spec)
+    case "http" | "https"       => new URL(context, spec, HTTP)
+    case OXFHandler.PROTOCOL    => new URL(context, removeQueryString(spec), OXF)
+    case SystemHandler.PROTOCOL => new URL(context, removeQueryString(spec), System)
+    case "data"                 => new URL(context, removeQueryString(spec), DataHandler)
+    case "file"                 => new URL(context, removeQueryString(spec))
+    case _                      => new URL(context, spec)
   }
 
   private def protocol(context: URL, spec: String) =

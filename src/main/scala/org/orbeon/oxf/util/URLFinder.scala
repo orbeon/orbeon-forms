@@ -21,13 +21,13 @@ object URLFinder {
   def replaceWithPlaceholder(s: String) = s"""<a>$s</a>"""
 
   // Replace HTTP/HTTPS URLs in a plain string and return an HTML fragment
-  def replaceURLs(s: String, replace: String ⇒ String) = {
+  def replaceURLs(s: String, replace: String => String) = {
 
     val sb = new StringBuilder("<span>")
     var afterPreviousMatch = 0
 
     // Don't just use replaceAllIn because we need to match on unescaped URLs, yet escape text around URLs
-    for (currentMatch ← URLMatchRegex.findAllMatchIn(s)) {
+    for (currentMatch <- URLMatchRegex.findAllMatchIn(s)) {
       val before = currentMatch.before
       val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
 

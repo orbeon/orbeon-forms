@@ -102,7 +102,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Compare all
     assert(actualDocs.size === expectedDocs.size)
-    for ((expected, actual) ← expectedDocs zip actualDocs)
+    for ((expected, actual) <- expectedDocs zip actualDocs)
       assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
   }
 

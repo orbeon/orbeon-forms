@@ -63,7 +63,7 @@ object FancytreeJsonNode {
     result.title = label
     result.key   = value
 
-    childrenOrUndef foreach { children ⇒
+    childrenOrUndef foreach { children =>
       result.folder   = true
       result.children = children
     }
@@ -71,7 +71,7 @@ object FancytreeJsonNode {
     if (open)
       result.expanded = true
 
-    classesOrUndef foreach { classes ⇒
+    classesOrUndef foreach { classes =>
       result.extraClasses = classes
     }
 

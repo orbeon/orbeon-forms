@@ -37,7 +37,7 @@ class ComponentControl(
     assert(_concreteBindingOpt.isEmpty)
 
     _concreteBindingOpt =
-      part.xblBindings.createConcreteBindingFromElem(abstractBinding, elemInSource, prefixedId, locationData, containerScope) |!> { newBinding ⇒
+      part.xblBindings.createConcreteBindingFromElem(abstractBinding, elemInSource, prefixedId, locationData, containerScope) |!> { newBinding =>
         part.xblBindings.addBinding(prefixedId, newBinding)
       }
   }
@@ -47,7 +47,7 @@ class ComponentControl(
 
     assert(bindingOpt.isDefined)
 
-    bindingOpt foreach { binding ⇒
+    bindingOpt foreach { binding =>
       // Remove all descendants only, keeping the current control
       part.deindexTree(this, self = false)
 

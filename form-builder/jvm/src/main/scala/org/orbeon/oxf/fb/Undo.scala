@@ -141,7 +141,7 @@ object Undo {
 
     implicit val encodeNodeInfo: Encoder[NodeInfo] = Encoder.encodeString.contramap[NodeInfo](TransformerUtils.tinyTreeToString)
 
-    implicit val decodeNodeInfo: Decoder[NodeInfo] = Decoder.decodeString.emap { encoded ⇒
+    implicit val decodeNodeInfo: Decoder[NodeInfo] = Decoder.decodeString.emap { encoded =>
       Either.catchNonFatal(
         TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, encoded, false, false).rootElement
       ).leftMap(_.getMessage)
@@ -154,7 +154,7 @@ object Undo {
   private object Private {
 
     def popAction(undoOrRedo: UndoOrRedo)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
-      ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo ⇒
+      ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo =>
 
         val encoded = lastUndoOrRedo.stringValue
         val result  = JsonConverter.decode(encoded).toOption

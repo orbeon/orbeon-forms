@@ -49,11 +49,11 @@ object SAXEvents {
     def getValue(index: Int)     = if (inRange(index)) atts(index)._2 else null
 
     def getIndex(uri: String, localName: String) =
-      atts indexWhere { case (qName, _) ⇒ qName.getNamespaceURI == uri && qName.getLocalPart == localName }
+      atts indexWhere { case (qName, _) => qName.getNamespaceURI == uri && qName.getLocalPart == localName }
 
     def getIndex(qName: String) = {
       val (prefix, localName) = parseQName(qName)
-      atts indexWhere { case (qName, _) ⇒ qName.getPrefix == prefix && qName.getLocalPart == localName }
+      atts indexWhere { case (qName, _) => qName.getPrefix == prefix && qName.getLocalPart == localName }
     }
 
     def getValue(uri: String, localName: String) = getValue(getIndex(uri, localName))
@@ -87,14 +87,14 @@ object SAXEvents {
       val result = ListBuffer[(QName, String)]()
       var i = 0
       while (i < length) {
-        result += new QName(atts.getURI(i), atts.getLocalName(i), XMLUtils.prefixFromQName(atts.getQName(i))) → atts.getValue(i)
+        result += new QName(atts.getURI(i), atts.getLocalName(i), XMLUtils.prefixFromQName(atts.getQName(i))) -> atts.getValue(i)
         i += 1
       }
       result.toList
     }
 
-    implicit def tuplesToAtts1(atts: List[(QName, String)]): Atts = Atts(atts map { case (qName, value) ⇒ qName → value })
-    implicit def tuplesToAtts2(atts: List[(String, String)]): Atts = Atts(atts map { case (name, value) ⇒ new QName("", name, name) → value })
+    implicit def tuplesToAtts1(atts: List[(QName, String)]): Atts = Atts(atts map { case (qName, value) => qName -> value })
+    implicit def tuplesToAtts2(atts: List[(String, String)]): Atts = Atts(atts map { case (name, value) => new QName("", name, name) -> value })
   }
 
   object Characters {

@@ -184,16 +184,16 @@ class NamespaceContextTest extends AnyFunSpec {
   }
 
   def assertAllEmpty(prefixes: Seq[String])(implicit ns: NamespaceContext): Unit =
-    prefixes foreach (p ⇒ assert(ns.current.uriForPrefix(p).isEmpty))
+    prefixes foreach (p => assert(ns.current.uriForPrefix(p).isEmpty))
 
-  def withElement[T](body: ⇒ T)(implicit ns: NamespaceContext): T = {
+  def withElement[T](body: => T)(implicit ns: NamespaceContext): T = {
     ns.startElement()
     val result = body
     ns.endElement()
     result
   }
 
-  def withPrefix[T](prefix: String, uri: String)(body: ⇒ T)(implicit ns: NamespaceContext): T = {
+  def withPrefix[T](prefix: String, uri: String)(body: => T)(implicit ns: NamespaceContext): T = {
     ns.startPrefixMapping(prefix, uri)
     val result = body
     result

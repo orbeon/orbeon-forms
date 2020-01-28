@@ -80,7 +80,7 @@ object StringUtils {
           var start = 0
           var doMatch = false
 
-          val test: Char ⇒ Boolean =
+          val test: Char => Boolean =
             if (sep eq null)
               Character.isWhitespace
             else if (sep.length == 1) {
@@ -139,13 +139,13 @@ object StringUtils {
     }
 
     def trimControlAndAllWhitespaceToEmptyCP =
-      trimToEmptyCP(c ⇒ Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
+      trimToEmptyCP(c => Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
 
     // Trim the string according to a matching function
     // This checks for Unicode code points, unlike String.trim() or StringUtils.trim(). When matching on spaces
     // and control characters, this is not strictly necessary since they are in the BMP and cannot collide with
     // surrogates. But in the general case it is more correct to test on code points.
-    def trimToEmptyCP(matches: Int ⇒ Boolean) =
+    def trimToEmptyCP(matches: Int => Boolean) =
       if ((s eq null) || s.isEmpty) {
         ""
       } else {
@@ -154,13 +154,13 @@ object StringUtils {
 
         var prefix = 0
 
-        it takeWhile matches foreach { c ⇒
+        it takeWhile matches foreach { c =>
           prefix += Character.charCount(c)
         }
 
         var suffix = 0
 
-        it foreach { c ⇒
+        it foreach { c =>
           if (matches(c))
             suffix += Character.charCount(c)
           else

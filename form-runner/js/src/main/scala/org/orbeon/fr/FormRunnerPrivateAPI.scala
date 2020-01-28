@@ -49,7 +49,7 @@ object FormRunnerPrivateAPI {
     else
       $(global).on(
         ListenerEvents,
-        ((_: JQueryEventObject) ⇒ Message): js.Function
+        ((_: JQueryEventObject) => Message): js.Function
       )
   }
 
@@ -93,7 +93,7 @@ object FormRunnerPrivateAPI {
 
     val (_, query) = PathUtils.splitQueryDecodeParams(location.search)
 
-    val newParams = ("form-version" → version.toString) :: (query filterNot (_._1 == "form-version"))
+    val newParams = ("form-version" -> version.toString) :: (query filterNot (_._1 == "form-version"))
 
     dom.window.history.replaceState(
       statedata = dom.window.history.state,

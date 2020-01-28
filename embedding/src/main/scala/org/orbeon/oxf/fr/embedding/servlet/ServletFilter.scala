@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
@@ -55,7 +55,7 @@ class ServletEmbeddingContextWithResponse(
 ) with EmbeddingContextWithResponse {
 
   def writer                                 = out.fold(identity, _.getWriter)
-  def outputStream                           = out.fold(_ ⇒ throw new IllegalStateException, _.getOutputStream)
+  def outputStream                           = out.fold(_ => throw new IllegalStateException, _.getOutputStream)
   def setHeader(name: String, value: String) = out.right.foreach(_.setHeader(name, value))
   override def setStatusCode(code: Int)      = out.right.foreach(_.setStatus(code))
 
@@ -63,10 +63,10 @@ class ServletEmbeddingContextWithResponse(
 
     def namespaceResource(path: String) =
       path match {
-        case "/xforms-server"              ⇒ true
-        case path if path.endsWith(".css") ⇒ true
-        case FormDynamicResourcesRegex(_)  ⇒ true
-        case _                             ⇒ false
+        case "/xforms-server"              => true
+        case path if path.endsWith(".css") => true
+        case FormDynamicResourcesRegex(_)  => true
+        case _                             => false
       }
 
     def createResourceURL(resourceId: String) =
@@ -109,20 +109,20 @@ class ServletFilter extends Filter {
   }
 
   def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-    settingsOpt foreach { settings ⇒
+    settingsOpt foreach { settings =>
 
       val httpReq = req.asInstanceOf[HttpServletRequest]
       val httpRes = res.asInstanceOf[HttpServletResponse]
 
       APISupport.scopeSettings(httpReq, settings) {
         NetUtils.getRequestPathInfo(httpReq) match {
-          case settings.OrbeonSubmitPathRegex() ⇒
+          case settings.OrbeonSubmitPathRegex() =>
             // Request is for an Orbeon submission
             APISupport.proxySubmission(httpReq, httpRes)
-          case settings.OrbeonResourcePathRegex(namespace, resourcePath) ⇒
+          case settings.OrbeonResourcePathRegex(namespace, resourcePath) =>
             // Request is for an Orbeon resource or Ajax call
             APISupport.proxyServletResources(httpReq, httpRes, namespace, resourcePath)
-          case _ ⇒
+          case _ =>
             // Not an Orbeon resource or submission
             chain.doFilter(httpReq, httpRes)
         }

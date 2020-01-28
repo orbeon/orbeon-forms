@@ -27,12 +27,12 @@ class ImageMetadataTest extends ResourceManagerTestBase with AssertionsForJUnit 
     val URLPrefix = "oxf:/org/orbeon/oxf/util/hs-2010-13-a-web"
 
     val ExtensionsToMediatypes = Map(
-      "jpg" → "image/jpeg",
-      "png" → "image/png",
-      "gif" → "image/gif",
-      "bmp" → "image/bmp")
+      "jpg" -> "image/jpeg",
+      "png" -> "image/png",
+      "gif" -> "image/gif",
+      "bmp" -> "image/bmp")
 
-    for (extension ← ExtensionsToMediatypes.keys) {
+    for (extension <- ExtensionsToMediatypes.keys) {
       def openStream = URLFactory.createURL(URLPrefix + "." + extension).openStream()
 
       val mediatype = findImageMediatype(openStream).get

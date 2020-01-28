@@ -42,7 +42,7 @@ class XIncludeReceiver(
     outputLocator  : OutputLocator
 ) extends ForwardingXMLReceiver(xmlReceiver) {
 
-  self ⇒
+  self =>
 
   def this(
     pipelineContext: PipelineContext,
@@ -94,12 +94,12 @@ class XIncludeReceiver(
 
       val closestAncestorMappings =
         relevantContexts.next().context.mappingsWithDefault filterNot
-        { case (prefix, _) ⇒ prefix == "xml" }
+        { case (prefix, _) => prefix == "xml" }
 
       val toUndeclare = closestAncestorMappings.toSet -- pending
       val toDeclare   = pending.toSet -- closestAncestorMappings
 
-      (toUndeclare map { case (prefix, _) ⇒ prefix → "" }) ++ toDeclare toMap
+      (toUndeclare map { case (prefix, _) => prefix -> "" }) ++ toDeclare toMap
     } else
       pending
 
@@ -162,7 +162,7 @@ class XIncludeReceiver(
 
       try {
         xpointer match {
-          case Some(XPointerPattern(xpath)) ⇒
+          case Some(XPointerPattern(xpath)) =>
             // xpath() scheme
 
             // Document is read entirely in memory for XPath processing
@@ -181,13 +181,13 @@ class XIncludeReceiver(
                 null)
 
             // Each resulting object is output through the next level of processing
-            for (item ← result.asScala)
+            for (item <- result.asScala)
               XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, new LocationData(outputLocator))
 
-          case Some(xpointer) ⇒
+          case Some(xpointer) =>
             // Other XPointer schemes are not supported
             throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, new LocationData(outputLocator))
-          case None ⇒
+          case None =>
             // No xpointer attribute specified, just stream the child document
             val xmlReader = source.getXMLReader
             val xmlReceiver = createChildReceiver
@@ -198,7 +198,7 @@ class XIncludeReceiver(
             xmlReader.parse(new InputSource(systemId)) // Yeah, the SAX API doesn't make much sense
         }
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           // Resource error, must go to fallback if possible
           if (systemId != null)
             throw new OXFException("Error while handling: " + systemId, t)
@@ -264,11 +264,11 @@ class XIncludeReceiver(
   }
 
   def playStartPrefixMappings(mappings: Map[String, String]): Unit =
-    for ((prefix, uri) ← mappings)
+    for ((prefix, uri) <- mappings)
       super.startPrefixMapping(prefix, uri)
 
   def playEndPrefixMappings(mappings: Map[String, String]): Unit =
-    for ((prefix, _) ← mappings)
+    for ((prefix, _) <- mappings)
       super.endPrefixMapping(prefix)
 }
 

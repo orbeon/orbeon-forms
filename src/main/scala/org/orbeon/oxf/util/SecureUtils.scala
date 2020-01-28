@@ -76,7 +76,7 @@ object SecureUtils {
 
   // See: https://github.com/orbeon/orbeon-forms/pull/1745
   private lazy val preferredProviderOpt =
-    getPreferredProvider flatMap { preferredProvider ⇒
+    getPreferredProvider flatMap { preferredProvider =>
       Security.getProviders find (_.getName == preferredProvider)
     }
 
@@ -84,12 +84,12 @@ object SecureUtils {
   // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
   private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
     def makeObject() = preferredProviderOpt match {
-      case Some(preferred) ⇒ Cipher.getInstance(EncryptionCipherTransformation, preferred)
-      case None            ⇒ Cipher.getInstance(EncryptionCipherTransformation)
+      case Some(preferred) => Cipher.getInstance(EncryptionCipherTransformation, preferred)
+      case None            => Cipher.getInstance(EncryptionCipherTransformation)
     }
   })
 
-  private def withCipher[T](body: Cipher ⇒ T) = {
+  private def withCipher[T](body: Cipher => T) = {
     val cipher = pool.borrowObject()
     try body(cipher)
     finally pool.returnObject(cipher)
@@ -100,13 +100,13 @@ object SecureUtils {
   def encrypt(bytes: Array[Byte]): String = encryptIV(bytes, None)
 
   def encryptIV(bytes: Array[Byte], ivOption: Option[Array[Byte]]): String =
-    withCipher { cipher ⇒
+    withCipher { cipher =>
       ivOption match {
-        case Some(iv) ⇒
+        case Some(iv) =>
           cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv))
           // Don't prepend IV
           Base64.encode(cipher.doFinal(bytes), false)
-        case None ⇒
+        case None =>
           cipher.init(Cipher.ENCRYPT_MODE, secretKey)
           val params = cipher.getParameters
           val iv = params.getParameterSpec(classOf[IvParameterSpec]).getIV
@@ -119,13 +119,13 @@ object SecureUtils {
   def decrypt(text: String): Array[Byte] = decryptIV(text, None)
 
   def decryptIV(text: String, ivOption: Option[Array[Byte]]): Array[Byte] =
-    withCipher { cipher ⇒
+    withCipher { cipher =>
       val (iv, message) =
         ivOption match {
-          case Some(iv) ⇒
+          case Some(iv) =>
             // The IV was passed
             (iv, Base64.decode(text))
-          case None ⇒
+          case None =>
             // The IV was prepended to the message
             Base64.decode(text).splitAt(AESIVSize)
         }
@@ -175,9 +175,9 @@ object SecureUtils {
   }
 
   private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
-    case "base64" ⇒ Base64.encode(bytes, false)
-    case "hex"    ⇒ byteArrayToHex(bytes)
-    case _        ⇒ throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$encoding`")
+    case "base64" => Base64.encode(bytes, false)
+    case "hex"    => byteArrayToHex(bytes)
+    case _        => throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$encoding`")
   }
 
   // Convert to a lowercase hexadecimal value

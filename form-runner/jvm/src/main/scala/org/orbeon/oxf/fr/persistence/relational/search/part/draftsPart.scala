@@ -22,14 +22,14 @@ object draftsPart {
 
   def apply(request: Request) =
     request.drafts match {
-      case IncludeDrafts ⇒ StatementPart("", Nil)
-      case ExcludeDrafts ⇒ StatementPart(" AND c.draft = 'N'", Nil)
-      case OnlyDrafts(whichDrafts) ⇒
+      case IncludeDrafts => StatementPart("", Nil)
+      case ExcludeDrafts => StatementPart(" AND c.draft = 'N'", Nil)
+      case OnlyDrafts(whichDrafts) =>
         val justDraft = " AND c.draft = 'Y'"
         whichDrafts match {
-          case AllDrafts ⇒
+          case AllDrafts =>
             StatementPart(justDraft, Nil)
-          case DraftsForNeverSavedDocs ⇒
+          case DraftsForNeverSavedDocs =>
             StatementPart(
               sql = justDraft +
                 """| AND
@@ -48,7 +48,7 @@ object draftsPart {
                 _.setString(_, request.form)
               )
             )
-          case DraftsForDocumentId(documentId) ⇒
+          case DraftsForDocumentId(documentId) =>
             StatementPart(
               sql = justDraft + " AND c.document_id = ?",
               setters = List(_.setString(_, documentId))

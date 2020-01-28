@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
@@ -37,13 +37,13 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   val (node, hasChildrenElements) =
     item match {
-      case node: NodeInfo ⇒
+      case node: NodeInfo =>
         val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && node.hasChildElement
         InstanceData.addBindNode(node, this)
         // The last type wins
         staticBind.dataType foreach (InstanceData.setBindType(node, _))
         (node, hasChildrenElements)
-      case _ ⇒
+      case _ =>
         (null, false)
     }
 
@@ -63,12 +63,12 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   // Failed validations for the given level, including type/required
   def failedValidations(level: ValidationLevel): List[StaticBind#MIP] = level match {
-    case level @ ErrorLevel if ! typeValid || ! requiredValid ⇒
+    case level @ ErrorLevel if ! typeValid || ! requiredValid =>
       // Add type/required if needed
       (! typeValid     list invalidTypeValidation)     :::
       (! requiredValid list invalidRequiredValidation) :::
       failedConstraints.getOrElse(level, Nil)
-    case level ⇒
+    case level =>
       // Cannot be type/required as those only have ErrorLevel
       failedConstraints(level)
   }
@@ -86,7 +86,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
     if (typeValid && requiredValid)
       failedConstraints
     else
-      failedConstraints + (ErrorLevel → failedValidations(ErrorLevel))
+      failedConstraints + (ErrorLevel -> failedValidations(ErrorLevel))
 
   def staticBind = parentBind.staticBind
   def locationData = staticBind.locationData
@@ -98,7 +98,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   def setTypeValid(value: Boolean, mip: StaticBind#MIP)             = this._invalidTypeValidation = if (! value) mip else null
   def setRequiredValid(value: Boolean, mip: Option[StaticBind#MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
 
-  def setCustom(name: String, value: String): Unit = _customMips += name → value
+  def setCustom(name: String, value: String): Unit = _customMips += name -> value
   def clearCustom(name: String): Unit = _customMips -= name
 
   def relevant        = _relevant
@@ -142,7 +142,7 @@ object BindNode {
       bindNodes.get(0)._customMips.get(mipName)
     else
       bindNodes.asScala.iterator flatMap (_._customMips.iterator) collectFirst {
-        case (`mipName`, mipValue) ⇒ mipValue
+        case (`mipName`, mipValue) => mipValue
       }
 
   // - prioritize failed required error validation, see https://github.com/orbeon/orbeon-forms/issues/1830. It
@@ -152,11 +152,11 @@ object BindNode {
   // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
   private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
     mipsForLevel match {
-      case (ErrorLevel, mips) if mips exists (_.name == Required.name) ⇒
-        ErrorLevel → (mips filter (_.name == Required.name))
-      case (ErrorLevel, mips) if mips exists (_.name == Type.name) ⇒
-        ErrorLevel → (mips filter (_.name == Type.name))
-      case validations ⇒
+      case (ErrorLevel, mips) if mips exists (_.name == Required.name) =>
+        ErrorLevel -> (mips filter (_.name == Required.name))
+      case (ErrorLevel, mips) if mips exists (_.name == Type.name) =>
+        ErrorLevel -> (mips filter (_.name == Type.name))
+      case validations =>
         validations
     }
 
@@ -183,8 +183,8 @@ object BindNode {
         mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
 
       for {
-        level       ← LevelsByPriority
-        bindNode    ← bindNodes
+        level       <- LevelsByPriority
+        bindNode    <- bindNodes
         failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
         if failed.nonEmpty
       } locally {
@@ -192,7 +192,7 @@ object BindNode {
         builder ++= failed
       }
 
-      buildersByLevel.map { case (k, v) ⇒ k → v.result()} (breakOut)
+      buildersByLevel.map { case (k, v) => k -> v.result()} (breakOut)
     }
 
   // Get all failed constraints for the highest level only, combining BindNodes if needed.
@@ -214,20 +214,20 @@ object BindNode {
 
   private def collectFailedValidationsForLevel(
     bindNodes : Seq[BindNode],
-    findLevel : BindNode ⇒ Option[ValidationLevel]
+    findLevel : BindNode => Option[ValidationLevel]
   ): Option[(ValidationLevel, List[StaticBind#MIP])] =
     if (bindNodes.isEmpty)
       None
     else {
-      val consideredLevels = bindNodes flatMap (node ⇒ findLevel(node) map (level ⇒ (level, node)))
+      val consideredLevels = bindNodes flatMap (node => findLevel(node) map (level => (level, node)))
       val highestLevelOpt  = consideredLevels.nonEmpty option (consideredLevels map (_._1) max)
 
       highestLevelOpt map {
-        highestLevel ⇒
+        highestLevel =>
 
           val failedForHighest =
             consideredLevels.toList collect {
-              case (`highestLevel`, node) ⇒ node.failedValidations(highestLevel)
+              case (`highestLevel`, node) => node.failedValidations(highestLevel)
             } flatten
 
           (highestLevel, failedForHighest)
@@ -250,11 +250,11 @@ class BindIteration(
 
   // Iterate over children and create children binds
   val childrenBinds =
-    for (staticBind ← childrenStaticBinds)
+    for (staticBind <- childrenStaticBinds)
       yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
 
-  def applyBinds(fn: BindNode ⇒ Unit): Unit =
-    for (currentBind ← childrenBinds)
+  def applyBinds(fn: BindNode => Unit): Unit =
+    for (currentBind <- childrenBinds)
       currentBind.applyBinds(fn)
 
   def findChildBindByStaticId(bindId: String) =

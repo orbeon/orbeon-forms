@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLFinder
@@ -28,7 +28,7 @@ trait FormRunnerPDF {
 
   val PdfFieldSeparator = "$"
 
-  // Return mappings (formatName → expression) for all PDF formats in the properties
+  // Return mappings (formatName -> expression) for all PDF formats in the properties
   //@XPathFunction
   def getPDFFormats: ju.Map[String, String] = {
 
@@ -37,11 +37,11 @@ trait FormRunnerPDF {
 
     val formatPairsIt =
       for {
-        formatPropertyName ← propertiesStartingWithIt("oxf.fr.pdf.format")
-        expression         ← Property.propertyAsString(formatPropertyName)
+        formatPropertyName <- propertiesStartingWithIt("oxf.fr.pdf.format")
+        expression         <- Property.propertyAsString(formatPropertyName)
         formatName         = formatPropertyName split '.' last
       } yield
-        formatName → expression
+        formatName -> expression
 
     formatPairsIt.toMap.asJava
   }
@@ -60,8 +60,8 @@ trait FormRunnerPDF {
 
     val expressionOpt =
       for {
-        format     ← Property.propertyAsString(propertyName)
-        expression ← Option(pdfFormats.get(format))
+        format     <- Property.propertyAsString(propertyName)
+        expression <- Option(pdfFormats.get(format))
       } yield
         expression
 
@@ -88,7 +88,7 @@ trait FormRunnerPDF {
       XFormsId.getEffectiveIdSuffix(id).trimAllToOpt.toList
 
     // This only makes sense if we are passed a control with a name
-    findControlName(control) map { controlName ⇒
+    findControlName(control) map { controlName =>
       ((ancestorContainers(control) flatMap findControlName) :+ controlName) ++ suffixAsList(control.id) mkString PdfFieldSeparator
      } orNull
   }

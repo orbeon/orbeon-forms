@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io._
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
@@ -91,9 +91,9 @@ object ExternalContext {
 
     def getNativeRequest: Any
 
-    // TODO: return immutable.Map[String, List[AnyRef]] → what about AnyRef?
+    // TODO: return immutable.Map[String, List[AnyRef]] -> what about AnyRef?
     def parameters: collection.Map[String, Array[AnyRef]]   = getParameterMap.asScala
-    def getFirstParamAsString(name: String): Option[String] = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
+    def getFirstParamAsString(name: String): Option[String] = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String => s })
     def getFirstHeader(name: String): Option[String]        = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
     def sessionOpt: Option[Session]                         = Option(getSession(create = false))
     lazy val contentLengthOpt: Option[Long]                 = Headers.firstNonNegativeLongHeaderIgnoreCase(getHeaderValuesMap.asScala, Headers.ContentLength)

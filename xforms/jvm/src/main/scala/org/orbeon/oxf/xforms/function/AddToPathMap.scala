@@ -21,35 +21,35 @@ import org.orbeon.saxon.functions.SystemFunction
 // Rewrite of Saxon addToPathMap in Scala
 trait AddToPathMap {
 
-  self: SystemFunction ⇒
+  self: SystemFunction =>
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
     val dependsOnFocus = (getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
     val attachmentPoint = pathMapNodeSet match {
-      case null if dependsOnFocus ⇒
+      case null if dependsOnFocus =>
         // Result is new ContextItemExpression
         val contextItemExpression = new ContextItemExpression
         contextItemExpression.setContainer(getContainer)
         new PathMap.PathMapNodeSet(pathMap.makeNewRoot(contextItemExpression))
-      case _ ⇒
+      case _ =>
         // All other cases
         if (dependsOnFocus) pathMapNodeSet else null
     }
 
     val resultNodeSet = new PathMap.PathMapNodeSet
-    for (child ← iterateSubExpressions.asScala)
+    for (child <- iterateSubExpressions.asScala)
       resultNodeSet.addNodeSet(child.asInstanceOf[Expression].addToPathMap(pathMap, attachmentPoint))
 
     // Handle result differently if result type is atomic or not
     getItemType(getExecutable.getConfiguration.getTypeHierarchy) match {
-      case atomicType: AtomicType ⇒
+      case atomicType: AtomicType =>
         // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
         // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
         // the atomization of the argument to sum().
 //                resultNodeSet.setAtomized()
         // If expression returns an atomic value then any nodes accessed don't contribute to the result
         null
-      case _ ⇒ resultNodeSet
+      case _ => resultNodeSet
     }
   }
 }

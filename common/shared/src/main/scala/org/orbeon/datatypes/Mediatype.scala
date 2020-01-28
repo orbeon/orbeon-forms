@@ -22,9 +22,9 @@ import scala.collection.compat._
 // Concrete mediatype, as opposed to `MediatypeRange` below
 case class Mediatype(typ: SpecificType, subtype: SpecificType) {
   def is(range: MediatypeRange): Boolean = range match {
-    case WildcardMediatypeRange             ⇒ true
-    case WildcardTypeMediatypeRange(typ)    ⇒ typ == this.typ
-    case SingletonMediatypeRange(mediatype) ⇒ mediatype == this
+    case WildcardMediatypeRange             => true
+    case WildcardTypeMediatypeRange(typ)    => typ == this.typ
+    case SingletonMediatypeRange(mediatype) => mediatype == this
   }
 
   override def toString = s"${typ.value}/${subtype.value}"
@@ -33,7 +33,7 @@ case class Mediatype(typ: SpecificType, subtype: SpecificType) {
 object Mediatype {
 
   def unapply(s: String): Option[Mediatype] =
-    MediatypeRange.unapply(s) collect { case SingletonMediatypeRange(mediatype) ⇒ mediatype }
+    MediatypeRange.unapply(s) collect { case SingletonMediatypeRange(mediatype) => mediatype }
 
   sealed trait TypeOrSubtype
   object TypeOrSubtype {
@@ -48,9 +48,9 @@ object Mediatype {
     }
 
     def unapply(s: String): Option[TypeOrSubtype] = s match {
-      case "*"                  ⇒ Some(WildcardType)
-      case TokenMatch(specific) ⇒ Some(SpecificType(specific))
-      case _                    ⇒ None
+      case "*"                  => Some(WildcardType)
+      case TokenMatch(specific) => Some(SpecificType(specific))
+      case _                    => None
     }
   }
 }
@@ -64,10 +64,10 @@ object MediatypeRange {
 
   def unapply(s: String): Option[MediatypeRange] = {
     s.split("/", -1).to(List) match {
-      case TypeOrSubtype(WildcardType)      :: TypeOrSubtype(WildcardType)          :: Nil ⇒ Some(WildcardMediatypeRange)
-      case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(WildcardType)          :: Nil ⇒ Some(WildcardTypeMediatypeRange(typ))
-      case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(subtype: SpecificType) :: Nil ⇒ Some(SingletonMediatypeRange(Mediatype(typ, subtype)))
-      case _ ⇒ None
+      case TypeOrSubtype(WildcardType)      :: TypeOrSubtype(WildcardType)          :: Nil => Some(WildcardMediatypeRange)
+      case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(WildcardType)          :: Nil => Some(WildcardTypeMediatypeRange(typ))
+      case TypeOrSubtype(typ: SpecificType) :: TypeOrSubtype(subtype: SpecificType) :: Nil => Some(SingletonMediatypeRange(Mediatype(typ, subtype)))
+      case _ => None
     }
   }
 }

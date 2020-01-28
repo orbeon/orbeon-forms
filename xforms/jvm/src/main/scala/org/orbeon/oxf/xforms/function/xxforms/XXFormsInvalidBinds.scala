@@ -31,19 +31,19 @@ class XXFormsInvalidBinds
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     // First item or context node if any
-    val item = argument.headOption map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
+    val item = argument.headOption map (e => Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
 
     item match {
-      case Some(nodeInfo: NodeInfo) ⇒
+      case Some(nodeInfo: NodeInfo) =>
         Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
-          case Some(invalidBindIdsString) ⇒
+          case Some(invalidBindIdsString) =>
             stringArrayToSequenceIterator(invalidBindIdsString.splitTo[Array]())
-          case None ⇒
+          case None =>
             // No invalid bind ids
             EmptyIterator.getInstance
         }
 
-      case _ ⇒
+      case _ =>
         // Return () if we can't access the node
         EmptyIterator.getInstance
     }

@@ -32,35 +32,35 @@ object XFormsActions {
 
   private val Actions = Map(
     // Standard XForms actions
-    xformsQName("action")                   → new XFormsActionAction,
-    xformsQName("dispatch")                 → new XFormsDispatchAction,
-    xformsQName("rebuild")                  → new XFormsRebuildAction,
-    xformsQName("recalculate")              → new XFormsRecalculateAction,
-    xformsQName("revalidate")               → new XFormsRevalidateAction,
-    xformsQName("refresh")                  → new XFormsRefreshAction,
-    xformsQName("setfocus")                 → new XFormsSetfocusAction,
-    xformsQName("load")                     → new XFormsLoadAction,
-    xformsQName("setvalue")                 → new XFormsSetvalueAction,
-    xformsQName("send")                     → new XFormsSendAction,
-    xformsQName("reset")                    → new XFormsResetAction,
-    xformsQName("message")                  → new XFormsMessageAction,
-    xformsQName("toggle")                   → new XFormsToggleAction,
-    xformsQName("insert")                   → new XFormsInsertAction,
-    xformsQName("delete")                   → new XFormsDeleteAction,
-    xformsQName("setindex")                 → new XFormsSetindexAction,
+    xformsQName("action")                   -> new XFormsActionAction,
+    xformsQName("dispatch")                 -> new XFormsDispatchAction,
+    xformsQName("rebuild")                  -> new XFormsRebuildAction,
+    xformsQName("recalculate")              -> new XFormsRecalculateAction,
+    xformsQName("revalidate")               -> new XFormsRevalidateAction,
+    xformsQName("refresh")                  -> new XFormsRefreshAction,
+    xformsQName("setfocus")                 -> new XFormsSetfocusAction,
+    xformsQName("load")                     -> new XFormsLoadAction,
+    xformsQName("setvalue")                 -> new XFormsSetvalueAction,
+    xformsQName("send")                     -> new XFormsSendAction,
+    xformsQName("reset")                    -> new XFormsResetAction,
+    xformsQName("message")                  -> new XFormsMessageAction,
+    xformsQName("toggle")                   -> new XFormsToggleAction,
+    xformsQName("insert")                   -> new XFormsInsertAction,
+    xformsQName("delete")                   -> new XFormsDeleteAction,
+    xformsQName("setindex")                 -> new XFormsSetindexAction,
 
     // Extension actions
-    xxformsQName("script")                  → new XFormsActionAction,
-    xxformsQName("show")                    → new XXFormsShowAction,
-    xxformsQName("hide")                    → new XXFormsHideAction,
-    xxformsQName("invalidate-instance")     → new XXFormsInvalidateInstanceAction,
-    xxformsQName("invalidate-instances")    → new XXFormsInvalidateInstancesAction,
-    xxformsQName("join-submissions")        → new XXFormsJoinSubmissions,
-    xxformsQName("setvisited")              → new XXFormsSetvisitedAction,
-    xxformsQName("update-validity")         → new XXFormsUpdateValidityAction,
+    xxformsQName("script")                  -> new XFormsActionAction,
+    xxformsQName("show")                    -> new XXFormsShowAction,
+    xxformsQName("hide")                    -> new XXFormsHideAction,
+    xxformsQName("invalidate-instance")     -> new XXFormsInvalidateInstanceAction,
+    xxformsQName("invalidate-instances")    -> new XXFormsInvalidateInstancesAction,
+    xxformsQName("join-submissions")        -> new XXFormsJoinSubmissions,
+    xxformsQName("setvisited")              -> new XXFormsSetvisitedAction,
+    xxformsQName("update-validity")         -> new XXFormsUpdateValidityAction,
 
     // xbl:handler as action container working like xf:action
-    XBL_HANDLER_QNAME                       → new XFormsActionAction
+    XBL_HANDLER_QNAME                       -> new XFormsActionAction
   )
 
   // Return a factory for action analysis
@@ -69,10 +69,10 @@ object XFormsActions {
     def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 
     val actionFactory: PartialFunction[Element, ControlFactory] = {
-      case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait
-      case e if isContainerAction(e.getQName)                      ⇒ new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait
-      case e if isAction(e.getQName) && isEventHandler(e)          ⇒ new EventHandlerImpl(_, _, _, _, _)      with ActionTrait
-      case e if isAction(e.getQName)                               ⇒ new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
+      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait
+      case e if isContainerAction(e.getQName)                      => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait
+      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait
+      case e if isAction(e.getQName)                               => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
     }
 
     actionFactory

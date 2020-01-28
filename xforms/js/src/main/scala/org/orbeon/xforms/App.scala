@@ -33,11 +33,11 @@ trait App {
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ ⇒ InitSupport.liferayF) onComplete {
-      case Success(_) ⇒
+    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ => InitSupport.liferayF) onComplete {
+      case Success(_) =>
         scribe.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()
-      case Failure(t) ⇒
+      case Failure(t) =>
         throw t
     }
   }
@@ -62,8 +62,8 @@ trait App {
         val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
 
         record.methodName match {
-          case Some(name) ⇒ new TextOutput(p"$className.$name")
-          case None       ⇒ new TextOutput(p"$className")
+          case Some(name) => new TextOutput(p"$className.$name")
+          case None       => new TextOutput(p"$className")
         }
       }
     }

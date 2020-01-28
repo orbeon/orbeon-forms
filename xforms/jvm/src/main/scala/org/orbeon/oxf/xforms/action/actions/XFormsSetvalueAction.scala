@@ -41,7 +41,7 @@ class XFormsSetvalueAction extends XFormsAction {
     // Determine value to set
     def evaluateValueToSet =
       valueExpression match {
-        case Some(valueExpression) ⇒
+        case Some(valueExpression) =>
           // Value to set is computed with an XPath expression
           actionInterpreter.evaluateAsString(
             actionElement,
@@ -49,14 +49,14 @@ class XFormsSetvalueAction extends XFormsAction {
             contextStack.getCurrentBindingContext.position,
             valueExpression
           )
-        case None ⇒
+        case None =>
           // Value to set is static content
           actionElement.getStringValue
       }
 
     // Set the value on target node if possible
     contextStack.getCurrentBindingContext.getSingleItem match {
-      case node: NodeInfo ⇒
+      case node: NodeInfo =>
         // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
         // be written to. But because of the way we now handle errors in actions, we throw an exception instead
         // and action processing is interrupted.
@@ -66,7 +66,7 @@ class XFormsSetvalueAction extends XFormsAction {
         DataModel.setValueIfChanged(
           nodeInfo   = node,
           newValue   = valueToSet,
-          onSuccess  = oldValue ⇒ DataModel.logAndNotifyValueChange(
+          onSuccess  = oldValue => DataModel.logAndNotifyValueChange(
             containingDocument = containingDocument,
             source             = "setvalue",
             nodeInfo           = node,
@@ -75,17 +75,17 @@ class XFormsSetvalueAction extends XFormsAction {
             isCalculate        = false,
             collector          = Dispatch.dispatchEvent
           ),
-          reason ⇒ throw new OXFException(reason.message)
+          reason => throw new OXFException(reason.message)
         )
-      case _ ⇒
+      case _ =>
         // Node doesn't exist: NOP
         debug(
           "xf:setvalue: not setting instance value",
           List(
-            "reason" → "destination node not found",
+            "reason" -> "destination node not found",
             Try(evaluateValueToSet) match {
-              case Success(v) ⇒ "value" → v
-              case Failure(t) ⇒ "value error" → t.getMessage
+              case Success(v) => "value" -> v
+              case Failure(t) => "value error" -> t.getMessage
             }
           )
         )

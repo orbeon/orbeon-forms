@@ -38,50 +38,50 @@ trait ClientPermissionsTest extends AssertionsForJUnit with FormBuilderOps {
 
         for {
           // Enable permissions
-          _ ← clickOn(OpenPermissions)
-          _ ← clickOn(HasPermissions)
+          _ <- clickOn(OpenPermissions)
+          _ <- clickOn(HasPermissions)
 
           // Clerks can read
-          _ ← clickOn(AddPermission)
-          _ ← textField(role(4)).value = "clerk"
-          _ ← clickOn(checkbox(4, "read"))
+          _ <- clickOn(AddPermission)
+          _ <- textField(role(4)).value = "clerk"
+          _ <- clickOn(checkbox(4, "read"))
 
           // Admins can do everything
-          _ ← clickOn(AddPermission)
-          _ ← patientlySendKeys(role(5), "admin")
-          _ ← clickOn(checkbox(5, "update"))
+          _ <- clickOn(AddPermission)
+          _ <- patientlySendKeys(role(5), "admin")
+          _ <- clickOn(checkbox(5, "update"))
           // Read auto-selected when selecting update
-          _ ← assert(checkbox(checkbox(5, "read")).isSelected)
-          _ ← clickOn(checkbox(5, "delete"))
+          _ <- assert(checkbox(checkbox(5, "read")).isSelected)
+          _ <- clickOn(checkbox(5, "delete"))
 
           // Everyone can create
-          _ ← clickOn(checkbox(1, "create"))
+          _ <- clickOn(checkbox(1, "create"))
           // All the following rows get the create permission
-          _ ← assert(checkbox(checkbox(4, "create")).isSelected)
-          _ ← assert(checkbox(checkbox(5, "create")).isSelected)
+          _ <- assert(checkbox(checkbox(4, "create")).isSelected)
+          _ <- assert(checkbox(checkbox(5, "create")).isSelected)
 
           // Save, reopen, and check the permissions are correct
-          _ ← clickOn(Apply)
-          _ ← clickOn(OpenPermissions)
-          _ ← assert(  checkbox(HasPermissions).isSelected)
+          _ <- clickOn(Apply)
+          _ <- clickOn(OpenPermissions)
+          _ <- assert(  checkbox(HasPermissions).isSelected)
           // Roles are re-ordered by alphabetic order, see #917
-          _ ← assert(  checkbox(checkbox(1, "create")).isSelected)
-          _ ← assert(! checkbox(checkbox(1, "read"  )).isSelected)
-          _ ← assert(! checkbox(checkbox(1, "update")).isSelected)
-          _ ← assert(! checkbox(checkbox(1, "delete")).isSelected)
-          _ ← assert(textField(role(4)).value === "admin")
-          _ ← assert(  checkbox(checkbox(4, "create")).isSelected)
-          _ ← assert(  checkbox(checkbox(4, "read"  )).isSelected)
-          _ ← assert(  checkbox(checkbox(4, "update")).isSelected)
-          _ ← assert(  checkbox(checkbox(4, "delete")).isSelected)
-          _ ← assert(textField(role(5)).value === "clerk")
-          _ ← assert(  checkbox(checkbox(5, "create")).isSelected)
-          _ ← assert(  checkbox(checkbox(5, "read"  )).isSelected)
-          _ ← assert(! checkbox(checkbox(5, "update")).isSelected)
-          _ ← assert(! checkbox(checkbox(5, "delete")).isSelected)
+          _ <- assert(  checkbox(checkbox(1, "create")).isSelected)
+          _ <- assert(! checkbox(checkbox(1, "read"  )).isSelected)
+          _ <- assert(! checkbox(checkbox(1, "update")).isSelected)
+          _ <- assert(! checkbox(checkbox(1, "delete")).isSelected)
+          _ <- assert(textField(role(4)).value === "admin")
+          _ <- assert(  checkbox(checkbox(4, "create")).isSelected)
+          _ <- assert(  checkbox(checkbox(4, "read"  )).isSelected)
+          _ <- assert(  checkbox(checkbox(4, "update")).isSelected)
+          _ <- assert(  checkbox(checkbox(4, "delete")).isSelected)
+          _ <- assert(textField(role(5)).value === "clerk")
+          _ <- assert(  checkbox(checkbox(5, "create")).isSelected)
+          _ <- assert(  checkbox(checkbox(5, "read"  )).isSelected)
+          _ <- assert(! checkbox(checkbox(5, "update")).isSelected)
+          _ <- assert(! checkbox(checkbox(5, "delete")).isSelected)
 
           // Done, close dialog
-          _ ← clickOn(Apply)
+          _ <- clickOn(Apply)
         }()
       }
     }

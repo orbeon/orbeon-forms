@@ -97,7 +97,7 @@ class XFormsSelect1Control(
         // Items are stored in the control
         itemsetProperty.value()
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
     }
 
@@ -132,10 +132,10 @@ class XFormsSelect1Control(
     // Find what got selected/deselected
     val (selectEvents, deselectEvents) = gatherEvents(externalValue, existingValue)
 
-    for (currentEvent ← deselectEvents)
+    for (currentEvent <- deselectEvents)
       Dispatch.dispatchEvent(currentEvent)
 
-    for (currentEvent ← selectEvents)
+    for (currentEvent <- selectEvents)
       Dispatch.dispatchEvent(currentEvent)
 
     None
@@ -143,9 +143,9 @@ class XFormsSelect1Control(
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
-      case select: XFormsSelectEvent ⇒
+      case select: XFormsSelectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
+          case Some(boundNode) =>
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
@@ -155,11 +155,11 @@ class XFormsSelect1Control(
               source             = "select",
               isCalculate        = false
             )
-          case None ⇒
+          case None =>
             // Q: Can this happen?
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case _ ⇒
+      case _ =>
     }
     super.performDefaultAction(event)
   }
@@ -175,7 +175,7 @@ class XFormsSelect1Control(
     val selectEvents   = mutable.ListBuffer[XFormsSelectEvent]()
     val deselectEvents = mutable.ListBuffer[XFormsDeselectEvent]()
 
-    for (currentItem ← getItemset.allItemsIterator) {
+    for (currentItem <- getItemset.allItemsIterator) {
       val currentItemValue = currentItem.value
 
       val itemWasSelected = existingValue == currentItemValue
@@ -203,10 +203,10 @@ class XFormsSelect1Control(
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XFormsSelect1Control) ⇒
+      case Some(other: XFormsSelect1Control) =>
         ! mustSendItemsetUpdate(other) &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
     }
 
   private def mustSendItemsetUpdate(otherSelect1Control: XFormsSelect1Control): Boolean = {
@@ -239,14 +239,14 @@ class XFormsSelect1Control(
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
   ): Unit = {
 
     val hasNestedContent =
       mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)
 
-    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+    val outputNestedContent = (ch: XMLReceiverHelper) => {
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array[String]())
 
       val itemset = getItemset

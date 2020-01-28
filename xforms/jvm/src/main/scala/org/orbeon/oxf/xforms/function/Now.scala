@@ -23,8 +23,8 @@ class Now extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(context: XPathContext): StringValue = {
     val value =
       stringArgumentOpt(0)(context) match {
-        case Some("test") ⇒ DateTimeValue.makeDateTimeValue("2004-12-31T12:00:00.000Z").asAtomic.asInstanceOf[DateTimeValue]
-        case _ ⇒
+        case Some("test") => DateTimeValue.makeDateTimeValue("2004-12-31T12:00:00.000Z").asAtomic.asInstanceOf[DateTimeValue]
+        case _ =>
           new DateTimeValue(new GregorianCalendar(TimeZone.getTimeZone("UTC")), true)
       }
     new StringValue(value.getStringValue)

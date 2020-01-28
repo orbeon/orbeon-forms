@@ -66,24 +66,24 @@ trait ValidSupport extends XFormsFunction {
     val items = itemsArgumentOrContextOpt(0)
 
     if (recurse)
-      ! (asScalaIterator(items) exists (i ⇒ ! isTreeValid(i, pruneNonRelevant)))
+      ! (asScalaIterator(items) exists (i => ! isTreeValid(i, pruneNonRelevant)))
     else
-      ! (asScalaIterator(items) exists (i ⇒ ! isItemValid(i, pruneNonRelevant)))
+      ! (asScalaIterator(items) exists (i => ! isItemValid(i, pruneNonRelevant)))
   }
 
   // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
   def isItemValid(item: Item, pruneNonRelevant: Boolean) = item match {
-    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute ⇒
+    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
       pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
-    case _ ⇒
+    case _ =>
       true
   }
 
   // Tree is valid unless one of its descendant-or-self nodes is invalid
   def isTreeValid(item: Item, pruneNonRelevant: Boolean) = item match {
-    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute ⇒
+    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
       ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
-    case _ ⇒
+    case _ =>
       true
   }
 }

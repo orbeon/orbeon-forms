@@ -52,7 +52,7 @@ extends ItemContainer {
 
   def classAttribute = attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
 
-  def externalValue(encode: Boolean)   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
+  def externalValue(encode: Boolean)   = Option(value) map (v => if (encode) position.toString else v) getOrElse ""
   def javaScriptValue(encode: Boolean) = escapeJavaScript(externalValue(encode))
 
   def javaScriptLabel(locationData: LocationData) =
@@ -68,20 +68,20 @@ extends ItemContainer {
   // NOTE: The compiler does not generate equals for case classes that come with an equals! So can't use super to
   // reach compiler-generated case class equals. Is there a better way?
   override def equals(other: Any) = other match {
-    case other: Item ⇒
+    case other: Item =>
       label                         == other.label         &&
       help                          == other.help          &&
       hint                          == other.hint          &&
       externalValue(encode = false) == other.externalValue(encode = false) &&
       attributes                    == other.attributes    &&
       super.equals(other)
-    case _ ⇒ false
+    case _ => false
   }
 
   def iterateLHHA =
     Iterator(
-      Option(label) map ("label" →),
-      help          map ("help"  →),
-      hint          map ("hint"  →)
+      Option(label) map ("label" ->),
+      help          map ("help"  ->),
+      hint          map ("hint"  ->)
     ).flatten
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
@@ -65,13 +65,13 @@ class XXFormsDialogControl(
     super.onCreate(restoreState, state, update)
 
     state match {
-      case Some(ControlState(_, _, keyValues)) ⇒
+      case Some(ControlState(_, _, keyValues)) =>
         setLocal(XXFormsDialogControlLocal(
           visible             = keyValues("visible") == "true",
           constrainToViewport = keyValues.get("constrain") contains "true",
           neighborControlId   = keyValues.get("neighbor")
         ))
-      case None if restoreState ⇒
+      case None if restoreState =>
         // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
         // a particular control might not be found.
         setLocal(XXFormsDialogControlLocal(
@@ -79,7 +79,7 @@ class XXFormsDialogControl(
           constrainToViewport = false,
           neighborControlId   = None
         ))
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -95,7 +95,7 @@ class XXFormsDialogControl(
   override def performTargetAction(event: XFormsEvent): Unit = {
     super.performTargetAction(event)
     event match {
-      case dialogOpenEvent: XXFormsDialogOpenEvent ⇒
+      case dialogOpenEvent: XXFormsDialogOpenEvent =>
 
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
         localForUpdate.visible             = true
@@ -105,7 +105,7 @@ class XXFormsDialogControl(
         containingDocument.getControls.markDirtySinceLastRequest(true)
         containingDocument.getControls.doPartialRefresh(this)
 
-      case _: XXFormsDialogCloseEvent ⇒
+      case _: XXFormsDialogCloseEvent =>
 
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
         localForUpdate.visible             = false
@@ -115,22 +115,22 @@ class XXFormsDialogControl(
         containingDocument.getControls.markDirtySinceLastRequest(false)
         containingDocument.getControls.doPartialRefresh(this)
 
-      case _ ⇒
+      case _ =>
     }
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
-      case _: XXFormsDialogOpenEvent ⇒
+      case _: XXFormsDialogOpenEvent =>
         // If dialog is closed and the focus is within the dialog, remove the focus
         // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
         if (isVisible && ! Focus.isFocusWithinContainer(this))
           Dispatch.dispatchEvent(new XFormsFocusEvent(this, Set.empty, Set.empty))
-      case _: XXFormsDialogCloseEvent ⇒
+      case _: XXFormsDialogCloseEvent =>
         // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
         if (! isVisible && Focus.isFocusWithinContainer(this))
           Focus.removeFocus(containingDocument)
-      case _ ⇒
+      case _ =>
     }
     super.performDefaultAction(event)
   }
@@ -153,16 +153,16 @@ class XXFormsDialogControl(
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XXFormsDialogControl) ⇒
+      case Some(other: XXFormsDialogControl) =>
         // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
         other.wasVisible == isVisible &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
   }
 
   override def outputAjaxDiff(
     previousControl : Option[XFormsControl],
-    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
   ): Unit = {
 
@@ -188,7 +188,7 @@ class XXFormsDialogControl(
         doOutputElement = true
       }
       if (visible) {
-        neighborControlId foreach { neighbor ⇒
+        neighborControlId foreach { neighbor =>
           if (previousControl.isEmpty || previousDialog.exists(_.neighborControlId != neighborControlId)) {
               atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
               doOutputElement = true

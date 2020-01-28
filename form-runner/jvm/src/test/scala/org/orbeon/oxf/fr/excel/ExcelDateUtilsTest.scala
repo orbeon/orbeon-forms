@@ -16,7 +16,7 @@
 ==================================================================== */
 package org.orbeon.oxf.fr.excel
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.CoreUtils._
@@ -51,7 +51,7 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
         (FormatType.Date , 78, "[DBNum3][$-804]yyyy\"\u5e74\"m\"\u6708\"d\"\u65e5\";@", "２０１６年１２月８日")
       )
 
-    for ((format, formatIndex, formatString, message) ← Expected)
+    for ((format, formatIndex, formatString, message) <- Expected)
       it(s"`$message`") {
         assert(format == ExcelDateUtils.analyzeFormatType(formatIndex, formatString))
       }
@@ -69,11 +69,11 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
         (FormatType.Time,     0x2d),
         (FormatType.Time,     0x2e)
       )
-      for ((formatType, builtin) ← builtins) {
+      for ((formatType, builtin) <- builtins) {
         it(s"`$builtin`") {
           assert(
             ExcelDateUtils.findInternalFormat(builtin) exists
-              (typeFormat ⇒ formatType == ExcelDateUtils.analyzeFormatType(builtin, typeFormat._2))
+              (typeFormat => formatType == ExcelDateUtils.analyzeFormatType(builtin, typeFormat._2))
           )
         }
       }
@@ -81,12 +81,12 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
 
     describe("Builtin non-date formats") {
       val builtins = List(0x01, 0x02, 0x17, 0x1f, 0x30)
-      for (builtin ← builtins) {
+      for (builtin <- builtins) {
         it(s"`$builtin`") {
           assert(
             ! (
               ExcelDateUtils.findInternalFormat(builtin) exists
-                (typeFormat ⇒ FormatType.Other != ExcelDateUtils.analyzeFormatType(builtin, typeFormat._2))
+                (typeFormat => FormatType.Other != ExcelDateUtils.analyzeFormatType(builtin, typeFormat._2))
             )
           )
         }
@@ -133,7 +133,7 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
           (FormatType.Date, "[yeLLow]yyyy-mm-dd")
         )
 
-      for ((formatType, format) ← formats)
+      for ((formatType, format) <- formats)
         it(s"`$format`") {
           assert(formatType == ExcelDateUtils.analyzeFormatType(formatId, format))
         }
@@ -161,14 +161,14 @@ class ExcelDateUtilsTest extends AnyFunSpecLike {
           (FormatType.Time, "[red][hh]")
       )
 
-      for ((formatType, format) ← formats)
+      for ((formatType, format) <- formats)
         it(s"`$format`") {
           assert(formatType == ExcelDateUtils.analyzeFormatType(formatId, format))
         }
     }
 
     describe("Invalid dates formats") {
-      for (format ← List("yyyy*mm*dd", "0.0", "0.000", "0%", "0.0%", "[]Foo", "[BLACK]0.00%", "[ms]", "[Mh]", ""))
+      for (format <- List("yyyy*mm*dd", "0.0", "0.000", "0%", "0.0%", "[]Foo", "[BLACK]0.00%", "[ms]", "[Mh]", ""))
         it(s"`$format`") {
           assert(FormatType.Other == ExcelDateUtils.analyzeFormatType(formatId, format))
         }

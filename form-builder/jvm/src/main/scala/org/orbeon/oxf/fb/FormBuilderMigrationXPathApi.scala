@@ -39,7 +39,7 @@ object FormBuilderMigrationXPathApi {
       outerDocument        = outerDocument,
       availableXBLBindings = availableXBLBindings,
       legacyGridsOnly      = false
-    ) flatMap { case (version, jsonString) ⇒
+    ) flatMap { case (version, jsonString) =>
       List(version.entryName, jsonString)
     }
 
@@ -67,8 +67,8 @@ object FormBuilderMigrationXPathApi {
     )
 
     // 3. Migrate other aspects such as binds and controls
-    MigrationSupport.AllMigrationOps foreach { ops ⇒
-      migrationsFromForm.find(ops) foreach (m ⇒ ops.migrateOthersTo(doc, m))
+    MigrationSupport.AllMigrationOps foreach { ops =>
+      migrationsFromForm.find(ops) foreach (m => ops.migrateOthersTo(doc, m))
     }
 
     // Q: Should we migrate repeat templates here?

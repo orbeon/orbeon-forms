@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.{DocumentFactory, Namespace, QName}
 

@@ -15,7 +15,7 @@ package org.orbeon.oxf.externalcontext
 
 import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter._
@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.{NetUtils, PathUtils, StringConversions, URLRewriterU
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
-  retrievePathMatchers : ⇒ ju.List[URLRewriterUtils.PathMatcher],
+  retrievePathMatchers : => ju.List[URLRewriterUtils.PathMatcher],
   request              : ExternalContext.Request,
   wsrpEncodeResources  : Boolean
 ) extends URLRewriter {
@@ -159,9 +159,9 @@ object WSRPURLRewriter {
   val PrefixTagLength               = PrefixTag.length
 
   private val URLTypes = Map(
-    URLTypeBlockingAction → URLTypeBlockingActionString,
-    URLTypeRender         → URLTypeRenderString,
-    URLTypeResource       → URLTypeResourceString
+    URLTypeBlockingAction -> URLTypeBlockingActionString,
+    URLTypeRender         -> URLTypeRenderString,
+    URLTypeResource       -> URLTypeResourceString
   )
 
   /**
@@ -215,8 +215,8 @@ object WSRPURLRewriter {
     sb.toString
   }
 
-  type CreateResourceURL = String ⇒ String
-  type CreatePortletURL  = (Option[String], Option[String], ju.Map[String, Array[String]]) ⇒ String
+  type CreateResourceURL = String => String
+  type CreatePortletURL  = (Option[String], Option[String], ju.Map[String, Array[String]]) => String
 
   def decodeURL(
     encodedURL        : String,

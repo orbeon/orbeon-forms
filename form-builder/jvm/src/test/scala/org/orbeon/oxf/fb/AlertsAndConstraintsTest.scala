@@ -24,7 +24,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.{xml ⇒ sx}
+import scala.{xml => sx}
 class AlertsAndConstraintsTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -39,24 +39,24 @@ class AlertsAndConstraintsTest
 
   describe("Initial alert") {
     it("must read initial alert") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val alertDetails = AlertDetails.fromForm(Control1)
-        assert(List(AlertDetails(None, List("en" → "Alert for en", "fr" → "Alert for fr"), global = false)) === alertDetails)
+        assert(List(AlertDetails(None, List("en" -> "Alert for en", "fr" -> "Alert for fr"), global = false)) === alertDetails)
 
         val expected =
           <alert message="Alert for en" global="false">
             <message lang="fr" value="Alert for fr"/>
           </alert>
 
-        assertAlertsXML(List(expected), alertDetails map (a ⇒ a.toXML(FormBuilder.currentLang): NodeInfo))
+        assertAlertsXML(List(expected), alertDetails map (a => a.toXML(FormBuilder.currentLang): NodeInfo))
       }
     }
   }
 
   describe("Warning constraint automatic id") {
     it("must add an automatic id") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val newValidation =
           <validation type="formula" id="" level="warning" default-alert="false">
@@ -83,7 +83,7 @@ class AlertsAndConstraintsTest
 
   describe("Warning constraint specify id") {
     it("must read back the constraint with the given id") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val newValidation =
           <validation type="formula" id="length-constraint" level="warning" default-alert="false">
@@ -101,7 +101,7 @@ class AlertsAndConstraintsTest
 
   describe("Multiple validations") {
     it("must read back multiple validations") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val newValidations = List(
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -126,7 +126,7 @@ class AlertsAndConstraintsTest
 
   describe("Remove alert in middle") {
     it("two validations and one validation") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
@@ -228,7 +228,7 @@ class AlertsAndConstraintsTest
 
   describe("Default alert") {
     it("must use local default alert") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
@@ -238,7 +238,7 @@ class AlertsAndConstraintsTest
     }
 
     it("must use global default alert") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val defaultAlertAsXML = AlertDetails.fromForm(Control1).head.toXML(FormBuilder.currentLang)
 
@@ -250,7 +250,7 @@ class AlertsAndConstraintsTest
 
   describe("Single constraint without custom alert") {
     it("must read back the constraint") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val newValidation =
           <validation type="formula" id="length5-constraint" level="error" default-alert="true">
@@ -277,7 +277,7 @@ class AlertsAndConstraintsTest
 
   describe("Single constraint with custom alert") {
     it("must read back the constraint") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val newValidation =
           <validation type="formula" id="length5-constraint" level="error" default-alert="false">
@@ -308,7 +308,7 @@ class AlertsAndConstraintsTest
 
   describe("Required and datatype validations") {
     it("required string") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -337,7 +337,7 @@ class AlertsAndConstraintsTest
     }
 
     it("optional decimal") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -365,7 +365,7 @@ class AlertsAndConstraintsTest
     }
 
     it("required decimal") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -393,7 +393,7 @@ class AlertsAndConstraintsTest
     }
 
     it("formula for required") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
         val newValidations = List(
@@ -410,7 +410,7 @@ class AlertsAndConstraintsTest
     }
 
     it("required decimal and custom alert") {
-      withActionAndFBDoc(AlertsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(AlertsDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -443,7 +443,7 @@ class AlertsAndConstraintsTest
               Some(
                 AlertDetails(
                   Some("validation-1-validation"),
-                  List("en" → "This is required!", "fr" → "Ce champ est requis !"),
+                  List("en" -> "This is required!", "fr" -> "Ce champ est requis !"),
                   global = false
                 )
               )
@@ -458,7 +458,7 @@ class AlertsAndConstraintsTest
               Some(
                 AlertDetails(
                   Some("validation-4-validation"),
-                  List("en" → "This must be a decimal!", "fr" → "Ce champ doit être une valeur décimale !"),
+                  List("en" -> "This must be a decimal!", "fr" -> "Ce champ doit être une valeur décimale !"),
                   global = false
                 )
               )
@@ -472,7 +472,7 @@ class AlertsAndConstraintsTest
 
   describe("Schema type") {
     it("must read back the XML Schema datatype") {
-      withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SchemaDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -500,7 +500,7 @@ class AlertsAndConstraintsTest
 
   describe("Schema prefix") {
     it("must find the schema prefix") {
-      withActionAndFBDoc(SchemaDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SchemaDoc) { implicit ctx =>
         assert(Some("foo") === findSchemaPrefix(ctx.formDefinitionRootElem))
       }
     }
@@ -508,7 +508,7 @@ class AlertsAndConstraintsTest
 
   describe("Schema type without namespace") {
     it("must set a datatype without prefix") {
-      withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx =>
 
         val bind = findBindByName(ctx.formDefinitionRootElem, Control1).toList
 
@@ -536,23 +536,23 @@ class AlertsAndConstraintsTest
 
   describe("Schema prefix without namespace") {
     it("must not find an XML Schema prefix") {
-      withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SchemaNoNamespaceDoc) { implicit ctx =>
         assert(None === findSchemaPrefix(ctx.formDefinitionRootElem))
       }
     }
   }
 
-  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, List(FormBuilder.currentLang → ""), global = true)
+  private def globalAlert     (implicit ctx: FormBuilderDocContext) = AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true)
   private def globalAlertAsXML(implicit ctx: FormBuilderDocContext) = globalAlert.toXML(FormBuilder.currentLang)
 
   private def readConstraintValidationsAsXML(controlName: String)(implicit ctx: FormBuilderDocContext) =
     ConstraintValidation.fromForm(controlName) map
-    (a ⇒ a.toXML(FormBuilder.currentLang): NodeInfo) toArray
+    (a => a.toXML(FormBuilder.currentLang): NodeInfo) toArray
 
   private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 
     left zip right foreach {
-      case (l, r) ⇒ assertXMLDocumentsIgnoreNamespacesInScope(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
+      case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
     }
 
     assert(left.size === right.size)

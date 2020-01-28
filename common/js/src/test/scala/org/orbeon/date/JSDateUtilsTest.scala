@@ -21,20 +21,20 @@ import scala.scalajs.js
 class JSDateUtilsTest extends AnyFunSpec {
 
   val StringsToDates = List(
-    "2032-05-29" → new js.Date(2032,  4, 29, 0, 0, 0, 0),
-    "2032-12-31" → new js.Date(2032, 11, 31, 0, 0, 0, 0),
-    "2019-01-01" → new js.Date(2019,  0,  1, 0, 0, 0, 0)
+    "2032-05-29" -> new js.Date(2032,  4, 29, 0, 0, 0, 0),
+    "2032-12-31" -> new js.Date(2032, 11, 31, 0, 0, 0, 0),
+    "2019-01-01" -> new js.Date(2019,  0,  1, 0, 0, 0, 0)
   )
 
   describe("ISO string conversion to JavaScript date") {
-    for ((isoString, expectedDate) ← StringsToDates)
+    for ((isoString, expectedDate) <- StringsToDates)
       it(s"must pass for `$isoString`") {
         assert(isoDateToStringUsingLocalTimezone(isoString) map (_.getTime) contains expectedDate.getTime)
       }
   }
 
   describe("JavaScript date conversion to ISO string") {
-    for ((date, expectedString) ← StringsToDates map (t ⇒ t._2 → t._1))
+    for ((date, expectedString) <- StringsToDates map (t => t._2 -> t._1))
       it(s"must pass for `$expectedString`") {
         assert(dateToISOStringUsingLocalTimezone(date) === expectedString)
       }

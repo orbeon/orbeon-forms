@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 
@@ -19,7 +19,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
           return firstText
         } else {
           val buffer = new jl.StringBuilder(firstText)
-          for (i ← 1 until size) {
+          for (i <- 1 until size) {
             val node = list.get(i)
             buffer.append(getContentAsText(node))
           }
@@ -33,8 +33,8 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   // Return the text value of the Text node.
   private def getContentAsText(content: Node): String =
     content match {
-      case _: Text ⇒ content.getText
-      case _       ⇒ ""
+      case _: Text => content.getText
+      case _       => ""
     }
 
   // TODO: review as trimming is ok, but normalization should follow standard semantic, and method renamed if kept
@@ -71,17 +71,17 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   }
 
   def add(node: Node) = node match {
-    case n: Element               ⇒ add(n)
-    case n: Comment               ⇒ add(n)
-    case n: ProcessingInstruction ⇒ add(n)
-    case n                        ⇒ invalidNodeTypeException(n)
+    case n: Element               => add(n)
+    case n: Comment               => add(n)
+    case n: ProcessingInstruction => add(n)
+    case n                        => invalidNodeTypeException(n)
   }
 
   def remove(node: Node): Boolean = node match {
-    case n: Element               ⇒ remove(n)
-    case n: Comment               ⇒ remove(n)
-    case n: ProcessingInstruction ⇒ remove(n)
-    case n                        ⇒ invalidNodeTypeException(n)
+    case n: Element               => remove(n)
+    case n: Comment               => remove(n)
+    case n: ProcessingInstruction => remove(n)
+    case n                        => invalidNodeTypeException(n)
   }
 
   def add(comment: Comment)             : Unit    = addNode(comment)
@@ -93,7 +93,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   def remove(pi: ProcessingInstruction) : Boolean = removeNode(pi)
 
   def appendContent(branch: Branch): Unit = {
-    for (i ← 0 until branch.nodeCount) {
+    for (i <- 0 until branch.nodeCount) {
       val node = branch.node(i)
       add(node.deepCopy)
     }
@@ -101,8 +101,8 @@ abstract class AbstractBranch extends AbstractNode with Branch {
 
   def node(index: Int): Node =
     internalContent.get(index) match {
-      case node: Node ⇒ node
-      case _          ⇒ null
+      case node: Node => node
+      case _          => null
     }
 
   def nodeCount: Int = internalContent.size

@@ -50,7 +50,7 @@ class EventHandlerImpl(
 ) with EventHandler
   with Logging {
 
-  self: ActionTrait ⇒
+  self: ActionTrait =>
 
   import EventHandlerImpl._
 
@@ -74,8 +74,8 @@ class EventHandlerImpl(
     // as modifiers require `keydown` in browsers.
     if (keyModifiers.nonEmpty)
       names map {
-        case EventNames.KeyPress ⇒ EventNames.KeyDown
-        case other               ⇒ other
+        case EventNames.KeyPress => EventNames.KeyDown
+        case other               => other
       }
     else
       names
@@ -127,13 +127,13 @@ class EventHandlerImpl(
     implicit val logger = staticStateContext.partAnalysis.getIndentedLogger
 
     def unknownTargetId(id: String) = {
-      warn("unknown id", Seq("id" → id))
+      warn("unknown id", Seq("id" -> id))
       Set.empty[String]
     }
 
     def ignoringHandler(attName: String) = {
       warn(attName + " attribute present but does not refer to at least one valid id, ignoring event handler",
-         Seq("element" → Dom4jUtils.elementToDebugString(element)))
+         Seq("element" -> Dom4jUtils.elementToDebugString(element)))
       Set.empty[String]
     }
 
@@ -141,7 +141,7 @@ class EventHandlerImpl(
     type TokenResolver = PartialFunction[String, Set[String]]
 
     val staticIdResolver: TokenResolver = {
-      case id ⇒
+      case id =>
         val prefixedId = scope.prefixedIdForStaticId(id)
         if (prefixedId ne null)
           Set(prefixedId)
@@ -153,10 +153,10 @@ class EventHandlerImpl(
 
     // Resolve a token starting with a hash (#)
     val observerHashResolver: TokenResolver = {
-      case ObserverIsPrecedingSibling ⇒
+      case ObserverIsPrecedingSibling =>
         preceding match {
-          case Some(p) ⇒ Set(p.prefixedId)
-          case None    ⇒ unknownTargetId(ObserverIsPrecedingSibling)
+          case Some(p) => Set(p.prefixedId)
+          case None    => unknownTargetId(ObserverIsPrecedingSibling)
         }
     }
 
@@ -175,11 +175,11 @@ class EventHandlerImpl(
           observersPrefixedIdsAndHashes
         else
           parent collect {
-            case iteration: RepeatIterationControl ⇒
+            case iteration: RepeatIterationControl =>
               // Case where the handler doesn't have an explicit observer and is within a repeat
               // iteration. As of 2012-05-18, the handler observes the enclosing repeat container.
               Set(iteration.parent.get.prefixedId)
-            case parent: ElementAnalysis ⇒
+            case parent: ElementAnalysis =>
               // Case where the handler doesn't have an explicit observer. It observes its parent.
               Set(parent.prefixedId)
           } getOrElse Set.empty[String]
@@ -189,7 +189,7 @@ class EventHandlerImpl(
 
     // Resolve a token starting with a hash (#)
     val targetHashResolver: TokenResolver = {
-      case TargetIsObserver ⇒ observersPrefixedIds
+      case TargetIsObserver => observersPrefixedIds
     }
 
     // Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
@@ -229,7 +229,7 @@ class EventHandlerImpl(
       eventObserver match {
 
         // Observer is the XBL component itself but from the "inside"
-        case componentControl: XFormsComponentControl if isXBLHandler ⇒
+        case componentControl: XFormsComponentControl if isXBLHandler =>
 
           if (componentControl.canRunEventHandlers(event)) {
 
@@ -243,25 +243,25 @@ class EventHandlerImpl(
             (xblContainer, handlerEffectiveId, stack)
           } else {
             debug("ignoring event dispatched to non-relevant component control", List(
-              "name"       → event.name,
-              "control id" → componentControl.effectiveId)
+              "name"       -> event.name,
+              "control id" -> componentControl.effectiveId)
             )
             return
           }
 
         // Regular observer
-        case _ ⇒
+        case _ =>
 
           // Resolve the concrete handler
           EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
-            case Some(concreteHandler) ⇒
+            case Some(concreteHandler) =>
 
               val handlerContainer   = concreteHandler.container
               val handlerEffectiveId = concreteHandler.getEffectiveId
               val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
               (handlerContainer, handlerEffectiveId, stack)
-            case None ⇒
+            case None =>
               return
           }
       }
@@ -289,7 +289,7 @@ class EventHandlerImpl(
           _.runAction(self)
         }
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           // Something bad happened while running the action: dispatch error event to the root of the current scope
           // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
           // target. We thought about dispatching to the root control of the current scope, BUT in case the action
@@ -300,10 +300,10 @@ class EventHandlerImpl(
       }
     } else {
       debug("skipping non-relevant handler", List(
-        "event"        → event.name,
-        "observer"     → event.targetObject.getEffectiveId,
-        "handler name" → localName,
-        "handler id"   → handlerEffectiveId
+        "event"        -> event.name,
+        "observer"     -> event.targetObject.getEffectiveId,
+        "handler name" -> localName,
+        "handler id"   -> handlerEffectiveId
       ))
     }
   }
@@ -353,12 +353,12 @@ object EventHandlerImpl extends Logging {
         warn(
           "skipping event in different scope (see issue #243)",
           List(
-            "target id"             → targetObject.getEffectiveId,
-            "handler id"            → handler.prefixedId,
-            "observer id"           → eventObserver.getEffectiveId,
-            "target scope"          → targetObject.scope.scopeId,
-            "handler scope"         → handler.scope.scopeId,
-            "observer scope"        → eventObserver.scope.scopeId
+            "target id"             -> targetObject.getEffectiveId,
+            "handler id"            -> handler.prefixedId,
+            "observer id"           -> eventObserver.getEffectiveId,
+            "target scope"          -> targetObject.scope.scopeId,
+            "handler scope"         -> handler.scope.scopeId,
+            "observer scope"        -> eventObserver.scope.scopeId
           ))(
           containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
         )
@@ -370,7 +370,7 @@ object EventHandlerImpl extends Logging {
 
   def parseKeyModifiers(value: Option[String]): Set[Modifier] =
     value match {
-      case Some(attValue) ⇒ Modifier.parseStringToSet(attValue)
-      case None           ⇒ Set.empty[Modifier]
+      case Some(attValue) => Modifier.parseStringToSet(attValue)
+      case None           => Set.empty[Modifier]
     }
 }

@@ -52,7 +52,7 @@ object PropertiesStartsWith {
 
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {
-      property ← Properties.instance.getPropertySet.propertiesStartsWith(propertyName)
+      property <- Properties.instance.getPropertySet.propertiesStartsWith(propertyName)
       if ! property.toLowerCase.contains("password")
     } yield
       SaxonUtils.convertJavaObjectToSaxonObject(property).asInstanceOf[AtomicValue]

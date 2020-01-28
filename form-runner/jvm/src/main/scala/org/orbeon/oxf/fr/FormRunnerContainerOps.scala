@@ -29,8 +29,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   val LegacyRepeatContentToken = "true"
 
   // Predicates
-  val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest    effectiveBooleanValue
-  val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest effectiveBooleanValue
+  val IsGrid:    NodeInfo => Boolean = _ self FRGridTest    effectiveBooleanValue
+  val IsSection: NodeInfo => Boolean = _ self FRSectionTest effectiveBooleanValue
 
   def isRepeatable(node: NodeInfo): Boolean =
     IsGrid(node) || IsSection(node)
@@ -58,8 +58,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def hasContainerSettings(node: NodeInfo): Boolean =
     IsSection(node) || IsGrid(node)
 
-  val IsContainer: NodeInfo ⇒ Boolean =
-    node ⇒ (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
+  val IsContainer: NodeInfo => Boolean =
+    node => (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
 
   def controlRequiresNestedIterationElement(node: NodeInfo): Boolean =
     isRepeat(node)
@@ -97,8 +97,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     val namesWithContainers =
       for {
-        container ← findAncestorContainersLeafToRoot(descendant, includeSelf).to(List)
-        name      ← getControlNameOpt(container)
+        container <- findAncestorContainersLeafToRoot(descendant, includeSelf).to(List)
+        name      <- getControlNameOpt(container)
         if includeNonRepeatedGrids || ! (IsGrid(container) && ! isRepeat(container))
       } yield
         name
@@ -106,7 +106,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     // Repeated sections and grids add an intermediary iteration element
     val namesFromLeaf =
       if (includeIterationElements)
-        namesWithContainers flatMap { name ⇒
+        namesWithContainers flatMap { name =>
           findRepeatIterationName(descendant, name).toList ::: name :: Nil
         }
       else
@@ -140,10 +140,10 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =
     for {
-      control       ← findControlByName(inDoc, controlName)
+      control       <- findControlByName(inDoc, controlName)
       if controlRequiresNestedIterationElement(control)
-      bind          ← control attValueOpt XFormsConstants.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
-      iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
+      bind          <- control attValueOpt XFormsConstants.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
+      iterationBind <- bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
 

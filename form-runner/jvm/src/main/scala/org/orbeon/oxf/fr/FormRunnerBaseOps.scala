@@ -116,9 +116,9 @@ trait FormRunnerBaseOps {
 
     def fromIndex =
       Option(inDoc.getDocumentRoot.selectID(id)) match {
-        case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) ⇒ elemOpt
-        case Some(_)                                                   ⇒ fromSearch
-        case None                                                      ⇒ None
+        case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) => elemOpt
+        case Some(_)                                                   => fromSearch
+        case None                                                      => None
       }
 
     if (hasIndex)
@@ -174,7 +174,7 @@ trait FormRunnerBaseOps {
 
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
-    getModelElem(inDoc) / XFInstanceTest filter (e ⇒ isTemplateId(e.id))
+    getModelElem(inDoc) / XFInstanceTest filter (e => isTemplateId(e.id))
 
   // Get the root element of instances
   //@XPathFunction
@@ -195,7 +195,7 @@ trait FormRunnerBaseOps {
   def findTopLevelBindFromModelElem(modelElem: NodeInfo): Option[NodeInfo] =
     modelElem / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-      bind ⇒ TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
+      bind => TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
 
   def properties: PropertySet = Properties.instance.getPropertySet
@@ -215,7 +215,7 @@ trait FormRunnerBaseOps {
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
-    properties.getPropertyOpt(buildPropertyName(name)) map { p ⇒ (p.value.toString, p.namespaceMapping) }
+    properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.value.toString, p.namespaceMapping) }
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
@@ -289,24 +289,24 @@ trait FormRunnerBaseOps {
     val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
     val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
     captchaPropertyOpt match {
-      case None ⇒ Array.empty
-      case Some(captchaProperty) ⇒
+      case None => Array.empty
+      case Some(captchaProperty) =>
         val propertyValue = captchaProperty.value.asInstanceOf[String]
         propertyValue match {
-          case ""              ⇒ Array.empty
-          case "reCAPTCHA"     ⇒ Array(XMLNames.FR, "fr:recaptcha")
-          case "SimpleCaptcha" ⇒ Array(XMLNames.FR, "fr:simple-captcha")
-          case captchaName     ⇒
+          case ""              => Array.empty
+          case "reCAPTCHA"     => Array(XMLNames.FR, "fr:recaptcha")
+          case "SimpleCaptcha" => Array(XMLNames.FR, "fr:simple-captcha")
+          case captchaName     =>
             captchaName.splitTo[List](":") match {
-              case List(prefix, _) ⇒
+              case List(prefix, _) =>
                 captchaProperty.namespaces.get(prefix) match {
-                  case Some(namespaceURI) ⇒
+                  case Some(namespaceURI) =>
                     Array(namespaceURI, captchaName)
-                  case None ⇒
+                  case None =>
                     logger.error(s"No namespace for captcha `$captchaName`")
                     Array.empty
                 }
-              case _ ⇒
+              case _ =>
                 logger.error(s"Invalid reference to captcha component `$captchaName`")
                 Array.empty
             }
@@ -331,7 +331,7 @@ trait FormRunnerBaseOps {
   // Display an error message
   //@XPathFunction
   def errorMessage(message: String): Unit =
-    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
+    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" -> Some(message)))
 
 }
 

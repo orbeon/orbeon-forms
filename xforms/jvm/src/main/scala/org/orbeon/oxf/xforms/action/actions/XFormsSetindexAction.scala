@@ -76,14 +76,14 @@ object XFormsSetindexAction {
 
     // Find repeat control
     interpreter.resolveObject(actionElement, repeatStaticId) match {
-      case control: XFormsControl ⇒
+      case control: XFormsControl =>
 
-        val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl ⇒ repeat }
+        val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl => repeat }
 
         debug(
           "xf:setindex: setting index upon xf:setindex",
-          ("new index" → index.toString) ::
-          (repeatControl.toList map (c ⇒ "old index" → c.getIndex.toString))
+          ("new index" -> index.toString) ::
+          (repeatControl.toList map (c => "old index" -> c.getIndex.toString))
         )
 
         val focusedBeforeOpt = interpreter.containingDocument.getControls.getFocusedControl
@@ -98,12 +98,12 @@ object XFormsSetindexAction {
         // figure this out yet
         repeatControl map (_.getIndex) getOrElse -1
 
-      case _ ⇒
+      case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action
         // such as dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
         debug(
           "xf:setindex: index does not refer to an existing xf:repeat element, ignoring action",
-          List("repeat id" → repeatStaticId)
+          List("repeat id" -> repeatStaticId)
         )
         -1
     }

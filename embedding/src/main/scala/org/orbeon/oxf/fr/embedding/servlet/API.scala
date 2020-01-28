@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
-import java.{util ⇒ ju}
+import java.{util => ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.fr.embedding.APISupport._
@@ -33,7 +33,7 @@ object API {
     path       : String,
     headers    : ju.Map[String, String]
    ): Unit =
-    withSettings(req, writer) { settings ⇒
+    withSettings(req, writer) { settings =>
 
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         req,
@@ -75,7 +75,7 @@ object API {
     path       : String,
     headers    : Seq[(String, String)] = Nil
    ): Unit =
-    withSettings(req, out.fold(identity, _.getWriter)) { settings ⇒
+    withSettings(req, out.fold(identity, _.getWriter)) { settings =>
 
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         req,

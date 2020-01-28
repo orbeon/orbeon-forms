@@ -46,9 +46,9 @@ class MSVGrammarReaderController(
     // service URLs, as we do for a top-level schema and instances.
     val url =
       baseURL match {
-        case Some(baseURL) ⇒
+        case Some(baseURL) =>
           URLFactory.createURL(baseURL, systemId)
-        case None ⇒
+        case None =>
           URLFactory.createURL(XFormsUtils.resolveServiceURL(containingDocument, null, systemId, URLRewriter.REWRITE_MODE_ABSOLUTE))
       }
 
@@ -63,8 +63,8 @@ class MSVGrammarReaderController(
 
     val formatted =
       locators match {
-        case Array()  ⇒ message
-        case locators ⇒ s"${locators map locToString mkString ", "}: $message"
+        case Array()  => message
+        case locators => s"${locators map locToString mkString ", "}: $message"
       }
 
     XFormsModelSchemaValidator.logger.warn(formatted)
@@ -81,7 +81,7 @@ class SchemaDependencies {
   private var includes: List[(URL, Long)] = Nil
 
   def addInclude(url: URL): Unit =
-    includes ::= url → NetUtils.getLastModified(url)
+    includes ::= url -> NetUtils.getLastModified(url)
 
   def areIncludesUnchanged: Boolean = {
 
@@ -91,7 +91,7 @@ class SchemaDependencies {
       catch {
         // If an include is missing it may just be the case that it isn't included anymore _and_ it has been
         // removed. So, we return `false` and then on a reparse we will find out the truth.
-        case NonFatal(e) ⇒ false
+        case NonFatal(e) => false
       }
 
     includes forall (isUnchanged _).tupled

@@ -16,9 +16,9 @@ package org.orbeon.oxf.util
 object SLF4JLogging {
 
   def withDebug[T](
-    message    : ⇒ String,
-    parameters : ⇒ Seq[(String, String)] = Nil)(
-    body       : ⇒ T)(implicit
+    message    : => String,
+    parameters : => Seq[(String, String)] = Nil)(
+    body       : => T)(implicit
     logger     : org.slf4j.Logger
   ): T =
     try {
@@ -26,7 +26,7 @@ object SLF4JLogging {
         logger.debug(
           s"start $message",
           parameters collect {
-            case (k, v) if (k ne null) && (v ne null) ⇒ s"""$k: "$v""""
+            case (k, v) if (k ne null) && (v ne null) => s"""$k: "$v""""
           } mkString ("{", ", ", "}")
         )
 

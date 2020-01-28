@@ -23,14 +23,14 @@ import scala.util.Try
 
 trait XFormsActions {
 
-  self: ProcessInterpreter ⇒
+  self: ProcessInterpreter =>
 
   def AllowedXFormsActions = Map[String, Action](
-    "xf:send"     → tryXFormsSend,
-    "xf:dispatch" → tryXFormsDispatch,
-    "xf:show"     → tryShowDialog,
-    "xf:hide"     → tryHideDialog,
-    "xf:setvalue" → trySetvalue
+    "xf:send"     -> tryXFormsSend,
+    "xf:dispatch" -> tryXFormsDispatch,
+    "xf:show"     -> tryShowDialog,
+    "xf:hide"     -> tryHideDialog,
+    "xf:setvalue" -> trySetvalue
   )
 
   def tryXFormsSend(params: ActionParams): Try[Any] =
@@ -43,7 +43,7 @@ trait XFormsActions {
   private val StandardDialogParams   = Set("dialog")
 
   private def collectCustomProperties(params: ActionParams, standardParamNames: Set[String]) = params.collect {
-    case (Some(name), value) if ! standardParamNames(name) ⇒ name → Option(evaluateValueTemplate(value))
+    case (Some(name), value) if ! standardParamNames(name) => name -> Option(evaluateValueTemplate(value))
   }
 
   def tryXFormsDispatch(params: ActionParams): Try[Any] =
@@ -74,10 +74,10 @@ trait XFormsActions {
       val refParam = requiredParamByName(params, "setvalue", "ref")
       val refSeq   = if (all) evaluate(refParam) else Seq(evaluateOne(refParam))
       refSeq.foreach {
-        case nodeInfo: NodeInfo ⇒
+        case nodeInfo: NodeInfo =>
           val valueToSet = params.get(Some("value")) match {
-            case None            ⇒ ""
-            case Some(valueExpr) ⇒
+            case None            => ""
+            case Some(valueExpr) =>
               // TODO: Use namespaces from appropriate scope.
               evaluateString(
                 item = nodeInfo,
@@ -85,7 +85,7 @@ trait XFormsActions {
               )
           }
           setvalue(nodeInfo, valueToSet)
-        case _ ⇒
+        case _ =>
           debug("setvalue: `ref` parameter did not return a node, ignoring")
       }
     }

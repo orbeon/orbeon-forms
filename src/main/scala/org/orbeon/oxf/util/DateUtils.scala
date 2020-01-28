@@ -82,20 +82,20 @@ object DateUtils {
         DateValue.makeDateValue(date)
 
     valueOrFailure match {
-      case value: CalendarValue ⇒
+      case value: CalendarValue =>
         // FIXME: Could we not just use: `value.getCalendar.getTimeInMillis`
         Some(value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, defaultTimeZone).getLengthInMilliseconds)
-      case _: ValidationFailure ⇒ None
+      case _: ValidationFailure => None
     }
   }
 
   // Parse an ISO date and return the number of milliseconds from the epoch.
   def tryParseISODate(date: String, defaultTimeZone: TimeZone): Option[Long] =
     DateValue.makeDateValue(date) match {
-      case value: DateValue     ⇒
+      case value: DateValue     =>
         value.getCalendar.getTimeInMillis
         Some(value.subtract(EpochDate, defaultTimeZone).getLengthInMilliseconds)
-      case _: ValidationFailure ⇒ None
+      case _: ValidationFailure => None
     }
 
   // Parse an RFC 1123 dateTime
@@ -103,10 +103,10 @@ object DateUtils {
   def parseRFC1123(date: String): Long =
     try RFC1123Date.parseDateTime(date).getMillis
     catch {
-      case _: IllegalArgumentException ⇒
+      case _: IllegalArgumentException =>
         try RFC1123Date2.parseDateTime(date).getMillis
         catch {
-          case _: IllegalArgumentException ⇒
+          case _: IllegalArgumentException =>
             RFC1123Date3.parseDateTime(date).getMillis
         }
     }

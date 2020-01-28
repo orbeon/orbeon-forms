@@ -44,7 +44,7 @@ object SubmissionUtils {
       new VisitorSupport {
         override def visit(element: Element): Unit =
           if (element.elements.isEmpty)
-            builder += element.getName → element.getText
+            builder += element.getName -> element.getText
       }
     )
 
@@ -77,12 +77,12 @@ object SubmissionUtils {
     SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
   def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
-    processGETConnection(model, resolvedURL) { is ⇒
+    processGETConnection(model, resolvedURL) { is =>
       NetUtils.inputStreamToByteArray(is)
     }
 
   def readTinyTree(model: XFormsModel, resolvedURL: String, handleXInclude: Boolean): DocumentInfo =
-    processGETConnection(model, resolvedURL) { is ⇒
+    processGETConnection(model, resolvedURL) { is =>
       TransformerUtils.readTinyTree(
         XPath.GlobalConfiguration,
         is,
@@ -92,7 +92,7 @@ object SubmissionUtils {
       )
     }
 
-  def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream ⇒ T): T =
+  def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream => T): T =
     ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedURL), closeOnSuccess = true)(body)
 
   def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
@@ -136,7 +136,7 @@ object SubmissionUtils {
       )
 
     } catch {
-      case e: OXFException ⇒
+      case e: OXFException =>
         throw new XFormsSubmissionException(
           submission  = submission,
           message     = e.getMessage,
@@ -156,10 +156,10 @@ object SubmissionUtils {
       //
       val toForward =
         for {
-          name   ← List("user-agent", "accept")
-          values ← allHeaders.get(name)
+          name   <- List("user-agent", "accept")
+          values <- allHeaders.get(name)
         } yield
-          name → values
+          name -> values
 
       // Give priority to explicit headers
       toForward.toMap
@@ -169,8 +169,8 @@ object SubmissionUtils {
 
   def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
     for {
-      (headerName, headerValues) ← http.Headers.proxyHeaders(cxr.headers, request = false)
-      headerValue                ← headerValues
+      (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
+      headerValue                <- headerValues
     } locally {
       response.addHeader(headerName, headerValue)
     }
@@ -181,19 +181,19 @@ object SubmissionUtils {
     instanceOpt : Option[XFormsInstance]
   ): Boolean =
     instanceOpt match {
-      case Some(instance) if doc.countPendingUploads > 0 ⇒
+      case Some(instance) if doc.countPendingUploads > 0 =>
 
         val boundRelevantPendingUploadControlsIt =
           for {
-            uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
+            uploadControl <- doc.getControls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
-            node          ← uploadControl.boundNodeOpt
+            node          <- uploadControl.boundNodeOpt
             if (instance.model.findInstanceForNode(node) exists (_ eq instance))
           } yield
             uploadControl
 
         boundRelevantPendingUploadControlsIt.nonEmpty
-      case _ ⇒
+      case _ =>
         false
     }
 

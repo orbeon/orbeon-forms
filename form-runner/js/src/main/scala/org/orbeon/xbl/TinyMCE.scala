@@ -61,15 +61,15 @@ object TinyMCE {
         val tabindex = tinyMceDiv.getAttribute("tabindex")
         myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, TinyMce.EditorManager)
         val xformsValue = Document.getValue(serverValueOutputId).get
-        onInit(() ⇒ {
+        onInit(() => {
           // Send value to the server on blur
-          myEditor.on("blur", (_) ⇒ clientToServer())
+          myEditor.on("blur", (_) => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
           myEditor.setContent(xformsValue)
           val iframe = $(containerElem).find("iframe")
           // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
-          iframe.contents().on("click", (_: JQueryEventObject) ⇒ containerElem.click())
+          iframe.contents().on("click", (_: JQueryEventObject) => containerElem.click())
           $(iframe.get(0).asInstanceOf[raw.HTMLIFrameElement].contentWindow).on("focus", onFocus _)
           // Copy the tabindex on the iframe
           if (tabindex != null && tabindex != "") iframe.attr("tabindex", tabindex)
@@ -100,7 +100,7 @@ object TinyMCE {
           AjaxEvent(
             eventName  = "fr-set-client-value",
             targetId   = containerElem.id,
-            properties = Map("fr-value" → cleanedContent)
+            properties = Map("fr-value" -> cleanedContent)
           )
         )
       }
@@ -132,14 +132,14 @@ object TinyMCE {
       }
 
       // Runs a function when the TinyMCE is initialized
-      private def onInit(thunk: () ⇒ Unit): Unit = {
+      private def onInit(thunk: () => Unit): Unit = {
         if (tinymceInitialized) thunk()
-        else myEditor.on("init", _ ⇒ thunk())
+        else myEditor.on("init", _ => thunk())
       }
 
       override def xformsFocus(): Unit = { onInit(myEditor.focus) }
-      def readonly   (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
-      def readwrite  (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
+      def readonly   (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
+      def readwrite  (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
     }
   )
 }

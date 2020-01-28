@@ -57,11 +57,11 @@ trait WebAppContext {
 
   // Call all webAppDestroyed listeners
   def webAppDestroyed(): Unit =
-    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener ⇒
+    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener =>
       try {
         listener.webAppDestroyed()
       } catch {
-        case NonFatal(t) ⇒ log("Throwable caught when calling listener", t)
+        case NonFatal(t) => log("Throwable caught when calling listener", t)
       }
     }
 
@@ -95,12 +95,12 @@ trait ParametersAndAttributes {
 
   // Immutable context initialization parameters
   lazy val initParameters =
-    getInitParameterNames map (n ⇒ n → getInitParameter(n)) toMap
+    getInitParameterNames map (n => n -> getInitParameter(n)) toMap
 
   // Mutable context attributes backed by the actual context
   lazy val attributes = new collection.mutable.Map[String, AnyRef] {
     def get(k: String) = Option(getAttribute(k))
-    def iterator = getAttributeNames map (k ⇒ k → getAttribute(k)) toIterator
+    def iterator = getAttributeNames map (k => k -> getAttribute(k)) toIterator
     override def size = getAttributeNames.size
     def +=(kv: (String, AnyRef)) = { setAttribute(kv._1, kv._2); this }
     def -=(k: String) = { removeAttribute(k); this }
@@ -117,7 +117,7 @@ trait ParametersAndAttributes {
 
 trait OrbeonWebApp {
 
-  self: WebAppContext ⇒
+  self: WebAppContext =>
 
   // Run initialization only once per web app
   WebAppContext.synchronized {

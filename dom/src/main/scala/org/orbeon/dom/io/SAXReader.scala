@@ -96,7 +96,7 @@ class SAXReader(xmlReader: XMLReader) {
 
       contentHandler.getDocument
     } catch {
-      case e: SAXParseException ⇒
+      case e: SAXParseException =>
 
         val systemId = Option(e.getSystemId) getOrElse ""
 
@@ -104,7 +104,7 @@ class SAXReader(xmlReader: XMLReader) {
           s"Error on line ${e.getLineNumber} of document $systemId: ${e.getMessage}",
           e
         )
-      case e: Exception ⇒
+      case e: Exception =>
         throw new DocumentException(e.getMessage, e)
     }
 

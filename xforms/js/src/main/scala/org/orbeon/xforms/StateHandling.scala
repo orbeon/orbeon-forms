@@ -58,7 +58,7 @@ object StateHandling {
       )
 
     StateHandling.findClientState(formId) match {
-      case None ⇒
+      case None =>
 
         scribe.debug("no state found, setting initial state")
 
@@ -66,7 +66,7 @@ object StateHandling {
         setInitialState(uuid)
         StateResult.Uuid(uuid)
 
-      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
+      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload =>
 
         scribe.debug("state found upon reload, setting initial state")
 
@@ -74,14 +74,14 @@ object StateHandling {
         setInitialState(uuid)
         StateResult.Uuid(uuid)
 
-      case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
+      case Some(_) if Properties.revisitHandling.get() == "reload" =>
 
         scribe.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
         StateHandling.clearClientState(formId)
         StateResult.Reload
 
-      case Some(state) ⇒
+      case Some(state) =>
 
         scribe.debug("state found, assuming back/forward/navigate, requesting all events")
 
@@ -108,12 +108,12 @@ object StateHandling {
     findClientState(formId) getOrElse (throw new IllegalStateException(s"client state not found for form `$formId`"))
 
   def findClientState(formId: String): Option[ClientState] =
-    findRawState flatMap (_.get(formId)) flatMap { serialized ⇒
+    findRawState flatMap (_.get(formId)) flatMap { serialized =>
       decode[ClientState](serialized) match {
-        case Left(_)  ⇒
+        case Left(_)  =>
           scribe.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
-        case Right(state) ⇒
+        case Right(state) =>
           scribe.trace(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
@@ -136,7 +136,7 @@ object StateHandling {
   }
 
   def clearClientState(formId: String): Unit =
-    findRawState foreach { state ⇒
+    findRawState foreach { state =>
       dom.window.history.replaceState(
         statedata = state -= formId,
         title     = "",

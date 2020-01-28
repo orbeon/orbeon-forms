@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 import javax.portlet.filter.PortletRequestWrapper
 import javax.portlet.{PortletRequest, PortletSession}
 
@@ -35,7 +35,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
   describe("The portlet filter's `amendRequest()` function") {
 
     // Initial properties
-    val initialProperties = Map("p1" → List("v1a", "v1b"))
+    val initialProperties = Map("p1" -> List("v1a", "v1b"))
 
     // Session
     val sessionAttributes = mutable.Map[String, AnyRef]()
@@ -46,7 +46,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     }
     Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
-        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
+        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1)
     }
 
     // Request with initial properties
@@ -95,25 +95,25 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
     val expectedProperties =
       initialProperties ++ Map(
-        "orbeon-liferay-user-id"          → List("123"),
-        "orbeon-liferay-user-screen-name" → List("jsmith"),
-        "orbeon-liferay-user-full-name"   → List("John Paul Smith"),
-        "orbeon-liferay-user-first-name"  → List("John"),
-        "orbeon-liferay-user-middle-name" → List("Paul"),
-        "orbeon-liferay-user-last-name"   → List("Smith"),
-        "orbeon-liferay-user-email"       → List("test@orbeon.com"),
-        "orbeon-liferay-user-group-id"    → List("42"),
-        "orbeon-liferay-user-group-name"  → List("universe"),
-        "orbeon-liferay-user-roles"       → List("manager", "employee"),
-        Headers.OrbeonUsernameLower       → List("test@orbeon.com"),
-        Headers.OrbeonGroupLower          → List("universe"),
-        Headers.OrbeonRolesLower          → List("manager", "employee"),
-        Headers.OrbeonCredentialsLower    → List("""{"username":"test%40orbeon.com","groups":["universe"],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}""")
+        "orbeon-liferay-user-id"          -> List("123"),
+        "orbeon-liferay-user-screen-name" -> List("jsmith"),
+        "orbeon-liferay-user-full-name"   -> List("John Paul Smith"),
+        "orbeon-liferay-user-first-name"  -> List("John"),
+        "orbeon-liferay-user-middle-name" -> List("Paul"),
+        "orbeon-liferay-user-last-name"   -> List("Smith"),
+        "orbeon-liferay-user-email"       -> List("test@orbeon.com"),
+        "orbeon-liferay-user-group-id"    -> List("42"),
+        "orbeon-liferay-user-group-name"  -> List("universe"),
+        "orbeon-liferay-user-roles"       -> List("manager", "employee"),
+        Headers.OrbeonUsernameLower       -> List("test@orbeon.com"),
+        Headers.OrbeonGroupLower          -> List("universe"),
+        Headers.OrbeonRolesLower          -> List("manager", "employee"),
+        Headers.OrbeonCredentialsLower    -> List("""{"username":"test%40orbeon.com","groups":["universe"],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}""")
       )
 
     // NOTE: Don't use Array for comparison, because Array's == doesn't work as expected in Scala
     val actualProperties =
-      amendedRequest.getPropertyNames.asScala map (n ⇒ n → amendedRequest.getProperties(n).asScala.toList) toMap
+      amendedRequest.getPropertyNames.asScala map (n => n -> amendedRequest.getProperties(n).asScala.toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

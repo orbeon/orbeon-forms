@@ -36,15 +36,15 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
       _httpResponse = {
 
         def credentialsFromURL(url: URL): Option[Credentials] = {
-          url.getUserInfo.trimAllToOpt flatMap { userInfo ⇒
+          url.getUserInfo.trimAllToOpt flatMap { userInfo =>
             // Set username and optional password specified on URL
             val separatorPosition = userInfo.indexOf(":")
 
             val (username, password) =
               if (separatorPosition == -1)
-                userInfo → ""
+                userInfo -> ""
               else
-                userInfo.substring(0, separatorPosition) → userInfo.substring(separatorPosition + 1)
+                userInfo.substring(0, separatorPosition) -> userInfo.substring(separatorPosition + 1)
 
             // If the username/password contain special character, those characters will be encoded, since
             // we are getting this from a URL. Now do the decoding.
@@ -52,7 +52,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             val usernameOpt = username.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
             val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
 
-            usernameOpt map { username ⇒
+            usernameOpt map { username =>
               Credentials(username, passwordOpt, preemptiveAuth = true, None)
             }
           }
@@ -101,11 +101,11 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
 
   override def getLastModified =
     Option(getHeaderField(Headers.LastModifiedLower)) match {
-      case Some(_) ⇒ super.getLastModified
-      case None    ⇒ 0L
+      case Some(_) => super.getLastModified
+      case None    => 0L
     }
 
-  private def withConnection[T](body: HttpResponse ⇒ T) = {
+  private def withConnection[T](body: HttpResponse => T) = {
     if (_httpResponse.isEmpty)
       connect()
 

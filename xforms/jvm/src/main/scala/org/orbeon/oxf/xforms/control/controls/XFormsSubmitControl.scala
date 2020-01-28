@@ -40,14 +40,14 @@ class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, elemen
         (throw new ValidationException("xf:submit requires a submission attribute.", getLocationData))
 
       resolve(submissionId) match {
-        case Some(submission: XFormsModelSubmission) ⇒
+        case Some(submission: XFormsModelSubmission) =>
           // Submission found, dispatch xforms-submit event to it
           Dispatch.dispatchEvent(new XFormsSubmitEvent(submission))
-        case _ ⇒
+        case _ =>
           // "If there is a null search result for the target object and the source object is an XForms action such as
           // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
           debug("submission does not refer to an existing xf:submission element, ignoring action",
-            Seq("submission id" → submissionId))
+            Seq("submission id" -> submissionId))
       }
     }
     super.performDefaultAction(event)

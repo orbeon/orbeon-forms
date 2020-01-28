@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 import scala.concurrent.duration._
 
 trait Content {
@@ -116,7 +116,7 @@ case class HttpClientSettings(
 
 object HttpClientSettings {
 
-  def apply(param: String ⇒ String): HttpClientSettings = {
+  def apply(param: String => String): HttpClientSettings = {
 
     def booleanParamWithDefault(name: String, default: Boolean) =
       param(name).trimAllToOpt map (_ == "true") getOrElse default

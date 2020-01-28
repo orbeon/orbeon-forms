@@ -28,7 +28,7 @@ class WhitespaceTest extends DocumentTestBase with AssertionsForJUnit {
   )
 
   def assertValues(expectedValues: List[String]) =
-    for ((expectedValue, controlId) ← expectedValues.zip(controlIds))
+    for ((expectedValue, controlId) <- expectedValues.zip(controlIds))
       assert(expectedValue === getControlValue(controlId))
 
   def assertInitialState() =

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor
 
 import java.io.{BufferedInputStream, InputStream, InputStreamReader}
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import org.orbeon.dom._
 import org.orbeon.oxf.common.Defaults
@@ -115,7 +115,7 @@ object BinaryTextSupport {
       attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode))
 
     if (headers ne null)
-      headers.toIterator filterNot (nameValue ⇒ HeadersToFilter(nameValue._1)) foreach { case (name, value) ⇒
+      headers.toIterator filterNot (nameValue => HeadersToFilter(nameValue._1)) foreach { case (name, value) =>
         require((name ne null) && (value ne null))
         attributes.addAttribute("", name, name, "CDATA", value)
       }

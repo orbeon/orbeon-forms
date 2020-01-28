@@ -43,7 +43,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
   }
 
   @Test def forwardAsIs(): Unit =
-    for (contentType ← Seq("text/html; charset=utf-16", "text/html", "image/png")) {
+    for (contentType <- Seq("text/html; charset=utf-16", "text/html", "image/png")) {
       val (response, receiver) = responseWithReceiver
 
       val document: Document =

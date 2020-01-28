@@ -19,12 +19,12 @@ object Backend {
 
   def reindexingProviders(
     providers     : List[String],
-    indexProvider : String ⇒ Unit
+    indexProvider : String => Unit
   ): Unit = {
     StatusStore.setStatus(Status.Starting(providers))
     providers
       .zipWithIndex
-      .foreach { case (provider, index) ⇒
+      .foreach { case (provider, index) =>
         if (StatusStore.getStatus != Status.Stopping) {
           StatusStore.setStatus(Status.Indexing(
             provider      = provider,
@@ -38,19 +38,19 @@ object Backend {
   }
 
   def setProviderDocumentTotal(total: Int): Unit =
-    setIndexing(i ⇒ Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
+    setIndexing(i => Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
 
   def setProviderDocumentNext(): Unit =
-    setDocumentCount(c ⇒ c.copy(current = c.current + 1))
+    setDocumentCount(c => c.copy(current = c.current + 1))
 
-  private def setIndexing(setter: Status.Indexing ⇒ Option[Status.Indexing]): Unit =
-    Some(StatusStore.getStatus).collect { case status: Status.Indexing ⇒
+  private def setIndexing(setter: Status.Indexing => Option[Status.Indexing]): Unit =
+    Some(StatusStore.getStatus).collect { case status: Status.Indexing =>
       setter(status).foreach(StatusStore.setStatus)
     }
 
-  private def setDocumentCount(setter: Count ⇒ Count): Unit =
-    setIndexing(indexing ⇒
-      indexing.documentCount.map { dc ⇒
+  private def setDocumentCount(setter: Count => Count): Unit =
+    setIndexing(indexing =>
+      indexing.documentCount.map { dc =>
         indexing.copy(documentCount = Some(setter(dc)))
       }
     )

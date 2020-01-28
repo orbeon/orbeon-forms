@@ -37,7 +37,7 @@ class FormRunnerFilterReceiverTest extends ResourceManagerTestBase with Assertio
 
     XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/fr/form-with-metadata.xhtml", metadataFilter, XINCLUDE_ONLY, false)
 
-    val XMLLang    = JXQName("http://www.w3.org/XML/1998/namespace" → "lang")
+    val XMLLang    = JXQName("http://www.w3.org/XML/1998/namespace" -> "lang")
     val Operations = JXQName("operations")
 
     val expected = List(
@@ -62,24 +62,24 @@ class FormRunnerFilterReceiverTest extends ResourceManagerTestBase with Assertio
           EndElement("application-name"),
           StartElement("form-name", Atts(Nil)),
           EndElement("form-name"),
-          StartElement("title", Atts(List(XMLLang → "en"))),
+          StartElement("title", Atts(List(XMLLang -> "en"))),
           EndElement("title"),
-          StartElement("description", Atts(List(XMLLang → "en"))),
+          StartElement("description", Atts(List(XMLLang -> "en"))),
           EndElement("description"),
-          StartElement("title", Atts(List(XMLLang → "fr"))),
+          StartElement("title", Atts(List(XMLLang -> "fr"))),
           EndElement("title"),
-          StartElement("description", Atts(List(XMLLang → "fr"))),
+          StartElement("description", Atts(List(XMLLang -> "fr"))),
           EndElement("description"),
           StartElement("permissions", Atts(Nil)),
-            StartElement("permission", Atts(List(Operations → "read update delete"))),
+            StartElement("permission", Atts(List(Operations -> "read update delete"))),
               StartElement("group-member", Atts(Nil)),
               EndElement("group-member"),
             EndElement("permission"),
-            StartElement("permission", Atts(List(Operations → "read update delete"))),
+            StartElement("permission", Atts(List(Operations -> "read update delete"))),
               StartElement("owner", Atts(Nil)),
               EndElement("owner"),
             EndElement("permission"),
-            StartElement("permission", Atts(List(Operations → "create"))),
+            StartElement("permission", Atts(List(Operations -> "create"))),
             EndElement("permission"),
           EndElement("permissions"),
         StartElement("available", Atts(Nil)),

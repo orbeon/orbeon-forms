@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
@@ -35,7 +35,7 @@ import org.orbeon.saxon.om.Item
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(
@@ -77,13 +77,13 @@ class XFormsRepeatControl(
 
     // Ensure that the initial state is set, either from default value, or for state deserialization.
     state match {
-      case Some(state) ⇒
+      case Some(state) =>
         setLocal(new XFormsRepeatControlLocal(state.keyValues("index").toInt))
-      case None if restoreState ⇒
+      case None if restoreState =>
         // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
         // a particular control might not be found.
         setLocal(new XFormsRepeatControlLocal(ensureIndexBounds(getStartIndex)))
-      case None ⇒
+      case None =>
         setIndexInternal(getStartIndex)
     }
 
@@ -261,14 +261,14 @@ class XFormsRepeatControl(
         // Remove control information for iterations that move or just disappear
         val oldChildren = children
 
-        for (i ← newIndexes.indices) {
+        for (i <- newIndexes.indices) {
           val currentNewIndex = newIndexes(i)
           if (currentNewIndex != i) {
             // Node has moved or is removed
             val isRemoved = currentNewIndex == -1
             val movedOrRemovedIteration = oldChildren(i)
             if (isRemoved) {
-              withDebug("removing iteration", Seq("id" → getEffectiveId, "index" → (i + 1).toString)) {
+              withDebug("removing iteration", Seq("id" -> getEffectiveId, "index" -> (i + 1).toString)) {
 
                 // If focused control is in removed iteration, remember this repeat and partially remove
                 // focus before deindexing the iteration. The idea here is that we don't want to dispatch
@@ -315,9 +315,9 @@ class XFormsRepeatControl(
             if (newRepeatIndex != oldRepeatIndex) {
 
               debug("adjusting index for new item", Seq(
-                "id"        → getEffectiveId,
-                "old index" → oldRepeatIndex.toString,
-                "new index" → newRepeatIndex.toString
+                "id"        -> getEffectiveId,
+                "old index" -> oldRepeatIndex.toString,
+                "new index" -> newRepeatIndex.toString
               ))
 
               setIndexInternal(newRepeatIndex)
@@ -329,9 +329,9 @@ class XFormsRepeatControl(
             if (newRepeatIndex != oldRepeatIndex) {
 
               debug("adjusting index for existing item", Seq(
-                "id"        → getEffectiveId,
-                "old index" → oldRepeatIndex.toString,
-                "new index" → newRepeatIndex.toString
+                "id"        -> getEffectiveId,
+                "old index" -> oldRepeatIndex.toString,
+                "new index" -> newRepeatIndex.toString
               ))
 
               setIndexInternal(newRepeatIndex)
@@ -344,8 +344,8 @@ class XFormsRepeatControl(
               // collection."
 
               debug("setting index to the size of the new sequence", Seq(
-                "id"        → getEffectiveId,
-                "new index" → newRepeatItems.size.toString
+                "id"        -> getEffectiveId,
+                "new index" -> newRepeatItems.size.toString
               ))
 
               setIndexInternal(newRepeatItems.size)
@@ -357,7 +357,7 @@ class XFormsRepeatControl(
           } else {
             // Old index was out of bounds?
             setIndexInternal(getStartIndex)
-            debug("resetting index", Seq("id" → getEffectiveId, "new index" → getIndex.toString))
+            debug("resetting index", Seq("id" -> getEffectiveId, "new index" -> getIndex.toString))
           }
         }
 
@@ -368,7 +368,7 @@ class XFormsRepeatControl(
         val movedIterationsOldPositions = ListBuffer[Int]()
         val movedIterationsNewPositions = ListBuffer[Int]()
 
-        for (repeatIndex ← 1 to newSize) {
+        for (repeatIndex <- 1 to newSize) {
           val currentOldIndex = oldIndexes(repeatIndex - 1)
           if (currentOldIndex == -1) {
             // This new item was not in the old sequence so create a new one
@@ -376,8 +376,8 @@ class XFormsRepeatControl(
             // Add new iteration
             newChildren +=
               withDebug("creating new iteration", Seq(
-                "id"    → getEffectiveId,
-                "index" → repeatIndex.toString
+                "id"    -> getEffectiveId,
+                "index" -> repeatIndex.toString
               )) {
 
                 // Create repeat iteration
@@ -397,9 +397,9 @@ class XFormsRepeatControl(
             if (newIterationOldIndex != repeatIndex) {
               // Iteration index changed
               debug("moving iteration", Seq(
-                "id"        → getEffectiveId,
-                "old index" → newIterationOldIndex.toString,
-                "new index" → repeatIndex.toString
+                "id"        -> getEffectiveId,
+                "old index" -> newIterationOldIndex.toString,
+                "new index" -> repeatIndex.toString
               ))
 
               // Set new index
@@ -436,11 +436,11 @@ class XFormsRepeatControl(
           Focus.removeFocus(containingDocument)
 
         // Remove control information for iterations that disappear
-        for (removedIteration ← children) {
+        for (removedIteration <- children) {
 
           withDebug("removing iteration", Seq(
-            "id"    → getEffectiveId,
-            "index" → removedIteration.iterationIndex.toString
+            "id"    -> getEffectiveId,
+            "index" -> removedIteration.iterationIndex.toString
           )) {
             // Dispatch destruction events and deindex old iteration
             currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(removedIteration, includeCurrent = true)
@@ -451,7 +451,7 @@ class XFormsRepeatControl(
         }
 
         if (getIndex != 0)
-          debug("setting index to 0", Seq("id" → getEffectiveId))
+          debug("setting index to 0", Seq("id" -> getEffectiveId))
 
         clearChildren()
         setIndexInternal(0)
@@ -475,7 +475,7 @@ class XFormsRepeatControl(
   }
 
   override def dispatchChangeEvents(): Unit =
-    refreshInfoOpt foreach { localRefreshInfo ⇒
+    refreshInfoOpt foreach { localRefreshInfo =>
 
       this.refreshInfoOpt = None
 
@@ -513,13 +513,13 @@ class XFormsRepeatControl(
   override def computeRelevant: Boolean = super.computeRelevant && getSize > 0
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case e: XXFormsSetindexEvent ⇒ setIndex(e.index)
-    case e: XXFormsDndEvent      ⇒ doDnD(e)
-    case _                       ⇒ super.performDefaultAction(event)
+    case e: XXFormsSetindexEvent => setIndex(e.index)
+    case e: XXFormsDndEvent      => doDnD(e)
+    case _                       => super.performDefaultAction(event)
   }
 
   override def buildChildren(
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
     idSuffix  : Seq[Int]
   ): Unit = {
 
@@ -534,7 +534,7 @@ class XFormsRepeatControl(
     // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding,
     // depending on its index/suffix)
     val iterationAnalysis = staticControl.iteration.get
-    for (iterationIndex ← 1 to bindingContext.nodeset.size)
+    for (iterationIndex <- 1 to bindingContext.nodeset.size)
       buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
 
     // TODO LATER: handle isOptimizeRelevance()
@@ -572,7 +572,7 @@ object XFormsRepeatControl {
     val ns = doc.getContainerNamespace
 
     val repeats =
-      for ((repeatId, index) ← currentIndexes(doc))
+      for ((repeatId, index) <- currentIndexes(doc))
         yield ns + repeatId + ' ' + index
 
     repeats mkString ","
@@ -604,9 +604,9 @@ object XFormsRepeatControl {
 
     def search(ancestorRepeats: List[RepeatControl], suffix: String): Iterator[String] =
       ancestorRepeats match {
-        case Nil          ⇒
+        case Nil          =>
           Iterator(addSuffix(controlPrefixedId, suffix))
-        case head :: tail ⇒
+        case head :: tail =>
 
           val repeatEffectiveId = addSuffix(head.prefixedId, suffix)
 
@@ -615,8 +615,8 @@ object XFormsRepeatControl {
               (throw new IllegalStateException)
 
           for {
-            index ← Iterator.from(1).take(repeatControl.getSize)
-            i     ← search(tail, suffix + (if (suffix.isEmpty) "" else REPEAT_INDEX_SEPARATOR) + index)
+            index <- Iterator.from(1).take(repeatControl.getSize)
+            i     <- search(tail, suffix + (if (suffix.isEmpty) "" else REPEAT_INDEX_SEPARATOR) + index)
           } yield
             i
       }
@@ -625,9 +625,9 @@ object XFormsRepeatControl {
   }
 
   // Find indexes for the given repeats in the current document
-  private def findIndexes(tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl ⇒ Int) =
+  private def findIndexes(tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl => Int) =
     repeats.foldLeft(m.LinkedHashMap[String, Int]()) {
-      (indexes, repeat) ⇒
+      (indexes, repeat) =>
 
         // Build the suffix based on all the ancestor repeats' indexes
         val suffix = suffixForRepeats(indexes, repeat.ancestorRepeatsAcrossParts.reverse)
@@ -636,16 +636,16 @@ object XFormsRepeatControl {
         val effectiveId = addSuffix(repeat.prefixedId, suffix)
 
         // Add the index to the map (0 if the control is not found)
-        indexes += (repeat.prefixedId → {
+        indexes += (repeat.prefixedId -> {
           tree.findRepeatControl(effectiveId) match {
-            case Some(control) ⇒ index(control)
-            case _             ⇒ 0
+            case Some(control) => index(control)
+            case _             => 0
           }
         })
     }
 
   private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
-    repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_INDEX_SEPARATOR_STRING
+    repeats map (repeat => indexes(repeat.prefixedId)) mkString REPEAT_INDEX_SEPARATOR_STRING
 
   private def addSuffix(prefixedId: String, suffix: String) =
     prefixedId + (if (suffix.length > 0) REPEAT_SEPARATOR + suffix else "")

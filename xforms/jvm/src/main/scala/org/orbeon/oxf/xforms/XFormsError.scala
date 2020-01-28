@@ -52,7 +52,7 @@ object ServerError {
   def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
     ServerError(
       message.trimAllToEmpty,
-      location flatMap (l ⇒ Option(l.file)),
+      location flatMap (l => Option(l.file)),
       location map     (_.line) filter (_ >= 0),
       location map     (_.col)  filter (_ >= 0),
       classOpt
@@ -64,10 +64,10 @@ object ServerError {
   private def collectTuples(error: ServerError, names: List[String]) =
     names zip
       List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt) collect
-      { case (k, Some(v)) ⇒ k → v.toString }
+      { case (k, Some(v)) => k -> v.toString }
 
   private def collectList(error: ServerError, names: List[String]) =
-    collectTuples(error, names) collect { case (k, v) ⇒ List(k, v) } flatten
+    collectTuples(error, names) collect { case (k, v) => List(k, v) } flatten
 
   def getDetailsAsList(error: ServerError): List[(String, String)] =
     collectTuples(error, attributes)
@@ -78,13 +78,13 @@ object ServerError {
 
   def errorsAsHTMLElem(errors: IterableOnce[ServerError]): Elem =
     <ul>{
-      for (error ← errors)
+      for (error <- errors)
         yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
     }</ul>
 
   def errorsAsXHTMLElem(errors: IterableOnce[ServerError]): Elem =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
-      for (error ← errors)
+      for (error <- errors)
         yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
     }</ul>
 }
@@ -138,9 +138,9 @@ object XFormsError {
     // errors are fatal. See https://github.com/orbeon/orbeon-forms/issues/2194
     def causesContainFatalError =
       Exceptions.causesIterator(t) exists {
-        case e: XPathException if e.isStaticError ⇒ true
-        case _: HttpStatusCode                    ⇒ true
-        case _                                    ⇒ false
+        case e: XPathException if e.isStaticError => true
+        case _: HttpStatusCode                    => true
+        case _                                    => false
       }
 
     if (container.getPartAnalysis.isTopLevel         &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
@@ -170,7 +170,7 @@ object XFormsError {
   // Insert server errors into the Ajax response
   def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit = {
     withElement(localName = "errors", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
-      for (error ← errors)
+      for (error <- errors)
         element(
           localName = "error",
           prefix    = "xxf",

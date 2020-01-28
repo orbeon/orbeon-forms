@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import java.io._
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext._
@@ -47,12 +47,12 @@ object ServletExternalContext {
 
   private def decodeCacheString(name: String, defaultValue: String): List[(String, String)] =
     for {
-      header ← Properties.instance.getPropertySet.getString(name, defaultValue).splitTo[List](sep = ";")
+      header <- Properties.instance.getPropertySet.getString(name, defaultValue).splitTo[List](sep = ";")
       parts = header.splitTo[List](sep = ":")
       if parts.size == 2
       name :: value :: Nil = parts
     } yield
-      name.trimAllToEmpty → value.trimAllToEmpty
+      name.trimAllToEmpty -> value.trimAllToEmpty
 }
 
 class ServletExternalContext(
@@ -129,8 +129,8 @@ class ServletExternalContext(
 
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
     protected[ServletExternalContext] lazy val headerValuesMap: Map[String, Array[String]] = (
-      for (name ← nativeRequest.getHeaderNames.asScala)
-        yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
+      for (name <- nativeRequest.getHeaderNames.asScala)
+        yield name.toLowerCase -> StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
     ).toMap
 
     def getHeaderValuesMap = headerValuesMap.asJava
@@ -156,8 +156,8 @@ class ServletExternalContext(
 
         // Just use native request parameters
         val paramsIt =
-          for (name ← nativeRequest.getParameterNames.asScala)
-            yield name → nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
+          for (name <- nativeRequest.getParameterNames.asScala)
+            yield name -> nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
 
         paramsIt.toMap.asJava
       }
@@ -208,9 +208,9 @@ class ServletExternalContext(
       if (! getInputStreamCalled)
         inputStreamCharsetOpt = Option(
           Option(nativeRequest.getCharacterEncoding) match {
-            case Some(requestCharacterEncoding) ⇒
+            case Some(requestCharacterEncoding) =>
               requestCharacterEncoding
-            case None ⇒
+            case None =>
               nativeRequest.setCharacterEncoding(ExternalContext.StandardFormCharacterEncoding)
               ExternalContext.StandardFormCharacterEncoding
           }
@@ -279,7 +279,7 @@ class ServletExternalContext(
                 location,
                 URLRewriter.REWRITE_MODE_ABSOLUTE_PATH
               ),
-              List("orbeon-embeddable" → "true")
+              List("orbeon-embeddable" -> "true")
             )
           else
             location

@@ -43,7 +43,7 @@ class SaxonUtilsTest extends AnyFunSpec {
         ("foo_bar_", "foo(bar)", true)
       )
 
-    for ((out, in, keepFirstIfPossible) ← expected)
+    for ((out, in, keepFirstIfPossible) <- expected)
       it(s"must convert `$in` with `keepFirstIfPossible = $keepFirstIfPossible`") {
         assert(out === SaxonUtils.makeNCName(in, keepFirstIfPossible))
       }
@@ -139,7 +139,7 @@ class SaxonUtilsTest extends AnyFunSpec {
       )
     )
 
-    for ((description, node, path) ← expected)
+    for ((description, node, path) <- expected)
       it(description) {
         assert(path === SaxonUtils.buildNodePath(node))
       }

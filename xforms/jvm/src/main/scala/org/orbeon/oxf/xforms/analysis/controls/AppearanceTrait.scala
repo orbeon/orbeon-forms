@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
@@ -33,7 +33,7 @@ trait AppearanceTrait extends SimpleElementAnalysis {
 
 object AppearanceTrait {
   // The client expects long prefixes
-  private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI → "xxforms", XFORMS_NAMESPACE_URI → "xforms")
+  private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI -> "xxforms", XFORMS_NAMESPACE_URI -> "xforms")
 
   def encodeAndAppendAppearances(sb: jl.StringBuilder, lhha: String, appearances: Set[String]): Unit =
     appearances map QName.apply foreach (encodeAndAppendAppearance(sb, lhha, _))

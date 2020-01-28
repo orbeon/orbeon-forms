@@ -50,7 +50,7 @@ class FormBuilderFunctionsTest
   val Section2 = "section-2"
 
   describe("Model instance body elements") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -70,7 +70,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Name and id") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -87,7 +87,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Control elements") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -107,7 +107,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Section name") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       val doc = ctx.formDefinitionRootElem
 
@@ -120,7 +120,7 @@ class FormBuilderFunctionsTest
 
   describe("New binds") {
     it("must find the newly-created binds") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -139,7 +139,7 @@ class FormBuilderFunctionsTest
 
   describe("Find the next id") {
     it("must find ids without collisions") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
         assert(nextId("control") === "control-2-control")
         assert(nextId("section") === "section-2-section")
       }
@@ -148,7 +148,7 @@ class FormBuilderFunctionsTest
   }
 
   describe("Containers") {
-    withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+    withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
       val firstTd = ctx.bodyElem descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest head
 
@@ -169,7 +169,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -207,7 +207,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert `fr:explanation` control") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -240,7 +240,7 @@ class FormBuilderFunctionsTest
 
   describe("Insert repeat") {
     it("must insert all elements in the right places") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -313,7 +313,7 @@ class FormBuilderFunctionsTest
 
   describe("Allowed binding expression") {
     it("must insert all elements in the right places") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         val doc = this setupDocument
           <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
                xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -365,18 +365,18 @@ class FormBuilderFunctionsTest
 
   describe("Control effective id") {
     it("must return the expected statics ids") {
-      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
         val expected = Map(
-          "|fb≡section-1-section≡grid-1-grid≡control-1-control|"                     → "control-1-control",
-          "|fb≡section-1-section≡grid-4-grid≡control-5-control⊙1|"                   → "control-5-control",
-          "|fb≡section-1-section≡section-3-section≡grid-2-grid≡control-6-control|"   → "control-6-control",
-          "|fb≡section-1-section≡section-3-section≡grid-7-grid≡control-8-control⊙1|" → "control-8-control"
+          "|fb≡section-1-section≡grid-1-grid≡control-1-control|"                     -> "control-1-control",
+          "|fb≡section-1-section≡grid-4-grid≡control-5-control⊙1|"                   -> "control-5-control",
+          "|fb≡section-1-section≡section-3-section≡grid-2-grid≡control-6-control|"   -> "control-6-control",
+          "|fb≡section-1-section≡section-3-section≡grid-7-grid≡control-8-control⊙1|" -> "control-8-control"
         )
 
-        for ((expected, id) ← expected)
+        for ((expected, id) <- expected)
           assert(expected === buildFormBuilderControlAbsoluteIdOrEmpty(id))
       }
     }
@@ -393,35 +393,35 @@ class FormBuilderFunctionsTest
     val Mapping =
       NamespaceMapping(
         Map(
-          XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
-          XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
-          XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
-          XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
-          XSD_PREFIX           → XSD_URI
+          XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
+          XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,
+          XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
+          XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
+          XSD_PREFIX           -> XSD_URI
         )
       )
 
     val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
     val data = List(
-      (Some("max-length"        → Some("5"))                                             , "xxf:max-length(5)"),
-      (Some("min-length"        → Some("5"))                                             , "xxf:min-length(5)"),
-      (Some("min-length"        → Some("5"))                                             , "xxf:min-length('5')"),
-      (Some("min-length"        → Some("5"))                                             , "(xxf:min-length(5))"),
-      (Some("non-negative"      → None)                                                  , "(xxf:non-negative())"),
-      (Some("negative"          → None)                                                  , "(xxf:negative())"),
-      (Some("non-positive"      → None)                                                  , "(xxf:non-positive())"),
-      (Some("positive"          → None)                                                  , "(xxf:positive())"),
-      (Some("upload-max-size"   → Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
-      (Some("upload-mediatypes" → Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
-      (Some("min-length"        → Some("foo"))                                           , "xxf:min-length(foo)"),
-      (Some("excluded-dates"    → Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
-      (Some("excluded-dates"    → Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
-      (Some("excluded-dates"    → Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
+      (Some("max-length"        -> Some("5"))                                             , "xxf:max-length(5)"),
+      (Some("min-length"        -> Some("5"))                                             , "xxf:min-length(5)"),
+      (Some("min-length"        -> Some("5"))                                             , "xxf:min-length('5')"),
+      (Some("min-length"        -> Some("5"))                                             , "(xxf:min-length(5))"),
+      (Some("non-negative"      -> None)                                                  , "(xxf:non-negative())"),
+      (Some("negative"          -> None)                                                  , "(xxf:negative())"),
+      (Some("non-positive"      -> None)                                                  , "(xxf:non-positive())"),
+      (Some("positive"          -> None)                                                  , "(xxf:positive())"),
+      (Some("upload-max-size"   -> Some("3221225472"))                                    , "xxf:upload-max-size(3221225472)"),
+      (Some("upload-mediatypes" -> Some("image/jpeg application/pdf"))                    , "xxf:upload-mediatypes('image/jpeg application/pdf')"),
+      (Some("min-length"        -> Some("foo"))                                           , "xxf:min-length(foo)"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates(xs:date('2018-11-29'))"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29')"))                         , "xxf:excluded-dates((xs:date('2018-11-29')))"),
+      (Some("excluded-dates"    -> Some("xs:date('2018-11-29'), xs:date('2018-12-02')"))  , "xxf:excluded-dates((xs:date('2018-11-29'), xs:date('2018-12-02')))"),
       (None                                                                              , "xxf:foobar(5)")
     )
 
-    for ((expected, expr) ← data)
+    for ((expected, expr) <- data)
       it(s"must pass checking `$expr`") {
         assert(expected === analyzeKnownConstraint(expr, Mapping, Library)(Logger))
       }
@@ -436,37 +436,37 @@ class FormBuilderFunctionsTest
   describe("Section template merging") {
 
     val SectionsNamesAndControls = List(
-      "section-1" → 1,
-      "section-2" → 3,
-      "section-3" → 0,
-      "section-4" → 0,
-      "section-5" → 2
+      "section-1" -> 1,
+      "section-2" -> 3,
+      "section-3" -> 0,
+      "section-4" -> 0,
+      "section-5" -> 2
     )
 
     val SectionNames = SectionsNamesAndControls map (_._1)
     val SectionIds   = SectionNames map (_ + "-section")
 
     def assertSectionsKeepName()(implicit ctx: FormBuilderDocContext) =
-      for (sectionName ← SectionNames)
+      for (sectionName <- SectionNames)
         assert(findControlByName(ctx.formDefinitionRootElem, sectionName).isDefined, s"for $sectionName")
 
     def assertUniqueIds()(implicit ctx: FormBuilderDocContext) = {
 
       val visited = mutable.Set[String]()
 
-      idsIterator(Right(ctx.formDefinitionRootElem)) foreach { id ⇒
+      idsIterator(Right(ctx.formDefinitionRootElem)) foreach { id =>
         assert(! visited(id), s"duplicate id `$id`")
         visited += id
       }
     }
 
     it("Must merge all section templates without errors") {
-      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
         assertSectionsKeepName()
         assertUniqueIds()
 
-        for (sectionId ← SectionIds)
+        for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
 
         assertSectionsKeepName()
@@ -475,20 +475,20 @@ class FormBuilderFunctionsTest
     }
 
     it("Must merge all section templates using a prefix") {
-      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
         assertSectionsKeepName()
         assertUniqueIds()
 
         // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
         // section templates and using `my-` would cause conflicts.
-        for (sectionId ← SectionIds)
+        for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "my-", "")
 
         assertSectionsKeepName()
         assertUniqueIds()
 
-        for ((sectionName, expectedCount) ← SectionsNamesAndControls) {
+        for ((sectionName, expectedCount) <- SectionsNamesAndControls) {
 
           val nestedControlsStartingWithMyCount =
             findNestedControls(findControlByName(ctx.formDefinitionRootElem, sectionName).get) flatMap
@@ -508,7 +508,7 @@ class FormBuilderFunctionsTest
     import org.orbeon.oxf.xforms.XFormsConstants._
 
     describe("Variable and LHHA references") {
-      withActionAndFBDoc(FormulasDoc) { implicit ctx ⇒
+      withActionAndFBDoc(FormulasDoc) { implicit ctx =>
 
         val RenamedBinds: NodeInfo =
           <xf:bind
@@ -608,7 +608,7 @@ class FormBuilderFunctionsTest
     }
 
     describe("Legacy actions") {
-      withActionAndFBDoc(FormulasDoc) { implicit ctx ⇒
+      withActionAndFBDoc(FormulasDoc) { implicit ctx =>
 
         val RenamedLegacyAction: NodeInfo =
           <fb:action
@@ -665,7 +665,7 @@ class FormBuilderFunctionsTest
     }
 
     describe("New actions") {
-      withActionAndFBDoc(FormulasDoc) { implicit ctx ⇒
+      withActionAndFBDoc(FormulasDoc) { implicit ctx =>
 
         val RenamedListener: NodeInfo =
           <fr:listener

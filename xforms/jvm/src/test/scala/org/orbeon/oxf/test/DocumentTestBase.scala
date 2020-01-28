@@ -66,8 +66,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     doc.afterUpdateResponse()
   }
 
-  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument ⇒ T): T =
-    InitUtils.withPipelineContext { pipelineContext ⇒
+  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument => T): T =
+    InitUtils.withPipelineContext { pipelineContext =>
       PipelineSupport.setExternalContext(
         pipelineContext,
         PipelineSupport.DefaultRequestUrl,

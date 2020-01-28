@@ -71,7 +71,7 @@ abstract class XFormsAnnotatorBase(
     }
 
     def endElement() = endElementName foreach {
-      case (uri, localname, qName) ⇒ endElement2(uri, localname, qName)
+      case (uri, localname, qName) => endElement2(uri, localname, qName)
     }
 
     def element(uri: String, localname: String, qName: String, atts: Attributes): Unit = {
@@ -111,7 +111,7 @@ abstract class XFormsAnnotatorBase(
     atts            : Attributes,
     xformsElementId : String
   ): Attributes =
-    templateSAXStoreOpt map { templateSAXStore ⇒
+    templateSAXStoreOpt map { templateSAXStore =>
 
       def isSwitch =
         stackElement.isXForms && stackElement.localname == "switch"
@@ -174,7 +174,7 @@ abstract class XFormsAnnotatorBase(
   }
 
   def doesClosestXHTMLRequireSeparatorAppearance =
-    currentStackElement.ancestors find (_.isXHTML) exists (e ⇒ SeparatorAppearanceElements(e.localname))
+    currentStackElement.ancestors find (_.isXHTML) exists (e => SeparatorAppearanceElements(e.localname))
 
   override def setDocumentLocator(locator: Locator): Unit = {
     this._documentLocator = locator

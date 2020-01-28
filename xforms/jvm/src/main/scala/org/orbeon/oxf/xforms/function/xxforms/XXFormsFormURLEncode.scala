@@ -26,10 +26,10 @@ class XXFormsFormURLEncode extends FunctionSupport {
     implicit val ctx = xpathContext
 
     itemArgument(0) match {
-      case node: NodeInfo ⇒
+      case node: NodeInfo =>
         val document = TransformerUtils.tinyTreeToDom4j(node)
         SubmissionUtils.createWwwFormUrlEncoded(document, "&")
-      case _ ⇒
+      case _ =>
         null
     }
   }

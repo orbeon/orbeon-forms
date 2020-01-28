@@ -50,8 +50,8 @@ class XFormsInputControl(
   private def unformat = staticControlOpt flatMap (_.unformat)
 
   private def unformatTransform(v: String) = unformat match {
-    case Some(expr) ⇒ evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""
-    case None       ⇒ v
+    case Some(expr) => evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""
+    case None       => v
   }
 
   override def evaluateExternalValue() : Unit = {
@@ -84,7 +84,7 @@ class XFormsInputControl(
 
     // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
     // formatted value
-    format foreach { _ ⇒
+    format foreach { _ =>
       markExternalValueDirty()
       containingDocument.getControls.markDirtySinceLastRequest(false)
     }
@@ -98,11 +98,11 @@ class XFormsInputControl(
 
     Option(
       getBuiltinTypeName match {
-        case "boolean"       ⇒ normalizeBooleanString(externalValue)
-        case "string" | null ⇒
+        case "boolean"       => normalizeBooleanString(externalValue)
+        case "string" | null =>
           // Replacement-based input sanitation for string type only
           containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
-        case _ ⇒
+        case _ =>
           unformatTransform(externalValue)
       }
     )
@@ -113,9 +113,9 @@ class XFormsInputControl(
     val result =
       if (isRelevant) {
         getBuiltinTypeName match {
-          case "date" | "time" ⇒ formatSubValue(getFirstValueType, getValue)
-          case "dateTime"      ⇒ formatSubValue(getFirstValueType, getDateTimeDatePart(getValue, 'T'))
-          case _               ⇒ externalValueOpt
+          case "date" | "time" => formatSubValue(getFirstValueType, getValue)
+          case "dateTime"      => formatSubValue(getFirstValueType, getDateTimeDatePart(getValue, 'T'))
+          case _               => externalValueOpt
         }
       } else
         None
@@ -128,8 +128,8 @@ class XFormsInputControl(
     val result =
       if (isRelevant) {
         getBuiltinTypeName match {
-          case "dateTime"      ⇒ formatSubValue(getSecondValueType, getDateTimeTimePart(getValue, 'T'))
-          case _               ⇒ None
+          case "dateTime"      => formatSubValue(getSecondValueType, getDateTimeTimePart(getValue, 'T'))
+          case _               => None
         }
       } else
         None
@@ -142,10 +142,10 @@ class XFormsInputControl(
 
   private def formatSubValue(valueType: String, value: String): Option[String] =
     boundItemOpt match {
-      case None ⇒
+      case None =>
         // No need to format
         null
-      case Some(boundItem) ⇒
+      case Some(boundItem) =>
 
         // Format
         val xpathExpression =
@@ -159,7 +159,7 @@ class XFormsInputControl(
           containingDocument.getTypeInputFormat(valueType) +
           "', 'en', (), ()) else $v"
 
-        val variables = Map[String, ValueRepresentation]("v" → stringToStringValue(value))
+        val variables = Map[String, ValueRepresentation]("v" -> stringToStringValue(value))
 
         evaluateAsString(
           xpathString        = xpathExpression,
@@ -183,10 +183,10 @@ class XFormsInputControl(
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XFormsInputControl) ⇒
+      case Some(other: XFormsInputControl) =>
         valueType == other.valueType &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
     }
 
   // Add type attribute if needed

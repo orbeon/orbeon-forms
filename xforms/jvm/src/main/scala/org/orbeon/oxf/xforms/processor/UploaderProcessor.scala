@@ -34,12 +34,12 @@ class UploaderProcessor extends ProcessorImpl {
         override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) = {
 
           UploaderServer.processUpload(NetUtils.getExternalContext.getRequest) match {
-            case (nameValues, None) ⇒
+            case (nameValues, None) =>
 
               // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
               // handle more than one here.
               val files = nameValues collect {
-                case (name, fileItem: FileItem) if fileItem.getName.nonBlank ⇒
+                case (name, fileItem: FileItem) if fileItem.getName.nonBlank =>
 
                   // Get size before renaming below
                   val size = fileItem.getSize
@@ -58,7 +58,7 @@ class UploaderProcessor extends ProcessorImpl {
 
               val serverEvents =
                 <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
-                  for ((name, fileItem, sessionURL, size) ← files)
+                  for ((name, fileItem, sessionURL, size) <- files)
                   yield
                     <xxf:event
                       name="xxforms-upload-done"
@@ -81,17 +81,17 @@ class UploaderProcessor extends ProcessorImpl {
 
               NodeConversions.elemToSAX(response, xmlReceiver)
 
-            case (nameValues, someThrowable @ Some(t)) ⇒
+            case (nameValues, someThrowable @ Some(t)) =>
               // NOTE: There is no point sending a response, see:
               // https://github.com/orbeon/orbeon-forms/issues/985
               Multipart.quietlyDeleteFileItems(nameValues)
 
               t match {
-                case e: FileScanException ⇒
+                case e: FileScanException =>
                   throw HttpStatusCodeException(StatusCode.Conflict, throwable = someThrowable) // unclear which status code makes the most sense
-                case _: SizeLimitExceededException | _: FileSizeLimitExceededException ⇒
+                case _: SizeLimitExceededException | _: FileSizeLimitExceededException =>
                   throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
-                case _ ⇒
+                case _ =>
                   throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)
               }
           }

@@ -77,11 +77,11 @@ class XFormsVariableControl(
         contextStack.setBinding(bindingContext)
 
         variable.staticVariable.expressionStringOpt match {
-          case Some(expression) ⇒
+          case Some(expression) =>
             containingDocument.getRequestStats.withXPath(expression) {
               _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
             }
-          case None ⇒
+          case None =>
             _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
         }
 

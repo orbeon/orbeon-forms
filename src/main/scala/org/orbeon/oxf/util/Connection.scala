@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.net.URI
-import java.util.{Map ⇒ JMap}
+import java.util.{Map => JMap}
 
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
@@ -70,9 +70,9 @@ class Connection(
 
     try {
       UriScheme.withName(url.getScheme) match {
-        case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(url) ⇒
+        case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(url) =>
           throw new OXFException(s"URL scheme `${scheme.entryName}` not allowed")
-        case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) ⇒
+        case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
 
           // Create URL connection object
           val urlConnection = URLFactory.createURL(urlString).openConnection
@@ -87,10 +87,10 @@ class Connection(
             Option(url.getPath) flatMap Mediatypes.findMediatypeForPath
 
           def contentTypeHeader =
-            contentTypeFromConnection orElse contentTypeFromPath map (ct ⇒ ContentType → List(ct))
+            contentTypeFromConnection orElse contentTypeFromPath map (ct => ContentType -> List(ct))
 
           val headers =
-            urlConnection.getHeaderFields.asScala map { case (k, v) ⇒ k → v.asScala.to(List) } toMap
+            urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap
 
           val headersWithContentType =
             headers ++ contentTypeHeader.toList
@@ -110,7 +110,7 @@ class Connection(
 
           connectionResult
 
-        case UriScheme.Http | UriScheme.Https ⇒
+        case UriScheme.Http | UriScheme.Https =>
 
           val cleanCapitalizedHeaders = {
 
@@ -129,9 +129,9 @@ class Connection(
 
             val capitalizedHeaders =
               for {
-                (name, values) ← headers.to(List)
+                (name, values) <- headers.to(List)
                 if values ne null
-                value ← values
+                value <- values
                 if value ne null
               } yield
                 (
@@ -139,7 +139,7 @@ class Connection(
                     capitalizeCommonOrSplitHeader(name)
                   else
                     name
-                ) → value
+                ) -> value
 
             combineValues[String, String, List](capitalizedHeaders).toMap
           }
@@ -149,8 +149,8 @@ class Connection(
 
           val (effectiveConnectionUrlString, client) =
             findInternalURL(urlString) match {
-              case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
-              case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
+              case Some(internalPath) => (internalPath, InternalHttpClient)
+              case _                  => (urlString,    PropertiesApacheHttpClient)
             }
 
           val response =
@@ -188,9 +188,9 @@ class Connection(
 
             debug("opened connection",
               List(
-                "client"        → (if (client == InternalHttpClient) "internal" else "Apache"),
-                "effective URL" → effectiveConnectionUriNoPassword.toString,
-                "method"        → method.entryName
+                "client"        -> (if (client == InternalHttpClient) "internal" else "Apache"),
+                "effective URL" -> effectiveConnectionUriNoPassword.toString,
+                "method"        -> method.entryName
               ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
           }
 
@@ -213,18 +213,18 @@ class Connection(
 
           connectionResult
 
-        case scheme ⇒
+        case scheme =>
           throw new OXFException(s"URL scheme `$scheme` not supported for method `$method`")
       }
     } catch {
-      case NonFatal(t) ⇒ throw new ValidationException(t, new LocationData(url.toString, -1, -1))
+      case NonFatal(t) => throw new ValidationException(t, new LocationData(url.toString, -1, -1))
     }
   }
 }
 
 trait ConnectionState {
 
-  self: Connection ⇒
+  self: Connection =>
 
   import org.orbeon.oxf.util.ConnectionState._
 
@@ -234,13 +234,13 @@ trait ConnectionState {
   def loadHttpState()(implicit logger: IndentedLogger): Unit = {
     cookieStoreOpt =
       stateAttributes(createSession = false) flatMap
-      (m ⇒ Option(m._1(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+      (m => Option(m._1(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
 
     debugStore("loaded HTTP state", "did not load HTTP state")
   }
 
   def saveHttpState()(implicit logger: IndentedLogger): Unit = {
-    cookieStoreOpt foreach { cookieStore ⇒
+    cookieStoreOpt foreach { cookieStore =>
       stateAttributes(createSession = true) foreach
       (_._2(HttpCookieStoreAttribute, cookieStore))
     }
@@ -251,33 +251,33 @@ trait ConnectionState {
   private def debugStore(positive: String, negative: String)(implicit logger: IndentedLogger) =
     ifDebug {
       cookieStoreOpt match {
-        case Some(cookieStore) ⇒
+        case Some(cookieStore) =>
           val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
           debug(positive, List(
-            "scope"        → stateScope,
-            "cookie names" → (if (cookies.nonEmpty) cookies else null))
+            "scope"        -> stateScope,
+            "cookie names" -> (if (cookies.nonEmpty) cookies else null))
           )
-        case None ⇒
+        case None =>
           debug(negative)
       }
     }
 
-  private def stateAttributes(createSession: Boolean): Option[(String ⇒ AnyRef, (String, AnyRef) ⇒ Unit)] = {
+  private def stateAttributes(createSession: Boolean): Option[(String => AnyRef, (String, AnyRef) => Unit)] = {
     val externalContext = NetUtils.getExternalContext
     stateScope match {
-      case "request" ⇒
+      case "request" =>
         val m = externalContext.getRequest.getAttributesMap
         Some((m.get, m.put))
-      case "session" if externalContext.getSessionOpt(createSession).isDefined ⇒
+      case "session" if externalContext.getSessionOpt(createSession).isDefined =>
         val s = externalContext.getSession(createSession)
         Some(
-          (name: String)                ⇒ s.getAttribute(name,        SessionScope.Local).orNull,
-          (name: String, value: AnyRef) ⇒ s.setAttribute(name, value, SessionScope.Local)
+          (name: String)                => s.getAttribute(name,        SessionScope.Local).orNull,
+          (name: String, value: AnyRef) => s.setAttribute(name, value, SessionScope.Local)
         )
-      case "application" ⇒
+      case "application" =>
         val m = externalContext.getWebAppContext.getAttributesMap
         Some((m.get, m.put))
-      case _ ⇒
+      case _ =>
         None
     }
   }
@@ -386,7 +386,7 @@ object Connection extends Logging {
       )
 
     for {
-      pathQuery ← url.startsWith(servicePrefix) option url.substring(servicePrefix.size - 1)
+      pathQuery <- url.startsWith(servicePrefix) option url.substring(servicePrefix.size - 1)
       pathOnly  = splitQuery(pathQuery)._1
       if isInternalPath(pathOnly)
     } yield
@@ -406,7 +406,7 @@ object Connection extends Logging {
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
     cookiesToForward : List[String],
-    getHeader        : String ⇒ Option[List[String]])(implicit
+    getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger,
     externalContext  : ExternalContext
   ): Map[String, List[String]] =
@@ -422,7 +422,7 @@ object Connection extends Logging {
     hasCredentials      : Boolean,
     customHeadersOrNull : JMap[String, Array[String]],
     headersToForward    : String,
-    getHeader           : String ⇒ Option[List[String]],
+    getHeader           : String => Option[List[String]],
     logger              : IndentedLogger
   ): Map[String, List[String]] =
     buildConnectionHeadersCapitalizedIfNeeded(
@@ -444,7 +444,7 @@ object Connection extends Logging {
     encodingForSOAP  : String,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
-    getHeader        : String ⇒ Option[List[String]])(implicit
+    getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger,
     externalContext  : ExternalContext
   ): Map[String, List[String]] =
@@ -454,7 +454,7 @@ object Connection extends Logging {
       // mediatype attribute"
       val headersWithContentTypeIfNeeded =
         if (requiresRequestBody(method) && firstItemIgnoreCase(customHeaders, ContentType).isEmpty && (mediatype ne null))
-          customHeaders + (ContentType → List(mediatype))
+          customHeaders + (ContentType -> List(mediatype))
         else
           customHeaders
 
@@ -463,7 +463,7 @@ object Connection extends Logging {
         firstItemIgnoreCase(headersWithContentTypeIfNeeded, ContentTypeLower) getOrElse mediatype
 
       // NOTE: SOAP processing overrides Content-Type in the case of a POST
-      // So we have: @serialization → @mediatype →  xf:header → SOAP
+      // So we have: @serialization -> @mediatype ->  xf:header -> SOAP
       val connectionHeadersCapitalized =
         buildConnectionHeadersCapitalized(
           hasCredentials,
@@ -510,7 +510,7 @@ object Connection extends Logging {
   def getHeadersToForwardCapitalized(
     hasCredentials         : Boolean, // exclude `Authorization` header when true
     headerNamesCapitalized : Set[String],
-    getHeader              : String ⇒ Option[List[String]])(implicit
+    getHeader              : String => Option[List[String]])(implicit
     logger                 : IndentedLogger
   ): List[(String, List[String])] = {
 
@@ -527,24 +527,24 @@ object Connection extends Logging {
     }
 
     for {
-      nameCapitalized ← headerNamesCapitalized.to(List)
+      nameCapitalized <- headerNamesCapitalized.to(List)
       nameLower       = nameCapitalized.toLowerCase
-      values          ← getHeader(nameLower)
+      values          <- getHeader(nameLower)
       if canForwardHeader(nameLower)
     } yield {
       debug("forwarding header", List(
-        "name"  → nameCapitalized,
-        "value" → (values mkString " ")
+        "name"  -> nameCapitalized,
+        "value" -> (values mkString " ")
         )
       )
-      nameCapitalized → values
+      nameCapitalized -> values
     }
   }
 
-  def getHeaderFromRequest(request: ExternalContext.Request): String ⇒ Option[List[String]] =
+  def getHeaderFromRequest(request: ExternalContext.Request): String => Option[List[String]] =
     Option(request) match {
-        case Some(request) ⇒ name ⇒ request.getHeaderValuesMap.asScala.get(name) map (_.to(List))
-        case None          ⇒ _    ⇒ None
+        case Some(request) => name => request.getHeaderValuesMap.asScala.get(name) map (_.to(List))
+        case None          => _    => None
       }
 
   /**
@@ -560,7 +560,7 @@ object Connection extends Logging {
     customHeadersCapitalized : Map[String, List[String]],
     headersToForward         : Set[String],
     cookiesToForward         : List[String],
-    getHeader                : String ⇒ Option[List[String]])(implicit
+    getHeader                : String => Option[List[String]])(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext
   ): Map[String, List[String]] = {
@@ -585,7 +585,7 @@ object Connection extends Logging {
       val token =
         externalContext.getWebAppContext.attributes.getOrElseUpdate(OrbeonTokenLower, SecureUtils.randomHexId).asInstanceOf[String]
 
-      Seq(OrbeonToken → List(token))
+      Seq(OrbeonToken -> List(token))
     }
 
     // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
@@ -626,8 +626,8 @@ object Connection extends Logging {
       val requestOption = Option(externalContext.getRequest)
       val nativeRequestOption =
         requestOption flatMap
-        (r ⇒ Option(r.getNativeRequest)) collect
-        { case r: HttpServletRequest ⇒ r }
+        (r => Option(r.getNativeRequest)) collect
+        { case r: HttpServletRequest => r }
 
       // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
       // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
@@ -640,31 +640,31 @@ object Connection extends Logging {
       // 2. If there is no incoming session cookie, try to make our own cookie. For this to work on WebSphere,
       // users will have the define the prefix and suffix properties.
       def fromSession =
-        externalContext.getSessionOpt(false).map(session ⇒ {
+        externalContext.getSessionOpt(false).map(session => {
           val propertySet   = Properties.instance.getPropertySet
           val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty, default = "")
           val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty, default = "")
           val sessionId     = session.getId
           val sessionCookie = s"$sessionCookieName=$prefix$sessionId$suffix"
-          Headers.Cookie    → List(sessionCookie)
+          Headers.Cookie    -> List(sessionCookie)
         })
 
       // Logging
       ifDebug {
         val incomingSessionHeaders =
           for {
-            request       ← requestOption.toList
-            cookieHeaders ← request.getHeaderValuesMap.asScala.get("cookie").toList
-            cookieValue   ← cookieHeaders
+            request       <- requestOption.toList
+            cookieHeaders <- request.getHeaderValuesMap.asScala.get("cookie").toList
+            cookieValue   <- cookieHeaders
             if cookieValue.contains(sessionCookieName) // rough test
           } yield
             cookieValue
 
         val incomingSessionCookies =
           for {
-            nativeRequest ← nativeRequestOption.toList
-            cookies       ← Option(nativeRequest.getCookies).toList
-            cookie        ← cookies
+            nativeRequest <- nativeRequestOption.toList
+            cookies       <- Option(nativeRequest.getCookies).toList
+            cookie        <- cookies
             if cookie.getName == sessionCookieName
           } yield
             cookie.getValue
@@ -672,12 +672,12 @@ object Connection extends Logging {
         val sessionOpt = externalContext.getSessionOpt(false)
 
         debug("setting cookie", List(
-          "new session"              → (sessionOpt map (_.isNew.toString) orNull),
-          "session id"               → (sessionOpt map (_.getId) orNull),
-          "requested session id"     → (requestOption flatMap (r ⇒ Option(r.getRequestedSessionId)) orNull),
-          "session cookie name"      → sessionCookieName,
-          "incoming session cookies" → (incomingSessionCookies mkString " - "),
-          "incoming session headers" → (incomingSessionHeaders mkString " - ")))
+          "new session"              -> (sessionOpt map (_.isNew.toString) orNull),
+          "session id"               -> (sessionOpt map (_.getId) orNull),
+          "requested session id"     -> (requestOption flatMap (r => Option(r.getRequestedSessionId)) orNull),
+          "session cookie name"      -> sessionCookieName,
+          "incoming session cookies" -> (incomingSessionCookies mkString " - "),
+          "incoming session headers" -> (incomingSessionHeaders mkString " - ")))
       }
 
       fromIncoming orElse fromSession
@@ -694,7 +694,7 @@ object Connection extends Logging {
   ): Option[(String, List[String])] = {
 
     def requestedSessionIdMatches =
-      externalContext.getSessionOpt(false) exists { session ⇒
+      externalContext.getSessionOpt(false) exists { session =>
         val requestedSessionId = externalContext.getRequest.getRequestedSessionId
         session.getId == requestedSessionId
       }
@@ -704,7 +704,7 @@ object Connection extends Logging {
 
       val pairsToForward =
         for {
-          cookie ← cookies
+          cookie <- cookies
           // Only forward cookie listed as cookies to forward
           if cookiesToForward.contains(cookie.getName)
           // Only forward if there is the requested session id is the same as the current session. Otherwise,
@@ -719,11 +719,11 @@ object Connection extends Logging {
         val cookieHeaderValue = pairsToForward mkString "; "
 
         debug("forwarding cookies", List(
-          "cookie"               → cookieHeaderValue,
-          "requested session id" → externalContext.getRequest.getRequestedSessionId)
+          "cookie"               -> cookieHeaderValue,
+          "requested session id" -> externalContext.getRequest.getRequestedSessionId)
         )
 
-        Some(Headers.Cookie → List(cookieHeaderValue))
+        Some(Headers.Cookie -> List(cookieHeaderValue))
       } else
         None
     } else
@@ -753,15 +753,15 @@ object Connection extends Logging {
 
     val newHeaders =
       method match {
-        case GET if contentTypeMediaType contains SoapContentType ⇒
+        case GET if contentTypeMediaType contains SoapContentType =>
           // Set an Accept header
 
           val acceptHeader = SoapContentType + charsetSuffix(getContentTypeCharset(mediatypeMaybeWithCharset))
 
           // Accept header with optional charset
-          List(Accept → List(acceptHeader))
+          List(Accept -> List(acceptHeader))
 
-        case POST if contentTypeMediaType contains SoapContentType ⇒
+        case POST if contentTypeMediaType contains SoapContentType =>
           // Set Content-Type and optionally SOAPAction headers
 
           val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset)
@@ -769,14 +769,14 @@ object Connection extends Logging {
           val actionParameter       = parameters.get(ContentTypes.ActionParameter)
 
           // Content-Type with optional charset and SOAPAction header if any
-          List(ContentType → List(overriddenContentType)) ++ (actionParameter map (a ⇒ SOAPAction → List(a)))
-        case _ ⇒
+          List(ContentType -> List(overriddenContentType)) ++ (actionParameter map (a => SOAPAction -> List(a)))
+        case _ =>
           // Not a SOAP submission
           Nil
       }
 
     if (newHeaders.nonEmpty)
-      debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ k → v.head })
+      debug("adding SOAP headers", newHeaders map { case (k, v) => k -> v.head })
 
     newHeaders
   }

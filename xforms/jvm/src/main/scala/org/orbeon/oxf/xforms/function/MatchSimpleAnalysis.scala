@@ -20,21 +20,21 @@ import org.orbeon.oxf.xforms.analysis.XPathAnalysis.ConstantXPathAnalysis
 
 trait MatchSimpleAnalysis {
   def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
-    case Some(element) if element.getBindingAnalysis.isDefined && element.getBindingAnalysis.get.figuredOutDependencies ⇒
+    case Some(element) if element.getBindingAnalysis.isDefined && element.getBindingAnalysis.get.figuredOutDependencies =>
       // Clone the PathMap first because the nodes returned must belong to this PathMap
       element.getBindingAnalysis.get match {
-        case bindingAnalysis: PathMapXPathAnalysis ⇒
+        case bindingAnalysis: PathMapXPathAnalysis =>
           val clonedContextPathMap = bindingAnalysis.pathmap.get.clone
           pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
           clonedContextPathMap.findFinalNodes
-        case bindingAnalysis: ConstantXPathAnalysis if bindingAnalysis.figuredOutDependencies ⇒
+        case bindingAnalysis: ConstantXPathAnalysis if bindingAnalysis.figuredOutDependencies =>
           null
-        case _ ⇒
+        case _ =>
           pathMap.setInvalidated(true)
           null
       }
 
-    case _ ⇒
+    case _ =>
       // Either there is no analysis at all or we couldn't figure out binding analysis
       pathMap.setInvalidated(true)
       null

@@ -32,7 +32,7 @@ object FutureUtils {
   def eventually[T](
     interval    : FiniteDuration,
     timeout     : FiniteDuration)(
-    block       : ⇒ Future[T])(implicit
+    block       : => Future[T])(implicit
     execContext : ExecutionContext
   ): Future[T] =
     eventuallyAsTry(interval, timeout)(block) flatMap
@@ -41,7 +41,7 @@ object FutureUtils {
   def eventuallyAsTry[T](
     interval    : FiniteDuration,
     timeout     : FiniteDuration)(
-    block       : ⇒ Future[T])(implicit
+    block       : => Future[T])(implicit
     execContext : ExecutionContext
   ): Future[Try[T]] = async {
 
@@ -52,10 +52,10 @@ object FutureUtils {
     var done = false
     while(! done) {
       await(block.toTry) match {
-        case v @ Success(_) ⇒
+        case v @ Success(_) =>
           result = v
           done = true
-        case v @ Failure(_) ⇒
+        case v @ Failure(_) =>
           if ((System.currentTimeMillis - startTime).millis > timeout) {
             result = v
             done = true
@@ -74,14 +74,14 @@ object FutureUtils {
   }
 
   def withFutureSideEffects[T](
-    before      : ⇒ Unit,
-    after       : ⇒ Unit)(
-    body        : ⇒ Future[T])(implicit
+    before      : => Unit,
+    after       : => Unit)(
+    body        : => Future[T])(implicit
     execContext : ExecutionContext
   ): Future[T] = {
     before
     val f = body
-    f.onComplete(_ ⇒ after)
+    f.onComplete(_ => after)
     f
   }
 }

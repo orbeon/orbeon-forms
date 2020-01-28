@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
 
 object ScopeFunctionSupport {
 
-  def storeAttribute(put: (String, AnyRef) ⇒ Any, attributeName: String, item: Item): Unit = {
+  def storeAttribute(put: (String, AnyRef) => Any, attributeName: String, item: Item): Unit = {
     if (item eq null) {
       // Clear value
       // TODO: Shouldn't this use `remove()`?
@@ -41,10 +41,10 @@ object ScopeFunctionSupport {
       // Prepare value
       val value =
         item match {
-          case v: StringValue ⇒ new StringValueWithEquals(v.getStringValueCS)
-          case v: AtomicValue ⇒ v
-          case v: NodeInfo    ⇒ TransformerUtils.tinyTreeToSAXStore(v)
-          case _ ⇒ throw new OXFException(s"xxf:set-*-attribute() does not support storing objects of type: ${item.getClass.getName}")
+          case v: StringValue => new StringValueWithEquals(v.getStringValueCS)
+          case v: AtomicValue => v
+          case v: NodeInfo    => TransformerUtils.tinyTreeToSAXStore(v)
+          case _ => throw new OXFException(s"xxf:set-*-attribute() does not support storing objects of type: ${item.getClass.getName}")
         }
       // Store value
       // TODO: It seems that Jetty sometimes fails down the line here by calling equals() on the value.
@@ -59,10 +59,10 @@ object ScopeFunctionSupport {
     xpathContext    : XPathContext
   ): SequenceIterator =
     valueOpt match {
-      case Some(v: Item) ⇒
+      case Some(v: Item) =>
         // NOTE: This can be a `StringValueWithEquals`
         SingletonIterator.makeIterator(v)
-      case Some(v) ⇒
+      case Some(v) =>
         val saxStore =
           try {
             // We don't have any particular mappings to pass to serialize objects
@@ -70,13 +70,13 @@ object ScopeFunctionSupport {
             mapping.loadMapping(new InputSource(new StringReader("<mapping/>")))
             ScopeGenerator.getSAXStore(v, mapping, contentTypeOpt.orNull, key)
           } catch {
-            case NonFatal(t) ⇒
+            case NonFatal(t) =>
               throw new OXFException(t)
           }
         // Convert to DocumentInfo
         val documentInfo = TransformerUtils.saxStoreToTinyTree(xpathContext.getConfiguration, saxStore)
         SingletonIterator.makeIterator(documentInfo)
-      case None ⇒
+      case None =>
         EmptyIterator.getInstance
     }
 }

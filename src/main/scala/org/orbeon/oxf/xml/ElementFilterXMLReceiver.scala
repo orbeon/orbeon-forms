@@ -18,7 +18,7 @@ import org.xml.sax.SAXException
 
 class ElementFilterXMLReceiver(
   xmlReceiver : XMLReceiver,
-  filter      : (Int, String, String, Attributes) ⇒ Boolean
+  filter      : (Int, String, String, Attributes) => Boolean
 ) extends SimpleForwardingXMLReceiver(xmlReceiver) {
 
   private var level: Int = 0

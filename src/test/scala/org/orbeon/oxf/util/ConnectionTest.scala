@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import cats.syntax.option._
 import org.mockito.Mockito
@@ -35,10 +35,10 @@ class ConnectionTest
 
     val incomingRequest = new RequestAdapter {
       override val getHeaderValuesMap: ju.Map[String, Array[String]] = mutable.LinkedHashMap(
-        "user-agent"    → Array("Mozilla 12.1"),
-        "authorization" → Array("xsifj1skf3"),
-        "host"          → Array("localhost"),
-        "cookie"        → Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
+        "user-agent"    -> Array("Mozilla 12.1"),
+        "authorization" -> Array("xsifj1skf3"),
+        "host"          -> Array("localhost"),
+        "cookie"        -> Array("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C")
       ).asJava
     }
 
@@ -56,8 +56,8 @@ class ConnectionTest
 
     // Custom headers
     val customHeaderValuesMap = Map(
-      "My-Stuff"   → List("my-value"),
-      "Your-Stuff" → List("your-value-1", "your-value-2")
+      "My-Stuff"   -> List("my-value"),
+      "Your-Stuff" -> List("your-value-1", "your-value-2")
     )
 
     it("must process request and response headers") {
@@ -113,7 +113,7 @@ class ConnectionTest
     // POST configuration
     val method = HttpMethod.POST
     val bodyMediaType = "application/x-www-form-urlencoded"
-    val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
+    val explicitHeaders = Map(ContentTypeLower -> List(bodyMediaType))
 
     it("must combine them") {
 
@@ -128,7 +128,7 @@ class ConnectionTest
           encodingForSOAP  = CharsetNames.Utf8,
           customHeaders    = explicitHeaders,
           headersToForward = Set(),
-          getHeader        = _ ⇒ None)(
+          getHeader        = _ => None)(
           logger           = ResourceManagerTestBase.newIndentedLogger,
           externalContext  = externalContext
         )
@@ -155,18 +155,18 @@ class ConnectionTest
     val contentType = ContentTypes.XmlContentType
 
     val Expected = List(
-      HttpMethod.GET     → None,
-      HttpMethod.POST    → contentType.some,
-      HttpMethod.PUT     → contentType.some,
-      HttpMethod.DELETE  → None,
-      HttpMethod.HEAD    → None,
-      HttpMethod.OPTIONS → None,
-      HttpMethod.TRACE   → None,
-      HttpMethod.LOCK    → contentType.some,
-      HttpMethod.UNLOCK  → contentType.some
+      HttpMethod.GET     -> None,
+      HttpMethod.POST    -> contentType.some,
+      HttpMethod.PUT     -> contentType.some,
+      HttpMethod.DELETE  -> None,
+      HttpMethod.HEAD    -> None,
+      HttpMethod.OPTIONS -> None,
+      HttpMethod.TRACE   -> None,
+      HttpMethod.LOCK    -> contentType.some,
+      HttpMethod.UNLOCK  -> contentType.some
     )
 
-    for ((method, expectedHeaderValue) ← Expected) {
+    for ((method, expectedHeaderValue) <- Expected) {
       it(s"must ${if (expectedHeaderValue.isDefined) "" else "not " }include a `Content-Type` header when using the `${method.entryName}` method") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
@@ -177,7 +177,7 @@ class ConnectionTest
             encodingForSOAP  = CharsetNames.Utf8,
             customHeaders    = Map.empty,
             headersToForward = Set(),
-            getHeader        = _ ⇒ None)(
+            getHeader        = _ => None)(
             logger           = ResourceManagerTestBase.newIndentedLogger,
             externalContext  = externalContext
           )

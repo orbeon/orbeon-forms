@@ -31,7 +31,7 @@ import scala.collection.mutable
 
 trait ControlAjaxSupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   // Whether the control support Ajax updates
   def supportAjaxUpdates = true
@@ -44,7 +44,7 @@ trait ControlAjaxSupport {
 
   def outputAjaxDiff(
     previousControlOpt : Option[XFormsControl],
-    content            : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content            : Option[XMLReceiverHelper => Unit])(implicit
     ch                 : XMLReceiverHelper
   ): Unit = ()
 
@@ -76,8 +76,8 @@ trait ControlAjaxSupport {
     var added = false
 
     for {
-      staticLhhaSupport ← staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
-      lhha              ← ajaxLhhaSupport
+      staticLhhaSupport <- staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
+      lhha              <- ajaxLhhaSupport
       // https://github.com/orbeon/orbeon-forms/issues/3836
       // Q: Could we just check `isLocal` instead of `isForRepeat`?
       if staticLhhaSupport.hasLHHANotForRepeat(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
@@ -104,7 +104,7 @@ trait ControlAjaxSupport {
     var added = false
 
     for {
-      avtAttributeQName ← staticControl.extensionAttributes.keys
+      avtAttributeQName <- staticControl.extensionAttributes.keys
       if avtAttributeQName.namespace.uri == XXFORMS_NAMESPACE_URI || avtAttributeQName == ACCEPT_QNAME // only keep xxf:* attributes which are defined statically
       value1 = previousControlOpt flatMap (_.extensionAttributeValue(avtAttributeQName))
       value2 = self.extensionAttributeValue(avtAttributeQName)
@@ -117,7 +117,7 @@ trait ControlAjaxSupport {
     added
   }
 
-  def writeMIPs(write: (String, String) ⇒ Unit): Unit =
+  def writeMIPs(write: (String, String) => Unit): Unit =
     write("relevant", isRelevant.toString)
 
   final def writeMIPsAsAttributes(newAttributes: AttributesImpl): Unit = {
@@ -208,7 +208,7 @@ object ControlAjaxSupport {
     currentControl     : XFormsControl,
     effectiveId        : String,
     name               : String,
-    value              : XFormsControl ⇒ String)(
+    value              : XFormsControl => String)(
     ch                 : XMLReceiverHelper,
     containingDocument : XFormsContainingDocument
   ): Unit = {
@@ -233,16 +233,16 @@ object ControlAjaxSupport {
   val AriaDetails     = "aria-details"
 
   val LhhaWithAriaAttName = List(
-    LHHA.Label → AriaLabelledby,
-    LHHA.Hint  → AriaDescribedby,
-    LHHA.Help  → AriaDetails
+    LHHA.Label -> AriaLabelledby,
+    LHHA.Hint  -> AriaDescribedby,
+    LHHA.Help  -> AriaDetails
   )
 
   def findAriaBy(
     staticControl      : ElementAnalysis,
     control            : XFormsControl,
     lhha               : LHHA,
-    condition          : LHHAAnalysis ⇒ Boolean)(
+    condition          : LHHAAnalysis => Boolean)(
     containingDocument : XFormsContainingDocument
   ): Option[String] = {
 
@@ -250,8 +250,8 @@ object ControlAjaxSupport {
     import syntax.typeable._
 
     for {
-      staticLhhaSupport ← staticControl.narrowTo[StaticLHHASupport]
-      staticLhha        ← staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
+      staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
+      staticLhha        <- staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
       if condition(staticLhha)
     } yield
       if (staticLhha.isLocal) {

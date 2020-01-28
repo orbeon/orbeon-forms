@@ -32,15 +32,15 @@ class CRUD
       val req = request
 
       httpRequest.getMethod match {
-        case HttpMethod.GET    ⇒ get(req)
-        case HttpMethod.PUT    ⇒ change(req, delete = false)
-        case HttpMethod.DELETE ⇒ change(req, delete = true)
-        case HttpMethod.LOCK   ⇒ lock(req)
-        case HttpMethod.UNLOCK ⇒ unlock(req)
-        case _                 ⇒ httpResponse.setStatus(405)
+        case HttpMethod.GET    => get(req)
+        case HttpMethod.PUT    => change(req, delete = false)
+        case HttpMethod.DELETE => change(req, delete = true)
+        case HttpMethod.LOCK   => lock(req)
+        case HttpMethod.UNLOCK => unlock(req)
+        case _                 => httpResponse.setStatus(405)
       }
     } catch {
-      case e: HttpStatusCodeException ⇒
+      case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)
     }
 }

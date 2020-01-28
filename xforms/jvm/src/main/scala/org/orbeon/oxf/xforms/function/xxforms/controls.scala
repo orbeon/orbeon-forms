@@ -32,7 +32,7 @@ trait SingleNodeControlMipFunction extends XFormsFunction {
   protected def getMip(c: XFormsSingleNodeControl): Boolean
 
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ getMip(c) } contains true
+    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl => getMip(c) } contains true
 
   // NOTE: We depend on MIPs so we cannot compute PathMap dependencies at this point.
 }

@@ -39,7 +39,7 @@ trait ItemContainer {
     // Prune children first
     _children foreach (_.pruneNonRelevantChildren())
     // Keep only children which have children or which have a value
-    _children = _children filter (child ⇒ child.hasChildren || (child.value ne null))
+    _children = _children filter (child => child.hasChildren || (child.value ne null))
   }
 
   // Visit the entire itemset
@@ -47,7 +47,7 @@ trait ItemContainer {
     if (hasChildren) {
       listener.startLevel(o, selfItem) // Item is used only by menu, not ideal!
       var first = true
-      for (item ← children) {
+      for (item <- children) {
         listener.startItem(o, item, first)
         item.visit(o, listener)
         listener.endItem(o, item)
@@ -78,12 +78,12 @@ trait ItemContainer {
 
   // Implement deep equals
   override def equals(other: Any) = other match {
-    case other: ItemContainer ⇒ _children == other._children
-    case _                    ⇒ false
+    case other: ItemContainer => _children == other._children
+    case _                    => false
   }
 
   private def selfItem = this match {
-    case item: Item ⇒ item
-    case _          ⇒ null
+    case item: Item => item
+    case _          => null
   }
 }

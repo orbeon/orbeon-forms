@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor
 
 import java.io._
-import java.util.{Properties ⇒ JProperties}
+import java.util.{Properties => JProperties}
 
 import javax.activation.{DataHandler, DataSource}
 import javax.mail.Message.RecipientType
@@ -79,12 +79,12 @@ class EmailProcessor extends ProcessorImpl {
       // Get credentials if any
       val (usernameOption, passwordOption) = {
         Option(messageElement.element("credentials")) match {
-          case Some(credentials) ⇒
+          case Some(credentials) =>
             val usernameElement = credentials.element(Username)
             val passwordElement = credentials.element(Password)
 
             (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
-          case None ⇒
+          case None =>
             (propertySet.getNonBlankString(Username), propertySet.getNonBlankString(Password))
         }
       }
@@ -93,19 +93,19 @@ class EmailProcessor extends ProcessorImpl {
         if (usernameOption.isEmpty)
           throw new OXFException("Credentails are required when using " + encryption.toUpperCase)
 
-      val defaultUpdatePort: String ⇒ Unit =
+      val defaultUpdatePort: String => Unit =
         properties.setProperty("mail.smtp.port", _)
 
       // SSL and TLS
       val (defaultPort, updatePort) =
         valueFromElementOrProperty(messageElement, Encryption) match {
-          case Some("ssl") ⇒
+          case Some("ssl") =>
             ensureCredentials("ssl") // partly enforced by the schema, but could have been blank
 
             properties.setProperty("mail.smtp.auth", "true")
             properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
 
-            val updatePort: String ⇒ Unit = { port ⇒
+            val updatePort: String => Unit = { port =>
               properties.setProperty("mail.smtp.socketFactory.port", port)
               defaultUpdatePort(port)
             }
@@ -115,7 +115,7 @@ class EmailProcessor extends ProcessorImpl {
             // specifications" http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol#Ports
             (Some("465"), updatePort)
 
-          case Some("tls") ⇒
+          case Some("tls") =>
             ensureCredentials("tls") // partly enforced by the schema, but could have been blank
 
             properties.setProperty("mail.smtp.auth", "true")
@@ -123,7 +123,7 @@ class EmailProcessor extends ProcessorImpl {
 
             (Some("587"), defaultUpdatePort)
 
-          case _ ⇒
+          case _ =>
             (None, defaultUpdatePort)
         }
 
@@ -131,7 +131,7 @@ class EmailProcessor extends ProcessorImpl {
       valueFromElementOrProperty(messageElement, SMTPPort) orElse defaultPort foreach updatePort
 
       usernameOption match {
-        case Some(username) ⇒
+        case Some(username) =>
           if (Logger.isInfoEnabled) Logger.info("Authentication")
 
           properties.setProperty("mail.smtp.auth", "true")
@@ -143,7 +143,7 @@ class EmailProcessor extends ProcessorImpl {
               new PasswordAuthentication(username, passwordOption getOrElse "")
             }
           })
-        case None ⇒
+        case None =>
           if (Logger.isInfoEnabled) Logger.info("No Authentication")
           Session.getInstance(properties)
       }
@@ -156,15 +156,15 @@ class EmailProcessor extends ProcessorImpl {
       val email = addressElement.element("email").getTextTrim // required
 
       val result = Option(addressElement.element("name")) match {
-        case Some(nameElement) ⇒ Seq(new InternetAddress(email, nameElement.getTextTrim))
-        case None              ⇒ InternetAddress.parse(email).toList
+        case Some(nameElement) => Seq(new InternetAddress(email, nameElement.getTextTrim))
+        case None              => InternetAddress.parse(email).toList
       }
 
       result.toArray
     }
 
     def addRecipients(elementName: String, recipientType: RecipientType) =
-      for (element ← messageElement.elements(elementName).asScala) {
+      for (element <- messageElement.elements(elementName).asScala) {
         val addresses = createAddresses(element)
         message.addRecipients(recipientType, addresses)
       }
@@ -174,15 +174,15 @@ class EmailProcessor extends ProcessorImpl {
 
     // Set To
     propertySet.getNonBlankString(TestTo) match {
-      case Some(testTo) ⇒ message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
-      case None         ⇒ addRecipients("to", Message.RecipientType.TO)
+      case Some(testTo) => message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
+      case None         => addRecipients("to", Message.RecipientType.TO)
     }
 
     addRecipients("cc", Message.RecipientType.CC)
     addRecipients("bcc", Message.RecipientType.BCC)
 
     // Set headers if any
-    for (headerElement ← messageElement.elements("header").asScala) {
+    for (headerElement <- messageElement.elements("header").asScala) {
       val headerName  = headerElement.element("name").getTextTrim  // required
       val headerValue = headerElement.element("value").getTextTrim // required
 
@@ -209,7 +209,7 @@ class EmailProcessor extends ProcessorImpl {
       throw new OXFException("Main text or body element not found")
 
     // Send message
-    useAndClose(session.getTransport("smtp")) { _ ⇒
+    useAndClose(session.getTransport("smtp")) { _ =>
       Transport.send(message)
     }
   }
@@ -237,7 +237,7 @@ class EmailProcessor extends ProcessorImpl {
         }
 
       multipartOption match {
-        case Some(multipart) ⇒
+        case Some(multipart) =>
           // Multipart content is requested
           val mimeMultipart = new MimeMultipart(multipart)
           while (parts.hasNext) {
@@ -249,7 +249,7 @@ class EmailProcessor extends ProcessorImpl {
 
           // Set content on parent part
           parentPart.setContent(mimeMultipart)
-        case None ⇒
+        case None =>
           // No multipart, just use the content of the element and add to the current part (which can be the main message)
           handlePart(pipelineContext, dataInputSystemId, parentPart, bodyElement)
       }
@@ -266,13 +266,13 @@ class EmailProcessor extends ProcessorImpl {
       // Either a String or a FileItem
       val content =
         partOrBodyElement.attributeValueOpt("src") match {
-          case Some(src) ⇒
+          case Some(src) =>
             // Content of the part is not inline
 
             // Generate a FileItem from the source
             val source = PartUtils.getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, mediatype)
             Left(PartUtils.handleStreamedPartContent(pipelineContext, source))
-          case None ⇒
+          case None =>
             // Content of the part is inline
 
             // For HTML, we support inline HTML or inline XHTML for backward compatibility
@@ -297,20 +297,20 @@ class EmailProcessor extends ProcessorImpl {
       if (! ContentTypes.isTextOrJSONContentType(mediatype)) {
         // This is binary content (including application/xml)
         content match {
-          case Left(fileItem) ⇒
+          case Left(fileItem) =>
             parentPart.setDataHandler(new DataHandler(new ReadonlyDataSource {
               def getContentType = mediatype
               def getInputStream = fileItem.getInputStream
               def getName = name
             }))
-          case Right(inline) ⇒
+          case Right(inline) =>
             val data = NetUtils.base64StringToByteArray(inline)
             parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, mediatype, data)))
         }
       } else {
         // This is text content (including text/xml)
         content match {
-          case Left(fileItem) ⇒
+          case Left(fileItem) =>
             parentPart.setDataHandler(new DataHandler(new ReadonlyDataSource {
               // This always contains a charset
               def getContentType = contentTypeWithCharset
@@ -318,18 +318,18 @@ class EmailProcessor extends ProcessorImpl {
               def getInputStream = fileItem.getInputStream
               def getName = name
             }))
-          case Right(inline) ⇒
+          case Right(inline) =>
             parentPart.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentTypeWithCharset, inline)))
         }
       }
 
       // Set content-disposition header
       partOrBodyElement.attributeValueOpt("content-disposition") foreach
-        (contentDisposition ⇒ parentPart.setDisposition(contentDisposition))
+        (contentDisposition => parentPart.setDisposition(contentDisposition))
 
       // Set content-id header
       partOrBodyElement.attributeValueOpt("content-id") foreach
-        (contentId ⇒ parentPart.setHeader("content-id", "<" + contentId + ">"))
+        (contentId => parentPart.setHeader("content-id", "<" + contentId + ">"))
       //part.setContentID(contentId);
     }
 

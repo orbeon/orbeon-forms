@@ -50,7 +50,7 @@ class GridOpsTest
 
   describe("Row insertion below") {
     it("must insert as expected") {
-      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RowspansDoc) { implicit ctx =>
 
         val gridElem =
           ctx.bodyElem descendant NodeInfoCell.GridTest head
@@ -59,7 +59,7 @@ class GridOpsTest
         var mapping = createAndAssertInitialGrid(gridElem)
 
         // Insert one row below each existing row
-        for (rowPos ← List(0, 2, 4)) {
+        for (rowPos <- List(0, 2, 4)) {
           rowInsertBelow(gridElem, rowPos)
           val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
           mapping = newMapping
@@ -82,7 +82,7 @@ class GridOpsTest
 
   describe("Row insertion above") {
     it("must insert as expected") {
-      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RowspansDoc) { implicit ctx =>
 
         val gridElem =
           ctx.bodyElem descendant NodeInfoCell.GridTest head
@@ -91,7 +91,7 @@ class GridOpsTest
         var mapping = createAndAssertInitialGrid(gridElem)
 
         // Insert one row above each existing row
-        for (rowPos ← List(0, 2, 4)) {
+        for (rowPos <- List(0, 2, 4)) {
           rowInsertAbove(gridElem, rowPos)
           val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
           mapping = newMapping
@@ -129,7 +129,7 @@ class GridOpsTest
 
   describe("Preceding name for control") {
     it("must insert all elements in the right places") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val controls =
           sectionWithGridAndControls descendant NodeInfoCell.CellTest child * filter (_.idOpt.nonEmpty)
@@ -142,7 +142,7 @@ class GridOpsTest
 
   describe("Preceding name for grid") {
     it("must insert all elements in the right places") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val section = sectionWithGridAndControls
 
@@ -158,15 +158,15 @@ class GridOpsTest
 
   describe("Delete") {
 
-    def assertSelectedCellAfterDelete(beforeAfter: List[(String, String)])(delete: NodeInfo ⇒ Any): Unit = {
+    def assertSelectedCellAfterDelete(beforeAfter: List[(String, String)])(delete: NodeInfo => Any): Unit = {
 
       // For before/after cell ids: create a doc, call the delete function, and assert the resulting selected cell
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
-        withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
 
-          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
+          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell =>
             selectCell(beforeCell)
             delete(beforeCell)
           }
@@ -177,20 +177,20 @@ class GridOpsTest
         }
 
       // Test all
-      for ((beforeTdId, afterTdId) ← beforeAfter)
+      for ((beforeTdId, afterTdId) <- beforeAfter)
         deleteAndCheckSelectedCell(beforeTdId, afterTdId)
     }
 
     it("must select the right cell after deleting a row") {
 
       val beforeAfter = List(
-        "1111" → "1121", // first cell
-        "2222" → "2231", // middle cell
-        "3333" → "3323", // last cell
-        "2111" → "2121"  // first cell of grid/section
+        "1111" -> "1121", // first cell
+        "2222" -> "2231", // middle cell
+        "3333" -> "3323", // last cell
+        "2111" -> "2121"  // first cell of grid/section
       )
 
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         implicit val ctx = FormBuilderDocContext()
         rowDelete(getContainingGrid(cell).id, (NodeInfoCellOps.y(cell) getOrElse 1) - 1)
       }
@@ -199,13 +199,13 @@ class GridOpsTest
     it("must select the right cell after deleting a grid") {
 
       val beforeAfter = List(
-        "1111" → "1211", // first cell
-        "2222" → "2311", // middle cell
-        "3333" → "3233", // last cell
-        "2111" → "2211"  // first cell of grid/section
+        "1111" -> "1211", // first cell
+        "2222" -> "2311", // middle cell
+        "3333" -> "3233", // last cell
+        "2111" -> "2211"  // first cell of grid/section
       )
 
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         deleteContainer(getContainingGrid(cell))
       }
     }
@@ -213,12 +213,12 @@ class GridOpsTest
     it("must select the right cell after deleting a section") {
 
       val beforeAfter = List(
-        "1111" → "2111", // first cell
-        "2222" → "3111", // middle cell
-        "3333" → "2333", // last cell
-        "2111" → "3111"  // first cell of grid/section
+        "1111" -> "2111", // first cell
+        "2222" -> "3111", // middle cell
+        "3333" -> "2333", // last cell
+        "2111" -> "3111"  // first cell of grid/section
       )
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         deleteContainer(findAncestorContainersLeafToRoot(getContainingGrid(cell)).head)
       }
     }
@@ -226,7 +226,7 @@ class GridOpsTest
 
   describe("Last grid in section") {
     it("must allow inserting a new grid") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -236,7 +236,7 @@ class GridOpsTest
         assert(canInsertControl(doc) === true)
 
         // Remove everything (assume top-level section with a single grid inside)
-        childrenContainers(ctx.bodyElem).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
+        childrenContainers(ctx.bodyElem).toList foreach  { section => // evaluate with toList otherwise the lazy iterator can fail
           assert(isLastGridInSection(childrenGrids(section).head) === true)
           deleteContainer(section)
         }

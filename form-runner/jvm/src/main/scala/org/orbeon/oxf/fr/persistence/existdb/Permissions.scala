@@ -45,7 +45,7 @@ object Permissions {
       val checkWithDataUser = CheckWithDataUser(
         username     = Option(metadataFromDB).map(_.child("username" ).stringValue),
         groupname    = Option(metadataFromDB).map(_.child("groupname").stringValue),
-        organization = Option(metadataFromDB).map(metadataEl ⇒ {
+        organization = Option(metadataFromDB).map(metadataEl => {
           val levelsEls = metadataEl.child("organization").child("level").map(_.stringValue)
           Organization(levelsEls.to(List))
         })
@@ -54,10 +54,10 @@ object Permissions {
     }
 
     val requiredOperation = method match {
-      case "GET"                ⇒ Read
-      case "DELETE"             ⇒ Delete
-      case "PUT" if dataExists  ⇒ Update
-      case "PUT" if !dataExists ⇒ Create
+      case "GET"                => Read
+      case "DELETE"             => Delete
+      case "PUT" if dataExists  => Update
+      case "PUT" if !dataExists => Create
     }
 
     val authorized = Operations.allows(authorizedOperations, requiredOperation)

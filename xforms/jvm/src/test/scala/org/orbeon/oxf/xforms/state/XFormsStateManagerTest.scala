@@ -31,12 +31,12 @@ class XFormsStateManagerTest
 
   describe("Cache configurations") {
 
-    for ((isCache, file) ← List(false → "client-nocache.xhtml", true → "client-cache.xhtml"))
+    for ((isCache, file) <- List(false -> "client-nocache.xhtml", true -> "client-cache.xhtml"))
       it(s"state with isCache = `$isCache` and file = `$file`") {
         testClient(isCache, file)
       }
 
-    for ((isCache, file) ← List(false → "server-nocache.xhtml", true → "server-cache.xhtml"))
+    for ((isCache, file) <- List(false -> "server-nocache.xhtml", true -> "server-cache.xhtml"))
       it(s"state with isCache = `$isCache` and file = `$file`") {
         testServer(isCache, file)
       }
@@ -44,7 +44,7 @@ class XFormsStateManagerTest
 
   describe("Session listener") {
     it("must remove the UUID when the session expires") {
-      withTestExternalContext { ec ⇒
+      withTestExternalContext { ec =>
 
         val session = ec.getSession(true)
 
@@ -65,7 +65,7 @@ class XFormsStateManagerTest
 
         val docs = List(createDoc(), createDoc())
 
-        docs foreach { doc ⇒
+        docs foreach { doc =>
           assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
           assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
         }
@@ -74,7 +74,7 @@ class XFormsStateManagerTest
         XFormsStateManager.sessionDestroyed(session)
 
         // Test that the document is no longer in cache
-        docs foreach { doc ⇒
+        docs foreach { doc =>
           assert(XFormsDocumentCache.take(doc.getUUID).isEmpty)
         }
       }
@@ -101,7 +101,7 @@ class XFormsStateManagerTest
     }
 
     def testClient(isCache: Boolean, formFile: String): Unit = {
-      withTestExternalContext { ec ⇒
+      withTestExternalContext { ec =>
 
         ec.getSession(true)
 
@@ -123,7 +123,7 @@ class XFormsStateManagerTest
         assert(state1.dynamicStateString map getSequenceNumber contains 1)
 
         // Run update
-        val state2 = doUpdate(isCache, state1, doc ⇒
+        val state2 = doUpdate(isCache, state1, doc =>
           List(
             new XXFormsValueEvent(
               doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
@@ -142,7 +142,7 @@ class XFormsStateManagerTest
         // Dynamic state must have changed
         assert((state1.dynamicStateString map stripSequenceNumber) != (state2.dynamicStateString map stripSequenceNumber))
 
-        val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
+        val state3 = doUpdate(isCache, state2, _ => Nil)
 
         assert(state1.uuid === state3.uuid)
         assert(state1.staticStateString === state3.staticStateString)
@@ -164,7 +164,7 @@ class XFormsStateManagerTest
     }
 
     def testServer(isCache: Boolean, formFile: String): Unit = {
-      withTestExternalContext { ec ⇒
+      withTestExternalContext { ec =>
 
         ec.getSession(true)
 
@@ -184,7 +184,7 @@ class XFormsStateManagerTest
 
         assert(1 === state1.document.getSequence)
 
-        val state2 = doUpdate(isCache, state1, doc ⇒
+        val state2 = doUpdate(isCache, state1, doc =>
           List(
             new XXFormsValueEvent(
               doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
@@ -199,7 +199,7 @@ class XFormsStateManagerTest
 
         assertEmptyClientState(state2)
 
-        val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
+        val state3 = doUpdate(isCache, state2, _ => Nil)
 
         assert(state1.uuid === state3.uuid)
         assert(3 === state3.document.getSequence)
@@ -217,7 +217,7 @@ class XFormsStateManagerTest
       }
     }
 
-    def doUpdate(isCache: Boolean, state1: TestState, callback: XFormsContainingDocument ⇒ List[XFormsEvent]) = {
+    def doUpdate(isCache: Boolean, state1: TestState, callback: XFormsContainingDocument => List[XFormsEvent]) = {
 
       val parameters =
         RequestParameters(
@@ -244,7 +244,7 @@ class XFormsStateManagerTest
         // Run events if any
         newDoc.beforeExternalEvents(null)
 
-        for (event ← callback(newDoc))
+        for (event <- callback(newDoc))
           ClientEvents.processEvent(newDoc, event)
 
         newDoc.afterExternalEvents()

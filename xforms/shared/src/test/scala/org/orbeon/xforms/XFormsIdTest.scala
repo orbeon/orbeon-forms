@@ -21,15 +21,15 @@ class XFormsIdTest extends AnyFunSpec {
   describe("extracting id parts") {
 
     val expected = List(
-      "input-control" →
+      "input-control" ->
         XFormsId("input-control", Nil, Nil),
-      "fr-view-component≡selection-controls-section≡xf-1156≡radio-buttons-control" →
+      "fr-view-component≡selection-controls-section≡xf-1156≡radio-buttons-control" ->
         XFormsId("radio-buttons-control", List("fr-view-component", "selection-controls-section", "xf-1156"), Nil),
-      "fr-view-component≡selection-controls-section≡xf-1156≡radio-buttons-control⊙42-7-2" →
+      "fr-view-component≡selection-controls-section≡xf-1156≡radio-buttons-control⊙42-7-2" ->
         XFormsId("radio-buttons-control", List("fr-view-component", "selection-controls-section", "xf-1156"), List(42, 7, 2))
     )
 
-    for ((s, xformsId) ← expected)
+    for ((s, xformsId) <- expected)
       it(s"must pass for `$s`") {
         assert(xformsId === XFormsId.fromEffectiveId(s))
       }

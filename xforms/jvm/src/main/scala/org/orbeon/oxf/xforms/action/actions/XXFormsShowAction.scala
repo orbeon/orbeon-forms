@@ -30,7 +30,7 @@ class XXFormsShowAction extends XFormsAction {
     synchronizeAndRefreshIfNeeded(actionContext)
 
     resolveControlAvt("dialog")(actionContext) match {
-      case Some(targetDialog: XFormsEventTarget) ⇒
+      case Some(targetDialog: XFormsEventTarget) =>
         val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
         val neighborEffectiveId = resolveControlAvt("neighbor", required = false)(actionContext) map (_.getEffectiveId)
         XXFormsShowAction.showDialog(
@@ -39,10 +39,10 @@ class XXFormsShowAction extends XFormsAction {
           constrainToViewport,
           XFormsAction.eventProperties(interpreter, actionElement)
         )
-      case _ ⇒
+      case _ =>
         debug(
           "xxf:show: dialog does not refer to an existing xxf:dialog element, ignoring action",
-          List("dialog id" → actionContext.element.attributeValue("dialog"))
+          List("dialog id" -> actionContext.element.attributeValue("dialog"))
         )
     }
   }

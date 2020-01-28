@@ -56,14 +56,14 @@ private object SubmitResponseEvent {
   // two child elements, name and value, whose string contents are the name and value of the header,
   // respectively."
   def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentInfo] =
-    headersOpt filter (_.nonEmpty) map { headers ⇒
+    headersOpt filter (_.nonEmpty) map { headers =>
       val sb = new StringBuilder
       sb.append("<headers>")
-      for ((name, values) ← headers) {
+      for ((name, values) <- headers) {
         sb.append("<header><name>")
         sb.append(name.escapeXmlMinimal)
         sb.append("</name>")
-        for (value ← values) {
+        for (value <- values) {
           sb.append("<value>")
           sb.append(value.escapeXmlMinimal)
           sb.append("</value>")
@@ -90,8 +90,8 @@ private object SubmitResponseEvent {
       }
 
     e.connectionResult flatMap readOrReturn map {
-      case Left(string)    ⇒ string
-      case Right(document) ⇒ document
+      case Left(string)    => string
+      case Right(document) => document
     }
   }
 
@@ -111,7 +111,7 @@ private object SubmitResponseEvent {
       // We go a bit further, trying to read independently from the returned mediatype.
 
       def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           logger.logWarning("xforms-submit-done|error", message, t)
           None
       }
@@ -120,21 +120,21 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try {
-          useAndClose(cxr.content.inputStream) { is ⇒
+          useAndClose(cxr.content.inputStream) { is =>
             Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
           }
         } catch {
           warn("error while reading response body.")
         }
 
-      tempURIOpt flatMap { tempURI ⇒
+      tempURIOpt flatMap { tempURI =>
 
         // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
         // Should modify readTinyTree() and readDom4j()
         def tryXML: Try[String Either DocumentInfo] =
           Try {
             Right(
-              useAndClose(URLFactory.createURL(tempURI).openStream()) { is ⇒
+              useAndClose(URLFactory.createURL(tempURI).openStream()) { is =>
                 TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
               }
             )
@@ -146,15 +146,15 @@ private object SubmitResponseEvent {
           }
 
         def asString(value: String Either DocumentInfo) = value match {
-          case Left(text) ⇒ text
-          case Right(xml) ⇒ TransformerUtils.tinyTreeToString(xml)
+          case Left(text) => text
+          case Right(xml) => TransformerUtils.tinyTreeToString(xml)
         }
 
         val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
 
         // See https://github.com/orbeon/orbeon-forms/issues/3082
         if (XFormsProperties.getErrorLogging.contains("submission-error-body") && ! cxr.isSuccessResponse)
-          result map asString foreach { value ⇒
+          result map asString foreach { value =>
             logger.logError("xforms-submit-done|error", "setting body document", "body", s"\n$value")
           }
 
@@ -165,15 +165,15 @@ private object SubmitResponseEvent {
   }
 
   val Deprecated = Map(
-    "body" → "response-body"
+    "body" -> "response-body"
   )
 
-  val Getters = Map[String, SubmitResponseEvent ⇒ Option[Any]] (
-    "response-headers"       → headerElements,
-    "response-reason-phrase" → (e ⇒ throw new ValidationException("Property Not implemented yet: " + "response-reason-phrase", e.locationData)),
-    "response-body"          → body,
-    "body"                   → body,
-    "resource-uri"           → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.url))),
-    "response-status-code"   → (e ⇒ e.connectionResult flatMap (c ⇒ Option(c.statusCode) filter (_ > 0)))
+  val Getters = Map[String, SubmitResponseEvent => Option[Any]] (
+    "response-headers"       -> headerElements,
+    "response-reason-phrase" -> (e => throw new ValidationException("Property Not implemented yet: " + "response-reason-phrase", e.locationData)),
+    "response-body"          -> body,
+    "body"                   -> body,
+    "resource-uri"           -> (e => e.connectionResult flatMap (c => Option(c.url))),
+    "response-status-code"   -> (e => e.connectionResult flatMap (c => Option(c.statusCode) filter (_ > 0)))
   )
 }

@@ -19,11 +19,11 @@ import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculate
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.saxon.om.NodeInfo
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 trait XFormsModelRebuildRecalculateRevalidate {
 
-  selfModel: XFormsModel ⇒
+  selfModel: XFormsModel =>
 
   import Private._
 
@@ -76,7 +76,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
     if (deferredActionContext.rebuild) {
       try {
         resetAndEvaluateVariables()
-        bindsIfInstance foreach { binds ⇒
+        bindsIfInstance foreach { binds =>
           // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
           binds.rebuild()
 
@@ -120,8 +120,8 @@ trait XFormsModelRebuildRecalculateRevalidate {
         } finally {
 
           for {
-            instanceId ← deferredActionContext.flaggedInstances
-            doc        ← getInstance(instanceId).underlyingDocumentOpt
+            instanceId <- deferredActionContext.flaggedInstances
+            doc        <- getInstance(instanceId).underlyingDocumentOpt
           } locally {
             InstanceDataOps.clearRequireDefaultValueRecursively(doc)
           }
@@ -139,7 +139,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
       val changedInstancesIt =
         for {
-          instance           ← instancesIterator
+          instance           <- instancesIterator
           previouslyValid    = instance.valid
           newlyValid         = ! invalidInstancesIds(instance.getEffectiveId)
           if previouslyValid != newlyValid
@@ -155,7 +155,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
       recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
 
     // Dispatch all events
-    for (event ← eventsToDispatch.iterator ++ validationEvents.iterator)
+    for (event <- eventsToDispatch.iterator ++ validationEvents.iterator)
       Dispatch.dispatchEvent(event)
   }
 
@@ -178,8 +178,8 @@ trait XFormsModelRebuildRecalculateRevalidate {
     lazy val _schemaValidator: XFormsModelSchemaValidator =
       new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
-    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit =
-      withDebug("performing recalculate", List("model" → effectiveId)) {
+    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent => Unit): Unit =
+      withDebug("performing recalculate", List("model" -> effectiveId)) {
 
         val hasVariables = staticModel.variablesSeq.nonEmpty
 
@@ -188,20 +188,20 @@ trait XFormsModelRebuildRecalculateRevalidate {
           resetAndEvaluateVariables()
 
         // Apply calculate binds
-        bindsIfInstance foreach { binds ⇒
+        bindsIfInstance foreach { binds =>
           binds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
         }
       }
 
-    def doRevalidate(collector: XFormsEvent ⇒ Unit): collection.Set[String] =
-      withDebug("performing revalidate", List("model" → effectiveId)) {
+    def doRevalidate(collector: XFormsEvent => Unit): collection.Set[String] =
+      withDebug("performing revalidate", List("model" -> effectiveId)) {
 
         val invalidInstancesIds = m.LinkedHashSet[String]()
 
         // Clear schema validation state
         // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
         for {
-          instance                       ← instancesIterator
+          instance                       <- instancesIterator
           instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
           if instanceMightBeSchemaValidated
         } locally {
@@ -211,7 +211,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
         // Validate using schemas if needed
         if (hasSchema)
           for {
-            instance ← instancesIterator
+            instance <- instancesIterator
             if instance.isSchemaValidation                   // we don't support validating read-only instances
             if ! _schemaValidator.validateInstance(instance) // apply schema
           } locally {
@@ -220,7 +220,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
           }
 
         // Validate using binds if needed
-        modelBindsOpt foreach { binds ⇒
+        modelBindsOpt foreach { binds =>
           binds.applyValidationBinds(invalidInstancesIds, collector)
         }
 

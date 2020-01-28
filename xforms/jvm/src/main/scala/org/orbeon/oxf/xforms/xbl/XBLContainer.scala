@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
@@ -58,7 +58,7 @@ class XBLContainer(
      with RefreshSupport
      with ContainerResolver {
 
-  self ⇒
+  self =>
 
   protected def this(
     associatedControl  : XFormsControl,
@@ -80,7 +80,7 @@ class XBLContainer(
   def ancestorsIterator: Iterator[XBLContainer] =
     Iterator.iterateOpt(self)(_.parentXBLContainer)
 
-  val containingDocument = ancestorsIterator collectFirst { case cd: XFormsContainingDocument ⇒ cd } get
+  val containingDocument = ancestorsIterator collectFirst { case cd: XFormsContainingDocument => cd } get
 
   val contextStack = new XFormsContextStack(self)
 
@@ -121,7 +121,7 @@ class XBLContainer(
     parentXBLContainer foreach
       (_.addChild(self))
 
-    for (currentModel ← models) {
+    for (currentModel <- models) {
 
       val newModelEffectiveId =
         XFormsId.getPrefixedId(currentModel.getEffectiveId) +
@@ -170,7 +170,7 @@ class XBLContainer(
 
 trait ModelContainer {
 
-  self: XBLContainer ⇒
+  self: XBLContainer =>
 
   private var _models = Seq.empty[XFormsModel]
   def models = _models
@@ -179,23 +179,23 @@ trait ModelContainer {
   def addAllModels(): Unit =
     _models =
       for {
-        model ← partAnalysis.getModelsForScope(innerScope)
+        model <- partAnalysis.getModelsForScope(innerScope)
         modelEffectiveId = model.prefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
       } yield
         new XFormsModel(self, modelEffectiveId, model)
 
   def initializeModels(eventsToDispatch: immutable.Seq[String]): Unit =
-    for (eventName ← eventsToDispatch){
+    for (eventName <- eventsToDispatch){
       if (eventName == XFORMS_READY) {
         initializeNestedControls()
         requireRefresh()
       }
-      for (model ← _models)
+      for (model <- _models)
         Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, model))
     }
 
   def destroyModels(): Unit =
-    for (model ← models)
+    for (model <- models)
       Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()))
 
   def defaultModel    = _models.headOption
@@ -221,7 +221,7 @@ trait ModelContainer {
     resolutionScopeContainer.searchContainedModels(staticId, contextItemOpt)
   }
 
-  // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
+  // Performance: for some reason, with Scala 2.9.2 at least, using for (model <- models) { ... return ... } is much
   // slower than using an Iterator (profiler).
   def searchContainedModels(staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] =
     isRelevant && models.nonEmpty flatOption {
@@ -232,20 +232,20 @@ trait ModelContainer {
     // Handle this container only
 
     // 1: Restore all instances
-    for (model ← _models)
+    for (model <- _models)
       model.restoreInstances()
 
     // 2: Restore everything else
     // NOTE: It's important to do this as a separate step, because variables which might refer to other models'
     // instances.
-    for (model ← _models)
+    for (model <- _models)
       model.restoreState(deferRRR)
   }
 }
 
 trait RefreshSupport {
 
-  self: XBLContainer ⇒
+  self: XBLContainer =>
 
   // Below we split RRR and Refresh in order to reduce the number of refreshes performed
 
@@ -297,7 +297,7 @@ trait RefreshSupport {
   def setDeferredFlagsForSetindex(): Unit =
     // XForms 1.1: "This action affects deferred updates by performing deferred update in its initialization and by
     // setting the deferred update flags for recalculate, revalidate and refresh."
-    for (model ← models)
+    for (model <- models)
       // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
       //currentModel.getBinds.rebuild()
       model.markValueChange(null, false)
@@ -305,7 +305,7 @@ trait RefreshSupport {
 
 trait ContainerResolver {
 
-  self: XBLContainer ⇒
+  self: XBLContainer =>
 
   // Return the namespace mappings associated with the given element. The element must be part of this container.
   def getNamespaceMappings(element: Element): NamespaceMapping =
@@ -337,8 +337,8 @@ trait ContainerResolver {
 
       val repeatControl =
         resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId) collect {
-          case repeat: XFormsRepeatControl             ⇒ repeat
-          case iteration: XFormsRepeatIterationControl ⇒ iteration.repeat
+          case repeat: XFormsRepeatControl             => repeat
+          case iteration: XFormsRepeatIterationControl => iteration.repeat
         }
 
       repeatControl map (_.getIndex)
@@ -351,8 +351,8 @@ trait ContainerResolver {
       val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
 
       getPartAnalysis.findControlAnalysis(repeatPrefixedId) match {
-        case Some(_: RepeatControl) ⇒ Some(0)
-        case _                      ⇒ None
+        case Some(_: RepeatControl) => Some(0)
+        case _                      => None
       }
     }
 
@@ -434,7 +434,7 @@ trait ContainerResolver {
     contextItemOpt     : Option[Item],
     followIndexes      : Boolean
   ): List[XFormsControl] =
-    findSourceControlEffectiveId(sourceEffectiveId, contextItemOpt).toList flatMap { sourceControlEffectiveId ⇒
+    findSourceControlEffectiveId(sourceEffectiveId, contextItemOpt).toList flatMap { sourceControlEffectiveId =>
 
       // Resolve on controls
       val controls =
@@ -445,7 +445,7 @@ trait ContainerResolver {
           followIndexes
         )
 
-      controls find (c ⇒ ! isEffectiveIdResolvableByThisContainer(c.getEffectiveId)) foreach { c ⇒
+      controls find (c => ! isEffectiveIdResolvableByThisContainer(c.getEffectiveId)) foreach { c =>
         // This should not happen!
         throw new OXFException(s"Resulting control is not in proper scope: `${c.getEffectiveId}`")
       }
@@ -461,10 +461,10 @@ trait ContainerResolver {
     contextItemOpt    : Option[Item]
   ): Option[String] =
     searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItemOpt) match {
-      case Some(_) ⇒
+      case Some(_) =>
         // Source is a model object, so find first control instead
         findFirstControlEffectiveId
-      case None ⇒
+      case None =>
         // Assume the source is a control
         Some(sourceEffectiveId)
     }
@@ -502,7 +502,7 @@ trait ContainerResolver {
 
   def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
     associatedControlOpt match {
-      case Some(container: XFormsContainerControl) ⇒ container.children
-      case _                                       ⇒ Nil
+      case Some(container: XFormsContainerControl) => container.children
+      case _                                       => Nil
     }
 }

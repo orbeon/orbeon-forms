@@ -102,6 +102,6 @@ class UriParamValues extends FunctionSupport {
   override def iterate(context: XPathContext): SequenceIterator = {
     implicit val ctx = context
     val paramName = stringArgument(1)
-    PathUtils.decodeSimpleQuery(new URI(stringArgument(0)).getRawQuery) collect { case (`paramName`, value) ⇒ value}
+    PathUtils.decodeSimpleQuery(new URI(stringArgument(0)).getRawQuery) collect { case (`paramName`, value) => value}
   }
 }

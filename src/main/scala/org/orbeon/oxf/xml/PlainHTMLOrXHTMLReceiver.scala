@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI ⇒ HtmlURI}
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => HtmlURI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -63,7 +63,7 @@ class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
 
   // Only keep attributes in no namespace
   def filterAttributes(attributes: Attributes) = {
-    
+
     val length = attributes.getLength
 
     // Whether there is at least one attribute in a namespace

@@ -62,11 +62,11 @@ object SectionGridEditor {
     // Position editor when block becomes current
     Position.currentContainerChanged(
       containerCache = BlockCache.sectionGridCache,
-      wasCurrent = (sectionGridBody: Block) ⇒ {
+      wasCurrent = (sectionGridBody: Block) => {
         if (sectionGridBody.el.is(BlockCache.GridSelector))
           sectionGridBody.el.children(".fr-grid").removeClass("fb-hover")
       },
-      becomesCurrent = (sectionGridBody: Block) ⇒ {
+      becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
 
         // Position the editor
@@ -85,7 +85,7 @@ object SectionGridEditor {
 
         def showContainerIcons(container: JQuery): Unit = {
 
-           Direction.values foreach { direction ⇒
+           Direction.values foreach { direction =>
 
             val relevant = container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = sectionGridEditorContainer.children(".fb-container-move-" + direction.entryName.toLowerCase)
@@ -126,32 +126,32 @@ object SectionGridEditor {
       }
     )
 
-    BlockCache.onExitFbMainOrOffsetMayHaveChanged { () ⇒
+    BlockCache.onExitFbMainOrOffsetMayHaveChanged { () =>
       sectionGridEditorContainer.hide()
       currentSectionGridOpt = None
     }
 
     // Register listener on editor icons
-    ContainerEditor.values foreach { editor ⇒
+    ContainerEditor.values foreach { editor =>
 
       val iconEl = sectionGridEditorContainer.children(s".fb-${editor.entryName}")
 
-      iconEl.on("click.orbeon.builder.section-grid-editor", () ⇒ asUnit {
-        currentSectionGridOpt foreach { currentSectionGrid ⇒
+      iconEl.on("click.orbeon.builder.section-grid-editor", () => asUnit {
+        currentSectionGridOpt foreach { currentSectionGrid =>
 
           val sectionGridId = currentSectionGrid.el.attr("id").get
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {
-            case ContainerMoveUp      ⇒ client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
-            case ContainerMoveDown    ⇒ client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
-            case ContainerMoveRight   ⇒ client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
-            case ContainerMoveLeft    ⇒ client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
-            case ContainerDelete      ⇒ client.containerDelete     (sectionGridId).call()
-            case ContainerEditDetails ⇒ client.containerEditDetails(sectionGridId).call()
-            case ContainerCopy        ⇒ client.containerCopy       (sectionGridId).call()
-            case ContainerCut         ⇒ client.containerCut        (sectionGridId).call()
-            case ContainerMerge       ⇒ client.containerMerge      (sectionGridId).call()
+            case ContainerMoveUp      => client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
+            case ContainerMoveDown    => client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
+            case ContainerMoveRight   => client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
+            case ContainerMoveLeft    => client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
+            case ContainerDelete      => client.containerDelete     (sectionGridId).call()
+            case ContainerEditDetails => client.containerEditDetails(sectionGridId).call()
+            case ContainerCopy        => client.containerCopy       (sectionGridId).call()
+            case ContainerCut         => client.containerCut        (sectionGridId).call()
+            case ContainerMerge       => client.containerMerge      (sectionGridId).call()
           }
         }
       })

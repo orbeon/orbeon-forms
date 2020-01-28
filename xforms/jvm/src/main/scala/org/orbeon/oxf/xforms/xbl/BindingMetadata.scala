@@ -53,7 +53,7 @@ trait BindingMetadata extends Logging {
       if (inlineBindingsRefs.nonEmpty) {
         debug(s"indexing ${inlineBindingsRefs.size} inline bindings")
 
-        inlineBindingsRefs foreach { inlineBinding ⇒
+        inlineBindingsRefs foreach { inlineBinding =>
           currentIndex = BindingIndex.indexBinding(currentIndex, inlineBinding)
         }
         inlineBindingsRefs = Nil
@@ -66,11 +66,11 @@ trait BindingMetadata extends Logging {
 
   def commitBindingIndex(): Unit =
     _xblIndex match {
-      case Some(index) ⇒
+      case Some(index) =>
         val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
         debug("committing global binding index", BindingIndex.stats(cleanIndex))
         GlobalBindingIndex.updateIndex(cleanIndex)
-      case None ⇒
+      case None =>
         debug("no binding index to commit")
     }
 
@@ -78,9 +78,9 @@ trait BindingMetadata extends Logging {
     debug(
       "registering inline binding",
       List(
-        "index"       → _xblIndex.isDefined.toString,
-        "element"     → elementAtt,
-        "prefixed id" → bindingPrefixedId
+        "index"       -> _xblIndex.isDefined.toString,
+        "element"     -> elementAtt,
+        "prefixed id" -> bindingPrefixedId
       )
     )
     val newBindingRef = InlineBindingRef(
@@ -89,21 +89,21 @@ trait BindingMetadata extends Logging {
       ns
     )
     _xblIndex match {
-      case Some(index) ⇒
+      case Some(index) =>
         // Case of restore, where `initializeBindingLibraryIfNeeded()` is called first
         val newIndex = BindingIndex.indexBinding(index, newBindingRef)
         if (index ne newIndex)
           _xblIndex = Some(newIndex)
-      case None ⇒
+      case None =>
         // Case of top-level initial analysis, where the library gets initialized once the body is found
         // `inlineBindingsRefs` is processed during subsequent `initializeBindingLibraryIfNeeded()`
-        debug("registering inline binding", List("element" → elementAtt, "prefixed id" → bindingPrefixedId))
+        debug("registering inline binding", List("element" -> elementAtt, "prefixed id" -> bindingPrefixedId))
         inlineBindingsRefs ::= newBindingRef
     }
   }
 
   def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
-    _xblIndex flatMap { index ⇒
+    _xblIndex flatMap { index =>
 
     val (newIndex, newPaths, bindingOpt) =
       BindingLoader.findMostSpecificBinding(index, Some(_checkedPaths), uri, localname, atts)
@@ -114,15 +114,15 @@ trait BindingMetadata extends Logging {
     _checkedPaths = newPaths
 
     if (debugEnabled)
-      bindingOpt foreach { _ ⇒
-        debug("found binding for", List("element" → s"Q{$uri}$localname"))
+      bindingOpt foreach { _ =>
+        debug("found binding for", List("element" -> s"Q{$uri}$localname"))
       }
 
     bindingOpt
   }
 
   def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding): Unit = {
-    bindingsByControlPrefixedId += controlPrefixedId → binding
+    bindingsByControlPrefixedId += controlPrefixedId -> binding
     binding.path foreach (bindingsPaths += _)
     maxLastModified = maxLastModified max binding.lastModified
   }
@@ -144,7 +144,7 @@ trait BindingMetadata extends Logging {
           ElementWithFiltersSelector(
             Some(TypeSelector(Some(Some(prefix)), `localname`)),
             Nil),
-          Nil) if ns.mapping.get(prefix) == someURI ⇒
+          Nil) if ns.mapping.get(prefix) == someURI =>
       } isDefined
     }
 
@@ -154,27 +154,27 @@ trait BindingMetadata extends Logging {
   // ==== XBLBindings API
 
   def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
-    _xblIndex foreach { index ⇒
+    _xblIndex foreach { index =>
 
       val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)
 
       debug("extracted inline XBL", List(
-        "elements" → inlineXBL.size.toString,
-        "bindings" → newBindings.size.toString
+        "elements" -> inlineXBL.size.toString,
+        "bindings" -> newBindings.size.toString
       ))
 
       def replaceBindingRefs(mappings: Map[String, IndexableBinding], newBindings: List[AbstractBinding]) = {
 
         var currentMappings = mappings
 
-        newBindings foreach { newBinding ⇒
+        newBindings foreach { newBinding =>
 
           val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
 
           currentMappings foreach {
-            case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _)) ⇒
-              currentMappings += controlPrefixedId → newBinding
-            case _ ⇒
+            case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _)) =>
+              currentMappings += controlPrefixedId -> newBinding
+            case _ =>
           }
         }
 
@@ -191,8 +191,8 @@ trait BindingMetadata extends Logging {
 
   def findAbstractBindingByPrefixedId(controlPrefixedId: String): Option[AbstractBinding] =
     bindingsByControlPrefixedId.get(controlPrefixedId) collect {
-      case binding: AbstractBinding ⇒ binding
-      case _                        ⇒ throw new IllegalStateException("missing binding")
+      case binding: AbstractBinding => binding
+      case _                        => throw new IllegalStateException("missing binding")
     }
 
   def removeBindingByPrefixedId(controlPrefixedId: String): Unit =
@@ -201,7 +201,7 @@ trait BindingMetadata extends Logging {
   // ==== Other API
 
   def baselineResources          : (List[String], List[String]) = _baselineResources
-  def allBindingsMaybeDuplicates : Iterable[AbstractBinding]    = bindingsByControlPrefixedId.values collect { case b: AbstractBinding ⇒ b }
+  def allBindingsMaybeDuplicates : Iterable[AbstractBinding]    = bindingsByControlPrefixedId.values collect { case b: AbstractBinding => b }
   def getBindingIncludesJava     : util.Set[String]             = bindingsPaths.asJava
 
   private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {

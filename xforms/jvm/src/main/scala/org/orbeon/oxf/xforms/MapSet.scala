@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.common.OXFException
 
 import scala.collection.generic.Growable
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 /**
  * Collection containing a number of distinct sets indexed by a map.
@@ -27,8 +27,8 @@ class MapSet[A, B] extends Iterable[(A, B)] with Growable[(A, B)] {
 
   def put(a: A, b: B): Unit = {
     (map.get(a) match {
-      case Some(set) ⇒ set
-      case None ⇒
+      case Some(set) => set
+      case None =>
         val newSet = new m.LinkedHashSet[B]
         map.put(a, newSet)
         newSet
@@ -38,13 +38,13 @@ class MapSet[A, B] extends Iterable[(A, B)] with Growable[(A, B)] {
   // NOTE: should use ++ operator, but harder to implement properly
   def combine(other: MapSet[A, B]): MapSet[A, B] = {
     val result = new MapSet[A, B]
-    this foreach (entry ⇒ result.put(entry._1, entry._2))
-    other foreach (entry ⇒ result.put(entry._1, entry._2))
+    this foreach (entry => result.put(entry._1, entry._2))
+    other foreach (entry => result.put(entry._1, entry._2))
     result
   }
 
   // Iterate over all (A, B) tuples
-  def iterator: Iterator[(A, B)] = map.iterator flatMap { case (key, values) ⇒ values.iterator map ((key, _)) }
+  def iterator: Iterator[(A, B)] = map.iterator flatMap { case (key, values) => values.iterator map ((key, _)) }
 
   // Growable
   def +=(elem: (A, B)): this.type = { put(elem._1, elem._2); this }

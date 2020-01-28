@@ -22,12 +22,12 @@ import scala.collection.compat._
 class MediatypeTest extends AnyFunSpec {
 
   val DisallowedChars               = """()<>@,;:\"/[]?=é天\u007F\u0000\u0010 """.to(List)
-  val MediatypesWithDisallowedChars = DisallowedChars map (char ⇒ s"application/fo${char}o")
+  val MediatypesWithDisallowedChars = DisallowedChars map (char => s"application/fo${char}o")
 
   val InvalidMediatypesOrMediatypeRanges = List("*/jpeg", "image/", "image") ::: MediatypesWithDisallowedChars
 
   describe("Invalid mediatypes") {
-    for (mediatypeString ← List("*/*", "image/*") ::: InvalidMediatypesOrMediatypeRanges)
+    for (mediatypeString <- List("*/*", "image/*") ::: InvalidMediatypesOrMediatypeRanges)
       it(s"must fail with `$mediatypeString`") {
         assert(Mediatype.unapply(mediatypeString).isEmpty)
       }
@@ -36,21 +36,21 @@ class MediatypeTest extends AnyFunSpec {
   describe("Valid mediatypes") {
 
     val expectations = List(
-      "application/pdf"                         → Mediatype(SpecificType("application"), SpecificType("pdf")),
-      "image/jpeg"                              → Mediatype(SpecificType("image"),       SpecificType("jpeg")),
-      "application/atom+xml"                    → Mediatype(SpecificType("application"), SpecificType("atom+xml")),
-      "application/vnd.oasis.opendocument.text" → Mediatype(SpecificType("application"), SpecificType("vnd.oasis.opendocument.text")),
-      "video/mp4"                               → Mediatype(SpecificType("video"),       SpecificType("mp4"))
+      "application/pdf"                         -> Mediatype(SpecificType("application"), SpecificType("pdf")),
+      "image/jpeg"                              -> Mediatype(SpecificType("image"),       SpecificType("jpeg")),
+      "application/atom+xml"                    -> Mediatype(SpecificType("application"), SpecificType("atom+xml")),
+      "application/vnd.oasis.opendocument.text" -> Mediatype(SpecificType("application"), SpecificType("vnd.oasis.opendocument.text")),
+      "video/mp4"                               -> Mediatype(SpecificType("video"),       SpecificType("mp4"))
     )
 
-    for ((mediatypeString, mediatype) ← expectations)
+    for ((mediatypeString, mediatype) <- expectations)
       it(s"must succeed with `$mediatypeString`") {
         assert(Mediatype.unapply(mediatypeString).contains(mediatype))
       }
   }
 
   describe("Invalid mediatype ranges") {
-    for (mediatypeString ← InvalidMediatypesOrMediatypeRanges)
+    for (mediatypeString <- InvalidMediatypesOrMediatypeRanges)
       it(s"must fail with `$mediatypeString`") {
         assert(MediatypeRange.unapply(mediatypeString).isEmpty)
       }
@@ -59,12 +59,12 @@ class MediatypeTest extends AnyFunSpec {
   describe("Valid mediatype ranges") {
 
     val expectations = List(
-      "*/*"        → WildcardMediatypeRange,
-      "image/*"    → WildcardTypeMediatypeRange(SpecificType("image")),
-      "image/jpeg" → SingletonMediatypeRange(Mediatype(SpecificType("image"), SpecificType("jpeg")))
+      "*/*"        -> WildcardMediatypeRange,
+      "image/*"    -> WildcardTypeMediatypeRange(SpecificType("image")),
+      "image/jpeg" -> SingletonMediatypeRange(Mediatype(SpecificType("image"), SpecificType("jpeg")))
     )
 
-    for ((mediatypeString, mediatypeRange) ← expectations)
+    for ((mediatypeString, mediatypeRange) <- expectations)
       it(s"must succeed with`$mediatypeString`") {
         assert(MediatypeRange.unapply(mediatypeString).contains(mediatypeRange))
       }

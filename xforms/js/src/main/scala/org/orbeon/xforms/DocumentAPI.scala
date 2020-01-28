@@ -56,13 +56,13 @@ object DocumentAPI {
 
     val eventObject  = js.Dictionary.empty[js.Any]
 
-    eventObject += "eventName" → eventName
-    eventObject += "targetId"  → targetId
+    eventObject += "eventName" -> eventName
+    eventObject += "targetId"  -> targetId
 
-    formElem     foreach (v ⇒ eventObject += "form"         → v)
-    incremental  foreach (v ⇒ eventObject += "incremental"  → v)
-    ignoreErrors foreach (v ⇒ eventObject += "ignoreErrors" → v)
-    properties   foreach (v ⇒ eventObject += "properties"   → v)
+    formElem     foreach (v => eventObject += "form"         -> v)
+    incremental  foreach (v => eventObject += "incremental"  -> v)
+    ignoreErrors foreach (v => eventObject += "ignoreErrors" -> v)
+    properties   foreach (v => eventObject += "properties"   -> v)
 
     dispatchEvent(eventObject)
   }
@@ -100,7 +100,7 @@ object DocumentAPI {
       AjaxEvent(
         eventName  = EventNames.XXFormsValue,
         targetId   = control.id,
-        properties = Map("value" → newStringValue)
+        properties = Map("value" -> newStringValue)
       )
     )
   }
@@ -131,16 +131,16 @@ object DocumentAPI {
 
       val (resolvedControlId, resolvedControlOpt) =
         (controlIdOrElem: Any) match {
-          case givenControlId: String ⇒
-            givenControlId → Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
-          case givenElement: html.Element ⇒
-            givenElement.id → Some(givenElement)
+          case givenControlId: String =>
+            givenControlId -> Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
+          case givenElement: html.Element =>
+            givenElement.id -> Some(givenElement)
         }
 
       resolvedControlOpt match {
-        case Some(resolvedControl: html.Element) ⇒
+        case Some(resolvedControl: html.Element) =>
           resolvedControl
-        case _ ⇒
+        case _ =>
           throw new IllegalArgumentException(s"Cannot find control for id `$resolvedControlId`")
       }
     }

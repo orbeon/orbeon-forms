@@ -39,9 +39,9 @@ object LabelEditor {
     AjaxClient.beforeSendingEvent.add((
       event         : AjaxEvent,
       addProperties : js.Function1[js.Dictionary[String], Unit]
-    ) ⇒ {
+    ) => {
 
-      event.targetIdOpt foreach { eventTargetId ⇒
+      event.targetIdOpt foreach { eventTargetId =>
 
         val eventName        = event.eventName
         val targetEl         = $(dom.document.getElementById(eventTargetId))
@@ -49,7 +49,7 @@ object LabelEditor {
 
         if (eventName == EventNames.DOMActivate && inSectionEditor)
           addProperties(js.Dictionary(
-            "section-id" → SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
+            "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
           ))
       }
     })
@@ -86,9 +86,9 @@ object LabelEditor {
         val labelInput = labelInputOpt.getOrElse {
           val labelInput = $("<input class='fb-edit-section-label'/>")
           $(".fb-main").append(labelInput)
-          labelInput.on("blur", () ⇒ asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
-          labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) ⇒ asUnit { if (e.which == 13) sendNewLabelValue() })
-          Events.ajaxResponseProcessedEvent.subscribe(() ⇒ labelInput.hide())
+          labelInput.on("blur", () => asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
+          labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit { if (e.which == 13) sendNewLabelValue() })
+          Events.ajaxResponseProcessedEvent.subscribe(() => labelInput.hide())
           labelInputOpt = labelInput
           labelInput
         }
@@ -130,7 +130,7 @@ object LabelEditor {
 
     // Update highlight of section title, as a hint users can click to edit
     def updateHighlight(
-      updateClass      : (String, JQuery) ⇒ Unit,
+      updateClass      : (String, JQuery) => Unit,
       clickInterceptor : JQuery
     )                  : Unit = {
 
@@ -158,10 +158,10 @@ object LabelEditor {
       // This will contain at least as many interceptors as there are sections
       var labelClickInterceptors: List[JQuery] = Nil
 
-      Position.onOffsetMayHaveChanged(() ⇒ {
+      Position.onOffsetMayHaveChanged(() => {
 
         val sections = BlockCache.sectionGridCache.elems collect {
-          case block if block.el.is(BlockCache.SectionSelector) ⇒ block.el
+          case block if block.el.is(BlockCache.SectionSelector) => block.el
         }
 
         // Create interceptor divs, so we have enough to cover all the sections
@@ -170,13 +170,13 @@ object LabelEditor {
           val newInterceptors =
             List.fill(sections.size - labelClickInterceptors.size) {
               val container = $("<div class='fb-section-label-editor-click-interceptor'>")
-              container.on("click.orbeon.builder.label-editor", (e: JQueryEventObject) ⇒ showLabelEditor($(e.target)))
-              container.on("mouseover", (e: JQueryEventObject) ⇒ asUnit {
-                  updateHighlight((cssClass: String, el: JQuery) ⇒ { el.addClass(cssClass); () }, $(e.target))
+              container.on("click.orbeon.builder.label-editor", (e: JQueryEventObject) => showLabelEditor($(e.target)))
+              container.on("mouseover", (e: JQueryEventObject) => asUnit {
+                  updateHighlight((cssClass: String, el: JQuery) => { el.addClass(cssClass); () }, $(e.target))
                   showClickHintIfTitleEmpty($(e.target))
               })
-              container.on("mouseout", (e: JQueryEventObject) ⇒ asUnit {
-                updateHighlight((cssClass: String, el: JQuery) ⇒ { el.removeClass(cssClass); () }, $(e.target))
+              container.on("mouseout", (e: JQueryEventObject) => asUnit {
+                updateHighlight((cssClass: String, el: JQuery) => { el.removeClass(cssClass); () }, $(e.target))
                 $(e.target).text("")
               })
               container
@@ -188,11 +188,11 @@ object LabelEditor {
         }
 
         // Hide interceptors we don't need
-        for (interceptor ← labelClickInterceptors)
+        for (interceptor <- labelClickInterceptors)
           interceptor.hide()
 
         // Position interceptor for each section
-        for ((section, interceptor) ← sections.iterator.zip(labelClickInterceptors.iterator)) {
+        for ((section, interceptor) <- sections.iterator.zip(labelClickInterceptors.iterator)) {
 
           val sectionTitle = $(section).find(SectionTitleSelector)
           val sectionLabel = $(section).find(SectionLabelSelector)

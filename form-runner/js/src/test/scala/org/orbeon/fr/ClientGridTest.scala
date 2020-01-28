@@ -46,49 +46,49 @@ class ClientGridTest extends AnyFunSpec {
         |""".stripMargin)
 
     val expected = List(
-      "cell-1-1"  → List(
-        Direction.Right → 3,
-        Direction.Down  → 0
+      "cell-1-1"  -> List(
+        Direction.Right -> 3,
+        Direction.Down  -> 0
       ),
-      "cell-1-8"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-1-8"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-1-9"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-1-9"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-2-3"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-2-3"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-2-5"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-2-5"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-2-9"  → List(
-        Direction.Right → 1,
-        Direction.Down  → 0
+      "cell-2-9"  -> List(
+        Direction.Right -> 1,
+        Direction.Down  -> 0
       ),
-      "cell-3-1"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-3-1"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-3-5"  → List(
-        Direction.Right → 1,
-        Direction.Down  → 0
+      "cell-3-5"  -> List(
+        Direction.Right -> 1,
+        Direction.Down  -> 0
       ),
-      "cell-3-9"  → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-3-9"  -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       ),
-      "cell-4-8"  → List(
-        Direction.Right → 1,
-        Direction.Down  → 0
+      "cell-4-8"  -> List(
+        Direction.Right -> 1,
+        Direction.Down  -> 0
       ),
-      "cell-4-10" → List(
-        Direction.Right → 0,
-        Direction.Down  → 0
+      "cell-4-10" -> List(
+        Direction.Right -> 0,
+        Direction.Down  -> 0
       )
     )
 
@@ -110,8 +110,8 @@ class ClientGridTest extends AnyFunSpec {
     // allow at all expanding into cells which have controls, or expand into cells spanning in some
     // ways.
     for {
-      (id, dirValue)     ← expected
-      (direction, space) ← dirValue
+      (id, dirValue)     <- expected
+      (direction, space) <- dirValue
     } locally {
       it(s"must pass moving `$id` ${direction.entryName.toLowerCase}") {
         // TODO

@@ -34,15 +34,15 @@ case class BindingIndex[+T](
 object BindingIndex {
 
   def stats(index: BindingIndex[IndexableBinding]) = List(
-    "name and attribute selectors" → index.nameAndAttSelectors.size.toString,
-    "attribute only selectors"     → index.attOnlySelectors.size.toString,
-    "name only selectors"          → index.nameOnlySelectors.size.toString,
-    "distinct bindings"            → distinctBindings(index).size.toString
+    "name and attribute selectors" -> index.nameAndAttSelectors.size.toString,
+    "attribute only selectors"     -> index.attOnlySelectors.size.toString,
+    "name only selectors"          -> index.nameOnlySelectors.size.toString,
+    "distinct bindings"            -> distinctBindings(index).size.toString
   )
 
   def distinctBindingsForPath(index: BindingIndex[IndexableBinding], path: String): List[IndexableBinding] = {
     val somePath = Some(path)
-    distinctBindings(index) collect { case binding if binding.path == somePath ⇒ binding }
+    distinctBindings(index) collect { case binding if binding.path == somePath => binding }
   }
 
   def distinctBindings(index: BindingIndex[IndexableBinding]): List[IndexableBinding] = {
@@ -55,7 +55,7 @@ object BindingIndex {
       index.nameOnlySelectors.iterator
 
     allIterator foreach {
-      case (_, binding) ⇒
+      case (_, binding) =>
         if (! (builder exists (_ eq binding)))
           builder += binding
     }
@@ -76,13 +76,13 @@ object BindingIndex {
     var currentIndex = index
 
     attDescriptors ++ nameOnlyDescriptors foreach {
-      case b @ BindingDescriptor(Some(elemName), None, Some(BindingAttributeDescriptor(name, pred, value))) ⇒
-        currentIndex = currentIndex.copy(nameAndAttSelectors = (b → binding) :: currentIndex.nameAndAttSelectors)
-      case b @ BindingDescriptor(None, None, Some(BindingAttributeDescriptor(name, pred, value))) ⇒
-        currentIndex = currentIndex.copy(attOnlySelectors = (b → binding) :: currentIndex.attOnlySelectors)
-      case b @ BindingDescriptor(Some(elemName), None, None) ⇒
-        currentIndex = currentIndex.copy(nameOnlySelectors = (b → binding) :: currentIndex.nameOnlySelectors)
-      case _ ⇒
+      case b @ BindingDescriptor(Some(elemName), None, Some(BindingAttributeDescriptor(name, pred, value))) =>
+        currentIndex = currentIndex.copy(nameAndAttSelectors = (b -> binding) :: currentIndex.nameAndAttSelectors)
+      case b @ BindingDescriptor(None, None, Some(BindingAttributeDescriptor(name, pred, value))) =>
+        currentIndex = currentIndex.copy(attOnlySelectors = (b -> binding) :: currentIndex.attOnlySelectors)
+      case b @ BindingDescriptor(Some(elemName), None, None) =>
+        currentIndex = currentIndex.copy(nameOnlySelectors = (b -> binding) :: currentIndex.nameOnlySelectors)
+      case _ =>
     }
 
     currentIndex
@@ -117,36 +117,36 @@ object BindingIndex {
   ): Option[(IndexableBinding, Boolean)] = {
 
     def attValueMatches(attDesc: BindingAttributeDescriptor, attValue: String) = attDesc.predicate match {
-      //case "" ⇒ // TODO: attribute existence (fix parser).
-      case "="  ⇒ attValue == attDesc.value
-      case "~=" ⇒ attValue.tokenizeToSet.contains(attDesc.value)
-      case "|=" ⇒ attValue == attDesc.value || attValue.startsWith(attDesc.value + '-')
-      case "^=" ⇒ attDesc.value != "" && attValue.startsWith(attDesc.value)
-      case "$=" ⇒ attDesc.value != "" && attValue.endsWith(attDesc.value)
-      case "*=" ⇒ attDesc.value != "" && attValue.contains(attDesc.value)
+      //case "" => // TODO: attribute existence (fix parser).
+      case "="  => attValue == attDesc.value
+      case "~=" => attValue.tokenizeToSet.contains(attDesc.value)
+      case "|=" => attValue == attDesc.value || attValue.startsWith(attDesc.value + '-')
+      case "^=" => attDesc.value != "" && attValue.startsWith(attDesc.value)
+      case "$=" => attDesc.value != "" && attValue.endsWith(attDesc.value)
+      case "*=" => attDesc.value != "" && attValue.contains(attDesc.value)
     }
 
     def attMatches(attDesc: BindingAttributeDescriptor) =
       atts exists {
-        case (attName, attValue) ⇒ attName == attDesc.name && attValueMatches(attDesc, attValue)
+        case (attName, attValue) => attName == attDesc.name && attValueMatches(attDesc, attValue)
       }
 
     def fromNameAndAtt =
-      index.byNameWithAtt.get(qName) flatMap { indexedBindings ⇒
+      index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
         indexedBindings.collectFirst {
-          case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) ⇒
+          case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) =>
             (binding, false)
         }
       }
 
     def fromAttOnly =
       index.attOnlySelectors collectFirst {
-        case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) ⇒
+        case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) =>
           (binding, false)
       }
 
     def fromNameOnly =
-      index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 → true)
+      index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 -> true)
 
     // Specificity: http://dev.w3.org/csswg/selectors-4/#specificity
     //
@@ -156,10 +156,10 @@ object BindingIndex {
   }
 
   private val abstractPF: PartialFunction[(BindingDescriptor, IndexableBinding), (BindingDescriptor, AbstractBinding)] =
-    { case (d, b: AbstractBinding) ⇒  d → b }
+    { case (d, b: AbstractBinding) =>  d -> b }
 
   private val pathsPF: PartialFunction[(BindingDescriptor, IndexableBinding), (BindingDescriptor, AbstractBinding)] =
-    { case (d, b: AbstractBinding) if b.path.isDefined ⇒  d → b }
+    { case (d, b: AbstractBinding) if b.path.isDefined =>  d -> b }
 
   def keepAbstractBindingsOnly(index: BindingIndex[IndexableBinding]): BindingIndex[AbstractBinding] =
     index.copy(

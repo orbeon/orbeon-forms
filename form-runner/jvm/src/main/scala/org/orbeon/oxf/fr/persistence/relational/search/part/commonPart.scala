@@ -31,7 +31,7 @@ object commonPart  {
           request.columns
             .filter(_.filterWith.nonEmpty)
             .zipWithIndex
-            .map { case (_, i) ⇒ s", orbeon_i_control_text tf$i" }
+            .map { case (_, i) => s", orbeon_i_control_text tf$i" }
             .mkString(" ")
         val freeTextTable =
           request.freeTextSearch.nonEmpty.string(", orbeon_form_data d")

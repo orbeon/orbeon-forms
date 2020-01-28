@@ -29,7 +29,7 @@ class SearchProcessor
     with SearchLogic
     with SearchResult {
 
-  self ⇒
+  self =>
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))
@@ -41,9 +41,9 @@ class SearchProcessor
 
           val version =
             Version(None, httpRequest.getFirstHeader(OrbeonFormDefinitionVersionLower)) match {
-              case v @ Unspecified       ⇒ v
-              case v @ Specific(_)       ⇒ v
-              case Next | ForDocument(_) ⇒ throw HttpStatusCodeException(StatusCode.BadRequest)
+              case v @ Unspecified       => v
+              case v @ Specific(_)       => v
+              case Next | ForDocument(_) => throw HttpStatusCodeException(StatusCode.BadRequest)
             }
 
           val searchDocument = readInputAsTinyTree(

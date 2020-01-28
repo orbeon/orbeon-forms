@@ -30,8 +30,8 @@ trait WithControl extends XFormsBaseHandlerXHTML {
 
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      staticControl ← staticControlOpt
-      attValue      ← ControlAjaxSupport.findAriaBy(staticControl, currentControl, LHHA.Label, condition = _ ⇒ true)(getContainingDocument)
+      staticControl <- staticControlOpt
+      attValue      <- ControlAjaxSupport.findAriaBy(staticControl, currentControl, LHHA.Label, condition = _ => true)(getContainingDocument)
       attName       = ControlAjaxSupport.AriaLabelledby
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
@@ -39,9 +39,9 @@ trait WithControl extends XFormsBaseHandlerXHTML {
 
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
-      staticControl   ← staticControlOpt
-      (lhha, attName) ← ControlAjaxSupport.LhhaWithAriaAttName
-      attValue        ← ControlAjaxSupport.findAriaBy(staticControl, currentControl, lhha, condition = _.isForRepeat)(getContainingDocument)
+      staticControl   <- staticControlOpt
+      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName
+      attValue        <- ControlAjaxSupport.findAriaBy(staticControl, currentControl, lhha, condition = _.isForRepeat)(getContainingDocument)
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }

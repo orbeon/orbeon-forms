@@ -121,10 +121,10 @@ class ResourcesPatcherTest
       // - allow "type" because it's used for the FB list of types
       val AllowedDuplicateNames = Set("item", "choices", "type")
 
-      for (url ← urls) {
+      for (url <- urls) {
 
         val doc =
-          useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+          useAndClose(URLFactory.createURL(url).openStream()) { is =>
             TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
           }
 
@@ -134,9 +134,9 @@ class ResourcesPatcherTest
         // Recursively compare element presence and order. All other nodes, including text and attribute nodes, are
         // ignored.
         def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
-          case (left: DocumentInfo, right: DocumentInfo) ⇒
+          case (left: DocumentInfo, right: DocumentInfo) =>
             compareElements(left.rootElement, right.rootElement, lang)
-          case (left: NodeInfo, right: NodeInfo) if left.isElement ⇒
+          case (left: NodeInfo, right: NodeInfo) if left.isElement =>
 
             def commonMessageSuffix = s" (url=$url and lang=$lang)"
 
@@ -164,17 +164,17 @@ class ResourcesPatcherTest
 
               leftChildren.size == rightChildren.size && {
                 (leftChildren zip rightChildren) forall {
-                  case (l, r) ⇒ compareElements(l, r, lang)
+                  case (l, r) => compareElements(l, r, lang)
                 }
               }
             })
-          case _ ⇒
+          case _ =>
             // Ignore all other nodes
             true
         }
 
         for {
-          resource ← doc / * / "resource" filterNot hasLang("en")
+          resource <- doc / * / "resource" filterNot hasLang("en")
           lang     = resource attValue "*:lang"
         } locally {
           assert(compareElements(englishResource, resource, lang))

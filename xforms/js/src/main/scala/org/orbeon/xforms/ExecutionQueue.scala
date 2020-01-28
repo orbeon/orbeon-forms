@@ -33,7 +33,7 @@ object ExecutionWait extends Enum[ExecutionWait] {
 
 // Handle a queue of events to which events can be added, and where after a certain delay all the events are
 // executed at once.
-class ExecutionQueue[T](execute: NonEmptyList[T] ⇒ Future[Unit]) {
+class ExecutionQueue[T](execute: NonEmptyList[T] => Future[Unit]) {
 
   import Private._
 
@@ -61,12 +61,12 @@ class ExecutionQueue[T](execute: NonEmptyList[T] ⇒ Future[Unit]) {
 
     // Call the `execute` function to run the events queued up so far.
     def executeEvents(): Unit =
-      NonEmptyList.fromList(events) foreach { localEvents ⇒
+      NonEmptyList.fromList(events) foreach { localEvents =>
 
         waitingCompletion = true
         events = Nil
 
-        execute(localEvents) onComplete { _ ⇒
+        execute(localEvents) onComplete { _ =>
           waitingCompletion = false
           executeEvents()
         }

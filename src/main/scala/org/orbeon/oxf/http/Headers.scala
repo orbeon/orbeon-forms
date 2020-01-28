@@ -71,7 +71,7 @@ object Headers {
   val EmptyHeaders = Map.empty[String, List[String]]
 
   // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
-  type ConvertibleToSeq[T[_], U] = T[U] ⇒ Seq[U]
+  type ConvertibleToSeq[T[_], U] = T[U] => Seq[U]
 
   // Filter headers that that should never be propagated in our proxies
   // Also combine headers with the same name into a single header
@@ -80,21 +80,21 @@ object Headers {
     request : Boolean)(implicit
     _conv   : ConvertibleToSeq[T, String]
   ): Iterable[(String, String)] =
-    proxyAndCapitalizeHeaders(headers, request) map { case (name, values) ⇒ name → (values mkString ",") }
+    proxyAndCapitalizeHeaders(headers, request) map { case (name, values) => name -> (values mkString ",") }
 
   def proxyAndCapitalizeHeaders[T[_] <: AnyRef, U](
     headers : Iterable[(String, T[U])],
     request : Boolean)(implicit
     _conv   : ConvertibleToSeq[T, U]
   ): Iterable[(String, T[U])] =
-    proxyHeaders(headers, request) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
+    proxyHeaders(headers, request) map { case (n, v) => capitalizeCommonOrSplitHeader(n) -> v }
 
   // NOTE: Filtering is case-insensitive, but original case is unchanged
   def proxyAndCombineRequestHeaders[T[_] <: AnyRef](
     headers : Iterable[(String, T[String])])(implicit
     _conv   : ConvertibleToSeq[T, String]
   ): Iterable[(String, String)] =
-    proxyHeaders(headers, request = true) map { case (name, values) ⇒ name → (values mkString ",") }
+    proxyHeaders(headers, request = true) map { case (name, values) => name -> (values mkString ",") }
 
   // NOTE: Filtering is case-insensitive, but original case is unchanged
   def proxyHeaders[T[_] <: AnyRef, U](
@@ -103,12 +103,12 @@ object Headers {
     _conv   : ConvertibleToSeq[T, U]
   ): Iterable[(String, T[U])] =
     for {
-      (name, values) ← headers
+      (name, values) <- headers
       if name ne null // HttpURLConnection.getHeaderFields returns null names. Great.
       if (request && ! RequestHeadersToRemove(name.toLowerCase)) || (! request && ! ResponseHeadersToRemove(name.toLowerCase))
       if (values ne null) && values.nonEmpty
     } yield
-      name → values
+      name -> values
 
   // Capitalize any header
   def capitalizeCommonOrSplitHeader(name: String): String =
@@ -125,15 +125,15 @@ object Headers {
   // NOTE: This logic is not restricted to headers. Pull it out from here.
   // For an `Iterable` mapping names to values where each value is itself `Iterable`, find the first
   // matching leaf value. Unicity of names is not enforced.
-  def firstItemIgnoreCase[T, V](coll: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[V]): Option[V] =
+  def firstItemIgnoreCase[T, V](coll: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[V]): Option[V] =
     coll collectFirst {
-      case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
+      case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty => value.head
     }
 
-  def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
+  def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap NumericUtils.parseLong filter (_ >= 0L)
 
-  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Iterable[String]): Option[Long] =
+  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
   // List of common HTTP headers
@@ -219,5 +219,5 @@ object Headers {
     "X-XSS-Protection"
   )
 
-  private val lowercaseToCommonCapitalization: Map[String, String] = CommonHeaders.iterator.map(name ⇒ name.toLowerCase → name).toMap
+  private val lowercaseToCommonCapitalization: Map[String, String] = CommonHeaders.iterator.map(name => name.toLowerCase -> name).toMap
 }

@@ -32,19 +32,19 @@ import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
 
 
 trait ValidationBindOps extends Logging {
 
-  self: XFormsModelBinds ⇒
+  self: XFormsModelBinds =>
 
   import Private._
 
-  def applyValidationBinds(invalidInstances: m.Set[String], collector: XFormsEvent ⇒ Unit): Unit = {
+  def applyValidationBinds(invalidInstances: m.Set[String], collector: XFormsEvent => Unit): Unit = {
     if (! staticModel.mustRevalidate) {
-      debug("skipping bind revalidate", List("model id" → model.getEffectiveId, "reason" → "no validation binds"))
+      debug("skipping bind revalidate", List("model id" -> model.getEffectiveId, "reason" -> "no validation binds"))
     } else {
 
       // Reset context stack just to re-evaluate the variables
@@ -52,14 +52,14 @@ trait ValidationBindOps extends Logging {
 
       // 1. Validate based on type and requiredness
       if (staticModel.hasTypeBind || staticModel.hasRequiredBind)
-        iterateBinds(topLevelBinds, bindNode ⇒
+        iterateBinds(topLevelBinds, bindNode =>
           if (bindNode.staticBind.dataType.isDefined || bindNode.staticBind.hasXPathMIP(Required))
             validateTypeAndRequired(bindNode, invalidInstances)
         )
 
       // 2. Validate constraints
       if (staticModel.hasConstraintBind)
-        iterateBinds(topLevelBinds, bindNode ⇒
+        iterateBinds(topLevelBinds, bindNode =>
           if (bindNode.staticBind.constraintsByLevel.nonEmpty)
             validateConstraint(bindNode, invalidInstances, collector)
         )
@@ -69,10 +69,10 @@ trait ValidationBindOps extends Logging {
   protected def failedConstraintMIPs(
     mips      : List[StaticXPathMIP],
     bindNode  : BindNode,
-    collector : XFormsEvent ⇒ Unit
+    collector : XFormsEvent => Unit
   ): List[StaticXPathMIP] =
     for {
-      mip       ← mips
+      mip       <- mips
       succeeded = evaluateBooleanExpressionStoreProperties(bindNode, mip, collector)
       if ! succeeded
     } yield
@@ -123,7 +123,7 @@ trait ValidationBindOps extends Logging {
       //
       val typeValidity =
         staticBind.dataType match {
-          case Some(_) ⇒
+          case Some(_) =>
             if (dependencies.requireModelMIPUpdate(model, staticBind, Type, null) ||
               requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(model, staticBind, Required, null)) {
               // Compute new type validity if the value of the node might have changed OR the value of requiredness
@@ -135,7 +135,7 @@ trait ValidationBindOps extends Logging {
               // Keep current value
               bindNode.typeValid
             }
-          case None ⇒
+          case None =>
             // Keep current value (defaults to true when no type attribute)
             bindNode.typeValid
         }
@@ -215,12 +215,12 @@ trait ValidationBindOps extends Logging {
 
             // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
             val context = evaluator.getStaticContext.asInstanceOf[IndependentContext]
-            for ((prefix, uri) ← staticBind.namespaceMapping.mapping)
+            for ((prefix, uri) <- staticBind.namespaceMapping.mapping)
               context.declareNamespace(prefix, uri)
 
             evaluator
           } catch {
-            case NonFatal(t) ⇒
+            case NonFatal(t) =>
               throw OrbeonLocationException.wrapException(t, staticBind.locationData)
               // TODO: Check what XForms event must be dispatched.
           }
@@ -234,8 +234,8 @@ trait ValidationBindOps extends Logging {
           true,
           new XPathContextMajor(stringValue, xpathEvaluator.getExecutable)
         ) match {
-          case _: ValidationFailure ⇒ false
-          case _                    ⇒ true
+          case _: ValidationFailure => false
+          case _                    => true
         }
       } else if (isBuiltInXXFormsType) {
         // Built-in extension types
@@ -293,7 +293,7 @@ trait ValidationBindOps extends Logging {
     def validateConstraint(
       bindNode         : BindNode,
       invalidInstances : m.Set[String],
-      collector        : XFormsEvent ⇒ Unit
+      collector        : XFormsEvent => Unit
     ): Unit = {
 
       assert(bindNode.staticBind.constraintsByLevel.nonEmpty)
@@ -313,13 +313,13 @@ trait ValidationBindOps extends Logging {
       // keep the list of constraints up to date even when the datatype is not valid.
 
       for {
-        (level, mips) ← bindNode.staticBind.constraintsByLevel
+        (level, mips) <- bindNode.staticBind.constraintsByLevel
       } locally {
         if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Constraint, level)) {
           // Re-evaluate and set
           val failedConstraints = failedConstraintMIPs(mips, bindNode, collector)
           if (failedConstraints.nonEmpty)
-            bindNode.failedConstraints += level → failedConstraints
+            bindNode.failedConstraints += level -> failedConstraints
           else
             bindNode.failedConstraints -= level
         } else {
@@ -337,7 +337,7 @@ trait ValidationBindOps extends Logging {
     def evaluateBooleanExpressionStoreProperties(
       bindNode  : BindNode,
       xpathMIP  : StaticXPathMIP,
-      collector : XFormsEvent ⇒ Unit
+      collector : XFormsEvent => Unit
     ): Boolean =
       try {
         // LATER: If we implement support for allowing binds to receive events, source must be bind id.
@@ -353,16 +353,16 @@ trait ValidationBindOps extends Logging {
             variableResolver   = model.variableResolver
           ).asInstanceOf[Boolean]
 
-        functionContext.properties foreach { propertiesMap ⇒
+        functionContext.properties foreach { propertiesMap =>
           propertiesMap foreach {
-            case (name, Some(s)) ⇒ bindNode.setCustom(name, s)
-            case (name, None)    ⇒ bindNode.clearCustom(name)
+            case (name, Some(s)) => bindNode.setCustom(name, s)
+            case (name, None)    => bindNode.clearCustom(name)
           }
         }
 
         result
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           handleMIPXPathException(t, bindNode, xpathMIP, "evaluating XForms constraint bind", collector)
           ! Model.DEFAULT_VALID
       }

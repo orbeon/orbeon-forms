@@ -99,15 +99,15 @@ trait FormRunnerPermissionsOps {
     ): List[String] = {
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
-          if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
+          if currentUsernameOrGroupname == dataUsernameOrGroupname =>
             val allPermissions                   = permissionsElOrNull.child("permission").toList
-            val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p / * forall (_.localname == condition))
+            val permissionsForOwnerOrGroupMember = allPermissions.filter(p => p / * forall (_.localname == condition))
             permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
-        case _ ⇒ Nil
+        case _ => Nil
       }
     }
 
-    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
+    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions =>
       val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser)
       val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.username), dataUsername,  "owner")
       val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.group),    dataGroupname, "group-member")
@@ -145,13 +145,13 @@ trait FormRunnerPermissionsOps {
         orbeonRolesFromCurrentRequest
       )
 
-    formsEls.flatMap { formEl ⇒
+    formsEls.flatMap { formEl =>
 
       val wrapper = wrapperOpt.getOrElse(
         // Create wrapper we don't have one already
         new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
         // Save wrapper for following iterations
-        |!> (w ⇒ wrapperOpt = Some(w))
+        |!> (w => wrapperOpt = Some(w))
       )
 
       val appName  = formEl.elemValue(Names.AppName)
@@ -218,12 +218,12 @@ trait FormRunnerPermissionsOps {
 
   private def allOperationsIfNoPermissionsDefined
     (permissionsElOrNull : NodeInfo)
-    (computePermissions  : List[Permission] ⇒ List[String]
+    (computePermissions  : List[Permission] => List[String]
   ): List[String] =
     PermissionsXML.parse(permissionsElOrNull) match {
       // No permissions defined for this form, authorize any operation
-      case UndefinedPermissions ⇒ List("*")
-      case DefinedPermissions(permissions) ⇒ computePermissions(permissions)
+      case UndefinedPermissions => List("*")
+      case DefinedPermissions(permissions) => computePermissions(permissions)
     }
 }
 

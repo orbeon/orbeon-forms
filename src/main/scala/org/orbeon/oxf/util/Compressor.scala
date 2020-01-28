@@ -73,14 +73,14 @@ object Compressor extends Logging {
   def compressBytesMeasurePerformance(bytesToEncode: Array[Byte]): Array[Byte] = {
 
     val settings = Map(
-      Deflater.BEST_SPEED          → "BEST_SPEED",
-      Deflater.DEFAULT_COMPRESSION → "DEFAULT_COMPRESSION",
-      Deflater.BEST_COMPRESSION    → "BEST_COMPRESSION"
+      Deflater.BEST_SPEED          -> "BEST_SPEED",
+      Deflater.DEFAULT_COMPRESSION -> "DEFAULT_COMPRESSION",
+      Deflater.BEST_COMPRESSION    -> "BEST_COMPRESSION"
     )
 
-    for ((level, description) ← settings)
+    for ((level, description) <- settings)
       withDebug(description) {
-        for (v ← 1 to 100)
+        for (v <- 1 to 100)
           compressBytes(bytesToEncode, level)
       }
 
@@ -105,8 +105,8 @@ object Compressor extends Logging {
     override def passivateObject(o: Deflater): Unit =
       try o.reset()
       catch {
-        case NonFatal(t) ⇒
-          error("exception while passivating Deflater", Seq("throwable" → OrbeonFormatter.format(t)))
+        case NonFatal(t) =>
+          error("exception while passivating Deflater", Seq("throwable" -> OrbeonFormatter.format(t)))
       }
   }
 

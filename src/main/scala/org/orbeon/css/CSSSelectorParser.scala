@@ -67,10 +67,10 @@ object CSSSelectorParser extends Parser {
 
   object Combinator {
     def apply(s: String) = s match {
-      case "+" ⇒ ImmediatelyFollowingCombinator
-      case ">" ⇒ ChildCombinator
-      case "~" ⇒ FollowingCombinator
-      case _   ⇒ DescendantCombinator
+      case "+" => ImmediatelyFollowingCombinator
+      case ">" => ChildCombinator
+      case "~" => FollowingCombinator
+      case _   => DescendantCombinator
     }
   }
 
@@ -179,8 +179,8 @@ object CSSSelectorParser extends Parser {
   def parseSelectors(selectors: String): List[Selector] = {
     val parsingResult = ReportingParseRunner(SelectorsGroupParser).run(selectors)
     parsingResult.result match {
-      case Some(list) ⇒ list
-      case None       ⇒ throw new ParsingException("Invalid source:\n" + ErrorUtils.printParseErrors(parsingResult))
+      case Some(list) => list
+      case None       => throw new ParsingException("Invalid source:\n" + ErrorUtils.printParseErrors(parsingResult))
     }
   }
 }

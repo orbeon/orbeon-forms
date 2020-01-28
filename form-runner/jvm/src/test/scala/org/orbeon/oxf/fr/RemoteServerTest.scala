@@ -30,9 +30,9 @@ class RemoteServerTest extends AnyFunSpecLike {
       assert(
         Success(
           List(
-            "Prod 1" → "http://prod1.acme.org/orbeon",
-            "Prod 2" → "http://prod2.acme.org/orbeon",
-            "Prod 3" → "http://prod2.acme.org/orbeon"
+            "Prod 1" -> "http://prod1.acme.org/orbeon",
+            "Prod 2" -> "http://prod2.acme.org/orbeon",
+            "Prod 3" -> "http://prod2.acme.org/orbeon"
           )
         ) === tryRemoteServersFromString(
           """
@@ -59,7 +59,7 @@ class RemoteServerTest extends AnyFunSpecLike {
         """[ { "label": "Prod 1", "url": "http://prod1.acme.org/orbeon" }, ]"""
       )
 
-      for (json ← Failures)
+      for (json <- Failures)
         assert(tryRemoteServersFromString(json).isFailure)
     }
   }

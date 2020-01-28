@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.Names._
@@ -99,11 +99,11 @@ trait FormRunnerLang {
   // Return a predicate telling whether a language is allowed based on properties. If app/form are specified, then the
   // result applies to that app/form, otherwise it is valid globally for Form Runner.
   // Public for unit tests
-  def isAllowedLang(appForm: Option[AppForm]): String ⇒ Boolean = {
+  def isAllowedLang(appForm: Option[AppForm]): String => Boolean = {
     val suffix = appForm.toList flatMap (_.toList)
     val set    = stringOptionToSet(properties.getNonBlankString("oxf.fr.available-languages" :: suffix mkString ".")) map cleanLanguage
     // If none specified via property or property contains a wildcard, all languages are considered available
-    if (set.isEmpty || set("*")) _ ⇒ true else set
+    if (set.isEmpty || set("*")) _ => true else set
   }
 
   // The requested language, trying a few things in order (given parameter, request, session, default)
@@ -153,10 +153,10 @@ trait FormRunnerLang {
     //
     def cleanLanguage(lang: String): String =
       lang.trimAllToEmpty match {
-        case OldLocaleRe("zh_CN") ⇒ "zh-Hans"
-        case OldLocaleRe("zh_TW") ⇒ "zh-Hant"
-        case OldLocaleRe(oldLang) ⇒ oldLang
-        case newLang              ⇒ newLang
+        case OldLocaleRe("zh_CN") => "zh-Hans"
+        case OldLocaleRe("zh_TW") => "zh-Hant"
+        case OldLocaleRe(oldLang) => oldLang
+        case newLang              => newLang
       }
 
     def selectLangUseDefault(
@@ -175,8 +175,8 @@ trait FormRunnerLang {
     def stringFromSession(request: Request, name: String) =
       request.sessionOpt flatMap
         (_.getAttribute(LanguageParam)) map {
-          case item: Item ⇒ item.getStringValue
-          case other      ⇒ other.toString
+          case item: Item => item.getStringValue
+          case other      => other.toString
         }
 
   }

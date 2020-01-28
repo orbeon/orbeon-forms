@@ -50,8 +50,8 @@ trait ExistentialFunction extends FunctionSupport {
     val items = arguments(0).iterate(context)
     val pexpr  =
       Option(arguments(1).evaluateItem(context)) collect
-      { case o: ObjectValue        ⇒ o.getObject  } collect
-      { case e: PreparedExpression ⇒ e } getOrElse
+      { case o: ObjectValue        => o.getObject  } collect
+      { case e: PreparedExpression => e } getOrElse
       { throwDynamicError() }
 
     val c = context.newCleanContext
@@ -59,7 +59,7 @@ trait ExistentialFunction extends FunctionSupport {
     c.setCurrentIterator(items)
     c.openStackFrame(pexpr.stackFrameMap)
 
-    for (i ← 2 until arguments.length) {
+    for (i <- 2 until arguments.length) {
       val slot = pexpr.variables(i - 2).getLocalSlotNumber
       c.setLocalVariable(slot, ExpressionTool.eagerEvaluate(arguments(i), c))
     }
@@ -71,10 +71,10 @@ trait ExistentialFunction extends FunctionSupport {
           break()
 
         pexpr.expression.evaluateItem(c) match {
-          case b: BooleanValue ⇒
+          case b: BooleanValue =>
             if (returnNonDefaultValue(b.getBooleanValue))
               return ! defaultValue
-          case _ ⇒
+          case _ =>
             val e = new XPathException("expression in xxf:forall() must return numeric values")
             e.setXPathContext(context)
             throw e

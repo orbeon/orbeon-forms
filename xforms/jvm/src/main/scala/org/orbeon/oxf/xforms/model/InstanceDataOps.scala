@@ -23,7 +23,7 @@ object InstanceDataOps {
   def removeRecursively[A <: Node](node: A): A =
     setDataRecursively(
       node               = node,
-      updateInstanceData = (n, _) ⇒ InstanceData.removeInstanceData(n)
+      updateInstanceData = (n, _) => InstanceData.removeInstanceData(n)
     )
 
   // Annotate instance data with the `requireDefaultValue` flag set to `true`, starting at the given node.
@@ -32,7 +32,7 @@ object InstanceDataOps {
   def setRequireDefaultValueRecursively[A <: Node](node: A): A =
     setDataRecursively(
       node               = node,
-      updateInstanceData = (n, hasChildrenElems) ⇒
+      updateInstanceData = (n, hasChildrenElems) =>
         if (hasChildrenElems)
           InstanceData.removeInstanceData(n)
         else
@@ -42,31 +42,31 @@ object InstanceDataOps {
   def clearRequireDefaultValueRecursively[A <: Node](node: A): A =
     setDataRecursively(
       node               = node,
-      updateInstanceData = (n, _) ⇒ InstanceData.clearRequireDefaultValue(n)
+      updateInstanceData = (n, _) => InstanceData.clearRequireDefaultValue(n)
       // NOTE: Don't check `hasChildrenElems` because there could have been subsequent element insertions since the
       // moment the flags were set. So instead check all elements.
     )
 
-  private def setDataRecursively[A <: Node](node: A, updateInstanceData: (Node, Boolean) ⇒ Unit): A = {
+  private def setDataRecursively[A <: Node](node: A, updateInstanceData: (Node, Boolean) => Unit): A = {
 
     // We can't store data on the Document object. Use root element instead.
     val adjustedNode =
       node match {
-        case document: Document ⇒ document.getRootElement
-        case node               ⇒ node
+        case document: Document => document.getRootElement
+        case node               => node
       }
 
     adjustedNode match {
-      case elem: Element ⇒
+      case elem: Element =>
         val childrenElems = Dom4j.elements(elem)
 
         updateInstanceData(elem, childrenElems.nonEmpty)
 
         Dom4j.attributes(elem) foreach (setDataRecursively(_, updateInstanceData))
         childrenElems          foreach (setDataRecursively(_, updateInstanceData))
-      case attribute: Attribute ⇒
+      case attribute: Attribute =>
         updateInstanceData(attribute, false)
-      case _ ⇒
+      case _ =>
     }
 
     node

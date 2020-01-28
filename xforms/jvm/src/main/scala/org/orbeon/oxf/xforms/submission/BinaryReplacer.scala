@@ -59,7 +59,7 @@ class BinaryReplacer(
     val filenameOpt  = filenameFromValue  orElse filenameFromHeader
     val mediatypeOpt = mediatypeFromValue orElse mediatypeFromHeader
 
-    contentUrlOpt foreach { contentUrl ⇒
+    contentUrlOpt foreach { contentUrl =>
 
       val sizeFromContentOpt = FileUtils.findFileUriPath(new URI(contentUrl)) map (new File(_).length)
 

@@ -40,7 +40,7 @@ object DockerSupport {
   def replacePaths(s: String): String =
     s.replaceAllLiterally("$BASE_DIRECTORY", BaseDirectory).replaceAllLiterally("$HOME", OS.homedir())
 
-  def withInfo[T](message: ⇒ String)(body: ⇒ T): T =
+  def withInfo[T](message: => String)(body: => T): T =
     try {
       println(s"start $message")
       body
@@ -55,9 +55,9 @@ object DockerSupport {
 
     withInfo(s"trying to run execFileSync: $replacedCmd $replacedParams") {
       (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {
-        case v: String      ⇒ v
-        case v: node.Buffer ⇒ v.toString()
-        case _              ⇒ throw new IllegalStateException
+        case v: String      => v
+        case v: node.Buffer => v.toString()
+        case _              => throw new IllegalStateException
       }
     }
   }
@@ -66,7 +66,7 @@ object DockerSupport {
     try {
       Future.successful(runProcessSync(cmd, params))
     } catch {
-      case t: Throwable ⇒
+      case t: Throwable =>
         Future.failed(t)
     }
   }
@@ -91,16 +91,16 @@ object DockerSupport {
 
     Success(
       existingContainerIdsOpt match {
-        case Some(containerIds) ⇒ containerIds.splitTo[List]()
-        case None               ⇒ List(await(runProcessSyncF("docker", s"run -d ${params.trim} $image")))
+        case Some(containerIds) => containerIds.splitTo[List]()
+        case None               => List(await(runProcessSyncF("docker", s"run -d ${params.trim} $image")))
       }
     )
   }
 
   def removeContainerByImage(image: String): Future[Unit] = async {
     await(runProcessSyncF("docker", s"ps -q --filter ancestor=$image")).trimAllToOpt match {
-      case Some(containerIds) ⇒ await(runProcessSyncF("docker", s"rm -f $containerIds"))
-      case None               ⇒ None
+      case Some(containerIds) => await(runProcessSyncF("docker", s"rm -f $containerIds"))
+      case None               => None
     }
   }
 
@@ -111,8 +111,8 @@ object DockerSupport {
 
   def removeContainerById(containerId: String): Future[Unit] = async {
     await(runProcessSyncF("docker", s"ps -q --filter id=$containerId")).trimAllToOpt match {
-      case Some(containerIds) ⇒ await(runProcessSyncF("docker", s"rm -f $containerId"))
-      case None               ⇒ None
+      case Some(containerIds) => await(runProcessSyncF("docker", s"rm -f $containerId"))
+      case None               => None
     }
   }
 
@@ -126,11 +126,11 @@ object DockerSupport {
 
   def createNetworkIfNeeded(): Future[Any] = async {
     await(findNetworkIdF) match {
-      case Some(networkId) ⇒ networkId
-      case None            ⇒ await(runProcessSyncF("docker", s"network create --driver bridge $OrbeonDockerNetwork"))
+      case Some(networkId) => networkId
+      case None            => await(runProcessSyncF("docker", s"network create --driver bridge $OrbeonDockerNetwork"))
     }
   }
 
   def removeNetworkIfNeeded(): Future[Unit] =
-    findNetworkIdF map { _ ⇒ runProcessSyncF("docker", s"network remove $OrbeonDockerNetwork") }
+    findNetworkIdF map { _ => runProcessSyncF("docker", s"network remove $OrbeonDockerNetwork") }
 }

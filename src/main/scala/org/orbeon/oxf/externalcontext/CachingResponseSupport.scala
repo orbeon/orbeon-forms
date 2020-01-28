@@ -25,7 +25,7 @@ trait CachingResponseSupport {
   protected var responseCachingDisabled = false
 
   private def setResponseHeaders(headers: List[(String, String)]): Unit =
-    for ((key, value) ← headers)
+    for ((key, value) <- headers)
       setHeader(key, value)
 
   private def setDateHeader(name: String, value: Long) =

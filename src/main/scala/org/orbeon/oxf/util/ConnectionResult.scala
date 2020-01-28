@@ -14,11 +14,11 @@
 package org.orbeon.oxf.util
 
 import java.io._
-import java.lang.{Long ⇒ JLong}
+import java.lang.{Long => JLong}
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode, StreamedContent, Headers ⇒ HttpHeaders}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.xml.XMLParsing
 
@@ -45,10 +45,10 @@ case class ConnectionResult(
   def isSuccessResponse: Boolean = NetUtils.isSuccessCode(statusCode)
 
   val mediatype: Option[String] =
-    content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeMediaType(ct))
+    content.contentType flatMap (ct => ContentTypes.getContentTypeMediaType(ct))
 
   val charset: Option[String] =
-    content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeCharset(ct))
+    content.contentType flatMap (ct => ContentTypes.getContentTypeCharset(ct))
 
   def mediatypeOrDefault(default: String): String =
     mediatype getOrElse default
@@ -58,11 +58,11 @@ case class ConnectionResult(
 
   def getHeaderIgnoreCase(name: String): List[String] = {
     val nameLowercase = name.toLowerCase
-    headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase ⇒ v } getOrElse Nil
+    headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase => v } getOrElse Nil
   }
 
   def readTextResponseBody: Option[String] = mediatype collect {
-    case mediatype if ContentTypes.isXMLMediatype(mediatype) ⇒
+    case mediatype if ContentTypes.isXMLMediatype(mediatype) =>
       // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
       //
       // http://tools.ietf.org/html/rfc7303:
@@ -86,10 +86,10 @@ case class ConnectionResult(
       //    In the absence of a BOM (Section 3.3), the charset parameter is
       //    authoritative if it is present
       //
-      useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader ⇒
+      useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader =>
         NetUtils.readStreamAsString(reader)
       }
-    case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) ⇒
+    case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
       readStreamAsText(content.inputStream, charset)
   }
 
@@ -98,12 +98,12 @@ case class ConnectionResult(
   // See https://github.com/orbeon/orbeon-forms/issues/1900
   def logResponseDetailsOnce(logLevel: Level)(implicit logger: IndentedLogger): Unit = {
     if (! _didLogResponseDetails) {
-      log(logLevel, "response", Seq("status code" → statusCode.toString))
+      log(logLevel, "response", Seq("status code" -> statusCode.toString))
       if (headers.nonEmpty) {
 
         val headersToLog =
-          for ((name, values) ← headers; value ← values)
-            yield name → value
+          for ((name, values) <- headers; value <- values)
+            yield name -> value
 
         log(logLevel, "response headers", headersToLog.toList)
       }
@@ -157,22 +157,22 @@ object ConnectionResult {
     )
   }
 
-  def withSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream ⇒ T): T =
+  def withSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): T =
     tryWithSuccessConnection(cxr, closeOnSuccess)(body).get
 
-  def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream ⇒ T): Try[T] = Try {
+  def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {
     try {
       cxr match {
-        case ConnectionResult(_, _, _, StreamedContent(inputStream, _, _, _), _, _) if cxr.isSuccessResponse ⇒
+        case ConnectionResult(_, _, _, StreamedContent(inputStream, _, _, _), _, _) if cxr.isSuccessResponse =>
           val result = body(inputStream)
           if (closeOnSuccess)
             cxr.close() // this eventually calls InputStream.close()
           result
-        case ConnectionResult(_, statusCode, _, _, _, _) ⇒
+        case ConnectionResult(_, statusCode, _, _, _, _) =>
           throw HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError)
       }
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         cxr.close()
         throw t
     }
@@ -183,7 +183,7 @@ object ConnectionResult {
     // - JSON: "JSON text SHALL be encoded in Unicode.  The default encoding is UTF-8."
     //   http://www.ietf.org/rfc/rfc4627.txt
     // - other: we pick UTF-8 anyway (2014-09-18)
-    useAndClose(new InputStreamReader(is, charset getOrElse Defaults.DefaultEncodingForModernUse)) { reader ⇒
+    useAndClose(new InputStreamReader(is, charset getOrElse Defaults.DefaultEncodingForModernUse)) { reader =>
       NetUtils.readStreamAsString(reader)
     }
   }

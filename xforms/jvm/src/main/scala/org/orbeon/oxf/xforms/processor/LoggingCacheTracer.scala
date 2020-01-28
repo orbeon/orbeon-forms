@@ -20,8 +20,8 @@ class LoggingCacheTracer(logger: IndentedLogger) extends CacheTracer {
 
   def digestAndTemplateStatus(digestIfFound: Option[String]): Unit =
     digestIfFound match {
-      case Some(digest) ⇒ logger.logDebug("", "template and static state digest obtained from cache", "digest", digest)
-      case None         ⇒ logger.logDebug("", "template and static state digest not obtained from cache.")
+      case Some(digest) => logger.logDebug("", "template and static state digest obtained from cache", "digest", digest)
+      case None         => logger.logDebug("", "template and static state digest not obtained from cache.")
     }
 
   def staticStateStatus(found: Boolean, digest: String): Unit =

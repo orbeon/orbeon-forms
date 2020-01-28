@@ -66,11 +66,11 @@ object ResourcesPatcher {
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
-      case ("detail" | "summary") :: "buttons" :: _ ⇒ path drop 1
-      case _                                        ⇒ path
+      case ("detail" | "summary") :: "buttons" :: _ => path drop 1
+      case _                                        => path
     }
 
-    val langPathValue = propertyNames flatMap { propertyName ⇒
+    val langPathValue = propertyNames flatMap { propertyName =>
 
       val _ :: _ :: _ :: _ :: _ :: lang :: resourceTokens = propertyName.splitTo[List](".")
 
@@ -104,9 +104,9 @@ object ResourcesPatcher {
 
     // Update or create elements and set values
     for {
-      (langOrWildcard, path, value) ← langPathValue.distinct
-      lang                          ← findConcreteLanguages(langOrWildcard)
-      rootForLang                   ← resourceElemsForLang(lang)
+      (langOrWildcard, path, value) <- langPathValue.distinct
+      lang                          <- findConcreteLanguages(langOrWildcard)
+      rootForLang                   <- resourceElemsForLang(lang)
     } locally {
       val elem = Dom4j.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove

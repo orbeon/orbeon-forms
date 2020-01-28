@@ -45,15 +45,15 @@ object RpcClient
         eventName  = EventNames.XXFormsRpcRequest,
         targetId   = Constants.DocumentId,
         properties = Map(
-          "id"   → id,
-          "path" → pathValue,
-          "args" → argsValue
+          "id"   -> id,
+          "path" -> pathValue,
+          "args" -> argsValue
         )
       )
     )
 
     val p = Promise[Json]()
-    pending += id → p
+    pending += id -> p
     p.future
   }
 
@@ -63,10 +63,10 @@ object RpcClient
   @JSExport
   def processResponse(id: String, response: String): Unit = {
     pending.get(id.toInt) match {
-      case Some(promise) ⇒
+      case Some(promise) =>
         pending -= id.toInt
         promise.complete(Success(parse(URIUtils.decodeURIComponent(response)).right.get))
-      case None ⇒
+      case None =>
         println(s"RPC: got incorrect id in response: $id")
     }
   }

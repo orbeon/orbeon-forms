@@ -63,7 +63,7 @@ class XFormsDispatchAction extends XFormsAction {
     val resolvedDelayOpt =
       Option(interpreter.resolveAVT(actionElement, "delay")) filter
       isNotBlank                  flatMap // "The default is the empty string, which indicates no delay"
-      (s ⇒ Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
+      (s => Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
       (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
 
     // Whether to allow duplicates by name/targetid if the event has a non-negative delay
@@ -77,7 +77,7 @@ class XFormsDispatchAction extends XFormsAction {
 
     // Find actual target
     interpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
-      case xformsEventTarget: XFormsEventTarget ⇒
+      case xformsEventTarget: XFormsEventTarget =>
         // Execute the dispatch proper
         XFormsDispatchAction.dispatch(
           eventName       = resolvedNewEventName,
@@ -89,10 +89,10 @@ class XFormsDispatchAction extends XFormsAction {
           showProgress    = showProgress,
           allowDuplicates = allowDuplicates
         )
-      case _ ⇒
+      case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-        warn("xf:dispatch: cannot find target, ignoring action", List("target id" → resolvedNewEventTargetStaticId))
+        warn("xf:dispatch: cannot find target, ignoring action", List("target id" -> resolvedNewEventTargetStaticId))
     }
   }
 }
@@ -110,7 +110,7 @@ object XFormsDispatchAction {
     allowDuplicates : Boolean
   ): Unit =
     delayOpt match {
-      case Some(delay) if delay >= 0 ⇒
+      case Some(delay) if delay >= 0 =>
         // Event is dispatched after a delay
 
         // "10.8 The dispatch Element [...] the specified event is added to the delayed event queue unless an event
@@ -134,7 +134,7 @@ object XFormsDispatchAction {
           showProgress      = showProgress,
           allowDuplicates   = allowDuplicates
         )
-      case _ ⇒
+      case _ =>
         // Event is dispatched immediately
 
         // "10.8 The dispatch Element [...] If the delay is not specified or if the given value does not conform

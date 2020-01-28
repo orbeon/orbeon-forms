@@ -36,7 +36,7 @@ trait FormBuilderPermissionsOps {
     val resourceManager = ResourceManagerWrapper.instance
 
     supportedPaths collectFirst
-      {case key if resourceManager.exists(key) ⇒ resourceManager.getContentAsDOM4J(key)} map
+      {case key if resourceManager.exists(key) => resourceManager.getContentAsDOM4J(key)} map
       (new DocumentWrapper(_, null, XPath.GlobalConfiguration))
   }
 
@@ -51,44 +51,44 @@ trait FormBuilderPermissionsOps {
       <apps has-roles="false"/>
     } else {
       <apps has-roles="true">{
-        formBuilderPermissions(configurationOpt, incomingRoleNames).to(List).sortBy(_._1) map { case (app, forms) ⇒
-          <app name={app}>{ forms.to(List).sorted map { form ⇒ <form name={form}/> } }</app>
+        formBuilderPermissions(configurationOpt, incomingRoleNames).to(List).sortBy(_._1) map { case (app, forms) =>
+          <app name={app}>{ forms.to(List).sorted map { form => <form name={form}/> } }</app>
         }
       }</apps>
     }
 
   def formBuilderPermissions(configurationOpt: Option[NodeInfo], incomingRoleNames: Set[String]): Map[String, Set[String]] =
     findConfiguredRoles(configurationOpt) match {
-      case Nil ⇒
+      case Nil =>
         // No role configured
         Map.empty
-      case configuredRoles ⇒
+      case configuredRoles =>
         // Roles configured
         val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
         val applicableRoleNames    = allConfiguredRoleNames & incomingRoleNames
-        val applicableRoles        = configuredRoles filter (e ⇒ (applicableRoleNames + "*")(e.attValue("name")))
+        val applicableRoles        = configuredRoles filter (e => (applicableRoleNames + "*")(e.attValue("name")))
         val applicableAppNames     = applicableRoles map (_.attValue("app")) toSet
 
         if (applicableAppNames("*")) {
           // User has access to all apps (and therefore all forms)
-          Map("*" → Set("*"))
+          Map("*" -> Set("*"))
         } else {
           // User has access to certain apps only
           (for {
-            app ← applicableAppNames
+            app <- applicableAppNames
             forms = {
               val applicableFormsForApp = applicableRoles filter (_.attValue("app") == app) map (_.attValue("form")) toSet
 
               if (applicableFormsForApp("*")) Set("*") else applicableFormsForApp
             }
           } yield
-            app → forms) toMap
+            app -> forms) toMap
         }
     }
 
   private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
-    case Some(configuration) ⇒ configuration.root / * / "role" toList
-    case None                ⇒ Nil
+    case Some(configuration) => configuration.root / * / "role" toList
+    case None                => Nil
   }
 }
 

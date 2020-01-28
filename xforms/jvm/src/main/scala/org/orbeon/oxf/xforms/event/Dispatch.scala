@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
 object Dispatch extends Logging {
 
   // Type of an event listener
-  type EventListener = XFormsEvent ⇒ Unit
+  type EventListener = XFormsEvent => Unit
 
   // Dispatch an event
   def dispatchEvent(event: XFormsEvent): Unit = {
@@ -38,7 +38,7 @@ object Dispatch extends Logging {
     implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
 
     // Utility to help make sure we push and pop the event
-    def withEvent[T](body: ⇒ T): T =
+    def withEvent[T](body: => T): T =
       try {
         containingDocument.startHandleEvent(event)
         body
@@ -51,7 +51,7 @@ object Dispatch extends Logging {
       var statHandleEvent = 0
       var statNativeHandlers = 0
 
-      def eventLogging = Seq("name" → event.name, "target" → target.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))
+      def eventLogging = Seq("name" -> event.name, "target" -> target.getEffectiveId, "location" -> (Option(event.locationData) map (_.toString) orNull))
 
       // Ask the target for the handlers associated with the event name
       val (performDefaultAction, handlers) = {
@@ -68,7 +68,7 @@ object Dispatch extends Logging {
 
       // Call native listeners on target if any
       def callNativeListeners(target: XFormsEventTarget): Unit =
-        for (listener ← target.getListeners(event.name)) {
+        for (listener <- target.getListeners(event.name)) {
           listener.apply(event)
           statNativeHandlers += 1
         }
@@ -85,15 +85,15 @@ object Dispatch extends Logging {
             // this point which is faster.
             def doPhase(observers: List[XFormsEventTarget], staticHandlers: Map[String, List[EventHandler]], phase: Phase) =
               for {
-                observer ← observers
-                handlers ← staticHandlers.get(observer.getPrefixedId).toList
-                handler  ← handlers
+                observer <- observers
+                handlers <- staticHandlers.get(observer.getPrefixedId).toList
+                handler  <- handlers
                 if event.matches(handler)   // custom filtering by event
               } yield {
                 event.currentObserver = observer
                 event.currentPhase = phase
 
-                withDebug("handler", Seq("name" → event.name, "phase" → phase.name, "observer" → observer.getEffectiveId)) {
+                withDebug("handler", Seq("name" -> event.name, "phase" -> phase.name, "observer" -> observer.getEffectiveId)) {
                   handler.handleEvent(observer, event)
                   statHandleEvent += 1
                 }
@@ -129,8 +129,8 @@ object Dispatch extends Logging {
               target.performDefaultAction(event)
 
             debugResults(Seq(
-              "regular handlers called" → statHandleEvent.toString,
-              "native handlers called"  → statNativeHandlers.toString
+              "regular handlers called" -> statHandleEvent.toString,
+              "native handlers called"  -> statNativeHandlers.toString
             ))
           }
         } else {
@@ -142,11 +142,11 @@ object Dispatch extends Logging {
             target.performDefaultAction(event)
 
           // Don't log this as there are too many
-          //debug("optimized dispatching", eventLogging ++ Seq("native handlers called" → statNativeHandlers.toString))
+          //debug("optimized dispatching", eventLogging ++ Seq("native handlers called" -> statNativeHandlers.toString))
         }
       }
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         // Add location information if possible
         val locationData = Option(target.getLocationData).orNull
         throw OrbeonLocationException.wrapException(t,
@@ -154,8 +154,8 @@ object Dispatch extends Logging {
             locationData,
             Some("dispatching XForms event"),
             List(
-              "event"     → event.name,
-              "target id" → target.getEffectiveId)
+              "event"     -> event.name,
+              "target id" -> target.getEffectiveId)
             ))
     }
   }

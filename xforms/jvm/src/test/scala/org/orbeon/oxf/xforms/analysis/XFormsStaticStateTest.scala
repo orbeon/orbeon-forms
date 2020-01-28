@@ -30,7 +30,7 @@ object XFormsStaticStateTest {
   def getStaticState(documentURL: String): XFormsStaticState =
     XFormsStaticStateImpl.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-  def withRefresh[T](thunk: ⇒ T)(implicit dependencies: XPathDependencies): T = {
+  def withRefresh[T](thunk: => T)(implicit dependencies: XPathDependencies): T = {
     dependencies.refreshStart()
     val result = thunk
     dependencies.refreshDone()
@@ -49,7 +49,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     // val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xhtml")
   }
 
-  private val EmptyNamespaces = Map("" → "")
+  private val EmptyNamespaces = Map("" -> "")
 
   @Test def bindAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)
@@ -411,16 +411,16 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
         val results =
           for {
-            prefixedId  ← List("foo-1≡acme-foo-input", "foo-1≡acme-foo-output")
-            iteration   ← 1 to 2
-            fn          ← List(requireBindingUpdate(_), requireValueUpdate(_))
+            prefixedId  <- List("foo-1≡acme-foo-input", "foo-1≡acme-foo-output")
+            iteration   <- 1 to 2
+            fn          <- List(requireBindingUpdate(_), requireValueUpdate(_))
             effectiveId = buildEffectiveId(prefixedId, List(iteration))
           } yield
             fn(effectiveId)
 
         assert(8 === results.size)
 
-        for ((e, a) ← expectedValues.zip(results))
+        for ((e, a) <- expectedValues.zip(results))
           assertTrue(e === a)
       }
 

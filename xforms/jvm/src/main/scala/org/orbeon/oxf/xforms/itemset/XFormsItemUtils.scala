@@ -76,9 +76,9 @@ object XFormsItemUtils {
     val staticControl = select1Control.staticControl
 
     staticControl.staticItemset match {
-      case Some(staticItemset) ⇒
+      case Some(staticItemset) =>
         staticItemset
-      case None ⇒
+      case None =>
 
         val container = select1Control.container
         val result = new Itemset(multiple = staticControl.isMultiple)
@@ -102,7 +102,7 @@ object XFormsItemUtils {
             def startElement(elem: Element): Unit = {
 
               elem.getQName match {
-                case XFORMS_ITEM_QNAME ⇒
+                case XFORMS_ITEM_QNAME =>
 
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
@@ -119,7 +119,7 @@ object XFormsItemUtils {
                   )
                   position += 1
 
-                case XFORMS_ITEMSET_QNAME ⇒
+                case XFORMS_ITEMSET_QNAME =>
 
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
@@ -132,7 +132,7 @@ object XFormsItemUtils {
 
                   var currentLevel: Int = 0
 
-                  for (currentPosition ← 1 to currentNodeset.size) {
+                  for (currentPosition <- 1 to currentNodeset.size) {
 
                     contextStack.pushIteration(currentPosition)
 
@@ -156,7 +156,7 @@ object XFormsItemUtils {
                         } else if (newLevel < currentLevel) {
                           //  We are going down one or more levels
                           itemStack = itemStack.tail
-                          for (_ ← newLevel until currentLevel) {
+                          for (_ <- newLevel until currentLevel) {
                             itemStack = itemStack.tail
                             currentContainer = currentContainer.parent
                           }
@@ -171,7 +171,7 @@ object XFormsItemUtils {
                         Option(elem.element(XFORMS_VALUE_QNAME)) orElse Option(elem.element(XFORMS_COPY_QNAME))
 
                       valueOrCopyElementOpt match {
-                        case Some(valueElem) if valueElem.getQName == XFORMS_VALUE_QNAME ⇒
+                        case Some(valueElem) if valueElem.getQName == XFORMS_VALUE_QNAME =>
                           currentContainer.addChildItem(
                             Item(
                               label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
@@ -184,9 +184,9 @@ object XFormsItemUtils {
                             )
                           )
                           position += 1
-                        case Some(copyElem) if copyElem.getQName == XFORMS_COPY_QNAME ⇒
+                        case Some(copyElem) if copyElem.getQName == XFORMS_COPY_QNAME =>
                           throw new ValidationException("xf:copy is not yet supported.", select1Control.getLocationData)
-                        case _ ⇒
+                        case _ =>
                           throw new ValidationException("xf:itemset element must contain one xf:value or one xf:copy element.", select1Control.getLocationData)
                       }
 
@@ -195,7 +195,7 @@ object XFormsItemUtils {
 
                     contextStack.popBinding()
                   }
-                case XFORMS_CHOICES_QNAME ⇒
+                case XFORMS_CHOICES_QNAME =>
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
                   val labelElem = elem.element(LABEL_QNAME)
                   if (labelElem ne null) {
@@ -213,22 +213,22 @@ object XFormsItemUtils {
 
                     position += 1
                   }
-                case _ ⇒
+                case _ =>
               }
             }
 
             def endElement(elem: Element): Unit =
               elem.getQName match {
-                case XFORMS_ITEM_QNAME ⇒
+                case XFORMS_ITEM_QNAME =>
                   contextStack.popBinding()
-                case  XFORMS_ITEMSET_QNAME ⇒
+                case  XFORMS_ITEMSET_QNAME =>
                   contextStack.popBinding()
-                case XFORMS_CHOICES_QNAME ⇒
+                case XFORMS_CHOICES_QNAME =>
                   contextStack.popBinding()
                   val labelElement = elem.element(LABEL_QNAME)
                   if (labelElement ne null)
                     currentContainer = currentContainer.parent
-                case _ ⇒
+                case _ =>
               }
 
             def text(text: Text) = ()
@@ -269,10 +269,10 @@ object XFormsItemUtils {
 
             private def getAttributes(elem: Element): List[(QName, String)] =
               for {
-                name   ← SelectionControlUtil.AttributesToPropagate
+                name   <- SelectionControlUtil.AttributesToPropagate
                 value  = elem.attributeValue(name)
                 if value ne null
-                result ← findAttributeAVTValue(elem, name, value, getElementEffectiveId(elem))
+                result <- findAttributeAVTValue(elem, name, value, getElementEffectiveId(elem))
               } yield
                 result
 
@@ -283,7 +283,7 @@ object XFormsItemUtils {
               elemEffectiveId       : String
             ): Option[(QName, String)] =
               if (! XFormsUtils.maybeAVT(attributeValue)) {
-                Some(attributeName → attributeValue)
+                Some(attributeName -> attributeValue)
               } else {
                 val currentBindingContext = contextStack.getCurrentBindingContext
                 val currentNodeset = currentBindingContext.nodeset
@@ -303,11 +303,11 @@ object XFormsItemUtils {
                         reporter           = container.getContainingDocument.getRequestStats.getReporter
                       )
                     } catch {
-                      case NonFatal(t) ⇒
+                      case NonFatal(t) =>
                         XFormsError.handleNonFatalXPathError(container, t)
                         ""
                     }
-                  Some(attributeName → tempResult)
+                  Some(attributeName -> tempResult)
                 } else {
                   None
                 }
@@ -316,20 +316,20 @@ object XFormsItemUtils {
             // Item level for the given item. If the stack is empty, the level is 0.
             private def getItemLevel(itemToCheck: om.Item, stack: List[om.Item]): Int = {
               itemToCheck match {
-                case nodeInfo: om.NodeInfo ⇒
+                case nodeInfo: om.NodeInfo =>
                   // Only nodes can have ancestor relationship
                   var level = stack.size
 
-                  stack.iterator foreach { currentItem ⇒
+                  stack.iterator foreach { currentItem =>
                     currentItem match {
-                      case currentNode: om.NodeInfo if SaxonUtils.isFirstNodeAncestorOfSecondNode(currentNode, nodeInfo, includeSelf = false) ⇒
+                      case currentNode: om.NodeInfo if SaxonUtils.isFirstNodeAncestorOfSecondNode(currentNode, nodeInfo, includeSelf = false) =>
                         return level
-                      case _ ⇒
+                      case _ =>
                     }
                     level -= 1
                   }
                   level
-                case _ ⇒
+                case _ =>
                   // If it's not a node, stay at current level
                   stack.size - 1
               }

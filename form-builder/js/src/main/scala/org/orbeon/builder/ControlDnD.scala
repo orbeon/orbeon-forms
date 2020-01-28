@@ -36,7 +36,7 @@ private object ControlDnD {
 
     $(document).on(
       "keyup keydown",
-      (event: JQueryEventObject) ⇒ {
+      (event: JQueryEventObject) => {
         // Surprisingly, `event.shiftKey` can be `undefined`
         val keyboardEventDyn = event.asInstanceOf[js.Dynamic]
         val shiftKeyOpt      = keyboardEventDyn.shiftKey.asInstanceOf[js.UndefOr[Boolean]]
@@ -72,7 +72,7 @@ private object ControlDnD {
       }
     )
 
-    drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
+    drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
       if (target ne null)
         RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, $(el).hasClass(CopyClass)).call()

@@ -21,8 +21,8 @@ class XXFormsComponentContext extends XFormsFunction {
   // Get the closest associated component control if any, then get its parent context if any, and then its nodeset
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     XFormsFunction.context.container.associatedControlOpt flatMap
-      (componentControl ⇒ Option(componentControl.bindingContext.parent)) map
-        (contextBinding ⇒ new ListIterator(contextBinding.nodeset)) getOrElse
+      (componentControl => Option(componentControl.bindingContext.parent)) map
+        (contextBinding => new ListIterator(contextBinding.nodeset)) getOrElse
           EmptyIterator.getInstance
 
   // TODO: PathMap

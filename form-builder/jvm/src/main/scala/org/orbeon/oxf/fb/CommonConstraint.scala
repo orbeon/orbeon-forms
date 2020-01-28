@@ -73,20 +73,20 @@ object CommonConstraint {
     // support extracting a sequence of items, in particular a sequence of `xs:date`.
     def isSupportedLiteral(l: Literal): Boolean =
       l.getValue match {
-        case _: StringValue | _: IntegerValue | _: DecimalValue | _: BooleanValue ⇒ true
-        case _ ⇒ false
+        case _: StringValue | _: IntegerValue | _: DecimalValue | _: BooleanValue => true
+        case _ => false
       }
 
     def analyze(expr: Expression) =
       expr match {
-        case e: ValidationFunction[_] ⇒
+        case e: ValidationFunction[_] =>
           e.arguments.headOption match {
-            case Some(l: Literal) if isSupportedLiteral(l) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
-            case Some(_)                                   ⇒ Some(e.propertyName → Some(findExpressionArgument(xpathString)))
-            case None                                      ⇒ Some(e.propertyName → None)
-            case _                                         ⇒ None
+            case Some(l: Literal) if isSupportedLiteral(l) => Some(e.propertyName -> Some(l.getValue.getStringValue))
+            case Some(_)                                   => Some(e.propertyName -> Some(findExpressionArgument(xpathString)))
+            case None                                      => Some(e.propertyName -> None)
+            case _                                         => None
           }
-        case _ ⇒
+        case _ =>
           None
       }
 

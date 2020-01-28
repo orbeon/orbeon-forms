@@ -2,7 +2,7 @@ package org.orbeon.dom
 
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.tree.AbstractNode
 

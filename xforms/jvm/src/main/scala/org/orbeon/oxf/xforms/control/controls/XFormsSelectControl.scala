@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
-import scala.collection.{mutable, Set ⇒ CSet}
+import scala.collection.{mutable, Set => CSet}
 import scala.collection.compat._
 
 /**
@@ -59,11 +59,11 @@ class XFormsSelectControl(
     val incomingValuesFiltered = {
       val newUIValues = valueAsSet(externalValue)
 
-      val matches: Item ⇒ Boolean =
+      val matches: Item => Boolean =
         if (mustEncodeValues)
-          item ⇒ newUIValues(item.position.toString)
+          item => newUIValues(item.position.toString)
         else
-          item ⇒ newUIValues(item.value)
+          item => newUIValues(item.value)
 
       mutable.LinkedHashSet(getItemset.allItemsIterator filter matches map (_.value) toList: _*)
     }
@@ -74,10 +74,10 @@ class XFormsSelectControl(
     // 2016-01-29: Switching order of event dispatch as `xf:select1` does it this way and XForms 1.1 says: "Newly
     // selected items receive the event xforms-select immediately after all newly deselected items receive the
     // event xforms-deselect."
-    for (value ← newlyDeselectedValues)
+    for (value <- newlyDeselectedValues)
       Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
 
-    for (value ← newlySelectedValues)
+    for (value <- newlySelectedValues)
       Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
 
     // Value is updated via `xforms-select`/`xforms-deselect` events
@@ -128,7 +128,7 @@ class XFormsSelectControl(
         // All itemset external values for which the value exists in the instance
         val intersection =
           for {
-            item ← itemset.allItemsIterator
+            item <- itemset.allItemsIterator
             if instanceValues(item.value)
           } yield
             item
@@ -139,9 +139,9 @@ class XFormsSelectControl(
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
-      case deselect: XFormsDeselectEvent ⇒
+      case deselect: XFormsDeselectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
+          case Some(boundNode) =>
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
@@ -151,13 +151,13 @@ class XFormsSelectControl(
               source             = "deselect",
               isCalculate        = false
             )
-          case None ⇒
+          case None =>
             // Q: Can this happen?
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case select: XFormsSelectEvent ⇒
+      case select: XFormsSelectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
+          case Some(boundNode) =>
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
@@ -167,11 +167,11 @@ class XFormsSelectControl(
               source             = "select",
               isCalculate        = false
             )
-          case None ⇒
+          case None =>
             // Q: Can this happen?
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case _ ⇒
+      case _ =>
     }
     // Make sure not to call the method of XFormsSelect1Control
     // We should *not* use inheritance this way here!
@@ -196,12 +196,12 @@ object XFormsSelectControl {
   }
 
   private def valueAsLinkedSet(s: String) = s.trimAllToOpt match {
-    case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
-    case None ⇒ Set[String]()
+    case Some(list) => mutable.LinkedHashSet(list split """\s+""": _*)
+    case None => Set[String]()
   }
 
   private def valueAsSet(s: String) = s.trimAllToOpt match {
-    case Some(list) ⇒ list split """\s+""" toSet
-    case None ⇒ Set[String]()
+    case Some(list) => list split """\s+""" toSet
+    case None => Set[String]()
   }
 }

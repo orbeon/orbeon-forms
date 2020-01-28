@@ -43,7 +43,7 @@ class XFormsLoadAction extends XFormsAction {
     val targetOpt =
       actionElem.attributeValueOpt(XFormsConstants.TARGET_QNAME)         orElse
       actionElem.attributeValueOpt(XFormsConstants.XXFORMS_TARGET_QNAME) flatMap
-      (v ⇒ Option(interpreter.resolveAVTProvideValue(actionElem, v)))
+      (v => Option(interpreter.resolveAVTProvideValue(actionElem, v)))
 
     val urlType =
       Option(interpreter.resolveAVT(actionElem, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
@@ -58,9 +58,9 @@ class XFormsLoadAction extends XFormsAction {
     val bindingContext = interpreter.actionXPathContext.getCurrentBindingContext
 
     bindingContext.newBind option bindingContext.getSingleItem match {
-      case Some(null) ⇒
+      case Some(null) =>
       // NOP if no URI obtained (2019-03-12 asked WG for confirmation)
-      case Some(item) ⇒
+      case Some(item) =>
         resolveStoreLoadValue(
           containingDocument = actionContext.containingDocument,
           currentElem        = Some(actionElem),
@@ -72,12 +72,12 @@ class XFormsLoadAction extends XFormsAction {
           isShowProgress     = isShowProgress,
           mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
         )
-      case None ⇒
+      case None =>
         actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
-          case Some(resourceAttValue) ⇒
+          case Some(resourceAttValue) =>
 
             Option(interpreter.resolveAVTProvideValue(actionElem, resourceAttValue)) match {
-              case Some(resolvedResource) ⇒
+              case Some(resolvedResource) =>
                 resolveStoreLoadValue(
                   containingDocument = actionContext.containingDocument,
                   currentElem        = Some(actionElem),
@@ -89,7 +89,7 @@ class XFormsLoadAction extends XFormsAction {
                   isShowProgress     = isShowProgress,
                   mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
                 )
-              case None ⇒
+              case None =>
                 if (interpreter.indentedLogger.isDebugEnabled)
                   interpreter.indentedLogger.logDebug(
                     "xf:load",
@@ -99,7 +99,7 @@ class XFormsLoadAction extends XFormsAction {
                   )
             }
 
-          case None ⇒
+          case None =>
             // "Either the single node binding attributes, pointing to a URI in the instance
             // data, or the linking attributes are required."
             throw new OXFException("Missing 'resource' attribute or single-item binding on the `xf:load` element.")

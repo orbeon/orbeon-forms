@@ -76,24 +76,24 @@ object DndRepeat {
             }
           )
 
-        newDrake.onDrag((el: Element, source: Element) ⇒ {
+        newDrake.onDrag((el: Element, source: Element) => {
 
           val jEl = $(el)
 
           def findElemLevel(el: Element) =
-            el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) ⇒ level.toInt }
+            el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) => level.toInt }
 
           val startLevelOpt = findElemLevel(el)
 
           val nextAllItems = jEl.nextAll(IsDndItemSelector)
 
           val nextDndItemIt =
-            for (i ← 0 until nextAllItems.length iterator)
+            for (i <- 0 until nextAllItems.length iterator)
               yield nextAllItems(i)
 
           val excludedTargets = startLevelOpt match {
-            case Some(startLevel) ⇒ nextDndItemIt.takeWhile(e ⇒ findElemLevel(e).exists(_ > startLevel)).to(List)
-            case None             ⇒ Nil
+            case Some(startLevel) => nextDndItemIt.takeWhile(e => findElemLevel(e).exists(_ > startLevel)).to(List)
+            case None             => Nil
           }
 
           dragState = Some(
@@ -105,12 +105,12 @@ object DndRepeat {
           )
         })
 
-        newDrake.onDragend((el: Element) ⇒ {
+        newDrake.onDragend((el: Element) => {
           dragState = None
         })
 
-        newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
-          dragState foreach { dragState ⇒
+        newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) => {
+          dragState foreach { dragState =>
 
             val dndEnd     = $(el).prevAll(IsDndItemSelector).length
             val repeatId   = $(el).prevAll(IsRepeatBeginEndSelector).attr("id").get.substring("repeat-begin-".length)
@@ -120,7 +120,7 @@ object DndRepeat {
 
             if (dndStart != dndEnd) {
 
-              lazy val moveBack: js.Function = () ⇒ {
+              lazy val moveBack: js.Function = () => {
                 $(beforeEl).after(el)
                 // TODO: Fix this if we switch to `jquery-facade`
                 AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
@@ -141,8 +141,8 @@ object DndRepeat {
                   eventName  = EventNames.XXFormsDnD,
                   targetId   = repeatId,
                   properties = Map(
-                    "dnd-start" → (dndStart + 1),
-                    "dnd-end"   → (dndEnd + 1)
+                    "dnd-start" -> (dndStart + 1),
+                    "dnd-end"   -> (dndEnd + 1)
                   )
                 )
               )

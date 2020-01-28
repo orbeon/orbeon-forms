@@ -43,9 +43,9 @@ class XXFormsValueChangedEvent(target: XFormsEventTarget, properties: PropertyGe
 
 private object XXFormsValueChangedEvent {
 
-  val Getters = Map[String, XXFormsValueChangedEvent ⇒ Option[Any]](
-    "node"      → (_.nodeOpt),
-    "old-value" → (_.oldValueOpt),
-    "new-value" → (_.newValueOpt)
+  val Getters = Map[String, XXFormsValueChangedEvent => Option[Any]](
+    "node"      -> (_.nodeOpt),
+    "old-value" -> (_.oldValueOpt),
+    "new-value" -> (_.newValueOpt)
   )
 }

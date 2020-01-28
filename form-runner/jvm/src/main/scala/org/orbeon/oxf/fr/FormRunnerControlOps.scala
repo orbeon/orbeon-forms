@@ -67,13 +67,13 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // Whether the given node corresponds to a control
   // TODO: should be more restrictive
-  val IsControl: NodeInfo ⇒ Boolean = hasName
+  val IsControl: NodeInfo => Boolean = hasName
 
   // Find a control by name (less efficient than searching by id)
   def findControlByName(inDoc: NodeInfo, controlName: String): Option[NodeInfo] = (
     for {
-      suffix  ← PossibleControlSuffixes.iterator
-      control ← findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
+      suffix  <- PossibleControlSuffixes.iterator
+      control <- findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
     } yield
       control
   ).nextOption()
@@ -121,7 +121,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind attValueOpt "name"
 
   def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[BindPath] =
-    findBindByName(inDoc, controlName) map { bindNode ⇒
+    findBindByName(inDoc, controlName) map { bindNode =>
       BindPath(bindNode, buildBindPath(bindNode))
     }
 
@@ -131,7 +131,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     controlName    : String,
     contextItemOpt : Option[Item]
   ): Option[BindPathHolders] =
-    findBindAndPathStatically(inDoc, controlName) map { case BindPath(bind, path) ⇒
+    findBindAndPathStatically(inDoc, controlName) map { case BindPath(bind, path) =>
 
       // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
       // overridden along the way!)
@@ -142,7 +142,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       BindPathHolders(
         bind,
         path,
-        contextItemOpt map { contextItem ⇒
+        contextItemOpt map { contextItem =>
           eval(
             item       = contextItem,
             expr       = path map (_.value) mkString "/",
@@ -153,7 +153,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     }
 
   def hasHTMLMediatype(nodes: Seq[NodeInfo]): Boolean =
-    nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
+    nodes exists (element => (element attValue "mediatype") == "text/html")
 
   //@XPathFunction
   def isSingleSelectionControl(localName: String): Boolean =
@@ -171,7 +171,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     val headOpt = (formDoc / "*:html" / "*:head").headOption
     val bodyOpt = (formDoc / "*:html" / "*:body").headOption
     val controlBindPathHoldersResourcesList =
-      bodyOpt.toList flatMap { body ⇒
+      bodyOpt.toList flatMap { body =>
 
         val topLevelOnly =
           FormRunner.searchControlsTopLevelOnly(
@@ -181,7 +181,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           )
 
         val withSectionTemplatesOpt =
-          headOpt map { head ⇒
+          headOpt map { head =>
             FormRunner.searchControlsUnderSectionTemplates(
               head      = head,
               body      = body,
@@ -193,8 +193,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
       }
     dataFormatVersion match {
-      case DataFormatVersion.Edge ⇒ controlBindPathHoldersResourcesList
-      case _                      ⇒
+      case DataFormatVersion.Edge => controlBindPathHoldersResourcesList
+      case _                      =>
         val (_, migrationOpsToApply) =
           findMigrationOps(
             srcVersion = DataFormatVersion.Edge,
@@ -204,12 +204,12 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         // Find the migration functions once and for all
         val pathMigrationFunctions =
           for {
-            metadataElem ← FormRunner.metadataInstanceRootOpt(formDoc).toList
-            ops          ← migrationOpsToApply
-            json         ← findMigrationForVersion(metadataElem, ops.version)
+            metadataElem <- FormRunner.metadataInstanceRootOpt(formDoc).toList
+            ops          <- migrationOpsToApply
+            json         <- findMigrationForVersion(metadataElem, ops.version)
           } yield
             ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
-        controlBindPathHoldersResourcesList map { controlBindPathHoldersResources ⇒
+        controlBindPathHoldersResourcesList map { controlBindPathHoldersResources =>
           val path = controlBindPathHoldersResources.path
           val adjustedBindPathElems =
             (pathMigrationFunctions.iterator flatMap (_.apply(path)) nextOption()) getOrElse path
@@ -221,7 +221,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def searchControlsTopLevelOnly(
     body      : NodeInfo,
     data      : Option[NodeInfo],
-    predicate : NodeInfo ⇒ Boolean
+    predicate : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
       controlElems       = body descendant * filter IsControl,
@@ -234,24 +234,24 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     head      : NodeInfo,
     body      : NodeInfo,
     data      : Option[NodeInfo],
-    predicate : NodeInfo ⇒ Boolean
+    predicate : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     for {
-      section         ← findSectionsWithTemplates(body)
-      sectionName     ← getControlNameOpt(section).toList
+      section         <- findSectionsWithTemplates(body)
+      sectionName     <- getControlNameOpt(section).toList
 
       BindPathHolders(
         _,
         sectionPath,
         sectionHoldersOpt
-      )              ← findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
+      )              <- findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
 
-      contextItemOpt ← sectionHoldersOpt match {
-                         case None | Some(Nil) ⇒ List(None)
-                         case Some(holders)    ⇒ holders map Some.apply
+      contextItemOpt <- sectionHoldersOpt match {
+                         case None | Some(Nil) => List(None)
+                         case Some(holders)    => holders map Some.apply
                        }
 
-      xblBinding     ← xblBindingForSection(head, section).toList
+      xblBinding     <- xblBindingForSection(head, section).toList
 
       ControlBindPathHoldersResources(
         control,
@@ -259,7 +259,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         path,
         holdersOpt,
         labels
-      )              ← searchControlBindPathHoldersInDoc(
+      )              <- searchControlBindPathHoldersInDoc(
                          controlElems   = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
                          inDoc          = xblBinding,
                          contextItemOpt = contextItemOpt,
@@ -273,14 +273,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     controlElems   : Seq[NodeInfo],
     inDoc          : NodeInfo,
     contextItemOpt : Option[NodeInfo],
-    predicate      : NodeInfo ⇒ Boolean
+    predicate      : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     for {
-      control                              ← controlElems
+      control                              <- controlElems
       if predicate(control)
-      bindId                               ← control.attValueOpt(XFormsConstants.BIND_QNAME).toList
-      controlName                          ← controlNameFromIdOpt(bindId).toList
-      BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
+      bindId                               <- control.attValueOpt(XFormsConstants.BIND_QNAME).toList
+      controlName                          <- controlNameFromIdOpt(bindId).toList
+      BindPathHolders(bind, path, holders) <- findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
       resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)
     } yield
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
@@ -296,7 +296,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
 
     // Find a bind by predicate
-    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
+    def findBind(inDoc: NodeInfo, p: NodeInfo => Boolean): Option[NodeInfo] =
       findTopLevelBind(inDoc).toSeq descendant "*:bind" find p
 
     // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
@@ -306,7 +306,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // for all languages. So far, this is handled as a special case, as this is not something that happens
     // in other forms.
     def buildBindPath(bind: NodeInfo): List[PathElem] =
-      (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef ⇒
+      (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef =>
         PathElem(
           if (bindRef.endsWith(FBLangPredicate))
             bindRef.dropRight(FBLangPredicate.length)

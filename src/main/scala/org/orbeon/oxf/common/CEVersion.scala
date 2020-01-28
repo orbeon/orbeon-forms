@@ -14,7 +14,7 @@
 package org.orbeon.oxf.common
 
 import java.util.concurrent.ConcurrentHashMap
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 class CEVersion extends Version {
 

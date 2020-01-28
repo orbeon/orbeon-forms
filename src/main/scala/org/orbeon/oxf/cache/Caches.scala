@@ -30,9 +30,9 @@ object Caches {
 
   def getOrElseThrow(cacheName: String): ehcache.Cache =
     cacheManager.getCache(cacheName) match {
-      case cache: ehcache.Cache ⇒
+      case cache: ehcache.Cache =>
         withMessage(cache, s"found cache configuration for `$cacheName`")
-      case _ ⇒
+      case _ =>
         throw new OXFException(s"Cache configuration not found for `$cacheName`. Make sure `$EhcachePath` exists.")
     }
 
@@ -44,7 +44,7 @@ object Caches {
       withMessage(
         try new CacheManager(URLFactory.createURL(EhcachePath))
         catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             throw new OXFException(s"unable to read cache manager configuration from `$EhcachePath`", t)
         },
         s"initialized cache manager from `$EhcachePath`"

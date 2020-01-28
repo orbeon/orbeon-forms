@@ -33,7 +33,7 @@ class DocumentInputSource(var document: Document) extends InputSource {
       writer.flush()
       new StringReader(writer.toString)
     } catch {
-      case e: IOException ⇒ new Reader {
+      case e: IOException => new Reader {
         def read(ch: Array[Char], offset: Int, length: Int): Int = throw e
         def close() = ()
       }

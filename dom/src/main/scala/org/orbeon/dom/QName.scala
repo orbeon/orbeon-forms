@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 
 
@@ -109,9 +109,9 @@ class QName private (val localName: String, val namespace: Namespace, val qualif
 
   override def equals(other: Any): Boolean =
     other match {
-      case anyRef: AnyRef if this eq anyRef ⇒ true
-      case that: QName if hashCode == that.hashCode && localName == that.localName && namespace.uri == that.namespace.uri ⇒ true
-      case _ ⇒ false
+      case anyRef: AnyRef if this eq anyRef => true
+      case that: QName if hashCode == that.hashCode && localName == that.localName && namespace.uri == that.namespace.uri => true
+      case _ => false
     }
 
   override def toString: String =

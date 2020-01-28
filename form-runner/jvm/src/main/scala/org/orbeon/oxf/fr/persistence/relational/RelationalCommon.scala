@@ -22,7 +22,7 @@ import org.orbeon.io.IOUtils.useAndClose
 object RelationalCommon {
 
   def joinColumns(cols: Seq[String], t1: String, t2: String): String =
-    cols.map(c ⇒ s"$t1.$c = $t2.$c").mkString(" AND ")
+    cols.map(c => s"$t1.$c = $t2.$c").mkString(" AND ")
 
   /**
     * Finds in the database what form version is used for an app/form and optional document id:
@@ -49,17 +49,17 @@ object RelationalCommon {
           |           FROM     $table
           |           WHERE    app = ?
           |                    AND form = ?
-          |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
+          |                    ${docId.map(_ => "and document_id = ?").getOrElse("")}
           |           GROUP BY app, form, form_version
           |       ) m
           |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
           |       AND t.deleted = 'N'
           |""".stripMargin
-    useAndClose(connection.prepareStatement(versionSql)) { ps ⇒
+    useAndClose(connection.prepareStatement(versionSql)) { ps =>
       ps.setString(1, app)
       ps.setString(2, form)
       docId.foreach(ps.setString(3, _))
-      useAndClose(ps.executeQuery()) { rs ⇒
+      useAndClose(ps.executeQuery()) { rs =>
         rs.next()
         val version = rs.getInt(1)
         if (rs.wasNull()) None else Some(version)
@@ -80,10 +80,10 @@ object RelationalCommon {
     def latest = formVersion(connection, req.app, req.form, None)
 
     req.version match {
-      case Unspecified        ⇒ latest.getOrElse(1)
-      case Next               ⇒ latest.map(_ + 1).getOrElse(1)
-      case Specific(v)        ⇒ v
-      case ForDocument(docId) ⇒ formVersion(connection, req.app, req.form, Some(docId))
+      case Unspecified        => latest.getOrElse(1)
+      case Next               => latest.map(_ + 1).getOrElse(1)
+      case Specific(v)        => v
+      case ForDocument(docId) => formVersion(connection, req.app, req.form, Some(docId))
         .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
   }

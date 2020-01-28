@@ -21,14 +21,14 @@ import org.orbeon.datatypes.MaximumSize._
 class LimiterInputStream(
   is           : InputStream,
   var maxBytes : MaximumSize,
-  error        : (Long, Long) ⇒ Unit
+  error        : (Long, Long) => Unit
 ) extends FilterInputStream(is) {
 
   private var bytesReadSoFar = 0L
 
   private def checkLimit(): Unit = maxBytes match {
-    case LimitedSize(maxSize) if bytesReadSoFar > maxSize ⇒ error(maxSize, bytesReadSoFar)
-    case  _ ⇒
+    case LimitedSize(maxSize) if bytesReadSoFar > maxSize => error(maxSize, bytesReadSoFar)
+    case  _ =>
   }
 
   override def read: Int = {

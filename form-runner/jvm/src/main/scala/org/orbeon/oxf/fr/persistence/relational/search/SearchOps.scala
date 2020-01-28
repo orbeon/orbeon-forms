@@ -37,8 +37,8 @@ object SearchOps {
     currentUser : Option[Credentials]
   ): List[String] = {
     val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
-    val userParametrizedRoles = currentUser.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) ⇒ role }
-    val usefulUserParametrizedRoles = userParametrizedRoles.filter(role ⇒ {
+    val userParametrizedRoles = currentUser.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) => role }
+    val usefulUserParametrizedRoles = userParametrizedRoles.filter(role => {
       val userWithJustThisRole = currentUser.map(_.copy(roles = List(role)))
       val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
       Operations.allowsAny(authorizedOperations, SearchOperations)

@@ -42,11 +42,11 @@ class Scope(val parent: Option[Scope], val scopeId: String) {
 
   def contains(staticId: String) = idMap.contains(staticId)
 
-  // Add a static id → prefixed id mapping
+  // Add a static id -> prefixed id mapping
   def += (kv: (String, String)) = kv match {
-    case (staticId, prefixedId) ⇒
-      // Index static id ⇒ prefixed id by scope
-      idMap += staticId → prefixedId
+    case (staticId, prefixedId) =>
+      // Index static id => prefixed id by scope
+      idMap += staticId -> prefixedId
   }
 
   // Remove a mapping by static id
@@ -57,8 +57,8 @@ class Scope(val parent: Option[Scope], val scopeId: String) {
   override def hashCode = scopeId.hashCode
 
   override def equals(that: Any) = that match {
-    case thatScope: Scope ⇒ scopeId == thatScope.scopeId
-    case _ ⇒ false
+    case thatScope: Scope => scopeId == thatScope.scopeId
+    case _ => false
   }
 
   override def toString = "Scope(" + scopeId + ")"

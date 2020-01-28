@@ -53,24 +53,24 @@ class PEVersion extends Version {
     val licenseInfo =
       try tryReadLicense flatMap tryGetSignedData flatMap LicenseInfo.tryApply get
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           Exceptions.getRootThrowable(t) match {
-            case _: ResourceNotFoundException ⇒
+            case _: ResourceNotFoundException =>
               licenseError("License file not found")
-            case _: SignatureException ⇒
+            case _: SignatureException =>
               licenseError("Invalid license file signature")
-            case NonFatal(t) ⇒
+            case NonFatal(t) =>
               licenseError("Error loading license file", Some(t))
           }
       }
 
     licenseInfo.formattedSubscriptionEnd match {
-      case Some(end) ⇒
+      case Some(end) =>
         // There is a subscription end date so we check that the build date is prior to that
         // NOTE: Don't check against the current date as we don't want to depend on that for production licenses
         if (licenseInfo.isBuildAfterSubscriptionEnd)
           licenseError(s"Subscription ended on: $end, Orbeon Forms build dates from: ${licenseInfo.formattedBuildDate.get}")
-      case None ⇒
+      case None =>
         // There is no subscription end date so we check against the version
         if (licenseInfo.isBadVersion)
           licenseError(s"License version doesn't match. License version is: ${licenseInfo.version.get}, Orbeon Forms version is: $VersionNumber")
@@ -99,15 +99,15 @@ private object PEVersion {
 
   def isVersionExpired(currentVersion: String, licenseVersion: String): Boolean =
     Version.compare(currentVersion, licenseVersion) match {
-      case Some(comparison) ⇒ comparison > 0
-      case None             ⇒ true
+      case Some(comparison) => comparison > 0
+      case None             => true
     }
 
   private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
 
   def dateFromVersionNumber(currentVersion: String): Option[Long] = (
     Some(currentVersion)
-    collect { case MatchTimestamp(_, year, month, day, _) ⇒ year + '-' + month + '-' + day }
+    collect { case MatchTimestamp(_, year, month, day, _) => year + '-' + month + '-' + day }
     map parseISODateOrDateTime
   )
 
@@ -124,7 +124,7 @@ private object PEVersion {
 
     def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
     def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
-    def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end ⇒ dateFromVersionNumber(versionNumber) exists (_ > end))
+    def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end => dateFromVersionNumber(versionNumber) exists (_ > end))
 
     def formattedExpiration      = expiration                           map DateNoZone.print
     def formattedSubscriptionEnd = subscriptionEnd                      map DateNoZone.print
@@ -170,7 +170,7 @@ private object PEVersion {
       Try {
         val path = System.getProperty("user.home").dropTrailingSlash + "/.orbeon/license.xml"
 
-        useAndClose(new FileInputStream(new File(path))) { is ⇒
+        useAndClose(new FileInputStream(new File(path))) { is =>
           Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
         }
       }
@@ -198,7 +198,7 @@ private object PEVersion {
       }
 
       // Execute pipeline to obtain license document
-      withPipelineContext { pipelineContext ⇒
+      withPipelineContext { pipelineContext =>
         serializer.reset(pipelineContext)
         serializer.runGetDocument(pipelineContext)
       }

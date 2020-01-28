@@ -54,7 +54,7 @@ object PathUtils {
   // We assume that there are no spaces in the input query
   def decodeSimpleQuery(query: String)(implicit ed: UrlEncoderDecoder): List[(String, String)] =
     for {
-      nameValue      ← query.split('&').toList
+      nameValue      <- query.split('&').toList
       if nameValue.nonEmpty
       nameValueArray = nameValue.split('=')
       if nameValueArray.size >= 1
@@ -63,13 +63,13 @@ object PathUtils {
       decodedName    = ed.decode(encodedName)
       decodedValue   = ed.decode(nameValueArray.lift(1) getOrElse "")
     } yield
-      decodedName → decodedValue
+      decodedName -> decodedValue
 
   // Get the first query parameter value for the given name
   def getFirstQueryParameter(url: String, name: String)(implicit ed: UrlEncoderDecoder): Option[String] = {
     val (_, params) = splitQueryDecodeParams(url)
 
-    params collectFirst { case (`name`, v) ⇒ v }
+    params collectFirst { case (`name`, v) => v }
   }
 
   // Encode a sequence of pairs to a query string
@@ -78,13 +78,13 @@ object PathUtils {
     separator  : String = "&")(implicit
     ed         : UrlEncoderDecoder
   ): String =
-    parameters map { case (name, value) ⇒ ed.encode(name) + '=' + ed.encode(value) } mkString separator
+    parameters map { case (name, value) => ed.encode(name) + '=' + ed.encode(value) } mkString separator
 
   // Find a path extension
   def findExtension(path: String): Option[String] =
     path.lastIndexOf(".") match {
-      case -1    ⇒ None
-      case index ⇒ Some(path.substring(index + 1))
+      case -1    => None
+      case index => Some(path.substring(index + 1))
     }
 
   // Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.

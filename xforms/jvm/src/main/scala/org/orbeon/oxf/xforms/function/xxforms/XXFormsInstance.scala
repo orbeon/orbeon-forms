@@ -39,9 +39,9 @@ class XXFormsInstance extends XFormsFunction {
 
     // Return or warn
     rootElementOpt match {
-      case Some(root) ⇒
+      case Some(root) =>
         SingletonIterator.makeIterator(root)
-      case None ⇒
+      case None =>
         EmptyIterator.getInstance
     }
   }

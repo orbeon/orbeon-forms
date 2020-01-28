@@ -1,7 +1,7 @@
 package org.orbeon.dom.io
 
 import java.io._
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.tree.NamespaceStack
@@ -39,7 +39,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
     */
   def write(doc: Document): Unit = {
     writeDeclaration()
-    for (i ← 0 until doc.nodeCount)
+    for (i <- 0 until doc.nodeCount)
       writeNode(doc.node(i))
     writeNewLineIfNeeded()
   }
@@ -61,19 +61,19 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       writeNamespace(ns)
     }
     var textOnly = true
-    for (i ← 0 until size) {
+    for (i <- 0 until size) {
       val node = element.node(i)
       node match {
-        case additional: Namespace ⇒
+        case additional: Namespace =>
           if (isNamespaceDeclaration(additional)) {
             namespaceStack.push(additional)
             writeNamespace(additional)
           }
-        case _: Element ⇒
+        case _: Element =>
           textOnly = false
-        case _: Comment ⇒
+        case _: Comment =>
           textOnly = false
-        case _ ⇒
+        case _ =>
       }
     }
     writeAttributes(element)
@@ -132,10 +132,10 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       var lastTextNode: Text = null
       var buff: jl.StringBuilder = null
       var textOnly = true
-      for (i ← 0 until element.nodeCount) {
+      for (i <- 0 until element.nodeCount) {
         val node = element.node(i)
         node match {
-          case textNode: Text ⇒
+          case textNode: Text =>
             if (lastTextNode eq null) {
               lastTextNode = textNode
             } else {
@@ -144,7 +144,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
               }
               buff.append(textNode.getText)
             }
-          case _ ⇒
+          case _ =>
             if (lastTextNode ne null) {
               if (buff ne null) {
                 writeString(buff.toString)
@@ -169,7 +169,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       }
     } else {
       var lastTextNode: Node = null
-      for (i ← 0 until element.nodeCount) {
+      for (i <- 0 until element.nodeCount) {
         val node = element.node(i)
         if (node.isInstanceOf[Text]) {
           writeNode(node)
@@ -261,14 +261,14 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
 
   private def writeNode(node: Node): Unit =
     node match {
-      case n: Element               ⇒ writeElement(n)
-      case n: Attribute             ⇒ writeAttribute(n)
-      case n: Text                  ⇒ writeNodeText(n)
-      case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
-      case n: Comment               ⇒ writeComment(n.getText)
-      case n: Document              ⇒ write(n)
-      case n: Namespace             ⇒
-      case _                        ⇒ throw new IllegalStateException
+      case n: Element               => writeElement(n)
+      case n: Attribute             => writeAttribute(n)
+      case n: Text                  => writeNodeText(n)
+      case n: ProcessingInstruction => writeProcessingInstruction(n)
+      case n: Comment               => writeComment(n.getText)
+      case n: Document              => write(n)
+      case n: Namespace             =>
+      case _                        => throw new IllegalStateException
     }
 
   private def writeComment(text: String): Unit = {
@@ -283,7 +283,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
   }
 
   private def writeAttributes(element: Element): Unit = {
-    for (i ← 0 until element.attributeCount) {
+    for (i <- 0 until element.attributeCount) {
       val attribute = element.attribute(i)
       val ns = attribute.getNamespace
       if ((ns ne null) && (ns != Namespace.EmptyNamespace) && (ns != Namespace.XMLNamespace)) {
@@ -334,7 +334,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
   private def indent(): Unit = {
     val indent = format.getIndent
     if (indent.nonEmpty) {
-      for (i ← 0 until indentLevel) {
+      for (i <- 0 until indentLevel) {
         writer.write(indent)
       }
     }
@@ -373,13 +373,13 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       var entity: String = null
       val c = text.charAt(i)
       c match {
-        case '<' ⇒ entity = "&lt;"
-        case '>' ⇒ entity = "&gt;"
-        case '&' ⇒ entity = "&amp;"
-        case '\t' | '\n' | '\r' ⇒ if (preserve) {
+        case '<' => entity = "&lt;"
+        case '>' => entity = "&gt;"
+        case '&' => entity = "&amp;"
+        case '\t' | '\n' | '\r' => if (preserve) {
           entity = String.valueOf(c)
         }
-        case _ ⇒
+        case _ =>
           if (c < 32) {
             entity = "&#" + c.toInt + ";"
           }
@@ -428,17 +428,17 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       var entity: String = null
       val c = text.charAt(i)
       c match {
-        case '<' ⇒ entity = "&lt;"
-        case '>' ⇒ entity = "&gt;"
-        case '\'' ⇒ if (quote == '\'') {
+        case '<' => entity = "&lt;"
+        case '>' => entity = "&gt;"
+        case '\'' => if (quote == '\'') {
           entity = "&apos;"
         }
-        case '\"' ⇒ if (quote == '\"') {
+        case '\"' => if (quote == '\"') {
           entity = "&quot;"
         }
-        case '&' ⇒ entity = "&amp;"
-        case '\t' | '\n' | '\r' ⇒ // don't encode standard whitespace characters
-        case _ ⇒ if (c < 32) {
+        case '&' => entity = "&amp;"
+        case '\t' | '\n' | '\r' => // don't encode standard whitespace characters
+        case _ => if (c < 32) {
           entity = "&#" + c.toInt + ";"
         }
       }

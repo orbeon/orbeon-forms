@@ -31,9 +31,9 @@ private[persistence] object HttpAssert extends XMLSupport {
   implicit val operationsEquality = new Equality[Operations] {
     def areEqual(left: Operations, right: Any): Boolean =
       (left, right) match {
-        case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) ⇒
+        case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) =>
           leftSpecific.to[Set] === rightSpecific.to[Set]
-        case _ ⇒
+        case _ =>
           left === right
       }
   }
@@ -58,19 +58,19 @@ private[persistence] object HttpAssert extends XMLSupport {
 
     val (resultCode, headers, resultBody) = {
       val (resultCode, headers, resultBody) = HttpCall.get(url, version, credentials)
-      val lowerCaseHeaders = headers.map{case (header, value) ⇒ header.toLowerCase → value}
+      val lowerCaseHeaders = headers.map{case (header, value) => header.toLowerCase -> value}
       (resultCode, lowerCaseHeaders, resultBody)
     }
 
     expected match {
-      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage) ⇒
+      case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage) =>
         assert(resultCode === 200)
         // Check body
         body match {
-          case HttpCall.XML(expectedDoc) ⇒
+          case HttpCall.XML(expectedDoc) =>
             val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
-          case HttpCall.Binary(expectedFile) ⇒
+          case HttpCall.Binary(expectedFile) =>
             assert(resultBody.get === expectedFile)
         }
         // Check operations
@@ -85,7 +85,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage)
         assert(expectedStage === resultStage)
 
-      case ExpectedCode(expectedCode) ⇒
+      case ExpectedCode(expectedCode) =>
         assert(resultCode === expectedCode)
     }
   }

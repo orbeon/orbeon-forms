@@ -48,7 +48,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
   // This must be called once exactly when the session is destroyed
   def sessionDestroyed(session: ExternalContext.Session): Unit = {
-    XFormsStateManager.getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid ⇒
+    XFormsStateManager.getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid =>
       XFormsDocumentCache.remove(uuid)
       EhcacheStateStore.removeDynamicState(uuid)
     }
@@ -157,7 +157,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     try {
       lock.tryLock(timeout, TimeUnit.MILLISECONDS) option lock
     } catch {
-      case e: InterruptedException ⇒
+      case e: InterruptedException =>
         throw new OXFException(e)
     }
   }
@@ -221,15 +221,15 @@ object XFormsStateManager extends XFormsStateLifecycle {
         ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.getSequence))
 
       XFormsDocumentCache.take(parameters.uuid) match {
-        case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  ⇒
+        case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  =>
           Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
           XFormsDocumentCache.remove(parameters.uuid)
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
-        case Some(cachedDocument) ⇒
+        case Some(cachedDocument) =>
           // Found in cache
           Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
           cachedDocument
-        case None ⇒
+        case None =>
           Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
       }
@@ -286,14 +286,14 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     // Create document
     val documentFromStore =
-      new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document ⇒
+      new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document =>
         (isServerState && document.getStaticState.isServerStateHandling) ||
           document.getStaticState.isClientStateHandling
       }
 
     // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
     // possible right now.
-    documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl ⇒
+    documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
       XFormsAPI.withContainingDocument(documentFromStore) {
         documentFromStore.withOutermostActionHandler {
           Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
@@ -313,7 +313,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
     parameters.encodedClientDynamicStateOpt match {
-      case None ⇒
+      case None =>
 
         assert(isServerState)
 
@@ -334,7 +334,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
           // the state store.
           throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
         }
-      case Some(encodedClientDynamicState) ⇒
+      case Some(encodedClientDynamicState) =>
         // State comes directly with request
 
         assert(! isServerState)
@@ -358,17 +358,17 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
     def getSessionDocument(uuid: String): Option[SessionDocument] =
-      Option(NetUtils.getSession(false)) flatMap { session ⇒
+      Option(NetUtils.getSession(false)) flatMap { session =>
         session.getAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application)
       } collect {
-        case value: SessionDocument ⇒ value
+        case value: SessionDocument => value
       }
 
     def getUUIDSessionKey(uuid: String) =
       XFormsStateManagerUuidKeyPrefix + uuid
 
     // Tricky: if `onRemove()` is called upon session expiration, there might not be an `ExternalContext`. But it's fine,
-    // because the session goes away → all of its attributes go away so we don't have to remove them below.
+    // because the session goes away -> all of its attributes go away so we don't have to remove them below.
     def removeUuidFromSession(uuid: String): Unit =
       Option(NetUtils.getSession(ForceSessionCreation)) map // support missing session for tests
         getOrCreateUuidListInSession                    foreach
@@ -399,8 +399,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
         "xforms",
         "after cacheOrStore",
         List(
-          "document cache current size" → XFormsDocumentCache.getCurrentSize.toString,
-          "document cache max size"     → XFormsDocumentCache.getMaxSize.toString
+          "document cache current size" -> XFormsDocumentCache.getCurrentSize.toString,
+          "document cache max size"     -> XFormsDocumentCache.getMaxSize.toString
         )
       )
     }

@@ -49,14 +49,14 @@ protected trait JsonToXmlAlgorithm {
 
     def escapeString(s: String) =
       s.iterateCodePoints map {
-        case cp @ (0x09 | 0x0a | 0x0d)      ⇒ cp
-        case cp if cp <= 0x1F || cp == 0x7F ⇒ cp + 0xE000
-        case cp                             ⇒ cp
+        case cp @ (0x09 | 0x0a | 0x0d)      => cp
+        case cp if cp <= 0x1F || cp == 0x7F => cp + 0xE000
+        case cp                             => cp
       } codePointsToString
 
-    def withElement[T](localName: String, atts: Seq[(String, String)] = Nil)(body: ⇒ T): T = {
+    def withElement[T](localName: String, atts: Seq[(String, String)] = Nil)(body: => T): T = {
       startElem(rcv, localName)
-      atts foreach { case (name, value) ⇒ addAttribute(rcv, name, value) }
+      atts foreach { case (name, value) => addAttribute(rcv, name, value) }
       val result = body
       endElem(rcv, localName)
       result
@@ -64,31 +64,31 @@ protected trait JsonToXmlAlgorithm {
 
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
-        case JsString(v) ⇒
+        case JsString(v) =>
           // Don't add `type="string"` since it's the default
           text(rcv, escapeString(v))
-        case JsNumber(v) ⇒
+        case JsNumber(v) =>
           addAttribute(rcv, Symbols.Type, Symbols.Number)
           text(rcv, v.toString)
-        case JsBoolean(v) ⇒
+        case JsBoolean(v) =>
           addAttribute(rcv, Symbols.Type, Symbols.Boolean)
           text(rcv, v.toString)
-        case JsNull ⇒
+        case JsNull =>
           addAttribute(rcv, Symbols.Type, Symbols.Null)
-        case JsObject(fields) ⇒
+        case JsObject(fields) =>
           addAttribute(rcv, Symbols.Type, Symbols.Object)
-          fields foreach { case (name, value) ⇒
+          fields foreach { case (name, value) =>
 
             val ncName  = makeNCName(name)
-            val nameAtt = ncName != name list (Symbols.Name → escapeString(name))
+            val nameAtt = ncName != name list (Symbols.Name -> escapeString(name))
 
             withElement(ncName, nameAtt) {
               processValue(value)
             }
           }
-        case JsArray(arrayValues) ⇒
+        case JsArray(arrayValues) =>
           addAttribute(rcv, Symbols.Type, Symbols.Array)
-          arrayValues foreach { arrayValue ⇒
+          arrayValues foreach { arrayValue =>
             withElement(Symbols.Anonymous) {
               processValue(arrayValue)
             }

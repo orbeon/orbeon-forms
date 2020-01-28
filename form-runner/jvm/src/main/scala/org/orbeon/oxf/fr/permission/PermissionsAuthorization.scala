@@ -39,10 +39,10 @@ object PermissionsAuthorization {
     check       : PermissionsCheck
   ): Operations =
     permissions match {
-      case DefinedPermissions(permissionsList) ⇒
+      case DefinedPermissions(permissionsList) =>
         val operationsList = permissionsList.map(authorizedOperations(_, currentUser, check))
         Operations.combine(operationsList)
-      case UndefinedPermissions ⇒
+      case UndefinedPermissions =>
         SpecificOperations(Operations.All)
     }
 
@@ -62,39 +62,39 @@ object PermissionsAuthorization {
     check       : PermissionsCheck
   ): Boolean =
     condition match {
-      case Owner ⇒
+      case Owner =>
         check match {
-          case CheckWithDataUser(dataUsernameOpt, _, _) ⇒
+          case CheckWithDataUser(dataUsernameOpt, _, _) =>
             (currentUser map (_.username), dataUsernameOpt) match {
-              case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername ⇒ true
-              case _ ⇒ false
+              case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername => true
+              case _ => false
             }
-          case CheckWithoutDataUser(optimistic) ⇒ optimistic
-          case CheckAssumingOrganizationMatch   ⇒ false
+          case CheckWithoutDataUser(optimistic) => optimistic
+          case CheckAssumingOrganizationMatch   => false
         }
-      case Group ⇒
+      case Group =>
         check match {
-          case CheckWithDataUser(_, dataGroupnameOpt, _) ⇒
+          case CheckWithDataUser(_, dataGroupnameOpt, _) =>
             (currentUser flatMap (_.group), dataGroupnameOpt) match {
-              case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt ⇒ true
-              case _ ⇒ false
+              case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt => true
+              case _ => false
             }
-          case CheckWithoutDataUser(optimistic) ⇒ optimistic
-          case CheckAssumingOrganizationMatch   ⇒ false
+          case CheckWithoutDataUser(optimistic) => optimistic
+          case CheckAssumingOrganizationMatch   => false
         }
-      case RolesAnyOf(permissionRoles) ⇒
-        permissionRoles.exists(permissionRoleName ⇒
+      case RolesAnyOf(permissionRoles) =>
+        permissionRoles.exists(permissionRoleName =>
           currentUser.to(List) flatMap (_.roles) exists {
-            case SimpleRole(userRoleName) ⇒
+            case SimpleRole(userRoleName) =>
               userRoleName == permissionRoleName
-            case ParametrizedRole(userRoleName, userOrganizationName) ⇒
+            case ParametrizedRole(userRoleName, userOrganizationName) =>
               userRoleName == permissionRoleName && (
                 check match {
-                  case CheckWithDataUser(_, _, dataOrganizationOpt) ⇒
+                  case CheckWithDataUser(_, _, dataOrganizationOpt) =>
                     dataOrganizationOpt.exists(_.levels.contains(userOrganizationName))
-                  case CheckWithoutDataUser(optimistic) ⇒
+                  case CheckWithoutDataUser(optimistic) =>
                     optimistic
-                  case CheckAssumingOrganizationMatch   ⇒ true
+                  case CheckAssumingOrganizationMatch   => true
                 }
               )
           }

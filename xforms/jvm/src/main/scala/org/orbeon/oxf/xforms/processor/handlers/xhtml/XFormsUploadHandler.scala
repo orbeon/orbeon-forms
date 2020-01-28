@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -74,7 +74,7 @@ class XFormsUploadHandler(
         uploadControl       flatMap
           (_.acceptValue)   map
           mediatypeToAccept foreach
-          (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
+          (accept => reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
 
         uploadControl foreach
           (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
@@ -90,13 +90,13 @@ class XFormsUploadHandler(
       withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
 
         // Metadata
-        def outputSpan(name: String, value: XFormsUploadControl ⇒ Option[String]) = {
+        def outputSpan(name: String, value: XFormsUploadControl => Option[String]) = {
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-" + name)
 
           withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
             uploadControl flatMap value foreach
-              { v ⇒ receiver.characters(v.toCharArray, 0, v.length) }
+              { v => receiver.characters(v.toCharArray, 0, v.length) }
           }
         }
 

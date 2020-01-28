@@ -41,8 +41,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
-      case ControlBindPathHoldersResources(_, _, _, None,          _) ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None,          _) => Nil
     }
 
   // Given a form head, form body and instance data:
@@ -71,8 +71,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
-      case ControlBindPathHoldersResources(_, _, _, None         , _) ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None         , _) => Nil
     }
 
   //@XPathFunction
@@ -95,8 +95,8 @@ trait FormRunnerEmail {
       )
 
     for {
-      (expr, mapping) ← formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
-      trimmedExpr     ← expr.trimAllToOpt
+      (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
+      trimmedExpr     <- expr.trimAllToOpt
       name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
     } yield {
       // This appears necessary for non-ASCII characters to make it through.

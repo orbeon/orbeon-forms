@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.controller
 
-import java.lang.{Boolean ⇒ JBoolean}
+import java.lang.{Boolean => JBoolean}
 import java.net.URI
 
 import org.orbeon.exception.OrbeonFormatter
@@ -45,15 +45,15 @@ object Authorizer extends Logging {
 
   // Whether the incoming request is authorized with a token
   def authorizedWithToken(ec: ExternalContext): Boolean =
-    authorizedWithToken(k ⇒ Option(ec.getRequest.getHeaderValuesMap.get(k)), k ⇒ ec.getWebAppContext.attributes.get(k))
+    authorizedWithToken(k => Option(ec.getRequest.getHeaderValuesMap.get(k)), k => ec.getWebAppContext.attributes.get(k))
 
-  def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
+  def authorizedWithToken(header: String => Option[Array[String]], attribute: String => Option[AnyRef]): Boolean = {
 
     val requestToken =
       header(OrbeonTokenLower).toList.flatten.headOption
 
     def applicationToken =
-      attribute(OrbeonTokenLower) collect { case token: String ⇒ token }
+      attribute(OrbeonTokenLower) collect { case token: String => token }
 
     requestToken.isDefined && requestToken == applicationToken
   }
@@ -65,7 +65,7 @@ object Authorizer extends Logging {
     def alreadyAuthorized =
       request.sessionOpt flatMap
       (_.getAttribute(AuthorizedKey)) collect
-      { case value: JBoolean ⇒ value.booleanValue() } exists
+      { case value: JBoolean => value.booleanValue() } exists
       identity
 
     def rememberAuthorized() =
@@ -95,10 +95,10 @@ object Authorizer extends Logging {
     // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
     def delegateAbsoluteBaseURIOpt =
       propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) map
-        (p ⇒ new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
+        (p => new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
 
     delegateAbsoluteBaseURIOpt match {
-      case Some(baseDelegateURI) ⇒
+      case Some(baseDelegateURI) =>
         // Forward method and headers but not the body
 
         // NOTE: There is a question of whether we need to forward cookies for authorization purposes. If we
@@ -114,7 +114,7 @@ object Authorizer extends Logging {
           val proxiedHeaders =
             proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true).toMap mapValues (_.toList)
 
-          proxiedHeaders + (OrbeonRemoteAddress → Option(request.getRemoteAddr).toList)
+          proxiedHeaders + (OrbeonRemoteAddress -> Option(request.getRemoteAddr).toList)
         }
 
         val content = Connection.requiresRequestBody(method) option
@@ -125,7 +125,7 @@ object Authorizer extends Logging {
             None
           )
 
-        debug("Delegating to authorizer", Seq("url" → newURL.toString))
+        debug("Delegating to authorizer", Seq("url" -> newURL.toString))
 
         val connection =
           Connection(
@@ -139,17 +139,17 @@ object Authorizer extends Logging {
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
-        try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ ⇒ true)
+        try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ => true)
         catch {
-          case HttpStatusCodeException(code, _, _) ⇒
-            debug("Unauthorized", Seq("code" → code.toString))
+          case HttpStatusCodeException(code, _, _) =>
+            debug("Unauthorized", Seq("code" -> code.toString))
             false
-          case NonFatal(t) ⇒
-            error("Could not connect to authorizer", Seq("url" → newURL.toString))
+          case NonFatal(t) =>
+            error("Could not connect to authorizer", Seq("url" -> newURL.toString))
             error(OrbeonFormatter.format(t))
             false
         }
-      case None ⇒
+      case None =>
         // No authorizer
         debug("No authorizer configured")
         false

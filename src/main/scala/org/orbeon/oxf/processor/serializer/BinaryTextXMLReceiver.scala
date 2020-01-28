@@ -111,30 +111,30 @@ class BinaryTextXMLReceiver(
         prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))
 
       val isBinaryInput = QName(typeLocalName, Namespace(typePrefix, typeNamespaceURI)) match {
-        case XS_BASE64BINARY_QNAME ⇒ true
-        case XS_STRING_QNAME       ⇒ false
-        case _                     ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")
+        case XS_BASE64BINARY_QNAME => true
+        case XS_STRING_QNAME       => false
+        case _                     => throw new OXFException("Type xs:string or xs:base64Binary must be specified")
       }
 
       // Set Last-Modified, Content-Disposition and status code when available
-      response foreach { response ⇒
+      response foreach { response =>
 
         // This will override caching settings which may have taken place before
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
-          (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
+          (validity => response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
-        attributes.getValue("filename").trimAllToOpt.foreach { fileName ⇒
+        attributes.getValue("filename").trimAllToOpt.foreach { fileName =>
           val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")
           val dispositionType = if (isInline) "inline" else "attachment"
           response.setHeader("Content-Disposition", s"$dispositionType; filename=$fileName")
         }
 
         attributes.getValue("status-code").trimAllToOpt foreach
-          (statusCode ⇒ response.setStatus(statusCode.toInt))
+          (statusCode => response.setStatus(statusCode.toInt))
 
         // Forward headers if any
-        headersToForward foreach { headerName ⇒
-          attributes.getValue(headerName).trimAllToOpt foreach { headerValue ⇒
+        headersToForward foreach { headerName =>
+          attributes.getValue(headerName).trimAllToOpt foreach { headerValue =>
             response.setHeader(headerName, headerValue)
           }
         }
@@ -143,7 +143,7 @@ class BinaryTextXMLReceiver(
       // Set ContentHandler and headers depending on input type
       val contentTypeAttribute = Option(attributes.getValue(Headers.ContentTypeLower))
       if (isBinaryInput) {
-        response foreach { response ⇒
+        response foreach { response =>
           // Get content-type and encoding
 
           if (! forceContentType          &&
@@ -198,14 +198,14 @@ class BinaryTextXMLReceiver(
 
   override def processingInstruction(target: String, data: String): Unit =
     parseSerializerPI(target, data) match {
-      case Some(("status-code", Some(code))) ⇒
+      case Some(("status-code", Some(code))) =>
         response foreach (_.setStatus(code.toInt))
-      case Some(("flush", _)) ⇒
+      case Some(("flush", _)) =>
         if (writer ne null)
           writer.flush()
 
         outputStream.flush()
-      case _ ⇒
+      case _ =>
         super.processingInstruction(target, data)
     }
 
@@ -240,8 +240,8 @@ object BinaryTextXMLReceiver {
   def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
     if (PITargets(target)) {
       Option(data) collect {
-        case StatusCodeRE(code) ⇒ "status-code" → Some(code)
-        case "flush"            ⇒ "flush" → None
+        case StatusCodeRE(code) => "status-code" -> Some(code)
+        case "flush"            => "flush" -> None
       }
     } else
       None

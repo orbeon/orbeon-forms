@@ -32,11 +32,11 @@ class CacheTest
     def runAndAssert(form: String, mode: String)(expectedInitialHit: Boolean): Unit = {
 
       def staticStateFoundOpt(events: List[CacheEvent]) =
-        events collectFirst { case StaticState(found, _) ⇒ found }
+        events collectFirst { case StaticState(found, _) => found }
 
       def staticStateHasTemplateOpt(events: List[CacheEvent]) = (
         events
-        collectFirst { case StaticState(_, digest) ⇒ digest}
+        collectFirst { case StaticState(_, digest) => digest}
         flatMap XFormsStaticStateCache.findDocument
         map (_._1.template.isDefined)
       )

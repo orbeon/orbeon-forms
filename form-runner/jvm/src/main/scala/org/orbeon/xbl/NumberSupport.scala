@@ -93,20 +93,20 @@ trait NumberSupport[Binding] {
         .translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
 
     (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)), precisionForRoundingOpt) match {
-      case (Some(sl @ Left(l)),  _      ) ⇒ format(sl,                           picture(fractionDigitsOpt getOrElse 0))
-      case (Some(Right(d)) ,     Some(p)) ⇒ format(Right(roundBigDecimal(d, p)), picture(p))
-      case (Some(sd @ Right(d)), None   ) ⇒ format(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
-      case (None,                _      ) ⇒ editValue(getStringValue(binding))
+      case (Some(sl @ Left(l)),  _      ) => format(sl,                           picture(fractionDigitsOpt getOrElse 0))
+      case (Some(Right(d)) ,     Some(p)) => format(Right(roundBigDecimal(d, p)), picture(p))
+      case (Some(sd @ Right(d)), None   ) => format(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
+      case (None,                _      ) => editValue(getStringValue(binding))
     }
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/3226
   def roundBigDecimal(value: scala.BigDecimal, precision: Int): scala.BigDecimal =
     value.signum match {
-      case -1 ⇒ value.setScale(precision, scala.BigDecimal.RoundingMode.HALF_DOWN)
-      case  0 ⇒ value
-      case  1 ⇒ value.setScale(precision, scala.BigDecimal.RoundingMode.HALF_UP)
-      case  _ ⇒ throw new IllegalStateException
+      case -1 => value.setScale(precision, scala.BigDecimal.RoundingMode.HALF_DOWN)
+      case  0 => value
+      case  1 => value.setScale(precision, scala.BigDecimal.RoundingMode.HALF_UP)
+      case  _ => throw new IllegalStateException
     }
 
   def storageValue(value: String, binding: Binding)(implicit params: NumberConfig): String = {
@@ -124,10 +124,10 @@ trait NumberSupport[Binding] {
       if (params.roundWhenStoring) fractionDigitsFromValidationOrProp(binding) else None
 
     (NumericValidation.tryParseAsLongOrBigDecimal(withSeparatorsReplaced), precisionForRoundingOpt) match {
-      case (Some(Left(l)),  _      ) ⇒ l.toString // no decimal fraction to round
-      case (Some(Right(d)), Some(p)) ⇒ formatNumber(Right(roundBigDecimal(d, p)), pictureString(p,        group = false, zeroes = false))
-      case (Some(Right(d)), None   ) ⇒ formatNumber(Right(d),                     pictureString(d.scale , group = false, zeroes = false))
-      case (None,           _      ) ⇒ withPeriodEncoded // Q: Unclear. Should just store `value`?
+      case (Some(Left(l)),  _      ) => l.toString // no decimal fraction to round
+      case (Some(Right(d)), Some(p)) => formatNumber(Right(roundBigDecimal(d, p)), pictureString(p,        group = false, zeroes = false))
+      case (Some(Right(d)), None   ) => formatNumber(Right(d),                     pictureString(d.scale , group = false, zeroes = false))
+      case (None,           _      ) => withPeriodEncoded // Q: Unclear. Should just store `value`?
     }
   }
 
@@ -187,17 +187,17 @@ object NumberSupportJava extends NumberSupport[Item] {
 
   def getDatatypeOpt(binding: Item): Option[dom.QName] =
     binding match {
-      case v: NodeInfo     ⇒ Option(InstanceData.getType(v))
-      case v: IntegerValue ⇒ Some(XMLConstants.XS_INTEGER_QNAME)
-      case v: DecimalValue ⇒ Some(XMLConstants.XS_DECIMAL_QNAME)
-      case _               ⇒ None
+      case v: NodeInfo     => Option(InstanceData.getType(v))
+      case v: IntegerValue => Some(XMLConstants.XS_INTEGER_QNAME)
+      case v: DecimalValue => Some(XMLConstants.XS_DECIMAL_QNAME)
+      case _               => None
     }
 
 
   def getCustomMipOpt(binding: Item, name: String): Option[String] =
     binding match {
-      case v: NodeInfo ⇒ InstanceData.findCustomMip(v, name)
-      case _           ⇒ None
+      case v: NodeInfo => InstanceData.findCustomMip(v, name)
+      case _           => None
     }
 
   //@XPathFunction

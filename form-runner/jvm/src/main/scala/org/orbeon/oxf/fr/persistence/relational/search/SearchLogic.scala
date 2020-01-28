@@ -42,9 +42,9 @@ trait SearchLogic extends SearchRequest {
 
     def hasPermissionCond(condition: Condition): Boolean =
       formPermissions match {
-        case UndefinedPermissions ⇒ true
-        case DefinedPermissions(permissionsList) ⇒
-          permissionsList.exists { permission ⇒
+        case UndefinedPermissions => true
+        case DefinedPermissions(permissionsList) =>
+          permissionsList.exists { permission =>
             permission.conditions.contains(condition) &&
               Operations.allowsAny(permission.operations, searchOperations)
           }
@@ -77,7 +77,7 @@ trait SearchLogic extends SearchRequest {
       // There is no chance we can access any data, no need to run any SQL
       (Nil, 0)
     else
-      RelationalUtils.withConnection { connection ⇒
+      RelationalUtils.withConnection { connection =>
 
         val version = requestedFormVersion(connection, request)
 
@@ -99,7 +99,7 @@ trait SearchLogic extends SearchRequest {
              """.stripMargin
 
           Logger.logDebug("search total query", sql)
-          executeQuery(connection, sql, commonParts) { rs ⇒
+          executeQuery(connection, sql, commonParts) { rs =>
             rs.next()
             rs.getInt(1)
           }
@@ -112,8 +112,8 @@ trait SearchLogic extends SearchRequest {
           val rowNumCol            = rowNumSQL.col
           val rowNumOrderBy        = rowNumSQL.orderBy
           val rowNumTable          = rowNumSQL.table match {
-            case Some(table) ⇒ table + ","
-            case None        ⇒ ""
+            case Some(table) => table + ","
+            case None        => ""
           }
 
           // Use LEFT JOIN instead of regular join, in case the form doesn't have any control marked
@@ -154,7 +154,7 @@ trait SearchLogic extends SearchRequest {
         }
         Logger.logDebug("search items query", sql)
 
-        val documentsMetadataValues = executeQuery(connection, sql, commonParts) { documentsResultSet ⇒
+        val documentsMetadataValues = executeQuery(connection, sql, commonParts) { documentsResultSet =>
 
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
@@ -187,9 +187,9 @@ trait SearchLogic extends SearchRequest {
 
         // Compute possible operations for each document
         val organizationsCache = mutable.Map[Int, Organization]()
-        val documents = documentsMetadataValues.map{ case (metadata, values) ⇒
+        val documents = documentsMetadataValues.map{ case (metadata, values) =>
             def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
-            val organization              = metadata.organizationId.map(id ⇒ organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
+            val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.username, metadata.groupname, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)
             Document(metadata, Operations.serialize(operations), values)

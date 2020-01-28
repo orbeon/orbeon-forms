@@ -57,26 +57,26 @@ abstract class XFormsAction extends Logging {
     import interpreter.indentedLogger
 
     resolveStringAVT(attName)(context) match {
-      case Some(resolvedAvt) ⇒
+      case Some(resolvedAvt) =>
 
         resolveControl(resolvedAvt) match {
-          case Some(control) ⇒ Some(control)
-          case _ ⇒
+          case Some(control) => Some(control)
+          case _ =>
             debug(
               "attribute does not refer to an existing control",
               List(
-                "attribute"      → attName,
-                "value"          → element.attributeValue("control"),
-                "resolved value" → resolvedAvt
+                "attribute"      -> attName,
+                "value"          -> element.attributeValue("control"),
+                "resolved value" -> resolvedAvt
               )
             )
             None
         }
 
-      case None if required ⇒
+      case None if required =>
         // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
         throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
-      case None if ! required ⇒
+      case None if ! required =>
         None
     }
   }
@@ -88,7 +88,7 @@ abstract class XFormsAction extends Logging {
   // Return None if there is no attribute or if the AVT cannot be evaluated
   def resolveStringAVT(att: String)(implicit context: DynamicActionContext): Option[String] =
     context.element.attributeValueOpt(att) flatMap
-      (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
+      (avt => Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
 
   // Resolve an optional boolean AVT
   def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext): Boolean =
@@ -109,7 +109,7 @@ object XFormsAction {
     // Iterate over context information if any
     val tuples =
       for {
-        element ← Dom4j.elements(actionElement)
+        element <- Dom4j.elements(actionElement)
         if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // xf:property since XForms 2.0
 
         // Get and check attributes
@@ -118,7 +118,7 @@ object XFormsAction {
             (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {
-          case Some(valueExpr) ⇒
+          case Some(valueExpr) =>
             // XPath expression
 
             // Set context on context element
@@ -150,7 +150,7 @@ object XFormsAction {
             contextStack.popBinding()
 
             result
-          case None ⇒
+          case None =>
             // Literal text
             element.getStringValue
         }

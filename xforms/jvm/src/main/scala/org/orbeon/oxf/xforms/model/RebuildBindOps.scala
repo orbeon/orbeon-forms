@@ -17,11 +17,11 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.saxon.om.Item
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 trait RebuildBindOps {
 
-  self: XFormsModelBinds ⇒
+  self: XFormsModelBinds =>
 
   import Private._
 
@@ -32,14 +32,14 @@ trait RebuildBindOps {
 
   // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
   def rebuild(): Unit =
-    withDebug("performing rebuild", List("model id" → model.getEffectiveId)) {
+    withDebug("performing rebuild", List("model id" -> model.getEffectiveId)) {
 
       // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
 
       // Clear all instances that might have InstanceData
       // Only need to do this after the first rebuild
       if (! _isFirstRebuildForModel)
-        for (instance ← model.instancesIterator) {
+        for (instance <- model.instancesIterator) {
           // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to
           // figure out the dependencies.
           // The reason is that clearing this state can take quite some time
@@ -62,7 +62,7 @@ trait RebuildBindOps {
       // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
       // Even before that, the bind tree could be modified more dynamically as is the case with controls
       _topLevelBinds =
-        for (staticBind ← staticModel.topLevelBinds)
+        for (staticBind <- staticModel.topLevelBinds)
           yield new RuntimeBind(model, staticBind, null, isSingleNodeContext = true)
 
       _isFirstRebuildForModel = false
@@ -86,11 +86,11 @@ trait RebuildBindOps {
   // object. Otherwise, the IDREF resolution produced a null search result."
   def resolveBind(bindId: String, contextItemOpt: Option[Item]): Option[RuntimeBind] =
     singleNodeContextBinds.get(bindId) match {
-      case some @ Some(_) ⇒
+      case some @ Some(_) =>
         // This bind has a single-node context (incl. top-level bind), so ignore context item and just return
         // the bind nodeset
         some
-      case None ⇒
+      case None =>
         // Nested bind: use context item
 
         // "From among the bind objects associated with the target bind element, if there exists a bind object
@@ -98,10 +98,10 @@ trait RebuildBindOps {
         // the desired target bind object. Otherwise, the IDREF resolution produced a null search result."
         val it =
           for {
-            contextItem ← contextItemOpt.iterator
-            iterations  ← iterationsForContextItem.get(contextItem).iterator
-            iteration   ← iterations
-            childBind   ← iteration.findChildBindByStaticId(bindId)
+            contextItem <- contextItemOpt.iterator
+            iterations  <- iterationsForContextItem.get(contextItem).iterator
+            iteration   <- iterations
+            childBind   <- iteration.findChildBindByStaticId(bindId)
           } yield
             childBind
 

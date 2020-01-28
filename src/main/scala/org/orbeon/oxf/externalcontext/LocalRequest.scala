@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
@@ -49,18 +49,18 @@ class LocalRequest(
   private val _headersIncludingAuthBodyLowercase = {
 
     def requestHeadersIt =
-      headersMaybeCapitalized.iterator map { case (k, v) ⇒ k.toLowerCase → v.toArray }
+      headersMaybeCapitalized.iterator map { case (k, v) => k.toLowerCase -> v.toArray }
 
     def credentialsHeadersIt =
       incomingRequest.credentials match {
-        case Some(credentials) ⇒ Credentials.toHeaders(credentials).iterator
-        case None              ⇒ Iterator.empty
+        case Some(credentials) => Credentials.toHeaders(credentials).iterator
+        case None              => Iterator.empty
       }
 
     def bodyHeadersIt =
       if (Connection.requiresRequestBody(method)) {
-        (_contentLengthOpt.iterator map (value ⇒ Headers.ContentLengthLower → Array(value.toString))) ++
-        (_contentTypeOpt.iterator   map (value ⇒ Headers.ContentTypeLower   → Array(value)))
+        (_contentLengthOpt.iterator map (value => Headers.ContentLengthLower -> Array(value.toString))) ++
+        (_contentTypeOpt.iterator   map (value => Headers.ContentTypeLower   -> Array(value)))
       } else
         Iterator.empty
 
@@ -87,8 +87,8 @@ class LocalRequest(
     def bodyParameters =
       if (method == POST)
         content collect {
-          case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) ⇒
-            useAndClose(is) { is ⇒
+          case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) =>
+            useAndClose(is) { is =>
               decodeSimpleQuery(IOUtils.toString(is, ExternalContext.StandardFormCharacterEncoding))
             }
         }
@@ -125,7 +125,7 @@ class LocalRequest(
     val newMap = new ju.HashMap[String, AnyRef]
 
     newMap.asScala ++= incomingRequest.getAttributesMap.asScala filter {
-      case (k, _) ⇒ k.startsWith("javax.servlet.")
+      case (k, _) => k.startsWith("javax.servlet.")
     }
 
     ju.Collections.synchronizedMap(newMap)

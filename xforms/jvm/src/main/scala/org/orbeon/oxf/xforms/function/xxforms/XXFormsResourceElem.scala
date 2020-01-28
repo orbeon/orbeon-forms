@@ -32,14 +32,14 @@ class XXFormsResourceElem extends XFormsFunction {
 
     def findResourcesElement =
       resolveOrFindByStaticOrAbsoluteId(instanceArgumentOpt getOrElse "fr-form-resources") collect
-        { case instance: XFormsInstance ⇒ instance.rootElement }
+        { case instance: XFormsInstance => instance.rootElement }
 
     for {
-      elementAnalysis ← elementAnalysisForSource.iterator
-      resources       ← findResourcesElement.iterator
-      requestedLang   ← XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis).iterator
-      resourceRoot    ← findResourceElementForLang(resources, requestedLang).iterator
-      leaf            ← pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
+      elementAnalysis <- elementAnalysisForSource.iterator
+      resources       <- findResourcesElement.iterator
+      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis).iterator
+      resourceRoot    <- findResourceElementForLang(resources, requestedLang).iterator
+      leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
     } yield
       leaf
   }

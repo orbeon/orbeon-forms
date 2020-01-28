@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform._
 
@@ -46,10 +46,10 @@ object XPath {
   trait FunctionContext
 
   // To report timing information
-  type Reporter = (String, Long) ⇒ Unit
+  type Reporter = (String, Long) => Unit
 
   // To resolve a variable
-  type VariableResolver = (StructuredQName, XPathContext) ⇒ ValueRepresentation
+  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
@@ -58,7 +58,7 @@ object XPath {
   // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
   private val xpathContextDyn = new DynamicVariable[FunctionContext]
 
-  def withFunctionContext[T](functionContext: FunctionContext)(thunk: ⇒ T): T = {
+  def withFunctionContext[T](functionContext: FunctionContext)(thunk: => T): T = {
     xpathContextDyn.withValue(functionContext) {
       thunk
     }
@@ -92,9 +92,9 @@ object XPath {
         Option(Value.asItem(JPConverter.allocate(any.getClass, context.getConfiguration).convert(any, context)))
 
       def convert(any: Any, context: XPathContext): ValueRepresentation = any match {
-        case v: Iterable[_] ⇒ new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
-        case v: Option[_]   ⇒ convert(v.toList, context)
-        case v: Iterator[_] ⇒ convert(v.toList, context) // we have to return a ValueRepresentation
+        case v: Iterable[_] => new SequenceExtent(v flatMap (anyToItem(_, context)) toArray)
+        case v: Option[_]   => convert(v.toList, context)
+        case v: Iterator[_] => convert(v.toList, context) // we have to return a ValueRepresentation
       }
 
       def getItemType = AnyItemType.getInstance
@@ -109,20 +109,20 @@ object XPath {
       //  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo])
       //
       private def itemToAny(item: Item, context: XPathContext) = item match {
-        case v: AtomicValue ⇒
+        case v: AtomicValue =>
           val config = context.getConfiguration
           val th     = config.getTypeHierarchy
 
           val pj = PJConverter.allocate(config, v.getItemType(th), StaticProperty.EXACTLY_ONE, classOf[AnyRef])
           pj.convert(v, classOf[AnyRef], context)
-        case v              ⇒ v
+        case v              => v
       }
 
       def convert(value: ValueRepresentation, targetClass: Class[_], context: XPathContext): AnyRef =
         if (targetClass.isAssignableFrom(classOf[List[_]])) {
 
           val values =
-            for (item ← Implicits.asScalaIterator(Value.asIterator(value)))
+            for (item <- Implicits.asScalaIterator(Value.asIterator(value)))
             yield itemToAny(item, context)
 
           values.toList
@@ -210,8 +210,8 @@ object XPath {
       )
 
     compiled.expression.getInternalExpression match {
-      case literal: Literal ⇒ Some(literal)
-      case _                ⇒ None
+      case literal: Literal => Some(literal)
+      case _                => None
     }
   }
 
@@ -295,7 +295,7 @@ object XPath {
     reporter            : Reporter
   ): AnyRef = {
 
-    withEvaluation(compiledExpression) { xpathExpression ⇒
+    withEvaluation(compiledExpression) { xpathExpression =>
 
       val (contextItem, position) =
         if (contextPosition > 0 && contextPosition <= contextItems.size)
@@ -315,10 +315,10 @@ object XPath {
       withFunctionContext(functionContext) {
         val iterator = xpathExpression.iterate(dynamicContext)
         iterator.next() match {
-          case atomicValue: AtomicValue ⇒ Value.convertToJava(atomicValue)
-          case nodeInfo: NodeInfo       ⇒ nodeInfo
-          case null                     ⇒ null
-          case _                        ⇒ throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
+          case atomicValue: AtomicValue => Value.convertToJava(atomicValue)
+          case nodeInfo: NodeInfo       => nodeInfo
+          case null                     => null
+          case _                        => throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
         }
       }
     }
@@ -347,7 +347,7 @@ object XPath {
       )
     ) map (_.toString) orNull
 
-  private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression ⇒ T)(implicit reporter: Reporter): T =
+  private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression => T)(implicit reporter: Reporter): T =
     try {
       if (reporter ne null) {
         val startTime = System.nanoTime
@@ -360,7 +360,7 @@ object XPath {
       } else
         body(expression.expression)
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
     }
 
@@ -369,7 +369,7 @@ object XPath {
     val validationException =
       OrbeonLocationException.wrapException(
         t,
-        new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString))
+        new ExtendedLocationData(locationData, Option(description), List("expression" -> xpathString))
       )
 
     // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
@@ -391,7 +391,7 @@ object XPath {
           new InputSource(url.openStream)
         )
       } catch {
-        case NonFatal(t) ⇒ throw new TransformerException(t)
+        case NonFatal(t) => throw new TransformerException(t)
       }
   }
 

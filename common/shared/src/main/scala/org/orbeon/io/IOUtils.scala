@@ -22,15 +22,15 @@ object IOUtils {
 
   private val CopyBufferSize = 8192
 
-  def copyStream(in: InputStream, out: OutputStream, progress: Long ⇒ Unit = _ ⇒ ()): Unit = {
+  def copyStream(in: InputStream, out: OutputStream, progress: Long => Unit = _ => ()): Unit = {
 
     require(in ne null)
     require(out ne null)
 
-    useAndClose(in) { in ⇒
-      useAndClose(out) { out ⇒
+    useAndClose(in) { in =>
+      useAndClose(out) { out =>
         val buffer = new Array[Byte](CopyBufferSize)
-        Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
+        Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
           progress(read)
           out.write(buffer, 0, read)
         }
@@ -39,15 +39,15 @@ object IOUtils {
     }
   }
 
-  def copyReader(in: Reader, out: Writer, progress: Long ⇒ Unit = _ ⇒ ()): Unit = {
+  def copyReader(in: Reader, out: Writer, progress: Long => Unit = _ => ()): Unit = {
 
     require(in ne null)
     require(out ne null)
 
-    useAndClose(in) { in ⇒
-      useAndClose(out) { out ⇒
+    useAndClose(in) { in =>
+      useAndClose(out) { out =>
         val buffer = new Array[Char](CopyBufferSize)
-        Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
+        Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
           progress(read)
           out.write(buffer, 0, read)
         }
@@ -57,7 +57,7 @@ object IOUtils {
 
   // Scala 2.13 has `scala.util.Using`. Switch to that when possible.
   // Use a closable item and make sure an attempt to close it is done after use
-  def useAndClose[T <: {def close()}, U](closable: T)(block: T ⇒ U): U =
+  def useAndClose[T <: {def close()}, U](closable: T)(block: T => U): U =
     try block(closable)
     finally {
       if (closable ne null)
@@ -65,9 +65,9 @@ object IOUtils {
     }
 
   // Run a block and swallow any exception. Use only for things like close().
-  def runQuietly(block: ⇒ Unit): Unit =
+  def runQuietly(block: => Unit): Unit =
     try block
     catch {
-      case NonFatal(_) ⇒ // NOP
+      case NonFatal(_) => // NOP
     }
 }

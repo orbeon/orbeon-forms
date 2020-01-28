@@ -63,7 +63,7 @@ trait RRRAction extends XFormsAction with RRRFunctions {
     def resolve(qName: QName) =
       (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
 
-    modelOpt foreach { model ⇒
+    modelOpt foreach { model =>
       val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
       val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 

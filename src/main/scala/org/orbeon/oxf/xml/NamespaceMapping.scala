@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xml
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import scala.collection.JavaConverters._
 

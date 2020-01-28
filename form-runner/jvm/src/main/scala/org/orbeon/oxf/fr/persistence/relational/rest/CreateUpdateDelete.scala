@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
-import java.sql.{Array ⇒ _, _}
+import java.sql.{Array => _, _}
 
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
@@ -46,7 +46,7 @@ object RequestReader {
 
   object IdAtt {
     val IdQName = JXQName("id")
-    def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) ⇒ value }
+    def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) => value }
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/2385
@@ -67,14 +67,14 @@ object RequestReader {
         StartElement(JXQName(XF, "model"),    IdAtt(Names.FormModel))        ::
         StartElement(JXQName(XH, "head"), _)                                 ::
         StartElement(JXQName(XH, "html"), _)                                 ::
-        Nil ⇒ true
-      case _  ⇒ false
+        Nil => true
+      case _  => false
     }
 
   def requestInputStream(): InputStream =
     RequestGenerator.getRequestBody(PipelineContext.get) match {
-      case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
-      case None          ⇒ NetUtils.getExternalContext.getRequest.getInputStream
+      case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
+      case None          => NetUtils.getExternalContext.getRequest.getInputStream
     }
 
   def bytes(): Array[Byte] = {
@@ -111,10 +111,10 @@ object RequestReader {
           new WhitespaceXMLReceiver(
             new ElementFilterXMLReceiver(
               newIdentityReceiver(metadataWriter),
-              (level, uri, localname, _) ⇒ level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
+              (level, uri, localname, _) => level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
             ),
             Whitespace.Policy.Normalize,
-            (_, _, _, _) ⇒ Whitespace.Policy.Normalize
+            (_, _, _, _) => Whitespace.Policy.Normalize
           ),
           isMetadataElement
         )
@@ -126,9 +126,9 @@ object RequestReader {
     val dataWriter = new StringBuilderWriter()
 
     val resultReceiver = metadataWriterAndReceiver match {
-      case Some((_, metadataFilter)) ⇒
+      case Some((_, metadataFilter)) =>
         new TeeXMLReceiver(newIdentityReceiver(dataWriter), metadataFilter)
-      case None ⇒
+      case None =>
         newIdentityReceiver(dataWriter)
     }
 
@@ -168,16 +168,16 @@ trait CreateUpdateDelete
           |       AND deleted = 'N'
           |""".stripMargin
 
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
 
       val position = Iterator.from(1)
       ps.setString(position.next(), req.app)
       ps.setString(position.next(), req.form)
       if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
 
-      req.dataPart foreach (dataPart ⇒ ps.setString(position.next(), dataPart.documentId))
+      req.dataPart foreach (dataPart => ps.setString(position.next(), dataPart.documentId))
 
-      useAndClose(ps.executeQuery()) { resultSet ⇒
+      useAndClose(ps.executeQuery()) { resultSet =>
 
         // Create Row object with first row of result
         if (resultSet.next()) {
@@ -210,7 +210,7 @@ trait CreateUpdateDelete
 
     // If for data, start by deleting any draft document and draft attachments
     req.dataPart match {
-      case Some(dataPart) if ! req.forAttachment ⇒
+      case Some(dataPart) if ! req.forAttachment =>
 
         // First delete from orbeon_i_control_text, which requires a join
         val deleteFromControlIndexSql =
@@ -223,7 +223,7 @@ trait CreateUpdateDelete
               |                     draft       = 'Y'
               |          )
               |""".stripMargin
-        useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps ⇒
+        useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
           ps.setString(1, dataPart.documentId)
           ps.executeUpdate()
         }
@@ -241,7 +241,7 @@ trait CreateUpdateDelete
           "orbeon_form_data"                                  ::
           Nil
 
-        tablesToDeleteDraftsFrom.foreach { table ⇒
+        tablesToDeleteDraftsFrom.foreach { table =>
 
           val fromWhere =
             s"""|
@@ -252,21 +252,21 @@ trait CreateUpdateDelete
           val select = "     SELECT count(*) count" + fromWhere
           val delete = "     DELETE" + fromWhere
           val count =
-            useAndClose(connection.prepareStatement(select)) { ps ⇒
+            useAndClose(connection.prepareStatement(select)) { ps =>
               ps.setString(1, dataPart.documentId)
-              useAndClose(ps.executeQuery()) { rs ⇒
+              useAndClose(ps.executeQuery()) { rs =>
                 rs.next()
                 rs.getInt("count")
               }
             }
           if (count > 0)
-            useAndClose(connection.prepareStatement(delete)) { ps ⇒
+            useAndClose(connection.prepareStatement(delete)) { ps =>
               ps.setString(1, dataPart.documentId)
               ps.executeUpdate()
             }
         }
 
-      case _ ⇒
+      case _ =>
 
     }
 
@@ -279,8 +279,8 @@ trait CreateUpdateDelete
       val colValues    =
         includedCols
           .map(_.value match {
-            case StaticColValue(value)           ⇒ value
-            case DynamicColValue(placeholder, _) ⇒ placeholder})
+            case StaticColValue(value)           => value
+            case DynamicColValue(placeholder, _) => placeholder})
           .mkString(", ")
 
       val insertSql =
@@ -288,14 +288,14 @@ trait CreateUpdateDelete
             |            ( $colNames  )
             |     VALUES ( $colValues )
             |""".stripMargin
-      useAndClose(connection.prepareStatement(insertSql)) { ps ⇒
+      useAndClose(connection.prepareStatement(insertSql)) { ps =>
 
         // Set parameters in prepared statement for the dynamic values
         includedCols
           .map(_.value)
-          .collect({ case DynamicColValue(_, paramSetter) ⇒ paramSetter })
+          .collect({ case DynamicColValue(_, paramSetter) => paramSetter })
           .zipWithIndex
-          .foreach{ case (paramSetter, index) ⇒ paramSetter(ps, index + 1)}
+          .foreach{ case (paramSetter, index) => paramSetter(ps, index + 1)}
 
         ps.executeUpdate()
       }
@@ -303,10 +303,10 @@ trait CreateUpdateDelete
 
     versionToSet
   }
-  
+
   def change(req: Request, delete: Boolean): Unit = {
 
-    debug("CRUD: handling change request", List("delete" → delete.toString, "request" → req.toString))
+    debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 
     // Read before establishing a connection, so we don't use two simultaneous connections
     val formPermissions = {
@@ -314,9 +314,9 @@ trait CreateUpdateDelete
       PermissionsXML.parse(elOpt.orNull)
     }
 
-    debug("CRUD: form permissions", List("permissions" → formPermissions.toString))
+    debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
 
-    RelationalUtils.withConnection { connection ⇒
+    RelationalUtils.withConnection { connection =>
 
       // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
       // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
@@ -331,7 +331,7 @@ trait CreateUpdateDelete
           req.forData && delete && ! (req.version == Unspecified)
 
         if (badVersion)
-          debug("CRUD: bad version", List("status code" → StatusCode.BadRequest.toString))
+          debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
 
         if (badVersion)
           throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -341,7 +341,7 @@ trait CreateUpdateDelete
         val authorized =
           if (req.forData) {
             existing match {
-              case Some(existing) ⇒
+              case Some(existing) =>
 
                 // Check we're allowed to update or delete this resource
                 val username      = existing.username
@@ -354,7 +354,7 @@ trait CreateUpdateDelete
                 )
                 val requiredOp    = if (delete) Delete else Update
                 Operations.allows(authorizedOps, requiredOp)
-              case None ⇒
+              case None =>
                 // For deletes, if there is no data to delete, it is a 403 if could not read, update,
                 // or delete if it existed (otherwise code later will return a 404)
                 val authorizedOps = PermissionsAuthorization.authorizedOperations(
@@ -371,7 +371,7 @@ trait CreateUpdateDelete
           }
 
         if (! authorized)
-          debug("CRUD: not authorized", List("status code" → StatusCode.Forbidden.toString))
+          debug("CRUD: not authorized", List("status code" -> StatusCode.Forbidden.toString))
 
         if (! authorized)
           throw HttpStatusCodeException(StatusCode.Forbidden)
@@ -390,9 +390,9 @@ trait CreateUpdateDelete
 
         def isUnspecifiedOrSpecificVersion =
           req.version match {
-            case Unspecified       ⇒ true
-            case Specific(version) ⇒ existingVersionOpt.contains(version)
-            case _                 ⇒ false
+            case Unspecified       => true
+            case Specific(version) => existingVersionOpt.contains(version)
+            case _                 => false
           }
 
         def isSpecificVersion =
@@ -403,7 +403,7 @@ trait CreateUpdateDelete
           (req.forData && isCreate && ! isSpecificVersion)
 
         if (badVersion)
-          debug("CRUD: bad version", List("status code" → StatusCode.BadRequest.toString))
+          debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
 
         if (badVersion)
           throw HttpStatusCodeException(StatusCode.BadRequest)
@@ -413,7 +413,7 @@ trait CreateUpdateDelete
         // We can't delete a document that doesn't exist
         val nothingToDelete = delete && existing.isEmpty
 
-        debug("CRUD: nothing to delete", List("status code" → StatusCode.NotFound.toString))
+        debug("CRUD: nothing to delete", List("status code" -> StatusCode.NotFound.toString))
 
         if (nothingToDelete)
           throw HttpStatusCodeException(StatusCode.NotFound)
@@ -423,7 +423,7 @@ trait CreateUpdateDelete
       checkVersionInitial()
       val existing = existingRow(connection, req)
 
-      debug("CRUD: retrieved existing row", List("existing" → existing.isDefined.toString))
+      debug("CRUD: retrieved existing row", List("existing" -> existing.isDefined.toString))
 
       checkAuthorized(existing)
       checkVersionWithExisting(existing)
@@ -432,7 +432,7 @@ trait CreateUpdateDelete
       // Update database
       val versionSet = store(connection, req, existing, delete)
 
-      debug("CRUD: database updated, before commit", List("version" → versionSet.toString))
+      debug("CRUD: database updated, before commit", List("version" -> versionSet.toString))
 
       // Commit before reindexing, as reindexing will read back the form definition, which can
       // cause a deadlock since we're still in the transaction writing the form definition
@@ -442,16 +442,16 @@ trait CreateUpdateDelete
 
       // Update index
       val whatToReindex = req.dataPart match {
-        case Some(dataPart) ⇒
+        case Some(dataPart) =>
           // Data: update index for this document id
           Index.WhatToReindex.DataForDocumentId(dataPart.documentId)
-        case None ⇒
+        case None =>
           // Form definition: update index for this form version
           // Re. the asInstanceOf, when updating a form, we must have a specific version specified
           Index.WhatToReindex.DataForForm(req.app, req.form, versionSet)
       }
 
-      withDebug("CRUD: reindexing", List("what" → whatToReindex.toString)) {
+      withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
         Index.reindex(req.provider, connection, whatToReindex)
       }
 

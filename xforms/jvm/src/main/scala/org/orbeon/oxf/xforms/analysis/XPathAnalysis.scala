@@ -25,8 +25,8 @@ abstract class XPathAnalysis extends DebugXML  {
   val xpathString: String
   val figuredOutDependencies: Boolean
 
-  val valueDependentPaths: MapSet[String, String] // instance prefixed id → paths
-  val returnablePaths: MapSet[String, String]     // instance prefixed id → paths
+  val valueDependentPaths: MapSet[String, String] // instance prefixed id -> paths
+  val returnablePaths: MapSet[String, String]     // instance prefixed id -> paths
 
   val dependentModels: collection.Set[String]
   val dependentInstances: collection.Set[String]

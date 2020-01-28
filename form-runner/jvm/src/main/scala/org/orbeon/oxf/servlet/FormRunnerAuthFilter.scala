@@ -43,7 +43,7 @@ class FormRunnerAuthFilter extends Filter {
   def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit = {
 
     // Set `Content-Security-Policy` response header if configured
-    settingsOpt flatMap (_.contentSecurityPolicy) foreach { value ⇒
+    settingsOpt flatMap (_.contentSecurityPolicy) foreach { value =>
       res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
     }
 
@@ -71,8 +71,8 @@ object FormRunnerAuthFilter {
     }
 
     def headersAsString(r: HttpServletRequest) = {
-      r.getHeaderNames.asScala flatMap { name ⇒
-        r.getHeaders(name).asScala map { value ⇒
+      r.getHeaderNames.asScala flatMap { name =>
+        r.getHeaders(name).asScala map { value =>
           s"$name: $value"
         }
       } mkString "\n"

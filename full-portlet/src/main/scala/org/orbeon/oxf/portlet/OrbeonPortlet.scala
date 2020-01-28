@@ -59,7 +59,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   // Immutable map of portlet parameters
   lazy val initParameters =
     getInitParameterNames.asScala map
-      (n ⇒ n → getInitParameter(n)) toMap
+      (n => n -> getInitParameter(n)) toMap
 
   case class AsyncContext(externalContext: ExternalContext, pipelineContext: Option[PipelineContext])
 
@@ -70,7 +70,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
       // Version
       val webAppContext = WebAppContext(getPortletContext)
       Version.instance.requirePEFeature("Orbeon Forms portlet")
-      init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
+      init(webAppContext, Some("oxf.portlet-initialized-processor." -> "oxf.portlet-initialized-processor.input."))
 
       webAppContext.addListener(new WebAppListener {
         def webAppDestroyed(): Unit = PropertiesApacheHttpClient.shutdown()
@@ -80,7 +80,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   // Portlet destroy
   override def destroy(): Unit =
     withRootException("destruction", new PortletException(_)) {
-      destroy(Some("oxf.portlet-destroyed-processor." → "oxf.portlet-destroyed-processor.input."))
+      destroy(Some("oxf.portlet-destroyed-processor." -> "oxf.portlet-destroyed-processor.input."))
     }
 
   // Portlet render
@@ -131,9 +131,9 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
     // Write out the response
     externalContext.getResponse.responseContent match {
-      case _: Redirect ⇒
+      case _: Redirect =>
         throw new NotImplementedError("redirect not supported when serving resource")
-      case s @ StreamedContent(_, contentType, _, _) ⇒
+      case s @ StreamedContent(_, contentType, _, _) =>
         contentType foreach response.setContentType
         APISupport.writeResponseBody(APISupport.mustRewriteForMediatype)(s)
     }

@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import org.apache.http.client.CookieStore
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{Credentials ⇒ _, _}
+import org.orbeon.oxf.externalcontext.{Credentials => _, _}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -73,11 +73,11 @@ object InternalHttpClient extends HttpClient {
       // Honor `Orbeon-Client` header (see also ServletExternalContext)
       val urlRewriter =
         Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) match {
-          case Some(client) if Headers.EmbeddedClientValues(client) ⇒
+          case Some(client) if Headers.EmbeddedClientValues(client) =>
             new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, wsrpEncodeResources = true)
-          case Some(_) ⇒
+          case Some(_) =>
             new ServletURLRewriter(request)
-          case None ⇒
+          case None =>
             incomingExternalContext.getResponse: URLRewriter
         }
 
@@ -97,8 +97,8 @@ object InternalHttpClient extends HttpClient {
       // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
       // the incoming request should be passed, minus content headers.
       response.serverSideRedirect match {
-        case Some(location) ⇒ processRedirects(location, GET, Map.empty, None)
-        case None           ⇒ response
+        case Some(location) => processRedirects(location, GET, Map.empty, None)
+        case None           => response
       }
     }
 

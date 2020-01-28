@@ -123,7 +123,7 @@ extends InputValueControl
 
         element.getQName match {
 
-          case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME ⇒
+          case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
 
             // Analyze container and add as a value dependency
             // We add this as dependency because the itemset must also be recomputed if any returned item of
@@ -150,7 +150,7 @@ extends InputValueControl
               processElement(HINT_QNAME, required = false)
             }
 
-          case XFORMS_CHOICES_QNAME ⇒
+          case XFORMS_CHOICES_QNAME =>
 
             // Analyze container and add as a value dependency (see above)
             itemElementAnalysis.analyzeXPath()
@@ -161,7 +161,7 @@ extends InputValueControl
             // Always push the container
             stack ::= itemElementAnalysis
 
-          case _ ⇒ // ignore
+          case _ => // ignore
         }
       }
 
@@ -179,11 +179,11 @@ extends InputValueControl
     super.toXMLContent(helper)
     if (_itemsetAnalyzed)
       getItemsetAnalysis match {
-        case Some(analysis) ⇒
+        case Some(analysis) =>
           helper.startElement("itemset")
           analysis.toXML(helper)
           helper.endElement()
-        case _ ⇒ // NOP
+        case _ => // NOP
       }
   }
 
@@ -218,7 +218,7 @@ extends InputValueControl
               ElementAnalysis.createLocationData(element)
             )
 
-          nestedElementOpt flatMap { nestedElement ⇒
+          nestedElementOpt flatMap { nestedElement =>
             val containsHTML = Array[Boolean](false)
 
             val valueOpt = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML).trimAllToOpt
@@ -232,7 +232,7 @@ extends InputValueControl
 
         element.getQName match {
 
-          case XFORMS_ITEM_QNAME ⇒ // xf:item
+          case XFORMS_ITEM_QNAME => // xf:item
 
             val label = findNestedLHHValue(LABEL_QNAME, required = true).get
             val help  = findNestedLHHValue(HELP_QNAME,  required = false)
@@ -262,16 +262,16 @@ extends InputValueControl
             )
             position += 1
 
-          case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
+          case XFORMS_ITEMSET_QNAME => // xf:itemset
 
             throw new ValidationException(
               "xf:itemset must not appear in static itemset.",
               ElementAnalysis.createLocationData(element)
             )
 
-          case XFORMS_CHOICES_QNAME ⇒ // xf:choices
+          case XFORMS_CHOICES_QNAME => // xf:choices
 
-            findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
+            findNestedLHHValue(LABEL_QNAME, required = false) foreach { label =>
               val newContainer = Item(
                 label      = label,
                 help       = None,
@@ -286,7 +286,7 @@ extends InputValueControl
               currentContainer = newContainer
             }
 
-          case _ ⇒ // ignore
+          case _ => // ignore
         }
       }
 
@@ -313,9 +313,9 @@ object SelectionControlUtil {
 
   def getAttributes(itemChoiceItemset: Element) =
     for {
-      attributeName   ← AttributesToPropagate
+      attributeName   <- AttributesToPropagate
       attributeValue = itemChoiceItemset.attributeValue(attributeName)
       if attributeValue ne null
     } yield
-      attributeName → attributeValue
+      attributeName -> attributeValue
 }

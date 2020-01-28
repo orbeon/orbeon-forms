@@ -44,11 +44,11 @@ class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsFor
     val names = List("filename", "mediatype", "size")
 
     // Check parameter values
-    for ((name, expected) ← names zip parameters.tail)
+    for ((name, expected) <- names zip parameters.tail)
       assert(Some(expected) === getFirstQueryParameter(signed, name))
 
     // Modify each parameter in turn and make sure the MAC is different
-    for (pos ← parameters.indices) {
+    for (pos <- parameters.indices) {
       val newParameters = parameters.updated(pos, parameters(pos) + 'x')
       assert(getMAC(signed) != getMAC(hmacFromList(newParameters)))
     }

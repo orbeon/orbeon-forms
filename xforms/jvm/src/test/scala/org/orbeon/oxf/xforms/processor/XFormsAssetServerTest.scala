@@ -27,16 +27,16 @@ class XFormsAssetServerTest
     implicit val indentedLogger = ResourceManagerTestBase.newIndentedLogger
 
     it("must work for an absolute path") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         assert("/xforms-server/dynamic/04fcb2850925c9064012678737bb76216020facf" ===
-          XFormsAssetServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+          XFormsAssetServer.proxyURI("/foo/bar.png", None, None, -1, Map(), Set(), _ => None))
       }
     }
 
     it("must work for an absolute URL") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         assert("/xforms-server/dynamic/563ec01cad20b038a8109ba984daac278a350f72" ===
-          XFormsAssetServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ ⇒ None))
+          XFormsAssetServer.proxyURI("http://example.org/foo/bar.png", None, None, -1, Map(), Set(), _ => None))
       }
     }
 

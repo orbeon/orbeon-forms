@@ -213,7 +213,7 @@ class XFormsOutputDownloadHandler(
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
 
     // For f:url-type="resource"
-    withFormattingPrefix { formattingPrefix ⇒
+    withFormattingPrefix { formattingPrefix =>
 
       def anchorAttributes = {
 

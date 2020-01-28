@@ -73,7 +73,7 @@ object WPaint {
             wpaintElC.css("height", imageEl.height())
             val annotation = annotationEl.attr("src").get
             wpaintElC.asInstanceOf[Dynamic].wPaint(new js.Object {
-              val drawDown: js.Function = () ⇒ wpaintElC.focus()
+              val drawDown: js.Function = () => wpaintElC.focus()
               val imageBg               = imageEl.attr("src")
               val image                 = if (annotation == "") null else annotation
             })
@@ -97,7 +97,7 @@ object WPaint {
           AjaxEvent(
             eventName  = "fr-update-annotation",
             targetId   = containerElem.id,
-            properties = Map("value" → annotationImgData.toString)
+            properties = Map("value" -> annotationImgData.toString)
           )
         )
       }

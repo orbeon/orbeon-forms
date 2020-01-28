@@ -29,22 +29,22 @@ class IdGenerator(var _nextSequenceNumber: Int = 1) {
 
   def nextSequenceNumber = _nextSequenceNumber
 
-  def ids = (_bits.iterator map (i ⇒ AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
+  def ids = (_bits.iterator map (i => AutomaticIdPrefix + (i + 1).toString)) ++ _others.iterator
 
   def contains(id: String): Boolean =  id match {
-    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
+    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits =>
       _bits contains (digits.toInt - 1)
-    case _ ⇒
+    case _ =>
       _others contains id
   }
-  
+
   def add(id: String): Unit = id match {
-    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits ⇒
+    case AutomaticIdFormat(digits) if digits.toInt <= MaxBits =>
       _bits += digits.toInt - 1
-    case _ ⇒
+    case _ =>
       _others += id
   }
-  
+
   // Skip existing ids to handle these cases:
   //
   // - user uses attribute of the form xf-*

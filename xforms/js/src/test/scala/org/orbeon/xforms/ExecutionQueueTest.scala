@@ -42,7 +42,7 @@ class ExecutionQueueTest extends AsyncFunSpec {
       eq.add("foo", 1.millis, ExecutionWait.MaxWait)
       eq.add("bar", 10.millis, ExecutionWait.MaxWait)
 
-      result.future map (r ⇒ assert(("bar" :: "foo" :: Nil) === r.toList))
+      result.future map (r => assert(("bar" :: "foo" :: Nil) === r.toList))
     }
   }
 }

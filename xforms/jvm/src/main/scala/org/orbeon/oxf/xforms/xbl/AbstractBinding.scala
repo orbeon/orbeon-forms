@@ -89,7 +89,7 @@ case class AbstractBinding(
 
     val modeLHHACustom = modeLHHA && xblMode("custom-lhha")
 
-    LHHA.values flatMap { lhha ⇒
+    LHHA.values flatMap { lhha =>
       ! (
         modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
           modeLHHA     &&   xblMode(s"+custom-${lhha.entryName}")
@@ -125,21 +125,21 @@ case class AbstractBinding(
   // We use the indexes because at this time, no id annotation has taken place yet
   val constantInstances: Map[(Int, Int), DocumentInfo] = (
     for {
-      (m, mi) ← modelElements.zipWithIndex
-      (i, ii) ← Dom4j.elements(m, XFORMS_INSTANCE_QNAME).zipWithIndex
+      (m, mi) <- modelElements.zipWithIndex
+      (i, ii) <- Dom4j.elements(m, XFORMS_INSTANCE_QNAME).zipWithIndex
       im      = new ThrowawayInstance(i)
       if im.readonly && im.useInlineContent
     } yield
-      (mi, ii) → im.inlineContent
+      (mi, ii) -> im.inlineContent
   ) toMap
 
   def templateElementOpt = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
   def supportAVTs        = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
   private def transformQNameOption = templateElementOpt flatMap
-    (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
+    (e => Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
 
-  private def templateRootOption = templateElementOpt map { e ⇒
+  private def templateRootOption = templateElementOpt map { e =>
     if (e.elements.size != 1)
       throw new OXFException("xxbl:transform requires a single child element.")
     e.elements.get(0)
@@ -147,15 +147,15 @@ case class AbstractBinding(
 
   private lazy val transformConfig =
     for {
-      transformQName ← transformQNameOption
-      templateRoot   ← templateRootOption
+      transformQName <- transformQNameOption
+      templateRoot   <- templateRootOption
     } yield
-      Transform.createPipelineConfig(transformQName, lastModified) →
+      Transform.createPipelineConfig(transformQName, lastModified) ->
         AbstractBinding.createTransformDomGenerator(templateRoot, lastModified)
 
   // A transform cannot be reused, so this creates a new one when called, based on the config
   def newTransform(boundElement: Element): Option[Document] = transformConfig map {
-    case (pipelineConfig, domGenerator) ⇒
+    case (pipelineConfig, domGenerator) =>
       // Run the transformation
       val generatedDocument =
         Transform.transformFromPipelineConfig(pipelineConfig, domGenerator, boundElement)
@@ -198,22 +198,22 @@ object AbstractBinding {
 
     val styles =
       for {
-        resourcesElement ← Dom4j.elements(bindingElem, XBL_RESOURCES_QNAME)
-        styleElement     ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
+        resourcesElement <- Dom4j.elements(bindingElem, XBL_RESOURCES_QNAME)
+        styleElement     <- Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
       } yield
         HeadElement(styleElement)
 
     val handlers =
       for {
-        handlersElement ← Option(bindingElem.element(XBL_HANDLERS_QNAME)).toSeq
-        handlerElement  ← Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
+        handlersElement <- Option(bindingElem.element(XBL_HANDLERS_QNAME)).toSeq
+        handlerElement  <- Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
       } yield
         handlerElement
 
     val modelElements =
       for {
-        implementationElement ← Option(bindingElem.element(XBL_IMPLEMENTATION_QNAME)).toSeq
-        modelElement          ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
+        implementationElement <- Option(bindingElem.element(XBL_IMPLEMENTATION_QNAME)).toSeq
+        modelElement          <- Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
       } yield
         modelElement
 

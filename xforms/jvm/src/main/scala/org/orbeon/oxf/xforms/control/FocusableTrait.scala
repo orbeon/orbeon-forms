@@ -18,11 +18,11 @@ import org.orbeon.oxf.util.CoreUtils._
 // Trait indicating that the control can directly receive keyboard focus
 trait FocusableTrait extends VisitableTrait {
 
-  self ⇒
+  self =>
 
   override def isFocusable = self match {
-    case single: XFormsSingleNodeControl ⇒ isRelevant && ! single.isReadonly
-    case _                               ⇒ isRelevant
+    case single: XFormsSingleNodeControl => isRelevant && ! single.isReadonly
+    case _                               => isRelevant
   }
 
   override def focusableControls: Iterator[XFormsControl] =

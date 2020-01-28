@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.itemset
 
 import XFormsItemUtils.isSelected
 import collection.JavaConverters._
-import java.lang.{Iterable ⇒ JIterable}
+import java.lang.{Iterable => JIterable}
 import org.orbeon.dom.Namespace
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
@@ -42,7 +42,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
   // TODO: Not used by XFormsSelect1Control, why?
   def selectedItems(value: String): List[Item] =
-    allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList
+    allItemsIterator filter (item => isSelected(multiple, value, item.value)) toList
 
   // Return the list of items as a JSON tree with hierarchical information
   def asJSON(controlValue: String, encode: Boolean, locationData: LocationData): String = {
@@ -62,11 +62,11 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           // Item LHH and value
           sb.append(""""label":"""")
           sb.append(item.javaScriptLabel(locationData))
-          item.javaScriptHelp(locationData) foreach { h ⇒
+          item.javaScriptHelp(locationData) foreach { h =>
             sb.append("""","help":"""")
             sb.append(h)
           }
-          item.javaScriptHint(locationData) foreach { h ⇒
+          item.javaScriptHint(locationData) foreach { h =>
             sb.append("""","hint":"""")
             sb.append(h)
           }
@@ -81,7 +81,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
             val nameValues =
               for {
-                (name, value) ← attributes
+                (name, value) <- attributes
                 escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
                 escapedValue  = XFormsUtils.escapeJavaScript(value)
               } yield
@@ -119,7 +119,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         def endLevel(o: AnyRef) = ()
       })
     } catch {
-      case e: SAXException ⇒
+      case e: SAXException =>
         throw new ValidationException("Error while creating itemset tree", e, locationData)
     }
     sb.append("]")
@@ -162,13 +162,13 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           item.label.streamAsHTML(ch, locationData)
           ch.endElement()
 
-          item.help foreach { h ⇒
+          item.help foreach { h =>
             ch.startElement("help")
             h.streamAsHTML(ch, locationData)
             ch.endElement()
           }
 
-          item.hint foreach { h ⇒
+          item.hint foreach { h =>
             ch.startElement("hint")
             h.streamAsHTML(ch, locationData)
             ch.endElement()

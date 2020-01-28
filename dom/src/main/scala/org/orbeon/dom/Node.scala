@@ -9,21 +9,21 @@ object Node {
   implicit class NodeOps(private val n: Node) extends AnyVal {
 
     def serializeToString(format: OutputFormat = XMLWriter.DefaultFormat): String =
-      IOUtils.useAndClose(new StringBuilderWriter) { writer ⇒
+      IOUtils.useAndClose(new StringBuilderWriter) { writer =>
         new XMLWriter(writer, format).write(n)
         writer.result
       }
   }
 
   def nodeTypeName(node: Node): String = node match {
-    case _: Element               ⇒ "Element"
-    case _: Attribute             ⇒ "Attribute"
-    case _: Text                  ⇒ "Text"
-    case _: Document              ⇒ "Document"
-    case _: Comment               ⇒ "Comment"
-    case _: ProcessingInstruction ⇒ "ProcessingInstruction"
-    case _: Namespace             ⇒ "Namespace"
-    case _                        ⇒ throw new IllegalStateException
+    case _: Element               => "Element"
+    case _: Attribute             => "Attribute"
+    case _: Text                  => "Text"
+    case _: Document              => "Document"
+    case _: Comment               => "Comment"
+    case _: ProcessingInstruction => "ProcessingInstruction"
+    case _: Namespace             => "Namespace"
+    case _                        => throw new IllegalStateException
   }
 }
 

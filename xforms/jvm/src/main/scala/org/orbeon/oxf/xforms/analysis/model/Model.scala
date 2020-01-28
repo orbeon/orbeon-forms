@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -59,10 +59,10 @@ class Model(
 
   val model = Some(this)
 
-  // NOTE: Same code is in SimpleElementAnalysis, which is not optimal → maybe think about passing the container scope to constructors
+  // NOTE: Same code is in SimpleElementAnalysis, which is not optimal -> maybe think about passing the container scope to constructors
   def containerScope = part.containingScope(prefixedId)
 
-  override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
+  override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
     PathMapXPathAnalysis(
       partAnalysis              = part,
       xpathString               = PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
@@ -81,7 +81,7 @@ class Model(
   // For now this only checks actions and submissions, in the future should also build rest of content
   override def findRelevantChildrenElements =
     findAllChildrenElements collect {
-      case t @ (e, s) if XFormsActions.isAction(e.getQName) || ChildrenElementsQNames(e.getQName) ⇒ t
+      case t @ (e, s) if XFormsActions.isAction(e.getQName) || ChildrenElementsQNames(e.getQName) => t
     }
 
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
@@ -96,10 +96,10 @@ class Model(
   }
 
   override def toXMLAttributes = Seq(
-    "scope"                        → scope.scopeId,
-    "prefixed-id"                  → prefixedId,
-    "default-instance-prefixed-id" → defaultInstancePrefixedId.orNull,
-    "analyzed-binds"               → figuredAllBindRefAnalysis.toString
+    "scope"                        -> scope.scopeId,
+    "prefixed-id"                  -> prefixedId,
+    "default-instance-prefixed-id" -> defaultInstancePrefixedId.orNull,
+    "analyzed-binds"               -> figuredAllBindRefAnalysis.toString
   )
 
   override def toXMLContent(helper: XMLReceiverHelper): Unit = {
@@ -119,11 +119,11 @@ class Model(
 
 trait ModelInstances {
 
-  self: Model ⇒
+  self: Model =>
 
   // Instance objects
   lazy val instances: collection.Map[String, Instance] =
-    m.LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
+    m.LinkedHashMap(children collect { case instance: Instance => instance.staticId -> instance }: _*)
 
   def instancesMap: util.Map[String, Instance] = instances.asJava
 
@@ -139,7 +139,7 @@ trait ModelInstances {
     def outputInstanceList(name: String, values: collection.Set[String]): Unit = {
       if (values.nonEmpty) {
         helper.startElement(name)
-        for (value ← values)
+        for (value <- values)
           helper.element("instance", value)
         helper.endElement()
       }
@@ -153,13 +153,13 @@ trait ModelInstances {
 
 trait ModelVariables {
 
-  self: Model ⇒
+  self: Model =>
 
   // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
   val inScopeVariables = Map.empty[String, VariableTrait]
 
   // Get *:variable/*:var elements
-  private val variableElements = Dom4j.elements(self.element) filter (e ⇒ ControlAnalysisFactory.isVariable(e.getQName)) asJava
+  private val variableElements = Dom4j.elements(self.element) filter (e => ControlAnalysisFactory.isVariable(e.getQName)) asJava
 
   // Handle variables
   val variablesSeq: Seq[VariableAnalysisTrait] = {
@@ -172,7 +172,7 @@ trait ModelVariables {
     var preceding: Option[SimpleElementAnalysis with VariableAnalysisTrait] = None
 
     for {
-      variableElement ← variableElements.asScala
+      variableElement <- variableElements.asScala
       analysis: VariableAnalysisTrait = {
         val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(self), preceding, scope) with VariableAnalysisTrait
         preceding = Some(result)
@@ -184,36 +184,36 @@ trait ModelVariables {
 
   def jVariablesSeq = variablesSeq.asJava
 
-  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable ⇒ variable.name → variable) toMap
+  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
   def analyzeVariablesXPath(): Unit =
-    for (variable ← variablesSeq)
+    for (variable <- variablesSeq)
       variable.analyzeXPath()
 
   def variablesToXML(helper: XMLReceiverHelper): Unit =
     // Output variable information
-    for (variable ← variablesSeq)
+    for (variable <- variablesSeq)
       variable.toXML(helper)
 
   def freeVariablesTransientState(): Unit =
-    for (variable ← variablesSeq)
+    for (variable <- variablesSeq)
       variable.freeTransientState()
 }
 
 trait ModelSubmissions {
 
-  self: Model ⇒
+  self: Model =>
 
   // Submissions (they are all direct children)
-  lazy val submissions: Seq[Submission] = children collect { case s: Submission ⇒ s }
+  lazy val submissions: Seq[Submission] = children collect { case s: Submission => s }
 }
 
 trait ModelEventHandlers {
 
-  self: Model ⇒
+  self: Model =>
 
   // Event handlers, including on submissions and within nested actions
-  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl ⇒ e }
+  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl => e }
 
   def handlersToXML(helper: XMLReceiverHelper): Unit =
     eventHandlers foreach (_.toXML(helper))
@@ -221,16 +221,16 @@ trait ModelEventHandlers {
 
 trait ModelBinds {
 
-  selfModel: Model ⇒
+  selfModel: Model =>
 
   // FIXME: A bit unhappy with this. Laziness desired because of init order issues with the superclass. There has to be a simpler way!
-  private class LazyConstant[T](evaluate: ⇒ T) extends (() ⇒ T) {
+  private class LazyConstant[T](evaluate: => T) extends (() => T) {
     private lazy val result = evaluate
     def apply() = result
   }
 
   // Q: Why do we pass isCustomMIP to BindTree? Init order issue?
-  private def isCustomMIP: QName ⇒ Boolean = {
+  private def isCustomMIP: QName => Boolean = {
 
     import ElementAnalysis.attQNameSet
 
@@ -240,10 +240,10 @@ trait ModelBinds {
       (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.namespace.uri))
 
     Option(selfModel.element.attribute(XXFORMS_CUSTOM_MIPS_QNAME)) match {
-      case Some(_) ⇒
+      case Some(_) =>
         // If the attribute is present, allow all specified QNames if valid, plus standard MIP QNames
         attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMIPsQNames filter canBeCustomMIP
-      case None    ⇒
+      case None    =>
         // Attribute not present: backward-compatible behavior
         canBeCustomMIP
     }
@@ -346,20 +346,20 @@ object Model {
   val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
   val AllMIPsInOrder           = AllMIPs.toList.sortBy(_.name)
   val AllMIPNamesInOrder       = AllMIPsInOrder map (_.name)
-  val AllMIPsByName            = AllMIPs map (m ⇒ m.name → m) toMap
+  val AllMIPsByName            = AllMIPs map (m => m.name -> m) toMap
   val AllMIPNames              = AllMIPs map (_.name)
-  val MIPNameToAttributeQName  = AllMIPs map (m ⇒ m.name → m.aName) toMap
+  val MIPNameToAttributeQName  = AllMIPs map (m => m.name -> m.aName) toMap
 
-  val AllComputedMipsByName    = AllMIPs collect { case m: ComputedMIP ⇒ m.name -> m } toMap
+  val AllComputedMipsByName    = AllMIPs collect { case m: ComputedMIP => m.name -> m } toMap
 
-  val QNameToXPathComputedMIP  = AllMIPs collect { case m: XPathMIP with ComputedMIP ⇒ m.aName → m } toMap
-  val QNameToXPathValidateMIP  = AllMIPs collect { case m: XPathMIP with ValidateMIP ⇒ m.aName → m } toMap
+  val QNameToXPathComputedMIP  = AllMIPs collect { case m: XPathMIP with ComputedMIP => m.aName -> m } toMap
+  val QNameToXPathValidateMIP  = AllMIPs collect { case m: XPathMIP with ValidateMIP => m.aName -> m } toMap
   val QNameToXPathMIP          = QNameToXPathComputedMIP ++ QNameToXPathValidateMIP
 
-  val CalculateMIPNames        = AllMIPs collect { case m: ComputedMIP ⇒ m.name }
-  val ValidateMIPNames         = AllMIPs collect { case m: ValidateMIP ⇒ m.name }
-  val BooleanXPathMIPNames     = AllMIPs collect { case m: XPathMIP with BooleanMIP ⇒ m.name }
-  val StringXPathMIPNames      = AllMIPs collect { case m: XPathMIP with StringMIP ⇒ m.name }
+  val CalculateMIPNames        = AllMIPs collect { case m: ComputedMIP => m.name }
+  val ValidateMIPNames         = AllMIPs collect { case m: ValidateMIP => m.name }
+  val BooleanXPathMIPNames     = AllMIPs collect { case m: XPathMIP with BooleanMIP => m.name }
+  val StringXPathMIPNames      = AllMIPs collect { case m: XPathMIP with StringMIP => m.name }
 
   val StandardCustomMIPsQNames = Set(XXFORMS_EVENT_MODE_QNAME)
   val NeverCustomMIPsURIs      = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)

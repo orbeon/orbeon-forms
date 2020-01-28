@@ -40,16 +40,16 @@ object ConverterTest {
 
   // Examples from the XForms 2.0 spec
   val XFormsJsonToXml = List[(String, Elem)](
-    """ {"given": "Mark", "family": "Smith"} """ →
+    """ {"given": "Mark", "family": "Smith"} """ ->
       <json type="object">
           <given>Mark</given>
           <family>Smith</family>
       </json>,
-    """ {"name": "Mark", "age": 21} """ →
+    """ {"name": "Mark", "age": 21} """ ->
       <json type="object"><name>Mark</name><age type="number">21</age></json>,
-    """ {"selected": true} """ →
+    """ {"selected": true} """ ->
       <json type="object"><selected type="boolean">true</selected></json>,
-    """ {"cities": ["Amsterdam", "Paris", "London"]} """ →
+    """ {"cities": ["Amsterdam", "Paris", "London"]} """ ->
       <json type="object">
         <cities type="array">
           <_>Amsterdam</_>
@@ -57,7 +57,7 @@ object ConverterTest {
           <_>London</_>
         </cities>
       </json>,
-    """ {"load": [0.31, 0.33, 0.32]} """ →
+    """ {"load": [0.31, 0.33, 0.32]} """ ->
       <json type="object">
         <load type="array">
           <_ type="number">0.31</_>
@@ -65,34 +65,34 @@ object ConverterTest {
           <_ type="number">0.32</_>
         </load>
       </json>,
-    """ {"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}} """ →
+    """ {"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}} """ ->
       <json type="object">
         <father type="object"><given>Mark</given><family>Smith</family></father>
         <mother type="object"><given>Mary</given><family>Smith</family></mother>
       </json>,
-    """ {"p": null} """ →
+    """ {"p": null} """ ->
       <json type="object"><p type="null"/></json>,
-    """ {"p": ""} """ →
+    """ {"p": ""} """ ->
       <json type="object"><p/></json>,
-    """ {"p": []} """ →
+    """ {"p": []} """ ->
       <json type="object"><p type="array"/></json>,
-    """ {"p": {}} """ →
+    """ {"p": {}} """ ->
       <json type="object"><p type="object"/></json>,
-    """ {"$v": 0} """ →
+    """ {"$v": 0} """ ->
       <json type="object"><_v name="$v" type="number">0</_v></json>,
-    """ {"1": "one"} """ →
+    """ {"1": "one"} """ ->
       <json type="object"><_1 name="1">one</_1></json>,
-    """ 3 """ →
+    """ 3 """ ->
       <json type="number">3</json>,
-    """ "Disconnected" """ →
+    """ "Disconnected" """ ->
       <json>Disconnected</json>,
-    """ ["red", "green", "blue"] """ →
+    """ ["red", "green", "blue"] """ ->
       <json type="array">
         <_>red</_>
         <_>green</_>
         <_>blue</_>
       </json>,
-    """ {"g": [["a", "b", "c"], ["d", "e"]]} """ →
+    """ {"g": [["a", "b", "c"], ["d", "e"]]} """ ->
       <json type="object">
         <g type="array">
           <_ type="array">
@@ -106,28 +106,28 @@ object ConverterTest {
           </_>
         </g>
       </json>,
-    """ {} """ →
+    """ {} """ ->
       <json type="object"/>,
-    """ [] """ →
+    """ [] """ ->
       <json type="array"/>,
-    """ "" """ →
+    """ "" """ ->
       <json/>
   )
 
   val AdditionalJsonToXml = List[(String, Elem)](
-    """ {"p": [{}]} """ →
+    """ {"p": [{}]} """ ->
       <json type="object">
         <p type="array">
             <_ type="object"/>
         </p>
       </json>,
-    """ {"p": [[]]} """ →
+    """ {"p": [[]]} """ ->
       <json type="object">
         <p type="array">
           <_ type="array"/>
         </p>
       </json>,
-    """ {"p": [[[]]]} """ →
+    """ {"p": [[[]]]} """ ->
       <json type="object">
         <p type="array">
           <_ type="array">
@@ -135,7 +135,7 @@ object ConverterTest {
           </_>
         </p>
       </json>,
-    """ ["red", 42, true, { "foo": "bar"}, []] """ →
+    """ ["red", 42, true, { "foo": "bar"}, []] """ ->
       <json type="array">
         <_>red</_>
         <_ type="number">42</_>
@@ -145,7 +145,7 @@ object ConverterTest {
         </_>
         <_ type="array"/>
       </json>,
-    """ { "< <": [[ "1 2 3" ], { "_" : 6 } ]} """ →
+    """ { "< <": [[ "1 2 3" ], { "_" : 6 } ]} """ ->
       <json type="object">
         <___ name="&lt; &lt;" type="array">
           <_ type="array">
@@ -156,16 +156,16 @@ object ConverterTest {
           </_>
         </___>
       </json>,
-    """ { "address": "1000 Main Street\nNew York, NY" } """ →
+    """ { "address": "1000 Main Street\nNew York, NY" } """ ->
       <json type="object">
         <address>1000 Main Street&#x0a;New York, NY</address>
       </json>,
-    """ { "values": "foo\t42" } """ →
+    """ { "values": "foo\t42" } """ ->
       <json type="object">
         <values>foo&#x09;42</values>
       </json>
     ,
-    """ { "escapes": "\\\"" } """ →
+    """ { "escapes": "\\\"" } """ ->
       <json type="object">
         <escapes>\"</escapes>
       </json>
@@ -183,11 +183,11 @@ object ConverterTest {
 class ConverterTest extends AnyFunSpecLike with XMLSupport {
 
   import ConverterTest._
-  import org.orbeon.scaxon.SimplePath.{Test ⇒ _, _}
+  import org.orbeon.scaxon.SimplePath.{Test => _, _}
 
   describe("Converting from JSON to XML") {
     it ("must match expectations") {
-      for ((json, xml) ← ExpectedJsonToXml) {
+      for ((json, xml) <- ExpectedJsonToXml) {
         val store = new SAXStore
         Converter.jsonStringToXmlStream(json, store)
         val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
@@ -200,8 +200,8 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
   describe("Converting from XML to JSON") {
     it ("must match expectations") {
       for {
-        strict      ← List(true, false)
-        (json, xml) ← ExpectedJsonToXml
+        strict      <- List(true, false)
+        (json, xml) <- ExpectedJsonToXml
       } locally {
         val expectedJson = json.parseJson
         val actualJson   = Converter.xmlToJson(xml, strict = strict)
@@ -216,7 +216,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
     val codePointsToEscape           = ((0 to 0x1F).to(Set) + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
     val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
-    val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${toHexString(Array(c.toByte))}") mkString
+    val unicodeEscapedString         = codePointsToEscape map (c => s"\\u00${toHexString(Array(c.toByte))}") mkString
     val translatedString             = new String(codePointsTranslated, 0, codePointsTranslated.length)
 
     // String containing both a property name and a string value with characters to escape
@@ -279,7 +279,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
     )
 
     it ("must fail with invalid XML input when set to `true` and pass when set to `false`") {
-      for (xml ← xmlInputs) {
+      for (xml <- xmlInputs) {
         intercept[IllegalArgumentException] {
           Converter.xmlToJson(xml, strict = true)
         }
@@ -292,7 +292,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
   describe("Support for blank values in XML") {
 
     val xmlInputs = List(
-      """ ["red",null,true,{"foo":"bar"}] """ →
+      """ ["red",null,true,{"foo":"bar"}] """ ->
         <json type="array">
           <_>red</_>
           <_ type="number"></_>
@@ -301,7 +301,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
             <foo>bar</foo>
           </_>
         </json>,
-      """ ["red",42,null,{"foo":"bar"}] """ →
+      """ ["red",42,null,{"foo":"bar"}] """ ->
         <json type="array">
           <_>red</_>
           <_ type="number">42</_>
@@ -314,8 +314,8 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
 
     it ("must create JSON with `null`") {
       for {
-        strict      ← List(true, false)
-        (json, xml) ← xmlInputs
+        strict      <- List(true, false)
+        (json, xml) <- xmlInputs
       } locally {
 
         val expectedJson = json.parseJson
@@ -329,7 +329,7 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
   describe("Non-compliant XML input") {
 
     val xmlInputs = List(
-      """ "504967 Quattordici lettere inedite di Pietro Mascagni NRMI, iv (1970) 1970 Italian 493-513" """ →
+      """ "504967 Quattordici lettere inedite di Pietro Mascagni NRMI, iv (1970) 1970 Italian 493-513" """ ->
         <book>
           <book-id>504967</book-id>
           <title>Quattordici lettere inedite di Pietro Mascagni</title>
@@ -343,13 +343,13 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
     it ("must succeed and default to a concatenation of string values") {
 
       for {
-        strict      ← List(true, false)
-        (json, xml) ← xmlInputs
+        strict      <- List(true, false)
+        (json, xml) <- xmlInputs
       } locally {
 
         def normalize(v: JsValue) = v match {
-          case JsString(s) ⇒ Whitespace.collapseWhitespace(s).toString
-          case other       ⇒ other
+          case JsString(s) => Whitespace.collapseWhitespace(s).toString
+          case other       => other
         }
 
         val expectedJson = normalize(json.parseJson)

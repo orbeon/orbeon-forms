@@ -23,7 +23,7 @@ class XFormsDeselectEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_DESELECT, target.asInstanceOf[XFormsControl], properties) {
 
   def this(target: XFormsEventTarget, itemValue: String) =
-    this(target, Map(ItemValueProperty → Option(itemValue)))
+    this(target, Map(ItemValueProperty -> Option(itemValue)))
 
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 

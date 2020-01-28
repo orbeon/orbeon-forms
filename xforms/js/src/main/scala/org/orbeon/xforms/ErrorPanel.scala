@@ -20,7 +20,7 @@ import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{newInstance, global ⇒ g}
+import scala.scalajs.js.Dynamic.{newInstance, global => g}
 
 object ErrorPanel {
 
@@ -62,7 +62,7 @@ object ErrorPanel {
     val panelElemOrUndef: js.UndefOr[html.Element] =
       $(formElem).find(".xforms-error-dialogs > .xforms-error-panel")(0)
 
-    panelElemOrUndef.toOption map { panelElem ⇒
+    panelElemOrUndef.toOption map { panelElem =>
 
       val jPanelElem = $(panelElem)
 
@@ -84,31 +84,31 @@ object ErrorPanel {
       // When the error dialog is closed, we make sure that the "details" section is closed,
       // so it will be closed the next time the dialog is opened.
       panel.beforeHideEvent.subscribe(
-        ((_: js.Any) ⇒ toggleDetails(panelElem, show = false)): js.Function
+        ((_: js.Any) => toggleDetails(panelElem, show = false)): js.Function
       )
 
       jPanelElem.onWithSelector(
         events   = "click",
         selector = ".xforms-error-panel-show-details",
-        handler  = (_: JQueryEventObject) ⇒ toggleDetails(panelElem, show = true)
+        handler  = (_: JQueryEventObject) => toggleDetails(panelElem, show = true)
       )
 
       jPanelElem.onWithSelector(
         events   = "click",
         selector = ".xforms-error-panel-hide-details",
-        handler  = (_: JQueryEventObject) ⇒ toggleDetails(panelElem, show = false)
+        handler  = (_: JQueryEventObject) => toggleDetails(panelElem, show = false)
       )
 
       jPanelElem.onWithSelector(
         events   = "click",
         selector = ".xforms-error-panel-close",
-        handler  = (_: JQueryEventObject) ⇒ panel.hide()
+        handler  = (_: JQueryEventObject) => panel.hide()
       )
 
       jPanelElem.onWithSelector(
         events   = "click",
         selector = ".xforms-error-panel-reload",
-        handler  = (_: JQueryEventObject) ⇒ dom.window.location.reload(flag = true)
+        handler  = (_: JQueryEventObject) => dom.window.location.reload(flag = true)
       )
 
       panel
@@ -123,10 +123,10 @@ object ErrorPanel {
     jErrorPanelElem.css("display: block")
 
     Option(detailsOrNull) match {
-      case Some(details) ⇒
+      case Some(details) =>
         jErrorPanelElem.find(".xforms-error-panel-details").html(details)
         toggleDetails(jErrorPanelElem(0), show = true)
-      case None ⇒
+      case None =>
         jErrorPanelElem.find(".xforms-error-panel-details-hidden").addClass("xforms-disabled")
         jErrorPanelElem.find(".xforms-error-panel-details-shown").addClass("xforms-disabled")
     }

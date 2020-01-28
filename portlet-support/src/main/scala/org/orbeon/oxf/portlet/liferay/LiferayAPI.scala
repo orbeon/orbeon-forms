@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 import javax.portlet.PortletRequest
 import javax.servlet.http.HttpServletRequest
 
@@ -50,8 +50,8 @@ trait LiferayAPI {
   private def liferayClass(suffix: String) =
     LiferayPackages.iterator                      map
       (_ + '.' + suffix)                          map
-      (className ⇒ Try(Class.forName(className))) collectFirst
-      { case Success(clazz) ⇒ clazz }             get
+      (className => Try(Class.forName(className))) collectFirst
+      { case Success(clazz) => clazz }             get
 
   private def liferayMethod(suffix: String, name: String, types: Class[_]*) =
     liferayClass(suffix).getMethod(name, types: _*)

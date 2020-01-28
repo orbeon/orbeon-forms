@@ -28,8 +28,8 @@ object OrbeonFormatter extends Formatter {
 
   override def getThrowableMessage(throwable: Throwable): Option[String] =
     throwable match {
-      case ve: ValidationException ⇒ Option(ve.message)
-      case t ⇒ Option(t.getMessage)
+      case ve: ValidationException => Option(ve.message)
+      case t => Option(t.getMessage)
     }
 
   override def getAllLocationData(t: Throwable): List[SourceLocation] =
@@ -41,8 +41,8 @@ object OrbeonFormatter extends Formatter {
 
       val (description, params) =
         locationData match {
-          case extended: ExtendedLocationData ⇒ (extended.description, extended.params)
-          case _                              ⇒ (None, Nil)
+          case extended: ExtendedLocationData => (extended.description, extended.params)
+          case _                              => (None, Nil)
         }
 
       SourceLocation(

@@ -42,8 +42,8 @@ class ImageMetadata extends DefaultFunctionSupport {
 
     def findMetadata(is: InputStream) =
       stringArgument(1) match {
-        case "mediatype" ⇒ findImageMediatype(is) map stringToStringValue
-        case name        ⇒ findKnownMetadata(is, name)
+        case "mediatype" => findImageMediatype(is) map stringToStringValue
+        case name        => findKnownMetadata(is, name)
       }
 
     argumentAsString map createStream flatMap findMetadata orNull

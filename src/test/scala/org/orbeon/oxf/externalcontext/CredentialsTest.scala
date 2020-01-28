@@ -40,7 +40,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
 
   describe("JSON serialization and deserialization") {
     for {
-      encode ← List(false, true)
+      encode <- List(false, true)
       serialized   = serializeCredentials(TestCredentials, encode)
       deserialized = parseCredentials(serialized, encode)
     } locally {
@@ -215,13 +215,13 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
         )
     )
 
-    for ((description, json, credentials) ← expectedPassing)
+    for ((description, json, credentials) <- expectedPassing)
       it (s"must support $description") {
         assert(Some(credentials) === parseCredentials(json, decodeForHeader = false))
       }
 
     val expectedFailing = List(
-      "missing username" →
+      "missing username" ->
       """
         {
           "groups": [
@@ -231,7 +231,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
       """
     )
 
-    for ((description, json) ← expectedFailing)
+    for ((description, json) <- expectedFailing)
       it (s"must reject $description") {
         intercept[DeserializationException] {
           parseCredentials(json, decodeForHeader = false)

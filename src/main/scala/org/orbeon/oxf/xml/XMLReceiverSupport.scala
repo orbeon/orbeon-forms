@@ -21,9 +21,9 @@ import scala.collection.immutable.Seq
 
 trait XMLReceiverSupport {
 
-  support ⇒
+  support =>
 
-  def withDocument[T](body: ⇒ T)(implicit receiver: XMLReceiver): T = {
+  def withDocument[T](body: => T)(implicit receiver: XMLReceiver): T = {
     receiver.startDocument()
     val result = body
     receiver.endDocument()
@@ -35,7 +35,7 @@ trait XMLReceiverSupport {
     prefix    : String = "",
     uri       : String = "",
     atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES)(
-    body      : ⇒ T)(implicit
+    body      : => T)(implicit
     receiver  : XMLReceiver
   ): T = {
     val qName = XMLUtils.buildQName(prefix, localName)
@@ -83,7 +83,7 @@ trait XMLReceiverSupport {
 
   def addAttributes(attributesImpl: AttributesImpl, atts: Seq[(String, String)]): Unit =
     atts foreach {
-      case (name, value) ⇒
+      case (name, value) =>
         require(name ne null)
         if (value ne null)
           attributesImpl.addAttribute("", name, name, "CDATA", value)
@@ -93,7 +93,7 @@ trait XMLReceiverSupport {
   def processingInstruction(name: String, atts: Seq[(String, String)] = Nil)(implicit receiver: XMLReceiver): Unit =
     receiver.processingInstruction(
       name,
-      atts map { case (name, value) ⇒ s"""$name="${value.escapeXmlForAttribute}"""" } mkString " "
+      atts map { case (name, value) => s"""$name="${value.escapeXmlForAttribute}"""" } mkString " "
     )
 
   implicit def pairsToAttributes(atts: Seq[(String, String)]): Attributes = {

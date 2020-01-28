@@ -46,10 +46,10 @@ case class RequestDetails(
     content flatMap (_.contentType)
 
   def contentTypeHeader: Option[(String, String)] =
-    contentType map (Headers.ContentType →)
+    contentType map (Headers.ContentType ->)
 
   def headersMapWithContentType: Map[String, List[String]] =
-    combineValues[String, String, List](headers).toMap ++ (contentType map (Headers.ContentType → List(_)))
+    combineValues[String, String, List](headers).toMap ++ (contentType map (Headers.ContentType -> List(_)))
 }
 
 trait EmbeddingContext {

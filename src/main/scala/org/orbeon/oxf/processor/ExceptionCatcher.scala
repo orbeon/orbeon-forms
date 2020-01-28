@@ -58,7 +58,7 @@ class ExceptionCatcher extends ProcessorImpl {
           // No exception: output what was read
           dataInput.replay(xmlReceiver)
         } catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             // Exception was thrown while reading input: generate a document with that exception
 
             // It is up to the caller to decide what to do with the exception

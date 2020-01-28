@@ -26,15 +26,15 @@ class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
 
     implicit val ctx = xpathContext
 
-    def evaluateControlItem(f: XFormsControl ⇒ String) =
+    def evaluateControlItem(f: XFormsControl => String) =
       relevantControl(0) map f
 
     evaluateControlItem(operation match {
-      case 0 ⇒ _.getLabel
-      case 1 ⇒ _.getHelp
-      case 2 ⇒ _.getHint
-      case 3 ⇒ _.getAlert
-      case _ ⇒ throw new UnsupportedOperationException
+      case 0 => _.getLabel
+      case 1 => _.getHelp
+      case 2 => _.getHint
+      case 3 => _.getAlert
+      case _ => throw new UnsupportedOperationException
     })
   }
 }

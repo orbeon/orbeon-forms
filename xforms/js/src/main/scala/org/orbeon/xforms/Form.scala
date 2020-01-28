@@ -56,7 +56,7 @@ class Form(
   }
 
   def addDialogTimerId(dialogId: String, id: Int): Unit =
-    dialogTimerIds += dialogId → id
+    dialogTimerIds += dialogId -> id
 
   def removeDialogTimerId(dialogId: String): Unit = {
     dialogTimerIds.get(dialogId) foreach dom.window.clearTimeout

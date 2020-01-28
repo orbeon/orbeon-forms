@@ -93,7 +93,7 @@ class XBLBindings(
     locationData      : LocationData,
     containerScope    : Scope
   ): Option[ConcreteBinding] =
-    for (rawShadowTree ← generateRawShadowTree(controlElement, abstractBinding))
+    for (rawShadowTree <- generateRawShadowTree(controlElement, abstractBinding))
       yield
         createScopeAndConcreteBinding(
           controlElement,
@@ -150,7 +150,7 @@ class XBLBindings(
         annotatedModels,
         templateTree,
         compactShadowTree,
-        boundElement.attributes.asScala map { att ⇒ att.getQName → att.getValue } toMap
+        boundElement.attributes.asScala map { att => att.getQName -> att.getValue } toMap
       )
 
     // Process globals here as the component is in use
@@ -263,8 +263,8 @@ class XBLBindings(
 
     if (logShadowTrees)
       debugResults(Seq(
-        "full tree"    → TransformerUtils.saxStoreToDom4jDocument(templateTree).getRootElement.serializeToString(),
-        "compact tree" → compactTree.getRootElement.serializeToString()
+        "full tree"    -> TransformerUtils.saxStoreToDom4jDocument(templateTree).getRootElement.serializeToString(),
+        "compact tree" -> compactTree.getRootElement.serializeToString()
       ))
 
     // Result is full annotated tree and, if needed, the compact tree
@@ -274,10 +274,10 @@ class XBLBindings(
   private def processGlobalsIfNeeded(abstractBinding: AbstractBinding, locationData: LocationData): Unit =
     if (partAnalysis.isTopLevel) // see also "Issues with xxbl:global" in PartAnalysisImpl
       abstractBinding.global match {
-        case Some(globalDocument) if ! abstractBindingsWithGlobals.exists(abstractBinding eq) ⇒
+        case Some(globalDocument) if ! abstractBindingsWithGlobals.exists(abstractBinding eq) =>
 
           val (globalTemplateTree, globalCompactShadowTree) =
-            withDebug("generating global XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
+            withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
 
               val topLevelScopeForGlobals = partAnalysis.startScope
 
@@ -297,14 +297,14 @@ class XBLBindings(
           abstractBindingsWithGlobals += abstractBinding
           allGlobals                  += Global(globalTemplateTree, globalCompactShadowTree)
 
-        case _ ⇒ // no global to process
+        case _ => // no global to process
       }
 
   // Generate raw (non-annotated) shadow content for the given control id and XBL binding.
   private def generateRawShadowTree(boundElement: Element, abstractBinding: AbstractBinding): Option[Document] =
     abstractBinding.templateElementOpt map {
-      templateElement ⇒
-        withDebug("generating raw XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
+      templateElement =>
+        withDebug("generating raw XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
 
           // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
@@ -402,7 +402,7 @@ class XBLBindings(
       currentScope : XXBLScope
     ): Unit = {
 
-      // Index prefixed id ⇒ scope
+      // Index prefixed id => scope
       val staticId = attributes.getValue("id")
 
       // NOTE: We can be called on HTML elements within LHHA, which may or may not have an id (they must have one
@@ -437,13 +437,13 @@ class XBLBindings(
     metadata.commitBindingIndex()
 
   // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:
-  // - deindex prefixed ids ⇒ Scope
+  // - deindex prefixed ids => Scope
   // - remove models associated with scope
   // - remove control analysis
-  // - deindex scope id ⇒ Scope
+  // - deindex scope id => Scope
   //def removeScope(scope: Scope) = ???
 
-  def addBinding(controlPrefixedId: String, binding: ConcreteBinding) : Unit                    = concreteBindings += controlPrefixedId → binding
+  def addBinding(controlPrefixedId: String, binding: ConcreteBinding) : Unit                    = concreteBindings += controlPrefixedId -> binding
   def hasBinding(controlPrefixedId: String)                           : Boolean                 = getBinding(controlPrefixedId).isDefined
   def getBinding(controlPrefixedId: String)                           : Option[ConcreteBinding] = concreteBindings.get(controlPrefixedId)
   def removeBinding(controlPrefixedId: String)                        : Unit                    = concreteBindings -= controlPrefixedId

@@ -26,7 +26,7 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[LockUnlockTest]), true)
 
   @Test def lockUnlockTest(): Unit = {
-    Connect.withOrbeonTables("lease") { (_, provider) ⇒
+    Connect.withOrbeonTables("lease") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 

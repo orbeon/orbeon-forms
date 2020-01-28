@@ -52,7 +52,7 @@ object NodeInfoCell {
 
   // Get the x/y position of a td given Cell information
   def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): Option[(Int, Int)] =
-    cells.iterator.flatten find (_.td == td) map (c ⇒ c.x → c.y)
+    cells.iterator.flatten find (_.td == td) map (c => c.x -> c.y)
 
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
   //
@@ -70,10 +70,10 @@ object NodeInfoCell {
         1
 
     ArrayFunctions.createValue(
-      allRowCells.cells.to(Vector) map { row ⇒
+      allRowCells.cells.to(Vector) map { row =>
         new SequenceExtent(
             row collect {
-              case Cell(u, None, x, y, h, w) ⇒
+              case Cell(u, None, x, y, h, w) =>
                 MapFunctions.createValue(
                   Map[AtomicValue, ValueRepresentation](
                     (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
@@ -97,10 +97,10 @@ object NodeInfoCell {
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row =>
         new SequenceExtent(
           row collect {
-            case Cell(u, None, x, y, h, w) ⇒
+            case Cell(u, None, x, y, h, w) =>
               MapFunctions.createValue(
                 Map[AtomicValue, ValueRepresentation](
                   (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
@@ -119,15 +119,15 @@ object NodeInfoCell {
   /* How I would like to write the function above with conversions for less boilerplate:
 
   def testAnalyze12ColumnGridAndFillHoles(grid: NodeInfo): Item =
-    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row ⇒
+    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row =>
       row collect {
-        case Cell(uOpt, x, y, h, w, false) ⇒
+        case Cell(uOpt, x, y, h, w, false) =>
           Map(
-            "c" → uOpt getOrElse EmptySequence.getInstance,
-            "x" → x,
-            "y" → y,
-            "w" → w,
-            "h" → h
+            "c" -> uOpt getOrElse EmptySequence.getInstance,
+            "x" -> x,
+            "y" -> y,
+            "w" -> w,
+            "h" -> h
           ) asXPath // or `toXPath`?
       } asXPathSeq  // or `toXPathSeq`?
     } asXPathArray  // or `toXPathArray`?

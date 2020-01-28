@@ -33,10 +33,10 @@ object FormRunnerAPI {
       .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
       .toArray() collect {
       // The result must be an `html.Element` already
-      case e: html.Element ⇒ e
+      case e: html.Element => e
     } filter {
       // Check the id matches the requested name
-      e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
+      e => (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray
   }
 
@@ -64,8 +64,8 @@ object FormRunnerWizardAPI {
         eventName  = "fr-wizard-focus",
         targetId   = Names.ViewComponent,
         properties = Map(
-          "fr-control-name"   → controlName,
-          "fr-repeat-indexes" → indexesString
+          "fr-control-name"   -> controlName,
+          "fr-repeat-indexes" -> indexesString
         )
       )
     )

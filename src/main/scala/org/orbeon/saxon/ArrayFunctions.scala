@@ -63,9 +63,9 @@ class ArrayGet extends ArrayFunction {
     val index  = longArgumentOpt(1).get.toInt // unlikely, but will lose precision if out of `Int` range
 
     vector(index - 1) match {
-      case v: Value    ⇒ v.iterate()
-      case v: NodeInfo ⇒ SingletonIterator.makeIterator(v)
-      case _           ⇒ throw new IllegalStateException
+      case v: Value    => v.iterate()
+      case v: NodeInfo => SingletonIterator.makeIterator(v)
+      case _           => throw new IllegalStateException
     }
   }
 }
@@ -189,7 +189,7 @@ object ArrayFunctions {
     val arrayType = saxonTypeForArray(config)
 
     asScalaIterator(it) collect {
-      case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == arrayType ⇒
+      case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == arrayType =>
         v.getObject.asInstanceOf[UnderlyingType]
     }
   }

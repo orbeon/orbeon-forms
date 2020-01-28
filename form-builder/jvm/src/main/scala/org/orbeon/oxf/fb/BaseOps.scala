@@ -49,8 +49,8 @@ trait BaseOps extends Logging {
   def idsIterator(docWithIdsInstanceOrElem: XFormsInstance Either NodeInfo): Iterator[String] = {
 
     val formDefinitionRootElem = docWithIdsInstanceOrElem match {
-      case Left(instance)  ⇒ instance.rootElement
-      case Right(formElem) ⇒ formElem
+      case Left(instance)  => instance.rootElement
+      case Right(formElem) => formElem
     }
 
     // This is not ideal, but we special-case search in XHTML vs. in an "xcv" document so as to avoid finding
@@ -94,7 +94,7 @@ trait BaseOps extends Logging {
     val suffix = "-" + token
 
     val allTmpIdsInUse =
-      collection.mutable.Set() ++ allIdsIt filter (id ⇒ id.startsWith(prefix) && id.endsWith(suffix))
+      collection.mutable.Set() ++ allIdsIt filter (id => id.startsWith(prefix) && id.endsWith(suffix))
 
     var guess = 1
 
@@ -110,7 +110,7 @@ trait BaseOps extends Logging {
       result
     }
 
-    for (_ ← 1 to count)
+    for (_ <- 1 to count)
       yield nextId()
   }
 
@@ -132,8 +132,8 @@ trait BaseOps extends Logging {
         iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)) ++ {
         // Ids coming from the special cut/copy/paste instance, if present
         ctx.xcvInstance match {
-          case Some(xcvInstance) ⇒ iterateNamesInUse(Left(xcvInstance))
-          case None              ⇒ Nil
+          case Some(xcvInstance) => iterateNamesInUse(Left(xcvInstance))
+          case None              => Nil
         }
       }
 
@@ -151,13 +151,13 @@ trait BaseOps extends Logging {
       result + suffix
     }
 
-    for (_ ← 1 to count)
+    for (_ <- 1 to count)
       yield nextId()
   }
 
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 
-  def withDebugGridOperation[T](message: String)(body: ⇒ T)(implicit ctx: FormBuilderDocContext): T = {
+  def withDebugGridOperation[T](message: String)(body: => T)(implicit ctx: FormBuilderDocContext): T = {
     debugDumpDocument(s"before $message")
     val result = body
     debugDumpDocument(s"after $message")
@@ -165,12 +165,12 @@ trait BaseOps extends Logging {
   }
 
   def debugDumpDocument(message: String)(implicit ctx: FormBuilderDocContext): Unit =
-    debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(ctx.formDefinitionRootElem)))
+    debug(message, Seq("doc" -> TransformerUtils.tinyTreeToString(ctx.formDefinitionRootElem)))
 
   def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
     val name            = origin.head.localname
     val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
-    val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
+    val elementsBefore  = into child * filter (e => namesUntil(e.localname))
 
     insert(into = into, after = elementsBefore, origin = origin)
   }

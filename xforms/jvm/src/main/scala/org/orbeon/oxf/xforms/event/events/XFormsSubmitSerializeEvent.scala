@@ -54,9 +54,9 @@ private object XFormsSubmitSerializeEvent {
     docWrapper.wrap(submissionBodyElement)
   }
 
-  val Getters = Map[String, XFormsSubmitSerializeEvent ⇒ Option[Any]] (
-    xxfName("binding")       → (_.bindingOpt),
-    xxfName("serialization") → (_.requestedSerializationOpt),
-    "submission-body"        → (e ⇒ Option(createSubmissionBodyElement(e.containingDocument)))
+  val Getters = Map[String, XFormsSubmitSerializeEvent => Option[Any]] (
+    xxfName("binding")       -> (_.bindingOpt),
+    xxfName("serialization") -> (_.requestedSerializationOpt),
+    "submission-body"        -> (e => Option(createSubmissionBodyElement(e.containingDocument)))
   )
 }

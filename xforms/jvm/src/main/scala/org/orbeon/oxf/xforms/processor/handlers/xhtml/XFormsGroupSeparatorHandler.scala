@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
@@ -80,7 +80,7 @@ class XFormsGroupSeparatorHandler(
       new OutputInterceptor(
         currentSavedOutput,
         groupElementQName,
-        outputInterceptor ⇒ {
+        outputInterceptor => {
 
           // Classes on first delimiter
           val firstDelimiterClasses = {

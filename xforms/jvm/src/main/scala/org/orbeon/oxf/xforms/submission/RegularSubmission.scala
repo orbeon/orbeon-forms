@@ -122,7 +122,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
 
           new SubmissionResult(submissionEffectiveId, replacer, connectionResult)
         } catch {
-          case throwable: Throwable ⇒
+          case throwable: Throwable =>
             // Exceptions are handled further down
             new SubmissionResult(submissionEffectiveId, throwable, connectionResult)
         } finally {

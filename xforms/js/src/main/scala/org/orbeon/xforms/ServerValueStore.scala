@@ -31,22 +31,22 @@ object ServerValueStore {
   // Store a value for a given control by id
   def set(id: String, valueOrUndef: js.UndefOr[String]): Unit =
     for {
-      controlElem ← Option(dom.document.getElementById(id)) // unclear if callers are sure the element exists
-      value       ← valueOrUndef.toOption                   // some callers pass `undefined` (e.g. triggers)
+      controlElem <- Option(dom.document.getElementById(id)) // unclear if callers are sure the element exists
+      value       <- valueOrUndef.toOption                   // some callers pass `undefined` (e.g. triggers)
     } locally {
-      idToControlValue += id → ControlValue(controlElem, value)
+      idToControlValue += id -> ControlValue(controlElem, value)
     }
 
   // Return the value of a control as known by the server or null
   def get(id: String): String =
     idToControlValue.get(id) match {
-      case None ⇒
+      case None =>
         // We known nothing about this control
         null
-      case Some(ControlValue(controlElem, value)) if controlElem eq dom.document.getElementById(id) ⇒
+      case Some(ControlValue(controlElem, value)) if controlElem eq dom.document.getElementById(id) =>
         // We have the value and it is for the right control
         value
-      case Some(_) ⇒
+      case Some(_) =>
         // We have a value but it is for an obsolete control
         remove(id)
         null
@@ -58,7 +58,7 @@ object ServerValueStore {
   // Purge controls which are no longer in the DOM
   def purgeExpired(): Unit =
     for {
-      (id, ControlValue(controlElem, _)) ← idToControlValue.iterator
+      (id, ControlValue(controlElem, _)) <- idToControlValue.iterator
       if controlElem ne dom.document.getElementById(id)
     } locally {
       remove(id)

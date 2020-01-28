@@ -159,7 +159,7 @@ class ClientFormRunnerApiTest extends AnyFunSpec {
 
     val controls = List("input", "input-counter", "name")
 
-    for (control ← controls)
+    for (control <- controls)
       it(s"must find the `$control` control in the first form but not the second form") {
         assert(FormRunnerAPI.findControlsByName(control).nonEmpty)
         assert(FormRunnerAPI.findControlsByName(control, form1.asInstanceOf[html.Form]).nonEmpty)
@@ -168,7 +168,7 @@ class ClientFormRunnerApiTest extends AnyFunSpec {
 
     it("must find the correct iterations for the `name` controls") {
       assert(
-        List(List(1), List(2)) === (FormRunnerAPI.findControlsByName("name").to(List) map (e ⇒ XFormsId.fromEffectiveId(e.id).iterations))
+        List(List(1), List(2)) === (FormRunnerAPI.findControlsByName("name").to(List) map (e => XFormsId.fromEffectiveId(e.id).iterations))
       )
     }
   }

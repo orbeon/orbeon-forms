@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.XPathCache
@@ -27,7 +27,7 @@ import scala.util.control.NonFatal
 
 trait ControlXPathSupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   def getNamespaceMappings: NamespaceMapping =
     if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
@@ -71,7 +71,7 @@ trait ControlXPathSupport {
             containingDocument.getRequestStats.addXPathStat
           )
         catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             XFormsError.handleNonFatalXPathError(container, t)
             null
         }
@@ -114,7 +114,7 @@ trait ControlXPathSupport {
           )
         )
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           XFormsError.handleNonFatalXPathError(container, t)
           None
       }

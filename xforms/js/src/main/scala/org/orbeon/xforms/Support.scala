@@ -43,7 +43,7 @@ object Support {
     val formId = form.id
 
     // See comment on `namespaceIdIfNeeded`
-    form → Page.namespaceIdIfNeeded(formId, targetId)
+    form -> Page.namespaceIdIfNeeded(formId, targetId)
   }
 
   def parseStringAsXml(xmlString: String): Option[dom.Document] =
@@ -51,14 +51,14 @@ object Support {
       Option((new DOMParser).parseFromString(xmlString, SupportedType.`application/xml`)) filter
         (_.documentElement.getElementsByTagName("parsererror").length == 0)
     } catch {
-      case NonFatal(_) ⇒
+      case NonFatal(_) =>
         // If `xmlString` can't be parsed, `parseFromString()` is expected to return a document with `<parsererror/>`
         // (which is crazy), but IE11 throws an exception instead.
         None
     }
 
   def getLocalName(n: dom.Node): Option[String] =
-    Option(n) collect { case e: dom.Element ⇒ getLocalName(e)}
+    Option(n) collect { case e: dom.Element => getLocalName(e)}
 
   def getLocalName(e: dom.Element): String =
     if (e.tagName.contains(":")) e.tagName.substringAfter(":") else e.tagName
@@ -77,7 +77,7 @@ object Support {
           new RequestInit {
             var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
             var body           : js.UndefOr[BodyInit]           = requestBody
-            var headers        : js.UndefOr[HeadersInit]        = contentType map (ct ⇒ js.defined(js.Dictionary("Content-Type" → ct))) getOrElse js.undefined
+            var headers        : js.UndefOr[HeadersInit]        = contentType map (ct => js.defined(js.Dictionary("Content-Type" -> ct))) getOrElse js.undefined
             var referrer       : js.UndefOr[String]             = js.undefined
             var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
             var mode           : js.UndefOr[RequestMode]        = js.undefined
@@ -92,8 +92,8 @@ object Support {
         )
 
       for {
-        response ← fetchPromise.toFuture
-        text     ← response.text().toFuture
+        response <- fetchPromise.toFuture
+        text     <- response.text().toFuture
       } yield
         (
           response.status,

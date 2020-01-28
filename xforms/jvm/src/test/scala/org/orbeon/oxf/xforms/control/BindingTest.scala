@@ -61,7 +61,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
     val tests = Seq(*, Text, Comment, PI)
 
-    tests foreach { test ⇒
+    tests foreach { test =>
       assert(instanceRoot / test nonEmpty)
     }
 
@@ -69,14 +69,14 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
     this setupDocument unsafeUnwrapElement(xmlDoc.rootElement).getDocument
 
     val initialNameValues = Seq(
-      "element-input"     → "42",
-      "attribute-input"   → "43",
-      "text-input"        → "44",
-      "comment-input"     → "Nice day",
-      "pi-input"          → """type="text/xsl" href="style.xsl""""
+      "element-input"     -> "42",
+      "attribute-input"   -> "43",
+      "text-input"        -> "44",
+      "comment-input"     -> "Nice day",
+      "pi-input"          -> """type="text/xsl" href="style.xsl""""
     )
 
-    initialNameValues foreach { case (name, value) ⇒
+    initialNameValues foreach { case (name, value) =>
       assert(isRelevant(name))
       assert(getValueControl(name).getValue.trimAllToEmpty === value)
     }
@@ -86,14 +86,14 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Check writing control bindings and reading back
     val newNameValues = Seq(
-      "element-input"     → "Mercury",
-      "attribute-input"   → "Mars",
-      "text-input"        → "Venus",
-      "comment-input"     → "Jupiter",
-      "pi-input"          → "Saturn"
+      "element-input"     -> "Mercury",
+      "attribute-input"   -> "Mars",
+      "text-input"        -> "Venus",
+      "comment-input"     -> "Jupiter",
+      "pi-input"          -> "Saturn"
     )
 
-    newNameValues foreach { case (name, value) ⇒
+    newNameValues foreach { case (name, value) =>
       setControlValue(name, value)
       assert(getValueControl(name).getValue === value)
     }

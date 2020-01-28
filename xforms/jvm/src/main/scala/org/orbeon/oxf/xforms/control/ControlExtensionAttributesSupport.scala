@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait ControlExtensionAttributesSupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   import ControlExtensionAttributesSupport._
 
@@ -36,7 +36,7 @@ trait ControlExtensionAttributesSupport {
         else if (isRelevant)
           // NOTE: evaluateAvt can return null if there is no context
           // WARNING: don't use `mapValues`, which return a view which can't be stored in the back control tree
-          staticControl.extensionAttributes map { case (k, v) ⇒ k → (Option(evaluateAvt(v)) getOrElse "") }
+          staticControl.extensionAttributes map { case (k, v) => k -> (Option(evaluateAvt(v)) getOrElse "") }
         else
           // Don't attempt to evaluate expression when the control is non-relevant
           staticControl.nonRelevantExtensionAttributes
@@ -63,7 +63,7 @@ trait ControlExtensionAttributesSupport {
   // NOTE: The `accept` attribute is also handled separately by the handler.
   final def addExtensionAttributesExceptClassAndAcceptForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
     for {
-      (name, value) ← evaluatedExtensionAttributes
+      (name, value) <- evaluatedExtensionAttributes
       if value ne null
       if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
       localName = name.localName
@@ -77,7 +77,7 @@ trait ControlExtensionAttributesSupport {
     ch                 : XMLReceiverHelper
   ): Unit =
     for {
-      name ← staticControl.extensionAttributes.keys
+      name <- staticControl.extensionAttributes.keys
       if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
     } locally {
       ControlAjaxSupport.outputAttributeElement(

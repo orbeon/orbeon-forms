@@ -35,7 +35,7 @@ trait ServletPortletRequest extends ExternalContext.Request {
 
   lazy val credentials: Option[Credentials] =
     sessionOpt flatMap (_.getAttribute(ServletPortletRequest.CredentialsSessionKey)) collect {
-      case credentials: Credentials ⇒ credentials
+      case credentials: Credentials => credentials
     }
 
   def isUserInRole(role: String): Boolean =

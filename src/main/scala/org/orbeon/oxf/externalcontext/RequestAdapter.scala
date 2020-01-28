@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io.InputStream
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.http.HttpMethod
 

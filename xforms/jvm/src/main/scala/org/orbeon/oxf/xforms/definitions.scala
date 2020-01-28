@@ -108,9 +108,9 @@ case class DelayedEvent(
       prefix    = XXFORMS_SHORT_PREFIX,
       uri       = XXFORMS_NAMESPACE_URI,
       atts      = List(
-        "delay"         → (time - currentTime).toString,
-        "discardable"   → discardable.toString,
-        "show-progress" → showProgress.toString
+        "delay"         -> (time - currentTime).toString,
+        "discardable"   -> discardable.toString,
+        "show-progress" -> showProgress.toString
       ),
       text      = asEncodedDocument
     )

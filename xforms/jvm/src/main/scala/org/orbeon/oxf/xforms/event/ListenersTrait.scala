@@ -32,7 +32,7 @@ trait ListenersTrait {
       listeners = new mutable.HashMap[String, Vector[EventListener]]
 
     val currentListeners = listeners.getOrElseUpdate(eventName, Vector.empty)
-    listeners += eventName → (currentListeners :+ listener)
+    listeners += eventName -> (currentListeners :+ listener)
   }
 
   // Add a given listener (if provided) or all listeners for the given event name
@@ -43,16 +43,16 @@ trait ListenersTrait {
 
     if (listeners ne null)
       listeners.get(eventName) foreach {
-        currentListeners ⇒
+        currentListeners =>
           listener match {
-            case Some(listener) ⇒
+            case Some(listener) =>
               // Remove given listener only
               val newListeners = currentListeners filterNot (_ eq listener)
               if (newListeners.nonEmpty)
-                listeners += eventName → newListeners
+                listeners += eventName -> newListeners
               else
                 listeners -= eventName
-            case None ⇒
+            case None =>
               // Remove all listeners
               listeners -= eventName
           }

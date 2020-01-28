@@ -37,14 +37,14 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case load: XXFormsLoadEvent ⇒
+    case load: XXFormsLoadEvent =>
       // Internal load event for "two-pass load" handling Ajax load in portlet environments (see `XFormsLoadAction`)
       try {
         NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
       } catch {
-        case e: IOException ⇒ throw new ValidationException(e, getLocationData)
+        case e: IOException => throw new ValidationException(e, getLocationData)
       }
-    case _ ⇒
+    case _ =>
       super.performDefaultAction(event)
   }
 

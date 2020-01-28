@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.URLRewriterUtils.globToRegexp
 
 class RegexpProcessor extends ProcessorImpl {
 
-  self ⇒
+  self =>
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG))
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
@@ -62,7 +62,7 @@ object RegexpMatcher {
     xmlReceiver.endElement("", "matches", "matches")
 
     // <group>
-    for (group ← result.groupsWithNulls) {
+    for (group <- result.groupsWithNulls) {
       xmlReceiver.startElement("", "group", "group", SAXUtils.EMPTY_ATTRIBUTES)
       if (group ne null)
         xmlReceiver.characters(group.toCharArray, 0, group.length)

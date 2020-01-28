@@ -25,8 +25,8 @@ class XXFormsIndexChangedEvent(target: XFormsEventTarget, properties: PropertyGe
     this(
       target,
       Map(
-        XXFormsIndexChangedEvent.OldIndexProperty → Option(oldIndex),
-        XXFormsIndexChangedEvent.NewIndexProperty → Option(newIndex)
+        XXFormsIndexChangedEvent.OldIndexProperty -> Option(oldIndex),
+        XXFormsIndexChangedEvent.NewIndexProperty -> Option(newIndex)
       )
     )
 }

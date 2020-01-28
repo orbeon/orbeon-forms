@@ -32,7 +32,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
 import scala.collection.compat._
@@ -65,7 +65,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
     def hasSuccessfulErrorConstraints =
       bind.staticBind.constraintsByLevel.nonEmpty option {
-        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips ⇒
+        bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to(List) flatMap { mips =>
           failedConstraintMIPs(mips, bindNode, collector)
         } isEmpty
       }
@@ -81,18 +81,18 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
     val result =
       mipType match {
-        case TYPE_QNAME            ⇒ bind.staticBind.dataType                                            map makeQNameValue
-        case RELEVANT_QNAME        ⇒ evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
-        case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
-        case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
-        case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                                       map booleanToBooleanValue
-        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map stringToStringValue
-        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map stringToStringValue
-        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map stringToStringValue
+        case TYPE_QNAME            => bind.staticBind.dataType                                            map makeQNameValue
+        case RELEVANT_QNAME        => evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
+        case READONLY_QNAME        => evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
+        case REQUIRED_QNAME        => evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
+        case CONSTRAINT_QNAME      => hasSuccessfulErrorConstraints                                       map booleanToBooleanValue
+        case CALCULATE_QNAME       => evaluateCalculatedBind(bindNode, Calculate, collector)              map stringToStringValue
+        case XXFORMS_DEFAULT_QNAME => evaluateCalculatedBind(bindNode, Default, collector)                map stringToStringValue
+        case mipType               => evaluateCustomMIPByName(mipType)                                    map stringToStringValue
       }
 
     // Dispatch all events
-    for (event ← eventsToDispatch)
+    for (event <- eventsToDispatch)
       Dispatch.dispatchEvent(event)
 
     result
@@ -128,11 +128,11 @@ object XFormsModelBinds {
 
   def isEmptyValue(value: String): Boolean = "" == value
 
-  def iterateBinds(topLevelBinds: List[RuntimeBind], fn: BindNode ⇒ Unit): Unit =
-    for (currentBind ← topLevelBinds)
+  def iterateBinds(topLevelBinds: List[RuntimeBind], fn: BindNode => Unit): Unit =
+    for (currentBind <- topLevelBinds)
       try currentBind.applyBinds(fn)
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           throw OrbeonLocationException.wrapException(
             t,
             new ExtendedLocationData(
@@ -176,28 +176,28 @@ object XFormsModelBinds {
     bindNode  : BindNode,
     xpathMIP  : StaticXPathMIP,
     message   : String,
-    collector : XFormsEvent ⇒ Unit)(implicit
+    collector : XFormsEvent => Unit)(implicit
     logger    : IndentedLogger
   ): Unit = {
     Exceptions.getRootThrowable(throwable) match {
-      case e: TypedNodeWrapper.TypedValueException ⇒
+      case e: TypedNodeWrapper.TypedValueException =>
         // Consider validation errors as ignorable. The rationale is that if the function (the XPath
         // expression) works on inputs that are not valid (hence the validation error), then the function cannot
         // produce a meaningful result. We think that it is worth handling this condition slightly differently
         // from other dynamic and static errors, so that users can just write expression without constant checks
         // with `castable as` or `instance of`.
         debug("typed value exception", List(
-          "node name"     → e.nodeName,
-          "expected type" → e.typeName,
-          "actual value"  → e.nodeValue
+          "node name"     -> e.nodeName,
+          "expected type" -> e.typeName,
+          "actual value"  -> e.nodeValue
         ))
-      case t ⇒
+      case t =>
         // All other errors dispatch an event and will cause the usual fatal-or-not behavior
         val ve = OrbeonLocationException.wrapException(t,
           new ExtendedLocationData(
             locationData = bindNode.locationData,
             description  = Option(message),
-            params       = List("expression" → xpathMIP.compiledExpression.string),
+            params       = List("expression" -> xpathMIP.compiledExpression.string),
             element      = Some(bindNode.staticBind.element)
           )
         )

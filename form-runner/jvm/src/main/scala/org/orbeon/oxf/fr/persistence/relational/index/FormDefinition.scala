@@ -37,7 +37,7 @@ trait FormDefinition {
     val indexedControlBindPathHolders =
       FormRunner.searchControlsInFormByClass(formDoc, ClassesPredicate, databaseDataFormatVersion)
 
-    indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) ⇒
+    indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       IndexedControl(
         name      = FormRunner.getControlName(control),
         inSearch  = control.attClasses(FRSearch),
@@ -45,7 +45,7 @@ trait FormDefinition {
         xpath     = path map (_.value) mkString "/",
         xsType    = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
-        htmlLabel = FormRunner.hasHTMLMediatype(control / (XF → "label")),
+        htmlLabel = FormRunner.hasHTMLMediatype(control / (XF -> "label")),
         resources = resources.toList
       )
     }
@@ -71,15 +71,15 @@ trait FormDefinition {
         summary-field={inSummary.toString}
         match="substring"
         html-label={htmlLabel.toString}>{
-        for ((lang, resourceHolder) ← resources)
+        for ((lang, resourceHolder) <- resources)
           yield
             <resources lang={lang}>{
               val labelElemOpt =
-                resourceHolder elemValueOpt "label" map { label ⇒
+                resourceHolder elemValueOpt "label" map { label =>
                   <label>{if (htmlLabel) label else label.escapeXmlMinimal}</label>
                 }
 
-              val itemElems = resourceHolder child "item" map { item ⇒
+              val itemElems = resourceHolder child "item" map { item =>
                 <item>{
                   <label>{item elemValue "label"}</label>
                   <value>{item elemValue "value"}</value>

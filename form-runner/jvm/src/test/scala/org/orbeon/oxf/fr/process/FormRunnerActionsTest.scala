@@ -55,7 +55,7 @@ class FormRunnerActionsTest extends AnyFunSpec{
       )
     )
 
-    for ((description, uri, params, expected) ← expected)
+    for ((description, uri, params, expected) <- expected)
       it (description) {
 
         val actual =

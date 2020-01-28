@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
@@ -26,10 +26,10 @@ import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
 
 trait PartControlsAnalysis extends TransientState {
 
-  self: PartAnalysisImpl ⇒
+  self: PartAnalysisImpl =>
 
   protected val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
-  protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type → Map of prefixedId → ElementAnalysis
+  protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
   // Special handling of attributes
   private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
@@ -44,19 +44,19 @@ trait PartControlsAnalysis extends TransientState {
     val controlName = elementAnalysis.localName
 
     // Index by prefixed id
-    controlAnalysisMap += elementAnalysis.prefixedId → elementAnalysis
+    controlAnalysisMap += elementAnalysis.prefixedId -> elementAnalysis
 
     // Index by type
     val controlsMap = controlTypes.getOrElseUpdate(controlName, LinkedHashMap[String, ElementAnalysis]())
-    controlsMap += elementAnalysis.prefixedId → elementAnalysis
+    controlsMap += elementAnalysis.prefixedId -> elementAnalysis
 
     // Register special controls
     elementAnalysis match {
-      case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) ⇒ lhhas += lhha
-      case eventHandler: EventHandlerImpl                                                 ⇒ eventHandlers += eventHandler
-      case model: Model                                                                   ⇒ models        += model
-      case attribute: AttributeControl                                                    ⇒ attributes    += attribute
-      case _                                                                              ⇒
+      case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) => lhhas += lhha
+      case eventHandler: EventHandlerImpl                                                 => eventHandlers += eventHandler
+      case model: Model                                                                   => models        += model
+      case attribute: AttributeControl                                                    => attributes    += attribute
+      case _                                                                              =>
     }
   }
 
@@ -65,7 +65,7 @@ trait PartControlsAnalysis extends TransientState {
       case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
 
       val triples =
-        for (attributeControl ← attributes)
+        for (attributeControl <- attributes)
           yield AttributeDetails(attributeControl.forPrefixedId, attributeControl.attributeName, attributeControl)
 
       // Nicely group the results in a two-level map
@@ -78,14 +78,14 @@ trait PartControlsAnalysis extends TransientState {
       // Accumulate new attributes into existing map by combining values for a given "for id"
       // NOTE: mapValues above ok, since we accumulate the values below into new immutable Maps.
       _attributeControls = newAttributes.foldLeft(_attributeControls) {
-        case (existingMap, (forId, newAttributes)) ⇒
+        case (existingMap, (forId, newAttributes)) =>
           val existingAttributes = existingMap.getOrElse(forId, Map[String, AttributeControl]())
-          existingMap + (forId → (existingAttributes ++ newAttributes))
+          existingMap + (forId -> (existingAttributes ++ newAttributes))
       }
     }
 
   protected def analyzeControlsXPath() =
-    for (control ← controlAnalysisMap.values if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
+    for (control <- controlAnalysisMap.values if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
       control.analyzeXPath()
 
   def iterateControls =
@@ -98,7 +98,7 @@ trait PartControlsAnalysis extends TransientState {
     controlAnalysisMap.get(prefixedId) orNull
 
   def controlElement(prefixedId: String) =
-    findControlAnalysis(prefixedId) map (control ⇒ staticStateDocument.documentWrapper.wrap(control.element))
+    findControlAnalysis(prefixedId) map (control => staticStateDocument.documentWrapper.wrap(control.element))
 
   def hasAttributeControl(prefixedForAttribute: String) =
     _attributeControls.get(prefixedForAttribute).isDefined
@@ -117,16 +117,16 @@ trait PartControlsAnalysis extends TransientState {
     controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Nil
 
   def getRepeatHierarchyString(ns: String): String =
-    controlTypes.get("repeat") map { repeats ⇒
+    controlTypes.get("repeat") map { repeats =>
       val repeatsWithAncestors =
         for {
-          repeat               ← repeats.values
+          repeat               <- repeats.values
           namespacedPrefixedId = ns + repeat.prefixedId
           ancestorRepeat       = repeat.ancestorRepeatsAcrossParts.headOption
         } yield
           ancestorRepeat match {
-            case Some(ancestorRepeat) ⇒ namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId
-            case None                 ⇒ namespacedPrefixedId
+            case Some(ancestorRepeat) => namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId
+            case None                 => namespacedPrefixedId
           }
 
       repeatsWithAncestors mkString ","
@@ -143,7 +143,7 @@ trait PartControlsAnalysis extends TransientState {
   override def freeTransientState() = {
     super.freeTransientState()
 
-    for (controlAnalysis ← controlAnalysisMap.values)
+    for (controlAnalysis <- controlAnalysisMap.values)
       controlAnalysis.freeTransientState()
   }
 
@@ -160,10 +160,10 @@ trait PartControlsAnalysis extends TransientState {
     unmapScopeIds(control)
 
     control match {
-      case model: Model              ⇒ deindexModel(model)
-      case handler: EventHandlerImpl ⇒ deregisterEventHandler(handler)
-      case att: AttributeControl     ⇒ _attributeControls -= att.forPrefixedId
-      case _                         ⇒
+      case model: Model              => deindexModel(model)
+      case handler: EventHandlerImpl => deregisterEventHandler(handler)
+      case att: AttributeControl     => _attributeControls -= att.forPrefixedId
+      case _                         =>
     }
 
     // NOTE: Can't update controlAppearances and _hasInputPlaceholder without checking all controls again, so for now leave that untouched
@@ -177,14 +177,14 @@ trait PartControlsAnalysis extends TransientState {
     }
 
     tree match {
-      case childrenBuilder: ChildrenBuilderTrait ⇒
+      case childrenBuilder: ChildrenBuilderTrait =>
         childrenBuilder.indexedElements foreach deindexControl
 
         if (! self)
           childrenBuilder.children foreach
             (_.removeFromParent())
 
-      case _ ⇒
+      case _ =>
     }
   }
 }

@@ -47,7 +47,7 @@ object XXFormsUpdateValidityAction {
       if (control.isRelevant && ! control.isStaticReadonly) {
 
         for {
-          singleNodeControl ← collectByErasedType[XFormsSingleNodeControl](control)
+          singleNodeControl <- collectByErasedType[XFormsSingleNodeControl](control)
           if singleNodeControl.staticControl.explicitValidation
           controlValidation = singleNodeControl.getValidation
           nodeValidation    = singleNodeControl.readValidation

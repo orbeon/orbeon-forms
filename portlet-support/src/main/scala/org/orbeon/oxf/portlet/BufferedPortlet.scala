@@ -14,7 +14,7 @@
 package org.orbeon.oxf.portlet
 
 import java.io.{OutputStream, PrintWriter}
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.portlet._
 import org.orbeon.io.IOUtils._
@@ -82,59 +82,59 @@ trait BufferedPortlet {
   def bufferedRender(
     request  : RenderRequest,
     response : RenderResponse,
-    render   : ⇒ StreamedContentOrRedirect)(implicit
+    render   : => StreamedContentOrRedirect)(implicit
     ctx      : EmbeddingContextWithResponse
   ): Unit =
     findStoredResponseWithParameters match {
-      case Some(ResponseWithParams(content: BufferedContent, params)) if matchesStoredResponse(request.getParameterMap, params) ⇒
+      case Some(ResponseWithParams(content: BufferedContent, params)) if matchesStoredResponse(request.getParameterMap, params) =>
         // The result of an action with the current parameters is available
         // NOTE: Until we can correctly handle multiple render requests for an XForms page, we should detect the
         // situation where a second render request tries to load a deferred action response, and display an
         // error message.
         writeResponseWithParameters(request, response, content)
-      case _ ⇒
+      case _ =>
         // No matching action result, call the render function
         // NOTE: The Portlet API does not support `sendRedirect()` and `setRenderParameters()` upon `render()`. This
         // means we cannot easily simulate redirects upon render. For internal redirects, we could maybe
         // implement the redirect loop here. The issue would be what happens upon subsequent renders, as they
         // would again request the first path, not the redirected path. For now we throw.
         render match {
-          case content: StreamedContent ⇒ useAndClose(content)(writeResponseWithParameters(request, response, _))
-          case _: Redirect              ⇒ throw new IllegalStateException("Processor execution did not return content.")
+          case content: StreamedContent => useAndClose(content)(writeResponseWithParameters(request, response, _))
+          case _: Redirect              => throw new IllegalStateException("Processor execution did not return content.")
         }
     }
 
   def bufferedProcessAction(
     request  : ActionRequest,
     response : ActionResponse,
-    action   : ⇒ StreamedContentOrRedirect)(implicit
+    action   : => StreamedContentOrRedirect)(implicit
     ctx      : EmbeddingContext
   ): Unit = {
     // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
     clearResponseWithParameters()
 
     action match {
-      case Redirect(location, true) ⇒
+      case Redirect(location, true) =>
         response.sendRedirect(location)
-      case Redirect(location, false) ⇒
+      case Redirect(location, false) =>
         // Just update the render parameters to simulate a redirect within the portlet
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
-          case Some(query) ⇒
+          case Some(query) =>
             val m = NetUtils.decodeQueryString(query)
             m.put(PathParameter, Array(path))
             ju.Collections.unmodifiableMap[String, Array[String]](m)
-          case None ⇒
+          case None =>
             ju.Collections.singletonMap(PathParameter, Array(path))
         }
 
         // Set the new parameters for the subsequent render requests
         response.setRenderParameters(parameters)
 
-      case content: StreamedContent ⇒
+      case content: StreamedContent =>
         // Content was written, keep it in the session for subsequent render requests with the current action parameters
 
-        useAndClose(content) { _ ⇒
+        useAndClose(content) { _ =>
 
           // NOTE: Don't use the action parameters, as in the case of a form POST there can be dozens of those
           // or more, and anyway those don't make sense as subsequent render parameters. Instead, we just use
@@ -145,8 +145,8 @@ trait BufferedPortlet {
 
           response.setRenderParameters(
             Map(
-              PathParameter   → Array(storedParams.path),
-              MethodParameter → Array(storedParams.method.entryName)
+              PathParameter   -> Array(storedParams.path),
+              MethodParameter -> Array(storedParams.method.entryName)
             ).asJava
           )
 
@@ -182,9 +182,9 @@ trait BufferedPortlet {
     object StoredParams {
       def fromJavaMap(requestParamsJava: ju.Map[String, Array[String]]): Option[StoredParams] =
         for {
-          methodString ← Headers.firstItemIgnoreCase(requestParamsJava.asScala, MethodParameter)
-          method       ← HttpMethod.withNameOption(methodString)
-          path         ← Headers.firstItemIgnoreCase(requestParamsJava.asScala, PathParameter)
+          methodString <- Headers.firstItemIgnoreCase(requestParamsJava.asScala, MethodParameter)
+          method       <- HttpMethod.withNameOption(methodString)
+          path         <- Headers.firstItemIgnoreCase(requestParamsJava.asScala, PathParameter)
         } yield
           StoredParams(method, path)
     }

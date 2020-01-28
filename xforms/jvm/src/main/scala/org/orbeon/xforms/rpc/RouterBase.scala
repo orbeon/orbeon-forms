@@ -39,12 +39,12 @@ abstract class RouterBase
       try {
         runnable.run()
       } catch {
-        case NonFatal(t) ⇒ reportFailure(t)
+        case NonFatal(t) => reportFailure(t)
       }
     }
 
     def reportFailure(t: Throwable): Unit =
-      error("RPC: Error processing request", List("throwable" → OrbeonFormatter.format(t)))
+      error("RPC: Error processing request", List("throwable" -> OrbeonFormatter.format(t)))
   }
 
   protected val routes: Router
@@ -57,15 +57,15 @@ abstract class RouterBase
   def processRequest(path: String, argsString: String): String = {
     val splitPath = path.split("/")
     try {
-      debug("RPC: Processing request", List("method" → (splitPath mkString ".")))
+      debug("RPC: Processing request", List("method" -> (splitPath mkString ".")))
       routes.apply(Request(splitPath, read[Json](parse(argsString).right.get).asObject.get.toMap)).value.get.get.noSpaces
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         error(
           "RPC: Error processing request",
           List(
-            "method"    → (splitPath mkString "."),
-            "throwable" → OrbeonFormatter.format(t)
+            "method"    -> (splitPath mkString "."),
+            "throwable" -> OrbeonFormatter.format(t)
           )
         )
         throw t

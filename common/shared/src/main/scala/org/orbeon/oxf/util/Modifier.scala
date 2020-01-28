@@ -33,10 +33,10 @@ object Modifier extends Enum[Modifier] with CirceEnum[Modifier] {
 
   def parseStringToSet(s: String): Set[Modifier] = {
     s.splitTo[Set]() map (_.toLowerCase) map {
-        case "control" ⇒ "ctrl"
-        case "option"  ⇒ "alt"
-        case "command" ⇒ "meta"
-        case other     ⇒ other
+        case "control" => "ctrl"
+        case "option"  => "alt"
+        case "command" => "meta"
+        case other     => other
       } map
         withNameLowercaseOnly
   }

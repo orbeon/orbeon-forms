@@ -78,7 +78,7 @@ class CSSRewriterTest
   }
 
   private def rewriteCSS(css: String) =
-    withTestExternalContext { ec ⇒
+    withTestExternalContext { ec =>
       XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", Some("_ns_"), ec.getResponse)(null)
     }
 }

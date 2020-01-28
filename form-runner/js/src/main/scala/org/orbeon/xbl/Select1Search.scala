@@ -38,9 +38,9 @@ private class Select1SearchCompanion extends XBLCompanion {
 
   override def init(): Unit =
     for {
-      jContainer        ← $(containerElem).headJQuery
-      jXFormsSelect     ← jContainer.find(".xforms-select1").headJQuery
-      (select, jSelect) ← jXFormsSelect.find("select").headElemJQuery
+      jContainer        <- $(containerElem).headJQuery
+      jXFormsSelect     <- jContainer.find(".xforms-select1").headJQuery
+      (select, jSelect) <- jXFormsSelect.find("select").headElemJQuery
       htmlSelect        = select.asInstanceOf[dom.html.Select]
     } locally {
 
@@ -86,8 +86,8 @@ private class Select1SearchCompanion extends XBLCompanion {
     }
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: JQuery, attributeName: String, listener: () ⇒ Unit) {
-    val observer = new MutationObserver((_, _) ⇒ listener())
+  private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
+    val observer = new MutationObserver((_, _) => listener())
     observer.observe(element.get(0), MutationObserverInit(
       attributes = true,
       attributeFilter = js.Array(attributeName)
@@ -103,8 +103,8 @@ private class Select1SearchCompanion extends XBLCompanion {
         eventName  = "fr-change",
         targetId   = containerElem.id,
         properties = Map(
-          "fr-label" → label,
-          "fr-value" → value
+          "fr-label" -> label,
+          "fr-value" -> value
         )
       )
     )
@@ -142,8 +142,8 @@ private class Select1SearchCompanion extends XBLCompanion {
           eventName  = "fr-search",
           targetId   = containerElem.id,
           properties = Map(
-            "fr-search-value" → searchValue,
-            "fr-search-page"  → searchPage.toString
+            "fr-search-value" -> searchValue,
+            "fr-search-page"  -> searchPage.toString
           )
         )
       )

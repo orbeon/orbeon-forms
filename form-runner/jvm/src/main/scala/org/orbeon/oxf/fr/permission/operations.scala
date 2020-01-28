@@ -44,10 +44,10 @@ object Operations {
 
   def parse(stringOperations: List[String]): Operations =
     stringOperations match {
-      case List("*") ⇒
+      case List("*") =>
         AnyOperation
-      case _   ⇒
-        val operations      = stringOperations.map { operationName ⇒
+      case _   =>
+        val operations      = stringOperations.map { operationName =>
           val operationOpt = All.find(_.entryName == operationName)
           operationOpt.getOrElse(throw new IllegalArgumentException(s"Unknown operation `$operationName`"))
         }
@@ -56,17 +56,17 @@ object Operations {
 
   def serialize(operations: Operations): List[String] =
     operations match {
-      case AnyOperation ⇒
+      case AnyOperation =>
         List("*")
-      case SpecificOperations(specificOperations) ⇒
+      case SpecificOperations(specificOperations) =>
         specificOperations.map(_.entryName)
      }
 
   def combine(left: Operations, right: Operations): Operations =
     (left, right) match {
-      case (SpecificOperations(leftOps), SpecificOperations(rightOps)) ⇒
+      case (SpecificOperations(leftOps), SpecificOperations(rightOps)) =>
         SpecificOperations((leftOps ++ rightOps).distinct)
-      case _ ⇒
+      case _ =>
         AnyOperation
     }
 
@@ -75,8 +75,8 @@ object Operations {
 
   def allows(granted: Operations, requested: Operation): Boolean =
     granted match {
-      case AnyOperation ⇒ true
-      case SpecificOperations(grantedOperations) ⇒ grantedOperations.contains(requested)
+      case AnyOperation => true
+      case SpecificOperations(grantedOperations) => grantedOperations.contains(requested)
     }
 
   def allowsAny(granted: Operations, mightHave: List[Operation]): Boolean =   mightHave.exists(  allows(granted, _))

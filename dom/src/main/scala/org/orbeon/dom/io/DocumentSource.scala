@@ -22,15 +22,15 @@ class DocumentSource(document: Document) extends SAXSource {
 
   override def setInputSource(inputSource: InputSource): Unit =
     inputSource match {
-      case source: DocumentInputSource ⇒ super.setInputSource(source)
-      case _                           ⇒ throw new UnsupportedOperationException
+      case source: DocumentInputSource => super.setInputSource(source)
+      case _                           => throw new UnsupportedOperationException
     }
 
   override def setXMLReader(reader: XMLReader): Unit =
     reader match {
-      case writer: SAXWriter ⇒
+      case writer: SAXWriter =>
         this.xmlReader = writer
-      case xmlFilter: XMLFilter ⇒
+      case xmlFilter: XMLFilter =>
 
         val breaks = new scala.util.control.Breaks
         import breaks._
@@ -40,14 +40,14 @@ class DocumentSource(document: Document) extends SAXSource {
           while (true) {
             val parent = currentFilter.getParent
             parent match {
-              case parentFilter: XMLFilter ⇒ currentFilter = parentFilter
-              case _ ⇒ break()
+              case parentFilter: XMLFilter => currentFilter = parentFilter
+              case _ => break()
             }
           }
         }
         currentFilter.setParent(xmlReader)
         xmlReader = currentFilter
-      case _ ⇒
+      case _ =>
         throw new UnsupportedOperationException
     }
 }

@@ -41,7 +41,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
 
     val expected: Map[RelevanceHandling, Document] =
       Map(
-        RelevanceHandling.Keep →
+        RelevanceHandling.Keep ->
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
             <e1 xxf:relevant="false">e1</e1>
             <e2/>
@@ -56,7 +56,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
               </e5-iteration>
             </e5>
           </form>,
-        RelevanceHandling.Remove →
+        RelevanceHandling.Remove ->
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
             <e2/>
             <e3/>
@@ -65,7 +65,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
               <e5-iteration/>
             </e5>
           </form>,
-        RelevanceHandling.Empty →
+        RelevanceHandling.Empty ->
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
             <e1 xxf:relevant="false"/>
             <e2/>
@@ -85,7 +85,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
     val XFRelevantQName  = QName("relevant", XFormsConstants.XFORMS_NAMESPACE_SHORT)
     val XXFRelevantQName = QName("relevant", XFormsConstants.XXFORMS_NAMESPACE_SHORT)
 
-    for (relevanceHandling ← RelevanceHandling.values)
+    for (relevanceHandling <- RelevanceHandling.values)
       it(s"must annotate and keep existing annotation when needed with $relevanceHandling") {
 
         val doc = newDoc

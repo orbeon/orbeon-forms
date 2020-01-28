@@ -25,7 +25,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     with SubmitResponseEvent {
 
   def this(target: XFormsEventTarget) = {
-    this(target, Map("error-type" → Some(ErrorType.XXFormsInternalError.entryName)))
+    this(target, Map("error-type" -> Some(ErrorType.XXFormsInternalError.entryName)))
     _errorType = ErrorType.XXFormsInternalError
   }
 
@@ -34,9 +34,9 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     this(
       target     = target,
       properties = Map(
-        "error-type"           → Some(errorType.entryName),
-        "resource-uri"         → resourceURI,
-        "response-status-code" → Some(statusCode)
+        "error-type"           -> Some(errorType.entryName),
+        "resource-uri"         -> resourceURI,
+        "response-status-code" -> Some(statusCode)
       )
     )
     _errorType = errorType
@@ -45,7 +45,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: ConnectionResult) = {
     this(
       target     = target,
-      properties = Map("error-type" → Some(errorType.entryName))
+      properties = Map("error-type" -> Some(errorType.entryName))
     )
     _errorType = errorType
     _connectionResult = Option(connectionResult)

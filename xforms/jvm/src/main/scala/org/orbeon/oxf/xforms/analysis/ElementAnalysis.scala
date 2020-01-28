@@ -47,7 +47,7 @@ abstract class ElementAnalysis(
   val preceding : Option[ElementAnalysis]
 ) extends ElementEventHandlers with ElementRepeats {
 
-  self ⇒
+  self =>
 
   import ElementAnalysis._
 
@@ -87,25 +87,25 @@ abstract class ElementAnalysis(
 
   def removeFromParent() =
     parent foreach
-      { case parent: ChildrenBuilderTrait ⇒ parent.removeChild(self); case _ ⇒ }
+      { case parent: ChildrenBuilderTrait => parent.removeChild(self); case _ => }
 
   lazy val treeInScopeVariables: Map[String, VariableTrait] = {
 
     def findPreceding(element: ElementAnalysis): Option[ElementAnalysis] = element.preceding match {
-      case Some(preceding) if preceding.scope == self.scope ⇒ Some(preceding)
-      case Some(preceding) ⇒ findPreceding(preceding)
-      case None ⇒ element.parent match {
-        case Some(parent: Model) ⇒
+      case Some(preceding) if preceding.scope == self.scope => Some(preceding)
+      case Some(preceding) => findPreceding(preceding)
+      case None => element.parent match {
+        case Some(parent: Model) =>
           None // models are not allowed to see outside variables for now (could lift this restriction later)
-        case Some(parent) ⇒ findPreceding(parent)
-        case _ ⇒ None
+        case Some(parent) => findPreceding(parent)
+        case _ => None
       }
     }
 
     findPreceding(self) match {
-      case Some(preceding: VariableAnalysisTrait) ⇒ preceding.treeInScopeVariables + (preceding.name → preceding)
-      case Some(preceding) ⇒ preceding.treeInScopeVariables
-      case None ⇒ Map.empty
+      case Some(preceding: VariableAnalysisTrait) => preceding.treeInScopeVariables + (preceding.name -> preceding)
+      case Some(preceding) => preceding.treeInScopeVariables
+      case None => Map.empty
     }
   }
 
@@ -149,12 +149,12 @@ abstract class ElementAnalysis(
   final lazy val extensionAttributes =
     Map() ++ (
       CommonExtensionAttributes ++
-      (element.attributeIterator.asScala collect { case att if att.getName.startsWith("data-") ⇒ att.getQName }) ++
-      allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null)
+      (element.attributeIterator.asScala collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
+      allowedExtensionAttributes map (qName => (qName, element.attributeValue(qName))) filter (_._2 ne null)
     )
 
   final lazy val nonRelevantExtensionAttributes =
-    extensionAttributes map { case (k, v) ⇒ k → (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
+    extensionAttributes map { case (k, v) => k -> (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
   private var contextAnalysis: Option[XPathAnalysis] = None
@@ -192,37 +192,37 @@ abstract class ElementAnalysis(
   val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
 
   def toXMLAttributes: Seq[(String, String)] = Seq(
-    "scope"             → scope.scopeId,
-    "prefixed-id"       → prefixedId,
-    "model-prefixed-id" → (model map (_.prefixedId) orNull),
-    "binding"           → hasBinding.toString,
-    "value"             → self.isInstanceOf[ValueTrait].toString,
-    "name"              → element.attributeValue("name")
+    "scope"             -> scope.scopeId,
+    "prefixed-id"       -> prefixedId,
+    "model-prefixed-id" -> (model map (_.prefixedId) orNull),
+    "binding"           -> hasBinding.toString,
+    "value"             -> self.isInstanceOf[ValueTrait].toString,
+    "name"              -> element.attributeValue("name")
   )
 
   def toXMLContent(helper: XMLReceiverHelper): Unit = {
     // Control binding and value analysis
     if (_bindingAnalyzed)
       getBindingAnalysis match {
-        case Some(bindingAnalysis) if hasBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+        case Some(bindingAnalysis) if hasBinding => // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
           helper.startElement("binding")
           bindingAnalysis.toXML(helper)
           helper.endElement()
-        case _ ⇒ // NOP
+        case _ => // NOP
       }
 
     if (_valueAnalyzed)
       getValueAnalysis match {
-        case Some(valueAnalysis) ⇒
+        case Some(valueAnalysis) =>
           helper.startElement("value")
           valueAnalysis.toXML(helper)
           helper.endElement()
-        case _ ⇒ // NOP
+        case _ => // NOP
       }
   }
 
   final def toXML(helper: XMLReceiverHelper): Unit = {
-    helper.startElement(localName, toXMLAttributes flatMap (t ⇒ Seq(t._1, t._2)) toArray)
+    helper.startElement(localName, toXMLAttributes flatMap (t => Seq(t._1, t._2)) toArray)
     toXMLContent(helper)
     helper.endElement()
   }
@@ -239,7 +239,7 @@ abstract class ElementAnalysis(
 
 trait ElementEventHandlers {
 
-  element: ElementAnalysis ⇒
+  element: ElementAnalysis =>
 
   import ElementAnalysis._
   import ElementAnalysis.propagateBreaks.{break, breakable}
@@ -271,7 +271,7 @@ trait ElementEventHandlers {
   def handlersForEvent(eventName: String): HandlerAnalysis =
     handlersCache.getOrElse(eventName, {
       val result = handlersForEventImpl(eventName)
-      handlersCache += eventName → result
+      handlersCache += eventName -> result
       result
     })
 
@@ -351,7 +351,7 @@ trait ElementEventHandlers {
     def handlersForPhase(observers: List[ElementAnalysis], phase: Phase): Option[(Phase, Map[String, List[EventHandler]])] = {
       val result = mutable.Map[String, List[EventHandler]]()
       breakable {
-        for (observer ← observers) {
+        for (observer <- observers) {
 
           val (localPropagate, localPerformDefaultAction, handlersToRun) =
             relevantHandlersForObserverByPhaseAndName(observer, phase)
@@ -359,7 +359,7 @@ trait ElementEventHandlers {
           propagate &= localPropagate
           performDefaultAction &= localPerformDefaultAction
           if (handlersToRun.nonEmpty)
-            result += observer.prefixedId → handlersToRun
+            result += observer.prefixedId -> handlersToRun
 
           // Cancel propagation if requested
           if (! propagate)
@@ -368,7 +368,7 @@ trait ElementEventHandlers {
       }
 
       if (result.nonEmpty)
-        Some(phase → result.toMap)
+        Some(phase -> result.toMap)
       else
         None
     }
@@ -396,21 +396,21 @@ trait ElementEventHandlers {
 
 trait ElementRepeats {
 
-  element: ElementAnalysis ⇒
+  element: ElementAnalysis =>
 
   // This control's ancestor repeats, computed on demand
   lazy val ancestorRepeats: List[RepeatControl] =
     parent match {
-      case Some(parentRepeat: RepeatControl) ⇒ parentRepeat :: parentRepeat.ancestorRepeats
-      case Some(parentElement)               ⇒ parentElement.ancestorRepeats
-      case None                              ⇒ Nil
+      case Some(parentRepeat: RepeatControl) => parentRepeat :: parentRepeat.ancestorRepeats
+      case Some(parentElement)               => parentElement.ancestorRepeats
+      case None                              => Nil
     }
 
   // Same as ancestorRepeats but across parts
   lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
     part.elementInParent match {
-      case Some(elementInParentPart) ⇒ ancestorRepeats ::: elementInParentPart.ancestorRepeatsAcrossParts
-      case None                      ⇒ ancestorRepeats
+      case Some(elementInParentPart) => ancestorRepeats ::: elementInParentPart.ancestorRepeatsAcrossParts
+      case None                      => ancestorRepeats
     }
 
   // This control's closest ancestor in the same scope
@@ -433,11 +433,11 @@ object ElementAnalysis {
    * NOTE: As in XPath, this does not include ancestors of the element.
    */
   def getClosestPrecedingInScope(element: ElementAnalysis)(scope: Scope = element.scope): Option[ElementAnalysis] = element.preceding match {
-    case Some(preceding) if preceding.scope == scope ⇒ Some(preceding)
-    case Some(preceding) ⇒ getClosestPrecedingInScope(preceding)(scope)
-    case None ⇒ element.parent match {
-      case Some(parent) ⇒ getClosestPrecedingInScope(parent)(scope)
-      case _ ⇒ None
+    case Some(preceding) if preceding.scope == scope => Some(preceding)
+    case Some(preceding) => getClosestPrecedingInScope(preceding)(scope)
+    case None => element.parent match {
+      case Some(parent) => getClosestPrecedingInScope(parent)(scope)
+      case _ => None
     }
   }
 
@@ -502,7 +502,7 @@ object ElementAnalysis {
    * Return the first ancestor with a binding analysis that is in the same scope/model.
    */
   def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel): Option[ElementAnalysis] =
-    ancestorIterator(start) find (e ⇒ ScopeModel(e.scope, e.model) == scopeModel)
+    ancestorIterator(start) find (e => ScopeModel(e.scope, e.model) == scopeModel)
 
   /**
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.
@@ -513,9 +513,9 @@ object ElementAnalysis {
 
   def createLocationData(element: Element): ExtendedLocationData =
       element.getData match {
-        case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 ⇒
+        case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
           new ExtendedLocationData(data, "gathering static information", element)
-        case _ ⇒ null
+        case _ => null
       }
 
   /**

@@ -57,7 +57,7 @@ class XXFormsComponentHandler(
     xformsHandlerContext.pushComponentContext(prefixedId)
 
     // Process shadow content
-    staticControl.bindingOpt foreach { binding ⇒
+    staticControl.bindingOpt foreach { binding =>
       XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
     }
   }
@@ -90,14 +90,14 @@ class XXFormsComponentHandler(
 
     val result =
       for {
-        staticControl                     ← staticControlOpt
-        staticLhhaSupport                 ← staticControl.narrowTo[StaticLHHASupport]
-        staticLabel                       ← staticLhhaSupport.lhh(Label)
-        effectiveTargetControlOrPrefixedI ← staticLabel.effectiveTargetControlOrPrefixedIdOpt
+        staticControl                     <- staticControlOpt
+        staticLhhaSupport                 <- staticControl.narrowTo[StaticLHHASupport]
+        staticLabel                       <- staticLhhaSupport.lhh(Label)
+        effectiveTargetControlOrPrefixedI <- staticLabel.effectiveTargetControlOrPrefixedIdOpt
         currentControlSuffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
       } yield
         effectiveTargetControlOrPrefixedI match {
-          case Left(effectiveTargetControl) ⇒
+          case Left(effectiveTargetControl) =>
 
             // Push/pop component context so that handler resolution works
             xformsHandlerContext.pushComponentContext(getPrefixedId)
@@ -110,7 +110,7 @@ class XXFormsComponentHandler(
             finally
               xformsHandlerContext.popComponentContext()
 
-          case Right(targetPrefixedId) ⇒
+          case Right(targetPrefixedId) =>
             Some(targetPrefixedId + currentControlSuffix)
         }
 

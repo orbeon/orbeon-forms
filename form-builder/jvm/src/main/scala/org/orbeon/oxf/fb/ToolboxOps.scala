@@ -53,20 +53,20 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     ensureEmptyCell() match {
-      case Some(gridTd) ⇒
+      case Some(gridTd) =>
         withDebugGridOperation("insert new control") {
           val newControlName = controlNameFromId(nextId("control"))
 
           // Insert control template
           val newControlElem: NodeInfo =
             findViewTemplate(binding) match {
-              case Some(viewTemplate) ⇒
+              case Some(viewTemplate) =>
                 // There is a specific template available
                 val controlElem = insert(into = gridTd, origin = viewTemplate).head
                 // xf:help might be in the template, but we don't need it as it is created on demand
                 delete(controlElem / "help")
                 controlElem
-              case _ ⇒
+              case _ =>
                 // No specific, create simple element with LHHA
                 val controlElem =
                   insert(
@@ -91,7 +91,7 @@ object ToolboxOps {
           // Create resource holder for all form languages
           val resourceHolders = {
             val formLanguages = FormRunnerResourcesOps.allLangs(ctx.resourcesRootElem)
-            formLanguages map { formLang ⇒
+            formLanguages map { formLang =>
 
               // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
               val lhhaResourceEls = {
@@ -112,7 +112,7 @@ object ToolboxOps {
                     originalTemplateItems
                   }  else {
                     // Hint not supported: <hint> in each <item>
-                    originalTemplateItems map { item ⇒
+                    originalTemplateItems map { item =>
                       val newLHHA = (item / *) filter (_.localname != "hint")
                       elementInfo("item", newLHHA)
                     }
@@ -122,7 +122,7 @@ object ToolboxOps {
                 }
 
               val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
-              formLang → List(elementInfo(newControlName, resourceEls))
+              formLang -> List(elementInfo(newControlName, resourceEls))
             }
           }
 
@@ -156,7 +156,7 @@ object ToolboxOps {
           Some(newControlName)
         }
 
-      case _ ⇒
+      case _ =>
         // no empty td found/created so NOP
         None
     }
@@ -224,7 +224,7 @@ object ToolboxOps {
       // Insert the bind element
       ensureBinds(findContainerNamesForModel(newSectionElem, includeSelf = true))
 
-      newNestedGridElemOpt foreach { newNestedGridElem ⇒
+      newNestedGridElemOpt foreach { newNestedGridElem =>
         insertHolders(
           controlElement       = newNestedGridElem,
           dataHolders          = List(elementInfo(newGridName)),
@@ -321,7 +321,7 @@ object ToolboxOps {
     implicit val ctx = FormBuilderDocContext()
 
     // Insert new section first
-    insertNewSection(withGrid = false) map { section ⇒
+    insertNewSection(withGrid = false) map { section =>
 
       val selector = binding attValue "element"
 
@@ -334,7 +334,7 @@ object ToolboxOps {
 
       // Insert template into section
       findViewTemplate(binding) foreach
-        (template ⇒ insert(into = section, after = section / *, origin = template))
+        (template => insert(into = section, after = section / *, origin = template))
 
       UndoAction.InsertSectionTemplate(section.id)
     }
@@ -388,21 +388,21 @@ object ToolboxOps {
         controlElems   = List(controlOrContainerElem),
         inDoc          = ctx.formDefinitionRootElem,
         contextItemOpt = Some(ctx.dataRootElem),
-        predicate      = _ ⇒ true
+        predicate      = _ => true
       ).headOption
 
     // In the context of Form Builder, we *should* always find the information. But there are some cases in tests where
     // the controls to delete don't have ids and binds.
     controlDetailsOpt collect {
-      case ControlBindPathHoldersResources(control, bind, _, holders, _) ⇒
+      case ControlBindPathHoldersResources(control, bind, _, holders, _) =>
 
         val bindAsList = List(bind)
 
         // Handle resources separately since unlike holders and binds, they are not nested
         val resourcesWithLang =
           for {
-            rootBind ← bindAsList
-            lang     ← FormRunnerResourcesOps.allLangs(resourcesRootElem)
+            rootBind <- bindAsList
+            lang     <- FormRunnerResourcesOps.allLangs(resourcesRootElem)
           } yield
             elementInfo(
               "resource",
@@ -412,22 +412,22 @@ object ToolboxOps {
 
         val xcvContent =
           XcvEntry.values map {
-            case e @ XcvEntry.Control   ⇒ e → List(control)
-            case e @ XcvEntry.Holder    ⇒ e → holders.toList.flatten
-            case e @ XcvEntry.Resources ⇒ e → resourcesWithLang
-            case e @ XcvEntry.Bind      ⇒ e → bindAsList
+            case e @ XcvEntry.Control   => e -> List(control)
+            case e @ XcvEntry.Holder    => e -> holders.toList.flatten
+            case e @ XcvEntry.Resources => e -> resourcesWithLang
+            case e @ XcvEntry.Bind      => e -> bindAsList
           }
 
         val result =
           elementInfo(
             "xcv",
-            xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) }
+            xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) }
           )
 
         // Remove all `tmp-*-tmp` attributes as they are transient and, instead of renaming them upon paste,
         // we just re-annotate at that time
         result descendant (FRGridTest || NodeInfoCell.CellTest) att "id" filter
-          (a ⇒ a.stringValue.startsWith("tmp-") && a.stringValue.endsWith("-tmp")) foreach (delete(_))
+          (a => a.stringValue.startsWith("tmp-") && a.stringValue.endsWith("-tmp")) foreach (delete(_))
 
         result
     }
@@ -496,8 +496,8 @@ object ToolboxOps {
       }
 
     undoDeleteControlOpt match {
-      case Some(undoDeleteControl) ⇒ undoInsertControlOpt map (MoveControl(_, undoDeleteControl))
-      case None                    ⇒ undoInsertControlOpt
+      case Some(undoDeleteControl) => undoInsertControlOpt map (MoveControl(_, undoDeleteControl))
+      case None                    => undoInsertControlOpt
     }
   }
 
@@ -508,9 +508,9 @@ object ToolboxOps {
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
     for {
-      xcvElem     ← xcvFromSectionWithTemplate(containerId)
-      sectionElem ← xcvElem / XcvEntry.Control.entryName firstChildOpt *
-      sectionName ← getControlNameOpt(sectionElem)
+      xcvElem     <- xcvFromSectionWithTemplate(containerId)
+      sectionElem <- xcvElem / XcvEntry.Control.entryName firstChildOpt *
+      sectionName <- getControlNameOpt(sectionElem)
     } yield
       namesToRenameForPaste(xcvElem, prefix, suffix, Set(sectionName))
 
@@ -570,10 +570,10 @@ object ToolboxOps {
         else
           newControlNamesIt.next()
 
-      needRenameWithAutomaticIds.iterator.map(name ⇒ name → newName(name)).toMap
+      needRenameWithAutomaticIds.iterator.map(name => name -> newName(name)).toMap
     }
 
-    xcvNamesInUse map { xcvName ⇒
+    xcvNamesInUse map { xcvName =>
 
       val withPrefixSuffix = toNameWithPrefixSuffix(xcvName)
       val automaticIdOpt   = newControlNamesWithAutomaticIdsMap.get(withPrefixSuffix)
@@ -591,7 +591,7 @@ object ToolboxOps {
 
       val head = ctx.formDefinitionRootElem / XHHeadTest head
 
-      xblBindingForSection(head, containerElem) map { bindingDoc ⇒
+      xblBindingForSection(head, containerElem) map { bindingDoc =>
 
         val bindingElem = bindingDoc.rootElement
 
@@ -614,12 +614,12 @@ object ToolboxOps {
             // be fixed, but in the meanwhile we need to remove those.
             XFormsAPI.delete(resourceElems / * filter (_.localname == sectionTemplateName))
 
-            resourceElems map (e ⇒ (e attValue XMLLangQName) → (e / *))
+            resourceElems map (e => (e attValue XMLLangQName) -> (e / *))
           }
 
           val nestedResourcesMap = nestedResources.toMap
 
-          allResources(ctx.resourcesRootElem) map { resource ⇒
+          allResources(ctx.resourcesRootElem) map { resource =>
 
             val lang = resource attValue XMLLangQName
 
@@ -640,10 +640,10 @@ object ToolboxOps {
           val newElem = TransformerUtils.extractAsMutableDocument(containerElem).rootElement
 
           // NOTE: This duplicates some annotations done in `annotate.xpl`.
-          nestedContainers ++ newElem foreach { containerElem ⇒
+          nestedContainers ++ newElem foreach { containerElem =>
             XFormsAPI.ensureAttribute(containerElem, "edit-ref", "")
             if (IsSection(containerElem))
-              XFormsAPI.ensureAttribute(containerElem, XXF → "update", "full")
+              XFormsAPI.ensureAttribute(containerElem, XXF -> "update", "full")
           }
 
           XFormsAPI.delete(newElem / * filter isSectionTemplateContent)
@@ -673,10 +673,10 @@ object ToolboxOps {
 
         val xcvContent =
           XcvEntry.values map {
-            case e @ XcvEntry.Control   ⇒ e → List(newSectionControlElem)
-            case e @ XcvEntry.Holder    ⇒ e → List(newDataHolderElem)
-            case e @ XcvEntry.Resources ⇒ e → resourcesWithLangElems
-            case e @ XcvEntry.Bind      ⇒ e → List(newBindElem)
+            case e @ XcvEntry.Control   => e -> List(newSectionControlElem)
+            case e @ XcvEntry.Holder    => e -> List(newDataHolderElem)
+            case e @ XcvEntry.Resources => e -> resourcesWithLangElems
+            case e @ XcvEntry.Bind      => e -> List(newBindElem)
           }
 
         new DocumentWrapper(
@@ -686,7 +686,7 @@ object ToolboxOps {
               Transform.InlineReadDocument(
                 "",
                 TransformerUtils.tinyTreeToDom4j(
-                  elementInfo("xcv", xcvContent map { case (xcvEntry, content) ⇒ elementInfo(xcvEntry.entryName, content) })
+                  elementInfo("xcv", xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) })
                 ),
                 0L
               )
@@ -708,10 +708,10 @@ object ToolboxOps {
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[UndoAction] =
-    xcvFromSectionWithTemplate(containerId) flatMap { xcvElem ⇒
+    xcvFromSectionWithTemplate(containerId) flatMap { xcvElem =>
 
       val undoOpt =
-        controlOrContainerElemToXcv(containerById(containerId)) map { xcvElem2 ⇒
+        controlOrContainerElemToXcv(containerById(containerId)) map { xcvElem2 =>
           MergeSectionTemplate(
             containerId,
             TransformerUtils.extractAsMutableDocument(xcvElem2).rootElement,
@@ -732,7 +732,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    readXcvFromClipboard flatMap { xcvElem ⇒
+    readXcvFromClipboard flatMap { xcvElem =>
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
@@ -743,7 +743,7 @@ object ToolboxOps {
           XFormsAPI.dispatch(
             name       = "fb-show-dialog",
             targetId   = "dialog-ids",
-            properties = Map("container-id" → Some(controlElem.id), "action" → Some("paste"))
+            properties = Map("container-id" -> Some(controlElem.id), "action" -> Some("paste"))
           )
           None
         }
@@ -771,7 +771,7 @@ object ToolboxOps {
 
       val oldToNewNames =
         namesToRenameForPaste(xcvElem, prefix, suffix, ignore) collect {
-          case (oldName, newName, _) if oldName != newName ⇒ oldName → newName
+          case (oldName, newName, _) if oldName != newName => oldName -> newName
         } toMap
 
       if (oldToNewNames.nonEmpty) {
@@ -779,11 +779,11 @@ object ToolboxOps {
         // Rename self control, nested sections and grids, and nested controls
         (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
           findNestedContainers(containerControlElem).iterator                             ++
-          findNestedControls(containerControlElem).iterator foreach { controlElem ⇒
+          findNestedControls(containerControlElem).iterator foreach { controlElem =>
 
           val oldName = controlNameFromId(controlElem.id)
 
-          oldToNewNames.get(oldName) foreach { newName ⇒
+          oldToNewNames.get(oldName) foreach { newName =>
             renameControlByElement(controlElem, newName)
           }
         }
@@ -792,7 +792,7 @@ object ToolboxOps {
         val holders =
           xcvElem / XcvEntry.Holder.entryName / *
 
-        holders.iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem ⇒
+        holders.iterator flatMap iterateSelfAndDescendantHoldersReversed foreach { holderElem =>
 
           val oldName = holderElem.localname
 
@@ -804,7 +804,7 @@ object ToolboxOps {
             else
               oldName
 
-          oldToNewNames.get(oldNameAdjusted) foreach { newName ⇒
+          oldToNewNames.get(oldNameAdjusted) foreach { newName =>
             rename(holderElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
           }
         }
@@ -813,17 +813,17 @@ object ToolboxOps {
         val resourceHolderContainers =
           xcvElem / XcvEntry.Resources.entryName / "resource"
 
-        resourceHolderContainers / * foreach { holderElem ⇒
+        resourceHolderContainers / * foreach { holderElem =>
 
           val oldName = holderElem.localname
 
-          oldToNewNames.get(oldName) foreach { newName ⇒
+          oldToNewNames.get(oldName) foreach { newName =>
             rename(holderElem, newName)
           }
         }
 
         // Rename binds
-        (xcvElem / XcvEntry.Bind.entryName / *).iterator flatMap iterateSelfAndDescendantBindsReversed foreach { bindElem ⇒
+        (xcvElem / XcvEntry.Bind.entryName / *).iterator flatMap iterateSelfAndDescendantBindsReversed foreach { bindElem =>
 
           val oldName = findBindName(bindElem).get
 
@@ -835,7 +835,7 @@ object ToolboxOps {
             else
               oldName
 
-          oldToNewNames.get(oldNameAdjusted) foreach { newName ⇒
+          oldToNewNames.get(oldNameAdjusted) foreach { newName =>
             renameBindElement(bindElem, if (isDefaultIterationName) newName + DefaultIterationSuffix else newName)
           }
         }
@@ -849,32 +849,32 @@ object ToolboxOps {
       // Rename nested element ids and alert ids
       val nestedBindElemsWithValidationId =
         for {
-          nestedElem   ← xcvElem / XcvEntry.Bind.entryName descendant XFBindTest child NestedBindElemTest
-          validationId ← nestedElem.idOpt
+          nestedElem   <- xcvElem / XcvEntry.Bind.entryName descendant XFBindTest child NestedBindElemTest
+          validationId <- nestedElem.idOpt
         } yield
-          nestedElem → validationId
+          nestedElem -> validationId
 
       val oldIdToNewId =
         nestedBindElemsWithValidationId map (_._2) zip nextTmpIds(token = Names.Validation, count = nestedBindElemsWithValidationId.size) toMap
 
       // Update nested element ids, in particular xf:constraint/@id
-      nestedBindElemsWithValidationId foreach { case (nestedElem, oldId) ⇒
+      nestedBindElemsWithValidationId foreach { case (nestedElem, oldId) =>
         setvalue(nestedElem att "id", oldIdToNewId(oldId))
       }
 
       val alertsWithValidationId =
         for {
-          alertElem    ← xcvElem / XcvEntry.Control.entryName descendant (XF → "alert")
-          validationId ← alertElem attValueOpt Names.Validation
+          alertElem    <- xcvElem / XcvEntry.Control.entryName descendant (XF -> "alert")
+          validationId <- alertElem attValueOpt Names.Validation
         } yield
-          alertElem → validationId
+          alertElem -> validationId
 
       // Update xf:alert/@validation and xf:constraint/@id
-      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
+      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) =>
 
         val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
 
-        newValidationIdOpt foreach { newValidationId ⇒
+        newValidationIdOpt foreach { newValidationId =>
           setvalue(alertWithValidation att Names.Validation, newValidationId)
         }
       }
@@ -882,7 +882,7 @@ object ToolboxOps {
 
     val (intoContainerElem, afterElemOpt) =
       insertPosition match {
-        case Some(ContainerPosition(into, after)) ⇒
+        case Some(ContainerPosition(into, after)) =>
 
           val intoContainerElem     = into  flatMap (findControlByName(ctx.formDefinitionRootElem, _))
           val afterContainerElemOpt = after flatMap (findControlByName(ctx.formDefinitionRootElem, _))
@@ -895,10 +895,10 @@ object ToolboxOps {
               afterContainerElemOpt
 
           (intoContainerElem getOrElse ctx.bodyElem, afterElemOpt)
-        case None if IsGrid(containerControlElem) ⇒
+        case None if IsGrid(containerControlElem) =>
           val (into, after, _) = findGridInsertionPoint
           (into, after)
-        case None ⇒
+        case None =>
           findSectionInsertionPoint
       }
 
@@ -914,10 +914,10 @@ object ToolboxOps {
 
     def resourceHolders(resourceElems: Seq[NodeInfo]): Seq[(String, Seq[NodeInfo])] =
       for {
-        resourceElem ← resourceElems
+        resourceElem <- resourceElems
         lang = resourceElem attValue "*:lang"
       } yield
-        lang → (resourceElem / *)
+        lang -> (resourceElem / *)
 
       insertHolders(
         controlElement       = newContainerElem, // in order to find containers
@@ -937,7 +937,7 @@ object ToolboxOps {
 
     // Insert template for repeated grids/sections
     (getControlNameOpt(containerControlElem).isDefined iterator containerControlElem) ++
-      findNestedContainers(containerControlElem).iterator filter isRepeat foreach  { containerElem ⇒
+      findNestedContainers(containerControlElem).iterator filter isRepeat foreach  { containerElem =>
 
       val newControlName = getControlName(containerElem)
       val bindElem       = findBindByName(ctx.formDefinitionRootElem, newControlName).get
@@ -972,15 +972,15 @@ object ToolboxOps {
 
     val insertCellElemOpt =
       insertPosition match {
-        case Some(ControlPosition(gridName, Coordinate1(x, y))) ⇒
+        case Some(ControlPosition(gridName, Coordinate1(x, y))) =>
           findControlByName(ctx.formDefinitionRootElem, gridName).toList descendant CellTest collectFirst {
-            case cell if NodeInfoCellOps.x(cell).contains(x) && NodeInfoCellOps.y(cell).contains(y) ⇒ cell
+            case cell if NodeInfoCellOps.x(cell).contains(x) && NodeInfoCellOps.y(cell).contains(y) => cell
           }
 
-        case None ⇒ ensureEmptyCell()
+        case None => ensureEmptyCell()
       }
 
-    insertCellElemOpt map { insertCellElem ⇒
+    insertCellElemOpt map { insertCellElem =>
 
       implicit val ctx = FormBuilderDocContext()
 
@@ -1017,45 +1017,45 @@ object ToolboxOps {
       insertHolders(
         controlElement       = newControlElem,
         dataHolders          = dataHolders,
-        resourceHolders      = xcvElem / XcvEntry.Resources.entryName / "resource" map (r ⇒ (r attValue "*:lang", (r / * headOption).toList)),
+        resourceHolders      = xcvElem / XcvEntry.Resources.entryName / "resource" map (r => (r attValue "*:lang", (r / * headOption).toList)),
         precedingControlName = precedingBoundControlNameInSectionForControl(newControlElem)
       )
 
       // Create the bind and copy all attributes and content
       val bind = ensureBinds(findContainerNamesForModel(insertCellElem) :+ name)
-      (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind ⇒
+      (xcvElem / XcvEntry.Bind.entryName / * headOption) foreach { xcvBind =>
         insert(into = bind, origin = (xcvBind /@ @*) ++ (xcvBind / *))
       }
 
       // Rename nested element ids and alert ids
       val nestedElemsWithId =
         for {
-          nestedElem ← bind descendant *
-          id         ← nestedElem.idOpt
+          nestedElem <- bind descendant *
+          id         <- nestedElem.idOpt
         } yield
-          nestedElem → id
+          nestedElem -> id
 
       val oldIdToNewId =
         nestedElemsWithId map (_._2) zip nextTmpIds(token = Names.Validation, count = nestedElemsWithId.size) toMap
 
       // Update nested element ids, in particular xf:constraint/@id
-      nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
+      nestedElemsWithId foreach { case (nestedElem, oldId) =>
         setvalue(nestedElem att "id", oldIdToNewId(oldId))
       }
 
       val alertsWithValidationId =
         for {
-          alertElem    ← newControlElem / (XF → "alert")
-          validationId ← alertElem attValueOpt Names.Validation
+          alertElem    <- newControlElem / (XF -> "alert")
+          validationId <- alertElem attValueOpt Names.Validation
         } yield
-          alertElem → validationId
+          alertElem -> validationId
 
       // Update xf:alert/@validation and xf:constraint/@id
-      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
+      alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) =>
 
         val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
 
-        newValidationIdOpt foreach { newValidationId ⇒
+        newValidationIdOpt foreach { newValidationId =>
           setvalue(alertWithValidation att Names.Validation, newValidationId)
         }
       }
@@ -1082,7 +1082,7 @@ object ToolboxOps {
 
     def findGridInsertionPoint(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[NodeInfo], Option[NodeInfo]) =
       findSelectedCell match {
-        case Some(currentCellElem) ⇒ // A cell is selected
+        case Some(currentCellElem) => // A cell is selected
 
           val containers = findAncestorContainersLeafToRoot(currentCellElem)
 
@@ -1097,13 +1097,13 @@ object ToolboxOps {
 
           (grandParentContainer, parentContainer, parentContainer)
 
-        case _ ⇒ // No cell is selected, add top-level grid
+        case _ => // No cell is selected, add top-level grid
           (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption, None)
       }
 
     def findSectionInsertionPoint(implicit ctx: FormBuilderDocContext): (NodeInfo, Option[NodeInfo]) =
       findSelectedCell match {
-        case Some(currentCellElem) ⇒ // A cell is selected
+        case Some(currentCellElem) => // A cell is selected
 
           val containers = findAncestorContainersLeafToRoot(currentCellElem)
 
@@ -1116,11 +1116,11 @@ object ToolboxOps {
           val greatGrandParentContainerOption = containers.tail.tail.headOption
 
           greatGrandParentContainerOption match {
-            case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
-            case None                            ⇒ (grandParentContainer, grandParentContainer / * headOption)
+            case Some(greatGrandParentContainer) => (greatGrandParentContainer, Some(grandParentContainer))
+            case None                            => (grandParentContainer, grandParentContainer / * headOption)
           }
 
-        case _ ⇒ // No cell is selected, add top-level section
+        case _ => // No cell is selected, add top-level section
           (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption)
       }
   }

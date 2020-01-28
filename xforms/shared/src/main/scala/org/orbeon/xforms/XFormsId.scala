@@ -100,7 +100,7 @@ object XFormsId {
   /**
     * Return an effective id's prefixed id, i.e. the effective id without its suffix, e.g.:
     *
-    *   `foo$bar$my-input.1-2` ⇒ `foo$bar$my-input`
+    *   `foo$bar$my-input.1-2` => `foo$bar$my-input`
     *
     * @param effectiveId effective id to check
     * @return effective id without its suffix, null if effectiveId was null
@@ -121,8 +121,8 @@ object XFormsId {
   /**
     * Return an effective id without its prefix, e.g.:
     *
-    * - `foo$bar$my-input` ⇒ `my-input`
-    * - `foo$bar$my-input.1-2` ⇒ `my-input.1-2`
+    * - `foo$bar$my-input` => `my-input`
+    * - `foo$bar$my-input.1-2` => `my-input.1-2`
     *
     * @param effectiveId effective id to check
     * @return effective id without its prefix, null if effectiveId was null
@@ -173,10 +173,10 @@ object XFormsId {
     val iterationPrefixedId = getPrefixedId(repeatEffectiveId) + "~iteration"
 
     if (parentSuffix == "") {
-      // E.g. foobar ⇒ foobar~iteration.3
+      // E.g. foobar => foobar~iteration.3
       iterationPrefixedId + Constants.RepeatSeparator + iterationIndex
     } else {
-      // E.g. foobar.3-7 ⇒ foobar~iteration.3-7-2
+      // E.g. foobar.3-7 => foobar~iteration.3-7-2
       iterationPrefixedId + parentSuffix + Constants.RepeatIndexSeparator + iterationIndex
     }
   }
@@ -217,7 +217,7 @@ object XFormsId {
   /**
     * Compute an effective id based on an existing effective id and a static id. E.g.:
     *
-    * `foo$bar.1-2` and `baz` ⇒ `foo$baz.1-2`
+    * `foo$bar.1-2` and `baz` => `foo$baz.1-2`
     *
     * @param baseEffectiveId base effective id
     * @param staticId        static id
@@ -240,7 +240,7 @@ object XFormsId {
   /**
     * Return the static id associated with the given id, removing suffix and prefix if present.
     *
-    * `foo$bar.1-2` ⇒ `bar`
+    * `foo$bar.1-2` => `bar`
     *
     * @param anyId id to check
     * @return static id, or null if anyId was null
@@ -251,7 +251,7 @@ object XFormsId {
   /**
     * Append a new string to an effective id.
     *
-    * `foo$bar.1-2` and `-my-ending` ⇒ `foo$bar-my-ending.1-2`
+    * `foo$bar.1-2` and `-my-ending` => `foo$bar-my-ending.1-2`
     *
     * @param effectiveId base effective id
     * @param ending      new ending

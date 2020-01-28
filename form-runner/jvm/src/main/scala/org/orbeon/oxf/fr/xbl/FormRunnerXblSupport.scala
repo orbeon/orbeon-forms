@@ -48,7 +48,7 @@ object FormRunnerXblSupport extends XBLSupport {
 
     def keepIfParamNonBlank =
       elem.attributeValueOpt(FRKeepIfParamQName) match {
-        case Some(att) ⇒
+        case Some(att) =>
 
           val paramName = QName(att)
 
@@ -56,7 +56,7 @@ object FormRunnerXblSupport extends XBLSupport {
             fromMetadataAndProperties(paramName) exists
             (_.nonBlank)
 
-        case None ⇒ true
+        case None => true
       }
 
     def isDesignTime =
@@ -67,9 +67,9 @@ object FormRunnerXblSupport extends XBLSupport {
 
     def keepIfDesignTime =
       elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {
-        case Some("true")  ⇒ isDesignTime
-        case Some("false") ⇒ ! isDesignTime
-        case _             ⇒ true
+        case Some("true")  => isDesignTime
+        case Some("false") => ! isDesignTime
+        case _             => true
       }
 
     ! (! keepIfParamNonBlank || ! keepIfDesignTime)

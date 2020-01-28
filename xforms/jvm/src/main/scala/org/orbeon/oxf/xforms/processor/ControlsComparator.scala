@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.xforms.rpc
 import shapeless.syntax.typeable._
 
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 import scala.util.control.Breaks
 
 class ControlsComparator(
@@ -53,7 +53,7 @@ class ControlsComparator(
       assert(left.size == right.size || left.isEmpty, "illegal state when comparing controls")
 
       for {
-        (control1OrNull, control2) ← left.iterator.zipAll(right.iterator, null, null)
+        (control1OrNull, control2) <- left.iterator.zipAll(right.iterator, null, null)
         control1Opt                = Option(control1OrNull)
       } locally {
 
@@ -73,28 +73,28 @@ class ControlsComparator(
         // Some controls require special processing, as well as `xxf:update="full"`
         val specificProcessingTookPlace =
           control2 match {
-            case c: XXFormsDynamicControl ⇒
+            case c: XXFormsDynamicControl =>
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "xxf:dynamic within full update is not supported")
 
                 def replay(r: XMLReceiver) =
-                  element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" → c.getId))(r)
+                  element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" -> c.getId))(r)
 
                 processFullUpdateForContent(c, replay)
                 true
               } else
                 false
-            case c: XFormsSwitchControl ⇒
+            case c: XFormsSwitchControl =>
               val otherSwitchControlOpt = control1Opt.asInstanceOf[Option[XFormsSwitchControl]]
               if (c.staticControl.hasFullUpdate && c.getSelectedCaseEffectiveId != c.getOtherSelectedCaseEffectiveId(otherSwitchControlOpt)) {
                 c.selectedCaseIfRelevantOpt match {
-                  case Some(selectedCase) ⇒ processFullUpdateForContent(c, getMarkOrThrow(selectedCase).replay)
-                  case None               ⇒ processFullUpdateForContent(c, _ ⇒ ())
+                  case Some(selectedCase) => processFullUpdateForContent(c, getMarkOrThrow(selectedCase).replay)
+                  case None               => processFullUpdateForContent(c, _ => ())
                 }
                 true
               } else
                 false
-            case c: XFormsCaseControl ⇒
+            case c: XFormsCaseControl =>
               // See https://github.com/orbeon/orbeon-forms/issues/3509 and
               // https://github.com/orbeon/orbeon-forms/issues/3510.
               // Also do not handle descendants if we are a hidden full update case
@@ -102,17 +102,17 @@ class ControlsComparator(
                 true
               } else
                 false
-            case c: XFormsComponentControl ⇒
+            case c: XFormsComponentControl =>
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")
                 processFullUpdateForContent(c, getMarkOrThrow(c).replay)
                 true
               } else
                 false
-            case _: XFormsRepeatControl ⇒
+            case _: XFormsRepeatControl =>
               // Repeat iterations are handled separately
               false
-            case c @ ControlWithMark(mark) ⇒
+            case c @ ControlWithMark(mark) =>
               tryBreakable {
                 // Output to buffer
                 val buffer = new SAXStore
@@ -124,14 +124,14 @@ class ControlsComparator(
 
                 val controlAdjustedForSwitch =
                   c match {
-                    case c: XFormsCaseControl ⇒ c.parent
-                    case c                    ⇒ c
+                    case c: XFormsCaseControl => c.parent
+                    case c                    => c
                   }
 
                 processFullUpdateForContent(controlAdjustedForSwitch, mark.replay)
               }
               true
-            case _ ⇒
+            case _ =>
               false
           }
 
@@ -146,9 +146,9 @@ class ControlsComparator(
         ): Unit = {
 
           val atts =
-            relevant.map("relevant" → _.toString) ++:
-            readonly.map("readonly" → _.toString) ++:
-            List("id" → namespaceId(document, effectiveId))
+            relevant.map("relevant" -> _.toString) ++:
+            readonly.map("readonly" -> _.toString) ++:
+            List("id" -> namespaceId(document, effectiveId))
 
           withElement(
             "init",
@@ -156,7 +156,7 @@ class ControlsComparator(
             uri    = XXFORMS_NAMESPACE_URI,
             atts   = atts
           ) {
-            valueChangeOpt foreach { value ⇒
+            valueChangeOpt foreach { value =>
               element(
                 "value",
                 prefix = "xxf",
@@ -183,10 +183,10 @@ class ControlsComparator(
         // - https://github.com/orbeon/orbeon-forms/issues/3909
         // - https://github.com/orbeon/orbeon-forms/issues/3957
         control2 match {
-          case cc2: XFormsComponentControl if cc2.staticControl.abstractBinding.modeJavaScriptLifecycle ⇒
+          case cc2: XFormsComponentControl if cc2.staticControl.abstractBinding.modeJavaScriptLifecycle =>
 
             control1Opt.asInstanceOf[Option[XFormsComponentControl]] match {
-              case None ⇒
+              case None =>
                 if (cc2.isRelevant) {
 
                   outputInit(
@@ -195,22 +195,22 @@ class ControlsComparator(
                     readonly       = None,
                     valueChangeOpt =
                       for {
-                        vcc2 ← cc2.narrowTo[XFormsValueComponentControl]
+                        vcc2 <- cc2.narrowTo[XFormsValueComponentControl]
                         if vcc2.staticControl.abstractBinding.modeExternalValue
                       } yield
                         vcc2.getEscapedExternalValue
                   )
                 }
-              case Some(cc1) ⇒
+              case Some(cc1) =>
 
                 val relevantChanged = cc1.isRelevant != cc2.isRelevant
                 val readonlyChanged = cc1.isReadonly != cc2.isReadonly
 
                 val valueChangeOpt =
                   for {
-                    vcc2        ← cc2.narrowTo[XFormsValueComponentControl]
+                    vcc2        <- cc2.narrowTo[XFormsValueComponentControl]
                     if vcc2.staticControl.abstractBinding.modeExternalValue
-                    valueChange ← findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
+                    valueChange <- findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
                   } yield
                     valueChange
 
@@ -223,14 +223,14 @@ class ControlsComparator(
                   )
             }
 
-          case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue ⇒
+          case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue =>
 
             // NOTE: `modeExternalValue` can be used without `modeJavaScriptLifecycle`, although that is an uncommon use case.
 
             val valueChangeOpt =
               for {
-                c1          ← control1Opt
-                valueChange ← findValueChange(c1.asInstanceOf[XFormsValueComponentControl], vcc2)
+                c1          <- control1Opt
+                valueChange <- findValueChange(c1.asInstanceOf[XFormsValueComponentControl], vcc2)
               } yield
                 valueChange
 
@@ -242,7 +242,7 @@ class ControlsComparator(
                 valueChangeOpt = valueChangeOpt
               )
 
-          case _ ⇒
+          case _ =>
         }
       }
     } else
@@ -257,7 +257,7 @@ class ControlsComparator(
   ): Unit =
     if (control2.supportAjaxUpdates)
       control2 match {
-        case c: XFormsValueControl ⇒
+        case c: XFormsValueControl =>
           // See https://github.com/orbeon/orbeon-forms/issues/2442
           val clientValueOpt   = valueChangeControlIdsAndValues.get(c.effectiveId)
           val controlValue1Opt = control1Opt.asInstanceOf[Option[XFormsValueControl]]
@@ -266,7 +266,7 @@ class ControlsComparator(
               clientValueOpt,
               controlValue1Opt
             )
-        case c ⇒
+        case c =>
           if (! c.compareExternalMaybeClientValue(None, control1Opt))
             c.outputAjaxDiff(
               previousControlOpt = control1Opt,
@@ -289,13 +289,13 @@ class ControlsComparator(
   ): Unit = {
 
     control2 match {
-      case containerControl2: XFormsContainerControl ⇒
+      case containerControl2: XFormsContainerControl =>
 
-        val children1 = control1Opt collect { case c: XFormsContainerControl ⇒ c.children } getOrElse Nil
+        val children1 = control1Opt collect { case c: XFormsContainerControl => c.children } getOrElse Nil
         val children2 = containerControl2.children
 
         containerControl2 match {
-          case repeatControl2: XFormsRepeatControl ⇒
+          case repeatControl2: XFormsRepeatControl =>
 
             // `xf:repeat` needs special treatment to handle adding and removing iterations
             // See https://github.com/orbeon/orbeon-forms/issues/4011
@@ -313,8 +313,8 @@ class ControlsComparator(
               val mark = getMarkOrThrow(containerControl2)
 
               if (control1Opt.isDefined)
-                for (newIteration ← children2.view(size1, size2))
-                  processFullUpdateForContent(newIteration, receiver ⇒ mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+                for (newIteration <- children2.view(size1, size2))
+                  processFullUpdateForContent(newIteration, receiver => mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
               else
                 diffChildren(Nil, children2.view(size1, size2), fullUpdateBuffer) // test mode
 
@@ -322,7 +322,7 @@ class ControlsComparator(
               outputDeleteRepeatElements(repeatControl2, size1 - size2)
             }
 
-          case componentControl2: XFormsComponentControl ⇒
+          case componentControl2: XFormsComponentControl =>
 
             // When iterations have moved and there is no structural change, the content of lazy binding components can be
             // incompatible. This should happen only when relevance changes.
@@ -333,18 +333,18 @@ class ControlsComparator(
             else
               diffChildren(children1, children2, fullUpdateBuffer)
 
-          case _ ⇒
+          case _ =>
             // Other grouping control
             diffChildren(children1, children2, fullUpdateBuffer)
         }
-      case _ ⇒
+      case _ =>
         // NOP, not a grouping control
     }
   }
 
   private def processFullUpdateForContent(
     control  : XFormsControl,
-    replay   : XMLReceiver ⇒ Unit)(implicit
+    replay   : XMLReceiver => Unit)(implicit
     receiver : XMLReceiver
   ): Unit = {
 
@@ -412,7 +412,7 @@ class ControlsComparator(
       handlerContext.restoreContext(control)
 
       // Special case for a repeat iteration
-      repeatIterationControlOpt foreach { c ⇒
+      repeatIterationControlOpt foreach { c =>
         handlerContext.pushRepeatContext(
           c.iterationIndex,
           c.repeat.getIndex == c.iterationIndex
@@ -426,7 +426,7 @@ class ControlsComparator(
       "inner-html",
       prefix = "xxf",
       uri    = XXFORMS_NAMESPACE_URI,
-      atts   = List("id" → namespaceId(document, control.effectiveId))
+      atts   = List("id" -> namespaceId(document, control.effectiveId))
     ) {
 
       // Setup everything and replay
@@ -439,11 +439,11 @@ class ControlsComparator(
         setupOutputPipeline(controller)
 
         controller.startDocument()
-        repeatIterationControlOpt foreach { _ ⇒
+        repeatIterationControlOpt foreach { _ =>
           controller.startElement("", "root", "root", SAXUtils.EMPTY_ATTRIBUTES)
         }
         replay(controller)
-        repeatIterationControlOpt foreach { _ ⇒
+        repeatIterationControlOpt foreach { _ =>
           controller.endElement("", "root", "root")
         }
         controller.endDocument()
@@ -456,7 +456,7 @@ class ControlsComparator(
         import io.circe.syntax._
 
         val controls =
-          controlsToInitialize map { case (id, value) ⇒ rpc.Control(namespaceId(document, id), value) }
+          controlsToInitialize map { case (id, value) => rpc.Control(namespaceId(document, id), value) }
 
         element(
           "init",
@@ -470,8 +470,8 @@ class ControlsComparator(
 
   private def repeatDetails(id: String) =
     id.indexOf(REPEAT_SEPARATOR) match {
-      case -1    ⇒ (id, "")
-      case index ⇒ (id.substring(0, index), id.substring(index + 1))
+      case -1    => (id, "")
+      case index => (id.substring(0, index), id.substring(index + 1))
     }
 
   private def outputDeleteRepeatElements(
@@ -488,9 +488,9 @@ class ControlsComparator(
         prefix = "xxf",
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
-          "id"             → namespaceId(document, templateId),
-          "parent-indexes" → parentIndexes,
-          "count"          → count.toString
+          "id"             -> namespaceId(document, templateId),
+          "parent-indexes" -> parentIndexes,
+          "count"          -> count.toString
         )
       )
     }

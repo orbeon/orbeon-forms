@@ -27,7 +27,7 @@ class InstanceMirrorTest
 
   describe("Mirror in same part") {
     it(s"must handle updates") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         this setupDocument
           <xh:html
@@ -82,7 +82,7 @@ class InstanceMirrorTest
         // Attach listeners
         val outerListener = {
 
-          val unknownChange: MirrorEventListener = _ ⇒ {
+          val unknownChange: MirrorEventListener = _ => {
             nonInstanceChanges += 1
             ListenerResult.Stop
           }
@@ -120,7 +120,7 @@ class InstanceMirrorTest
         )
 
         expected.zipWithIndex foreach {
-          case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
+          case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) =>
             dispatch(name = "update" + (index + 1), effectiveId = "model")
 
             assert(instanceToString(innerInstance) === expectedInnerInstanceValue)
@@ -132,7 +132,7 @@ class InstanceMirrorTest
 
   describe("Mirror XBL") {
     it(s"must handle updates in XBL") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         this setupDocument
           <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -212,9 +212,9 @@ class InstanceMirrorTest
         val NestedModelId = "my-gaga" + COMPONENT_SEPARATOR + "gaga-model"
 
         // First update outer instance and check inner instance, then do the reverse
-        for ((targetPrefixedId, mirroredInstance) ← List(OuterModelId → innerInstance, NestedModelId → outerInstance))
+        for ((targetPrefixedId, mirroredInstance) <- List(OuterModelId -> innerInstance, NestedModelId -> outerInstance))
           expected.zipWithIndex foreach {
-            case (expectedInstanceValue, index) ⇒
+            case (expectedInstanceValue, index) =>
               dispatch(name = s"update${index + 1}", effectiveId = targetPrefixedId)
               assert(instanceToString(mirroredInstance) === expectedInstanceValue)
               updates += 1
@@ -227,7 +227,7 @@ class InstanceMirrorTest
 
   describe("#1166: XBL with mirror instance doesn't rebind after context change") {
     it("must match initial and new values") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         this setupDocument
           <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

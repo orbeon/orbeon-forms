@@ -51,12 +51,12 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
   // Immutable map of servlet parameters
   lazy val initParameters =
     getInitParameterNames.asScala map
-      (n ⇒ n → getInitParameter(n)) toMap
+      (n => n -> getInitParameter(n)) toMap
 
   // Servlet init
   override def init(): Unit =
     withRootException("initialization", new ServletException(_)) {
-      init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." → "oxf.servlet-initialized-processor.input."))
+      init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
 
       // Unclear whether there is a better place to do this
       webAppContext.addListener(new WebAppListener {
@@ -67,7 +67,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
   // Servlet destroy
   override def destroy(): Unit =
     withRootException("destruction", new ServletException(_)) {
-      destroy(Some("oxf.servlet-destroyed-processor." → "oxf.servlet-destroyed-processor.input."))
+      destroy(Some("oxf.servlet-destroyed-processor." -> "oxf.servlet-destroyed-processor.input."))
     }
 
   // Servlet request

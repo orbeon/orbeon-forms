@@ -33,13 +33,13 @@ trait LockUnlock extends RequestResponse {
   def lock(req: Request): Unit = {
     import LeaseStatus._
     val timeout = readTimeoutFromHeader
-    readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) ⇒
+    readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
       leaseStatus match {
-        case DoesNotExist ⇒
+        case DoesNotExist =>
           LockSql.createLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
-        case ExistsCanUse ⇒
+        case ExistsCanUse =>
           LockSql.updateLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
-        case ExistsCanNotUse(existingLease) ⇒
+        case ExistsCanNotUse(existingLease) =>
           issueLockedResponse(existingLease)
       }
     }
@@ -47,13 +47,13 @@ trait LockUnlock extends RequestResponse {
 
   def unlock(req: Request): Unit = {
     import LeaseStatus._
-    readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) ⇒
+    readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
       leaseStatus match {
-        case DoesNotExist ⇒
+        case DoesNotExist =>
           // NOP, we're already good
-        case ExistsCanUse ⇒
+        case ExistsCanUse =>
           LockSql.removeLease(connection, dataPart)
-        case ExistsCanNotUse(existingLease) ⇒
+        case ExistsCanNotUse(existingLease) =>
           issueLockedResponse(existingLease)
       }
     }
@@ -72,7 +72,7 @@ trait LockUnlock extends RequestResponse {
     def issueLockedResponse(existingLease: LockSql.Lease): Unit = {
       httpResponse.setStatus(StatusCode.Locked)
       httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
-      httpResponse.getOutputStream.pipe(useAndClose(_)(os ⇒
+      httpResponse.getOutputStream.pipe(useAndClose(_)(os =>
         LockInfo.serialize(LockInfo(existingLease.lockInfo.username, existingLease.lockInfo.groupname), os)
       ))
     }
@@ -82,39 +82,39 @@ trait LockUnlock extends RequestResponse {
       val prefix            = Headers.TimeoutValuePrefix
       val request           = NetUtils.getExternalContext.getRequest
       val headerValue       = request.getFirstHeader(Headers.TimeoutLower)
-      val timeoutString     = headerValue.flatMap(hv ⇒ hv.startsWith(prefix).option(hv.substring(prefix.length)))
-      val timeoutInt        = timeoutString.flatMap(ts ⇒ Try(ts.toInt).toOption)
+      val timeoutString     = headerValue.flatMap(hv => hv.startsWith(prefix).option(hv.substring(prefix.length)))
+      val timeoutInt        = timeoutString.flatMap(ts => Try(ts.toInt).toOption)
       timeoutInt.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
     }
 
     def readLeaseStatus(
       req   : Request)(
-      thunk : (Connection, LeaseStatus, DataPart, LockInfo) ⇒ Unit
+      thunk : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
     ): Unit = {
 
       import LeaseStatus._
       val bodyInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
-        case None          ⇒ NetUtils.getExternalContext.getRequest.getInputStream
+        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
+        case None          => NetUtils.getExternalContext.getRequest.getInputStream
       }
 
       val reqLockInfo = LockInfo.parse(bodyInputStream)
       req.dataPart match {
-        case None ⇒ throw HttpStatusCodeException(StatusCode.BadRequest)
-        case Some(dataPart) ⇒
-          RelationalUtils.withConnection { connection ⇒
+        case None => throw HttpStatusCodeException(StatusCode.BadRequest)
+        case Some(dataPart) =>
+          RelationalUtils.withConnection { connection =>
             def callThunk(leaseStatus: LeaseStatus): Unit =
               thunk(connection, leaseStatus, dataPart, reqLockInfo)
-            Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () ⇒
+            Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () =>
               LockSql.readLease(connection, req.provider, dataPart) match {
-                case Some(lease) ⇒
+                case Some(lease) =>
                   val canUseExistingLease =
                     reqLockInfo.username == lease.lockInfo.username || lease.timeout <= 0
                   if (canUseExistingLease)
                     callThunk(ExistsCanUse)
                   else
                     callThunk(ExistsCanNotUse(lease))
-                case None ⇒
+                case None =>
                   callThunk(DoesNotExist)
               }
             )

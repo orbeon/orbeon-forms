@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.util.concurrent.Callable
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom
 import org.orbeon.dom.io.XMLWriter
@@ -99,12 +99,12 @@ object XFormsServer {
                 .addAttribute("name", eventName)
 
             // Check for `xxforms-submit` event
-            activeSubmissionOpt foreach { activeSubmission ⇒
+            activeSubmissionOpt foreach { activeSubmission =>
               newEventElem(activeSubmission.getEffectiveId, XFormsEvents.XXFORMS_SUBMIT)
             }
 
             // Check for `xxforms-load` event (for portlet mode only!)
-            portletLoadOpt foreach { load ⇒
+            portletLoadOpt foreach { load =>
               // We need to submit the event so that the portlet can load the new path
               // NOTE: don't care about the target for portlets
               newEventElem(Constants.DocumentId, XFormsEvents.XXFORMS_LOAD)
@@ -117,7 +117,7 @@ object XFormsServer {
         }
 
         // Output dynamic state
-        XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState ⇒
+        XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState =>
           element(
             localName = "dynamic-state",
             prefix    = XXFORMS_SHORT_PREFIX,
@@ -148,7 +148,7 @@ object XFormsServer {
             // Output new controls values and associated information
             withElement(localName = "control-values", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
               initialContainingDocumentOpt match {
-                case Some(initialContainingDocument) ⇒
+                case Some(initialContainingDocument) =>
                   // All events
                   // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                   val currentControlTree = controls.getCurrentControlTree
@@ -158,7 +158,7 @@ object XFormsServer {
                   // know whether there were any, so we safely force structural changes. This ensures that the
                   // client will have all the necessary markup, and also prevents the comparator from choking when
                   // comparing incompatible trees.
-                  for (e ← containingDocument.getStaticOps.controlsByName("dynamic"))
+                  for (e <- containingDocument.getStaticOps.controlsByName("dynamic"))
                     containingDocument.addControlStructuralChange(e.prefixedId)
 
                   diffControls(
@@ -168,7 +168,7 @@ object XFormsServer {
                     valueChangeControlIdsAndValues = Map.empty,
                     isTestMode                     = testOutputAllActions
                   )
-                case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest ⇒
+                case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
                   val currentControlTree = controls.getCurrentControlTree
                   diffControls(
                     containingDocument             = containingDocument,
@@ -177,13 +177,13 @@ object XFormsServer {
                     valueChangeControlIdsAndValues = eventFindings.valueChangeControlIdsAndValues,
                     isTestMode                     = testOutputAllActions
                   )
-                case _ ⇒ // NOP
+                case _ => // NOP
               }
             }
 
             // Add repeat hierarchy update if needed
             // https://github.com/orbeon/orbeon-forms/issues/2891
-            repeatHierarchyOpt foreach { repeatHierarchy ⇒
+            repeatHierarchyOpt foreach { repeatHierarchy =>
               val newRepeatHierarchy = containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
               if (repeatHierarchy != newRepeatHierarchy) {
                 element(
@@ -198,25 +198,25 @@ object XFormsServer {
             // Output index updates
             val ns = containingDocument.getContainerNamespace
             initialContainingDocumentOpt match {
-              case Some(initialContainingDocument) ⇒
+              case Some(initialContainingDocument) =>
                 // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                 diffIndexState(
                   ns,
                   XFormsRepeatControl.initialIndexes(initialContainingDocument),
                   XFormsRepeatControl.currentIndexes(containingDocument)
                 )
-              case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest ⇒
+              case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
                 diffIndexState(
                   ns,
                   controls.getInitialControlTree.initialRepeatIndexes,
                   XFormsRepeatControl.currentIndexes(containingDocument)
                 )
-              case _ ⇒ // NOP
+              case _ => // NOP
             }
 
             // Output server events
 
-            submissionServerEventsOpt foreach { submissionServerEvents ⇒
+            submissionServerEventsOpt foreach { submissionServerEvents =>
               element(
                 localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
                 prefix    = XXFORMS_SHORT_PREFIX,
@@ -228,7 +228,7 @@ object XFormsServer {
             val delayedEvents = containingDocument.delayedEvents
             if (delayedEvents.nonEmpty) {
               val currentTime = System.currentTimeMillis
-              for (delayedEvent ← delayedEvents)
+              for (delayedEvent <- delayedEvents)
                 delayedEvent.writeAsSAX(currentTime)
             }
 
@@ -240,8 +240,8 @@ object XFormsServer {
 
             // `javascript:` loads only and regular scripts
             containingDocument.getScriptsToRun foreach {
-              case Left(load)              ⇒ outputLoad(containingDocument, load)
-              case Right(scriptInvocation) ⇒ outputScriptInvocation(containingDocument, scriptInvocation)
+              case Left(load)              => outputLoad(containingDocument, load)
+              case Right(scriptInvocation) => outputScriptInvocation(containingDocument, scriptInvocation)
             }
 
             // Output focus instruction
@@ -252,29 +252,29 @@ object XFormsServer {
               // current request, or the focus information we kept since the previous request.
               val beforeFocusEffectiveIdOpt =
                 eventFindings.clientFocusControlIdOpt match {
-                  case Some(clientFocusControlIdOpt) ⇒ clientFocusControlIdOpt
-                  case None                          ⇒ beforeFocusedControlIdOpt
+                  case Some(clientFocusControlIdOpt) => clientFocusControlIdOpt
+                  case None                          => beforeFocusedControlIdOpt
                 }
 
               val afterFocusEffectiveIdOpt =
                 afterFocusedControlOpt map (_.getEffectiveId)
 
               (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
-                case (Some(beforeFocusEffectiveId), None) ⇒
+                case (Some(beforeFocusEffectiveId), None) =>
                   // Focus removed: notify the client only if the control still exists AND is visible
                   // See https://github.com/orbeon/orbeon-forms/issues/4113
-                  if (containingDocument.getControls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c ⇒ ! Focus.isHidden(c)))
+                  if (containingDocument.getControls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => ! Focus.isHidden(c)))
                     outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
-                case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt ⇒
+                case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt =>
                   // There is a focused control and it is different from the focus as known by the client
                   outputFocusInfo(containingDocument, focus = true, afterFocusEffectiveId)
-                case _ ⇒
+                case _ =>
                   // Nothing to notify
               }
             }
 
             // Output help instruction
-            containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId ⇒
+            containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId =>
               outputHelpInfo(containingDocument, helpControlEffectiveId)
             }
 
@@ -288,7 +288,7 @@ object XFormsServer {
 
             // Non-`javascript:` loads only
             containingDocument.getNonJavaScriptLoadsToRun filterNot (isPortletLoadMatch(containingDocument, _)) foreach
-              (load ⇒ outputLoad(containingDocument, load))
+              (load => outputLoad(containingDocument, load))
           }
         }
 
@@ -370,8 +370,8 @@ object XFormsServer {
       if (currentRepeatIdToIndex.nonEmpty) {
         var found = false
         for {
-          (repeatId, newIndex) ← currentRepeatIdToIndex
-          oldIndex             ← initialRepeatIdToIndex.get(repeatId) // may be None if there was no iteration
+          (repeatId, newIndex) <- currentRepeatIdToIndex
+          oldIndex             <- initialRepeatIdToIndex.get(repeatId) // may be None if there was no iteration
           if newIndex != oldIndex
         } locally {
             if (! found) {
@@ -387,7 +387,7 @@ object XFormsServer {
               localName = "repeat-index",
               prefix    = XXFORMS_SHORT_PREFIX,
               uri       = XXFORMS_NAMESPACE_URI,
-              atts      = List("id" → (ns + repeatId), "new-index" → newIndex.toString)
+              atts      = List("id" -> (ns + repeatId), "new-index" -> newIndex.toString)
             )
         }
 
@@ -409,10 +409,10 @@ object XFormsServer {
       // when executed from within a portlet is ran as very much like the `replace="all"` submissions.
 
       val showProgressAtt =
-        activeSubmissionOpt exists (!_.getActiveSubmissionParameters.xxfShowProgress) list ("show-progress" → "false")
+        activeSubmissionOpt exists (!_.getActiveSubmissionParameters.xxfShowProgress) list ("show-progress" -> "false")
 
       val targetAtt =
-        activeSubmissionOpt flatMap (_.getActiveSubmissionParameters.xxfTargetOpt) map ("target" → _) toList
+        activeSubmissionOpt flatMap (_.getActiveSubmissionParameters.xxfTargetOpt) map ("target" -> _) toList
 
       val actionAtt =
         isPortletContainer list {
@@ -425,7 +425,7 @@ object XFormsServer {
             else
               response.rewriteActionURL(SubmitUrl)
 
-          "action" → actionUrl
+          "action" -> actionUrl
         }
 
       // Signal that we want a POST to the XForms server
@@ -433,7 +433,7 @@ object XFormsServer {
         localName = "submission",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = ("method" → HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
+        atts      = ("method" -> HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
 
@@ -441,12 +441,12 @@ object XFormsServer {
       messages    : Seq[Message])(implicit
       xmlReceiver : XMLReceiver
     ): Unit =
-      for (message ← messages)
+      for (message <- messages)
         element(
           localName = "message",
           prefix    = XXFORMS_SHORT_PREFIX,
           uri       = XXFORMS_NAMESPACE_URI,
-          atts      = List("level" → message.level),
+          atts      = List("level" -> message.level),
           text      = message.message
         )
 
@@ -460,10 +460,10 @@ object XFormsServer {
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
         atts      =
-          ("resource" → load.resource)                          ::
-          (load.target.toList map ("target" → _))               :::
-          ("show" → (if (load.isReplace) "replace" else "new")) ::
-          (! load.isShowProgress list ("show-progress" → "false"))
+          ("resource" -> load.resource)                          ::
+          (load.target.toList map ("target" -> _))               :::
+          ("show" -> (if (load.isReplace) "replace" else "new")) ::
+          (! load.isShowProgress list ("show-progress" -> "false"))
       )
 
     def outputScriptInvocation(
@@ -476,13 +476,13 @@ object XFormsServer {
         prefix = XXFORMS_SHORT_PREFIX,
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
-          "name"        → scriptInvocation.script.shared.clientName,
-          "target-id"   → XFormsUtils.namespaceId(doc, scriptInvocation.targetEffectiveId),
-          "observer-id" → XFormsUtils.namespaceId(doc, scriptInvocation.observerEffectiveId)
+          "name"        -> scriptInvocation.script.shared.clientName,
+          "target-id"   -> XFormsUtils.namespaceId(doc, scriptInvocation.targetEffectiveId),
+          "observer-id" -> XFormsUtils.namespaceId(doc, scriptInvocation.observerEffectiveId)
         )
       ) {
 
-        for (value ← scriptInvocation.paramValues) {
+        for (value <- scriptInvocation.paramValues) {
           element(
             "param",
             prefix = XXFORMS_SHORT_PREFIX,
@@ -503,7 +503,7 @@ object XFormsServer {
         localName = if (focus) "focus" else "blur",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = List("control-id" → XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId))
+        atts      = List("control-id" -> XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId))
       )
 
     def outputHelpInfo(
@@ -515,14 +515,14 @@ object XFormsServer {
         localName = "help",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = List("control-id" → XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId))
+        atts      = List("control-id" -> XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId))
       )
   }
 }
 
 class XFormsServer extends ProcessorImpl {
 
-  self ⇒
+  self =>
 
   import XFormsServer._
 
@@ -535,12 +535,12 @@ class XFormsServer extends ProcessorImpl {
         try {
           doIt(pipelineContext, Some(xmlReceiver))
         } catch {
-          case e: SessionExpiredException ⇒
+          case e: SessionExpiredException =>
             LifecycleLogger.eventAssumingRequest("xforms", e.message, Nil)
             // Don't log whole exception
             XFormsServer.logger.info(e.message)
             ClientEvents.errorDocument(e.message, e.code)(xmlReceiver)
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             XFormsServer.logger.error(OrbeonFormatter.format(t))
             ClientEvents.errorDocument(OrbeonFormatter.message(t), StatusCode.InternalServerError)(xmlReceiver)
         }
@@ -574,7 +574,7 @@ class XFormsServer extends ProcessorImpl {
     val logRequestResponse = XFormsProperties.getDebugLogging.contains("server-body")
 
     if (logRequestResponse)
-      debug("ajax request", List("body" → requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
+      debug("ajax request", List("body" -> requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
 
     // Get action
     val actionElement = requestDocument.getRootElement.element(XXFORMS_ACTION_QNAME)
@@ -584,7 +584,7 @@ class XFormsServer extends ProcessorImpl {
     // replace="all". In this case, only server events are provided.
     val remainingClientEvents =
       xmlReceiverOpt match {
-        case Some(xmlReceiver) ⇒
+        case Some(xmlReceiver) =>
 
           val remainingClientEvents =
             ClientEvents.handleQuickReturnEvents(
@@ -599,7 +599,7 @@ class XFormsServer extends ProcessorImpl {
             return
 
           remainingClientEvents
-        case None ⇒
+        case None =>
           ClientEvents.extractLocalEvents(actionElement)
       }
 
@@ -627,7 +627,7 @@ class XFormsServer extends ProcessorImpl {
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
     val lockResult: Try[Option[Callable[SubmissionResult]]] =
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
-        case Some(containingDocument) ⇒
+        case Some(containingDocument) =>
 
           val expectedSequenceNumber = containingDocument.getSequence
           if (ignoreSequence || (parameters.sequenceOpt contains expectedSequenceNumber)) {
@@ -695,9 +695,9 @@ class XFormsServer extends ProcessorImpl {
               Success(
                 withUpdateResponse(containingDocument, ignoreSequence) {
                   containingDocument.getReplaceAllCallable match {
-                    case None ⇒
+                    case None =>
                       xmlReceiverOpt match {
-                        case Some(xmlReceiver) ⇒
+                        case Some(xmlReceiver) =>
 
                           // Create resulting document if there is a receiver
                           if (containingDocument.isGotSubmissionRedirect) {
@@ -745,29 +745,29 @@ class XFormsServer extends ProcessorImpl {
                               try {
                                 responseStore.replay(xmlReceiver)
                               } catch {
-                                case NonFatal(t) ⇒
+                                case NonFatal(t) =>
                                   indentedLogger.logDebug("retry", "got exception while sending response; ignoring and expecting client to retry", t)
                               }
 
-                              debugContentHandlerOpt foreach { debugContentHandler ⇒
-                                debugResults(List("ajax response" → debugContentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
+                              debugContentHandlerOpt foreach { debugContentHandler =>
+                                debugResults(List("ajax response" -> debugContentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
                               }
                             }
                           }
-                        case None ⇒
+                        case None =>
                           // This is the second pass of a submission with replace="all". We ensure that the document is
                           // not modified.
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case someCallable ⇒
+                    case someCallable =>
                       // Check if there is a submission with replace="all" that needs processing
                       someCallable
                   }
                 }
               )
             } catch {
-              case NonFatal(t) ⇒
+              case NonFatal(t) =>
                 // Log body of Ajax request if needed
                 if (XFormsProperties.getErrorLogging.contains("server-body"))
                   indentedLogger.logError("", "error processing Ajax update", "request", requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
@@ -783,14 +783,14 @@ class XFormsServer extends ProcessorImpl {
 
               val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
 
-              LifecycleLogger.eventAssumingRequest("xforms", "replay response", List("uuid" → parameters.uuid))
+              LifecycleLogger.eventAssumingRequest("xforms", "replay response", List("uuid" -> parameters.uuid))
               withDebug("replaying previous Ajax response") {
                 try {
                   // Write last response
                   containingDocument.getLastAjaxResponse.replay(xmlReceiver)
-                  debugResults(List("success" → "true"))
+                  debugResults(List("success" -> "true"))
                 } finally {
-                  debugResults(List("success" → "false"))
+                  debugResults(List("success" -> "false"))
                 }
               }
               None
@@ -800,7 +800,7 @@ class XFormsServer extends ProcessorImpl {
             // Keep the document around but return an `Failure`
             Failure(throw new OXFException("Got unexpected request sequence number"))
           }
-        case None ⇒
+        case None =>
           // This is most likely the case of a retry if the initial request was long-running
           // See https://github.com/orbeon/orbeon-forms/issues/1984
           info("Ajax update lock timeout exceeded, returning error to client")
@@ -814,14 +814,14 @@ class XFormsServer extends ProcessorImpl {
 
     // Throw the exception if there was any
     lockResult match {
-      case Success(Some(replaceAllCallable)) ⇒
+      case Success(Some(replaceAllCallable)) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
         XFormsModelSubmission.runDeferredSubmission(replaceAllCallable, response)
-      case Success(None) ⇒
-      case Failure(t)    ⇒ throw t
+      case Success(None) =>
+      case Failure(t)    => throw t
     }
   }
 }

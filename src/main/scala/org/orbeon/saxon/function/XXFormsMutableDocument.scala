@@ -25,7 +25,7 @@ class XXFormsMutableDocument extends DefaultFunctionSupport {
 
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo =
     itemArgument(0)(xpathContext) match {
-      case n: NodeInfo ⇒ TransformerUtils.extractAsMutableDocument(n)
-      case _           ⇒ null
+      case n: NodeInfo => TransformerUtils.extractAsMutableDocument(n)
+      case _           => null
     }
 }

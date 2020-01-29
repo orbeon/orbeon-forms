@@ -75,7 +75,8 @@ private class Select1SearchCompanion extends XBLCompanion {
             Select2Ajax
           else
             null
-        options.allowClear = true
+        options.allowClear     = true
+        options.dropdownParent = jContainer
         jSelect.select2(options)
         if (performsSearch)
           jSelect.on("change", onChange(htmlSelect) _)
@@ -162,9 +163,10 @@ private object Select2 {
   }
 
   class Options extends js.Object {
-    var placeholder : Option  = _
-    var ajax        : Ajax    = _
-    var allowClear  : Boolean = false
+    var placeholder    : Option             = _
+    var ajax           : Ajax               = _
+    var allowClear     : Boolean            = false
+    var dropdownParent : js.UndefOr[JQuery] = _
   }
 
   trait Option extends js.Object {

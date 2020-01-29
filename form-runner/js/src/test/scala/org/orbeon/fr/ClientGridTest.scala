@@ -92,7 +92,7 @@ class ClientGridTest extends AnyFunSpec {
       )
     )
 
-    val GridBodySelector = "#fb≡section-1-control≡grid-1-control .fr-grid-body"
+    val GridSelector = "#fb≡section-1-control≡grid-1-control"
 
     val expectedASCII =
       """
@@ -103,7 +103,9 @@ class ClientGridTest extends AnyFunSpec {
       """.stripMargin.trim.replaceAllLiterally("|", "") // use `|` on the right as editors remove spaces
 
     it(s"must must analyze as expected") {
-      assert(expectedASCII === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridBodySelector)(0), simplify = false))._1)
+      assert(
+        expectedASCII ===
+          Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridSelector)(0), simplify = false))._1)
     }
 
     // NOTE: The logic which allows expanding cells can be improved. Right now (2017-10-03), it won't

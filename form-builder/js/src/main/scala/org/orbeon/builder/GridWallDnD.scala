@@ -74,8 +74,10 @@ object GridWallDnD {
 
     object DndSides {
        def show(cell: Block): Unit = {
-         val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
-         val walls     = Cell.movableWalls(cell.underlying)
+
+         val gridModel = Cell.analyze12ColumnGridAndFillHoles(HtmlElementCellOps.gridForCell(cell.underlying), simplify = false)
+
+         val walls     = Cell.movableWalls(gridModel, cell.underlying)
          walls.foreach { case (direction, wallPosition) =>
            val wallOrientation = DndWall.wallOrientation(direction)
            val index = direction match {
@@ -101,7 +103,7 @@ object GridWallDnD {
       private var mouseOnWall                = false
 
       def show[Underlying](
-        gridMode    : GridModel[Underlying],
+        gridModel   : GridModel[Underlying],
         index       : Int,
         orientation : Orientation,
         side        : Option[Direction]
@@ -294,7 +296,7 @@ object GridWallDnD {
             DndShadow.show(source)
             DndWall.hideAll()
             ControlEditor.mask()
-            val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.underlying.parentElement, simplify = false)
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(HtmlElementCellOps.gridForCell(currentCell.underlying), simplify = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
             possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
           }

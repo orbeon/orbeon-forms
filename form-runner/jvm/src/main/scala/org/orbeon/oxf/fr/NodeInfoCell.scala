@@ -19,6 +19,7 @@ import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+
 import scala.collection.compat._
 
 // This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition
@@ -36,6 +37,12 @@ object NodeInfoCell {
     def children       (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to(List)
     def parent         (u: NodeInfo)              : NodeInfo       = u.parentUnsafe
     def hasChildElement(u: NodeInfo)              : Boolean        = u.hasChildElement
+
+    def cellsForGrid   (u: NodeInfo)              : List[NodeInfo] = (u / CellTest).to(List)
+    def gridForCell    (u: NodeInfo)              : NodeInfo       = parent(u)
+
+    def maxGridWidth(u: NodeInfo): Int =
+      if (u.attValueOpt("columns") contains "24") 24 else 12
 
     def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)
     def y(u: NodeInfo): Option[Int] = attValueOpt(u, "y") map (_.toInt)

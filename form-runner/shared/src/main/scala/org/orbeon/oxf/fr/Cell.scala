@@ -13,16 +13,16 @@
   */
 package org.orbeon.oxf.fr
 
+import enumeratum._
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.Try
-import enumeratum._
 
-case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int) {
+case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int)(maxGridWidth: Int) {
 
-  require(x > 0 && y > 0 && h > 0 && w > 0,                                     s"`$x`, `$y`, `$h`, `$w`")
-  require(x <= Cell.StandardGridWidth && (x + w - 1) <= Cell.StandardGridWidth, s"`$x`, `$y`, `$h`, `$w`")
+  require(x > 0 && y > 0 && h > 0 && w > 0,                 s"`$x`, `$y`, `$h`, `$w`")
+  require(x <= maxGridWidth && (x + w - 1) <= maxGridWidth, s"`$x`, `$y`, `$h`, `$w`")
 
   def td           = u getOrElse (throw new NoSuchElementException)
   def missing      = origin.isDefined
@@ -43,6 +43,9 @@ trait CellOps[Underlying] {
   def children       (u: Underlying, name: String): List[Underlying]
   def parent         (u: Underlying)              : Underlying
   def hasChildElement(u: Underlying)              : Boolean
+  def cellsForGrid   (u: Underlying)              : List[Underlying]
+  def gridForCell    (u: Underlying)              : Underlying
+  def maxGridWidth   (u: Underlying)              : Int
 
   def x(u: Underlying): Option[Int]
   def y(u: Underlying): Option[Int]
@@ -68,7 +71,7 @@ object Cell {
 
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
   // The cells returned can have a width which is less than `StandardGridWidth`.
-  def analyzeTrTdGrid[Underlying : CellOps](
+  def analyzeTrTdGrid[Underlying: CellOps](
     grid     : Underlying,
     simplify : Boolean
   ): (Int, GridModel[Underlying]) = {
@@ -95,7 +98,7 @@ object Cell {
             val w = getNormalizedSizeAtt(td, "colspan")
             val h = getNormalizedSizeAtt(td, "rowspan")
 
-            val newCell = Cell(Some(td), None, start + 1, iy + 1, h, w)
+            val newCell = Cell(Some(td), None, start + 1, iy + 1, h, w)(xyGridWidth)
 
             for {
               iy1 <- iy until ((iy + h) min xyGridHeight)
@@ -106,7 +109,7 @@ object Cell {
                 if (isOriginCell)
                   newCell
                 else
-                  newCell.copy(origin = Some(newCell), x = ix1 + 1, y = iy1 + 1, h = h + iy - iy1, w = w + start - ix1)
+                  newCell.copy(origin = Some(newCell), x = ix1 + 1, y = iy1 + 1, h = h + iy - iy1, w = w + start - ix1)(xyGridWidth)
             }
 
             ix = start + w
@@ -129,12 +132,12 @@ object Cell {
         if (widths.nonEmpty) widths.max else 0
       }
 
-      if (simplify && actualGridWidth != 0 && Cell.StandardGridWidth % actualGridWidth == 0)
+      if (simplify && actualGridWidth != 0 && xyGridWidth % actualGridWidth == 0)
         actualGridWidth
       else if (simplify && actualGridWidth == 5)
         6
       else
-        StandardGridWidth
+        xyGridWidth
     }
 
     // In most cases, there won't be holes as `<xh:tr>`/`<xh:td>` grids are supposed to be fully populated.
@@ -147,13 +150,14 @@ object Cell {
     simplify   : Boolean
   ): GridModel[Underlying] = {
 
-    val ops = implicitly[CellOps[Underlying]]
-    val cs  = ops.children(grid, CellTestName)
+    val ops          = implicitly[CellOps[Underlying]]
+    val cs           = ops.cellsForGrid(grid)
+    val maxGridWidth = ops.maxGridWidth(grid)
 
     // TODO: can it be 0?
     val gridHeight = if (cs.nonEmpty) cs map (c => ops.y(c).getOrElse(1) + ops.h(c).getOrElse(1) - 1) max else 0
 
-    val xy = Array.fill[Cell[Underlying]](gridHeight, StandardGridWidth)(null)
+    val xy = Array.fill[Cell[Underlying]](gridHeight, maxGridWidth)(null)
 
     // Mark cells
     cs foreach { c =>
@@ -163,7 +167,7 @@ object Cell {
       val w = ops.w(c).getOrElse(1)
       val h = ops.h(c).getOrElse(1)
 
-      val newCell = Cell(Some(c), None, x, y, h, w)
+      val newCell = Cell(Some(c), None, x, y, h, w)(maxGridWidth)
 
       for {
         iy <- (y - 1) until (y + h - 1)
@@ -174,16 +178,16 @@ object Cell {
           if (isOriginCell)
             newCell
           else
-            newCell.copy(origin = Some(newCell), x = ix + 1, y = iy + 1, h = h - iy + y - 1, w = w - ix + x - 1)
+            newCell.copy(origin = Some(newCell), x = ix + 1, y = iy + 1, h = h - iy + y - 1, w = w - ix + x - 1)(maxGridWidth)
       }
     }
 
-    fillHoles(xy, StandardGridWidth)
+    fillHoles(xy, maxGridWidth)
 
     if (simplify)
-      Private.simplify(xy)
+      Private.simplify(xy, maxGridWidth)
     else
-      xyToList(xy, StandardGridWidth)
+      xyToList(xy, maxGridWidth)
   }
 
   def originCells[Underlying](gridModel: GridModel[Underlying]): List[Cell[Underlying]] =
@@ -202,11 +206,15 @@ object Cell {
   }
 
   // Finds the neighbors on the given side of the given cell
-  def findOriginNeighbors[Underlying](
+  def findOriginNeighbors[Underlying: CellOps](
     originCell : Cell[Underlying],
     side       : Direction,
     gridModel  : GridModel[Underlying]
   ): List[Cell[Underlying]] = {
+
+    val ops  = implicitly[CellOps[Underlying]]
+    val grid = ops.gridForCell(originCell.u.get)
+
     val (neighborX, neighborY) = side match {
       case Direction.Left  => (originCell.x - 1           , originCell.y               )
       case Direction.Right => (originCell.x + originCell.w, originCell.y               )
@@ -215,7 +223,7 @@ object Cell {
     }
     val isCoordinateValid =
       neighborX >= 1 &&
-      neighborX <= Cell.StandardGridWidth &&
+      neighborX <= ops.maxGridWidth(grid) &&
       neighborY >= 1 &&
       neighborY <= gridModel.cells.length
     isCoordinateValid.flatList {
@@ -228,16 +236,16 @@ object Cell {
     }
   }
 
-  def nonOverflowingNeighbors[Underlying](
-    cells: GridModel[Underlying],
-    originCell: Cell[Underlying],
-    direction: Direction
+  def nonOverflowingNeighbors[Underlying: CellOps](
+    gridModel  : GridModel[Underlying],
+    originCell : Cell[Underlying],
+    direction  : Direction
   ): List[Cell[Underlying]] = {
     def overflowsOriginCell(c: Cell[Underlying]) = direction match {
       case Direction.Left | Direction.Right => c.y < originCell.y || c.y + c.h > originCell.y + originCell.h
       case Direction.Up   | Direction.Down  => c.x < originCell.x || c.x + c.w > originCell.x + originCell.w
     }
-    val neighborCells       = findOriginNeighbors(originCell, direction, cells)
+    val neighborCells       = findOriginNeighbors(originCell, direction, gridModel)
     val originNeighborCells = neighborCells.map(selfCellOrOrigin).distinct
     val directionOK         = ! originNeighborCells.exists(overflowsOriginCell)
     if (directionOK) originNeighborCells else Nil
@@ -259,15 +267,13 @@ object Cell {
   }
 
   // For a given cell, returns the walls that can be moved by D&D
-  def movableWalls[Underlying](
-    cellElem         : Underlying)(
-    implicit cellOps : CellOps[Underlying]
-  ): List[(Direction, WallPosition)] = {
-
-    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
-    findOriginCell(cells, cellElem).toList.flatMap { originCell =>
+  def movableWalls[Underlying: CellOps](
+    gridModel : GridModel[Underlying],
+    cellElem  : Underlying
+  ): List[(Direction, WallPosition)] =
+    findOriginCell(gridModel, cellElem).toList.flatMap { originCell =>
       Direction.values.flatMap { direction =>
-        val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
+        val neighbors = nonOverflowingNeighbors(gridModel, originCell, direction)
         val smallestNeighborOpt = findSmallestNeighbor(direction, neighbors)
         val directionWallPosition = smallestNeighborOpt.flatMap { smallestNeighbor =>
           val directionOK =
@@ -287,18 +293,18 @@ object Cell {
         directionWallPosition.map(direction -> _)
       }
     }
-  }
 
-  def canChangeSize[Underlying](
-    cellElem         : Underlying)(
-    implicit cellOps : CellOps[Underlying]
-  ): List[Direction] = {
-    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
+  def canChangeSize[Underlying: CellOps](cellElem: Underlying): List[Direction] = {
+
+    val ops  = implicitly[CellOps[Underlying]]
+    val grid = ops.gridForCell(cellElem)
+
+    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell =>
       val merge =
         List(Direction.Right, Direction.Down) flatMap { direction =>
           val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
-          val canExpand = neighbors.lengthCompare(1) == 0 && neighbors.head.u.exists(! cellOps.hasChildElement(_))
+          val canExpand = neighbors.lengthCompare(1) == 0 && neighbors.head.u.exists(! ops.hasChildElement(_))
           canExpand.list(direction)
         }
       val splitX = (originCell.w > 1).list(Direction.Left)
@@ -309,12 +315,16 @@ object Cell {
 
   // When dragging a given wall of a given cell, returns where this wall can go
   case class PossibleDropTargets(statusQuo: Int, all: List[Int])
-  def cellWallPossibleDropTargets[Underlying](
-    cellElem         : Underlying,
-    startSide        : Direction)(
-    implicit cellOps : CellOps[Underlying]
+
+  def cellWallPossibleDropTargets[Underlying: CellOps](
+    cellElem  : Underlying,
+    startSide : Direction
   ): Option[PossibleDropTargets] = {
-    val cells = analyze12ColumnGridAndFillHoles(cellOps.parent(cellElem), simplify = false)
+
+    val ops  = implicitly[CellOps[Underlying]]
+    val grid = ops.gridForCell(cellElem)
+
+    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false)
     findOriginCell(cells, cellElem).map { originCell =>
 
       def insideCellPositions(cell: Cell[Underlying]): List[Int] =
@@ -323,7 +333,7 @@ object Cell {
           case Orientation.Vertical   => (cell.y until cell.y + cell.h - 1).toList
         }
 
-      val statusQuoPosition   = startSide match {
+      val statusQuoPosition = startSide match {
         case Direction.Left  => originCell.x - 1
         case Direction.Right => originCell.x + originCell.w - 1
         case Direction.Up    => originCell.y - 1
@@ -394,7 +404,7 @@ object Cell {
           findRun(ix) match {
             case Some((start, endInclusive)) =>
 
-              val newCell = Cell[Underlying](None, None, start + 1, iy + 1, 1, endInclusive - start + 1)
+              val newCell = Cell[Underlying](None, None, start + 1, iy + 1, 1, endInclusive - start + 1)(width)
 
               for {
                 ix1 <- start to endInclusive
@@ -404,7 +414,7 @@ object Cell {
                   if (isOriginCell)
                     newCell
                   else
-                    newCell.copy(origin = Some(newCell), x = ix1 + 1, w = endInclusive - ix1 + 1)
+                    newCell.copy(origin = Some(newCell), x = ix1 + 1, w = endInclusive - ix1 + 1)(width)
               }
 
               ix = endInclusive + 1
@@ -417,11 +427,11 @@ object Cell {
     // Create a simplified grid if positions and widths have a gcd
     // NOTE: The resulting grid will then not necessarily have `StandardGridWidth` cells on each row,
     // but 1, 2, 3, 4, 6, or 12 cells.
-    def simplify[Underlying](xy: Array[Array[Cell[Underlying]]]): GridModel[Underlying] = {
+    def simplify[Underlying](xy: Array[Array[Cell[Underlying]]], maxGridWidth: Int): GridModel[Underlying] = {
 
       val gcd = {
 
-        val Divisors = List(12, 6, 4, 3, 2)
+        val Divisors = List(24, 12, 8, 6, 4, 3, 2)
 
         def gcd2(v1: Int, v2: Int): Int =
           Divisors find (d => v1 % d == 0 && v2 % d == 0) getOrElse 1
@@ -439,9 +449,9 @@ object Cell {
       }
 
       if (gcd > 1)
-        GridModel(xy map (_ grouped gcd map (x => x.head) map (c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList)
+        GridModel(xy map (_ grouped gcd map (x => x.head) map (c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(maxGridWidth)) toList) toList)
       else
-        xyToList(xy, StandardGridWidth)
+        xyToList(xy, maxGridWidth)
     }
   }
 

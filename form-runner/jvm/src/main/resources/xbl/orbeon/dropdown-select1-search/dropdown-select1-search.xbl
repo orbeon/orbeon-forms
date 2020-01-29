@@ -63,6 +63,7 @@
         </metadata>
 
         <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.css"/>
         </xbl:resources>
 

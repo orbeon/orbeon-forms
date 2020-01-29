@@ -64,19 +64,17 @@ private class Select1SearchCompanion extends XBLCompanion {
           }
         }
 
-        val options = new Select2.Options
-        options.placeholder =
-          new Select2.Option {
-            val id   = "0"
-            val text = elementWithData.attr(DataPlaceholder).get
-          }
-        options.ajax =
-          if (performsSearch)
-            Select2Ajax
-          else
-            null
-        options.allowClear     = true
-        options.dropdownParent = jContainer
+        object options extends Select2.Options {
+          allowClear     = true
+          dropdownParent = jContainer
+          ajax           = if (performsSearch) Select2Ajax else null
+          placeholder    =
+            new Select2.Option {
+              val id   = "0"
+              val text = elementWithData.attr(DataPlaceholder).get
+            }
+        }
+
         jSelect.select2(options)
         if (performsSearch)
           jSelect.on("change", onChange(htmlSelect) _)

@@ -43,7 +43,7 @@
             fr|databound-select1[appearance ~= search]"
         xxf:external-events="fr-search fr-change"
         xxbl:container="span"
-        xxbl:mode="lhha binding value selection javascript-lifecycle">
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Search</display-name>

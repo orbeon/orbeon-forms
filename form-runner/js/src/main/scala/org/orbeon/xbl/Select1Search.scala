@@ -84,6 +84,9 @@ private class Select1SearchCompanion extends XBLCompanion {
       onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
     }
 
+  override def xformsFocus(): Unit =
+    containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
+
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
     val observer = new MutationObserver((_, _) => listener())

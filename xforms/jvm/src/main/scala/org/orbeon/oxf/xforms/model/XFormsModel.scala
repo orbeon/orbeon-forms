@@ -92,8 +92,7 @@ class XFormsModel(
       ): _*
     )
 
-  private val _modelBindsOpt: Option[XFormsModelBinds] = XFormsModelBinds(selfModel)
-  def modelBindsOpt: Option[XFormsModelBinds] = _modelBindsOpt
+  val modelBindsOpt: Option[XFormsModelBinds] = XFormsModelBinds(selfModel)
 
   def findObjectByEffectiveId(effectiveId: String): Option[XFormsObject] = {
 
@@ -116,7 +115,7 @@ class XFormsModel(
       findInstance(targetStaticId)             orElse
       _submissions.get(targetStaticId)         orElse
       _actions.get(targetStaticId)             orElse
-      (_modelBindsOpt flatMap (_.resolveBind(targetStaticId, contextItemOpt)))
+      (modelBindsOpt flatMap (_.resolveBind(targetStaticId, contextItemOpt)))
   }
 
   // Restore the state of the model when the model object was just recreated
@@ -239,8 +238,7 @@ trait XFormsModelEventTarget
   extends XFormsEventTarget
      with ListenersTrait  {
 
-  def effectiveId: String
-  val staticModel: Model
+  selfModel: XFormsModel =>
 
   def scope: Scope = staticModel.scope
 
@@ -318,10 +316,6 @@ trait XFormsModelVariables {
 trait XFormsModelInstances {
 
   selfModel: XFormsModel =>
-
-  val container: XBLContainer
-  def effectiveId: String
-  val staticModel: Model
 
   private val (_instanceIds: Seq[String], _instances: Array[XFormsInstance], _instancesMap: ju.Map[String, XFormsInstance]) =
     (

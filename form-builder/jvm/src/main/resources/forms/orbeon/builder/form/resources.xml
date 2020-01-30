@@ -681,6 +681,9 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "address"</hint>
             </control-name>
+            <grid-columns>
+                <label>Number of grid columns</label>
+            </grid-columns>
             <options>
                 <label>Options</label>
                 <item>
@@ -1929,6 +1932,9 @@
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint>Par ex.: "addresse"</hint>
             </control-name>
+            <grid-columns>
+                <label>Nombre de colonnes dans la grille</label>
+            </grid-columns>
             <options>
                 <label>Options</label>
                 <item>
@@ -3161,6 +3167,9 @@
                 <alert>Navnet er galt eller allerede i bruk.</alert>
                 <hint>F.eks.: «adresse»</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -4419,6 +4428,9 @@
                 <alert>Название уже используется или некорректно</alert>
                 <hint>Например: "address"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -5678,6 +5690,9 @@
                 <alert>Il nome é già in uso o non è valido</alert>
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opzioni</label>
                 <item>
@@ -6929,6 +6944,9 @@
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>z.B.: "Kontaktdaten"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Optionen</label>
                 <item>
@@ -8183,6 +8201,9 @@
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "osoite"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Asetukset</label>
                 <item>
@@ -9434,6 +9455,9 @@
                 <alert>Nombre ya usado o incorrecto</alert>
                 <hint>Ej: "nombre"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opciones</label>
                 <item>
@@ -10686,6 +10710,9 @@
                 <alert>Naam is al in gebruik of ongeldig</alert>
                 <hint>Bijv.: "adres"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opties</label>
                 <item>
@@ -11917,6 +11944,9 @@
                 <alert>O Nome é incorrecto ou já existe</alert>
                 <hint>Ex.: "morada"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opções</label>
                 <item>
@@ -13175,6 +13205,9 @@
                 <alert>Namnet är felaktigt eller redan definierat</alert>
                 <hint>Exempel: "adress"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Val</label>
                 <item>

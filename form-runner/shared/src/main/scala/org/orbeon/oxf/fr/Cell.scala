@@ -190,10 +190,10 @@ object Cell {
       xyToList(xy, maxGridWidth)
   }
 
-  def originCells[Underlying](gridModel: GridModel[Underlying]): List[Cell[Underlying]] =
+  def originCells[Underlying](gridModel: GridModel[Underlying]): Iterator[Cell[Underlying]] =
     gridModel.cells.iterator.flatten collect {
       case c @ Cell(Some(_), None, _, _, _, _) => c
-    } toList
+    }
 
   def findOriginCell[Underlying](gridModel: GridModel[Underlying], u: Underlying): Option[Cell[Underlying]] =
     gridModel.cells.iterator.flatten collectFirst {

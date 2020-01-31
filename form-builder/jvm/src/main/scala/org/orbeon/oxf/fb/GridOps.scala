@@ -454,6 +454,60 @@ trait GridOps extends ContainerOps {
         None
     }
 
+  sealed trait ColumnMigrationType
+  case object To24ColumnMigrationType extends ColumnMigrationType
+  case object To12ColumnMigrationType extends ColumnMigrationType
+
+  def migrateGridColumns(
+    gridElem : NodeInfo,
+    from     : Int,
+    to       : Int)(implicit
+    ctx      : FormBuilderDocContext
+  ): Option[UndoAction] =
+    findGridColumnMigrationType(gridElem, from, to) map { columnMigrationType =>
+
+      val migrationFunction =
+        columnMigrationType match {
+          case To24ColumnMigrationType =>
+            (u: NodeInfo, x: Int, w: Int) => {
+              NodeInfoCellOps.updateX(u, (x - 1) * 2 + 1)
+              NodeInfoCellOps.updateW(u, w * 2)
+            }
+          case To12ColumnMigrationType =>
+            (u: NodeInfo, x: Int, w: Int) => {
+                NodeInfoCellOps.updateX(u, (x - 1) / 2 + 1)
+                NodeInfoCellOps.updateW(u, w / 2)
+            }
+        }
+
+      collectAllOriginCells(gridElem) foreach migrationFunction.tupled
+
+      MigrateGridColumns(gridElem.id, from, to)
+    }
+
+  def findGridColumnMigrationType(
+    gridElem : NodeInfo,
+    from     : Int,
+    to       : Int)(implicit
+    ctx      : FormBuilderDocContext
+  ): Option[ColumnMigrationType] =
+    (from, to) match {
+      case (12, 24) => Some(To24ColumnMigrationType)
+      case (24, 12) =>
+        collectAllOriginCells(gridElem) forall {
+          case (_, x, w) => w % 2 == 0 && (x - 1) % 2 == 0
+        } option To12ColumnMigrationType
+      case _ => None
+    }
+
+  private def collectAllOriginCells(
+    gridElem : NodeInfo)(implicit
+    ctx      : FormBuilderDocContext
+  ): Iterator[(NodeInfo, Int, Int)] =
+    Cell.originCells(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)) collect {
+      case Cell(Some(u), None, x, _, _, w) => (u, x, w)
+    }
+
   private def insertCellAtBestPosition(
     gridModel : GridModel[NodeInfo],
     id        : String,
@@ -463,7 +517,7 @@ trait GridOps extends ContainerOps {
     h         : Int
   ): Option[NodeInfo] = {
 
-    val originCells = Cell.originCells(gridModel)
+    val originCells = Cell.originCells(gridModel).toList
 
     require(originCells.nonEmpty)
 

@@ -21,7 +21,7 @@ import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.{Cell, FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -36,6 +36,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+
 import scala.collection.compat._
 
 object FormBuilderXPathApi {
@@ -684,6 +685,18 @@ object FormBuilderXPathApi {
     }
   }
 
+  //@XPathFunction
+  def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.migrateGridColumns(gridElem, from, to) foreach Undo.pushUserUndoAction
+  }
+
+  //@XPathFunction
+  def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean = {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
+  }
+
   private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     undoAction match {
       case DeleteContainer(position, xcvElem) =>
@@ -808,5 +821,7 @@ object FormBuilderXPathApi {
         FormBuilder.merge(FormBuilderRpcApiImpl.resolveId(cellId).get, direction)
       case MergeCell(cellId, direction, size) =>
         FormBuilder.split(FormBuilderRpcApiImpl.resolveId(cellId).get, direction, Some(size))
+      case MigrateGridColumns(gridId, from, to) =>
+        FormBuilder.migrateGridColumns(FormBuilderRpcApiImpl.resolveId(gridId).get, to, from)
     }
 }

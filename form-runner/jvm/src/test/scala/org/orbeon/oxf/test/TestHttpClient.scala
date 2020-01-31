@@ -42,6 +42,8 @@ import scala.collection.mutable
 //
 // NOTE: Doesn't extend HttpClient because it has to return a `ProcessorService` and `CacheEvent`s.
 //
+// TODO: This should reuse/be merged with `InternalHttpClient`!
+//
 object TestHttpClient {
 
   sealed trait CacheEvent

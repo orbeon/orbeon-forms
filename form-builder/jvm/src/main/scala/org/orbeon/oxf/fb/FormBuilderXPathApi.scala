@@ -688,7 +688,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormBuilder.migrateGridColumns(gridElem, from, to) foreach Undo.pushUserUndoAction
+    FormBuilder.migrateGridColumns(gridElem, from, to) // foreach Undo.pushUserUndoAction
   }
 
   //@XPathFunction

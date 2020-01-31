@@ -57,10 +57,6 @@ object NodeInfoCell {
     def updateW(u: NodeInfo, w: Int): Unit = XFormsAPI.ensureAttribute(u, "w", w.toString)
   }
 
-  // Get the x/y position of a td given Cell information
-  def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): Option[(Int, Int)] =
-    cells.iterator.flatten find (_.td == td) map (c => c.x -> c.y)
-
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
   //
   // Return `array(map(xs:string, *)*)`.

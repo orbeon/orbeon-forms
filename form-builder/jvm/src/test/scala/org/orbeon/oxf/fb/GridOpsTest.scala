@@ -19,6 +19,10 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.xforms.NodeInfoFactory.attributeInfo
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -246,6 +250,56 @@ class GridOpsTest
         assert(canInsertGrid(doc)    === false)
         assert(canInsertControl(doc) === false)
       }
+    }
+  }
+
+  describe("#4134: 24-column conversion") {
+
+    val grid12: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="6"/><fr:c x="7" y="1" w="6"/>
+      </fr:grid>
+
+    val grid24Even: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        columns="24"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="12"/><fr:c x="13" y="1" w="12"/>
+      </fr:grid>
+
+    val grid24Odd: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        columns="24"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="13"/><fr:c x="14" y="1" w="11"/>
+      </fr:grid>
+
+    import org.orbeon.scaxon.Implicits._
+
+    it("must convert from 12 to 24 columns") {
+      val result = TransformerUtils.extractAsMutableDocument(grid12).rootElement
+      FormBuilder.migrateGridColumns(result, from = 12, to = 24)
+      XFormsAPI.insert(into = result, origin = attributeInfo("columns", "24") )
+      assertXMLElementsIgnoreNamespacesInScope(grid24Even, result)
+    }
+
+    it("must convert from 24 to 12 columns") {
+      val result = TransformerUtils.extractAsMutableDocument(grid24Even).rootElement
+      FormBuilder.migrateGridColumns(result, from = 24, to = 12)
+      XFormsAPI.delete(result /@ "columns")
+      assertXMLElementsIgnoreNamespacesInScope(grid12, result)
+    }
+
+    it("must report success to convert from 24 to 12 columns if cells are evenly aligned") {
+      assert(FormBuilder.findGridColumnMigrationType(grid24Even, from = 24, to = 12).contains(FormBuilder.To12ColumnMigrationType))
+    }
+
+    it("must report failure to convert from 24 to 12 columns if cells are oddly aligned") {
+      assert(FormBuilder.findGridColumnMigrationType(grid24Odd, from = 24 ,to = 12).isEmpty)
     }
   }
 }

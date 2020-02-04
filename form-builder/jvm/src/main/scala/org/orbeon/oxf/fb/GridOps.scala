@@ -461,8 +461,7 @@ trait GridOps extends ContainerOps {
   def migrateGridColumns(
     gridElem : NodeInfo,
     from     : Int,
-    to       : Int)(implicit
-    ctx      : FormBuilderDocContext
+    to       : Int
   ): Option[UndoAction] =
     findGridColumnMigrationType(gridElem, from, to) map { columnMigrationType =>
 
@@ -488,8 +487,7 @@ trait GridOps extends ContainerOps {
   def findGridColumnMigrationType(
     gridElem : NodeInfo,
     from     : Int,
-    to       : Int)(implicit
-    ctx      : FormBuilderDocContext
+    to       : Int
   ): Option[ColumnMigrationType] =
     (from, to) match {
       case (12, 24) => Some(To24ColumnMigrationType)
@@ -500,10 +498,7 @@ trait GridOps extends ContainerOps {
       case _ => None
     }
 
-  private def collectAllOriginCells(
-    gridElem : NodeInfo)(implicit
-    ctx      : FormBuilderDocContext
-  ): Iterator[(NodeInfo, Int, Int)] =
+  private def collectAllOriginCells(gridElem: NodeInfo): Iterator[(NodeInfo, Int, Int)] =
     Cell.originCells(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)) collect {
       case Cell(Some(u), None, x, _, _, w) => (u, x, w)
     }

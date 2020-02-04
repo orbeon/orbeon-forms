@@ -686,16 +686,12 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+  def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit =
     FormBuilder.migrateGridColumns(gridElem, from, to) // foreach Undo.pushUserUndoAction
-  }
 
   //@XPathFunction
-  def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean = {
-    implicit val ctx = FormBuilderDocContext()
+  def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean =
     FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
-  }
 
   private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     undoAction match {

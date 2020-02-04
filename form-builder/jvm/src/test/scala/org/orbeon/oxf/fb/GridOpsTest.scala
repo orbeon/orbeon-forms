@@ -19,7 +19,6 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.attributeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils

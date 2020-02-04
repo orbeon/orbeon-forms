@@ -54,22 +54,62 @@
             </templates>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/attachment/attachment.css"/>
+        </xbl:resources>
+
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
-                        <resource xml:lang="en"><download>Download</download></resource>
-                        <resource xml:lang="es"><download>Bajar Archivo</download></resource>
-                        <resource xml:lang="fi"><download>Lataa</download></resource>
-                        <resource xml:lang="fr"><download>Télécharger</download></resource>
-                        <resource xml:lang="ru"><download>Download</download></resource>
-                        <resource xml:lang="it"><download>Scaricare</download></resource>
-                        <resource xml:lang="de"><download>Herunterladen</download></resource>
-                        <resource xml:lang="sv"><download>Ladda ner</download></resource>
-                        <resource xml:lang="nl"><download>Download</download></resource>
-                        <resource xml:lang="pt"><download>Baixar</download></resource>
-                        <resource xml:lang="lt"><download>Parsisiųsti</download></resource>
-                        <resource xml:lang="da"><download>Hent</download></resource>
+                        <resource xml:lang="en">
+                            <download>Download</download>
+                            <select>Select file</select>
+                        </resource>
+                        <resource xml:lang="es">
+                            <download>Bajar Archivo</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <download>Lataa</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <download>Télécharger</download>
+                            <select>Sélectionner un fichier</select>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <download>Download</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="it">
+                            <download>Scaricare</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="de">
+                            <download>Herunterladen</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <download>Ladda ner</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <download>Download</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <download>Baixar</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="lt">
+                            <download>Parsisiųsti</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
+                        <resource xml:lang="da">
+                            <download>Hent</download>
+                            <select todo="true">[Select file]</select>
+                        </resource>
                     </resources>
                 </xf:instance>
             </xf:model>
@@ -80,6 +120,7 @@
                 value="xxf:binding('fr-attachment')"/>
 
             <xf:upload
+                id="xf-upload"
                 ref="$binding"
                 accept="{
                     (
@@ -99,7 +140,6 @@
                     event="xxforms-upload-start xxforms-upload-cancel"
                     targetid="fr-attachment"
                     name="{event('xxf:type')}"/>
-
                 <xf:dispatch
                     event="xxforms-upload-done"
                     targetid="fr-attachment"
@@ -109,7 +149,6 @@
                     <xf:property name="content-type"   value="event('content-type')"/>
                     <xf:property name="content-length" value="event('content-length')"/>
                 </xf:dispatch>
-
                 <xf:dispatch
                     event="xxforms-upload-error"
                     targetid="fr-attachment"
@@ -120,6 +159,13 @@
                 </xf:dispatch>
 
             </xf:upload>
+
+            <xh:label
+                class="btn btn-default btn-file"
+                for="xf-upload≡xforms-input">
+                <xf:output value="xxf:r('select')"/>
+            </xh:label>
+
             <xf:output appearance="xxf:download" ref="$binding[xxf:non-blank()]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>

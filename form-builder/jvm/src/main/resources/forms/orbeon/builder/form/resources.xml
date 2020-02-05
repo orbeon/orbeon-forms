@@ -6715,7 +6715,7 @@
                 <hint>z.B.: "Vorname"</hint>
             </control-name>
             <pdf-field-name>
-                <label todo="true">[Name of the PDF field]</label>
+                <label>Name des PDF-Felds</label>
             </pdf-field-name>
             <options>
                 <item>
@@ -6732,7 +6732,7 @@
                 </item>
             </options>
             <email-options>
-                <label todo="true">[Email Options]</label>
+                <label>E-Mail Optionen</label>
                 <item>
                     <label>E-Mail-Empfänger</label>
                     <value>fr-email-recipient</value>
@@ -7165,10 +7165,10 @@
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Service führt Such aus</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Service unterstützt Paging</label>
             </service-supports-paging>
             <resource>
                 <label>URL der Ressourcen</label>
@@ -7411,7 +7411,7 @@
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </item-value>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
             <save>
                 <label>Speichern</label>
@@ -7505,7 +7505,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>

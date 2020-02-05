@@ -288,7 +288,7 @@
                                 origin="instance('fr-form-template')/*"/>
                             <!-- RRR with defaults -->
                             <xf:rebuild/>
-                            <xf:recalculate xxf:defauls="true"/>
+                            <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                         <!-- If not empty, update with instance where holes have been filled if necessary -->
                         <xf:action if="not($is-empty)">
@@ -309,7 +309,7 @@
                                     origin="$simply-migrated/*"/>
                                 <!-- RRR with defaults -->
                                 <xf:rebuild/>
-                                <xf:recalculate xxf:defauls="true"/>
+                                <xf:recalculate xxf:defaults="true"/>
                             </xf:action>
                         </xf:action>
                     </xf:action>

@@ -159,7 +159,7 @@
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
-                            <xf:recalculate xxf:defauls="true"/>
+                            <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>
                 </xf:model>
@@ -328,7 +328,7 @@
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
-                            <xf:recalculate xxf:defauls="true"/>
+                            <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>
                 </xf:model>
@@ -490,7 +490,7 @@
                         <xf:action if="empty(instance()/*)"><xf:insert context="instance()"
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
-                            <xf:recalculate xxf:defauls="true"/>
+                            <xf:recalculate xxf:defaults="true"/>
                         </xf:action>
                     </xf:action>
                 </xf:model>

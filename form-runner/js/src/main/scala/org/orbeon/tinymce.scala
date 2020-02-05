@@ -6,7 +6,7 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
 
-package object tinymce {
+object tinymce {
 
   @JSGlobalScope
   @js.native

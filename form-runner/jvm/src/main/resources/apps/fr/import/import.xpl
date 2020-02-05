@@ -120,6 +120,7 @@
 
                                 <!-- Set filled data -->
                                 <xf:insert ref="xxf:instance('fr-form-instance')" origin="$new"/>
+                                <xf:rebuild model="fr-form-model"/>
 
                                 <!-- Save -->
                                 <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>

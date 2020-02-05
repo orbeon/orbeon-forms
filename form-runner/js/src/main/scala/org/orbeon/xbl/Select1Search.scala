@@ -68,6 +68,7 @@ private class Select1SearchCompanion extends XBLCompanion {
           allowClear     = true
           dropdownParent = jContainer
           ajax           = if (performsSearch) Select2Ajax else null
+          width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =
             new Select2.Option {
               val id   = "0"
@@ -168,6 +169,7 @@ private object Select2 {
     var ajax           : Ajax               = _
     var allowClear     : Boolean            = false
     var dropdownParent : js.UndefOr[JQuery] = _
+    var width          : String             = _
   }
 
   trait Option extends js.Object {

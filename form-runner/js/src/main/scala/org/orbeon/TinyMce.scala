@@ -6,7 +6,7 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
 
-object tinymce {
+object TinyMce {
 
   @JSGlobalScope
   @js.native
@@ -18,7 +18,7 @@ object tinymce {
 
   @js.native
   @JSGlobal("tinymce")
-  object TinyMce extends js.Object {
+  object GlobalTinyMce extends js.Object {
     var baseURL: String = js.native
     val EditorManager: TinyMceEditorManager = js.native
   }

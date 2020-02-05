@@ -13,7 +13,7 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.tinymce._
+import org.orbeon.TinyMce._
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.{$, AjaxEvent}
 import org.scalajs.dom
@@ -44,7 +44,7 @@ object TinyMCE {
           // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
           // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
           val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
-          TinyMce.baseURL = baseURL
+          GlobalTinyMce.baseURL = baseURL
 
           baseUrlInitialized = true
         }
@@ -55,11 +55,11 @@ object TinyMCE {
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
         tinyMceConfig.suffix      = ".min"
-        tinyMceConfig.content_css = TinyMce.baseURL + "/../../content.css"
+        tinyMceConfig.content_css = GlobalTinyMce.baseURL + "/../../content.css"
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tabindex = tinyMceDiv.getAttribute("tabindex")
-        myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, TinyMce.EditorManager)
+        myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
         val xformsValue = Document.getValue(serverValueOutputId).get
         onInit(() => {
           // Send value to the server on blur

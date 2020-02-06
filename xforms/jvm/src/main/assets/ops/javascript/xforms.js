@@ -2192,9 +2192,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         if (visible) {
                             YAHOO.util.Dom.addClass(el, "xforms-case-selected");
                             YAHOO.util.Dom.removeClass(el, "xforms-case-deselected");
-                            YAHOO.util.Dom.removeClass(el, "xforms-case-deselected-subsequent");
                         } else {
-                            YAHOO.util.Dom.addClass(el, "xforms-case-deselected-subsequent");
+                            YAHOO.util.Dom.addClass(el, "xforms-case-deselected");
                             YAHOO.util.Dom.removeClass(el, "xforms-case-selected");
                         }
                     }, cursor);

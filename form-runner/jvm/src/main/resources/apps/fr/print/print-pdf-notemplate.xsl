@@ -168,7 +168,6 @@
             *[
                 p:has-class('xforms-disabled')                   or
                 p:has-class('xforms-case-deselected')            or
-                p:has-class('xforms-case-deselected-subsequent') or
                 p:has-class('xforms-case-begin-end')             or
                 p:has-class('xforms-hidden')                     or
                 p:has-class('fr-dialog')                         or

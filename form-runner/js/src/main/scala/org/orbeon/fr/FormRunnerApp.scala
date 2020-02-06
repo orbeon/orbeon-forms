@@ -29,6 +29,7 @@ object FormRunnerApp extends App {
     xbl.TreeSelect1
     xbl.WPaint
     xbl.HrefButton
+    xbl.LaddaButton
     xbl.Select1Search
     xbl.AutosizeTextarea
     xbl.TinyMCE

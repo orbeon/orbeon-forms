@@ -22,31 +22,20 @@
 
     <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/spin.min.js"/>
     <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.min.js"/>
-    <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.jquery.min.js"/>
-    <xbl:script src="/xbl/orbeon/ladda-button/ladda-button.js"/>
     <xbl:binding
             id="fr-ladda-button"
             element="fr|ladda-button"
-            xxbl:mode="binding lhha custom-lhha">
+            xxbl:mode="binding lhha custom-lhha javascript-lifecycle">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda-themeless.min.css"/>
             <xbl:style src="/xbl/orbeon/ladda-button/ladda-button.css"/>
         </xbl:resources>
         <xbl:template>
             <xf:group>
-
-                <xf:action
-                        id="xf-init"
-                        type="javascript"
-                        event="xforms-enabled xxforms-iteration-moved">
-                    YAHOO.xbl.fr.LaddaButton.instance(this);
-                </xf:action>
-
                 <xf:trigger ref="xxf:binding('fr-ladda-button')">
                     <xf:label mediatype="text/html" value="xxf:label('fr-ladda-button')"/>
                     <xf:dispatch event="DOMActivate" name="DOMActivate" targetid="fr-ladda-button"/>
                 </xf:trigger>
-
             </xf:group>
         </xbl:template>
     </xbl:binding>

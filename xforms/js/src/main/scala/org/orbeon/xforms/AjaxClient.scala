@@ -43,14 +43,11 @@ object AjaxClient {
 
   import Private._
 
-  private lazy val _beforeSendingEvent  : JQueryCallback = $.Callbacks()
-  private lazy val _ajaxResponseReceived: JQueryCallback = $.Callbacks()
+  // Callback with parameters `(ev: AjaxEvent, updateProps: js.Function1[js.Dictionary[js.Any], Unit])`
+  lazy val beforeSendingEvent: JQueryCallback = $.Callbacks()
 
-  // TODO: Convert `ladda-button.js` so we can remove the def/lazy val and export
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.beforeSendingEvent")
-  def  beforeSendingEvent()  : JQueryCallback = _beforeSendingEvent
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseReceived")
-  def ajaxResponseReceived(): JQueryCallback = _ajaxResponseReceived
+  // Callback with parameters `()`
+  lazy val ajaxResponseReceived: JQueryCallback = $.Callbacks()
 
   // Used by `OrbeonClientTest`
   // TODO: Check if `ajaxResponseProcessedForCurrentEventQueueF` should/could be used instead.
@@ -60,11 +57,11 @@ object AjaxClient {
     val result = Promise[Unit]()
 
     lazy val callback: js.Function = () => {
-      ajaxResponseReceived().asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
+      ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
       result.success(())
     }
 
-    ajaxResponseReceived().add(callback)
+    ajaxResponseReceived.add(callback)
 
     result.future.toJSPromise
   }

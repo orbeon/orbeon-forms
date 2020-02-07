@@ -91,7 +91,7 @@ object SubmissionUtils {
       )
     }
 
-  private def processGETConnection[T](model: XFormsModel, resolvedAbsoluteUrl: URI)(body: InputStream ⇒ T): T =
+  private def processGETConnection[T](model: XFormsModel, resolvedAbsoluteUrl: URI)(body: InputStream => T): T =
     ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedAbsoluteUrl), closeOnSuccess = true)(body)
 
   private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {

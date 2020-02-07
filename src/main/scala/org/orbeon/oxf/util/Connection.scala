@@ -266,7 +266,7 @@ trait ConnectionState {
   private def stateAttributes(
     createSession   : Boolean)(implicit
     externalContext : ExternalContext
-  ): Option[(String => AnyRef, (String, AnyRef) ⇒ Unit)] =
+  ): Option[(String => AnyRef, (String, AnyRef) => Unit)] =
     stateScope match {
       case "request" =>
         val m = externalContext.getRequest.getAttributesMap
@@ -383,7 +383,7 @@ object Connection extends Logging {
 
   def findInternalUrl(
     normalizedUrl : URI,
-    filter        : String ⇒ Boolean)(implicit
+    filter        : String => Boolean)(implicit
     ec            : ExternalContext
   ): Option[String] = {
 
@@ -593,7 +593,7 @@ object Connection extends Logging {
 
     // 4. Authorization token only for internal connections
     // https://github.com/orbeon/orbeon-forms/issues/4388
-    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ ⇒ true).isDefined list {
+    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ => true).isDefined list {
 
       // Get token from web app scope
       val token =

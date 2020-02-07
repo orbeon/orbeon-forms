@@ -216,7 +216,7 @@ class ConnectionTest
             encodingForSOAP  = CharsetNames.Utf8,
             customHeaders    = Map.empty,
             headersToForward = Set.empty,
-            getHeader        = _ ⇒ None)(
+            getHeader        = _ => None)(
             logger           = ResourceManagerTestBase.newIndentedLogger,
             externalContext  = externalContext
           )

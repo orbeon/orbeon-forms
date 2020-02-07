@@ -13,14 +13,13 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.facades.Ladda
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient}
-import org.scalajs.dom.html
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 
 object LaddaButton {
 
@@ -89,20 +88,4 @@ object LaddaButton {
       }
     }
   )
-}
-
-@js.native
-trait Ladda extends js.Object {
-  def start()                    : Unit    = js.native
-  def setProgress(width: Double) : Unit    = js.native
-  def stop()                     : Unit    = js.native
-  def toggle()                   : Unit    = js.native
-  def isLoading()                : Boolean = js.native
-  def remove()                   : Unit    = js.native
-}
-
-@js.native
-@JSGlobal("Ladda")
-object Ladda extends js.Object {
-  def create(button: html.Element): Ladda = js.native
 }

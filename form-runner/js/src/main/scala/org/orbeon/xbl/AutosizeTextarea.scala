@@ -13,12 +13,10 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.facades.Autosize
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
-
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 
 
 object AutosizeTextarea {
@@ -50,12 +48,4 @@ object AutosizeTextarea {
       }
     }
   )
-}
-
-@js.native
-@JSGlobal("autosize")
-object Autosize extends js.Function1[html.TextArea, Unit] {
-  def apply  (textarea: html.TextArea): Unit = js.native
-  def update (textarea: html.TextArea): Unit = js.native
-  def destroy(textarea: html.TextArea): Unit = js.native
 }

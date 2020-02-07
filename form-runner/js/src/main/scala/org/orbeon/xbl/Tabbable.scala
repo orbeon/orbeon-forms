@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.xbl.DndRepeat._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}

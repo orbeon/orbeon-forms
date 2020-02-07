@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.facades.{Fancytree, FancytreeEventData, FancytreeJsonNode}
 import org.orbeon.xforms
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{Item, XBL, XBLCompanion}

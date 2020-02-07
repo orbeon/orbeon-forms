@@ -15,7 +15,7 @@ package org.orbeon.builder
 
 import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
-import org.orbeon.xbl.{Dragula, DragulaOptions}
+import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html.Element

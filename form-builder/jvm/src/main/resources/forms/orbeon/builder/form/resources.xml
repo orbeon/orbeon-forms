@@ -7165,7 +7165,7 @@
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
             <service-performs-search>
-                <label>Service führt Such aus</label>
+                <label>Service führt Suche aus</label>
             </service-performs-search>
             <service-supports-paging>
                 <label>Service unterstützt Paging</label>

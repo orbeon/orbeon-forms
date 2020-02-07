@@ -24,9 +24,7 @@ object TinyMce {
   }
 
   @js.native
-  trait TinyMceEditorManager extends js.Object {
-    var baseURL: String = js.native
-  }
+  trait TinyMceEditorManager extends js.Object
 
   @js.native
   @JSGlobal("tinymce.Editor")

@@ -114,7 +114,7 @@ object ControlLabelHintTextEditor {
       // Remove `for` so browser doesn't set the focus to the control on click
       resourceEditorCurrentLabelHint.removeAttr("for")
       // Show, position, and populate editor
-      // Get position before showing editor, so showing doesn"t move things in the page
+      // Get position before showing editor, so showing doesn't move things in the page
       Private.container.width(resourceEditorCurrentLabelHint.outerWidth())
       // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
       // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
@@ -175,7 +175,8 @@ object ControlLabelHintTextEditor {
       private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
 
       // State
-      var tinyMceObject: TinyMceEditor = null
+      var tinyMceObject      : TinyMceEditor = _
+      var tinyMceInitialized : Boolean       = false
 
       // Create elements for editing
       val container     = $("""<div   class="xforms-hidden fb-label-editor"/>""")
@@ -222,11 +223,14 @@ object ControlLabelHintTextEditor {
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html(value)
         else                 resourceEditorCurrentLabelHint.text(value)
 
-      def afterTinyMCEInitialized(f: TinyMceEditor => Unit): Unit =
-        tinyMceObject.initialized.toOption match {
-          case Some(true)  => f(tinyMceObject)
-          case _           => tinyMceObject.on("init", f)
-        }
+      def afterTinyMCEInitialized(thunk: () => Unit): Unit =
+        if (tinyMceInitialized)
+          thunk()
+        else
+          tinyMceObject.on("init", _ => {
+            tinyMceInitialized = true
+            thunk()
+          })
 
       def makeSpaceForMCE(): Unit = {
         // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
@@ -240,8 +244,15 @@ object ControlLabelHintTextEditor {
         tinymceAnchor.show()
         tinymceAnchor.attr("id", Underscore.uniqueId())
 
+        // Initialize baseURL
+        locally {
+          val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
+          val baseURL = href.substring(0, href.length - s"$URLBaseMagic.js".length)
+          GlobalTinyMce.baseURL = baseURL
+        }
+
         // TinyMCE config from property, if defined
-        val mceConfig = {
+        val tinyMceConfig = {
           val customConfigJS = $(".fb-tinymce-config .xforms-output-output").text()
           if (customConfigJS.trim != "")
             js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
@@ -249,19 +260,15 @@ object ControlLabelHintTextEditor {
             Underscore.clone(TinyMceDefaultConfig)
         }
 
-        // Auto-size MCE height based on the content, with min height of 100px
-        mceConfig.plugins                  += ",autoresize"
-        mceConfig.autoresize_min_height    = 100.0
-        mceConfig.autoresize_bottom_margin = 16.0 // Default padding for autoresize adds too much empty space at the bottom
+        tinyMceConfig.plugins                  += ",autoresize"  // Auto-size MCE height based on the content
+        tinyMceConfig.autoresize_min_height    =  100.0          // Min height of 100px
+        tinyMceConfig.autoresize_bottom_margin =  16.0           // Default padding for autoresize adds too much empty space at the bottom
+        tinyMceConfig.suffix                   =  ".min"
+        tinyMceConfig.content_css              =  GlobalTinyMce.baseURL + "/../../content.css"
 
-        GlobalTinyMce.EditorManager.baseURL = {
-          val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
-          href.substring(0, href.length - s"$URLBaseMagic.js".length)
-        }
-
-        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, mceConfig, GlobalTinyMce.EditorManager)
+        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObject.render()
-        afterTinyMCEInitialized((_) => {
+        afterTinyMCEInitialized(() => {
           // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM
           tinymceAnchor.detach()
           $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
@@ -274,9 +281,7 @@ object ControlLabelHintTextEditor {
       // (Hacky, but didn't find a better way to do it)
       def setTinyMCEWidth(): Unit = {
         if (tinyMceObject ne null) {
-          val tinymceTable = $(tinyMceObject.container).find(".mceLayout")
-          val widthSetOn = if (tinymceTable.is("*")) tinymceTable else tinymceAnchor
-          widthSetOn.width(container.outerWidth())
+          $(tinyMceObject.container).width(container.outerWidth())
         }
       }
 
@@ -292,12 +297,12 @@ object ControlLabelHintTextEditor {
 
       def setValue(newValue: String): Unit =
         if (labelOrHintOrText == "text") {
-            afterTinyMCEInitialized((_) => {
-              tinyMceObject.setContent(newValue)
-              // Workaround for resize not happening with empty values, see
-              // https://twitter.com/avernet/status/580798585291177984
-              tinyMceObject.execCommand("mceAutoResize")
-            })
+          afterTinyMCEInitialized(() => {
+            tinyMceObject.setContent(newValue)
+            // Workaround for resize not happening with empty values, see
+            // https://twitter.com/avernet/status/580798585291177984
+            tinyMceObject.execCommand("mceAutoResize")
+          })
         } else {
           textfield.value(newValue)
           textfield.focus()
@@ -310,10 +315,12 @@ object ControlLabelHintTextEditor {
         checkbox.hide()
         if (tinyMceObject ne null) tinyMceObject.hide()
         if (labelOrHintOrText == "text") {
-          setTinyMCEWidth()
           initTinyMCE()
-          afterTinyMCEInitialized((_) => {
+          afterTinyMCEInitialized(() => {
+            // Without hiding first, the first time after render the TinyMCE can't get the focus
+            tinyMceObject.hide()
             makeSpaceForMCE()
+            setTinyMCEWidth()
             tinyMceObject.show()
             tinyMceObject.focus()
           })
@@ -325,8 +332,8 @@ object ControlLabelHintTextEditor {
 
       def endEdit(): Unit =
         if (labelOrHintOrText == "text")
-            // Reset height we might have placed on the explanation element inside the cell
-            resourceEditorCurrentLabelHint.css("height", "")
+          // Reset height we might have placed on the explanation element inside the cell
+          resourceEditorCurrentLabelHint.css("height", "")
     }
   }
 }

@@ -48,8 +48,6 @@ trait App {
     import scribe.output.{LogOutput, TextOutput}
     import scribe.{Level, LogRecord}
 
-    import scala.scalajs.LinkingInfo
-
     // Custom log formatter to output something that is readable
     private object CustomPosition extends FormatBlock {
 
@@ -78,7 +76,8 @@ trait App {
 
     def initialize(): Unit = {
 
-      val rootLevel = if (LinkingInfo.developmentMode) Level.Debug else Level.Error
+      // By default, set to `Error` instead of `Debug`, not to pollute the console when it isn't necessary
+      val rootLevel = Level.Error
 
       scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
         minimumLevel = Some(rootLevel),

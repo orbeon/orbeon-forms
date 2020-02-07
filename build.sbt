@@ -530,7 +530,8 @@ lazy val formRunnerJVM = formRunner.jvm
 lazy val formRunnerJS = formRunner.js
   .dependsOn(
     commonJS,
-    xformsJS % "test->test;compile->compile"
+    xformsJS % "test->test;compile->compile",
+    webFacades
   )
   .settings(commonScalaJsSettings)
   .settings(
@@ -707,6 +708,20 @@ lazy val nodeFacades = (project in file("node-facades"))
     jsEnv                           in Test := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
 
     scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+  )
+
+lazy val webFacades = (project in file("web-facades"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(commonJS)
+  .settings(commonSettings: _*)
+  .settings(commonScalaJsSettings: _*)
+  .settings(
+    name := "orbeon-web-facades",
+
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion
+    )
   )
 
 lazy val core = (project in file("src"))

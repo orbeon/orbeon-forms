@@ -13,7 +13,7 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.TinyMce._
+import org.orbeon.facades.TinyMce._
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.{$, AjaxEvent}
 import org.scalajs.dom

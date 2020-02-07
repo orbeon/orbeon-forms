@@ -13,9 +13,9 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.facades.Select2
+import org.orbeon.facades.Select2.toJQuerySelect2
 import org.orbeon.jquery._
-import org.orbeon.Select2
-import org.orbeon.Select2.toJQuerySelect2
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxEvent, ServerValueStore}
 import org.scalajs.dom

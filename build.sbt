@@ -17,7 +17,7 @@ val PerfolationVersion            = "1.1.5"
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.0"
 val ScalaTestPlusVersion          = "1.0.0-M2"
-val CirceVersion                  = "0.12.3"
+val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.5.15"
 val EnumeratumCirceVersion        = "1.5.22"
 val ScalaXmlVersion               = "2.0.0-M1"

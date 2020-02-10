@@ -514,7 +514,17 @@
 
   fetch.polyfill = true;
 
-  if (!self.fetch) {
+  var loadPoly = false;
+  if(!self.fetch) {
+    loadPoly = true;
+  }
+  if(!loadPoly && !self.Headers.prototype.entries) {
+    loadPoly = true;
+  }
+  if(!loadPoly && !!self.Headers.prototype.entries.prototype) {
+    loadPoly = true;
+  }
+  if(!!loadPoly){
     self.fetch = fetch;
     self.Headers = Headers;
     self.Request = Request;

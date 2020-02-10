@@ -58,13 +58,11 @@ object LaddaButton {
           events   = ClickEventName,
           selector = null,
           handler  = (_: JQueryEventObject) => {
-            if (state == State.Begin) {
-              // Defer changing the button, not to prevent other listeners on the click event from being called
-              js.timers.setTimeout(0) {
+            if (state == State.Begin)
+              js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
                 ladda.foreach (_.start())
                 state = State.Clicked
               }
-            }
           }
         )
 

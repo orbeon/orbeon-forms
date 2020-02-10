@@ -20,7 +20,7 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 >
 
-    <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
+    <xbl:script src="/ops/dragula/dragula.min.js"/>
 
     <!-- NOTE: When using this component outside of Form Runner, the supporting JavaScript must be explicitly included. -->
 
@@ -30,8 +30,7 @@
         xxbl:mode="javascript-lifecycle">
 
         <xbl:resources>
-             <!--<xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>-->
-             <xbl:style src="/xbl/orbeon/tabbable/dragula/dragula.min.css"/>
+             <xbl:style src="/ops/dragula/dragula.min.css"/>
         </xbl:resources>
 
         <xbl:template>

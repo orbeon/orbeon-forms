@@ -171,6 +171,7 @@ object AjaxClient {
   }
 
   // Create a timer which after the specified delay will fire a server event
+  // 2020-07-21: Only for upload response
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedServerEvent")
   def createDelayedServerEvent(
     encodedEvent : String,
@@ -198,6 +199,21 @@ object AjaxClient {
     if (discardable)
       form.addDiscardableTimerId(timerId)
   }
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedPollEvent")
+  def createDelayedPollEvent(
+    delay  : js.UndefOr[Double],
+    formId : String
+  ): Unit =
+    timers.setTimeout(delay.getOrElse(0.0)) {
+      fireEvent(
+        AjaxEvent(
+          eventName = EventNames.XXFormsPoll,
+          targetId  = Constants.DocumentId,
+          form      = Page.getForm(formId).elem.some
+        )
+      )
+    }
 
   def hasShowProgressEvent: Boolean =
     EventQueue.eventsReversed exists (_.showProgress)

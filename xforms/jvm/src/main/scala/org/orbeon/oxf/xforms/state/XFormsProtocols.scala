@@ -20,12 +20,14 @@ import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.WhitelistObjectInputStream
+import org.orbeon.oxf.xforms.DelayedEvent
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import sbinary.Operations._
 import sbinary._
 
+// TODO: Almost none of this should be needed, as case classes, etc. should be handled automatically.
 object XFormsOperations {
 
   // NOTE: We use immutable.Seq instead of Array to indicate immutability
@@ -85,6 +87,30 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
     def reads(input: Input) =
       ControlState(read[String](input), read[Boolean](input), read[Map[String, String]](input))
+  }
+
+  implicit object DelayedEventFormat extends Format[DelayedEvent] {
+
+    def writes(output: Output, delayedEvent: DelayedEvent): Unit = {
+      write(output, delayedEvent.eventName)
+      write(output, delayedEvent.targetEffectiveId)
+      write(output, delayedEvent.bubbles)
+      write(output, delayedEvent.cancelable)
+      write(output, delayedEvent.time)
+      write(output, delayedEvent.showProgress)
+      write(output, delayedEvent.browserTarget)
+    }
+
+    def reads(input: Input): DelayedEvent =
+      DelayedEvent(
+        read[String](input),
+        read[String](input),
+        read[Boolean](input),
+        read[Boolean](input),
+        read[Option[Long]](input),
+        read[Boolean](input),
+        read[Option[String]](input)
+      )
   }
 
   implicit object InstanceCachingFormat extends Format[InstanceCaching] {

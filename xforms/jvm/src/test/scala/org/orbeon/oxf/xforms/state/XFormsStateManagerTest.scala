@@ -242,12 +242,12 @@ class XFormsStateManagerTest
           assert(state1.document ne newDoc) // can't be the same because cache is disabled
 
         // Run events if any
-        newDoc.beforeExternalEvents(null)
+        newDoc.beforeExternalEvents(null, true)
 
         for (event <- callback(newDoc))
           ClientEvents.processEvent(newDoc, event)
 
-        newDoc.afterExternalEvents()
+        newDoc.afterExternalEvents(true)
 
         XFormsStateManager.beforeUpdateResponse(newDoc, ignoreSequence = false)
 

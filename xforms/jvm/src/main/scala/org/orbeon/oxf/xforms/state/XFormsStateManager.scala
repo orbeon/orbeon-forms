@@ -263,7 +263,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
   // Cache the document and/or store its current state.
   def afterUpdateResponse(containingDocument: XFormsContainingDocument): Unit =
-    // Notify document that we are done sending the response
     containingDocument.afterUpdateResponse()
 
   // The UUID list is added once upon session creation so it is expected to be found here

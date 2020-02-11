@@ -122,9 +122,9 @@ trait XFormsSupport extends MockitoSugar {
 
     def process(target: XFormsEventTarget) = {
       ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
-      document.afterExternalEvents()
+      document.afterExternalEvents(true)
       document.afterUpdateResponse()
-      document.beforeExternalEvents(null)
+      document.beforeExternalEvents(null, true)
     }
 
     getObject(controlEffectiveId) match {

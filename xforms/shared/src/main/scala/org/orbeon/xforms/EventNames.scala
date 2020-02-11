@@ -27,6 +27,7 @@ object EventNames {
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
   val XXFormsSessionHeartbeat  = "xxforms-session-heartbeat"
   val XXFormsServerEvents      = "xxforms-server-events"
+  val XXFormsPoll              = "xxforms-poll"
   val XXFormsValue             = "xxforms-value"
   val XXFormsRpcRequest        = "xxforms-rpc-request"
   val XXFormsDnD               = "xxforms-dnd"

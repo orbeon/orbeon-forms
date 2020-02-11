@@ -26,8 +26,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.xforms.{EventNames, rpc}
 
-import scala.collection.mutable.ListBuffer
 import scala.collection.compat._
+import scala.collection.mutable.ListBuffer
 
 object ScriptBuilder {
 
@@ -205,7 +205,12 @@ object ScriptBuilder {
             } yield
               rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
             ).distinct,
-        events = Nil,
+        pollEvent =
+          for {
+            delayedEvent <- containingDocument.findEarliestPendingDelayedEvent
+            time         <- delayedEvent.time
+          } yield
+          rpc.PollEvent(time - currentTime),
         userScripts =
           for (script <- containingDocument.getScriptsToRun.to(List) collect { case Right(s) => s })
             yield

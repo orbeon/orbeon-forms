@@ -78,7 +78,7 @@ class UploaderProcessor extends ProcessorImpl {
               val response =
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                   <xxf:action>
-                    <xxf:server-events delay="0">{
+                    <xxf:server-events>{
                       EncodeDecode.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
                     }</xxf:server-events>
                   </xxf:action>

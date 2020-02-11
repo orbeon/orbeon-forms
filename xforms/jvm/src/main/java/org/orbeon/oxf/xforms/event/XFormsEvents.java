@@ -29,7 +29,6 @@ public class XFormsEvents {
 
     // Other custom events
     public static final String XXFORMS_STATE_RESTORED = "xxforms-state-restored";
-    public static final String XXFORMS_POLL = "xxforms-poll";
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
     public static final String XXFORMS_LOAD = "xxforms-load";
     public static final String XXFORMS_SETINDEX = "xxforms-setindex";

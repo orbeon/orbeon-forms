@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.Modifier
 
 case class Control(id: String, valueOpt: Option[String])
 case class KeyListener(eventName: Set[String], observer: String, keyText: String, modifiers: Set[Modifier])
-case class ServerEvent(delay: Long, discardable: Boolean, showProgress: Boolean, encodedEvent: String)
+case class PollEvent(delay: Long)
 case class UserScript(functionName: String, targetId: String, observerId: String, paramValues: List[String])
 
 case class Initializations(
@@ -32,6 +32,6 @@ case class Initializations(
   calendarImagePath      : String,
   controls               : List[Control],
   listeners              : List[KeyListener],
-  events                 : List[ServerEvent],
+  pollEvent              : Option[PollEvent],
   userScripts            : List[UserScript]
 )

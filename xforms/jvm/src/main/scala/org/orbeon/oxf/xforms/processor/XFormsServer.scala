@@ -22,7 +22,6 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -36,11 +35,11 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsUploadControl}
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvents}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{SubmissionResult, UrlType, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
@@ -179,6 +178,15 @@ object XFormsServer {
               case _ => // NOP
             }
 
+            // Issue an `xxforms-poll` if there are pending delayed events
+            // In case there is a submission AND a poll needed, send both, except if we guess that there
+            // is navigation within the same browsing context. It's just a heuristic to prevent sending
+            // an Ajax request whose response might not succeed because the browsing context has navigated.
+            if (! (containingDocument.findTwoPassSubmitEvent exists (_.browserTarget.isEmpty))) {
+              containingDocument.findEarliestPendingDelayedEvent foreach { event =>
+                outputPoll(event, System.currentTimeMillis)
+              }
+            }
 
             // TODO: the following should be ordered in the order they were requested
             // Output messages to display
@@ -221,22 +229,22 @@ object XFormsServer {
               }
             }
 
-            // Output help instruction
             containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId =>
               outputHelpInfo(containingDocument, helpControlEffectiveId)
             }
 
-            // Check if we need to tell the client to perform a form submission
-            if (submissionServerEventsOpt.isDefined)
+            containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
               outputSubmissionInfo(
-                containingDocument.getClientActiveSubmissionFirstPass,
+                twoPassSubmitEvent,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,
                 NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
+            }
 
             // Non-`javascript:` loads only
-            containingDocument.getNonJavaScriptLoadsToRun foreach
-              (load => outputLoad(containingDocument, load))
+            containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
+              outputLoad(containingDocument, load)
+            }
           }
         }
 
@@ -342,33 +350,21 @@ object XFormsServer {
       }
 
     def outputSubmissionInfo(
-      activeSubmissionOpt : Option[XFormsModelSubmission],
-      isPortletContainer  : Boolean,
-      response            : Response)(implicit
-      receiver            : XMLReceiver
+      twoPassSubmitEvent : DelayedEvent,
+      isPortletContainer : Boolean,
+      response           : Response)(implicit
+      receiver           : XMLReceiver
     ): Unit = {
-      // `activeSubmissionOpt` can be `None` when we are running as a portlet and handling an `<xf:load>`, which
-      // when executed from within a portlet is ran as very much like the `replace="all"` submissions.
 
       val showProgressAtt =
-        activeSubmissionOpt exists (!_.getActiveSubmissionParameters.xxfShowProgress) list ("show-progress" -> "false")
+        ! twoPassSubmitEvent.showProgress list ("show-progress" -> "false")
 
       val targetAtt =
-        activeSubmissionOpt flatMap (_.getActiveSubmissionParameters.xxfTargetOpt) map ("target" -> _) toList
+         twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
       val actionAtt =
-        isPortletContainer list {
-
-          val SubmitUrl = XFORMS_SERVER_SUBMIT
-
-          val actionUrl =
-            if (activeSubmissionOpt exists (_.getActiveSubmissionParameters.resolvedIsResponseResourceType))
-              response.rewriteResourceURL(SubmitUrl, URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT) // NOTE: mode ignored in portlet mode
-            else
-              response.rewriteActionURL(SubmitUrl)
-
-          "action" -> actionUrl
-        }
+        isPortletContainer list
+          "action" -> response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
 
       // Signal that we want a POST to the XForms server
       element(
@@ -378,6 +374,18 @@ object XFormsServer {
         atts      = ("method" -> HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
+
+    def outputPoll(
+      delayedEvent : DelayedEvent,
+      currentTime  : Long)(implicit
+      xmlReceiver  : XMLReceiver
+    ): Unit =
+      element(
+        localName = "poll",
+        prefix    = XXFORMS_SHORT_PREFIX,
+        uri       = XXFORMS_NAMESPACE_URI,
+        atts      = delayedEvent.time.toList map (time => "delay" -> (time - currentTime).toString)
+      )
 
     def outputMessagesInfo(
       messages    : Seq[Message])(implicit
@@ -475,7 +483,7 @@ class XFormsServer extends ProcessorImpl {
     val output = new ProcessorOutputImpl(self, outputName) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
         try {
-          doIt(pipelineContext, Some(xmlReceiver))
+          doIt(pipelineContext, xmlReceiverOpt = Some(xmlReceiver))
         } catch {
           case e: SessionExpiredException =>
             LifecycleLogger.eventAssumingRequest("xforms", e.message, Nil)
@@ -494,7 +502,7 @@ class XFormsServer extends ProcessorImpl {
 
   // Case where the response is generated through the ExternalContext (submission with `replace="all"`).
   override def start(pipelineContext: PipelineContext): Unit =
-    doIt(pipelineContext, None)
+    doIt(pipelineContext, xmlReceiverOpt = None)
 
   private def doIt(pipelineContext: PipelineContext, xmlReceiverOpt: Option[XMLReceiver]): Unit = {
 
@@ -521,9 +529,6 @@ class XFormsServer extends ProcessorImpl {
     // Get action
     val actionElement = requestDocument.getRootElement.element(XXFORMS_ACTION_QNAME)
 
-    // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
-    // NOTE: If we don't have a receiver, this means that we are in the second pass of a submission with
-    // replace="all". In this case, only server events are provided.
     val remainingClientEvents =
       xmlReceiverOpt match {
         case Some(xmlReceiver) =>
@@ -545,11 +550,9 @@ class XFormsServer extends ProcessorImpl {
           ClientEvents.extractLocalEvents(actionElement)
       }
 
-    val isAjaxRequest =
-      request.getMethod == HttpMethod.POST &&
-      ContentTypes.isXMLContentType(request.getContentType)
-
-    val ignoreSequence = ! isAjaxRequest
+    // Was the following, but this is not true in tests right now:
+    // `request.getMethod == HttpMethod.POST && ContentTypes.isXMLContentType(request.getContentType)`
+    val isAjaxRequest = xmlReceiverOpt.isDefined
 
     // Find an output stream for xf:submission[@replace = 'all']
     val response = PipelineResponse.getResponse(xmlReceiverOpt.orNull, externalContext)
@@ -565,8 +568,10 @@ class XFormsServer extends ProcessorImpl {
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
+          val ignoreSequenceNumber   = ! isAjaxRequest
           val expectedSequenceNumber = containingDocument.getSequence
-          if (ignoreSequence || (parameters.sequenceOpt contains expectedSequenceNumber)) {
+
+          if (ignoreSequenceNumber || (parameters.sequenceOpt contains expectedSequenceNumber)) {
             // We are good: process request and produce new sequence number
             try {
 
@@ -593,31 +598,46 @@ class XFormsServer extends ProcessorImpl {
                   containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
 
               // Run events if any
-              val eventsFindingsOpt =
-                remainingClientEvents.nonEmpty option {
-                  // Scope the containing document for the XForms API
+              val eventsFindingsOpt = {
+
+                val eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+
+                if (isAjaxRequest) {
+                  remainingClientEvents.nonEmpty option {
+                    // Scope the containing document for the XForms API
+                    XFormsAPI.withContainingDocument(containingDocument) {
+
+
+                      withDebug("handling external events") {
+
+                        // Start external events
+                        containingDocument.beforeExternalEvents(response, isAjaxRequest)
+
+                        // Dispatch the events
+                        val result =
+                          ClientEvents.processEvents(containingDocument, remainingClientEvents)
+
+                        // End external events
+                        // The following will process async submission and delayed events
+                        containingDocument.afterExternalEvents(isAjaxRequest)
+
+                        result
+                      } (eventsIndentedLogger)
+                    }
+                  }
+                } else {
                   XFormsAPI.withContainingDocument(containingDocument) {
-
-                    val eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-                    withDebug("handling external events and/or uploaded files") {
-
-                      // Start external events
-                      containingDocument.beforeExternalEvents(response)
-
-                      // Dispatch the events
-                      val result =
-                        ClientEvents.processEvents(containingDocument, remainingClientEvents)
-
-                      // End external events
-                      containingDocument.afterExternalEvents()
-
-                      result
+                    withDebug("handling two-pass submission event") {
+                      containingDocument.beforeExternalEvents(response, isAjaxRequest)
+                      containingDocument.afterExternalEvents(isAjaxRequest)
+                      Some(ClientEvents.EmptyEventsFindings)
                     } (eventsIndentedLogger)
                   }
                 }
+              }
 
               Success(
-                withUpdateResponse(containingDocument, ignoreSequence) {
+                withUpdateResponse(containingDocument, ignoreSequenceNumber) {
                   containingDocument.getReplaceAllCallable match {
                     case None =>
                       xmlReceiverOpt match {
@@ -665,7 +685,6 @@ class XFormsServer extends ProcessorImpl {
                               containingDocument.rememberLastAjaxResponse(responseStore)
 
                               // Actually output response
-                              // If there is an error, we do not
                               try {
                                 responseStore.replay(xmlReceiver)
                               } catch {

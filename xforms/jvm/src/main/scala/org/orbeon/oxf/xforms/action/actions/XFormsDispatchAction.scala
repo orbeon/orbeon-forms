@@ -130,7 +130,6 @@ object XFormsDispatchAction {
           bubbles           = bubbles,
           cancelable        = cancelable,
           time              = System.currentTimeMillis + delay,
-          discardable       = false,
           showProgress      = showProgress,
           allowDuplicates   = allowDuplicates
         )

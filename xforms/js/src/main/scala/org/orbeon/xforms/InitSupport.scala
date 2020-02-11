@@ -217,7 +217,7 @@ object InitSupport {
       initializeJavaScriptControls(initializations.controls)
       initializeKeyListeners(initializations.listeners, formElem)
 
-      dispatchInitialServerEvents(initializations.events, formId)
+      dispatchInitialServerEvents(initializations.pollEvent, formId)
 
       // Register events that bubble on document for all browsers
       // TODO: Move away from YUI even listeners.
@@ -427,14 +427,11 @@ object InitSupport {
         }
       }
 
-    def dispatchInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
-      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, encodedEvent) =>
-        AjaxClient.createDelayedServerEvent(
-          encodedEvent = encodedEvent,
-          delay        = delay.toDouble,
-          showProgress = showProgress,
-          discardable  = discardable,
-          formId       = formId
+    def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
+      events foreach { case rpc.PollEvent(delay) =>
+        AjaxClient.createDelayedPollEvent(
+          delay  = delay.toDouble,
+          formId = formId
         )
       }
   }

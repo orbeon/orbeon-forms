@@ -1184,18 +1184,21 @@
                                     break;
                                 }
 
-                                // Server events
+                                // 2020-07-21: Only for upload response
                                 case "server-events": {
                                     var serverEventsElement = childNode;
-                                    var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
-                                    var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
-                                    showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
-                                    var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
-                                    discardable = ! YAHOO.lang.isNull(discardable) && discardable == "true";
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
 
-                                    // Only for uploads, where `delay="0"`
-                                    AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
+                                    AjaxServer.createDelayedServerEvent(serverEvents, 0, true, false, formID);
+
+                                    break;
+                                }
+
+                                case "poll": {
+                                    var pollElement = childNode;
+                                    var delayOrNull = ORBEON.util.Dom.getAttribute(pollElement, "delay");
+
+                                    AjaxServer.createDelayedPollEvent(_.isNull(delayOrNull) ? undefined : parseInt(delayOrNull), formID);
 
                                     break;
                                 }

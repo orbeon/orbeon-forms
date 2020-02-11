@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms.{Constants, EventNames}
 
 /**
  * Single root container for a part, whether top-level or a nested part.
@@ -63,6 +63,6 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     findAllChildrenElements filterNot
       { case (e, _) => Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)(e.getQName) }
 
-  override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
+  override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, EventNames.XXFormsPoll)
   override val externalEvents              = externalEventsDef
 }

@@ -385,6 +385,7 @@ object AjaxClient {
 
     def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
 
+      val requestForm = Page.getForm(requestFormId)
       Globals.requestTryCount += 1
 
       // Timeout support using `AbortController`
@@ -404,25 +405,30 @@ object AjaxClient {
         }
       ) {
         Support.fetchText(
-          url         = Page.getForm(requestFormId).xformsServerPath,
+          url         = requestForm.xformsServerPath,
           requestBody = requestBody,
           contentType = "application/xml".some,
           formId      = requestFormId,
           abortSignal = controller.signal.some
         )
-      } onComplete {
-        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
-          // We ignore HTTP status and just check that we have a well-formed response document
-          handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
-        case Success((503, _, _)) =>
-          // We return an explicit 503 when the Ajax server is still busy
-          retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
-        case Success((_, responseText, responseXmlOpt)) =>
-          if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
-            retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
-        case Failure(_) =>
-          logAndShowError(_, requestFormId, ignoreErrors)
-          retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+      } onComplete { response =>
+        // Ignore response if for a form we don't have anymore on the page
+        if (dom.document.body.contains(requestForm.elem)) {
+          response match {
+            case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
+              // We ignore HTTP status and just check that we have a well-formed response document
+              handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
+            case Success((503, _, _)) =>
+              // We return an explicit 503 when the Ajax server is still busy
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+            case Success((_, responseText, responseXmlOpt)) =>
+              if (!handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
+                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+            case Failure(_) =>
+              logAndShowError(_, requestFormId, ignoreErrors)
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+          }
+        }
       }
     }
 

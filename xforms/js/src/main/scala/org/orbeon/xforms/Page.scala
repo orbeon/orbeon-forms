@@ -23,6 +23,8 @@ object Page {
 
   import Private._
 
+  val loadingIndicator = new LoadingIndicator
+
   def registerForm(namespacedFormId: String, form: Form): Unit = {
     formsByNamespacedFormId += namespacedFormId -> form
     formsByUuid             += form.uuid        -> form

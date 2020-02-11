@@ -361,11 +361,14 @@ object AjaxClient {
       Globals.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
+      org.scalajs.dom.console.log("executeNextRequest, eventQueue", Globals.eventQueue)
 
       Globals.executeEventFunctionQueued -= 1
 
-      if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0))
-        findEventsToProcess match {
+      if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0)) {
+        val x = findEventsToProcess
+        org.scalajs.dom.console.log("events to process", x.toJSArray)
+        x match {
           case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
             // which we have received the keyup corresponding to the keydown.
@@ -377,6 +380,7 @@ object AjaxClient {
           case None =>
             Globals.eventQueue = js.Array()
         }
+      }
     }
 
     def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
@@ -392,21 +396,21 @@ object AjaxClient {
       FutureUtils.withFutureSideEffects(
         before = {
           Globals.requestInProgress = true
-          Page.getForm(requestFormId).loadingIndicator.requestStarted()
+          Page.loadingIndicator.requestStarted()
         },
         after  = {
           Globals.requestInProgress = false
-          Page.getForm(requestFormId).loadingIndicator.requestEnded()
+          Page.loadingIndicator.requestEnded()
         }
       ) {
-      Support.fetchText(
-        url         = Page.getForm(requestFormId).xformsServerPath,
-        requestBody = requestBody,
-        contentType = "application/xml".some,
-        formId      = requestFormId,
-        abortSignal = controller.signal.some
-      )
-    } onComplete {
+        Support.fetchText(
+          url         = Page.getForm(requestFormId).xformsServerPath,
+          requestBody = requestBody,
+          contentType = "application/xml".some,
+          formId      = requestFormId,
+          abortSignal = controller.signal.some
+        )
+      } onComplete {
         case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
           // We ignore HTTP status and just check that we have a well-formed response document
           handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
@@ -543,7 +547,7 @@ object AjaxClient {
         Page.getForm(currentFormId).clearDiscardableTimerIds()
 
       // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
-      Page.getForm(currentFormId).loadingIndicator.setNextConnectShow(showProgress)
+      Page.loadingIndicator.setNextConnectShow(showProgress)
 
       asyncAjaxRequest(currentFormId, buildXmlRequest(currentFormId, events), ! (events exists (_.ignoreErrors)))
     }

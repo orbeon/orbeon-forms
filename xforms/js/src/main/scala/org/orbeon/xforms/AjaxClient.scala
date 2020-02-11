@@ -361,14 +361,11 @@ object AjaxClient {
       Globals.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
-      org.scalajs.dom.console.log("executeNextRequest, eventQueue", Globals.eventQueue)
 
       Globals.executeEventFunctionQueued -= 1
 
       if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0)) {
-        val x = findEventsToProcess
-        org.scalajs.dom.console.log("events to process", x.toJSArray)
-        x match {
+        findEventsToProcess match {
           case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
             // which we have received the keyup corresponding to the keydown.

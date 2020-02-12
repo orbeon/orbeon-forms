@@ -30,7 +30,6 @@ class Form(
   val xformsServerPath              : String,
   val xformsServerUploadPath        : String,
   val calendarImagePath             : String,
-  val errorPanel                    : js.Object,
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
   val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access
@@ -39,6 +38,9 @@ class Form(
 
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
+
+  lazy val errorPanel = ErrorPanel.initializeErrorPanel(elem.asInstanceOf[html.Form]) getOrElse
+        (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
   var isFormDataSafe: Boolean = false

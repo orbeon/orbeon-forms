@@ -162,10 +162,6 @@ object InitSupport {
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
 
-      // The error panel shouldn't depend on much and is useful early on
-      val errorPanel = ErrorPanel.initializeErrorPanel(formElem) getOrElse
-        (throw new IllegalStateException(s"missing error panel element for form `$formId`"))
-
       // Q: Do this later?
       $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
@@ -209,7 +205,6 @@ object InitSupport {
           xformsServerPath              = initializations.xformsServerPath,
           xformsServerUploadPath        = initializations.xformsServerUploadPath,
           calendarImagePath             = initializations.calendarImagePath,
-          errorPanel                    = errorPanel,
           repeatTreeChildToParent       = repeatTreeChildToParent,
           repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
           repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes),

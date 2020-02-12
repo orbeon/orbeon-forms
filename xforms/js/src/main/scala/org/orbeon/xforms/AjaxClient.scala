@@ -552,7 +552,10 @@ object AjaxClient {
       // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
       Page.loadingIndicator.setNextConnectShow(showProgress)
 
-      asyncAjaxRequest(currentFormId, buildXmlRequest(currentFormId, events), ! (events exists (_.ignoreErrors)))
+      // Don't ignore errors if any of the events tell us not to ignore errors
+      // So we only ignore errors if all of the events tell us to ignore errors
+      val ignoreErrors = events.forall(_.ignoreErrors)
+      asyncAjaxRequest(currentFormId, buildXmlRequest(currentFormId, events), ignoreErrors)
     }
 
     // NOTE: Later we can switch this to an automatically-generated protocol

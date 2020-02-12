@@ -10,7 +10,7 @@ val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
 val ScalaJsDomVersion             = "0.9.8"
-val ScalaJsJQueryVersion          = "0.9.6"
+val ScalaJsJQueryVersion          = "1.0.0"
 val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 

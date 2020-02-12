@@ -1098,8 +1098,6 @@
 
                     function handleOtherActions(actionElement) {
 
-                        var serverEventsValue = null;
-
                         _.each(actionElement.childNodes, function(childNode) {
                             switch (ORBEON.util.Utils.getLocalName(childNode)) {
 
@@ -1195,15 +1193,10 @@
                                     var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
                                     discardable = ! YAHOO.lang.isNull(discardable) && discardable == "true";
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                    if (delay == null) {
-                                        // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of
-                                        // server-events in the $server-events form field, which will be submitted to the server by POSTing the form.
-                                        serverEventsValue = serverEvents;
-                                    } else {
-                                        // Case where we need to send those events to the server with a regular Ajax request
-                                        // after the given delay.
-                                        AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
-                                    }
+
+                                    // Only for uploads, where `delay="0"`
+                                    AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
+
                                     break;
                                 }
 
@@ -1214,8 +1207,6 @@
                                     var replace      = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
-
-                                    ORBEON.xforms.Page.updateServerEventsInput(formID, serverEventsValue);
 
                                     // Increment and send sequence number
                                     var requestForm = document.getElementById(formID);

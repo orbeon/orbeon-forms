@@ -25,7 +25,6 @@ class Form(
   val uuid                          : String,
   val elem                          : html.Element,
   val uuidInput                     : html.Input,
-  val serverEventInput              : html.Input,
   val ns                            : String,
   val xformsServerPath              : String,
   val xformsServerUploadPath        : String,

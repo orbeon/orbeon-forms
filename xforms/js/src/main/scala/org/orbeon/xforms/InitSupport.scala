@@ -184,7 +184,6 @@ object InitSupport {
         }
 
       val uuidInput        = getTwoPassSubmissionField(formElem, UuidFieldName)
-      val serverEventInput = getTwoPassSubmissionField(formElem, ServerEventsFieldName)
 
       val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
         processRepeatHierarchy(initializations.repeatTree)
@@ -201,7 +200,6 @@ object InitSupport {
           uuid                          = uuid,
           elem                          = formElem,
           uuidInput                     = uuidInput,
-          serverEventInput              = serverEventInput,
           ns                            = formId.substring(0, formId.indexOf(Constants.FormClass)),
           xformsServerPath              = initializations.xformsServerPath,
           xformsServerUploadPath        = initializations.xformsServerUploadPath,
@@ -215,7 +213,6 @@ object InitSupport {
 
       // TODO: We set those here, but we could set them just before submission instead.
       uuidInput.value        = uuid
-      serverEventInput.value = ""
 
       initializeJavaScriptControls(initializations.controls)
       initializeKeyListeners(initializations.listeners, formElem)

@@ -205,11 +205,7 @@ object ScriptBuilder {
             } yield
               rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
             ).distinct,
-        events    =
-          for {
-            delayedEvent <- containingDocument.delayedEvents
-          } yield
-            delayedEvent.toServerEvent(currentTime),
+        events = Nil,
         userScripts =
           for (script <- containingDocument.getScriptsToRun.to(List) collect { case Right(s) => s })
             yield

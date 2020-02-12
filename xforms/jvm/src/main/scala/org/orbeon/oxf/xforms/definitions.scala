@@ -99,23 +99,6 @@ case class DelayedEvent(
     )
   }
 
-  def writeAsSAX(currentTime: Long)(implicit receiver: XMLReceiver): Unit = {
-
-    import XMLReceiverSupport._
-
-    element(
-      localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
-      prefix    = XXFORMS_SHORT_PREFIX,
-      uri       = XXFORMS_NAMESPACE_URI,
-      atts      = List(
-        "delay"         -> (time - currentTime).toString,
-        "discardable"   -> discardable.toString,
-        "show-progress" -> showProgress.toString
-      ),
-      text      = asEncodedDocument
-    )
-  }
-
   def toServerEvent(currentTime: Long): rpc.ServerEvent =
     rpc.ServerEvent(
       delay        = time - currentTime,

@@ -16,9 +16,8 @@ package org.orbeon.oxf.xforms.processor
 import java.util.concurrent.Callable
 import java.{util => ju}
 
-import org.orbeon.dom
+import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.dom.{Document, Element}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
@@ -45,7 +44,6 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, UrlType, XFormsModelS
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
-import org.orbeon.xforms.Constants
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
@@ -82,39 +80,6 @@ object XFormsServer {
     withDocument {
       xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
       withElement(localName = "event-response", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
-
-        // Compute server events
-        val submissionServerEventsOpt: Option[String] = {
-
-          val activeSubmissionOpt = containingDocument.getClientActiveSubmissionFirstPass
-          val portletLoadOpt      = containingDocument.getNonJavaScriptLoadsToRun find (isPortletLoadMatch(containingDocument, _))
-
-          (activeSubmissionOpt.isDefined || portletLoadOpt.isDefined) option {
-            val eventsDocument = dom.Document()
-            val eventsElement  = eventsDocument.addElement(XXFORMS_EVENTS_QNAME)
-
-            def newEventElem(sourceControlId: String, eventName: String): Element =
-              eventsElement.addElement(XXFORMS_EVENT_QNAME)
-                .addAttribute("source-control-id", sourceControlId)
-                .addAttribute("name", eventName)
-
-            // Check for `xxforms-submit` event
-            activeSubmissionOpt foreach { activeSubmission =>
-              newEventElem(activeSubmission.getEffectiveId, XFormsEvents.XXFORMS_SUBMIT)
-            }
-
-            // Check for `xxforms-load` event (for portlet mode only!)
-            portletLoadOpt foreach { load =>
-              // We need to submit the event so that the portlet can load the new path
-              // NOTE: don't care about the target for portlets
-              newEventElem(Constants.DocumentId, XFormsEvents.XXFORMS_LOAD)
-                .addAttribute("resource", load.resource)
-            }
-
-            // Encode events so that the client cannot send back arbitrary events
-            XFormsUtils.encodeXML(eventsDocument, false)
-          }
-        }
 
         // Output dynamic state
         XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState =>
@@ -214,23 +179,6 @@ object XFormsServer {
               case _ => // NOP
             }
 
-            // Output server events
-
-            submissionServerEventsOpt foreach { submissionServerEvents =>
-              element(
-                localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
-                prefix    = XXFORMS_SHORT_PREFIX,
-                uri       = XXFORMS_NAMESPACE_URI,
-                text      = submissionServerEvents
-              )
-            }
-
-            val delayedEvents = containingDocument.delayedEvents
-            if (delayedEvents.nonEmpty) {
-              val currentTime = System.currentTimeMillis
-              for (delayedEvent <- delayedEvents)
-                delayedEvent.writeAsSAX(currentTime)
-            }
 
             // TODO: the following should be ordered in the order they were requested
             // Output messages to display
@@ -287,7 +235,7 @@ object XFormsServer {
               )
 
             // Non-`javascript:` loads only
-            containingDocument.getNonJavaScriptLoadsToRun filterNot (isPortletLoadMatch(containingDocument, _)) foreach
+            containingDocument.getNonJavaScriptLoadsToRun foreach
               (load => outputLoad(containingDocument, load))
           }
         }
@@ -328,12 +276,6 @@ object XFormsServer {
   }
 
   private object Private {
-
-    def isPortletLoadMatch(containingDocument: XFormsContainingDocument, load: Load): Boolean =
-      containingDocument.isPortletContainer    &&
-      load.isReplace                           &&
-      ! NetUtils.urlHasProtocol(load.resource) &&
-      load.urlType != UrlType.Resource
 
     def diffControls(
       containingDocument             : XFormsContainingDocument,
@@ -609,9 +551,6 @@ class XFormsServer extends ProcessorImpl {
 
     val ignoreSequence = ! isAjaxRequest
 
-    // Gather server events containers if any
-    val serverEventsElements = ClientEvents.extractServerEventsElements(requestDocument.getRootElement)
-
     // Find an output stream for xf:submission[@replace = 'all']
     val response = PipelineResponse.getResponse(xmlReceiverOpt.orNull, externalContext)
 
@@ -654,11 +593,8 @@ class XFormsServer extends ProcessorImpl {
                   containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
 
               // Run events if any
-              val eventsFindingsOpt = {
-
-                val hasEvents = remainingClientEvents.nonEmpty || serverEventsElements.nonEmpty
-
-                if (hasEvents) {
+              val eventsFindingsOpt =
+                remainingClientEvents.nonEmpty option {
                   // Scope the containing document for the XForms API
                   XFormsAPI.withContainingDocument(containingDocument) {
 
@@ -670,7 +606,7 @@ class XFormsServer extends ProcessorImpl {
 
                       // Dispatch the events
                       val result =
-                        Some(ClientEvents.processEvents(containingDocument, remainingClientEvents, serverEventsElements))
+                        ClientEvents.processEvents(containingDocument, remainingClientEvents)
 
                       // End external events
                       containingDocument.afterExternalEvents()
@@ -678,9 +614,7 @@ class XFormsServer extends ProcessorImpl {
                       result
                     } (eventsIndentedLogger)
                   }
-                } else
-                  None
-              }
+                }
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequence) {

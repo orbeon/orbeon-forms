@@ -710,7 +710,6 @@
                         <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
-                        <xh:input type="hidden" name="$server-events" value=""/>
                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
                             <div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
                                 <div class="hd" id="error-dialog-title">An error has occurred</div>

@@ -156,11 +156,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         {
-            // Only for 2-pass submission
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$server-events", "value", ""
-            });
-
             // Ajax error panel
             XFormsError.outputAjaxErrorPanel(containingDocument, helper, htmlPrefix);
 

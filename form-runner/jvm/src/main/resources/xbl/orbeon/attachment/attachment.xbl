@@ -162,7 +162,9 @@
 
             <xh:label
                 class="btn btn-default btn-file"
-                for="xf-upload≡xforms-input">
+                for="xf-upload≡xforms-input"
+                role="button"
+                tabindex="0">
                 <xf:output value="xxf:r('select')"/>
             </xh:label>
 

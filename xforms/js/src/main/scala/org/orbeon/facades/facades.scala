@@ -16,6 +16,7 @@ package org.orbeon.facades
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLLinkElement
 
+import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -52,4 +53,15 @@ object Html {
     }
   }
 
+  implicit class HTMLElementOps(private val element: html.Element) extends AnyVal {
+
+    @tailrec def closest(selector: String): Option[html.Element] = {
+      if (element.matches(selector))
+        Some(element)
+      else if (element.parentElement == null)
+        None
+      else
+        element.parentElement.closest(selector)
+    }
+  }
 }

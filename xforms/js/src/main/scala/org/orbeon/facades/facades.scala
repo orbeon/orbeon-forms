@@ -14,10 +14,11 @@
 package org.orbeon.facades
 
 import org.scalajs.dom.html
+import org.scalajs.dom.raw.HTMLLinkElement
 
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
-
 
 @js.native
 trait Mousetrap extends js.Object {
@@ -39,4 +40,16 @@ object Bowser extends js.Object {
   val mobile  : js.UndefOr[Boolean] = js.native
   val version : String  = js.native
   val name    : String  = js.native
+}
+
+object Html {
+
+  implicit class HTMLLinkElementOps(private val link: HTMLLinkElement) extends AnyVal {
+    def onloadF: Future[Unit] = {
+      val promise = Promise[Unit]()
+      link.asInstanceOf[js.Dynamic].onload = () => promise.success()
+      promise.future
+    }
+  }
+
 }

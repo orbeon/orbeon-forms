@@ -17,7 +17,6 @@ package org.orbeon.oxf.xforms.processor
 import net.sf.ehcache.{Element => EhElement}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.util.CoreUtils._
@@ -153,46 +152,6 @@ class AssetsAggregator extends ProcessorImpl {
               def outputPreservedElement(e: HeadElement) = {
                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, e.name, e.attributes)
                 e.text foreach helper.text
-                helper.endElement()
-              }
-
-              def outputScriptCSSAsJSON() = {
-
-                // NOTE: oxf:xhtml-rewrite usually takes care of URL rewriting, but not in JSON content.
-                // So we rewrite here.
-                def rewritePath(path: String) = response.rewriteResourceURL(path, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
-
-                def appendJS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
-                def appendCSS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
-
-                def appendPreservedElement(e: HeadElement) =
-                  e match {
-                    case ref: ReferenceElement =>
-                      val srcHref = Option(ref.attributes.getValue("src")) getOrElse ref.attributes.getValue("href")
-                      Some("""{"src":"""" + srcHref + """"}""")
-                    case inline: InlineElement =>
-                      inline.text map ("""{"text":"""" + JSON.quoteValue(_) + """"}""")
-                  }
-
-                val builder = new StringBuilder
-                builder append """{"scripts":["""
-
-                builder append
-                  (aggregate(baselineJS, appendJS, namespaceOpt, isCSS = false) ++
-                    aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCSS = false) ++
-                      (preservedJS flatMap (appendPreservedElement(_).toList)) mkString ",")
-
-                builder append """],"styles":["""
-
-                builder append
-                  (aggregate(baselineCSS, appendCSS, namespaceOpt, isCSS = true) ++
-                    aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCSS = true) ++
-                      (preservedCSS flatMap (appendPreservedElement(_).toList)) mkString ",")
-
-                builder append """]}"""
-
-                helper.startElement(xhtmlPrefix, uri, "div", Array("class", "orbeon-portlet-resources"))
-                helper.text(builder.toString)
                 helper.endElement()
               }
 

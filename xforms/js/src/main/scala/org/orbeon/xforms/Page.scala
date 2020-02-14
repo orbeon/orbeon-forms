@@ -23,7 +23,8 @@ object Page {
 
   import Private._
 
-  val loadingIndicator = new LoadingIndicator
+  // https://github.com/orbeon/orbeon-forms/issues/4430
+  lazy val loadingIndicator = new LoadingIndicator
 
   def registerForm(namespacedFormId: String, form: Form): Unit = {
     formsByNamespacedFormId += namespacedFormId -> form

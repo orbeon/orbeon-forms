@@ -95,19 +95,13 @@ class XHTMLHeadHandler(
 
       if (! containingDocument.isServeInlineResources) {
 
-        val baseAttsWithDefer =
-          if (XFormsProperties.isCombinedResources)
-            ("defer" -> "defer") :: StandaloneScriptBaseAtts
-          else
-            StandaloneScriptBaseAtts
-
         // Static resources
         if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)
           element(
             localName = "script",
             prefix    = xhtmlPrefix,
             uri       = XHTML_NAMESPACE_URI,
-            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js") :: baseAttsWithDefer)
+            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js") :: StandaloneScriptBaseAtts)
           )
 
         // Dynamic resources
@@ -115,7 +109,7 @@ class XHTMLHeadHandler(
           localName = "script",
           prefix    = xhtmlPrefix,
           uri       = XHTML_NAMESPACE_URI,
-          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js") :: baseAttsWithDefer)
+          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js") :: StandaloneScriptBaseAtts)
         )
 
       } else {
@@ -175,7 +169,8 @@ private object XHTMLHeadHandler {
   val StandaloneScriptBaseAtts =
     List(
       "type"  -> "text/javascript",
-      "class" -> "xforms-standalone-resource"
+      "class" -> "xforms-standalone-resource",
+      "defer" -> "defer"
     )
 
   val StyleBaseAtts =

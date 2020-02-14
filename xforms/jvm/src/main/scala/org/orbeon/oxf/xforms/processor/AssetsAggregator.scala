@@ -28,10 +28,10 @@ import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable.{Buffer, LinkedHashSet}
 
-/**
-  * Aggregate CSS and JS resources under <head>.
-  */
+// Aggregate CSS and JS resources under `<head>`.
 class AssetsAggregator extends ProcessorImpl {
+
+  self =>
 
   import AssetsAggregator._
 
@@ -39,7 +39,7 @@ class AssetsAggregator extends ProcessorImpl {
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
   override def createOutput(name: String) =
-    addOutput(name, new ProcessorOutputImpl(AssetsAggregator.this, name) {
+    addOutput(name, new ProcessorOutputImpl(self, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
           if (! XFormsProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
@@ -216,10 +216,10 @@ object AssetsAggregator extends Logging {
 
   // Output combined resources
   def aggregate[T](
-    resources               : scala.collection.Set[String],
-    outputElement           : String => T,
-    namespaceOpt            : Option[String],
-    isCSS                   : Boolean
+    resources     : scala.collection.Set[String],
+    outputElement : String => T,
+    namespaceOpt  : Option[String],
+    isCSS         : Boolean
   ): Option[T] =
     resources.nonEmpty option {
 

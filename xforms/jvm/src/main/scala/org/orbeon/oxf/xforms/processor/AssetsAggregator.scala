@@ -186,10 +186,6 @@ class AssetsAggregator extends ProcessorImpl {
                 super.endElement(uri, localname, qName)
 
                 inHead = false
-              } else if (level == 2 && localname == "body") {
-
-                // Close body element
-                super.endElement(uri, localname, qName)
 
               } else if (filter && level == 3 && inHead) {
                 currentInlineElement = null

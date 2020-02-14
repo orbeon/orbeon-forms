@@ -140,7 +140,6 @@
                 <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/StringOps.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>

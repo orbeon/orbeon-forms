@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -50,12 +51,10 @@ class AssetsAggregator extends ProcessorImpl {
               def text: Option[String] = None
             }
             case class ReferenceElement(name: String, attributes: Attributes) extends HeadElement
-            case class InlineElement(name: String, attributes: Attributes) extends HeadElement {
+            case class InlineElement   (name: String, attributes: Attributes) extends HeadElement {
               var content = new StringBuilder
               override def text = Some(content.toString)
             }
-
-            val attributesImpl = new AttributesImpl
 
             // State
             var level = 0
@@ -86,7 +85,7 @@ class AssetsAggregator extends ProcessorImpl {
             // Whether a path is a user resource in separate deployment
             def isSeparatePath(path: String) = isSeparateDeployment && ! URLRewriterUtils.isPlatformPath(path)
 
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
+            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
               level += 1
 
               if (level == 2 && localname == "head") {
@@ -137,37 +136,42 @@ class AssetsAggregator extends ProcessorImpl {
                 super.startElement(uri, localname, qName, attributes)
             }
 
-            override def endElement(uri: String, localname: String, qName: String) = {
+            override def endElement(uri: String, localname: String, qName: String): Unit = {
 
               lazy val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
-              lazy val helper = new XMLReceiverHelper(xmlReceiver)
 
-              // Configurable function to output an element
-              def outputElement(getAttributes: String => Array[String], elementName: String)(resource: String) = {
-                attributesImpl.clear()
-                XMLReceiverHelper.populateAttributes(attributesImpl, getAttributes(resource))
-                helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
-              }
+              implicit val receiver: XMLReceiver = xmlReceiver
 
-              def outputPreservedElement(e: HeadElement) = {
-                helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, e.name, e.attributes)
-                e.text foreach helper.text
-                helper.endElement()
-              }
+              def outputPreservedElement(e: HeadElement): Unit =
+                withElement(
+                  localName = e.name,
+                  prefix    = xhtmlPrefix,
+                  uri       = XMLConstants.XHTML_NAMESPACE_URI,
+                  atts      = e.attributes
+                ) {
+                  e.text foreach text
+                }
 
-              def outputCSS() = {
-                val outputCSSElement = outputElement(resource => Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
+              def outputCSS(): Unit = {
+
+                def outputCSSElement(resource: String): Unit =
+                  element("link", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "href" -> resource :: LinkBaseAtts)
+
                 aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
                 aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCSS = true)
                 preservedCSS foreach outputPreservedElement
               }
 
-              def outputJS() = {
-                val outputJSElement =
-                  outputElement(
-                    resource => Array("type", "text/javascript", "src", resource , "defer", "defer"),
-                    "script"
-                  )(_)
+              def outputJS(hasInlineScript: Boolean): Unit = {
+
+                val attsBase =
+                  if (hasInlineScript)
+                    ScriptBaseAtts
+                else
+                    "defer" -> "defer" :: ScriptBaseAtts
+
+                def outputJSElement(resource: String): Unit =
+                  element("script", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "src" -> resource :: attsBase)
 
                 aggregate(baselineJS, outputJSElement, namespaceOpt, isCSS = false)
                 aggregate(supplementalJS -- baselineJS, outputJSElement, namespaceOpt, isCSS = false)
@@ -180,7 +184,12 @@ class AssetsAggregator extends ProcessorImpl {
                 outputCSS()
 
                 // 2. Combined and inline JS
-                outputJS()
+                outputJS(
+                  preservedJS exists {
+                    case _: InlineElement => true
+                    case _ =>                false
+                  }
+                )
 
                 // Close head element
                 super.endElement(uri, localname, qName)
@@ -213,6 +222,18 @@ class AssetsAggregator extends ProcessorImpl {
 }
 
 object AssetsAggregator extends Logging {
+
+  val ScriptBaseAtts =
+    List(
+      "type"  -> "text/javascript"
+    )
+
+  val LinkBaseAtts =
+    List(
+      "rel"   -> "stylesheet",
+      "type"  -> "text/css",
+      "media" -> "all"
+    )
 
   // Output combined resources
   def aggregate[T](

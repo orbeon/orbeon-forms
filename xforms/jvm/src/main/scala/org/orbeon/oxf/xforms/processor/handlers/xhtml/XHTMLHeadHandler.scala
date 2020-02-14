@@ -28,6 +28,8 @@ import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+import XMLReceiverSupport._
+
 // Handler for <xh:head>
 class XHTMLHeadHandler(
   uri            : String,
@@ -42,7 +44,7 @@ class XHTMLHeadHandler(
 
   override def start(): Unit = {
 
-    val xmlReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     // Register control handlers on controller
     xformsHandlerContext.getController.registerHandler(
@@ -98,31 +100,33 @@ class XHTMLHeadHandler(
 
       if (! containingDocument.isServeInlineResources) {
 
+        val baseAtts =
+          List(
+            "type"  -> "text/javascript",
+            "class" -> "xforms-standalone-resource"
+          )
+
+        val baseAttsWithDefer =
+          if (XFormsProperties.isCombinedResources)
+            ("defer" -> "defer") :: baseAtts
+          else
+            baseAtts
+
         // Static resources
         if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)
-          helper.element(
-            xhtmlPrefix,
-            XHTML_NAMESPACE_URI,
-            "script",
-            Array(
-              "type", "text/javascript",
-              "class", "xforms-standalone-resource",
-              "defer", "defer",
-              "src", XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js"
-            )
+          element(
+            localName = "script",
+            prefix    = xhtmlPrefix,
+            uri       = XHTML_NAMESPACE_URI,
+            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js") :: baseAttsWithDefer)
           )
 
         // Dynamic resources
-        helper.element(
-          xhtmlPrefix,
-          XHTML_NAMESPACE_URI,
-          "script",
-          Array(
-            "type", "text/javascript",
-            "class", "xforms-standalone-resource",
-            "defer", "defer",
-            "src", XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js"
-          )
+        element(
+          localName = "script",
+          prefix    = xhtmlPrefix,
+          uri       = XHTML_NAMESPACE_URI,
+          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js") :: baseAttsWithDefer)
         )
 
       } else {

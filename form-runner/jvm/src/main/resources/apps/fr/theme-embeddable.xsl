@@ -52,7 +52,7 @@
             <xh:div class="orbeon-portlet-body">
                 <xsl:apply-templates select="/xh:html/xh:body/(node() except xh:script)"/>
             </xh:div>
-            <!-- Handle body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <!-- Handle body scripts if present. They can be placed here by `oxf:assets-aggregator` -->
             <xsl:for-each select="/xh:html/xh:body/xh:script">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
                     <xsl:copy-of select="@* except @defer"/>

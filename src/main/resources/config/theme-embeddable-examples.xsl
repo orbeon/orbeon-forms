@@ -73,7 +73,7 @@
                     <xsl:apply-templates select="/xh:html/xh:body/(node() except xh:script)"/>
                 </xh:div>
             </xh:div>
-            <!-- Handle body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <!-- Handle body scripts if present. They can be placed here by `oxf:assets-aggregator` -->
             <xsl:apply-templates select="/xh:html/xh:body/xh:script"/>
         </xh:div>
     </xsl:template>

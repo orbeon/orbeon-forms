@@ -79,7 +79,7 @@
             </p:processor>
 
             <!-- Combine resources if needed -->
-            <p:processor name="oxf:resources-aggregator">
+            <p:processor name="oxf:assets-aggregator">
                 <p:input name="data" href="#xincluded-data"/>
                 <p:output name="data" ref="xformed-data"/>
             </p:processor>

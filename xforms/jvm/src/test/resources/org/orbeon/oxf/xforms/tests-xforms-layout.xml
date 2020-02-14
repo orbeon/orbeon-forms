@@ -1544,13 +1544,13 @@
         </output>
     </test>
 
-    <test description="oxf:resources-aggregator" name="oxf:pipeline">
+    <test description="oxf:assets-aggregator" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param name="data" type="output"/>
 
                 <!-- Aggregate resources and cache -->
-                <p:processor name="oxf:resources-aggregator">
+                <p:processor name="oxf:assets-aggregator">
                     <p:input name="data">
                         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                             <xh:head xmlns:f="http://orbeon.org/oxf/xml/formatting">

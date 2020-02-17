@@ -62,7 +62,7 @@ object ResourcesPatcher {
   ): Unit = {
 
     val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
-    val propertyNames = properties.propertiesStartsWith(Prefix :: appForm.toList :: Nil mkString ".")
+    val propertyNames = properties.propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {

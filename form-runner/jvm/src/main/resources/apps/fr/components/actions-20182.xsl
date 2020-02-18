@@ -591,6 +591,30 @@
 
     </xsl:template>
 
+    <xsl:template match="fr:control-clear" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xf:action>
+
+            <!-- Will run only if needed, right? -->
+            <xf:rebuild/>
+            <xf:revalidate/>
+
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <!-- Clear all possible elements and attributes -->
+                <xf:setvalue
+                    iterate="., @filename, @mediatype, @size, image, image/@filename, image/@mediatype, image/@size, @label"
+                    ref="."/>
+            </xf:action>
+        </xf:action>
+
+    </xsl:template>
+
     <xsl:template match="fr:control-setitems" mode="within-action-2018.2">
 
         <xsl:param tunnel="yes" name="model-id" as="xs:string"/>

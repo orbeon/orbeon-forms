@@ -809,7 +809,7 @@
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
                 <xf:setvalue
-                    ref="@mediatype"
+                    ref="image/@mediatype, ./@mediatype"
                     value="$value"/>
             </xf:action>
 

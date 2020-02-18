@@ -80,8 +80,6 @@ object FutureUtils {
     execContext : ExecutionContext
   ): Future[T] = {
     before
-    val f = body
-    f.onComplete(_ => after)
-    f
+    body andThen { case _ => after } // make sure to sequence `after` *before* the result
   }
 }

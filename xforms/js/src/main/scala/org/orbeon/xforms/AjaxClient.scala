@@ -257,6 +257,9 @@ object AjaxClient {
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
   def fireEvents(events: js.Array[AjaxEvent], incremental: Boolean): Unit = {
 
+    // NOTE: Only `keypress` passes two events, and with `incremental == false`
+    // NOTE: `incremental == true` for `focus` and `keyup` event processing
+
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
 
@@ -361,6 +364,24 @@ object AjaxClient {
       Globals.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
+
+      // `executeEventFunctionQueued`:
+      //
+      // - incremented
+      //     - just before `executeNextRequest()` is called directly after an Ajax response (so in effect it's a NOP as it's decremented below)
+      //     - OR before `executeNextRequest()` is *scheduled* to be called
+      // - decremented here
+      //
+      // The idea is that if you keep scheduling events with an incremental delay, they won't be sent as
+      // long as the user types within that delay, unless some other non-incremental event sends the request
+      // in the meanwhile (with `bypassRequestQueue = true`).
+      //
+      // Bottom line: `executeEventFunctionQueued` is only used for incremental events... except that upon
+      // Ajax response, we pass `bypassRequestQueue = false`, which means that if there is either an
+      // incremental or a non-incremental `executeNextRequest()` scheduled when that happens, the actual
+      // check of the queue will wait until that completes, which could be up to the incremental delay.
+      //
+      // Q: Should we then call `executeNextRequest(bypassRequestQueue = true)` instead?
 
       Globals.executeEventFunctionQueued -= 1
 

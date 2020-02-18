@@ -240,7 +240,6 @@ object AjaxClient {
       form.addDiscardableTimerId(timerId)
   }
 
-
   // NOTE: Used from JS only from obsolete `ORBEON.util.Test.executeCausingAjaxRequest`. So
   // currently we don't export it.
   def hasEventsToProcess: Boolean =

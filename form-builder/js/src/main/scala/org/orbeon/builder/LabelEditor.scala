@@ -70,7 +70,7 @@ object LabelEditor {
 
     def showLabelEditor(clickInterceptor: JQuery): Unit = {
 
-      if (AjaxClient.hasEventsToProcess()) {
+      if (AjaxClient.hasEventsToProcess) {
 
         // If we have a request in progress or events in the queue, try this again later
         js.timers.setTimeout(Properties.internalShortDelay.get()) {

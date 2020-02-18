@@ -31,8 +31,7 @@ import scala.collection.compat._
 case class UploadEvent(form: html.Form, upload: Upload)
 
 // - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
-// - We should move away from YUI's Connect for Ajax. Other enhancements are listed here:
-//   https://github.com/orbeon/orbeon-forms/issues/3150
+// - Other enhancements are listed here: https://github.com/orbeon/orbeon-forms/issues/3150
 object UploaderClient {
 
   import Private._

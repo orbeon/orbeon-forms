@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 import java.{util => ju}
 
-import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -328,7 +327,7 @@ trait XFormsModelInstances {
     _instances(position) ne null
 
   def defaultInstanceOpt: Option[XFormsInstance] =
-    _instances.headOption
+    _instances.find(_ ne null)
 
   // Iterate over all initialized instances
   def instancesIterator: Iterator[XFormsInstance] =

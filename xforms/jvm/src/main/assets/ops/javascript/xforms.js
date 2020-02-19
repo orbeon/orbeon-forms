@@ -2136,7 +2136,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (neighbor == null) {
                 // Center dialog in page, delaying until the end of the request to give a chance to the content of the dialog
                 // to show itself.
-                if (ORBEON.xforms.Globals.requestInProgress) {
+                if (ORBEON.xforms.server.AjaxServer.isRequestInProgress()) {
                     var centerDialog = function() {
                         yuiDialog.center();
                         ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);

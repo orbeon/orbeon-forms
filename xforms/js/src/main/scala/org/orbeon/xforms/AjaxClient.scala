@@ -62,7 +62,7 @@ object AjaxClient {
     val result = Promise[Unit]()
 
     // When there is a request in progress, we need to wait for the response after the next response processed
-    var skipNext = Globals.requestInProgress
+    var skipNext = EventQueue.requestInProgress
 
     lazy val callback: js.Function = () => {
       if (skipNext) {
@@ -112,7 +112,7 @@ object AjaxClient {
     // Notify listeners that we are done processing this request
     Events.ajaxResponseProcessedEvent.fire(formId)
     // Go ahead with next request, if any
-    Globals.executeEventFunctionQueued += 1
+    EventQueue.executeEventFunctionQueued += 1
     executeNextRequest(bypassRequestQueue = false)
   }
 
@@ -240,9 +240,15 @@ object AjaxClient {
       form.addDiscardableTimerId(timerId)
   }
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasEventsToProcess")
-  def hasEventsToProcess(): Boolean =
-    Globals.requestInProgress || Globals.eventQueue.nonEmpty
+
+  // NOTE: Used from JS only from obsolete `ORBEON.util.Test.executeCausingAjaxRequest`. So
+  // currently we don't export it.
+  def hasEventsToProcess: Boolean =
+    EventQueue.requestInProgress || EventQueue.eventQueue.nonEmpty
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
+  def isRequestInProgress(): Boolean =
+    EventQueue.requestInProgress
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
   def fireEvents(events: js.Array[AjaxEvent], incremental: Boolean): Unit = {
@@ -262,18 +268,18 @@ object AjaxClient {
 
     // Store the time of the first event to be sent in the queue
     val currentTime = new js.Date().getTime()
-    if (Globals.eventQueue.isEmpty)
-      Globals.eventsFirstEventTime = currentTime
+    if (EventQueue.eventQueue.isEmpty)
+      EventQueue.eventsFirstEventTime = currentTime
 
     // Store events to fire
     events foreach { event =>
       if (! event.targetIdOpt.contains("")) // Q: Why do we check this? We expect `None` or `Some(targetId)`
-        Globals.eventQueue.push(event)
+        EventQueue.eventQueue ::= event
     }
 
     // Fire them with a delay to give us a change to aggregate events together
-    Globals.executeEventFunctionQueued += 1
-    if (incremental && !(currentTime - Globals.eventsFirstEventTime > Properties.delayBeforeIncrementalRequest.get())) {
+    EventQueue.executeEventFunctionQueued += 1
+    if (incremental && ! (currentTime - EventQueue.eventsFirstEventTime > Properties.delayBeforeIncrementalRequest.get())) {
       // After a delay (e.g. 500 ms), run `executeNextRequest()` and send queued events to server
       // if there are no other `executeNextRequest()` that have been added to the queue after this
       // request.
@@ -333,17 +339,27 @@ object AjaxClient {
       ErrorPanel.showError(formId, detailsString)
   }
 
+  private object EventQueue {
+
+    var eventQueue                 : List[AjaxEvent]  = Nil
+
+    var eventsFirstEventTime       : Double           = 0         // time when the first event in the queue was added
+    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
+    var executeEventFunctionQueued : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
+    var requestInProgress          : Boolean          = false     // indicates whether an Ajax request is currently in process
+  }
+
   private object Private {
 
     val Indent: String = " " * 4
 
     def debugEventQueue(): Unit =
-      println(s"Event queue: ${Globals.eventQueue mkString ", "}")
+      println(s"Event queue: ${EventQueue.eventQueue mkString ", "}")
 
     // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
     // a maximum delay.
     def retryRequestAfterDelay(requestFunction: () => Unit): Unit = {
-      val delay = Math.min(Properties.retryDelayIncrement.get() * (Globals.requestTryCount - 1), Properties.retryMaxDelay.get())
+      val delay = Math.min(Properties.retryDelayIncrement.get() * (EventQueue.requestTryCount - 1), Properties.retryMaxDelay.get())
       if (delay == 0)
         requestFunction()
       else
@@ -351,7 +367,7 @@ object AjaxClient {
     }
 
     def eventQueueHasShowProgressEvent: Boolean =
-      Globals.eventQueue exists (_.showProgress)
+      EventQueue.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
 
@@ -373,9 +389,9 @@ object AjaxClient {
       //
       // Q: Should we then call `executeNextRequest(bypassRequestQueue = true)` instead?
 
-      Globals.executeEventFunctionQueued -= 1
+      EventQueue.executeEventFunctionQueued -= 1
 
-      if (! Globals.requestInProgress && Globals.eventQueue.nonEmpty && (bypassRequestQueue || Globals.executeEventFunctionQueued == 0)) {
+      if (! EventQueue.requestInProgress && EventQueue.eventQueue.nonEmpty && (bypassRequestQueue || EventQueue.executeEventFunctionQueued == 0)) {
         findEventsToProcess match {
           case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
@@ -383,10 +399,10 @@ object AjaxClient {
             // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
             // TODO: check where this is used!
             Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
-            Globals.eventQueue        = eventsForOtherForms.toJSArray
-            processEvents(currentForm, eventsForCurrentForm)
+            EventQueue.eventQueue = eventsForOtherForms
+            processEvents(currentForm, eventsForCurrentForm.reverse)
           case None =>
-            Globals.eventQueue = js.Array()
+            EventQueue.eventQueue = Nil
         }
       }
     }
@@ -394,7 +410,7 @@ object AjaxClient {
     def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
 
       val requestForm = Page.getForm(requestFormId)
-      Globals.requestTryCount += 1
+      EventQueue.requestTryCount += 1
 
       // Timeout support using `AbortController`
       val controller = new AbortController
@@ -404,11 +420,11 @@ object AjaxClient {
 
       FutureUtils.withFutureSideEffects(
         before = {
-          Globals.requestInProgress = true
+          EventQueue.requestInProgress = true
           Page.loadingIndicator.requestStarted()
         },
         after  = {
-          Globals.requestInProgress = false
+          EventQueue.requestInProgress = false
           Page.loadingIndicator.requestEnded()
         }
       ) {
@@ -463,7 +479,7 @@ object AjaxClient {
                 val (blockTail, remaining) = l.tail.span(e => e.eventName == eventName && e.targetIdOpt == targetIdOpt)
                 val block                  = l.head :: blockTail
 
-                (block.last, remaining)
+                (block.head, remaining)
               case _ =>
                 (l.head, l.tail)
             }
@@ -477,7 +493,7 @@ object AjaxClient {
       // Keep only the last `XXFormsUploadProgress`. This makes sense because as of 2019-11-25, we only handle a
       // single upload at a time.
       def coalescedProgressEvents(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        events collect { case e if e.eventName == XXFormsUploadProgress => e } lastOption match {
+        events find (_.eventName == XXFormsUploadProgress) match {
           case Some(lastProgressEvent) =>
             NonEmptyList.fromList(
               events collect {
@@ -491,17 +507,17 @@ object AjaxClient {
 
       def eventsForOldestEventForm(events: NonEmptyList[AjaxEvent]): (html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent]) = {
 
-        val oldestEvent = events.head
+        val oldestEvent = events.last
         val currentForm = oldestEvent.form
 
         val (eventsToSend, eventsForOtherForms) =
           events.toList partition (event => event.form.isSameNode(currentForm))
 
-        (currentForm, NonEmptyList(oldestEvent, eventsToSend.tail), eventsForOtherForms)
+        (currentForm, NonEmptyList.ofInitLast(eventsToSend.init, oldestEvent), eventsForOtherForms)
       }
 
       for {
-        originalEvents           <- NonEmptyList.fromList(Globals.eventQueue.toList)
+        originalEvents           <- NonEmptyList.fromList(EventQueue.eventQueue)
         eventsForFormsInDocument <- eventsForFormsInDocument(originalEvents)
         coalescedEvents          <- coalescedProgressEvents(coalesceValueEvents(eventsForFormsInDocument))
       } yield
@@ -541,14 +557,14 @@ object AjaxClient {
           events collect { case e if e.eventName == XXFormsValue => e } groupByKeepOrder (_.targetIdOpt)
 
         valueEventsGroupedByTargetId foreach {
-          case (Some(targetId), events) => ServerValueStore.set(targetId, events.last.properties.get("value").get.asInstanceOf[String])
+          case (Some(targetId), events) => ServerValueStore.set(targetId, events.head.properties.get("value").get.asInstanceOf[String])
           case _ =>
         }
       }
 
       val currentFormId = currentForm.id
 
-      Globals.requestTryCount = 0
+      EventQueue.requestTryCount = 0
 
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)

@@ -25,12 +25,7 @@ object Globals {
 
   lazy val isRenderingEngineTrident: Boolean                   = Bowser.msie.getOrElse(false) // one usage left to check as of 2019-12-09
 
-  var eventQueue                  : js.Array[AjaxEvent]       = js.Array()                   // events to be sent to the server
-  var eventsFirstEventTime        : Double                    = 0                            // time when the first event in the queue was added
-  var requestInProgress           : Boolean                   = false                        // indicates whether an Ajax request is currently in process
-  var requestTryCount             : Int                       = 0                            // how many attempts to run the current Ajax request we have done so far
-  var executeEventFunctionQueued  : Int                       = 0                            // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
-  var changedIdsRequest           : js.Dictionary[Int]        = js.Dictionary.empty          // id of controls that have been touched by user since the last response was received
+  /*xforms.js*/var changedIdsRequest           : js.Dictionary[Int]        = js.Dictionary.empty          // id of controls that have been touched by user since the last response was received
 
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server

@@ -68,7 +68,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   def updateWindow(window: OrbeonWindow, controlId: String, newValue: String | Double | Boolean): Future[Unit] = {
     window.documentAPI.setValue(controlId, newValue)
-    window.ajaxServer.ajaxResponseReceivedForTests().toFuture
+    window.ajaxServer.ajaxResponseProcessedForCurrentEventQueueP().toFuture
   }
 
   def updateWindowsAndAssert(windows: List[OrbeonWindow], line: Int): Future[Unit] = async {

@@ -50,21 +50,11 @@ object AjaxClient {
   lazy val ajaxResponseReceived: JQueryCallback = $.Callbacks(flags = "")
 
   // Used by `OrbeonClientTest`
-  // TODO: Check if `ajaxResponseProcessedForCurrentEventQueueF` should/could be used instead.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseReceivedForTests")
-  def ajaxResponseReceivedForTests(): js.Promise[Unit] = {
-
-    val result = Promise[Unit]()
-
-    lazy val callback: js.Function = () => {
-      ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(callback) // because has `removed`
-      result.success(())
-    }
-
-    ajaxResponseReceived.add(callback)
-
-    result.future.toJSPromise
-  }
+  // This uses a JavaScript `Promise` as the API is used across Scala.js compilation contexts and Scala
+  // classes cannot go through that boundary.
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseProcessedForCurrentEventQueueP")
+  def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] =
+    ajaxResponseProcessedForCurrentEventQueueF(null).toJSPromise
 
   // TODO: `formId` is not used.
   def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {

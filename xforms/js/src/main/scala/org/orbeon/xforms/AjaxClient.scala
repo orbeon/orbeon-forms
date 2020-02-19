@@ -287,7 +287,7 @@ object AjaxClient {
     //      event before this method is called.
 
     // Store the time of the first event to be sent in the queue
-    val currentTime = new js.Date().getTime()
+    val currentTime = System.currentTimeMillis()
     if (EventQueue.eventQueue.isEmpty)
       EventQueue.eventsFirstEventTime = currentTime
 
@@ -316,7 +316,7 @@ object AjaxClient {
       }
     }
     // Used by heartbeat
-    Globals.lastEventSentTime = new js.Date().getTime()
+    EventQueue.lastEventSentTime = System.currentTimeMillis()
   }
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -359,14 +359,26 @@ object AjaxClient {
       ErrorPanel.showError(formId, detailsString)
   }
 
+  // Sending a heartbeat event if no event has been sent to server in the last time interval
+  // determined by the `session-heartbeat-delay` property.
+  def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
+    if ((System.currentTimeMillis() - EventQueue.lastEventSentTime) >= heartBeatDelay)
+      AjaxEvent.dispatchEvent(
+        AjaxEvent(
+          eventName = EventNames.XXFormsSessionHeartbeat,
+          form      = Support.getFirstForm
+        )
+      )
+
   private object EventQueue {
 
     var eventQueue                 : List[AjaxEvent]  = Nil
 
-    var eventsFirstEventTime        : Double           = 0         // time when the first event in the queue was added
-    var requestTryCount             : Int              = 0         // how many attempts to run the current Ajax request we have done so far
-    var executeEventFunctionQueued  : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
-    var requestInProgress           : Boolean          = false     // indicates whether an Ajax request is currently in process
+    var eventsFirstEventTime       : Long             = 0         // time when the first event in the queue was added
+    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
+    var executeEventFunctionQueued : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
+    var requestInProgress          : Boolean          = false     // indicates whether an Ajax request is currently in process
+    var lastEventSentTime          : Long             = System.currentTimeMillis // timestamp when the last event was sent to server
 
     // See https://github.com/orbeon/orbeon-forms/issues/1732
     var changedIdsRequest           : Map[String, Int] = Map.empty // id of controls that have been touched by user since the last response was received

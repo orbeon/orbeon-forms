@@ -2984,33 +2984,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        /**
-         * A method for sending a heartbeat event if no event has sent to server in
-         * the last time interval determined by session-heartbeat-delay property
-         */
-        sendHeartBeatIfNeeded: function (heartBeatDelay) {
-            var currentTime = new Date().getTime();
-            if ((currentTime - ORBEON.xforms.Globals.lastEventSentTime) >= heartBeatDelay) {
-                var heartBeatDiv = document.getElementById("xforms-heartbeat");
-                if (heartBeatDiv == null) {
-                    var form;
-                    for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
-                        var candidateForm = document.forms[formIndex];
-                        if ($(candidateForm).is('.xforms-form')) {
-                            form = candidateForm;
-                            break;
-                        }
-                    }
-                    var heartBeatDiv = document.createElement("div");
-                    heartBeatDiv.className = "xforms-heartbeat";
-                    heartBeatDiv.id = "xforms-heartbeat";
-                    form.appendChild(heartBeatDiv);
-                }
-                var event = new ORBEON.xforms.server.AjaxServer.Event(null, heartBeatDiv.id, null, "xxforms-session-heartbeat");
-                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-            }
-        },
-
         orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded", window, false, YAHOO.util.CustomEvent.LIST, true),
         ajaxResponseProcessedEvent  : new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
         errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),

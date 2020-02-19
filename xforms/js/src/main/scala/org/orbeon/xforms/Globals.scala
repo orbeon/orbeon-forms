@@ -38,7 +38,6 @@ object Globals {
   var hintTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty          // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
   var alertTooltipForControl      : js.Dictionary[js.Any]     = js.Dictionary.empty          // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
   var helpTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty          // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
-  var lastEventSentTime           : Double                    = new js.Date().getTime()      // timestamp when the last event was sent to server
   var sliderYui                   : js.Dictionary[js.Any]     = js.Dictionary.empty          // maps slider id to the YUI object for that slider
   var lastDialogZIndex            : Int                       = 1050                         // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
 

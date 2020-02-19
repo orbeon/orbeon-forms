@@ -144,8 +144,6 @@ object Events extends js.Object {
   val mouseout                    : js.Function    = js.native
   val click                       : js.Function    = js.native
   val scrollOrResize              : js.Function    = js.native
-
-  val sendHeartBeatIfNeeded       : js.Function1[Double, Unit] = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")

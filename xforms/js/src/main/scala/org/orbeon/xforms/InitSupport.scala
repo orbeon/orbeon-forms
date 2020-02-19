@@ -267,7 +267,7 @@ object InitSupport {
           if (heartBeatCheckDelay > 0) {
             scribe.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
             js.timers.setInterval(heartBeatCheckDelay) {
-              Events.sendHeartBeatIfNeeded(heartBeatDelay)
+              AjaxClient.sendHeartBeatIfNeeded(heartBeatDelay)
             }
           }
         }

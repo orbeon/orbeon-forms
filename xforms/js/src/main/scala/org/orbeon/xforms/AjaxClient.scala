@@ -335,8 +335,8 @@ object AjaxClient {
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
     Events.errorEvent.fire(
       new js.Object {
-        val title   = titleString
-        val details = detailsString
+        val title  : String = titleString
+        val details: String = detailsString
       }
     )
     if (! ignoreErrors && Properties.showErrorDialog.get())
@@ -360,7 +360,7 @@ object AjaxClient {
         timers.setTimeout(delay.millis)(requestFunction())
     }
 
-    def eventQueueHasShowProgressEvent(): Boolean =
+    def eventQueueHasShowProgressEvent: Boolean =
       Globals.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {

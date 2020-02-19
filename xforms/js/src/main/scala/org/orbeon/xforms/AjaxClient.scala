@@ -107,8 +107,8 @@ object AjaxClient {
       Utils.hideModalProgressPanel()
 
     AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formId, ignoreErrors)
-    // Reset changes, as changes are included in this bach of events
-    Globals.changedIdsRequest = js.Dictionary.empty
+    // Reset changes, as changes are included in this batch of events
+    EventQueue.changedIdsRequest = Map.empty
     // Notify listeners that we are done processing this request
     Events.ajaxResponseProcessedEvent.fire(formId)
     // Go ahead with next request, if any
@@ -250,6 +250,26 @@ object AjaxClient {
   def isRequestInProgress(): Boolean =
     EventQueue.requestInProgress
 
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
+  def hasChangedIdsRequest(controlId: String): Boolean =
+    EventQueue.changedIdsRequest.contains(controlId)
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.clearChangedIdsRequestIfPresentForChange")
+  def clearChangedIdsRequestIfPresentForChange(controlId: String): Unit =
+    EventQueue.changedIdsRequest.get(controlId) foreach { _ =>
+      EventQueue.changedIdsRequest += controlId -> 0
+    }
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.setOrIncrementChangedIdsRequestForKeyDown")
+  def setOrIncrementChangedIdsRequestForKeyDown(controlId: String): Unit =
+    EventQueue.changedIdsRequest += controlId -> (EventQueue.changedIdsRequest.getOrElse(controlId, 0) + 1)
+
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.decrementChangedIdsRequestIfPresentForKeyUp")
+  def decrementChangedIdsRequestIfPresentForKeyUp(controlId: String): Unit =
+    EventQueue.changedIdsRequest.get(controlId) foreach { v =>
+      EventQueue.changedIdsRequest += controlId -> (v - 1)
+    }
+
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
   def fireEvents(events: js.Array[AjaxEvent], incremental: Boolean): Unit = {
 
@@ -343,10 +363,13 @@ object AjaxClient {
 
     var eventQueue                 : List[AjaxEvent]  = Nil
 
-    var eventsFirstEventTime       : Double           = 0         // time when the first event in the queue was added
-    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
-    var executeEventFunctionQueued : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
-    var requestInProgress          : Boolean          = false     // indicates whether an Ajax request is currently in process
+    var eventsFirstEventTime        : Double           = 0         // time when the first event in the queue was added
+    var requestTryCount             : Int              = 0         // how many attempts to run the current Ajax request we have done so far
+    var executeEventFunctionQueued  : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
+    var requestInProgress           : Boolean          = false     // indicates whether an Ajax request is currently in process
+
+    // See https://github.com/orbeon/orbeon-forms/issues/1732
+    var changedIdsRequest           : Map[String, Int] = Map.empty // id of controls that have been touched by user since the last response was received
   }
 
   private object Private {
@@ -397,8 +420,8 @@ object AjaxClient {
             // Remove from this list of ids that changed the id of controls for
             // which we have received the keyup corresponding to the keydown.
             // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
-            // TODO: check where this is used!
-            Globals.changedIdsRequest = (Globals.changedIdsRequest filterNot (_._2 == 0)).dict
+            // Q: Should we do this only for the controls in the form we are currently processing?
+            EventQueue.changedIdsRequest = EventQueue.changedIdsRequest filterNot (_._2 == 0)
             EventQueue.eventQueue = eventsForOtherForms
             processEvents(currentForm, eventsForCurrentForm.reverse)
           case None =>

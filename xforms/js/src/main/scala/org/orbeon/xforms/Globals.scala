@@ -25,8 +25,6 @@ object Globals {
 
   lazy val isRenderingEngineTrident: Boolean                   = Bowser.msie.getOrElse(false) // one usage left to check as of 2019-12-09
 
-  /*xforms.js*/var changedIdsRequest           : js.Dictionary[Int]        = js.Dictionary.empty          // id of controls that have been touched by user since the last response was received
-
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : js.Object                 = null                         // id of the control that got the focus last

@@ -1473,7 +1473,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
-            } else if ((_.isUndefined(force) || force == false) && _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
+            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest(control.id)) {
                 // User has modified the value of this control since we sent our request so don't try to update it
                 // 2017-03-29: Added `force` attribute to handle https://github.com/orbeon/orbeon-forms/issues/3130 as we
                 // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
@@ -2539,8 +2539,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 } else {
                     // When we move out from a field, we don't receive the keyup events corresponding to keydown
                     // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
-                    if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
-                        ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
+                    ORBEON.xforms.server.AjaxServer.clearChangedIdsRequestIfPresentForChange(target.id);
 
                     if ($(target).is('.xforms-select1-appearance-compact')) {
                         // For select1 list, make sure we have exactly one value selected
@@ -2624,9 +2623,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (control != null) {
                 ORBEON.xforms.Events.keydownEvent.fire({control: control, target: target});
                 if (ORBEON.xforms.Events._isChangingKey(control, event.keyCode)) {
-                    ORBEON.xforms.Globals.changedIdsRequest[control.id] =
-                            (! _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) ? 1
-                                    : ORBEON.xforms.Globals.changedIdsRequest[control.id] + 1;
+                    ORBEON.xforms.server.AjaxServer.setOrIncrementChangedIdsRequestForKeyDown(control.id);
                 }
             }
         },
@@ -2662,10 +2659,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
                 // Remember we have received the keyup for this element
-                // NOTE: `changedIdsRequest` can be undefined in some cases. Test that it is a number before decrementing!
-                // It is unclear why this can be the case, but see https://github.com/orbeon/orbeon-forms/issues/1732.
-                if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode) && _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
-                    ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
+                if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
+                    ORBEON.xforms.server.AjaxServer.decrementChangedIdsRequestIfPresentForKeyUp(target.id);
                 // Incremental control: treat keypress as a value change event
                 if ($(target).is('.xforms-incremental')) {
                     var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");

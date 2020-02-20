@@ -62,7 +62,7 @@ object AjaxClient {
     val result = Promise[Unit]()
 
     // When there is a request in progress, we need to wait for the response after the next response processed
-    var skipNext = EventQueue.requestInProgress
+    var skipNext = EventQueue.ajaxRequestInProgress
 
     lazy val callback: js.Function = () => {
       if (skipNext) {
@@ -100,7 +100,7 @@ object AjaxClient {
           responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
           (e => ! e.hasAttribute("target") && ! e.hasAttribute("show-progress"))
 
-      ! (eventQueueHasShowProgressEvent || serverSaysToKeepModelProgressPanelDisplayed)
+      ! (EventQueue.hasShowProgressEvent || serverSaysToKeepModelProgressPanelDisplayed)
     }
 
     if (mustHideProgressDialog)
@@ -244,11 +244,11 @@ object AjaxClient {
   // NOTE: Used from JS only from obsolete `ORBEON.util.Test.executeCausingAjaxRequest`. So
   // currently we don't export it.
   def hasEventsToProcess: Boolean =
-    EventQueue.requestInProgress || EventQueue.eventQueue.nonEmpty
+    EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
   def isRequestInProgress(): Boolean =
-    EventQueue.requestInProgress
+    EventQueue.ajaxRequestInProgress
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
@@ -289,17 +289,16 @@ object AjaxClient {
     // Store the time of the first event to be sent in the queue
     val currentTime = System.currentTimeMillis()
     if (EventQueue.eventQueue.isEmpty)
-      EventQueue.eventsFirstEventTime = currentTime
+      EventQueue.oldestEventScheduledTime = currentTime
 
-    // Store events to fire
-    events foreach { event =>
-      if (! event.targetIdOpt.contains("")) // Q: Why do we check this? We expect `None` or `Some(targetId)`
-        EventQueue.eventQueue ::= event
-    }
+    // Add events to the queue
+    // We used to filter out events with `targetIdOpt.contains("")`. This should not happen so we don't
+    // check for this anymore.
+    EventQueue.eventQueue ++:= events
 
     // Fire them with a delay to give us a change to aggregate events together
     EventQueue.executeEventFunctionQueued += 1
-    if (incremental && ! (currentTime - EventQueue.eventsFirstEventTime > Properties.delayBeforeIncrementalRequest.get())) {
+    if (incremental && ! (currentTime - EventQueue.oldestEventScheduledTime > Properties.delayBeforeIncrementalRequest.get())) {
       // After a delay (e.g. 500 ms), run `executeNextRequest()` and send queued events to server
       // if there are no other `executeNextRequest()` that have been added to the queue after this
       // request.
@@ -316,7 +315,7 @@ object AjaxClient {
       }
     }
     // Used by heartbeat
-    EventQueue.lastEventSentTime = System.currentTimeMillis()
+    EventQueue.newestEventScheduledTime = System.currentTimeMillis()
   }
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -362,7 +361,7 @@ object AjaxClient {
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
   def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
-    if ((System.currentTimeMillis() - EventQueue.lastEventSentTime) >= heartBeatDelay)
+    if ((System.currentTimeMillis() - EventQueue.newestEventScheduledTime) >= heartBeatDelay)
       AjaxEvent.dispatchEvent(
         AjaxEvent(
           eventName = EventNames.XXFormsSessionHeartbeat,
@@ -374,22 +373,26 @@ object AjaxClient {
 
     var eventQueue                 : List[AjaxEvent]  = Nil
 
-    var eventsFirstEventTime       : Long             = 0         // time when the first event in the queue was added
-    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
-    var executeEventFunctionQueued : Int              = 0         // number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
-    var requestInProgress          : Boolean          = false     // indicates whether an Ajax request is currently in process
-    var lastEventSentTime          : Long             = System.currentTimeMillis // timestamp when the last event was sent to server
+    var oldestEventScheduledTime   : Long             = 0
+    var newestEventScheduledTime   : Long             = System.currentTimeMillis
 
-    // See https://github.com/orbeon/orbeon-forms/issues/1732
-    var changedIdsRequest           : Map[String, Int] = Map.empty // id of controls that have been touched by user since the last response was received
+    var ajaxRequestInProgress      : Boolean          = false
+
+    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
+    var executeEventFunctionQueued : Int              = 0         // number of `ORBEON.xforms.server.AjaxServer.executeNextRequest` waiting to be executed
+
+    var changedIdsRequest          : Map[String, Int] = Map.empty // see https://github.com/orbeon/orbeon-forms/issues/1732
+
+    def hasShowProgressEvent: Boolean =
+      eventQueue exists (_.showProgress)
+
+    def debugEventQueue(): Unit =
+      println(s"Event queue: ${eventQueue mkString ", "}")
   }
 
   private object Private {
 
     val Indent: String = " " * 4
-
-    def debugEventQueue(): Unit =
-      println(s"Event queue: ${EventQueue.eventQueue mkString ", "}")
 
     // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
     // a maximum delay.
@@ -400,9 +403,6 @@ object AjaxClient {
       else
         timers.setTimeout(delay.millis)(requestFunction())
     }
-
-    def eventQueueHasShowProgressEvent: Boolean =
-      EventQueue.eventQueue exists (_.showProgress)
 
     def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
 
@@ -426,7 +426,7 @@ object AjaxClient {
 
       EventQueue.executeEventFunctionQueued -= 1
 
-      if (! EventQueue.requestInProgress && EventQueue.eventQueue.nonEmpty && (bypassRequestQueue || EventQueue.executeEventFunctionQueued == 0)) {
+      if (! EventQueue.ajaxRequestInProgress && EventQueue.eventQueue.nonEmpty && (bypassRequestQueue || EventQueue.executeEventFunctionQueued == 0)) {
         findEventsToProcess match {
           case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
@@ -455,11 +455,11 @@ object AjaxClient {
 
       FutureUtils.withFutureSideEffects(
         before = {
-          EventQueue.requestInProgress = true
+          EventQueue.ajaxRequestInProgress = true
           Page.loadingIndicator.requestStarted()
         },
         after  = {
-          EventQueue.requestInProgress = false
+          EventQueue.ajaxRequestInProgress = false
           Page.loadingIndicator.requestEnded()
         }
       ) {

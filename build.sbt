@@ -41,7 +41,7 @@ val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.2.2"
 val JacksonVersion                = "2.10.2"
 val JavaMailVersion               = "1.6.2"
-val JavaActivationVersion         = "1.2.1"
+val JavaActivationVersion         = "1.2.2"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"

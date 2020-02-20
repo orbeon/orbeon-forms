@@ -311,9 +311,10 @@ lazy val commonSettings = Seq(
     "-language:reflectiveCalls",
     "-language:implicitConversions",
     "-language:higherKinds",
-    "-language:existentials"
+    "-language:existentials",
     // Consider the following flags
-//    "-deprecation",
+    "-deprecation"
+//    "-feature",
 //    "-unchecked",
 //    "-Xfatal-warnings",
 //    "-Xlint",

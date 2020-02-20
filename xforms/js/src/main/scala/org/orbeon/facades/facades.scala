@@ -48,7 +48,7 @@ object Html {
   implicit class HTMLLinkElementOps(private val link: HTMLLinkElement) extends AnyVal {
     def onloadF: Future[Unit] = {
       val promise = Promise[Unit]()
-      link.asInstanceOf[js.Dynamic].onload = () => promise.success()
+      link.asInstanceOf[js.Dynamic].onload = () => promise.success(())
       promise.future
     }
   }

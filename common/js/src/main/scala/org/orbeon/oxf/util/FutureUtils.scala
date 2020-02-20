@@ -70,7 +70,7 @@ object FutureUtils {
 
   implicit class FutureOps[T](private val f: Future[T]) extends AnyVal {
     def toTry(implicit executor: ExecutionContext): Future[Try[T]] =
-      f map Success.apply recover PartialFunction(Failure.apply)
+      f map Success.apply recover { case t => Failure(t) }
   }
 
   def withFutureSideEffects[T](

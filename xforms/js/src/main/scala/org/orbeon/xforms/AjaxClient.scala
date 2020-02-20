@@ -44,10 +44,10 @@ object AjaxClient {
   import Private._
 
   // Callback with parameters `(ev: AjaxEvent, updateProps: js.Function1[js.Dictionary[js.Any], Unit])`
-  lazy val beforeSendingEvent: JQueryCallback = $.Callbacks()
+  lazy val beforeSendingEvent: JQueryCallback = $.Callbacks(flags = "")
 
   // Callback with parameters `()`
-  lazy val ajaxResponseReceived: JQueryCallback = $.Callbacks()
+  lazy val ajaxResponseReceived: JQueryCallback = $.Callbacks(flags = "")
 
   // Used by `OrbeonClientTest`
   // TODO: Check if `ajaxResponseProcessedForCurrentEventQueueF` should/could be used instead.

@@ -33,7 +33,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 object ControlLabelHintTextEditor {
 
   @JSExportTopLevel("ORBEON.builder.controlAdded")
-  val controlAdded: JQueryCallback = $.Callbacks()
+  val controlAdded: JQueryCallback = $.Callbacks(flags = "")
 
   locally {
     val LabelHintSelectorList = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output") map (".fb-main .fr-editable " + _)

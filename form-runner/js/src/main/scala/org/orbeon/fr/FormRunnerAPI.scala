@@ -44,7 +44,6 @@ object FormRunnerAPI {
     formElem    : js.UndefOr[html.Form] = js.undefined
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
-
 }
 
 @JSExportTopLevel("ORBEON.fr.API.wizard")

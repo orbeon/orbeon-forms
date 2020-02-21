@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import cats.syntax.option._
 import io.circe.generic.auto._
 import org.orbeon.xforms.EventNames._
-import org.orbeon.xforms.facade.{AjaxServer, Controls}
+import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -83,6 +83,8 @@ object AjaxEvent {
       events      = js.Array(event),
       incremental = event.incremental
     )
+
+  private val EventsWithoutTargetId = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
 }
 
 @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
@@ -125,7 +127,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
     val targetIdOpt = checkArgOpt[String]("targetId")
 
     (formOpt, targetIdOpt) match {
-      case (Some(form), None) if eventName == XXFormsAllEventsRequired || eventName == XXFormsServerEvents =>
+      case (Some(form), None) if EventsWithoutTargetId(eventName) =>
         form -> None
       case (Some(_), None) =>
         throw new IllegalArgumentException("targetId")

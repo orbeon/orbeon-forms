@@ -18,10 +18,13 @@ import java.net.URI
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
+import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
+import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
+import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.scaxon.Implicits
@@ -249,4 +252,16 @@ object SaxonUtils {
     }
     false
   }
+
+  def deepCompare(config: Configuration, it1: SequenceIterator, it2: SequenceIterator): Boolean =
+    DeepEqual.deepEquals(
+      it1,
+      it2,
+      new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
+      config,
+      DeepEqual.INCLUDE_PREFIXES |
+        DeepEqual.INCLUDE_COMMENTS |
+        DeepEqual.COMPARE_STRING_VALUES |
+        DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS
+    )
 }

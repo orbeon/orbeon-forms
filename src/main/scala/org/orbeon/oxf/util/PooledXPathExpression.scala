@@ -85,9 +85,15 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    *
    * NOTE: Used by XPathCache.
    */
-  def evaluateKeepItems(functionContext: FunctionContext): ju.List[Item] =
+  def evaluateKeepItemsJava(functionContext: FunctionContext): ju.List[Item] =
     withFunctionContext(functionContext) {
       scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()))
+    }
+
+  // NOTE: Used by XPathCache.
+  def evaluateKeepItems(functionContext: FunctionContext): List[Item] =
+    withFunctionContext(functionContext) {
+      Implicits.asScalaIterator(evaluate()).toList
     }
 
   /**

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
-import org.orbeon.saxon.om.ValueRepresentation
+import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -129,7 +129,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       throw new OXFException("operation not allowed")
 
   // Subclasses can override this to translate the incoming external value
-  def translateExternalValue(externalValue: String): Option[String] = Option(externalValue)
+  def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = Option(externalValue)
 
   // Set the external value into the instance
   final def doStoreExternalValue(externalValue: String): Unit = {
@@ -141,7 +141,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         // This should not happen
         throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
       case Some(boundNode) =>
-        translateExternalValue(externalValue) foreach { translatedValue =>
+        translateExternalValue(boundNode, externalValue) foreach { translatedValue =>
           DataModel.setValueIfChangedHandleErrors(
             containingDocument = containingDocument,
             eventTarget        = this,

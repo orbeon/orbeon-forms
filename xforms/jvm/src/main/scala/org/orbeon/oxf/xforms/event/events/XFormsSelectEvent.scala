@@ -17,6 +17,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.saxon.om
 
 class XFormsSelectEvent(
   target     : XFormsEventTarget,
@@ -31,12 +33,12 @@ class XFormsSelectEvent(
 
   import XFormsSelectEvent._
 
-  def this(target: XFormsEventTarget, itemValue: String) =
+  def this(target: XFormsEventTarget, itemValue: Item.ItemValue[om.Item]) =
     this(target, Map(XFormsSelectEvent.ItemValueProperty -> Option(itemValue)))
 
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 
-  def itemValue = property[String](ItemValueProperty).get
+  def itemValue: Item.ItemValue[om.Item] = property[Item.ItemValue[om.Item]](ItemValueProperty).get
 }
 
 private object XFormsSelectEvent {

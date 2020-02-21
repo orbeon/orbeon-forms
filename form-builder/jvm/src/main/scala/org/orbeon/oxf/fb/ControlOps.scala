@@ -34,12 +34,10 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -644,16 +642,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val someNode = params.headOption orElse existingParams.headOption get
         val config   = someNode.getConfiguration
 
-        ! DeepEqual.deepEquals(
-          params.iterator,
-          existingParams.iterator,
-          new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
-          config,
-          DeepEqual.INCLUDE_PREFIXES |
-            DeepEqual.INCLUDE_COMMENTS |
-            DeepEqual.COMPARE_STRING_VALUES |
-            DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS
-        )
+        ! SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator)
       }
     }
 

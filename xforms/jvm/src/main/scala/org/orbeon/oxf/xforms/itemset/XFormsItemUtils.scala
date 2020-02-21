@@ -13,64 +13,93 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.apache.commons.lang3
+import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{StringUtils, XPathCache}
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.{LHHAValue, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
+import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
-// Utilities to deal with items and itemsets
+
 object XFormsItemUtils {
 
-  /**
-    * Return whether a select control's value is selected given an item value.
-    *
-    * @param isMultiple   whether multiple selection is allowed
-    * @param controlValue current value of the control (to determine selected item) or null
-    * @param itemValue    item value to check
-    * @return true is selected, false otherwise
-    */
-  def isSelected(isMultiple: Boolean, controlValue: String, itemValue: String): Boolean = {
-    if (controlValue eq null) {
-      // TODO: Clarify what it means: control non-relevant? Template?
-      false
-    } else {
-      if (isMultiple) {
-        // Trim for select only
-        val trimmedControlValue = StringUtils.trimAllToEmpty(controlValue)
-        val trimmedItemValue    = StringUtils.trimAllToEmpty(itemValue)// TODO: maybe this should be trimmed in the itemset in the first place
-
-        if (trimmedControlValue == "") {
-          // Special case of empty string: check the item that has empty string if any
-          trimmedItemValue == ""
-        } else {
-          // Case of multiple tokens
-          trimmedControlValue.splitTo[scala.Iterator]() contains trimmedItemValue
-        }
-      } else {
-        // Do exact string comparison for select1
-        controlValue == itemValue
-      }
-    }
+  def isSelected(isMultiple: Boolean, dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): Boolean = {
+    if (isMultiple)
+      compareMultipleItemValues(dataValue, itemValue)
+    else
+      compareSingleItemValues(dataValue, itemValue)
   }
 
-  /**
-    * Evaluate the itemset for a given xf:select or xf:select1 control.
-    *
-    * @param select1Control control to evaluate
-    * @return Itemset
-    */
+  def compareSingleItemValues(dataValue: Item.ItemValue[om.Item], itemValue: Item.ItemValue[om.Item]): Boolean =
+    (dataValue, itemValue) match {
+      case (Left(dataValue), Left(itemValue)) =>
+        dataValue == itemValue
+      case (Right(dataXPathItems), Right(itemXPathItems)) =>
+        SaxonUtils.deepCompare(
+          XPath.GlobalConfiguration,
+          Implicits.itemSeqToSequenceIterator(dataXPathItems),
+          Implicits.itemSeqToSequenceIterator(itemXPathItems)
+        )
+      case _ =>
+        // Mixing and matching `xf:copy` and `xf:value` is not supported for now
+        false
+    }
+
+  def compareMultipleItemValues(dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): Boolean =
+    (dataValue, itemValue) match {
+      case (Left(dataValue), Left(itemValue)) =>
+        val trimmedControlValue = dataValue.trimAllToEmpty
+        val trimmedItemValue    = itemValue.trimAllToEmpty // TODO: trim during itemset construction
+
+        if (trimmedControlValue.isEmpty)
+          trimmedItemValue.isEmpty // special case
+        else
+          trimmedControlValue.splitTo[scala.Iterator]() contains trimmedItemValue
+      case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
+        allDataItems exists { oneDataXPathItem =>
+          SaxonUtils.deepCompare(
+            XPath.GlobalConfiguration,
+            Implicits.itemToSequenceIterator(oneDataXPathItem),
+            Implicits.itemToSequenceIterator(firstItemXPathItem)
+          )
+        }
+      case (Right(_), Right(Nil)) =>
+        // Itemset construction doesn't ever produce an empty `List[om.Item]` for multiple selection
+        false
+      case _ =>
+        // Mixing and matching `xf:copy` and `xf:value` is not supported
+        false
+    }
+
+  def findMultipleItemValues(dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): List[om.NodeInfo] =
+    (dataValue, itemValue) match {
+      case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
+        allDataItems collect { case oneDataXPathItem if
+          SaxonUtils.deepCompare(
+            XPath.GlobalConfiguration,
+            Implicits.itemToSequenceIterator(oneDataXPathItem),
+            Implicits.itemToSequenceIterator(firstItemXPathItem)
+          ) => oneDataXPathItem
+        }
+      case _ =>
+        Nil
+    }
+
+  // Evaluate the itemset for a given `xf:select` or `xf:select1` control.
   def evaluateItemset(select1Control: XFormsSelect1Control): Itemset = {
 
     val staticControl = select1Control.staticControl
@@ -81,7 +110,7 @@ object XFormsItemUtils {
       case None =>
 
         val container = select1Control.container
-        val result = new Itemset(multiple = staticControl.isMultiple)
+        val result = new Itemset(multiple = staticControl.isMultiple, hasCopy = staticControl.useCopy)
 
         // Set binding on this control, after saving the current context because the context stack must
         // remain unmodified.
@@ -91,7 +120,8 @@ object XFormsItemUtils {
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
         Dom4jUtils.visitSubtree(
-          select1Control.element, new Dom4jUtils.VisitorListener() {
+          select1Control.element,
+          new Dom4jUtils.VisitorListener {
 
             private var position: Int = 0
             private var currentContainer: ItemContainer = result
@@ -106,18 +136,10 @@ object XFormsItemUtils {
 
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
-                  currentContainer.addChildItem(
-                    Item(
-                      label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
-                      help       = getLabelValue(elem.element(HELP_QNAME),  required = false),
-                      hint       = getLabelValue(elem.element(HINT_QNAME),  required = false),
-                      value      = lang3.StringUtils.defaultString(getValueValueOrNull(elem.element(XFORMS_VALUE_QNAME))),
-                      attributes = getAttributes(elem)
-                    )(
-                      position   = position
-                    )
-                  )
-                  position += 1
+                  createItem(elem, position, labelOnly = false) foreach { newItem =>
+                    currentContainer.addChildItem(newItem)
+                    position += 1
+                  }
 
                 case XFORMS_ITEMSET_QNAME =>
 
@@ -125,93 +147,44 @@ object XFormsItemUtils {
 
                   val currentBindingContext = contextStack.getCurrentBindingContext
 
-                  val currentNodeset = currentBindingContext.nodeset
+                  val currentSequence = currentBindingContext.nodeset
 
                   // Node stack tracks the relative position of the current node wrt ancestor nodes
-                  var itemStack: List[om.Item] = Nil
+                  var levelAndStack: (Int, List[om.Item]) = (0, Nil)
 
-                  var currentLevel: Int = 0
+                  for (currentPosition <- 1 to currentSequence.size)
+                    withIteration(currentPosition) {
 
-                  for (currentPosition <- 1 to currentNodeset.size) {
+                      val currentXPathItem = currentSequence.get(currentPosition - 1)
 
-                    contextStack.pushIteration(currentPosition)
+                      // Handle children of xf:itemset
 
-                    val currentItem = currentNodeset.get(currentPosition - 1)
+                      // We support relevance of items as an extension to XForms
 
-                    // Handle children of xf:itemset
+                      // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
+                      // well. If a node is non-relevant, it should be as if it had not even been part of
+                      // the nodeset.
+                      if (XFormsSingleNodeControl.isRelevantItem(currentXPathItem)) {
+                        createItem(elem, position, labelOnly = false) foreach { newItem =>
 
-                    // We support relevance of items as an extension to XForms
+                          levelAndStack = updatedLevelAndItemStack(levelAndStack, currentXPathItem)
 
-                    // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
-                    // well. If a node is non-relevant, it should be as if it had not even been part of
-                    // the nodeset.
-                    if (XFormsSingleNodeControl.isRelevantItem(currentItem)) {
-
-                      // Update stack and containers
-                      if (itemStack.nonEmpty) {
-                        val newLevel = getItemLevel(currentItem, itemStack)
-                        if (newLevel == currentLevel) {
-                          //  We are staying at the same level, pop old item
-                          itemStack = itemStack.tail
-                        } else if (newLevel < currentLevel) {
-                          //  We are going down one or more levels
-                          itemStack = itemStack.tail
-                          for (_ <- newLevel until currentLevel) {
-                            itemStack = itemStack.tail
-                            currentContainer = currentContainer.parent
-                          }
-                        } else if (newLevel > currentLevel) {
-                          // Going up one level, set new container as last added child
-                          currentContainer = currentContainer.lastChild
-                        }
-                        currentLevel = newLevel
-                      }
-
-                      val valueOrCopyElementOpt =
-                        Option(elem.element(XFORMS_VALUE_QNAME)) orElse Option(elem.element(XFORMS_COPY_QNAME))
-
-                      valueOrCopyElementOpt match {
-                        case Some(valueElem) if valueElem.getQName == XFORMS_VALUE_QNAME =>
-                          currentContainer.addChildItem(
-                            Item(
-                              label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
-                              help       = getLabelValue(elem.element(HELP_QNAME),  required = false),
-                              hint       = getLabelValue(elem.element(HINT_QNAME),  required = false),
-                              value      = getValueValueOrNull(valueElem), // NOTE: can be null if evaluation failed,
-                              attributes = getAttributes(elem)
-                            )(
-                              position   = position
-                            )
-                          )
+                          currentContainer.addChildItem(newItem)
                           position += 1
-                        case Some(copyElem) if copyElem.getQName == XFORMS_COPY_QNAME =>
-                          throw new ValidationException("xf:copy is not yet supported.", select1Control.getLocationData)
-                        case _ =>
-                          throw new ValidationException("xf:itemset element must contain one xf:value or one xf:copy element.", select1Control.getLocationData)
+                        }
                       }
 
-                      itemStack ::= currentItem
-                    }
-
-                    contextStack.popBinding()
-                  }
+                    }(contextStack)
                 case XFORMS_CHOICES_QNAME =>
-                  contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
-                  val labelElem = elem.element(LABEL_QNAME)
-                  if (labelElem ne null) {
-                    val newContainer = Item(
-                      label      = getLabelValue(labelElem, required = true).orNull, // NOTE: returned label can be null in some cases
-                      help       = None,
-                      hint       = None,
-                      value      = null,
-                      attributes = getAttributes(elem)
-                    )(
-                      position   = position
-                    )
-                    currentContainer.addChildItem(newContainer)
-                    currentContainer = newContainer
 
-                    position += 1
+                  contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
+
+                  if (elem.elementOpt(LABEL_QNAME).isDefined) {
+                    createItem(elem, position, labelOnly = true) foreach { newItem =>
+                      currentContainer.addChildItem(newItem)
+                      position += 1
+                      currentContainer = newItem
+                    }
                   }
                 case _ =>
               }
@@ -219,53 +192,156 @@ object XFormsItemUtils {
 
             def endElement(elem: Element): Unit =
               elem.getQName match {
-                case XFORMS_ITEM_QNAME =>
-                  contextStack.popBinding()
-                case  XFORMS_ITEMSET_QNAME =>
+                case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
                   contextStack.popBinding()
                 case XFORMS_CHOICES_QNAME =>
                   contextStack.popBinding()
-                  val labelElement = elem.element(LABEL_QNAME)
-                  if (labelElement ne null)
+                  if (elem.elementOpt(LABEL_QNAME).isDefined)
                     currentContainer = currentContainer.parent
                 case _ =>
               }
 
-            def text(text: Text) = ()
+            def text(text: Text): Unit = ()
 
-            private def getValueValueOrNull(valueElem: Element): String = {
+            private def updatedLevelAndItemStack(
+              currentLevelAndStack: (Int, List[om.Item]),
+              currentXPathItem    : om.Item
+            ): (Int, List[om.Item]) = {
 
-              if (valueElem eq null)
-                throw new ValidationException("xf:item or xf:itemset must contain an xf:value element.", select1Control.getLocationData)
+              val currentLevel = currentLevelAndStack._1
+              var newItemStack: List[om.Item] = currentLevelAndStack._2
 
-              val elemScope = select1Control.getChildElementScope(valueElem)
-              val elemEffectiveId = getElementEffectiveId(valueElem)
-
-              XFormsUtils.getChildElementValue(container, elemEffectiveId, elemScope, valueElem, false, false, null)
+              val newLevel =
+                if (newItemStack.nonEmpty) {
+                  val newLevel = getXPathItemLevel(currentXPathItem, newItemStack)
+                  if (newLevel == currentLevel) {
+                    //  We are staying at the same level, pop old item
+                    newItemStack = newItemStack.tail
+                  } else if (newLevel < currentLevel) {
+                    //  We are going down one or more levels
+                    newItemStack = newItemStack.tail
+                    for (_ <- newLevel until currentLevel) {
+                      newItemStack = newItemStack.tail
+                      currentContainer = currentContainer.parent
+                    }
+                  } else if (newLevel > currentLevel) {
+                    // Going up one level, set new container as last added child
+                    currentContainer = currentContainer.lastChild
+                  }
+                  newLevel
+                } else {
+                  currentLevel
+                }
+              (newLevel, currentXPathItem :: newItemStack)
             }
 
-            private def getLabelValue(labelElem: Element, required: Boolean): Option[LHHAValue] = {
+            private def createItem(elem: Element, position: Int, labelOnly: Boolean): Option[Item] = {
 
-              if (required && (labelElem eq null))
-                throw new ValidationException("xf:item or xf:itemset must contain an xf:label element.", select1Control.getLocationData)
+              val value = if (! labelOnly) getValueOrCopyValue(elem) else None
 
-              if (labelElem eq null)
-                return None
-
-              val elemScope = select1Control.getChildElementScope(labelElem)
-              val elemEffectiveId = getElementEffectiveId(labelElem)
-              val supportsHTML = select1Control.isFullAppearance // Only support HTML when appearance is "full"
-              val containsHTML = Array[Boolean](false)
-
-              // FIXME: Would be good to do this check statically
-              val defaultToHTML = LHHAAnalysis.isHTML(labelElem)
-              val label = XFormsUtils.getChildElementValue(container, elemEffectiveId, elemScope, labelElem, supportsHTML, defaultToHTML, containsHTML)
-
-              if (required)
-                Some(LHHAValue(StringUtils.trimAllToEmpty(label), containsHTML(0)))
-              else
-                StringUtils.trimAllToOpt(label) map (LHHAValue(_, containsHTML(0)))
+              (labelOnly || value.nonEmpty) option
+                Item(
+                  label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true),
+                  help       = ! labelOnly flatOption findLhhValue(elem.elementOpt(HELP_QNAME),  required = false),
+                  hint       = ! labelOnly flatOption findLhhValue(elem.elementOpt(HINT_QNAME),  required = false),
+                  value      = value,
+                  attributes = getAttributes(elem)
+                )(
+                  position   = position
+                )
             }
+
+            private def getValueOrCopyValue(elem: Element): Option[Item.ItemValue[om.Item]] = {
+
+              def fromValueElem =
+                elem.elementOpt(XFORMS_VALUE_QNAME) flatMap
+                  getValueValue                     map
+                  Left.apply
+
+              def fromCopyElem =
+                elem.elementOpt(XFORMS_COPY_QNAME)           flatMap
+                  getCopyValue                               filter
+                  (_.nonEmpty || ! staticControl.isMultiple) map
+                  Right.apply
+
+              fromValueElem orElse fromCopyElem
+            }
+
+            private def getValueValue(valueElem: Element): Option[String] =
+              getChildElementValue(
+                container          = container,
+                sourceEffectiveId  = getElementEffectiveId(valueElem),
+                scope              = select1Control.getChildElementScope(valueElem),
+                childElement       = valueElem,
+                acceptHTML         = false,
+                defaultHTML        = false
+              )._1
+
+            // Return `None` if:
+            //
+            // - there is no `ref` attribute
+            // - there is an XPath error
+            // - the context item is missing
+            //
+            private def getCopyValue(copyElem: Element): Option[List[om.Item]] =
+              copyElem.attributeValueOpt(XFormsConstants.REF_QNAME) flatMap { refAtt =>
+
+                val sourceEffectiveId = getElementEffectiveId(copyElem)
+
+                withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) {
+
+                  val currentBindingContext = contextStack.getCurrentBindingContext
+                  val currentNodeset        = currentBindingContext.nodeset
+
+                  try {
+                    ! currentNodeset.isEmpty option
+                      XPathCache.evaluateKeepItems(
+                        contextItems       = currentNodeset,
+                        contextPosition    = currentBindingContext.position,
+                        xpathString        = refAtt,
+                        namespaceMapping   = container.getNamespaceMappings(copyElem),
+                        variableToValueMap = currentBindingContext.getInScopeVariables,
+                        functionLibrary    = container.getContainingDocument.getFunctionLibrary,
+                        functionContext    = contextStack.getFunctionContext(sourceEffectiveId),
+                        baseURI            = null,
+                        locationData       = copyElem.getData.asInstanceOf[LocationData],
+                        reporter           = container.getContainingDocument.getRequestStats.getReporter
+                      )
+                  } catch {
+                    case NonFatal(t) =>
+                      XFormsError.handleNonFatalXPathError(container, t)
+                      None
+                  }
+                }(contextStack)
+              }
+
+            private def findLhhValue(lhhaElemOpt: Option[Element], required: Boolean): Option[LHHAValue] =
+              lhhaElemOpt match {
+                case Some(lhhaElem) =>
+                  val elemScope = select1Control.getChildElementScope(lhhaElem)
+                  val elemEffectiveId = getElementEffectiveId(lhhaElem)
+                  val supportsHtml = select1Control.isFullAppearance // only support HTML when appearance is "full"
+
+                  // FIXME: Would be good to do this check statically
+                  val defaultToHTML = LHHAAnalysis.isHTML(lhhaElem)
+                  val (lhhaValueOpt, containsHtml) =
+                    getChildElementValue(container, elemEffectiveId, elemScope, lhhaElem, supportsHtml, defaultToHTML)
+
+                  val trimmed = lhhaValueOpt flatMap (_.trimAllToOpt)
+
+                  if (required)
+                    LHHAValue(trimmed getOrElse "", containsHtml).some
+                  else
+                    trimmed map (LHHAValue(_, containsHtml))
+                case None =>
+                  if (required)
+                    throw new ValidationException(
+                      "`xf:item` or `xf:itemset` must contain an `xf:label` element",
+                      select1Control.getLocationData
+                    )
+                  else
+                    None
+              }
 
             private def getAttributes(elem: Element): List[(QName, String)] =
               for {
@@ -314,7 +390,7 @@ object XFormsItemUtils {
               }
 
             // Item level for the given item. If the stack is empty, the level is 0.
-            private def getItemLevel(itemToCheck: om.Item, stack: List[om.Item]): Int = {
+            private def getXPathItemLevel(itemToCheck: om.Item, stack: List[om.Item]): Int = {
               itemToCheck match {
                 case nodeInfo: om.NodeInfo =>
                   // Only nodes can have ancestor relationship
@@ -338,8 +414,30 @@ object XFormsItemUtils {
         )
 
         contextStack.setBinding(savedBindingContext)
-        result.pruneNonRelevantChildren()
         result
     }
+  }
+
+  private def getChildElementValue(
+    container          : XBLContainer,
+    sourceEffectiveId  : String,  // source effective id for id resolution
+    scope              : Scope,
+    childElement       : Element, // element to evaluate (`xf:label`, etc.)
+    acceptHTML         : Boolean, // whether the result may contain HTML
+    defaultHTML        : Boolean
+  ): (Option[String], Boolean) = {
+    val contextStack = container.getContextStack
+    withBinding(childElement, sourceEffectiveId, scope) {
+      val containsHTML = Array[Boolean](false)
+      Option(XFormsUtils.getElementValue(
+        container,
+        contextStack,
+        sourceEffectiveId,
+        childElement,
+        acceptHTML,
+        defaultHTML,
+        containsHTML)
+      ) -> containsHTML.head
+    }(contextStack)
   }
 }

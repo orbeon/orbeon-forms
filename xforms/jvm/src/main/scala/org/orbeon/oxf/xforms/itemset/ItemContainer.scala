@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
+import org.orbeon.saxon.om
+
 trait ItemContainer {
 
   var level: Int = 0
-  def isTopLevel = level == 0
+  def isTopLevel: Boolean = level == 0
 
   var parent: ItemContainer = null
 
@@ -29,16 +31,9 @@ trait ItemContainer {
     _children ::= childItem
   }
 
-  def hasChildren = _children.nonEmpty
-  def children = _children.reverse
-  def lastChild = _children.head
-
-  def pruneNonRelevantChildren(): Unit = {
-    // Prune children first
-    _children foreach (_.pruneNonRelevantChildren())
-    // Keep only children which have children or which have a value
-    _children = _children filter (child => child.hasChildren || (child.value ne null))
-  }
+  def hasChildren: Boolean = _children.nonEmpty
+  def children: List[Item] = _children.reverse
+  def lastChild: Item = _children.head
 
   // Visit the entire itemset
   def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
@@ -56,27 +51,30 @@ trait ItemContainer {
   }
 
   // Depth-first Iterator over all the items of this and children
-  def allItemsIterator: Iterator[Item] = {
-    def selfIterator = new Iterator[Item] {
-      var current = selfItem
-      def hasNext = current ne null
-      def next() = {
-        val result = current
-        current = null
-        result
-      }
+  def allItemsIterator: Iterator[Item] =
+    selfIterator ++ (children.iterator flatMap (_.allItemsIterator))
+
+  // Same as `allItemsIterator` but in reverse order
+  def allItemsReverseIterator: Iterator[Item] =
+    (_children.iterator flatMap (_.allItemsReverseIterator)) ++ selfIterator
+
+  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item, Item.ItemValue[om.Item])] =
+    for {
+      currentItem      <- if (reverse) allItemsReverseIterator else allItemsIterator
+      currentItemValue <- currentItem.value.iterator // TODO: `value` should not be an `Option`?
+    } yield
+      currentItem -> currentItemValue
+
+  override def equals(other: Any): Boolean = other match {
+    case c: ItemContainer => _children == c._children
+    case _                => false
+  }
+
+  private def selfIterator: Iterator[Item] =
+    this match {
+      case item: Item => Iterator.single(item)
+      case _          => Iterator.empty
     }
-
-    def childrenIterator = children.iterator flatMap (_.allItemsIterator)
-
-    selfIterator ++ childrenIterator
-  }
-
-  // Implement deep equals
-  override def equals(other: Any) = other match {
-    case other: ItemContainer => _children == other._children
-    case _                    => false
-  }
 
   private def selfItem = this match {
     case item: Item => item

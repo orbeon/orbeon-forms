@@ -16,18 +16,20 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import XFormsDeselectEvent._
+import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.saxon.om
 
 class XFormsDeselectEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_DESELECT, target.asInstanceOf[XFormsControl], properties) {
 
-  def this(target: XFormsEventTarget, itemValue: String) =
+  def this(target: XFormsEventTarget, itemValue: Item.ItemValue[om.Item]) =
     this(target, Map(ItemValueProperty -> Option(itemValue)))
 
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 
-  def itemValue = property[String](ItemValueProperty).get
+  def itemValue: Item.ItemValue[om.Item] = property[Item.ItemValue[om.Item]](ItemValueProperty).get
 }
 
 private object XFormsDeselectEvent {

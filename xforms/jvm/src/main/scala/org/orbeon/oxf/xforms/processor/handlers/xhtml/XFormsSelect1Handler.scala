@@ -16,15 +16,17 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectAppearanceTrait, SelectionControlTrait}
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.{LHHAValue, XFormsValueControl}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetListener, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.Item.ItemValue
+import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -40,6 +42,26 @@ object XFormsSelect1Handler {
     XFormsId.appendToEffectiveId(
       effectiveId = effectiveId,
       ending      = XFormsConstants.XF_COMPONENT_SEPARATOR_STRING + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex.toString
+    )
+
+  // Support `XFormsValueControl` only for the legacy boolean `xf:input`
+  def dataValueFromControl(control: XFormsValueControl): Option[ItemValue[om.NodeInfo]] =
+    control match {
+      case c: XFormsSelect1Control => c.boundItemOpt map c.getCurrentItemValueFromData
+      case c: XFormsValueControl   => Option(c.getValue) map Left.apply
+      case null                    => None
+    }
+
+  // Support `XFormsValueControl` only for the legacy boolean `xf:input`
+  def isItemSelected(control: XFormsValueControl, item: Item, isMultiple: Boolean): Boolean =
+    dataValueFromControl(control) exists (dataValue =>
+      item.value exists ( itemValue =>
+        XFormsItemUtils.isSelected(
+          isMultiple = isMultiple,
+          dataValue  = dataValue,
+          itemValue  = itemValue
+        )
+      )
     )
 
   def outputItemFullTemplate(
@@ -75,7 +97,7 @@ object XFormsSelect1Handler {
           LHHAValue(
             "$xforms-template-label$",
             isHTML = false
-          ),
+          ).some,
           LHHAValue(
             "$xforms-template-help$",
             isHTML = false
@@ -84,7 +106,7 @@ object XFormsSelect1Handler {
             "$xforms-template-hint$",
             isHTML = false
           ).some,
-          "$xforms-template-value$",
+          Left("$xforms-template-value$").some,
           Nil
         )( // make sure the value "$xforms-template-value$" is not encrypted
           0
@@ -114,10 +136,10 @@ object XFormsSelect1Handler {
     encode             : Boolean)(implicit
     xmlReceiver        : XMLReceiver,
   ): Unit = {
+
     val xformsHandlerContextForItem = baseHandler.getHandlerContext
 
-    // Whether this is selected
-    val isSelected = isItemSelected(xformsHandlerContextForItem, control, isMultiple, item)
+    val isSelected = isItemSelected(control, item, isMultiple)
 
     // `xh:span` enclosing input and label
     val itemClasses = getItemClasses(item, if (isSelected) "xforms-selected" else "xforms-deselected")
@@ -136,7 +158,7 @@ object XFormsSelect1Handler {
 
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = spanAttributes) {
 
-      val itemLabel = item.label
+      val itemLabelOpt = item.label
       val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.getContainingDocument, itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
 
@@ -190,14 +212,20 @@ object XFormsSelect1Handler {
         val showHint = item.hint.isDefined && ! isStaticReadonly
 
         // `<span class="xforms-hint-region">` or plain `<span>`
-        withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = showHint list ("class" -> "xforms-hint-region")) {
-          outputLabelText(
-            xformsHandlerContextForItem.getController.getOutput,
-            itemLabel.label,
-            xhtmlPrefix,
-            itemLabel.isHTML,
-            None
-          )
+        withElement(
+          localName = "span",
+          prefix    = xhtmlPrefix,
+          uri       = XHTML_NAMESPACE_URI,
+          atts      = showHint list ("class" -> "xforms-hint-region")
+        ) {
+          itemLabelOpt foreach { itemLabel =>
+            outputLabelTextIfNotEmpty(
+              itemLabel.label,
+              xhtmlPrefix,
+              itemLabel.isHTML,
+              None
+            )
+          }
         }
 
         // <span class="xforms-help">
@@ -234,24 +262,8 @@ object XFormsSelect1Handler {
       }
       if (! isBooleanInput)
         outputLabelForEnd(xformsHandlerContextForItem, labelName)
-
     }
   }
-
-  private def isItemSelected(
-    handlerContext: HandlerContext,
-    xformsControl : XFormsValueControl,
-    isMultiple    : Boolean,
-    item          : Item
-  ): Boolean =
-    if (xformsControl ne null) {
-      XFormsItemUtils.isSelected(
-        isMultiple,
-        controlValue = if (xformsControl.getValue eq null) "" else xformsControl.getValue,
-        itemValue    = item.value
-      )
-    } else
-      false
 
   private def addItemAttributes(item: Item, spanAttributes: AttributesImpl): Unit =
     for {
@@ -404,16 +416,19 @@ class XFormsSelect1Handler(
                 // TODO: Check this, which fails with the workflow UI
     //            assert(! item.label.isHTML)
 
-                val label = item.label.label
                 val value = item.value
-                if (value eq null) {
+                if (value.isEmpty) { //TODO: here we are handling `xf:choice` which shouldn't be done by checking the value
+
                   assert(item.hasChildren)
 
                   val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
                   val optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
 
-                  if (label ne null)
+                  val labelOpt = item.label map (_.label)
+
+                  labelOpt foreach { label =>
                     optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label)
+                  }
 
                   // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
                   // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
@@ -424,8 +439,9 @@ class XFormsSelect1Handler(
                   // Start `xh:optgroup`
                   openElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optGroupAttributes)
                   inOptgroup = true
-                } else
+                } else {
                   gotSelected |= handleItemCompact(xhtmlPrefix, control, isMultiple, item, encode, gotSelected)
+                }
               }
 
               def startLevel(contentHandler: XMLReceiver, item: Item): Unit = ()
@@ -439,16 +455,16 @@ class XFormsSelect1Handler(
 
       containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field")
       withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
-
-        val value = if (control == null || control.getValue == null) "" else control.getValue
-
         itemsetOpt foreach { itemset =>
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)
-          for (currentItem <- itemset.selectedItems(value)) {
+          for {
+            dataValue   <- XFormsSelect1Handler.dataValueFromControl(control).iterator
+            currentItem <- itemset.iterateSelectedItems(dataValue)
+          } locally {
             if (selectedFound)
               ch.text(" - ")
-            currentItem.label.streamAsHTML(ch, control.getLocationData)
+            currentItem.label foreach (_.streamAsHTML(ch, control.getLocationData))
             selectedFound = true
           }
         }
@@ -518,7 +534,7 @@ class XFormsSelect1Handler(
           itemName           = effectiveId,
           itemEffectiveId    = XFormsSelect1Handler.getItemId(effectiveId, itemIndex),
           isMultiple         = isMultiple,
-          fullItemType             = fullItemType,
+          fullItemType       = fullItemType,
           item               = item,
           isFirst            = itemIndex == 0,
           isBooleanInput     = isBooleanInput,
@@ -554,7 +570,7 @@ class XFormsSelect1Handler(
     // Don't output more than one `selected` in the case of single-selection, see:
     // https://github.com/orbeon/orbeon-forms/issues/2901
     val mustSelect =
-      (isMultiple || ! gotSelected) && XFormsSelect1Handler.isItemSelected(xformsHandlerContext, xformsControl, isMultiple, item)
+      (isMultiple || ! gotSelected) && XFormsSelect1Handler.isItemSelected(xformsControl, item, isMultiple)
     if (mustSelect)
       optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected")
 
@@ -562,9 +578,9 @@ class XFormsSelect1Handler(
     withElement(localName = "option", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optionAttributes) {
       // TODO: Check this, which fails with the workflow UI
   //    assert(! item.label.isHTML)
-      val label = item.label.label
-      if (label ne null)
-        text(text = label)
+      item.label foreach { label =>
+        text(text = label.label)
+      }
     }
 
     mustSelect

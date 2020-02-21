@@ -48,6 +48,15 @@ object XFormsContextStackSupport {
     body |!> (_ => xformsContextStack.popBinding())
   }
 
+  def withBinding[T](
+    bindingElement    : Element,
+    sourceEffectiveId : String,
+    scope             : Scope
+  )(body: => T)(implicit xformsContextStack: XFormsContextStack): T = {
+    xformsContextStack.pushBinding(bindingElement, sourceEffectiveId, scope)
+    body |!> (_ => xformsContextStack.popBinding())
+  }
+
   def withIteration[T](currentPosition: Int)(body: => T)(implicit xformsContextStack: XFormsContextStack): T = {
     xformsContextStack.pushIteration(currentPosition)
     body |!> (_ => xformsContextStack.popBinding())

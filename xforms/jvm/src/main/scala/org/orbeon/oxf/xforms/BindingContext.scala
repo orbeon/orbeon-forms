@@ -272,8 +272,8 @@ case class BindingContext(
 
   class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {
     private var _next = if (includeSelf) self else parent
-    def hasNext = _next ne null
-    def next() = {
+    def hasNext: Boolean = _next ne null
+    def next(): BindingContext = {
       val result = _next
       _next = _next.parent
       result
@@ -286,7 +286,20 @@ case class VariableNameValue(name: String, value: ValueRepresentation)
 
 object BindingContext {
   // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context
-  // should simply be None.
-  def empty(bindingElement: Element, scope: Scope) =
-    BindingContext(null, None, null, Seq.empty[Item].asJava, 0, null, newBind = false, bindingElement, null, hasOverriddenContext = false, null, scope)
+  // should simply be `None`.
+  def empty(bindingElement: Element, scope: Scope): BindingContext =
+    BindingContext(
+      parent               = null,
+      modelOpt             = None,
+      bind                 = null,
+      nodeset              = Nil.asJava,
+      position             = 0,
+      elementId            = null,
+      newBind              = false,
+      controlElement       = bindingElement,
+      _locationData        = null,
+      hasOverriddenContext = false,
+      contextItem          = null,
+      scope                = scope
+    )
 }

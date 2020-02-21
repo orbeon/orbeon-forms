@@ -115,7 +115,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                 // origin attribute in the insert context."
 
-                originObjects = actionInterpreter.evaluateKeepItems(actionElement,
+                originObjects = actionInterpreter.evaluateKeepItemsJava(actionElement,
                         Collections.singletonList(insertContextItem), 1, originAttribute);
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."

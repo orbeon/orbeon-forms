@@ -214,6 +214,6 @@ object XPathUtils {
           reporter            = null
         )
 
-    resultWithItems.asScala.iterator
+    resultWithItems.iterator
   }
 }

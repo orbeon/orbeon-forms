@@ -25,7 +25,7 @@ import shapeless.syntax.typeable._
 class XXFormsItemset extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
 
-    implicit val ctx = xpathContext
+    implicit val ctx: XPathContext = xpathContext
 
     val jsonOrXMLOpt =
       for {
@@ -38,14 +38,18 @@ class XXFormsItemset extends XFormsFunction {
         val format   = stringArgument(1)
         val selected = argument.lift(2) exists (e => ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
 
-        val controlValueForSelection = if (selected) select1Control.getValue else null
+        val controlValueForSelection =
+          if (selected)
+            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData
+          else
+            None
 
         if (format == "json")
           // Return a string
           itemset.asJSON(controlValueForSelection, select1Control.mustEncodeValues, control.getLocationData): Item
         else
           // Return an XML document
-          itemset.asXML(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData): Item
+          itemset.asXML(ctx.getConfiguration, controlValueForSelection, control.getLocationData): Item
       }
 
     jsonOrXMLOpt.orNull

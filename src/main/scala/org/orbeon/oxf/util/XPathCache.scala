@@ -160,11 +160,11 @@ object XPathCache {
       baseURI            = xpathContext.baseURI,
       locationData       = xpathContext.locationData,
       reporter           = null
-    ).asScala
+    )
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
-  // 4 external usages
-  def evaluateKeepItems(
+  // 2 external usages
+  def evaluateKeepItemsJava(
     contextItems       : JList[Item],
     contextPosition    : Int,
     xpathString        : String,
@@ -176,6 +176,38 @@ object XPathCache {
     locationData       : LocationData,
     reporter           : Reporter
   ): JList[Item] = {
+
+    val xpathExpression =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    withEvaluation(xpathString, xpathExpression, locationData, reporter) {
+      xpathExpression.evaluateKeepItemsJava(functionContext)
+    }
+  }
+
+  def evaluateKeepItems(
+    contextItems       : JList[Item],
+    contextPosition    : Int,
+    xpathString        : String,
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : JMap[String, ValueRepresentation],
+    functionLibrary    : FunctionLibrary,
+    functionContext    : FunctionContext,
+    baseURI            : String,
+    locationData       : LocationData,
+    reporter           : Reporter
+  ): List[Item] = {
 
     val xpathExpression =
       getXPathExpression(
@@ -324,7 +356,7 @@ object XPathCache {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ) = {
+  ): AnyRef = {
 
     val xpathExpression =
       getXPathExpression(

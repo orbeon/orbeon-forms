@@ -35,7 +35,10 @@ import scala.collection.JavaConverters._
  *   - passing to the constructor
  * - the reason we use `lazyProperties` is that we had trouble passing a `PropertyGetter` with a reference to this to the
  *   constructor!
- * - all property values are Java values or `Seq` of Java values
+ * - all property values are:
+ *   - Java values (including `NodeInfo`)
+ *   - `Seq` of Java values
+ *   - `Either` of the above (2020-02-27)
  * - for Java/Scala consumers, use `property[T]``
  * - for XPath consumers, use `getAttribute``
  * - `PropertyGetter` is used instead of a plain `Map` because:
@@ -104,10 +107,13 @@ abstract class XFormsEvent(
     // "If the event context information does not contain the property indicated by the string argument, then an
     // empty node-set is returned."
 
-    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map {
-      case s: Seq[_] => listIterator(s map SaxonUtils.anyToItemIfNeeded)
-      case other     => itemIterator(SaxonUtils.anyToItemIfNeeded(other))
-    } getOrElse emptyIterator
+    def handleOneLevel(any: Any): SequenceIterator = any match {
+      case s: Seq[_]       => listIterator(s map SaxonUtils.anyToItemIfNeeded)
+      case e: Either[_, _] => e.fold(handleOneLevel, handleOneLevel)
+      case other           => itemIterator(SaxonUtils.anyToItemIfNeeded(other))
+    }
+
+    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
   }
 
   private def warnDeprecatedIfNeeded(name: String) =

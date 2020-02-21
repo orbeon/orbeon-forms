@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
@@ -404,7 +403,7 @@ object XFormsBaseHandlerXHTML {
     addIds: Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
-    outputLabelText(handlerContext.getController.getOutput, labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)
+    outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.getController.getOutput)
     outputLabelForEnd(handlerContext, elementName)
   }
 
@@ -458,14 +457,14 @@ object XFormsBaseHandlerXHTML {
     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName)
   }
 
-  def outputLabelText(
-    xmlReceiver            : XMLReceiver,
+  def outputLabelTextIfNotEmpty(
     value                  : String,
     xhtmlPrefix            : String,
     mustOutputHTMLFragment : Boolean,
-    locationDataOpt        : Option[LocationData]
+    locationDataOpt        : Option[LocationData])(implicit
+    xmlReceiver            : XMLReceiver
   ): Unit =
-    if (StringUtils.isNotEmpty(value)) {
+    if ((value ne null) && value.nonEmpty) {
       if (mustOutputHTMLFragment)
         XFormsUtils.streamHTMLFragment(
           xmlReceiver,

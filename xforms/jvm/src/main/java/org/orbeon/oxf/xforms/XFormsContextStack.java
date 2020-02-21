@@ -485,7 +485,7 @@ public class XFormsContextStack {
 
                             List<Item> result;
                                 try {
-                                    result = XPathCache.evaluateKeepItems(
+                                    result = XPathCache.evaluateKeepItemsJava(
                                         evaluationContextBinding.nodeset(),
                                         evaluationContextBinding.position(),
                                         ref != null ? ref : nodeset,

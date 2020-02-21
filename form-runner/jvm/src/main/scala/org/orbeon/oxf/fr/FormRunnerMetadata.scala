@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CollectionUtils._
@@ -24,7 +25,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
-import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.oxf.xforms.itemset.{Item, LHHAValue}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
@@ -37,8 +38,8 @@ import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.xml.Elem
 import scala.collection.compat._
+import scala.xml.Elem
 
 object FormRunnerMetadata {
 
@@ -353,10 +354,10 @@ object FormRunnerMetadata {
         for ((item, position) <- enclosingHolder child Names.Item zipWithIndex)
         yield
           itemset.Item(
-            label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false), // TODO isHTML
+            label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false).some, // TODO isHTML
             help       = item elemValueOpt LHHA.Help.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
             hint       = item elemValueOpt LHHA.Hint.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
-            value      = item elemValue Names.Value,
+            value      = item elemValueOpt Names.Value map Left.apply,
             attributes = Nil
           )(position)
 
@@ -404,13 +405,13 @@ object FormRunnerMetadata {
             Option(control) collect {
               case c: XFormsSelectControl  =>
 
-                val selectedLabels = c.findSelectedItems map (_.label.label) // TODO: HTML
+                val selectedLabels = c.findSelectedItems flatMap (_.label) map (_.label) // TODO: HTML
 
                 MultipleControlValue(c.getValue, selectedLabels) // TODO
 
               case c: XFormsSelect1Control =>
 
-                val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
+                val selectedLabel = c.findSelectedItem flatMap (_.label) map (_.label) // TODO: HTML
 
                 SingleControlValue(c.getValue, selectedLabel) // TODO
 
@@ -420,19 +421,22 @@ object FormRunnerMetadata {
 
                 selectionControlOpt match {
                   case Some(selectControl: XFormsSelectControl) =>
-                    val selectedLabels = selectControl.findSelectedItems map (_.label.label)  // TODO: HTML
+                    val selectedLabels = selectControl.findSelectedItems flatMap (_.label) map (_.label)  // TODO: HTML
                     MultipleControlValue(selectControl.getValue, selectedLabels) // TODO
                   case Some(select1Control) =>
 
                     // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
                     val itemOpt =
                       if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
-                        select1Control.findSelectedItem filter (_.value.nonBlank)
+                        select1Control.findSelectedItem filter (_.value exists {
+                          case Left(v) if v.nonBlank => true
+                          case _                     => false
+                        })
                       else
                         select1Control.findSelectedItem
 
                     // TODO: HTML
-                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse Some("") // use a blank string so we get `N/A` in the end
+                    val selectedLabelOpt  = itemOpt flatMap (_.label) map (_.label) orElse Some("") // use a blank string so we get `N/A` in the end
                     SingleControlValue(select1Control.getValue, selectedLabelOpt)
                   case None =>
                     throw new IllegalStateException

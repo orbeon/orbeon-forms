@@ -29,7 +29,6 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.state.ControlState;
-import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -173,34 +172,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Get the value of a child element by pushing the context of the child element on the binding stack first, then
-     * calling getElementValue() and finally popping the binding context.
-     *
-     * @param container             current XFormsContainingDocument
-     * @param sourceEffectiveId     source effective id for id resolution
-     * @param scope                 XBL scope
-     * @param childElement          element to evaluate (xf:label, etc.)
-     * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
-     */
-    public static String getChildElementValue(final XBLContainer container, final String sourceEffectiveId,
-                                              final Scope scope, final Element childElement, final boolean acceptHTML,
-                                              final boolean defaultHTML, boolean[] containsHTML) {
-
-        // Check that there is a current child element
-        if (childElement == null)
-            return null;
-
-        // Child element becomes the new binding
-        final XFormsContextStack contextStack = container.getContextStack();
-        contextStack.pushBinding(childElement, sourceEffectiveId, scope);
-        final String result = getElementValue(container, contextStack, sourceEffectiveId, childElement, acceptHTML, defaultHTML, containsHTML);
-        contextStack.popBinding();
-        return result;
-    }
-
-    /**
      * Get the value of an element by trying single-node binding, value attribute, linking attribute, and inline value
      * (including nested XHTML and xf:output elements).
      *
@@ -249,7 +220,7 @@ public class XFormsUtils {
             final boolean hasValueAttribute = valueAttribute != null;
             if (hasValueAttribute) {
                 final List<Item> currentNodeset = currentBindingContext.nodeset();
-                if (currentNodeset != null && currentNodeset.size() > 0) {
+                if (! currentNodeset.isEmpty()) {
                     String tempResult;
                     try {
                         tempResult = XPathCache.evaluateAsString(

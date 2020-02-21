@@ -15,28 +15,27 @@ package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils.isSelected
-import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.Configuration
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder
+import org.orbeon.saxon.{Configuration, om}
 import org.xml.sax.SAXException
 
-/**
- * Represents an itemset.
- */
-class Itemset(multiple: Boolean) extends ItemContainer {
+class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer {
 
   import Itemset._
 
-  // TODO: Not used by XFormsSelect1Control, why?
-  def selectedItems(value: String): List[Item] =
-    allItemsIterator filter (item => isSelected(multiple, value, item.value)) toList
+  def iterateSelectedItems(dataValue: Item.ItemValue[om.NodeInfo]): Iterator[Item] =
+    allItemsWithValueIterator(reverse = false) collect {
+      case (item, itemValue) if isSelected(multiple, dataValue, itemValue) => item
+    }
 
   // Return the list of items as a JSON tree with hierarchical information
-  def asJSON(controlValue: String, encode: Boolean, locationData: LocationData): String = {
+  def asJSON(controlValue: Option[Item.ItemValue[om.NodeInfo]], encode: Boolean, locationData: LocationData): String = {
+
     val sb = new StringBuilder
     // Array of top-level items
     sb.append("[")
@@ -84,8 +83,8 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           }
 
           // Handle selection
-          val itemValue = Option(item.value) getOrElse ""
-          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
+          val itemValueOpt = item.value
+          val itemSelected = itemValueOpt exists (itemValue => controlValue exists (isSelected(multiple, _, itemValue)))
 
           if (itemSelected) {
             sb.append(""","selected":""")
@@ -106,8 +105,8 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           sb.append("}")
         }
 
-        def startLevel(o: AnyRef, item: Item) = ()
-        def endLevel(o: AnyRef) = ()
+        def startLevel(o: AnyRef, item: Item): Unit = ()
+        def endLevel(o: AnyRef): Unit = ()
       })
     } catch {
       case e: SAXException =>
@@ -119,16 +118,23 @@ class Itemset(multiple: Boolean) extends ItemContainer {
   }
 
   // Return the list of items as an XML tree
-  def asXML(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
+  def asXML(
+    configuration : Configuration,
+    controlValue  : Option[Item.ItemValue[om.NodeInfo]],
+    locationData  : LocationData
+  ): DocumentInfo = {
+
     val treeBuilder = new TinyBuilder
     val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
     identity.setResult(treeBuilder)
+
     val ch = new XMLReceiverHelper(identity)
 
     ch.startDocument()
     ch.startElement("itemset")
     if (hasChildren) {
       visit(null, new ItemsetListener[AnyRef] {
+
         def startLevel(o: AnyRef, item: Item): Unit =
           ch.startElement("choices")
 
@@ -136,8 +142,9 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           ch.endElement()
 
         def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
-          val itemValue = Option(item.value) getOrElse ""
-          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
+
+          val itemExternalValue = item.externalValue(encode = false)
+          val itemSelected      = item.value exists (itemValue => controlValue exists (isSelected(multiple, _, itemValue)))
 
           val itemAttributes =
             if (itemSelected)
@@ -150,7 +157,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           ch.startElement("item", itemAttributes)
 
           ch.startElement("label")
-          item.label.streamAsHTML(ch, locationData)
+          item.label foreach (_.streamAsHTML(ch, locationData))
           ch.endElement()
 
           item.help foreach { h =>
@@ -166,7 +173,8 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           }
 
           ch.startElement("value")
-          ch.text(itemValue)
+          if (itemExternalValue.nonEmpty)
+            ch.text(itemExternalValue)
           ch.endElement()
         }
 

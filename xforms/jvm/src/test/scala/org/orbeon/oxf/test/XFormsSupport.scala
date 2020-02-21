@@ -144,9 +144,9 @@ trait XFormsSupport extends MockitoSugar {
 
   def hasFocus(controlEffectiveId: String)   = document.getControls.getFocusedControl exists (_ eq getSingleNodeControl(controlEffectiveId))
 
-  def getItemset(controlEffectiveId: String) = {
+  def getItemset(controlEffectiveId: String): String = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
-    select1.getItemset.asJSON(null, select1.mustEncodeValues, null)
+    select1.getItemset.asJSON(None, select1.mustEncodeValues, null)
   }
 
   def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {

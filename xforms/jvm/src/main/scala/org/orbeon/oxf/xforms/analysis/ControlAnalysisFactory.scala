@@ -280,7 +280,8 @@ object ControlAnalysisFactory {
     XFORMS_CHOICES_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
     XFORMS_ITEM_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
     XFORMS_ITEMSET_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
-    XFORMS_VALUE_QNAME            -> (new SimpleElementAnalysis(_, _, _, _, _) with ValueTrait with OptionalSingleNode)
+    XFORMS_VALUE_QNAME            -> (new SimpleElementAnalysis(_, _, _, _, _) with ValueTrait with OptionalSingleNode),
+    XFORMS_COPY_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with RequiredSingleNode)
   ) ++ variableFactory
 
   private val ControlFactory: PartialFunction[Element, ControlFactory] =

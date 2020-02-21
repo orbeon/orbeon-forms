@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.{SAXUtils, XMLUtils}
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -40,7 +40,7 @@ class XFormsTriggerFullHandler(
   override protected def handleControlStart(): Unit = {
 
     val triggerControl = currentControl.asInstanceOf[XFormsTriggerControl]
-    val xmlReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
 
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, true)
 
@@ -64,7 +64,7 @@ class XFormsTriggerFullHandler(
 
     // Output content of <button> element
     if ("button" == elementName)
-      outputLabelText(xmlReceiver, getTriggerLabel(triggerControl), xhtmlPrefix, isHTMLLabel, Option(triggerControl.getLocationData))
+      outputLabelTextIfNotEmpty(getTriggerLabel(triggerControl), xhtmlPrefix, isHTMLLabel, Option(triggerControl.getLocationData))
 
     xmlReceiver.endElement(XHTML_NAMESPACE_URI, elementName, spanQName)
   }
@@ -83,7 +83,7 @@ private object XFormsTriggerFullHandler {
     atts.addAttribute("", name, name, CDATA, value)
 
   // Map appearances to Bootstrap classes, e.g. xxf:primary -> btn-primary
-  val BootstrapAppearances =
+  val BootstrapAppearances: Map[QName, String] =
     Seq("primary", "info", "success", "warning", "danger", "inverse", "mini", "small", "large", "block") map
       (name => QName(name, XXFORMS_NAMESPACE) -> ("btn-" + name)) toMap
 }

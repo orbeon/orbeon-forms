@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{DeferredXMLReceiver, XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 
@@ -64,14 +64,17 @@ class XFormsInputHandler(
   private def isBoolean     = controlHas(c => c.getBuiltinTypeName == "boolean")
 
   override protected def handleControlStart(): Unit = {
+
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+
     val inputControl = currentControl.asInstanceOf[XFormsInputControl]
-    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
     val isRelevantControl = ! isNonRelevant(inputControl)
+
     if (isBoolean) {
       // Produce a boolean output
 
       val isMultiple = true
-      val itemset = new Itemset(isMultiple)
+      val itemset = new Itemset(isMultiple, hasCopy = false)
       // NOTE: We have decided that it did not make much sense to encode the value for boolean. This also poses
       // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
       // the encrypted value of "true". So we do not encrypt values.
@@ -79,10 +82,10 @@ class XFormsInputHandler(
       // encode = false,
       itemset.addChildItem(
         Item(
-          label      = null,
+          label      = None,
           help       = None,
           hint       = None,
-          value      = "true",
+          value      = Left("true").some,
           attributes = Nil
         )(
           position   = 0

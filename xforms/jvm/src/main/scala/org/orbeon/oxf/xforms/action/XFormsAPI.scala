@@ -122,7 +122,9 @@ object XFormsAPI {
     searchForInstance    : Boolean       = true
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
+
       val action = actionInterpreterDyn.value
+      val doc    = action map (_.containingDocument) orElse containingDocumentDyn.value
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
@@ -131,7 +133,7 @@ object XFormsAPI {
           ("after", after)
 
       XFormsInsertAction.doInsert(
-        action map (_.containingDocument) orNull,
+        doc.orNull,
         action map (_.indentedLogger) orNull,
         positionAttribute,
         collectionToUpdate.asJava,
@@ -152,11 +154,13 @@ object XFormsAPI {
     doDispatch    : Boolean = true
   ): Seq[NodeInfo] =
     if (ref.nonEmpty) {
+
       val action = actionInterpreterDyn.value
+      val doc    = action map (_.containingDocument) orElse containingDocumentDyn.value
 
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          containingDocument = action map (_.containingDocument) orNull,
+          containingDocument = doc.orNull,
           collectionToUpdate = ref,
           deleteIndexOpt     = None,
           doDispatch         = doDispatch)(

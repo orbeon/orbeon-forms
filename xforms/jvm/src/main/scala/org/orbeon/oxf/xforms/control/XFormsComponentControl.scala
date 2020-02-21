@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils, XMLReceiverHelper}
-import org.orbeon.saxon.om.VirtualNode
+import org.orbeon.saxon.om.{Item, VirtualNode}
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
@@ -54,7 +54,7 @@ class XFormsValueComponentControl(
   override type Control <: ComponentControl with ValueComponentTrait with ViewTrait with StaticLHHASupport
 
   // Don't expose an external value unless explicitly allowed
-  override def handleExternalValue = staticControl.abstractBinding.modeExternalValue
+  override def handleExternalValue: Boolean = staticControl.abstractBinding.modeExternalValue
 
   private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String]): Option[String] =
     for {
@@ -117,7 +117,7 @@ class XFormsValueComponentControl(
     setExternalValue(fromBinding getOrElse getValue)
   }
 
-  override def translateExternalValue(externalValue: String): Option[String] = {
+  override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = {
 
     def fromBinding =
       staticControl.abstractBinding.deserializeExternalValueOpt flatMap { deserializeExpr =>
@@ -134,7 +134,7 @@ class XFormsValueComponentControl(
         )
       }
 
-    fromBinding orElse super.translateExternalValue(externalValue)
+    fromBinding orElse super.translateExternalValue(boundItem, externalValue)
   }
 
   // TODO

@@ -228,7 +228,7 @@ class XFormsActionInterpreter(
         xpathExpression = XPath.makeBooleanExpression(conditionAttribute)
       )
 
-    if (! conditionResult.get(0).asInstanceOf[BooleanValue].effectiveBooleanValue) {
+    if (! conditionResult.head.asInstanceOf[BooleanValue].effectiveBooleanValue) {
       // Don't execute action
       debug(
         "not executing",
@@ -277,8 +277,28 @@ class XFormsActionInterpreter(
     nodeset         : ju.List[Item],
     position        : Int,
     xpathExpression : String
-  ): ju.List[Item] =
+  ): List[Item] =
     XPathCache.evaluateKeepItems(
+      contextItems       = nodeset,
+      contextPosition    = position,
+      xpathString        = xpathExpression,
+      namespaceMapping   = getNamespaceMappings(actionElement),
+      variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
+      functionLibrary    = containingDocument.getFunctionLibrary,
+      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+      baseURI            = null,
+      locationData       = actionElement.getData.asInstanceOf[LocationData],
+      reporter           = containingDocument.getRequestStats.getReporter
+    )
+
+  // TODO: Pass `DynamicActionContext`.
+  def evaluateKeepItemsJava(
+    actionElement   : Element,
+    nodeset         : ju.List[Item],
+    position        : Int,
+    xpathExpression : String
+  ): ju.List[Item] =
+    XPathCache.evaluateKeepItemsJava(
       contextItems       = nodeset,
       contextPosition    = position,
       xpathString        = xpathExpression,

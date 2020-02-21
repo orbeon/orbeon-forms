@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils._
@@ -285,17 +286,17 @@ class XFormsSelect1Control(
 object XFormsSelect1Control {
 
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
-  // lookup by id takes place and the control must have a static itemset or otherwise null is returned.
-  def getInitialItemset(control: XFormsSelect1Control, staticControl: SelectionControlTrait): Itemset =
+  // lookup by id takes place and the control must have a static itemset or otherwise `None` is returned.
+  def getInitialItemset(control: XFormsSelect1Control, staticControl: SelectionControlTrait): Option[Itemset] =
     if ((control ne null) && control.isRelevant) {
       // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
-      control.getItemset
+      control.getItemset.some
     } else {
       // Control is not there or is not relevant, so use static itemsets
       // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-      staticControl.staticItemset.orNull
+      staticControl.staticItemset
     }
 
-  def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait) =
+  def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait): Boolean =
     control.mustEncodeValues getOrElse containingDocument.encodeItemValues
 }

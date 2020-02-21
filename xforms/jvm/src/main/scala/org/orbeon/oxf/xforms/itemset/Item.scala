@@ -48,8 +48,6 @@ extends ItemContainer {
   //   - exception when dereferencing an @src attribute
   // - xf|input:xxf-type(xs:boolean)
 
-  def jAttributes = attributes.asJava
-
   def classAttribute = attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
 
   def externalValue(encode: Boolean)   = Option(value) map (v => if (encode) position.toString else v) getOrElse ""

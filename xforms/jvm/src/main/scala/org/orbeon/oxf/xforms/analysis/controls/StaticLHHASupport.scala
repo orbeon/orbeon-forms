@@ -34,10 +34,6 @@ object LHHA extends Enum[LHHA] {
   case object Hint  extends LHHA
   case object Alert extends LHHA
 
-  def jLabel = Label
-  def jHelp  = Help
-  def jHint  = Hint
-
   val size = values.size
 
   val QNameForValue = values map (value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap

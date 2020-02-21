@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import collection.JavaConverters._
-
 trait ItemContainer {
 
   var level: Int = 0
@@ -73,8 +71,6 @@ trait ItemContainer {
 
     selfIterator ++ childrenIterator
   }
-
-  def jAllItemsIterator = allItemsIterator.asJava
 
   // Implement deep equals
   override def equals(other: Any) = other match {

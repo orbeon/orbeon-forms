@@ -13,15 +13,10 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.xml.sax.SAXException
-
-/**
- * Callback interface for visiting itemsets.
- */
+// Callback interface for visiting itemsets
 trait ItemsetListener[T] {
-  // NOTE: @throws because of Java callers.
-  @throws(classOf[SAXException]) def startLevel(o: T, item: Item)
-  @throws(classOf[SAXException]) def endLevel(o: T)
-  @throws(classOf[SAXException]) def startItem(o: T, item: Item, first: Boolean)
-  @throws(classOf[SAXException]) def endItem(o: T, item: Item)
+  def startLevel(o: T, item: Item)
+  def endLevel(o: T)
+  def startItem(o: T, item: Item, first: Boolean)
+  def endItem(o: T, item: Item)
 }

@@ -13,16 +13,11 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import XFormsItemUtils.isSelected
-import collection.JavaConverters._
-import java.lang.{Iterable => JIterable}
-import org.orbeon.dom.Namespace
-import org.orbeon.dom.QName
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils.isSelected
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.om.DocumentInfo
@@ -35,10 +30,6 @@ import org.xml.sax.SAXException
 class Itemset(multiple: Boolean) extends ItemContainer {
 
   import Itemset._
-
-  // All of this itemset's selected items based on the given instance value
-  def jSelectedItems(value: String): JIterable[Item] =
-    selectedItems(value).asJava
 
   // TODO: Not used by XFormsSelect1Control, why?
   def selectedItems(value: String): List[Item] =

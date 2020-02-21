@@ -124,7 +124,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveId);
     }
 
-    protected static AttributesImpl getIdClassXHTMLAttributes(XFormsContainingDocument containingDocument, AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String effectiveId) {
+    public static AttributesImpl getIdClassXHTMLAttributes(XFormsContainingDocument containingDocument, AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String effectiveId) {
         reusableAttributes.clear();
 
         // Copy "id"

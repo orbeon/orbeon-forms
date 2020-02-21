@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
-
 
 /**
  * Handle xf:input.
@@ -92,16 +92,14 @@ class XFormsInputHandler(
       // TODO: Do not delegate but just share `outputContent` implementation.
       new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext)
         .outputContent(
-          uri,
-          localname,
-          attributes,
-          getEffectiveId,
-          inputControl,
-          itemset,
-          isMultiple,
-          true,
-          true,
-          xformsHandlerContext
+          attributes           = attributes,
+          effectiveId          = getEffectiveId,
+          control              = inputControl,
+          itemsetOpt           = itemset.some,
+          isMultiple           = isMultiple,
+          isFull               = true,
+          isBooleanInput       = true,
+          xformsHandlerContext = xformsHandlerContext
         )
     } else {
 
@@ -238,7 +236,7 @@ class XFormsInputHandler(
     isDateTime option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-2")) orNull
 
   override def getForEffectiveId(effectiveId: String): String =
-    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, "0") getOrElse getFirstInputEffectiveId(getEffectiveId)
+    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveId(getEffectiveId)
 
   protected override def handleLabel(): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))

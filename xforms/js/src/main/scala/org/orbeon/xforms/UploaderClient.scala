@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.facade.Properties
+import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.ext._
@@ -158,12 +158,12 @@ object UploaderClient {
 
         responseF.onComplete {
           case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
-              // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-              currentEvent.upload.clear()
-              // The Ajax response typically contains information about each file (name, size, etc)
-              AjaxClient.handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = true, ignoreErrors = false)
-              // Are we done, or do we still need to handle events for other forms?
-              continueWithRemainingEvents()
+            // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+            currentEvent.upload.clear()
+            // The Ajax response only contains "server events"
+            AjaxServer.handleResponseDom(responseXml, requestFormId, ignoreErrors = false)
+            // Are we done, or do we still need to handle events for other forms?
+            continueWithRemainingEvents()
           case Success((_, responseText, responseXmlOpt)) =>
             cancel(doAbort = false, EventNames.XXFormsUploadError)
             AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)

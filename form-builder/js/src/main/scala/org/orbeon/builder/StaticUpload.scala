@@ -13,8 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.xforms.$
-import org.orbeon.xforms.facade.Events
+import org.orbeon.xforms.{$, AjaxClient}
 
 object StaticUpload {
 
@@ -31,5 +30,5 @@ object StaticUpload {
   findAndReplaceAllSpacersWithImages()
 
   // Run again after every Ajax request
-  Events.ajaxResponseProcessedEvent.subscribe(findAndReplaceAllSpacersWithImages _)
+  AjaxClient.ajaxResponseProcessed.add(_ => findAndReplaceAllSpacersWithImages())
 }

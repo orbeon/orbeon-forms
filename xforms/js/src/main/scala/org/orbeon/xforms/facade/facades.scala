@@ -68,10 +68,9 @@ trait AjaxServerTrait extends js.Object {
 @JSGlobal("ORBEON.xforms.server.AjaxServer")
 object AjaxServer extends AjaxServerTrait {
   def handleResponseDom(
-    responseXML                  : dom.Document,
-    isResponseToBackgroundUpload : Boolean,
-    formId                       : String,
-    ignoreErrors                 : Boolean
+    responseXML  : dom.Document,
+    formId       : String,
+    ignoreErrors : Boolean
   ): Unit = js.native
 }
 
@@ -130,7 +129,7 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @JSGlobal("ORBEON.xforms.Events")
 @js.native
 object Events extends js.Object {
-  val ajaxResponseProcessedEvent  : YUICustomEvent = js.native
+
   val errorEvent                  : YUICustomEvent = js.native
   val orbeonLoadedEvent           : YUICustomEvent = js.native
   val componentChangedLayoutEvent : YUICustomEvent = js.native

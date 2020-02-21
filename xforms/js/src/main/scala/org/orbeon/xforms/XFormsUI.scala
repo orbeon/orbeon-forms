@@ -13,10 +13,11 @@
  */
 package org.orbeon.xforms
 
-import cats.syntax.option._
 import org.orbeon.xforms.facade.{Controls, Utils}
 import org.scalajs.dom
+import org.scalajs.dom.ext._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global => g}
@@ -24,10 +25,11 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
 
+
 // Progressively migrate contents of xforms.js here
 object XFormsUI {
 
-  @JSExportTopLevel("ORBEON.xforms.Globals.modalProgressPanelShown")
+  @JSExportTopLevel("ORBEON.xforms.Globals.modalProgressPanelShown") // 2020-04-27: 6 JavaScript usages
   var modalProgressPanelShown: Boolean = false
 
   @JSExportTopLevel("ORBEON.util.Utils.displayModalProgressPanel") // 2020-04-27: 1 JavaScript usage
@@ -38,50 +40,51 @@ object XFormsUI {
 
       // Take out the focus from the current control
       // See https://github.com/orbeon/orbeon-forms/issues/4511
-      Option(Globals.currentFocusControlId) foreach { focusControlId =>
-        Controls.removeFocus(focusControlId)
-        Private.focusControlIdOpt = focusControlId.some
-      }
+      val focusControlIdOpt =
+        Option(Globals.currentFocusControlId) map { focusControlId =>
+          Controls.removeFocus(focusControlId)
+          focusControlId
+        }
 
-      if (Utils.isIOS && Utils.getZoomLevel() != 1.0) {
-        Utils.resetIOSZoom()
-        Private.timerIdOpt =
-          Some(
-            timers.setTimeout(200.milliseconds) {
-              Private.timerIdOpt = None
-              Private.panel.show()
-            }
-          )
-      } else {
-        Private.panel.show()
-      }
-    }
+      val timerIdOpt =
+        if (Utils.isIOS && Utils.getZoomLevel() != 1.0) {
+          Utils.resetIOSZoom()
+            Some(
+              timers.setTimeout(200.milliseconds) {
+                Private.panel.show()
+              }
+            )
+        } else {
+          Private.panel.show()
+          None
+        }
 
-  def hideModalProgressPanel(): Unit =
-    if (modalProgressPanelShown) {
+      AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { details =>
 
-      modalProgressPanelShown = false
+        // If neither of these two conditions is met, hide the modal progress panel:
+        //
+        //      1. There is another Ajax request in the queue, which could be the one that triggered the
+        //         display of the modal progress panel, so we don't want to hide before that request ran.
+        //      2. The server tells us to do a submission or load, so we don't want to remove it otherwise
+        //         users could start interacting with a page which is going to be replaced shortly.
+        //
+        // We remove the modal progress panel before handling DOM response, as script actions may dispatch
+        // events and we don't want them to be filtered. If there are server events, we don't remove the
+        // panel until they have been processed, i.e. the request sending the server events returns.
+        val mustHideProgressDialog =
+          ! AjaxClient.hasShowProgressEvent && ! (
+            // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
+            details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
+              details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
+              (e => ! e.hasAttribute("target") && e.getAttribute("show-progress") != "false")
+            )
 
-      // Remove timer so that the modal progress panel doesn't show just after we try to hide it
-      Private.timerIdOpt foreach { modalProgressPanelTimerId =>
-        timers.clearTimeout(modalProgressPanelTimerId)
-        Private.timerIdOpt = None
-      }
-
-      Private.panel.hide()
-
-      // Restore focus
-      // See https://github.com/orbeon/orbeon-forms/issues/4511
-      Private.focusControlIdOpt foreach { modalProgressFocusControlId =>
-        Controls.setFocus(modalProgressFocusControlId)
-        Private.focusControlIdOpt = None
+        if (mustHideProgressDialog)
+          Private.hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
       }
     }
 
   private object Private {
-
-    var timerIdOpt       : Option[SetTimeoutHandle] = None
-    var focusControlIdOpt: Option[String]           = None
 
     lazy val panel: js.Dynamic = {
 
@@ -104,5 +107,23 @@ object XFormsUI {
 
       panel
     }
+
+    def hideModalProgressPanel(
+      timerIdOpt        : Option[SetTimeoutHandle],
+      focusControlIdOpt : Option[String]
+    ): Unit =
+      if (modalProgressPanelShown) {
+
+        modalProgressPanelShown = false
+
+        // So that the modal progress panel doesn't show just after we try to hide it
+        timerIdOpt foreach timers.clearTimeout
+
+        Private.panel.hide()
+
+        // Restore focus
+        // See https://github.com/orbeon/orbeon-forms/issues/4511
+        focusControlIdOpt foreach Controls.setFocus
+      }
   }
 }

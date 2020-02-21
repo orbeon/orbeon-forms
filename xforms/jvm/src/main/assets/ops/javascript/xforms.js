@@ -2061,11 +2061,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
                 if (ORBEON.xforms.server.AjaxServer.isRequestInProgress()) {
-                    var centerDialog = function() {
-                        yuiDialog.center();
-                        ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);
-                    };
-                    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(centerDialog);
+                    ORBEON.xforms.server.AjaxServer.ajaxResponseProcessedForCurrentEventQueueP().then(function() { yuiDialog.center(); });
                 } else {
                     yuiDialog.center();
                 }
@@ -2931,7 +2927,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded", window, false, YAHOO.util.CustomEvent.LIST, true),
-        ajaxResponseProcessedEvent  : new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
         errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),
         yuiCalendarCreated          : new YAHOO.util.CustomEvent("yuiCalendarCreated"),
         componentChangedLayoutEvent : new YAHOO.util.CustomEvent("componentChangedLayout")
@@ -3301,11 +3296,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (isVisible) ORBEON.xforms.Controls.showDialog(dialog.id, null);
         }
     };
-
-    // TODO: Shouldn't this not be done directly in AjaxServer instead of using the indirection of an event?
-    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
-        ORBEON.xforms.ServerValueStore.purgeExpired();
-    });
 
     YAHOO.util.Event.throwErrors = true;
     ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();

@@ -18,6 +18,7 @@ import org.orbeon.facades.ResizeObserver
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
@@ -57,13 +58,13 @@ object Position {
     $(document).on("mousemove.orbeon.builder", fn _)
     // Resizing the window might change what is under the pointer the last time we saw it in the window
     $(window).on("resize.orbeon.builder", fn _)
-    Events.ajaxResponseProcessedEvent.subscribe(fn _)
+    AjaxClient.ajaxResponseProcessed.add(_ => fn)
   }
 
   // Call listener when anything on the page that could change element positions happened
   def onOffsetMayHaveChanged(fn: () => Unit): Unit = {
     Events.orbeonLoadedEvent.subscribe(fn)
-    Events.ajaxResponseProcessedEvent.subscribe(fn)
+    AjaxClient.ajaxResponseProcessed.add(_ => fn())
     Events.componentChangedLayoutEvent.subscribe(fn)
 
     // Can be removed once we only support Safari 14, which implements the `ResizeObserver`

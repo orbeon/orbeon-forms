@@ -101,7 +101,7 @@ object Number {
             // edit value hasn't changed.
             //
             val formId = $(containerElem).parents("form").attr("id").get
-            AjaxClient.ajaxResponseProcessedForCurrentEventQueueF(formId) foreach { _ =>
+            AjaxClient.ajaxResponseProcessedForCurrentEventQueueF foreach { _ =>
               updateVisibleValue()
             }
           }

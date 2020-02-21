@@ -19,15 +19,14 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.FutureUtils
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Events, Properties, Utils}
+import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.AbortController
 import org.scalajs.dom.ext._
 import org.scalajs.dom.{FormData, html}
-import org.scalajs.jquery.{JQueryCallback, JQueryEventObject}
+import org.scalajs.jquery.JQueryEventObject
 
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
@@ -43,74 +42,73 @@ object AjaxClient {
 
   import Private._
 
-  // Callback with parameters `(ev: AjaxEvent, updateProps: js.Function1[js.Dictionary[js.Any], Unit])`
-  lazy val beforeSendingEvent: JQueryCallback = $.Callbacks(flags = "")
+  class AjaxResponseDetails(
+    val responseXML : dom.Document,
+    val formId      : String
+  )
 
-  // Callback with parameters `()`
-  lazy val ajaxResponseReceived: JQueryCallback = $.Callbacks(flags = "")
+  val beforeSendingEvent    = new CallbackList[(AjaxEvent, js.Function1[js.Dictionary[js.Any], Unit])]()
+  val ajaxResponseReceived  = new CallbackList[AjaxResponseDetails]()
+  val ajaxResponseProcessed = new CallbackList[AjaxResponseDetails]()
 
   // Used by `OrbeonClientTest`
   // This uses a JavaScript `Promise` as the API is used across Scala.js compilation contexts and Scala
   // classes cannot go through that boundary.
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseProcessedForCurrentEventQueueP")
   def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] =
-    ajaxResponseProcessedForCurrentEventQueueF(null).toJSPromise
+    ajaxResponseProcessedForCurrentEventQueueF.map(_ => ()).toJSPromise
 
-  // TODO: `formId` is not used.
-  def ajaxResponseProcessedForCurrentEventQueueF(formId: String): Future[Unit] = {
+  // 2020-04-28: Only used by legacy autocomplete
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.addAjaxResponseProcessed")
+  def addAjaxResponseProcessed(fn: js.Function0[js.Any]): Unit =
+    ajaxResponseProcessed.add(_ => fn.apply())
 
-    val result = Promise[Unit]()
+  // FIXME: This is not done per form. There used to be a `formId` but it was unused.
+  def ajaxResponseReceivedForCurrentEventQueueF: Future[AjaxResponseDetails] =
+    ajaxResponseForCurrentEventQueueF(ajaxResponseReceived)
+
+  // FIXME: This is not done per form. There used to be a `formId` but it was unused.
+  def ajaxResponseProcessedForCurrentEventQueueF: Future[AjaxResponseDetails] =
+    ajaxResponseForCurrentEventQueueF(ajaxResponseProcessed)
+
+  private def ajaxResponseForCurrentEventQueueF[T](cb: CallbackList[T]): Future[T] = {
+
+    val result = Promise[T]()
 
     // When there is a request in progress, we need to wait for the response after the next response processed
     var skipNext = EventQueue.ajaxRequestInProgress
 
-    lazy val callback: js.Function = () => {
-      if (skipNext) {
-        skipNext = false
-      } else {
-        Events.ajaxResponseProcessedEvent.unsubscribe(callback)
-        result.success(())
+    lazy val callback: T => Unit =
+      (v: T) => {
+        if (skipNext) {
+          skipNext = false
+        } else {
+          cb.remove(callback)
+          result.success(v)
+        }
       }
-    }
 
-    Events.ajaxResponseProcessedEvent.subscribe(callback)
+    cb.add(callback)
 
     result.future
   }
 
-  // Public for `UploaderClient`
-  def handleResponseAjax(responseXML: dom.Document, formId: String, isResponseToBackgroundUpload: Boolean, ignoreErrors: Boolean) {
+  private def handleResponseAjax(responseXML: dom.Document, formId: String, ignoreErrors: Boolean): Unit = {
 
-    if (! isResponseToBackgroundUpload)
-        AjaxClient.ajaxResponseReceived.fire()
+    val details = new AjaxResponseDetails(responseXML, formId)
 
-    // If neither of these two conditions is met, hide the modal progress panel:
-    //      a) There is another Ajax request in the queue, which could be the one that triggered the
-    //         display of the modal progress panel, so we don't want to hide before that request ran.
-    //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
-    //         users could start interacting with a page which is going to be replaced shortly.
-    // We remove the modal progress panel before handling DOM response, as script actions may dispatch
-    // events and we don't want them to be filtered. If there are server events, we don't remove the
-    // panel until they have been processed, i.e. the request sending the server events returns.
-    val mustHideProgressDialog = {
+    ajaxResponseReceived.fire(details)
 
-      // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
-      val serverSaysToKeepModelProgressPanelDisplayed =
-        responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
-          responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
-          (e => ! e.hasAttribute("target") && ! e.hasAttribute("show-progress"))
+    AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
 
-      ! (EventQueue.hasShowProgressEvent || serverSaysToKeepModelProgressPanelDisplayed)
-    }
-
-    if (mustHideProgressDialog)
-      XFormsUI.hideModalProgressPanel()
-
-    AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formId, ignoreErrors)
     // Reset changes, as changes are included in this batch of events
     EventQueue.changedIdsRequest = Map.empty
+
+    ServerValueStore.purgeExpired()
+
     // Notify listeners that we are done processing this request
-    Events.ajaxResponseProcessedEvent.fire(formId)
+    ajaxResponseProcessed.fire(details)
+
     // Go ahead with next request, if any
     EventQueue.executeEventFunctionQueued += 1
     executeNextRequest(bypassRequestQueue = false)
@@ -245,9 +243,12 @@ object AjaxClient {
   def hasEventsToProcess: Boolean =
     EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty
 
+  def hasShowProgressEvent: Boolean =
+    EventQueue.eventQueue exists (_.showProgress)
+
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
-   def isRequestInProgress(): Boolean =
-     EventQueue.ajaxRequestInProgress
+  def isRequestInProgress(): Boolean =
+    EventQueue.ajaxRequestInProgress
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
@@ -382,9 +383,6 @@ object AjaxClient {
 
     var changedIdsRequest          : Map[String, Int] = Map.empty // see https://github.com/orbeon/orbeon-forms/issues/1732
 
-    def hasShowProgressEvent: Boolean =
-      eventQueue exists (_.showProgress)
-
     def debugEventQueue(): Unit =
       println(s"Event queue: ${eventQueue mkString ", "}")
   }
@@ -456,12 +454,11 @@ object AjaxClient {
       Page.loadingIndicator().requestStarted()
 
       Support.fetchText(
-          url         = requestForm.xformsServerPath,
-          requestBody = requestBody,
-          contentType = "application/xml".some,
-          formId      = requestFormId,
-          abortSignal = controller.signal.some
-
+        url         = requestForm.xformsServerPath,
+        requestBody = requestBody,
+        contentType = "application/xml".some,
+        formId      = requestFormId,
+        abortSignal = controller.signal.some
       ).onComplete { response =>
 
         // Ignore response if for a form we don't have anymore on the page
@@ -469,12 +466,12 @@ object AjaxClient {
           response match {
             case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
               // We ignore HTTP status and just check that we have a well-formed response document
-              handleResponseAjax(responseXml, requestFormId, isResponseToBackgroundUpload = false, ignoreErrors)
+              handleResponseAjax(responseXml, requestFormId, ignoreErrors)
             case Success((503, _, _)) =>
               // We return an explicit 503 when the Ajax server is still busy
               retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
             case Success((_, responseText, responseXmlOpt)) =>
-              if (!handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
+              if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
                 retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
             case Failure(_) =>
               logAndShowError(_, requestFormId, ignoreErrors)
@@ -563,8 +560,7 @@ object AjaxClient {
         val updateProps: js.Function1[js.Dictionary[js.Any], Unit] =
           properties => event.properties = properties
 
-        // 2019-11-22: `beforeSendingEvent` is undocumented but used
-        beforeSendingEvent.fire(event, updateProps)
+        beforeSendingEvent.fire((event, updateProps))
       }
 
       // Only remember the last value for a given `targetId`. Notes:
@@ -653,17 +649,16 @@ object AjaxClient {
         val currentSequenceNumber = StateHandling.getSequence(currentFormId)
         requestDocumentString.append(currentSequenceNumber)
 
-        lazy val incrementSequenceNumberCallback: js.Function = () => {
+        // `require(EventQueue.ajaxRequestInProgress == false)`
+        AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { _ =>
           // Increment sequence number, now that we know the server processed our request
           // If we were to do this after the request was processed, we might fail to increment the sequence
           // if we were unable to process the response (i.e. JS error). Doing this here, before the
           // response is processed, we incur the risk of incrementing the counter while the response is
           // garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
           StateHandling.updateSequence(currentFormId, currentSequenceNumber.toInt + 1)
-          AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(incrementSequenceNumberCallback) // because has `removed`
         }
 
-        AjaxClient.ajaxResponseReceived.add(incrementSequenceNumberCallback)
       }
       requestDocumentString.append("</xxf:sequence>")
       newLine()

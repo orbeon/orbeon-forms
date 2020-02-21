@@ -37,7 +37,7 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID, ignoreErrors) {
+    AjaxServer.handleResponseDom = function(responseXML, formID, ignoreErrors) {
 
         try {
             var responseRoot = responseXML.documentElement;

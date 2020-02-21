@@ -17,11 +17,13 @@ import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
-import org.scalajs.dom.html//.Element
+import org.scalajs.dom.html
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 import scala.collection.compat._
+
 
 // Companion for `fr:dnd-repeat`
 object DndRepeat {
@@ -121,18 +123,14 @@ object DndRepeat {
 
             if (dndStart != dndEnd) {
 
-              lazy val moveBack: js.Function = () => {
-                $(beforeEl).after(el)
-                // TODO: Fix this if we switch to `jquery-facade`
-                AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
-              }
-
               // Restore order once we get an Ajax response back
               // NOTE: You might think that we should wait for the specific response to the Ajax request corresponding to
               // the event below. However, we should move the element back to its original location before *any*
               // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
               // doing this is probably the right thing to do.
-              AjaxClient.ajaxResponseReceived.add(moveBack)
+              AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { _ =>
+                $(beforeEl).after(el)
+              }
 
               // Thinking this should instead block input, but only after a while show a modal screen.
               // XFormsUI.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(container).id)

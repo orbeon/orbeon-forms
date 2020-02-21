@@ -17,6 +17,7 @@ import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
+import org.orbeon.xforms.AjaxClient.AjaxResponseDetails
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
@@ -36,23 +37,24 @@ object LabelEditor {
     var labelInputOpt: js.UndefOr[JQuery] = js.undefined
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
-    AjaxClient.beforeSendingEvent.add((
-      event         : AjaxEvent,
-      addProperties : js.Function1[js.Dictionary[String], Unit]
-    ) => {
+    AjaxClient.beforeSendingEvent.add(
+      (eventWithProperties: (AjaxEvent, js.Function1[js.Dictionary[js.Any], Unit])) => {
 
-      event.targetIdOpt foreach { eventTargetId =>
+        val (event, addProperties) = eventWithProperties
 
-        val eventName        = event.eventName
-        val targetEl         = $(dom.document.getElementById(eventTargetId))
-        val inSectionEditor  = targetEl.closest(".fb-section-grid-editor").is("*")
+        event.targetIdOpt foreach { eventTargetId =>
 
-        if (eventName == EventNames.DOMActivate && inSectionEditor)
-          addProperties(js.Dictionary(
-            "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
-          ))
+          val eventName        = event.eventName
+          val targetEl         = $(dom.document.getElementById(eventTargetId))
+          val inSectionEditor  = targetEl.closest(".fb-section-grid-editor").is("*")
+
+          if (eventName == EventNames.DOMActivate && inSectionEditor)
+            addProperties(js.Dictionary(
+              "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
+            ))
+        }
       }
-    })
+    )
 
     def sendNewLabelValue(): Unit = {
 
@@ -88,7 +90,7 @@ object LabelEditor {
           $(".fb-main").append(labelInput)
           labelInput.on("blur", () => asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
           labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit { if (e.which == 13) sendNewLabelValue() })
-          Events.ajaxResponseProcessedEvent.subscribe(() => labelInput.hide())
+          AjaxClient.ajaxResponseProcessed.add(_ => labelInput.hide())
           labelInputOpt = labelInput
           labelInput
         }

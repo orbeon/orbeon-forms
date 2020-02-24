@@ -142,10 +142,6 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         )
 
         handleElements(pageContext, configRoot.elements.asScala)
-
-        // Handle preview grid (NOTE: This can be heavy in memory)
-        if (templateRoot.attributeValue("show-grid") == "true")
-          stampGrid(pageContext)
       }
 
       // no document.close() ?
@@ -398,51 +394,6 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
         context.contentByte.addImage(image)
     }
-  }
-
-  def stampGrid(context: ElementContext): Unit = {
-    val topPosition = 10f
-    val baseFont = createFont("Courier", embed = false)
-
-    val contentByte = context.contentByte
-    val width = context.pageWidth
-    val height = context.pageHeight
-
-    contentByte.beginText()
-
-    // 20-pixel lines and side legends
-    contentByte.setFontAndSize(baseFont, 7f)
-
-    for (w <- 0f to (width, 20f))
-      for (h <- 0f to (height, 2f))
-        contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
-
-    for (h <- 0f to (height, 20f))
-      for (w <- 0f to (width, 2f))
-        contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
-
-    for (w <- 0f to (width, 20f)) {
-      contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, w.toString, w, height - topPosition, 0)
-      contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, w.toString, w, topPosition, 0)
-    }
-
-    for (h <- 0f to (height, 20f)) {
-      contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, h.toString, 5f, height - h, 0)
-      contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, h.toString, width - 5f, height - h, 0)
-    }
-
-    // 10-pixel lines
-    contentByte.setFontAndSize(baseFont, 3f)
-
-    for (w <- 10f to (width, 10f))
-      for (h <- 0f to (height, 2f))
-        contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
-
-    for (h <- 10f to (height, 10f))
-      for (w <- 0f to (width, 2f))
-        contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", w, height - h, 0)
-
-    contentByte.endText()
   }
 }
 

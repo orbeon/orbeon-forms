@@ -20,6 +20,7 @@ import java.util.{List => JList}
 
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
+import org.apache.log4j.Logger
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
@@ -88,7 +89,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
       val initialContext =
         ElementContext(
           pipelineContext = pipelineContext,
-          logger          = new IndentedLogger(Logger),
+          logger          = new IndentedLogger(PDFTemplateProcessor.Logger),
           contentByte     = null,
           acroFields      = stamper.getAcroFields,
           pageWidth       = 0,
@@ -149,7 +150,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
   }
 
   // How to handle known elements
-  val Handlers = Map[String, ElementContext => Unit](
+  val Handlers: Map[String, ElementContext => Unit] = Map(
     "group"   -> handleGroup,
     "repeat"  -> handleRepeat,
     "field"   -> handleField,
@@ -232,7 +233,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         val fieldName = context.evaluateAsString(fieldNameExpr)
 
         if (findFieldPage(context.acroFields, fieldName) contains context.pageNumber) {
-          Option(context.acroFields.getFieldItem(fieldName)) foreach { item =>
+          Option(context.acroFields.getFieldItem(fieldName)) foreach { _ =>
             // Field exists
             val exportValue = Option(context.att("export-value"))
             val valueExpr   = exportValue orElse Option(context.att("value")) getOrElse context.att("ref")
@@ -273,7 +274,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         Option(context.evaluateAsString(value)) foreach { text =>
           // Iterate over characters and print them
           val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
-          for (j <-  0 to len - 1)
+          for (j <- 0 until len)
             context.contentByte.showTextAligned(
               PdfContentByte.ALIGN_CENTER,
               text.substring(j, j + 1),
@@ -350,7 +351,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, Logger)
+            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger)
             // NOTE: iText's Image.getInstance() closes the local URL's InputStream
             Image.getInstance(URLFactory.createURL(tempURLString))
           }
@@ -399,10 +400,10 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
 object PDFTemplateProcessor {
 
-  val Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
+  val Logger: Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
   val PDFTemplateModelNamespaceURI = "http://www.orbeon.com/oxf/pdf-template/model"
 
-  def createBarCode(barcodeType: String) = barcodeType match {
+  def createBarCode(barcodeType: String): Barcode = barcodeType match {
     case "CODE39"  => new Barcode39
     case "CODE128" => new Barcode128
     case "EAN"     => new BarcodeEAN
@@ -434,13 +435,13 @@ object PDFTemplateProcessor {
     private def jVariables = variables.asJava
     private def functionLibrary = FunctionLibrary.instance
 
-    def att(name: String) = element.attributeValue(name)
+    def att(name: String): String = element.attributeValue(name)
 
-    def resolveFloat(name: String, offset: Float, default: Float) =
+    def resolveFloat(name: String, offset: Float, default: Float): Float =
       Option(resolveAVT(name)) map
         (offset + _.toFloat) getOrElse default
 
-    def resolveString(name: String, current: String) =
+    def resolveString(name: String, current: String): String =
       Option(resolveAVT(name)) map
         identity getOrElse current
 
@@ -486,7 +487,7 @@ object PDFTemplateProcessor {
         null
       )
 
-    def resolveAVT(attributeName: String, otherAttributeName: String = null) =
+    def resolveAVT(attributeName: String, otherAttributeName: String = null): String =
       Option(att(attributeName)) orElse Option(Option(otherAttributeName) map att orNull) map
         (
           XPathCache.evaluateAsAvt(
@@ -502,7 +503,7 @@ object PDFTemplateProcessor {
           )
         ) orNull
 
-    def getFontAttributes = {
+    def getFontAttributes: FontAttributes = {
       val newFontPitch  = Option(resolveAVT("font-pitch", "spacing")) map (_.toFloat) getOrElse fontPitch
       val newFontFamily = Option(resolveAVT("font-family"))                           getOrElse fontFamily
       val newFontSize   = Option(resolveAVT("font-size"))             map (_.toFloat) getOrElse fontSize
@@ -512,7 +513,7 @@ object PDFTemplateProcessor {
   }
 
   // Create a font
-  def createFont(fontFamilyOrPath: String, embed: Boolean) =
+  def createFont(fontFamilyOrPath: String, embed: Boolean): BaseFont =
     BaseFont.createFont(fontFamilyOrPath, findFontEncoding(fontFamilyOrPath), embed)
 
   // PDF built-in fonts
@@ -534,7 +535,7 @@ object PDFTemplateProcessor {
   )
 
   // Find an encoding suitable for the given font family
-  def findFontEncoding(fontFamilyName: String) = {
+  def findFontEncoding(fontFamilyName: String): String = {
 
     // The reason we do this is that specifying Identity-H or Identity-V with a Type1 font always fails as iText
     // tries to find an actual character encoding based on the value passed. For other font types, Identity-H and

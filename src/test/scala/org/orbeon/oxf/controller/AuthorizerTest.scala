@@ -13,42 +13,69 @@
  */
 package org.orbeon.oxf.controller
 
-import org.orbeon.oxf.http.Headers._
-import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext}
-
-import collection.JavaConverters._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.orbeon.oxf.http.Headers._
+import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
+class AuthorizerTest extends AnyFunSpecLike with MockitoSugar {
 
   import Authorizer._
 
-  @Test def testAuthorizedWithToken(): Unit = {
+  describe("Authorization with token") {
 
-    val appAttributes     = collection.mutable.Map[String, AnyRef]()
-    val requestAttributes = collection.mutable.Map[String, Array[String]]()
+    def buildExternalContextWith(appAttributes: Map[String, AnyRef], reqAttributes: Map[String, Array[String]]): ExternalContext = {
 
-    val ec = mock[ExternalContext]
-    val webAppContext = mock[WebAppContext]
-    val request = mock[ExternalContext.Request]
+      val ec = mock[ExternalContext]
+      val webAppContext = mock[WebAppContext]
+      val request = mock[ExternalContext.Request]
 
-    Mockito when ec.getRequest thenReturn request
-    Mockito when ec.getWebAppContext thenReturn webAppContext
-    Mockito when webAppContext.attributes thenReturn appAttributes
-    Mockito when request.getHeaderValuesMap thenReturn requestAttributes.asJava
+      Mockito when ec.getRequest thenReturn request
+      Mockito when ec.getWebAppContext thenReturn webAppContext
+      Mockito when webAppContext.attributes thenReturn (mutable.HashMap() ++ appAttributes)
+      Mockito when request.getHeaderValuesMap thenReturn reqAttributes.asJava
 
-    assert(! authorizedWithToken(ec))
+      ec
+    }
 
-    appAttributes += OrbeonTokenLower -> "1234567890"
-    assert(! authorizedWithToken(ec))
+    it("must not be authorized when no token is set in the app") {
+      assert(
+        ! authorizedWithToken(
+          buildExternalContextWith(Map.empty, Map.empty)
+        )
+      )
+    }
 
-    requestAttributes += OrbeonTokenLower -> Array("abcdefghij")
-    assert(! authorizedWithToken(ec))
+    it("must not be authorized when no token is passed") {
+      assert(
+        ! authorizedWithToken(
+          buildExternalContextWith(Map(OrbeonTokenLower -> "1234567890"), Map.empty)
+        )
+      )
+    }
 
-    requestAttributes += OrbeonTokenLower -> Array("1234567890")
-    assert(authorizedWithToken(ec))
+    it("must not be authorized when an incorrect token is passed") {
+      assert(
+        ! authorizedWithToken(buildExternalContextWith(
+          Map(OrbeonTokenLower -> "1234567890"),
+          Map(OrbeonTokenLower -> Array("abcdefghij")))
+        )
+      )
+    }
+
+    it("must be authorized when the tokens match") {
+      assert(
+        authorizedWithToken(
+          buildExternalContextWith(
+            Map(OrbeonTokenLower -> "1234567890"),
+            Map(OrbeonTokenLower -> Array("1234567890"))
+          )
+        )
+      )
+    }
   }
 }

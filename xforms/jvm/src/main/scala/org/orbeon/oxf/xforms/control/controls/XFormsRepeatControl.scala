@@ -201,7 +201,6 @@ class XFormsRepeatControl(
       /* doClone               = */ false, // do not clone the node as we know the node it is ready for insertion
       /* doDispatch            = */ true,
       /* requireDefaultValues  = */ false,
-      /* updateRepeats         = */ true,
       /* searchForInstance     = */ true
     )
 

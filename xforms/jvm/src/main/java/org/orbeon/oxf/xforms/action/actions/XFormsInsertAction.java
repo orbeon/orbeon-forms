@@ -63,8 +63,6 @@ public class XFormsInsertAction extends XFormsAction {
         // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
         final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME()));
 
-        final boolean updateRepeats = ! "false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_UPDATE_REPEATS_QNAME()));
-
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
             final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
@@ -191,7 +189,6 @@ public class XFormsInsertAction extends XFormsAction {
             true,
             true,
             setRequireDefaultValues,
-            updateRepeats,
             true
         );
     }
@@ -207,7 +204,6 @@ public class XFormsInsertAction extends XFormsAction {
         boolean doClone,
         boolean doDispatch,
         boolean requireDefaultValues,
-        boolean updateRepeats,
         boolean searchForInstance
     ) {
 
@@ -523,8 +519,7 @@ public class XFormsInsertAction extends XFormsAction {
                     originItems,
                     adjustedInsertLocationNodeInfo,
                     adjustedBeforeAfterInto,
-                    insertLocationIndexWithinParentBeforeUpdate,
-                    updateRepeats
+                    insertLocationIndexWithinParentBeforeUpdate
                 )
             );
         }

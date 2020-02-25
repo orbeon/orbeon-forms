@@ -312,8 +312,7 @@ class XFormsInstance(
           null,   // CHECK
           currentRoot.getDocumentRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
-          0,
-          true
+          0
         )
       )
     }

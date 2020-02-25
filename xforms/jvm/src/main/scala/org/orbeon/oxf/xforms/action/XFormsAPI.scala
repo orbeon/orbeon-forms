@@ -119,7 +119,6 @@ object XFormsAPI {
     before               : Seq[NodeInfo] = Nil,
     doDispatch           : Boolean       = true,
     requireDefaultValues : Boolean       = false,
-    updateRepeats        : Boolean       = true,
     searchForInstance    : Boolean       = true
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
@@ -142,7 +141,6 @@ object XFormsAPI {
         true, // doClone
         doDispatch,
         requireDefaultValues,
-        updateRepeats,
         searchForInstance
       ).asInstanceOf[JList[T]].asScala
     } else

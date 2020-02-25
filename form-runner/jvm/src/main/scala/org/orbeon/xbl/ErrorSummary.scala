@@ -412,8 +412,7 @@ object ErrorSummary {
       XFormsAPI.insert(
         into          = rootElem,
         after         = afterElemList,
-        origin        = newErrorElem,
-        updateRepeats = false
+        origin        = newErrorElem
       )
     }
   }

@@ -31,8 +31,7 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
     originItems         : JList[Item],
     insertLocationNode  : NodeInfo,
     position            : String,
-    insertLocationIndex : Int,
-    updateRepeats       : Boolean
+    insertLocationIndex : Int
   ) = this(
       target,
       Map(
@@ -40,8 +39,7 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
         "origin-nodes"          -> Option(originItems.asScala),    // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
         "insert-location-node"  -> Option(insertLocationNode),     // "The insert location node as defined by the insert action."
         "insert-location-index" -> Option(insertLocationIndex),    // The position of the insert location node relative to its parent, before the insertion took place.
-        "position"              -> Option(position),               // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
-        "update-repeats"        -> Some(updateRepeats)
+        "position"              -> Option(position)                // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
       )
     )
 

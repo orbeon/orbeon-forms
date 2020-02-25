@@ -293,7 +293,6 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             false,
             true,
             applyDefaults,
-            true,
             true
           )
 

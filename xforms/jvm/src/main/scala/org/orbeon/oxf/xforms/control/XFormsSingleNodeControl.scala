@@ -45,7 +45,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   override type Control <: SingleNodeTrait
 
   private var _boundItem: Item = null
-  final def boundItemOpt = Option(_boundItem)
+  final def boundItemOpt: Option[Item] = Option(_boundItem)
   final def boundNodeOpt: Option[NodeInfo] = boundItemOpt collect { case node: NodeInfo => node }
 
   final override def bindingEvenIfNonRelevant: Seq[Item] =

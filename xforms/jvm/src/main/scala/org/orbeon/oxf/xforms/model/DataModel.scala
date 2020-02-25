@@ -41,7 +41,7 @@ object DataModel {
    *
    * NOTE: As of 2012-04-26, we allow binding non-value controls to any node type.
    */
-  def isAllowedBoundItem(item: Item) = item ne null
+  def isAllowedBoundItem(item: Item): Boolean = item ne null
 
   /**
    * Whether the given item is acceptable as a bound item storing a value.
@@ -50,7 +50,7 @@ object DataModel {
    * not disallowed by per XForms, however doing so might lead to funny results when writing values back. In
    * particular, writing an empty value to a text node causes the control to become non-relevant.
    */
-  def isAllowedValueBoundItem(item: Item) = item match {
+  def isAllowedValueBoundItem(item: Item): Boolean = item match {
     case _: AtomicValue                                                                     => true
     case node: NodeInfo if node.isAttribute || node.isElement && node.supportsSimpleContent => true
     case node: NodeInfo if node self (Text || PI || Comment) effectiveBooleanValue          => true
@@ -106,7 +106,7 @@ object DataModel {
     newValue  : String,
     onSuccess : () => Unit     = () => (),
     onError   : Reason => Unit = _ => ()
-  ) = {
+  ): Boolean = {
 
     assert(nodeInfo ne null)
     assert(newValue ne null)
@@ -146,7 +146,7 @@ object DataModel {
   }
 
   /**
-   * Same as setValueIfChanged but with default error handling.
+   * Same as `setValueIfChanged` but with default error handling.
    *
    * Used by MIPs and when setting external values on controls.
    *
@@ -185,7 +185,7 @@ object DataModel {
     isCalculate        : Boolean,
     collector          : XFormsEvent => Unit)(implicit
     logger             : IndentedLogger
-  ) = {
+  ): Unit = {
     logValueChange(source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
     notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate, collector)
   }
@@ -199,7 +199,7 @@ object DataModel {
     newValue            : String,
     instanceEffectiveId : Option[String])(implicit
     logger              : IndentedLogger
-  ) =
+  ): Unit =
     if (logger.isDebugEnabled)
       logger.logDebug("xf:setvalue", "setting instance value", "source", source,
         "old value", oldValue, "new value", newValue,
@@ -212,7 +212,7 @@ object DataModel {
     newValue           : String,
     isCalculate        : Boolean,
     collector          : XFormsEvent => Unit
-  ) =
+  ): Unit =
     containingDocument.instanceForNodeOpt(nodeInfo) match {
       case Some(modifiedInstance) =>
         // Tell the model about the value change
@@ -227,7 +227,7 @@ object DataModel {
         containingDocument.getControls.markDirtySinceLastRequest(true)
     }
 
-  private def setValueForNode(node: dom.Node, newValue: String) =
+  private def setValueForNode(node: dom.Node, newValue: String): Unit =
     node match {
       case element   : dom.Element                   => element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
       case attribute : dom.Attribute                 => attribute.setValue(newValue)
@@ -240,10 +240,10 @@ object DataModel {
     }
 
   // Whether the item is an element node.
-  def isElement(item: Item) = isNodeType(item, ELEMENT_NODE)
+  def isElement(item: Item): Boolean = isNodeType(item, ELEMENT_NODE)
 
   // Whether the an item is a document node.
-  def isDocument(item: Item) = isNodeType(item, DOCUMENT_NODE)
+  def isDocument(item: Item): Boolean = isNodeType(item, DOCUMENT_NODE)
 
   private def isNodeType(item: Item, nodeType: Int) = item match {
     case nodeInfo: NodeInfo if nodeInfo.getNodeKind == nodeType => true

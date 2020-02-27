@@ -126,7 +126,7 @@
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="0"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->

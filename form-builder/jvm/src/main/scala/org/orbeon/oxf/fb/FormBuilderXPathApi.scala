@@ -566,8 +566,8 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def buildFormBuilderControlEffectiveIdOrEmpty(staticId: String): String =
-    FormBuilder.buildFormBuilderControlEffectiveId(staticId)(FormBuilderDocContext()).orNull
+  def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String): String =
+    FormBuilder.buildFormBuilderControlNamespacedIdOrEmpty(staticId)(FormBuilderDocContext())
 
   //@XPathFunction
   def findControlByNameOrEmpty(controlName: String): NodeInfo = {

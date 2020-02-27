@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Whitespace, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -744,7 +745,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       Nil
   }
 
-  // Build an effective id for a given static id or return null (the empty sequence)
+  // Build an namespaced id for a given static id or return null (the empty sequence)
+  def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String = {
+    val effectiveId  = buildFormBuilderControlEffectiveId(staticId)
+    val namespacedId = effectiveId.map(XFormsUtils.namespaceId(XFormsAPI.inScopeContainingDocument, _))
+    namespacedId.orNull
+  }
+
   def buildFormBuilderControlAbsoluteIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String =
     buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 

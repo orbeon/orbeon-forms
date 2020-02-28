@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import cats.syntax.option._
 import org.orbeon.dom.{Attribute, Document}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._
@@ -24,8 +25,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
-import scala.language.postfixOps
 import scala.collection.compat._
+import scala.language.postfixOps
+
 
 /**
  * 9.3.6 The delete Element
@@ -73,10 +75,10 @@ class XFormsDeleteAction extends XFormsAction {
         }
 
       doDelete(
-        containingDocument = actionContext.containingDocument,
-        collectionToUpdate = collectionToUpdate,
-        deleteIndexOpt     = deleteIndexOpt,
-        doDispatch         = true
+        containingDocumentOpt = actionContext.containingDocument.some,
+        collectionToUpdate    = collectionToUpdate,
+        deleteIndexOpt        = deleteIndexOpt,
+        doDispatch            = true
       )
     } else {
       // "The delete action is terminated with no effect if the Sequence Binding is expressed and the Sequence Binding
@@ -108,19 +110,19 @@ object XFormsDeleteAction extends Logging {
     require(nodeInfo ne null)
 
     doDelete(
-      containingDocument = containingDocument,
-      collectionToUpdate = List(nodeInfo),
-      deleteIndexOpt     = Some(1),
-      doDispatch         = doDispatch
+      containingDocumentOpt = containingDocument.some,
+      collectionToUpdate    = List(nodeInfo),
+      deleteIndexOpt        = Some(1),
+      doDispatch            = doDispatch
     ).headOption
   }
 
   def doDelete(
-    containingDocument : XFormsContainingDocument,
-    collectionToUpdate : Seq[Item],
-    deleteIndexOpt     : Option[Int],
-    doDispatch         : Boolean)(implicit
-    indentedLogger     : IndentedLogger
+    containingDocumentOpt : Option[XFormsContainingDocument],
+    collectionToUpdate    : Seq[Item],
+    deleteIndexOpt        : Option[Int],
+    doDispatch            : Boolean)(implicit
+    indentedLogger        : IndentedLogger
   ): List[DeletionDescriptor] = {
 
     require(collectionToUpdate ne null)
@@ -139,28 +141,30 @@ object XFormsDeleteAction extends Logging {
           case None        => collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to(List)
         }
 
-      if (deletionDescriptors.nonEmpty && (containingDocument ne null)) {
-        // Identify the instance that actually changes
-        // NOTE: More than one instance may be modified! For now we look at the first one only.
-        val modifiedInstanceOpt = containingDocument.instanceForNodeOpt(deletionDescriptors.head.nodeInfo)
+      if (deletionDescriptors.nonEmpty)
+        containingDocumentOpt foreach { containingDocument =>
 
-        debugAllowNull(
-          "deleted nodes",
-          List("count" -> deletionDescriptors.size.toString) ++ (modifiedInstanceOpt map ("instance" -> _.getEffectiveId))
-        )
+          // Identify the instance that actually changes
+          // NOTE: More than one instance may be modified! For now we look at the first one only.
+          val modifiedInstanceOpt = containingDocument.instanceForNodeOpt(deletionDescriptors.head.nodeInfo)
 
-        // Instance can be missing if document into which delete is performed is not in an instance!
-        modifiedInstanceOpt foreach { modifiedInstance =>
+          debugAllowNull(
+            "deleted nodes",
+            List("count" -> deletionDescriptors.size.toString) ++ (modifiedInstanceOpt map ("instance" -> _.getEffectiveId))
+          )
 
-          // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-          modifiedInstance.markModified()
-          modifiedInstance.model.markStructuralChange(modifiedInstanceOpt, NoDefaultsStrategy)
+          // Instance can be missing if document into which delete is performed is not in an instance!
+          modifiedInstanceOpt foreach { modifiedInstance =>
 
-          // "4. If the delete is successful, the event xforms-delete is dispatched."
-          if (doDispatch)
-            Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt))
+            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+            modifiedInstance.markModified()
+            modifiedInstance.model.markStructuralChange(modifiedInstanceOpt, NoDefaultsStrategy)
+
+            // "4. If the delete is successful, the event xforms-delete is dispatched."
+            if (doDispatch)
+              Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt))
+          }
         }
-      }
 
       deletionDescriptors
     }

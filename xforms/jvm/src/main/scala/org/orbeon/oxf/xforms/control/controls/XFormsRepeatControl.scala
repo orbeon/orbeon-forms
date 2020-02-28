@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.{util => ju}
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
@@ -166,10 +167,10 @@ class XFormsRepeatControl(
     val deletedNodeInfo = {
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          containingDocument = containingDocument,
-          collectionToUpdate = sourceItems,
-          deleteIndexOpt     = Some(requestedSourceIndex),
-          doDispatch         = false // don't dispatch event because one call to updateRepeatNodeset() is enough
+          containingDocumentOpt = containingDocument.some,
+          collectionToUpdate    = sourceItems,
+          deleteIndexOpt        = Some(requestedSourceIndex),
+          doDispatch            = false // don't dispatch event because one call to updateRepeatNodeset() is enough
         )
       deletionDescriptors.head.nodeInfo // above deletes exactly one node
     }

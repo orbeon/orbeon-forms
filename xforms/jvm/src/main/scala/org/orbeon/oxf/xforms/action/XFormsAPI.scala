@@ -155,16 +155,16 @@ object XFormsAPI {
   ): Seq[NodeInfo] =
     if (ref.nonEmpty) {
 
-      val action = actionInterpreterDyn.value
-      val doc    = action map (_.containingDocument) orElse containingDocumentDyn.value
+      val actionOpt = actionInterpreterDyn.value
+      val docOpt    = actionOpt map (_.containingDocument) orElse containingDocumentDyn.value
 
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          containingDocument = doc.orNull,
-          collectionToUpdate = ref,
-          deleteIndexOpt     = None,
-          doDispatch         = doDispatch)(
-          indentedLogger     = action map (_.indentedLogger) orNull
+          containingDocumentOpt = docOpt,
+          collectionToUpdate    = ref,
+          deleteIndexOpt        = None,
+          doDispatch            = doDispatch)(
+          indentedLogger        = actionOpt map (_.indentedLogger) orNull
         )
 
       deletionDescriptors map (_.nodeInfo)

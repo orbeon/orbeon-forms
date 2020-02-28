@@ -203,7 +203,7 @@ class ItemsetActionTest
           def assertStateItemsetsContain(label: String) =
             for (sectionIndex <- 1 to 2) {
               val stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(sectionIndex)).get
-              assert(getItemsetSearchNested(stateControl).get.allItemsIterator.flatMap(_.label) exists (_.label == label))
+              assert(getItemsetSearchNested(stateControl).get.allItemsIterator exists (_.label.label == label))
             }
 
           assertStateItemsetsContain("California")

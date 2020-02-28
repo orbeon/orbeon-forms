@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
+import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils._
@@ -21,7 +22,7 @@ import org.orbeon.saxon.om
 
 
 sealed trait ItemNode extends ItemContainer with ItemNodeImpl {
-  val label      : Option[LHHAValue] // TODO: should be just `LHHAValue`?
+  val label      : LHHAValue
   val attributes : List[(QName, String)]
   val position   : Int
   def iterateLHHA: Iterator[(String, LHHAValue)]
@@ -32,7 +33,7 @@ object Item {
   type ItemValue[T <: om.Item] = String Either List[T]
 
   case class ValueNode(
-    label      : Option[LHHAValue],
+    label      : LHHAValue,
     help       : Option[LHHAValue],
     hint       : Option[LHHAValue],
     value      : Item.ItemValue[om.Item],
@@ -42,7 +43,7 @@ object Item {
     ItemNode with ItemLeafImpl
 
   case class ChoiceNode(
-    label      : Option[LHHAValue],
+    label      : LHHAValue,
     attributes : List[(QName, String)])(val
     position   : Int
   ) extends
@@ -56,7 +57,7 @@ sealed trait ItemNodeImpl {
   require(attributes ne null)
 
   def javaScriptLabel(locationData: LocationData): String =
-    label map (_.javaScriptValue(locationData)) getOrElse ""
+    label.javaScriptValue(locationData)
 
   def classAttribute: Option[String] =
     attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
@@ -99,7 +100,7 @@ sealed trait ItemLeafImpl {
 
   def iterateLHHA: Iterator[(String, LHHAValue)] =
     Iterator(
-      label map ("label" ->),
+      ("label" -> label).some,
       help  map ("help"  ->),
       hint  map ("hint"  ->)
     ).flatten
@@ -124,9 +125,7 @@ sealed trait ChoiceLeafImpl {
   self: Item.ChoiceNode =>
 
   def iterateLHHA: Iterator[(String, LHHAValue)] =
-    Iterator(
-      label map ("label" ->)
-    ).flatten
+    Iterator("label" -> label)
 
   override def equals(other: Any): Boolean = other match {
     case other: Item.ChoiceNode =>

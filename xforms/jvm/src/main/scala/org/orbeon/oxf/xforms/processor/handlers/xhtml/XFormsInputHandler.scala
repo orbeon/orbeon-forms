@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
@@ -82,7 +82,7 @@ class XFormsInputHandler(
       // encode = false,
       itemset.addChildItem(
         Item.ValueNode(
-          label      = None,
+          label      = LHHAValue.Empty,
           help       = None,
           hint       = None,
           value      = Left("true"),

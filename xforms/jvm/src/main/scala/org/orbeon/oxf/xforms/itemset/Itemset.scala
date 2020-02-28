@@ -170,7 +170,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
           ch.startElement("item", itemAttributes)
 
           ch.startElement("label")
-          itemNode.label foreach (_.streamAsHTML(ch, locationData))
+          itemNode.label.streamAsHTML(ch, locationData)
           ch.endElement()
 
           itemNode match {

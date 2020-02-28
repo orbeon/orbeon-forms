@@ -116,7 +116,7 @@ class XFormsSelect1Control(
       if (! isStaticReadonly)
         findSelectedItem map (_.externalValue(mustEncodeValues)) orNull
       else
-        findSelectedItem flatMap (_.label) map (_.htmlValue(getLocationData)) orNull // external value is the label
+        findSelectedItem map (_.label.htmlValue(getLocationData)) orNull // external value is the label
     )
   }
 

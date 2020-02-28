@@ -232,7 +232,7 @@ object XFormsItemUtils {
             private def createItemLeaf(elem: Element, position: Int): Option[ItemNode] =
               getValueOrCopyValue(elem) map { value =>
                 Item.ValueNode(
-                  label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true),
+                  label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
                   help       = findLhhValue(elem.elementOpt(HELP_QNAME),  required = false),
                   hint       = findLhhValue(elem.elementOpt(HINT_QNAME),  required = false),
                   value      = value,
@@ -244,7 +244,7 @@ object XFormsItemUtils {
 
             private def createChoiceLeaf(elem: Element, position: Int): Item.ChoiceNode =
               Item.ChoiceNode(
-                label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true),
+                label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
                 attributes = getAttributes(elem)
               )(
                 position   = position

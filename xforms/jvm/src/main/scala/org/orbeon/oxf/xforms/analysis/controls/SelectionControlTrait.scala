@@ -297,7 +297,7 @@ extends InputValueControl
 
             currentContainer.addChildItem(
               Item.ValueNode(
-                label      = labelOpt,
+                label      = labelOpt getOrElse LHHAValue.Empty,
                 help       = helpOpt,
                 hint       = hintOpt,
                 value      = Left(stringValue),
@@ -321,7 +321,7 @@ extends InputValueControl
 
             labelOpt foreach { _ =>
               val newContainer = Item.ChoiceNode(
-                label      = labelOpt,
+                label      = labelOpt getOrElse LHHAValue.Empty,
                 attributes = SelectionControlUtil.getAttributes(element)
               )(
                 position   = position

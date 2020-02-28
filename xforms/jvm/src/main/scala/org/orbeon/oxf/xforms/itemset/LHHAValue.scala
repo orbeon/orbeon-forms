@@ -39,3 +39,7 @@ case class LHHAValue(label: String, isHTML: Boolean) {
   def javaScriptValue(locationData: LocationData): String =
     escapeJavaScript(htmlValue(locationData))
 }
+
+object LHHAValue {
+  val Empty: LHHAValue = LHHAValue("", isHTML = false)
+}

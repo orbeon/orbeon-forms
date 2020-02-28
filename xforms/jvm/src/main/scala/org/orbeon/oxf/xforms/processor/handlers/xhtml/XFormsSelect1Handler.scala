@@ -100,7 +100,7 @@ object XFormsSelect1Handler {
           LHHAValue(
             "$xforms-template-label$",
             isHTML = false
-          ).some,
+          ),
           LHHAValue(
             "$xforms-template-help$",
             isHTML = false
@@ -161,7 +161,6 @@ object XFormsSelect1Handler {
 
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = spanAttributes) {
 
-      val itemLabelOpt = item.label
       val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.getContainingDocument, itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
 
@@ -221,14 +220,13 @@ object XFormsSelect1Handler {
           uri       = XHTML_NAMESPACE_URI,
           atts      = showHint list ("class" -> "xforms-hint-region")
         ) {
-          itemLabelOpt foreach { itemLabel =>
-            outputLabelTextIfNotEmpty(
-              itemLabel.label,
-              xhtmlPrefix,
-              itemLabel.isHTML,
-              None
-            )
-          }
+          val itemLabel = item.label
+          outputLabelTextIfNotEmpty(
+            itemLabel.label,
+            xhtmlPrefix,
+            itemLabel.isHTML,
+            None
+          )
         }
 
         // <span class="xforms-help">
@@ -426,11 +424,7 @@ class XFormsSelect1Handler(
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
                     val optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
 
-                    val labelOpt = item.label map (_.label)
-
-                    labelOpt foreach { label =>
-                      optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label)
-                    }
+                    optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
 
                     // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
                     // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
@@ -465,7 +459,7 @@ class XFormsSelect1Handler(
           } locally {
             if (selectedFound)
               ch.text(" - ")
-            currentItem.label foreach (_.streamAsHTML(ch, control.getLocationData))
+            currentItem.label.streamAsHTML(ch, control.getLocationData)
             selectedFound = true
           }
         }
@@ -579,9 +573,7 @@ class XFormsSelect1Handler(
     withElement(localName = "option", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optionAttributes) {
       // TODO: Check this, which fails with the workflow UI
   //    assert(! item.label.isHTML)
-      item.label foreach { label =>
-        text(text = label.label)
-      }
+      text(text = item.label.label)
     }
 
     mustSelect

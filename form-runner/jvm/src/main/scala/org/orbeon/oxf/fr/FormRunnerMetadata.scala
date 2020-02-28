@@ -354,7 +354,7 @@ object FormRunnerMetadata {
         for ((item, position) <- enclosingHolder child Names.Item zipWithIndex)
         yield
           itemset.Item.ValueNode(
-            label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false).some, // TODO isHTML
+            label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false), // TODO isHTML
             help       = item elemValueOpt LHHA.Help.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
             hint       = item elemValueOpt LHHA.Hint.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
             value      = Left(item elemValueOpt Names.Value getOrElse ""),
@@ -405,13 +405,13 @@ object FormRunnerMetadata {
             Option(control) collect {
               case c: XFormsSelectControl  =>
 
-                val selectedLabels = c.findSelectedItems flatMap (_.label) map (_.label) // TODO: HTML
+                val selectedLabels = c.findSelectedItems map (_.label.label) // TODO: HTML
 
                 MultipleControlValue(c.getValue, selectedLabels) // TODO
 
               case c: XFormsSelect1Control =>
 
-                val selectedLabel = c.findSelectedItem flatMap (_.label) map (_.label) // TODO: HTML
+                val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
 
                 SingleControlValue(c.getValue, selectedLabel) // TODO
 
@@ -421,7 +421,7 @@ object FormRunnerMetadata {
 
                 selectionControlOpt match {
                   case Some(selectControl: XFormsSelectControl) =>
-                    val selectedLabels = selectControl.findSelectedItems flatMap (_.label) map (_.label)  // TODO: HTML
+                    val selectedLabels = selectControl.findSelectedItems map (_.label.label)  // TODO: HTML
                     MultipleControlValue(selectControl.getValue, selectedLabels) // TODO
                   case Some(select1Control) =>
 
@@ -436,7 +436,7 @@ object FormRunnerMetadata {
                         select1Control.findSelectedItem
 
                     // TODO: HTML
-                    val selectedLabelOpt  = itemOpt flatMap (_.label) map (_.label) orElse Some("") // use a blank string so we get `N/A` in the end
+                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse "".some // use a blank string so we get `N/A` in the end
                     SingleControlValue(select1Control.getValue, selectedLabelOpt)
                   case None =>
                     throw new IllegalStateException

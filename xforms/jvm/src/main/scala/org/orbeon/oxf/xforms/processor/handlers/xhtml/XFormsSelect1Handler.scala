@@ -57,7 +57,7 @@ object XFormsSelect1Handler {
     itemNode match {
       case item: Item.ValueNode =>
         dataValueFromControl(control) exists (dataValue =>
-          XFormsItemUtils.isSelected(
+          ItemsetSupport.isSelected(
             isMultiple = isMultiple,
             dataValue  = dataValue,
             itemValue  = item.value

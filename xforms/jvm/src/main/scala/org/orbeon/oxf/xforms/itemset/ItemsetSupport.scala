@@ -35,7 +35,7 @@ import org.orbeon.xforms.XFormsId
 import scala.util.control.NonFatal
 
 
-object XFormsItemUtils {
+object ItemsetSupport {
 
   def isSelected(isMultiple: Boolean, dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): Boolean = {
     if (isMultiple)

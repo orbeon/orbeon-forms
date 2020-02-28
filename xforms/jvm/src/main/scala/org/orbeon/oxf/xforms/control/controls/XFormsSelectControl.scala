@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEven
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
 import org.orbeon.oxf.xforms.itemset.Item.ItemValue
-import org.orbeon.oxf.xforms.itemset.{Item, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
@@ -145,7 +145,7 @@ class XFormsSelectControl(
                 )
               case r @ Right(_) =>
                 XFormsAPI.delete(
-                  ref = XFormsItemUtils.findMultipleItemValues(getCurrentItemValueFromData(boundNode), r)
+                  ref = ItemsetSupport.findMultipleItemValues(getCurrentItemValueFromData(boundNode), r)
                 )
             }
           case None =>
@@ -194,7 +194,7 @@ object XFormsSelectControl {
   ): (List[Item.ItemValue[om.Item]], List[Item.ItemValue[om.Item]], List[Item.ItemValue[om.Item]]) = {
 
     def belongsTo(values: List[Item.ItemValue[om.Item]])(value: Item.ItemValue[om.Item]): Boolean =
-      values exists (XFormsItemUtils.compareSingleItemValues(_, value))
+      values exists (ItemsetSupport.compareSingleItemValues(_, value))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
     val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)

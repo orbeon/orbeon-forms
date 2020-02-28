@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableCo
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -91,7 +91,7 @@ class XFormsSelect1Control(
         // Items are not automatically refreshed and stored globally
         // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
         containingDocument.getControls.getConstantItems(getPrefixedId) getOrElse {
-          val newItemset = XFormsItemUtils.evaluateItemset(selfControl)
+          val newItemset = ItemsetSupport.evaluateItemset(selfControl)
           containingDocument.getControls.setConstantItems(getPrefixedId, newItemset)
           newItemset
         }
@@ -127,7 +127,7 @@ class XFormsSelect1Control(
   def findSelectedItem: Option[Item.ValueNode] =
     boundItemOpt map getCurrentItemValueFromData flatMap { current =>
       getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
-        case (item, itemValue) if XFormsItemUtils.compareSingleItemValues(current, itemValue) => item
+        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(current, itemValue) => item
       }
     }
 
@@ -206,7 +206,7 @@ class XFormsSelect1Control(
     itemset.allItemsWithValueIterator(reverse = true).foldLeft((Nil: List[XFormsSelectEvent], Nil: List[XFormsDeselectEvent])) {
       case (result @ (selected, deselected), (item, itemValue)) =>
 
-        val itemWasSelected = XFormsItemUtils.compareSingleItemValues(dataValue, itemValue)
+        val itemWasSelected = ItemsetSupport.compareSingleItemValues(dataValue, itemValue)
         val itemIsSelected  = item.externalValue(mustEncodeValues) == newExternalValue
 
         val getsSelected   = ! itemWasSelected &&   itemIsSelected

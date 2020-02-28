@@ -121,10 +121,10 @@ class XFormsSelect1Control(
   }
 
   // Q: In theory, multiple items could have the same value and therefore be selected, right?
-  def findSelectedItems: List[Item] =
+  def findSelectedItems: List[Item.ValueNode] =
     findSelectedItem.toList
 
-  def findSelectedItem: Option[Item] =
+  def findSelectedItem: Option[Item.ValueNode] =
     boundItemOpt map getCurrentItemValueFromData flatMap { current =>
       getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
         case (item, itemValue) if XFormsItemUtils.compareSingleItemValues(current, itemValue) => item

@@ -53,16 +53,19 @@ object XFormsSelect1Handler {
     }
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def isItemSelected(control: XFormsValueControl, item: Item, isMultiple: Boolean): Boolean =
-    dataValueFromControl(control) exists (dataValue =>
-      item.value exists ( itemValue =>
-        XFormsItemUtils.isSelected(
-          isMultiple = isMultiple,
-          dataValue  = dataValue,
-          itemValue  = itemValue
+  def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean): Boolean =
+    itemNode match {
+      case item: Item.ValueNode =>
+        dataValueFromControl(control) exists (dataValue =>
+          XFormsItemUtils.isSelected(
+            isMultiple = isMultiple,
+            dataValue  = dataValue,
+            itemValue  = item.value
+          )
         )
-      )
-    )
+      case _: Item.ChoiceNode =>
+        false
+    }
 
   def outputItemFullTemplate(
     baseHandler        : XFormsBaseHandlerXHTML,
@@ -93,7 +96,7 @@ object XFormsSelect1Handler {
         itemEffectiveId    = "$xforms-item-id-select" + (if (isMultiple) "" else "1") + "$", // create separate id for `select`/`select1`
         isMultiple         = isMultiple,
         fullItemType       = fullItemType,
-        item               = Item(
+        item               = Item.ValueNode(
           LHHAValue(
             "$xforms-template-label$",
             isHTML = false
@@ -106,7 +109,7 @@ object XFormsSelect1Handler {
             "$xforms-template-hint$",
             isHTML = false
           ).some,
-          Left("$xforms-template-value$").some,
+          Left("$xforms-template-value$"),
           Nil
         )( // make sure the value "$xforms-template-value$" is not encrypted
           0
@@ -129,7 +132,7 @@ object XFormsSelect1Handler {
     itemEffectiveId    : String,
     isMultiple         : Boolean,
     fullItemType       : String,
-    item               : Item,
+    item               : Item.ValueNode,
     isFirst            : Boolean,
     isBooleanInput     : Boolean,
     isStaticReadonly   : Boolean,
@@ -265,7 +268,7 @@ object XFormsSelect1Handler {
     }
   }
 
-  private def addItemAttributes(item: Item, spanAttributes: AttributesImpl): Unit =
+  private def addItemAttributes(item: ItemNode, spanAttributes: AttributesImpl): Unit =
     for {
       (attQName, attValue) <- item.attributes
       if attQName != XFormsConstants.CLASS_QNAME // `class` is handled separately
@@ -274,7 +277,7 @@ object XFormsSelect1Handler {
       spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attValue)
     }
 
-  private def getItemClasses(item: Item, initialClasses: String): String = {
+  private def getItemClasses(item: ItemNode, initialClasses: String): String = {
     val classOpt = item.classAttribute
     val sb = if (initialClasses ne null) new StringBuilder(initialClasses) else new StringBuilder
     if (classOpt.isDefined) {
@@ -411,48 +414,46 @@ class XFormsSelect1Handler(
                   inOptgroup = false
                 }
 
-              def startItem(contentHandler: XMLReceiver, item: Item, first: Boolean): Unit = {
+              def startItem(contentHandler: XMLReceiver, itemNode: ItemNode, first: Boolean): Unit = {
 
                 // TODO: Check this, which fails with the workflow UI
     //            assert(! item.label.isHTML)
 
-                val value = item.value
-                if (value.isEmpty) { //TODO: here we are handling `xf:choice` which shouldn't be done by checking the value
+                itemNode match {
+                  case item: Item.ChoiceNode =>
+                    assert(item.hasChildren)
 
-                  assert(item.hasChildren)
+                    val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
+                    val optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
 
-                  val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
-                  val optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
+                    val labelOpt = item.label map (_.label)
 
-                  val labelOpt = item.label map (_.label)
+                    labelOpt foreach { label =>
+                      optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label)
+                    }
 
-                  labelOpt foreach { label =>
-                    optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label)
-                  }
+                    // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
+                    // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
+                    // the indentation himself, it will still look right.
+                    if (inOptgroup)
+                      closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
 
-                  // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
-                  // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
-                  // the indentation himself, it will still look right.
-                  if (inOptgroup)
-                    closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
-
-                  // Start `xh:optgroup`
-                  openElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optGroupAttributes)
-                  inOptgroup = true
-                } else {
-                  gotSelected |= handleItemCompact(xhtmlPrefix, control, isMultiple, item, encode, gotSelected)
+                    // Start `xh:optgroup`
+                    openElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optGroupAttributes)
+                    inOptgroup = true
+                  case item: Item.ValueNode =>
+                    gotSelected |= handleItemCompact(xhtmlPrefix, control, isMultiple, item, encode, gotSelected)
                 }
               }
 
-              def startLevel(contentHandler: XMLReceiver, item: Item): Unit = ()
-              def endItem(contentHandler: XMLReceiver, item: Item)   : Unit = ()
+              def startLevel(contentHandler: XMLReceiver, itemNode: ItemNode): Unit = ()
+              def endItem(contentHandler: XMLReceiver, itemNode: ItemNode)   : Unit = ()
             }
           )
         }
       }
     } else {
       // Output static read-only value
-
       containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field")
       withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>
@@ -523,7 +524,7 @@ class XFormsSelect1Handler(
     //                    xmlReceiver.endElement(XHTML_NAMESPACE_URI, legendName, legendQName);
     //                }
     itemsetOpt foreach { itemset =>
-      for ((item, itemIndex) <- itemset.allItemsIterator.zipWithIndex) {
+      for (((item, _), itemIndex) <- itemset.allItemsWithValueIterator(reverse = false).zipWithIndex) {
         XFormsSelect1Handler.handleItemFull(
           baseHandler        = this,
           reusableAttributes = reusableAttributes,
@@ -553,7 +554,7 @@ class XFormsSelect1Handler(
     xhtmlPrefix    : String,
     xformsControl  : XFormsValueControl,
     isMultiple     : Boolean,
-    item           : Item,
+    item           : Item.ValueNode,
     encode         : Boolean,
     gotSelected    : Boolean)(implicit
     xmlReceiver    : XMLReceiver

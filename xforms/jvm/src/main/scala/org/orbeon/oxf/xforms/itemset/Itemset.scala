@@ -24,11 +24,19 @@ import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.saxon.{Configuration, om}
 import org.xml.sax.SAXException
 
+
+trait ItemsetListener[T] {
+  def startLevel(o: T, itemNode: ItemNode)
+  def endLevel(o: T)
+  def startItem(o: T, itemNode: ItemNode, first: Boolean)
+  def endItem(o: T, itemNode: ItemNode)
+}
+
 class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer {
 
   import Itemset._
 
-  def iterateSelectedItems(dataValue: Item.ItemValue[om.NodeInfo]): Iterator[Item] =
+  def iterateSelectedItems(dataValue: Item.ItemValue[om.NodeInfo]): Iterator[Item.ValueNode] =
     allItemsWithValueIterator(reverse = false) collect {
       case (item, itemValue) if isSelected(multiple, dataValue, itemValue) => item
     }
@@ -40,9 +48,9 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
     // Array of top-level items
     sb.append("[")
     try {
-      visit(null, new ItemsetListener[AnyRef] {
+      visit((), new ItemsetListener[Unit] {
 
-        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
+        def startItem(o: Unit, itemNode: ItemNode, first: Boolean): Unit = {
           if (! first)
             sb.append(',')
 
@@ -51,21 +59,29 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
 
           // Item LHH and value
           sb.append(""""label":"""")
-          sb.append(item.javaScriptLabel(locationData))
-          item.javaScriptHelp(locationData) foreach { h =>
-            sb.append("""","help":"""")
-            sb.append(h)
-          }
-          item.javaScriptHint(locationData) foreach { h =>
-            sb.append("""","hint":"""")
-            sb.append(h)
-          }
-          sb.append("""","value":"""")
-          sb.append(item.javaScriptValue(encode))
+          sb.append(itemNode.javaScriptLabel(locationData))
           sb.append('"')
 
+          itemNode match {
+            case item: Item.ValueNode =>
+              item.javaScriptHelp(locationData) foreach { h =>
+                sb.append(""","help":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              item.javaScriptHint(locationData) foreach { h =>
+                sb.append(""","hint":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              sb.append(""","value":"""")
+              sb.append(item.javaScriptValue(encode))
+              sb.append('"')
+            case _ =>
+          }
+
           // Item attributes if any
-          val attributes = item.attributes
+          val attributes = itemNode.attributes
           if (attributes.nonEmpty) {
             sb.append(""","attributes":{""")
 
@@ -83,30 +99,28 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
           }
 
           // Handle selection
-          val itemValueOpt = item.value
-          val itemSelected = itemValueOpt exists (itemValue => controlValue exists (isSelected(multiple, _, itemValue)))
-
-          if (itemSelected) {
-            sb.append(""","selected":""")
-            sb.append(itemSelected.toString)
+          itemNode match {
+            case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
+              sb.append(""","selected":true""")
+            case _ =>
           }
 
           // Start array of children items
-          if (item.hasChildren)
+          if (itemNode.hasChildren)
             sb.append(""","children":[""")
         }
 
-        def endItem(o: AnyRef, item: Item): Unit = {
+        def endItem(o: Unit, itemNode: ItemNode): Unit = {
           // End array of children items
-          if (item.hasChildren)
+          if (itemNode.hasChildren)
             sb.append(']')
 
           // End object
           sb.append("}")
         }
 
-        def startLevel(o: AnyRef, item: Item): Unit = ()
-        def endLevel(o: AnyRef): Unit = ()
+        def startLevel(o: Unit, itemNode: ItemNode): Unit = ()
+        def endLevel(o: Unit): Unit = ()
       })
     } catch {
       case e: SAXException =>
@@ -133,52 +147,56 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
     ch.startDocument()
     ch.startElement("itemset")
     if (hasChildren) {
-      visit(null, new ItemsetListener[AnyRef] {
+      visit((), new ItemsetListener[Unit] {
 
-        def startLevel(o: AnyRef, item: Item): Unit =
+        def startLevel(o: Unit, itemNode: ItemNode): Unit =
           ch.startElement("choices")
 
-        def endLevel(o: AnyRef): Unit =
+        def endLevel(o: Unit): Unit =
           ch.endElement()
 
-        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
-
-          val itemExternalValue = item.externalValue(encode = false)
-          val itemSelected      = item.value exists (itemValue => controlValue exists (isSelected(multiple, _, itemValue)))
+        def startItem(o: Unit, itemNode: ItemNode, first: Boolean): Unit = {
 
           val itemAttributes =
-            if (itemSelected)
-              Array("selected", "true")
-            else
-              Array[String]()
+            itemNode match {
+              case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
+                Array("selected", "true")
+              case _ =>
+                Array.empty[String]
+            }
 
           // TODO: Item attributes if any
 
           ch.startElement("item", itemAttributes)
 
           ch.startElement("label")
-          item.label foreach (_.streamAsHTML(ch, locationData))
+          itemNode.label foreach (_.streamAsHTML(ch, locationData))
           ch.endElement()
 
-          item.help foreach { h =>
-            ch.startElement("help")
-            h.streamAsHTML(ch, locationData)
-            ch.endElement()
-          }
+          itemNode match {
+            case item: Item.ValueNode =>
+              item.help foreach { h =>
+                ch.startElement("help")
+                h.streamAsHTML(ch, locationData)
+                ch.endElement()
+              }
 
-          item.hint foreach { h =>
-            ch.startElement("hint")
-            h.streamAsHTML(ch, locationData)
-            ch.endElement()
-          }
+              item.hint foreach { h =>
+                ch.startElement("hint")
+                h.streamAsHTML(ch, locationData)
+                ch.endElement()
+              }
 
-          ch.startElement("value")
-          if (itemExternalValue.nonEmpty)
-            ch.text(itemExternalValue)
-          ch.endElement()
+              val itemExternalValue = item.externalValue(encode = false)
+              ch.startElement("value")
+              if (itemExternalValue.nonEmpty)
+                ch.text(itemExternalValue)
+              ch.endElement()
+            case _ =>
+          }
         }
 
-        def endItem(o: AnyRef, item: Item): Unit =
+        def endItem(o: Unit, itemNode: ItemNode): Unit =
           ch.endElement()
       })
     }

@@ -2559,7 +2559,7 @@
                             <xxf:value>43</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-foo-2≡my-inner-select1">
-                            <xxf:itemset>[{"label":"43","value":"","children":[{"label":"Pear","value":"pear"}]},{"label":"42","value":"","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
+                            <xxf:itemset>[{"label":"43","children":[{"label":"Pear","value":"pear"}]},{"label":"42","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
                         </xxf:control>
                     </xxf:control-values>
                 </xxf:action>

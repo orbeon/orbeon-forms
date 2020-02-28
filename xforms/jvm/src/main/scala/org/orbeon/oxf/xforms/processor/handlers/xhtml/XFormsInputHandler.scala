@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{DeferredXMLReceiver, XMLReceiver, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 
@@ -81,11 +81,11 @@ class XFormsInputHandler(
       // NOTE: Put null label so that it is not output at all
       // encode = false,
       itemset.addChildItem(
-        Item(
+        Item.ValueNode(
           label      = None,
           help       = None,
           hint       = None,
-          value      = Left("true").some,
+          value      = Left("true"),
           attributes = Nil
         )(
           position   = 0

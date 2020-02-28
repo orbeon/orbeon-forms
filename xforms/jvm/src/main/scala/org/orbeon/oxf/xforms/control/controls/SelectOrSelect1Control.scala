@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.oxf.xforms.itemset.ItemNode
 import org.orbeon.saxon.om
 
 
 trait SelectOrSelect1Control {
   def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String]
-  def findSelectedItems: List[Item]
+  def findSelectedItems: List[ItemNode]
   def performDefaultAction(event: XFormsEvent): Unit
   def evaluateExternalValue(): Unit
 }

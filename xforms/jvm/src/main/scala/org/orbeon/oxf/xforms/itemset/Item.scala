@@ -20,56 +20,76 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om
 
 
-sealed trait ItemNode
-case class ItemLeaf()   extends ItemNode
-case class ChoiceLeaf() extends ItemNode
-
-object Item {
-  type ItemValue[T <: om.Item] = String Either List[T]
+sealed trait ItemNode extends ItemContainer with ItemNodeImpl {
+  val label      : Option[LHHAValue] // TODO: should be just `LHHAValue`?
+  val attributes : List[(QName, String)]
+  val position   : Int
+  def iterateLHHA: Iterator[(String, LHHAValue)]
 }
 
-// Represents an item (`xf:item`, `xf:choice`, or item in an itemset)
-case class Item(
-  label      : Option[LHHAValue],
-  help       : Option[LHHAValue],
-  hint       : Option[LHHAValue],
-  value      : Option[Item.ItemValue[om.Item]],
-  attributes : List[(QName, String)])(val
-  position   : Int
-) extends ItemContainer {
+object Item {
+
+  type ItemValue[T <: om.Item] = String Either List[T]
+
+  case class ValueNode(
+    label      : Option[LHHAValue],
+    help       : Option[LHHAValue],
+    hint       : Option[LHHAValue],
+    value      : Item.ItemValue[om.Item],
+    attributes : List[(QName, String)])(val
+    position   : Int
+  ) extends
+    ItemNode with ItemLeafImpl
+
+  case class ChoiceNode(
+    label      : Option[LHHAValue],
+    attributes : List[(QName, String)])(val
+    position   : Int
+  ) extends
+    ItemNode with ChoiceLeafImpl
+}
+
+sealed trait ItemNodeImpl {
+
+  self: ItemNode =>
+
+  require(attributes ne null)
+
+  def javaScriptLabel(locationData: LocationData): String =
+    label map (_.javaScriptValue(locationData)) getOrElse ""
+
+  def classAttribute: Option[String] =
+    attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
+}
+
+sealed trait ItemLeafImpl {
+
+  self: Item.ValueNode =>
 
   // We allow the empty string for label value, but somehow we don't allow this for help and hint
   require(help.isEmpty  || help.exists(_.label.nonEmpty))
   require(hint.isEmpty  || hint.exists(_.label.nonEmpty))
   require(value ne null)
-  require(attributes ne null)
 
   // `label` can be `None` in these cases:
   //
-  // - `xf:choice` with (see XFormsUtils.getElementValue())
+  // - `xf:choices` with (see `XFormsUtils.getElementValue()`)
   //   - single-node binding that doesn't point to an acceptable item
   //   - value attribute but the evaluation context is empty
   //   - exception when dereferencing an @src attribute
   // - `xf|input:xxf-type(xs:boolean)`
-
-  def classAttribute: Option[String] =
-    attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
 
   def externalValue(encode: Boolean): String =
     if (encode)
       position.toString
     else
       value match {
-        case Some(Left(v))  => v
-        case Some(Right(_)) => position.toString
-        case None           => ""
+        case Left(v)  => v
+        case Right(_) => position.toString
       }
 
   def javaScriptValue(encode: Boolean): String =
     escapeJavaScript(externalValue(encode))
-
-  def javaScriptLabel(locationData: LocationData): String =
-    label map (_.javaScriptValue(locationData)) getOrElse ""
 
   def javaScriptHelp(locationData: LocationData): Option[String] =
     help map (_.javaScriptValue(locationData))
@@ -77,11 +97,18 @@ case class Item(
   def javaScriptHint(locationData: LocationData): Option[String] =
     hint map (_.javaScriptValue(locationData))
 
+  def iterateLHHA: Iterator[(String, LHHAValue)] =
+    Iterator(
+      label map ("label" ->),
+      help  map ("help"  ->),
+      hint  map ("hint"  ->)
+    ).flatten
+
   // Implement equals by hand because children are not part of the case class
   // NOTE: The compiler does not generate equals for case classes that come with an equals! So can't use super to
   // reach compiler-generated case class equals. Is there a better way?
   override def equals(other: Any): Boolean = other match {
-    case other: Item =>
+    case other: Item.ValueNode =>
       label                         == other.label                         &&
       help                          == other.help                          &&
       hint                          == other.hint                          &&
@@ -90,11 +117,22 @@ case class Item(
       super.equals(other)
     case _ => false
   }
+}
+
+sealed trait ChoiceLeafImpl {
+
+  self: Item.ChoiceNode =>
 
   def iterateLHHA: Iterator[(String, LHHAValue)] =
     Iterator(
-      label map ("label" ->),
-      help  map ("help"  ->),
-      hint  map ("hint"  ->)
+      label map ("label" ->)
     ).flatten
+
+  override def equals(other: Any): Boolean = other match {
+    case other: Item.ChoiceNode =>
+      label      == other.label      &&
+      attributes == other.attributes &&
+      super.equals(other)
+    case _ => false
+  }
 }

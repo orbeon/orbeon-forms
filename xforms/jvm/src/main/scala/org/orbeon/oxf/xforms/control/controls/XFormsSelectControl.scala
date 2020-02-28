@@ -56,8 +56,8 @@ class XFormsSelectControl(
    */
   override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
-    def filterItemsReturnValues(f: itemset.Item => Boolean): List[ItemValue[om.Item]] =
-      (getItemset.allItemsIterator filter f flatMap (_.value)).to(List)
+    def filterItemsReturnValues(f: itemset.Item.ValueNode => Boolean): List[ItemValue[om.Item]] =
+      (getItemset.allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
 
     val dataItemValues =
       getCurrentItemValueFromData(boundItem) match {
@@ -119,7 +119,7 @@ class XFormsSelectControl(
     setExternalValue(updatedValue)
   }
 
-  override def findSelectedItems: List[itemset.Item] =
+  override def findSelectedItems: List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
         getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem)).to(List)

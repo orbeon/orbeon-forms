@@ -296,11 +296,11 @@ extends InputValueControl
             }
 
             currentContainer.addChildItem(
-              Item(
+              Item.ValueNode(
                 label      = labelOpt,
                 help       = helpOpt,
                 hint       = hintOpt,
-                value      = Left(stringValue).some,
+                value      = Left(stringValue),
                 attributes = SelectionControlUtil.getAttributes(element)
               )(
                 position   = position
@@ -320,11 +320,8 @@ extends InputValueControl
             val labelOpt = findLhhValue(LABEL_QNAME, required = false)
 
             labelOpt foreach { _ =>
-              val newContainer = Item(
+              val newContainer = Item.ChoiceNode(
                 label      = labelOpt,
-                help       = None,
-                hint       = None,
-                value      = None,
                 attributes = SelectionControlUtil.getAttributes(element)
               )(
                 position   = position

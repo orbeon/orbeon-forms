@@ -17,23 +17,19 @@ import org.orbeon.saxon.om
 
 trait ItemContainer {
 
-  var level: Int = 0
-  def isTopLevel: Boolean = level == 0
+  protected var _parent: ItemContainer = null
+  def parent: ItemContainer = _parent
 
-  var parent: ItemContainer = null
+  private var _childrenReversed: List[ItemNode] = Nil
 
-  private var _children: List[Item] = Nil
-
-  def addChildItem(childItem: Item): Unit = {
-    childItem.level = level
-    childItem.parent = this
-
-    _children ::= childItem
+  def addChildItem(childItem: ItemNode): Unit = {
+    childItem._parent = this
+    _childrenReversed ::= childItem
   }
 
-  def hasChildren: Boolean = _children.nonEmpty
-  def children: List[Item] = _children.reverse
-  def lastChild: Item = _children.head
+  def hasChildren: Boolean = _childrenReversed.nonEmpty
+  def children: List[ItemNode] = _childrenReversed.reverse
+  def lastChild: ItemNode = _childrenReversed.head
 
   // Visit the entire itemset
   def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
@@ -51,33 +47,31 @@ trait ItemContainer {
   }
 
   // Depth-first Iterator over all the items of this and children
-  def allItemsIterator: Iterator[Item] =
+  def allItemsIterator: Iterator[ItemNode] =
     selfIterator ++ (children.iterator flatMap (_.allItemsIterator))
 
   // Same as `allItemsIterator` but in reverse order
-  def allItemsReverseIterator: Iterator[Item] =
-    (_children.iterator flatMap (_.allItemsReverseIterator)) ++ selfIterator
+  def allItemsReverseIterator: Iterator[ItemNode] =
+    (_childrenReversed.iterator flatMap (_.allItemsReverseIterator)) ++ selfIterator
 
-  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item, Item.ItemValue[om.Item])] =
-    for {
-      currentItem      <- if (reverse) allItemsReverseIterator else allItemsIterator
-      currentItemValue <- currentItem.value.iterator // TODO: `value` should not be an `Option`?
-    } yield
-      currentItem -> currentItemValue
+  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item.ValueNode, Item.ItemValue[om.Item])] =
+    (if (reverse) allItemsReverseIterator else allItemsIterator) collect {
+      case l: Item.ValueNode => l -> l.value
+    }
 
   override def equals(other: Any): Boolean = other match {
-    case c: ItemContainer => _children == c._children
+    case c: ItemContainer => _childrenReversed == c._childrenReversed
     case _                => false
   }
 
-  private def selfIterator: Iterator[Item] =
+  private def selfIterator: Iterator[ItemNode] =
     this match {
-      case item: Item => Iterator.single(item)
-      case _          => Iterator.empty
+      case item: ItemNode => Iterator.single(item)
+      case _              => Iterator.empty
     }
 
-  private def selfItem = this match {
-    case item: Item => item
-    case _          => null
+  private def selfItem: ItemNode = this match {
+    case item: ItemNode => item
+    case _              => null
   }
 }

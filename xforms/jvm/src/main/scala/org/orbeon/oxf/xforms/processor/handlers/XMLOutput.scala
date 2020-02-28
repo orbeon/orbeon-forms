@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHA}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml._
@@ -113,12 +114,16 @@ object XMLOutput extends XMLReceiverSupport {
       implicit val _xmlReceiver = xmlReceiver
       withElement("items") {
         c.getItemset.allItemsIterator foreach { item =>
-            val attsList = item.attributes map { case (k, v) => k.uriQualifiedName -> v }
-            withElement(localName = "item", atts = List("value" -> item.externalValue(encode = false)) ++ attsList) {
-              item.iterateLHHA foreach { case (name, lhha) =>
-                writeTextOrHTML(name, lhha.label, lhha.isHTML)
-              }
+          val attsList = item.attributes map { case (k, v) => k.uriQualifiedName -> v }
+          val value = item match {
+            case item: Item.ValueNode  => item.externalValue(encode = false)
+            case _: Item.ChoiceNode    => ""
+          }
+          withElement(localName = "item", atts = ("value" -> value) :: attsList) {
+            item.iterateLHHA foreach { case (name, lhha) =>
+              writeTextOrHTML(name, lhha.label, lhha.isHTML)
             }
+          }
         }
       }
     }

@@ -57,7 +57,7 @@ class ItemsetActionTest
 
             def assertOne(control: XFormsComponentControl, itemValueOpt: Option[String]) = itemValueOpt match {
               case Some(itemValue) =>
-                assert(getItemsetSearchNested(control).get.allItemsIterator exists (_.value.contains(Left(itemValue))))
+                assert(getItemsetSearchNested(control).get.allItemsWithValueIterator(reverse = false) exists (_._2 == Left(itemValue)))
               case None =>
                 assert(1 === getItemsetSearchNested(control).get.allItemsIterator.size) // because fr:dropdown has a blank item
             }

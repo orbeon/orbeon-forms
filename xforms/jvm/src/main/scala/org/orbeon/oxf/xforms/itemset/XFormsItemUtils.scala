@@ -136,7 +136,7 @@ object XFormsItemUtils {
 
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
-                  createItem(elem, position, labelOnly = false) foreach { newItem =>
+                  createItemLeaf(elem, position) foreach { newItem =>
                     currentContainer.addChildItem(newItem)
                     position += 1
                   }
@@ -157,18 +157,13 @@ object XFormsItemUtils {
 
                       val currentXPathItem = currentSequence.get(currentPosition - 1)
 
-                      // Handle children of xf:itemset
-
                       // We support relevance of items as an extension to XForms
-
                       // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
                       // well. If a node is non-relevant, it should be as if it had not even been part of
                       // the nodeset.
                       if (XFormsSingleNodeControl.isRelevantItem(currentXPathItem)) {
-                        createItem(elem, position, labelOnly = false) foreach { newItem =>
-
+                        createItemLeaf(elem, position) foreach { newItem =>
                           levelAndStack = updatedLevelAndItemStack(levelAndStack, currentXPathItem)
-
                           currentContainer.addChildItem(newItem)
                           position += 1
                         }
@@ -180,11 +175,10 @@ object XFormsItemUtils {
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
                   if (elem.elementOpt(LABEL_QNAME).isDefined) {
-                    createItem(elem, position, labelOnly = true) foreach { newItem =>
-                      currentContainer.addChildItem(newItem)
-                      position += 1
-                      currentContainer = newItem
-                    }
+                    val newItem = createChoiceLeaf(elem, position)
+                    currentContainer.addChildItem(newItem)
+                    position += 1
+                    currentContainer = newItem
                   }
                 case _ =>
               }
@@ -235,21 +229,26 @@ object XFormsItemUtils {
               (newLevel, currentXPathItem :: newItemStack)
             }
 
-            private def createItem(elem: Element, position: Int, labelOnly: Boolean): Option[Item] = {
-
-              val value = if (! labelOnly) getValueOrCopyValue(elem) else None
-
-              (labelOnly || value.nonEmpty) option
-                Item(
+            private def createItemLeaf(elem: Element, position: Int): Option[ItemNode] =
+              getValueOrCopyValue(elem) map { value =>
+                Item.ValueNode(
                   label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true),
-                  help       = ! labelOnly flatOption findLhhValue(elem.elementOpt(HELP_QNAME),  required = false),
-                  hint       = ! labelOnly flatOption findLhhValue(elem.elementOpt(HINT_QNAME),  required = false),
+                  help       = findLhhValue(elem.elementOpt(HELP_QNAME),  required = false),
+                  hint       = findLhhValue(elem.elementOpt(HINT_QNAME),  required = false),
                   value      = value,
                   attributes = getAttributes(elem)
                 )(
                   position   = position
                 )
-            }
+              }
+
+            private def createChoiceLeaf(elem: Element, position: Int): Item.ChoiceNode =
+              Item.ChoiceNode(
+                label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true),
+                attributes = getAttributes(elem)
+              )(
+                position   = position
+              )
 
             private def getValueOrCopyValue(elem: Element): Option[Item.ItemValue[om.Item]] = {
 

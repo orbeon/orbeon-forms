@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
-import org.orbeon.oxf.xforms.itemset.{Item, LHHAValue}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, LHHAValue}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
@@ -50,7 +50,7 @@ object FormRunnerMetadata {
     repeated     : Boolean,
     iterations   : List[Int],
     datatype     : Option[String],
-    lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[Item]))],
+    lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[ItemNode]))],
     value        : Option[ControlValue],
     forHashes    : List[String]
   )
@@ -338,7 +338,7 @@ object FormRunnerMetadata {
       lang          : Lang,
       resourcesRoot : NodeInfo,
       controlName   : String
-    ): (List[(LHHA, String)], List[Item]) = {
+    ): (List[(LHHA, String)], List[ItemNode]) = {
 
       val enclosingHolder = resourcesRoot descendant controlName take 1
 
@@ -353,11 +353,11 @@ object FormRunnerMetadata {
       val items =
         for ((item, position) <- enclosingHolder child Names.Item zipWithIndex)
         yield
-          itemset.Item(
+          itemset.Item.ValueNode(
             label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false).some, // TODO isHTML
             help       = item elemValueOpt LHHA.Help.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
             hint       = item elemValueOpt LHHA.Hint.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
-            value      = item elemValueOpt Names.Value map Left.apply,
+            value      = Left(item elemValueOpt Names.Value getOrElse ""),
             attributes = Nil
           )(position)
 
@@ -428,7 +428,7 @@ object FormRunnerMetadata {
                     // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
                     val itemOpt =
                       if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
-                        select1Control.findSelectedItem filter (_.value exists {
+                        select1Control.findSelectedItem filter (_.value match {
                           case Left(v) if v.nonBlank => true
                           case _                     => false
                         })

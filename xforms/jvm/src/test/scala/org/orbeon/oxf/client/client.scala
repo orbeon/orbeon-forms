@@ -268,8 +268,8 @@ trait FormBuilderOps extends FormRunnerOps {
       Option(
         executeScript(
           "return ORBEON.jQuery('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
-          new java.lang.Integer(row),
-          new java.lang.Integer(col)
+          java.lang.Integer.valueOf(row),
+          java.lang.Integer.valueOf(col)
         ).asInstanceOf[WebElement]
       )
 

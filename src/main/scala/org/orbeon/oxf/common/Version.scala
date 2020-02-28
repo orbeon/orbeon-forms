@@ -98,7 +98,7 @@ object Version {
     def fromName =
       Class.forName(versionClassName).asInstanceOf[Class[Version]]
 
-    fromContextClassLoaderOpt getOrElse fromName newInstance
+    (fromContextClassLoaderOpt getOrElse fromName).getConstructor().newInstance()
   }
 
   //@XPathFunction

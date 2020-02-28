@@ -107,7 +107,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
       case Some(entry) =>
         val functionClass = entry.implementationClass
         val f =
-          try functionClass.newInstance.asInstanceOf[SystemFunction]
+          try functionClass.getConstructor().newInstance().asInstanceOf[SystemFunction]
           catch {
             case NonFatal(t) => throw new OXFException("Failed to load function: " + t.getMessage, t)
           }

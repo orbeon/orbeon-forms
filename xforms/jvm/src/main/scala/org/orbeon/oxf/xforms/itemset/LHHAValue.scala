@@ -17,17 +17,18 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, streamHTMLFragment}
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
-import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 case class LHHAValue(label: String, isHTML: Boolean) {
 
-  def streamAsHTML(ch: XMLReceiverHelper, locationData: LocationData): Unit =
+  def streamAsHTML(locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
     if (label.nonBlank) {
       if (isHTML)
-        streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
+        streamHTMLFragment(xmlReceiver, label, locationData, "")
       else
-        ch.text(label)
+        text(label)
     }
 
   def htmlValue(locationData: LocationData): String =

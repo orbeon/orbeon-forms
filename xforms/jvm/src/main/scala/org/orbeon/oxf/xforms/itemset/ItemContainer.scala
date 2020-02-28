@@ -32,19 +32,18 @@ trait ItemContainer {
   def lastChild: ItemNode = _childrenReversed.head
 
   // Visit the entire itemset
-  def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
+  def visit[T](listener: ItemsetListener): Unit =
     if (hasChildren) {
-      listener.startLevel(o, selfItem) // Item is used only by menu, not ideal!
+      listener.startLevel(selfItem) // Item is used only by menu, not ideal!
       var first = true
       for (item <- children) {
-        listener.startItem(o, item, first)
-        item.visit(o, listener)
-        listener.endItem(o, item)
+        listener.startItem(item, first)
+        item.visit(listener)
+        listener.endItem(item)
         first = false
       }
-      listener.endLevel(o)
+      listener.endLevel()
     }
-  }
 
   // Depth-first Iterator over all the items of this and children
   def allItemsIterator: Iterator[ItemNode] =

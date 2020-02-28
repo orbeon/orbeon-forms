@@ -399,20 +399,19 @@ class XFormsSelect1Handler(
       withElement(localName = "select", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>
           itemset.visit(
-            xmlReceiver,
-            new ItemsetListener[XMLReceiver] {
+            new ItemsetListener {
 
               var inOptgroup  = false // nesting groups is not allowed, avoid it
               var gotSelected = false
 
-              def endLevel(contentHandler: XMLReceiver): Unit =
+              def endLevel(): Unit =
                 if (inOptgroup) {
                   // End `xh:optgroup`
                   closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
                   inOptgroup = false
                 }
 
-              def startItem(contentHandler: XMLReceiver, itemNode: ItemNode, first: Boolean): Unit = {
+              def startItem(itemNode: ItemNode, first: Boolean): Unit = {
 
                 // TODO: Check this, which fails with the workflow UI
     //            assert(! item.label.isHTML)
@@ -440,8 +439,8 @@ class XFormsSelect1Handler(
                 }
               }
 
-              def startLevel(contentHandler: XMLReceiver, itemNode: ItemNode): Unit = ()
-              def endItem(contentHandler: XMLReceiver, itemNode: ItemNode)   : Unit = ()
+              def startLevel(itemNode: ItemNode): Unit = ()
+              def endItem(itemNode: ItemNode)   : Unit = ()
             }
           )
         }
@@ -459,7 +458,7 @@ class XFormsSelect1Handler(
           } locally {
             if (selectedFound)
               ch.text(" - ")
-            currentItem.label.streamAsHTML(ch, control.getLocationData)
+            currentItem.label.streamAsHTML(control.getLocationData)
             selectedFound = true
           }
         }

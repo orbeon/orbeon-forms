@@ -15,21 +15,22 @@ package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils.isSelected
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport.isSelected
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.saxon.{Configuration, om}
 import org.xml.sax.SAXException
 
 
-trait ItemsetListener[T] {
-  def startLevel(o: T, itemNode: ItemNode)
-  def endLevel(o: T)
-  def startItem(o: T, itemNode: ItemNode, first: Boolean)
-  def endItem(o: T, itemNode: ItemNode)
+trait ItemsetListener {
+  def startLevel(itemNode: ItemNode)
+  def endLevel()
+  def startItem(itemNode: ItemNode, first: Boolean)
+  def endItem(itemNode: ItemNode)
 }
 
 class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer {
@@ -48,9 +49,9 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
     // Array of top-level items
     sb.append("[")
     try {
-      visit((), new ItemsetListener[Unit] {
+      visit(new ItemsetListener {
 
-        def startItem(o: Unit, itemNode: ItemNode, first: Boolean): Unit = {
+        def startItem(itemNode: ItemNode, first: Boolean): Unit = {
           if (! first)
             sb.append(',')
 
@@ -110,7 +111,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
             sb.append(""","children":[""")
         }
 
-        def endItem(o: Unit, itemNode: ItemNode): Unit = {
+        def endItem(itemNode: ItemNode): Unit = {
           // End array of children items
           if (itemNode.hasChildren)
             sb.append(']')
@@ -119,8 +120,8 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
           sb.append("}")
         }
 
-        def startLevel(o: Unit, itemNode: ItemNode): Unit = ()
-        def endLevel(o: Unit): Unit = ()
+        def startLevel(itemNode: ItemNode): Unit = ()
+        def endLevel(): Unit = ()
       })
     } catch {
       case e: SAXException =>
@@ -142,66 +143,66 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
     val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
     identity.setResult(treeBuilder)
 
-    val ch = new XMLReceiverHelper(identity)
+    implicit val xmlReceiver: XMLReceiver = identity
 
-    ch.startDocument()
-    ch.startElement("itemset")
-    if (hasChildren) {
-      visit((), new ItemsetListener[Unit] {
+    withDocument {
+      withElement("itemset") {
+        if (hasChildren) {
+          visit(new ItemsetListener {
 
-        def startLevel(o: Unit, itemNode: ItemNode): Unit =
-          ch.startElement("choices")
+            def startLevel(itemNode: ItemNode): Unit =
+              openElement("choices")
 
-        def endLevel(o: Unit): Unit =
-          ch.endElement()
+            def endLevel(): Unit =
+              closeElement("choices")
 
-        def startItem(o: Unit, itemNode: ItemNode, first: Boolean): Unit = {
+            def startItem(itemNode: ItemNode, first: Boolean): Unit = {
 
-          val itemAttributes =
-            itemNode match {
-              case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
-                Array("selected", "true")
-              case _ =>
-                Array.empty[String]
+              val itemAttributes =
+                itemNode match {
+                  case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
+                    List("selected" -> "true")
+                  case _ =>
+                    Nil
+                }
+
+              // TODO: Item attributes if any
+
+              openElement("item", atts = itemAttributes)
+
+              withElement("label") {
+                itemNode.label.streamAsHTML(locationData)
+              }
+
+              itemNode match {
+                case item: Item.ValueNode =>
+                  item.help foreach { h =>
+                    withElement("help") {
+                      h.streamAsHTML(locationData)
+                    }
+                  }
+
+                  item.hint foreach { h =>
+                    withElement("hint") {
+                      h.streamAsHTML(locationData)
+                    }
+                  }
+
+                  val itemExternalValue = item.externalValue(encode = false)
+                  withElement("value") {
+                    if (itemExternalValue.nonEmpty)
+                      text(itemExternalValue)
+                  }
+                case _ =>
+              }
             }
 
-          // TODO: Item attributes if any
-
-          ch.startElement("item", itemAttributes)
-
-          ch.startElement("label")
-          itemNode.label.streamAsHTML(ch, locationData)
-          ch.endElement()
-
-          itemNode match {
-            case item: Item.ValueNode =>
-              item.help foreach { h =>
-                ch.startElement("help")
-                h.streamAsHTML(ch, locationData)
-                ch.endElement()
-              }
-
-              item.hint foreach { h =>
-                ch.startElement("hint")
-                h.streamAsHTML(ch, locationData)
-                ch.endElement()
-              }
-
-              val itemExternalValue = item.externalValue(encode = false)
-              ch.startElement("value")
-              if (itemExternalValue.nonEmpty)
-                ch.text(itemExternalValue)
-              ch.endElement()
-            case _ =>
-          }
+            def endItem(itemNode: ItemNode): Unit =
+              closeElement("item")
+          })
         }
-
-        def endItem(o: Unit, itemNode: ItemNode): Unit =
-          ch.endElement()
-      })
+      }
     }
-    ch.endElement()
-    ch.endDocument()
 
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }

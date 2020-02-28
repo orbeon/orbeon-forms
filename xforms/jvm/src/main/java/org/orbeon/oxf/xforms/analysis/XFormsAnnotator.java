@@ -294,6 +294,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                                         htmlElementId = reusableStringArray[0];
 
                                         // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
+                                        // TODO: 2020-02-27: There are no more repeat templates. Check this.
                                     }
 
                                     if (!elementWithAVTHasBeenOutput) {

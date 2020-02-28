@@ -172,7 +172,7 @@ class LHHAAnalysis(
 
   // TODO: make use of static value
   //
-  // - output static value in HTML markup and repeat templates
+  // - output static value in HTML markup
   // - if has static value, don't attempt to compare values upon diff, and never send new related information to client
   // - 2017-10-17: Now using this in `XFormsLHHAControl`.
   //

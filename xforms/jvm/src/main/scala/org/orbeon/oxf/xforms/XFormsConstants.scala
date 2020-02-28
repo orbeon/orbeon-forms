@@ -59,7 +59,7 @@ object XFormsConstants {
       "xbl",
       "binding",
       "handlers",
-      "handler", // just for the case of top-level <xbl:handler>
+      "handler", // just for the case of top-level `<xbl:handler>`
       "implementation",
       "template"
     )

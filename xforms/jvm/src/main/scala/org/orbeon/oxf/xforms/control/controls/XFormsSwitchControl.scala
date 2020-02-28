@@ -346,6 +346,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         case _ =>
           // Control was not relevant, send all deselected to be sure
           // TODO: This should not be needed because the repeat template should have a reasonable default.
+          // TODO: 2020-02-27: There are no more repeat templates. Check this.
           getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl =>
             ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
               "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),

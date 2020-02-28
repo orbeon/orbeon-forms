@@ -46,8 +46,8 @@ object Position {
   def adjustedOffset(el: JQuery): Offset = {
     val rawOffset = Offset(el)
     Offset(
-      left = rawOffset.left,
-      top  = rawOffset.top + scrollTop()
+      left = rawOffset.left + scrollLeft(),
+      top  = rawOffset.top  + scrollTop()
     )
   }
 

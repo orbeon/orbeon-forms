@@ -251,10 +251,16 @@ extends InputValueControl
 
               val containsHTML = Array[Boolean](false)
 
-              val valueOpt = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, lhhaElem, isFull, containsHTML).trimAllToOpt
+              val valueOpt =
+                XFormsUtils.getStaticChildElementValue(
+                  containerScope.fullPrefix,
+                  lhhaElem,
+                  isFull,
+                  containsHTML
+                ).trimAllToOpt
 
               if (required)
-                Some(LHHAValue(valueOpt getOrElse "", containsHTML(0)))
+                LHHAValue(valueOpt getOrElse "", containsHTML(0)).some
               else
                 valueOpt map (LHHAValue(_, containsHTML(0)))
 
@@ -277,36 +283,43 @@ extends InputValueControl
             val helpOpt  = findLhhValue(HELP_QNAME,  required = false)
             val hintOpt  = findLhhValue(HINT_QNAME,  required = false)
 
-            val stringValue = {
-              val valueElement = element.element(XFORMS_VALUE_QNAME)
-              if (valueElement eq null)
-                throw new ValidationException(
-                  "xf:item must contain an xf:value element.",
-                  ElementAnalysis.createLocationData(element)
+            val valueOpt = {
+
+              val rawValue =
+                element.elementOpt(XFORMS_VALUE_QNAME) map (
+                  XFormsUtils.getStaticChildElementValue(
+                    containerScope.fullPrefix,
+                    _,
+                    false,
+                    null
+                  )
+                ) getOrElse (
+                  throw new ValidationException(
+                    "xf:item must contain an xf:value element.",
+                    ElementAnalysis.createLocationData(element)
+                  )
                 )
 
-              Option(
-                XFormsUtils.getStaticChildElementValue(
-                  containerScope.fullPrefix,
-                  valueElement,
-                  false,
-                  null
-                )
-              ) getOrElse ""
+              if (isMultiple)
+                rawValue.trimAllToOpt
+              else
+                rawValue.some
             }
 
-            currentContainer.addChildItem(
-              Item.ValueNode(
-                label      = labelOpt getOrElse LHHAValue.Empty,
-                help       = helpOpt,
-                hint       = hintOpt,
-                value      = Left(stringValue),
-                attributes = SelectionControlUtil.getAttributes(element)
-              )(
-                position   = position
+            valueOpt foreach { value =>
+              currentContainer.addChildItem(
+                Item.ValueNode(
+                  label      = labelOpt getOrElse LHHAValue.Empty,
+                  help       = helpOpt,
+                  hint       = hintOpt,
+                  value      = Left(value),
+                  attributes = SelectionControlUtil.getAttributes(element)
+                )(
+                  position   = position
+                )
               )
-            )
-            position += 1
+              position += 1
+            }
 
           case XFORMS_ITEMSET_QNAME => // xf:itemset
 
@@ -337,9 +350,7 @@ extends InputValueControl
 
       def endElement(element: Element): Unit =
         if (element.getQName == XFORMS_CHOICES_QNAME) {
-          // xf:choices
-          val labelElement = element.element(LABEL_QNAME)
-          if (labelElement ne null)
+          if (element.elementOpt(LABEL_QNAME).isDefined)
             currentContainer = currentContainer.parent
         }
 

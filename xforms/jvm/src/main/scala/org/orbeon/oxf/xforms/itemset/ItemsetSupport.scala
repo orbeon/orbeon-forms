@@ -61,9 +61,8 @@ object ItemsetSupport {
 
   def compareMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean =
     (dataValue, itemValue) match {
-      case (Left(dataValue), Left(itemValue)) =>
+      case (Left(dataValue), Left(trimmedItemValue)) =>
         val trimmedControlValue = dataValue.trimAllToEmpty
-        val trimmedItemValue    = itemValue.trimAllToEmpty // TODO: trim during itemset construction
 
         if (trimmedControlValue.isEmpty)
           trimmedItemValue.isEmpty // special case
@@ -136,7 +135,7 @@ object ItemsetSupport {
 
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
-                  createItemLeaf(elem, position) foreach { newItem =>
+                  createValueNode(elem, position) foreach { newItem =>
                     currentContainer.addChildItem(newItem)
                     position += 1
                   }
@@ -162,7 +161,7 @@ object ItemsetSupport {
                       // well. If a node is non-relevant, it should be as if it had not even been part of
                       // the nodeset.
                       if (XFormsSingleNodeControl.isRelevantItem(currentXPathItem)) {
-                        createItemLeaf(elem, position) foreach { newItem =>
+                        createValueNode(elem, position) foreach { newItem =>
                           levelAndStack = updatedLevelAndItemStack(levelAndStack, currentXPathItem)
                           currentContainer.addChildItem(newItem)
                           position += 1
@@ -175,7 +174,7 @@ object ItemsetSupport {
                   contextStack.pushBinding(elem, getElementEffectiveId(elem), select1Control.getChildElementScope(elem))
 
                   if (elem.elementOpt(LABEL_QNAME).isDefined) {
-                    val newItem = createChoiceLeaf(elem, position)
+                    val newItem = createChoiceNode(elem, position)
                     currentContainer.addChildItem(newItem)
                     position += 1
                     currentContainer = newItem
@@ -229,8 +228,8 @@ object ItemsetSupport {
               (newLevel, currentXPathItem :: newItemStack)
             }
 
-            private def createItemLeaf(elem: Element, position: Int): Option[ItemNode] =
-              getValueOrCopyValue(elem) map { value =>
+            private def createValueNode(elem: Element, position: Int): Option[Item.ValueNode] =
+              getValueOrCopyItemValue(elem) map { value =>
                 Item.ValueNode(
                   label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
                   help       = findLhhValue(elem.elementOpt(HELP_QNAME),  required = false),
@@ -242,7 +241,7 @@ object ItemsetSupport {
                 )
               }
 
-            private def createChoiceLeaf(elem: Element, position: Int): Item.ChoiceNode =
+            private def createChoiceNode(elem: Element, position: Int): Item.ChoiceNode =
               Item.ChoiceNode(
                 label      = findLhhValue(elem.elementOpt(LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
                 attributes = getAttributes(elem)
@@ -250,7 +249,7 @@ object ItemsetSupport {
                 position   = position
               )
 
-            private def getValueOrCopyValue(elem: Element): Option[Item.Value[om.Item]] = {
+            private def getValueOrCopyItemValue(elem: Element): Option[Item.Value[om.Item]] = {
 
               def fromValueElem =
                 elem.elementOpt(XFORMS_VALUE_QNAME) flatMap
@@ -266,15 +265,28 @@ object ItemsetSupport {
               fromValueElem orElse fromCopyElem
             }
 
-            private def getValueValue(valueElem: Element): Option[String] =
-              getChildElementValue(
-                container          = container,
-                sourceEffectiveId  = getElementEffectiveId(valueElem),
-                scope              = select1Control.getChildElementScope(valueElem),
-                childElement       = valueElem,
-                acceptHTML         = false,
-                defaultHTML        = false
-              )._1
+            private def getValueValue(valueElem: Element): Option[String] = {
+
+              val rawValue =
+                getChildElementValue(
+                  container          = container,
+                  sourceEffectiveId  = getElementEffectiveId(valueElem),
+                  scope              = select1Control.getChildElementScope(valueElem),
+                  childElement       = valueElem,
+                  acceptHTML         = false,
+                  defaultHTML        = false
+                )._1
+
+              // For multiple selection:
+              //
+              // - trim the value
+              // - if the value is blank, it can't be used and the item is excluded
+              //
+              if (select1Control.staticControl.isMultiple)
+                rawValue flatMap (_.trimAllToOpt)
+              else
+                rawValue
+            }
 
             // Return `None` if:
             //

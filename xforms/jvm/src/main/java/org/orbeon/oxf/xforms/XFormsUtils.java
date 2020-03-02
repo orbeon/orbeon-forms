@@ -137,12 +137,11 @@ public class XFormsUtils {
      * @param childElement          element to evaluate (xf:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
+     * @return                      string containing the result of the evaluation
      */
     public static String getStaticChildElementValue(final String prefix, final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
-        // Check that there is a current child element
-        if (childElement == null)
-            return null;
+
+        assert childElement != null;
 
         // No HTML found by default
         if (containsHTML != null)

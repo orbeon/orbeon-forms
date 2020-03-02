@@ -1341,7 +1341,7 @@
                         }}" aria-current="{{
                             if ($section-active) then 'page' else 'false'
                         }}" aria-disabled="{{
-                            if ($section-active) then 'true' else 'false'
+                            if (not($top-level-section-available)) then 'true' else 'false'
                         }}">
 
                             <xf:trigger appearance="minimal">

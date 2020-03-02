@@ -1179,6 +1179,7 @@
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
                         <xh:div class="fr-wizard-other">
+                            <xh:div class="fr-wizard-cell-placeholder"/>
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <xsl:apply-templates select="* except fr:section"/>
                             </xf:group>

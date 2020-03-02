@@ -37,7 +37,7 @@ class XFormsSelectControlTest
       def setToList(s: Set[String]): List[Left[String, Nothing]] =
         (s map Left.apply).to(List)
 
-      def listToSet(l: List[Item.ItemValue[om.Item]]): Set[String] =
+      def listToSet(l: List[Item.Value[om.Item]]): Set[String] =
         (
           l collect {
             case Left(s) => s

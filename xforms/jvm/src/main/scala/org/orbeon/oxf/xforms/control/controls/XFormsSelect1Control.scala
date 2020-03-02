@@ -132,7 +132,7 @@ class XFormsSelect1Control(
     }
 
   // The current value depends on whether we follow `xf:copy` or `xf:value` semantics
-  def getCurrentItemValueFromData(boundItem: om.Item): Item.ItemValue[om.NodeInfo] = {
+  def getCurrentItemValueFromData(boundItem: om.Item): Item.Value[om.NodeInfo] = {
     if (staticControl.useCopy)
       Right(
         boundItem match {
@@ -200,7 +200,7 @@ class XFormsSelect1Control(
 
   private def gatherEventsForExternalValue(
     itemset          : Itemset,
-    dataValue        : Item.ItemValue[om.NodeInfo],
+    dataValue        : Item.Value[om.NodeInfo],
     newExternalValue : String
   ): (List[XFormsSelectEvent], List[XFormsDeselectEvent]) =
     itemset.allItemsWithValueIterator(reverse = true).foldLeft((Nil: List[XFormsSelectEvent], Nil: List[XFormsDeselectEvent])) {

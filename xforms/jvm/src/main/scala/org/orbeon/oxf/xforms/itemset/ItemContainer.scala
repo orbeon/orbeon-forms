@@ -53,7 +53,7 @@ trait ItemContainer {
   def allItemsReverseIterator: Iterator[ItemNode] =
     (_childrenReversed.iterator flatMap (_.allItemsReverseIterator)) ++ selfIterator
 
-  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item.ValueNode, Item.ItemValue[om.Item])] =
+  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item.ValueNode, Item.Value[om.Item])] =
     (if (reverse) allItemsReverseIterator else allItemsIterator) collect {
       case l: Item.ValueNode => l -> l.value
     }

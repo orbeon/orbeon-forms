@@ -18,7 +18,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectAppearanceTrait, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.itemset.Item.ItemValue
 import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -45,7 +44,7 @@ object XFormsSelect1Handler {
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def dataValueFromControl(control: XFormsValueControl): Option[ItemValue[om.NodeInfo]] =
+  def dataValueFromControl(control: XFormsValueControl): Option[Item.Value[om.NodeInfo]] =
     control match {
       case c: XFormsSelect1Control => c.boundItemOpt map c.getCurrentItemValueFromData
       case c: XFormsValueControl   => Option(c.getValue) map Left.apply

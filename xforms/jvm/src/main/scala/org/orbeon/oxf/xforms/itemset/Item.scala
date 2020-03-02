@@ -30,13 +30,13 @@ sealed trait ItemNode extends ItemContainer with ItemNodeImpl {
 
 object Item {
 
-  type ItemValue[T <: om.Item] = String Either List[T]
+  type Value[T <: om.Item] = String Either List[T]
 
   case class ValueNode(
     label      : LHHAValue,
     help       : Option[LHHAValue],
     hint       : Option[LHHAValue],
-    value      : Item.ItemValue[om.Item],
+    value      : Item.Value[om.Item],
     attributes : List[(QName, String)])(val
     position   : Int
   ) extends

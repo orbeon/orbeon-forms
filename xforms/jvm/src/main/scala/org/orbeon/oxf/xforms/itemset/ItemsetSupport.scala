@@ -37,14 +37,14 @@ import scala.util.control.NonFatal
 
 object ItemsetSupport {
 
-  def isSelected(isMultiple: Boolean, dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): Boolean = {
+  def isSelected(isMultiple: Boolean, dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean = {
     if (isMultiple)
       compareMultipleItemValues(dataValue, itemValue)
     else
       compareSingleItemValues(dataValue, itemValue)
   }
 
-  def compareSingleItemValues(dataValue: Item.ItemValue[om.Item], itemValue: Item.ItemValue[om.Item]): Boolean =
+  def compareSingleItemValues(dataValue: Item.Value[om.Item], itemValue: Item.Value[om.Item]): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
         dataValue == itemValue
@@ -59,7 +59,7 @@ object ItemsetSupport {
         false
     }
 
-  def compareMultipleItemValues(dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): Boolean =
+  def compareMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
         val trimmedControlValue = dataValue.trimAllToEmpty
@@ -85,7 +85,7 @@ object ItemsetSupport {
         false
     }
 
-  def findMultipleItemValues(dataValue: Item.ItemValue[om.NodeInfo], itemValue: Item.ItemValue[om.Item]): List[om.NodeInfo] =
+  def findMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): List[om.NodeInfo] =
     (dataValue, itemValue) match {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems collect { case oneDataXPathItem if
@@ -250,7 +250,7 @@ object ItemsetSupport {
                 position   = position
               )
 
-            private def getValueOrCopyValue(elem: Element): Option[Item.ItemValue[om.Item]] = {
+            private def getValueOrCopyValue(elem: Element): Option[Item.Value[om.Item]] = {
 
               def fromValueElem =
                 elem.elementOpt(XFORMS_VALUE_QNAME) flatMap

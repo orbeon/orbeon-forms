@@ -37,13 +37,13 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
 
   import Itemset._
 
-  def iterateSelectedItems(dataValue: Item.ItemValue[om.NodeInfo]): Iterator[Item.ValueNode] =
+  def iterateSelectedItems(dataValue: Item.Value[om.NodeInfo]): Iterator[Item.ValueNode] =
     allItemsWithValueIterator(reverse = false) collect {
       case (item, itemValue) if isSelected(multiple, dataValue, itemValue) => item
     }
 
   // Return the list of items as a JSON tree with hierarchical information
-  def asJSON(controlValue: Option[Item.ItemValue[om.NodeInfo]], encode: Boolean, locationData: LocationData): String = {
+  def asJSON(controlValue: Option[Item.Value[om.NodeInfo]], encode: Boolean, locationData: LocationData): String = {
 
     val sb = new StringBuilder
     // Array of top-level items
@@ -135,7 +135,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
   // Return the list of items as an XML tree
   def asXML(
     configuration : Configuration,
-    controlValue  : Option[Item.ItemValue[om.NodeInfo]],
+    controlValue  : Option[Item.Value[om.NodeInfo]],
     locationData  : LocationData
   ): DocumentInfo = {
 

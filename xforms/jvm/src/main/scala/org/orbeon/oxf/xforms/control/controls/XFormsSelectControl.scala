@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
-import org.orbeon.oxf.xforms.itemset.Item.ItemValue
 import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -56,7 +55,7 @@ class XFormsSelectControl(
    */
   override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
-    def filterItemsReturnValues(f: itemset.Item.ValueNode => Boolean): List[ItemValue[om.Item]] =
+    def filterItemsReturnValues(f: itemset.Item.ValueNode => Boolean): List[Item.Value[om.Item]] =
       (getItemset.allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
 
     val dataItemValues =
@@ -188,12 +187,12 @@ class XFormsSelectControl(
 object XFormsSelectControl {
 
   def updateSelection(
-    dataValues     : List[Item.ItemValue[om.NodeInfo]],
-    itemsetValues  : List[Item.ItemValue[om.Item]],
-    incomingValues : List[Item.ItemValue[om.Item]]
-  ): (List[Item.ItemValue[om.Item]], List[Item.ItemValue[om.Item]], List[Item.ItemValue[om.Item]]) = {
+    dataValues     : List[Item.Value[om.NodeInfo]],
+    itemsetValues  : List[Item.Value[om.Item]],
+    incomingValues : List[Item.Value[om.Item]]
+  ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
-    def belongsTo(values: List[Item.ItemValue[om.Item]])(value: Item.ItemValue[om.Item]): Boolean =
+    def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
       values exists (ItemsetSupport.compareSingleItemValues(_, value))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)

@@ -33,12 +33,12 @@ class XFormsSelectEvent(
 
   import XFormsSelectEvent._
 
-  def this(target: XFormsEventTarget, itemValue: Item.ItemValue[om.Item]) =
+  def this(target: XFormsEventTarget, itemValue: Item.Value[om.Item]) =
     this(target, Map(XFormsSelectEvent.ItemValueProperty -> Option(itemValue)))
 
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 
-  def itemValue: Item.ItemValue[om.Item] = property[Item.ItemValue[om.Item]](ItemValueProperty).get
+  def itemValue: Item.Value[om.Item] = property[Item.Value[om.Item]](ItemValueProperty).get
 }
 
 private object XFormsSelectEvent {

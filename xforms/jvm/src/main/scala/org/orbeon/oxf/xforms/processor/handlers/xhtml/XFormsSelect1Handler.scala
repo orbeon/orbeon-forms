@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
-import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
@@ -81,7 +81,7 @@ object XFormsSelect1Handler {
     withElement(
       localName = "span",
       prefix    = xhtmlPrefix,
-      uri       = XHTML_NAMESPACE_URI,
+      uri       = XHTML,
       atts      = List("id" -> templateId, "class" -> "xforms-template") // The client queries template by id without namespace,
     ) {                                                                  // so output that even though it's not ideal (FIXME)
       handleItemFull(
@@ -158,7 +158,7 @@ object XFormsSelect1Handler {
     // Add item attributes to span
     addItemAttributes(item, spanAttributes)
 
-    withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = spanAttributes) {
+    withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = spanAttributes) {
 
       val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.getContainingDocument, itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
@@ -205,7 +205,7 @@ object XFormsSelect1Handler {
         if (baseHandler.isHTMLDisabled(control))
           outputDisabledAttribute(reusableAttributes)
 
-        element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
+        element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = reusableAttributes)
       }
 
       if (! isBooleanInput) {
@@ -216,7 +216,7 @@ object XFormsSelect1Handler {
         withElement(
           localName = "span",
           prefix    = xhtmlPrefix,
-          uri       = XHTML_NAMESPACE_URI,
+          uri       = XHTML,
           atts      = showHint list ("class" -> "xforms-hint-region")
         ) {
           val itemLabel = item.label
@@ -395,7 +395,7 @@ class XFormsSelect1Handler(
       if (control ne null)
         XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, containerAttributes)
 
-      withElement(localName = "select", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+      withElement(localName = "select", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>
           itemset.visit(
             new ItemsetListener {
@@ -406,7 +406,7 @@ class XFormsSelect1Handler(
               def endLevel(): Unit =
                 if (inOptgroup) {
                   // End `xh:optgroup`
-                  closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
+                  closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML)
                   inOptgroup = false
                 }
 
@@ -428,10 +428,10 @@ class XFormsSelect1Handler(
                     // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
                     // the indentation himself, it will still look right.
                     if (inOptgroup)
-                      closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
+                      closeElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML)
 
                     // Start `xh:optgroup`
-                    openElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optGroupAttributes)
+                    openElement(localName = "optgroup", prefix = xhtmlPrefix, uri = XHTML, atts = optGroupAttributes)
                     inOptgroup = true
                   case item: Item.ValueNode =>
                     gotSelected |= handleItemCompact(xhtmlPrefix, control, isMultiple, item, encode, gotSelected)
@@ -447,7 +447,7 @@ class XFormsSelect1Handler(
     } else {
       // Output static read-only value
       containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field")
-      withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+      withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)
@@ -500,21 +500,21 @@ class XFormsSelect1Handler(
     val outputContainerElement = ! isBooleanInput
 
     if (outputContainerElement)
-      openElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
-    //                {
-    //                    // Output <legend>
-    //                    final String legendName = "legend";
-    //                    final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
-    //                    reusableAttributes.clear();
-    //                    // TODO: handle other attributes? xforms-disabled?
-    //                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
-    //                    xmlReceiver.startElement(XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
-    //                    if (control != null) {
-    //                        final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
-    //                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
-    //                    }
-    //                    xmlReceiver.endElement(XHTML_NAMESPACE_URI, legendName, legendQName);
-    //                }
+      openElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes)
+    // {
+    //     // Output <legend>
+    //     final String legendName = "legend";
+    //     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
+    //     reusableAttributes.clear();
+    //     // TODO: handle other attributes? xforms-disabled?
+    //     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
+    //     xmlReceiver.startElement(XHTML, legendName, legendQName, reusableAttributes);
+    //     if (control != null) {
+    //         final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
+    //         outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
+    //     }
+    //     xmlReceiver.endElement(XHTML, legendName, legendQName);
+    // }
     itemsetOpt foreach { itemset =>
       for (((item, _), itemIndex) <- itemset.allItemsWithValueIterator(reverse = false).zipWithIndex) {
         XFormsSelect1Handler.handleItemFull(
@@ -537,7 +537,7 @@ class XFormsSelect1Handler(
       }
     }
     if (outputContainerElement)
-      closeElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI)
+      closeElement(localName = containingElementName, prefix = xhtmlPrefix, uri = XHTML)
 
     // NOTE: Templates for full items are output globally in `XHTMLBodyHandler`
   }
@@ -568,7 +568,7 @@ class XFormsSelect1Handler(
       optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected")
 
     // `xh:option`
-    withElement(localName = "option", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = optionAttributes) {
+    withElement(localName = "option", prefix = xhtmlPrefix, uri = XHTML, atts = optionAttributes) {
       // TODO: Check this, which fails with the workflow UI
   //    assert(! item.label.isHTML)
       text(text = item.label.label)

@@ -22,6 +22,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.CoreUtils._
 
+
 // ORBEON: Moved subset of original Apache POI class to Scala and made lots of changes, including:
 //
 // - Scala-ified a little

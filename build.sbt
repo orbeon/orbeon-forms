@@ -39,7 +39,7 @@ val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.6"
 val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.2.2"
-val JacksonVersion                = "2.10.2"
+val JacksonVersion                = "2.10.3"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.2"
 

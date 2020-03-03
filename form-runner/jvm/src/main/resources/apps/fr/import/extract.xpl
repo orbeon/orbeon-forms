@@ -134,6 +134,8 @@
                                                 $c/ms-main:is
                                             else if ($type = ('datetime', 'date', 'time')) then
                                                 fri:convertDateTime($v, $type, $use1904windowing)
+                                            else if ($type = 'number') then
+                                                fri:convertNumber($v)
                                             else
                                                 $v"/>
                                 </c>

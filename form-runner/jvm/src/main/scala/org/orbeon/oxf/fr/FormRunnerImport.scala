@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import java.{util => ju}
 
 import org.joda.time.format.ISODateTimeFormat
-import org.orbeon.oxf.fr.excel.ExcelDateUtils
+import org.orbeon.oxf.fr.excel.{ExcelDateUtils, NumberToTextConverter}
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.StringUtils._
 
@@ -72,4 +72,8 @@ object FormRunnerImport {
       removeTrailingZIfPresent      map
       removeTrailingMillisIfPresent orNull
   }
+
+  // https://github.com/orbeon/orbeon-forms/issues/4452
+  def convertNumber(value: String): String =
+    Try(NumberToTextConverter.toText(value.toDouble)).toOption.getOrElse(value)
 }

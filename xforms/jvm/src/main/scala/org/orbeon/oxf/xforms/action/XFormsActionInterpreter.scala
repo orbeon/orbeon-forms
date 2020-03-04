@@ -108,7 +108,7 @@ class XFormsActionInterpreter(
             // i.e. `@context` is evaluated first, and `@iterate` sets a new context for each iteration.
             val currentNodeset = actionXPathContext.getCurrentBindingContext.nodeset.asScala
             for ((overriddenContextNodeInfo, zeroBasedIndex) <- currentNodeset.iterator.zipWithIndex)
-              withIteration(zeroBasedIndex + 1) {
+              withIteration(zeroBasedIndex + 1) { _ =>
                 runSingle(
                   hasOverriddenContext = true,
                   contextItem          = overriddenContextNodeInfo

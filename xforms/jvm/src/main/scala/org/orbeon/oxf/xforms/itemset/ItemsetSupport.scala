@@ -33,6 +33,7 @@ import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
+import scala.collection.JavaConverters._
 
 
 object ItemsetSupport {
@@ -152,9 +153,7 @@ object ItemsetSupport {
                   var levelAndStack: (Int, List[om.Item]) = (0, Nil)
 
                   for (currentPosition <- 1 to currentSequence.size)
-                    withIteration(currentPosition) {
-
-                      val currentXPathItem = currentSequence.get(currentPosition - 1)
+                    withIteration(currentPosition) { currentXPathItem =>
 
                       // We support relevance of items as an extension to XForms
                       // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
@@ -299,30 +298,11 @@ object ItemsetSupport {
 
                 val sourceEffectiveId = getElementEffectiveId(copyElem)
 
-                withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) {
+                withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) { currentBindingContext =>
+                  val currentNodeset = currentBindingContext.nodeset.asScala.toList
+                  currentNodeset.nonEmpty option currentNodeset
 
-                  val currentBindingContext = contextStack.getCurrentBindingContext
-                  val currentNodeset        = currentBindingContext.nodeset
 
-                  try {
-                    ! currentNodeset.isEmpty option
-                      XPathCache.evaluateKeepItems(
-                        contextItems       = currentNodeset,
-                        contextPosition    = currentBindingContext.position,
-                        xpathString        = refAtt,
-                        namespaceMapping   = container.getNamespaceMappings(copyElem),
-                        variableToValueMap = currentBindingContext.getInScopeVariables,
-                        functionLibrary    = container.getContainingDocument.getFunctionLibrary,
-                        functionContext    = contextStack.getFunctionContext(sourceEffectiveId),
-                        baseURI            = null,
-                        locationData       = copyElem.getData.asInstanceOf[LocationData],
-                        reporter           = container.getContainingDocument.getRequestStats.getReporter
-                      )
-                  } catch {
-                    case NonFatal(t) =>
-                      XFormsError.handleNonFatalXPathError(container, t)
-                      None
-                  }
                 }(contextStack)
               }
 
@@ -438,7 +418,7 @@ object ItemsetSupport {
     defaultHTML        : Boolean
   ): (Option[String], Boolean) = {
     val contextStack = container.getContextStack
-    withBinding(childElement, sourceEffectiveId, scope) {
+    withBinding(childElement, sourceEffectiveId, scope) { _ =>
       val containsHTML = Array[Boolean](false)
       Option(XFormsUtils.getElementValue(
         container,

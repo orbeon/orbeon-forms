@@ -186,12 +186,12 @@ object XFormsSelect1Handler {
         reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, itemNamespacedId)
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, fullItemType)
 
-        // Get group name from selection control if possible, otherwise use effective id
+        // Get group name from selection control if possible
         val name =
-          if (! isMultiple && control.isInstanceOf[XFormsSelect1Control])
-            control.asInstanceOf[XFormsSelect1Control].getGroupName
-          else
-            itemName
+          control match {
+            case c: XFormsSelect1Control if ! isMultiple => c.getGroupName // TODO: fix select/select1 inheritance
+            case _ => itemName
+          }
 
         reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, name)
         reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode))
@@ -316,10 +316,8 @@ class XFormsSelect1Handler(
   def handleControlStart(): Unit = {
 
     // Get items, dynamic or static, if possible
-    val xformsSelect1Control = currentControl.asInstanceOf[XFormsSelect1Control]
-
-    // TODO: ugly
-    val staticSelectionControl = staticControlOpt.get.asInstanceOf[SelectionControlTrait]
+    val xformsSelect1Control   = currentControl.asInstanceOf[XFormsSelect1Control]
+    val staticSelectionControl = xformsSelect1Control.staticControl
 
     // Get items if:
     // 1. The itemset is static

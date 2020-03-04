@@ -362,7 +362,7 @@ public class XFormsInsertAction extends XFormsAction {
         if (isEmptyNodesetBinding) {
             // Insert INTO a node
 
-            insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
+            insertLocationIndexWithinParentBeforeUpdate = findNodeIndex(insertLocationNodeInfo);
 
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstanceOrNull, doDispatch);
@@ -380,7 +380,7 @@ public class XFormsInsertAction extends XFormsAction {
         } else {
             // Insert BEFORE or AFTER a node
 
-            insertLocationIndexWithinParentBeforeUpdate = findNodeIndexRewrapIfNeeded(insertLocationNodeInfo);
+            insertLocationIndexWithinParentBeforeUpdate = findNodeIndex(insertLocationNodeInfo);
 
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             final Document insertLocationNodeDocument = insertLocationNode.getDocument();
@@ -525,10 +525,6 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         return insertedNodeInfos;
-    }
-
-    private static int findNodeIndexRewrapIfNeeded(NodeInfo node) {
-        return findNodeIndex(node);
     }
 
     private static int findNodeIndex(NodeInfo node) {

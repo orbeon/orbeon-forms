@@ -22,18 +22,15 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 class NumberToTextConverterTest extends AnyFunSpecLike {
 
-  private def confirmNaN(l: Long, excelRep: String): Unit = {
-    assert("NaN" == jl.Double.toString(jl.Double.longBitsToDouble(l)))
-    assert(excelRep == NumberToTextConverter.rawDoubleBitsToText(l))
-  }
-
   describe("All number conversion examples") {
     for (example <- NumberToTextConversionExamples.Examples)
       it(s"must pass `$example`") {
-        if (example.isNaN)
-          confirmNaN(example.rawDoubleBits, example.excelRendering)
-        else
+        if (example.isNaN) {
+          assert("NaN" == jl.Double.toString(jl.Double.longBitsToDouble(example.rawDoubleBits)))
+          assert(example.excelRendering == NumberToTextConverter.rawDoubleBitsToText(example.rawDoubleBits))
+        } else {
           assert(example.excelRendering == NumberToTextConverter.toText(example.doubleValue))
+        }
       }
   }
 

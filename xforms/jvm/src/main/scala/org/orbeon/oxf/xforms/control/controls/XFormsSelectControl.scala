@@ -134,13 +134,12 @@ class XFormsSelectControl(
             deselect.itemValue match {
               case Left(v)  =>
                 DataModel.setValueIfChangedHandleErrors(
-                  containingDocument = containingDocument,
-                  eventTarget        = selfControl,
-                  locationData       = getLocationData,
-                  nodeInfo           = boundNode,
-                  valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) - v) mkString " ",
-                  source             = "deselect",
-                  isCalculate        = false
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) - v) mkString " ",
+                  source       = "deselect",
+                  isCalculate  = false
                 )
               case r @ Right(_) =>
                 XFormsAPI.delete(
@@ -156,13 +155,12 @@ class XFormsSelectControl(
             select.itemValue match {
               case Left(v)  =>
                 DataModel.setValueIfChangedHandleErrors(
-                  containingDocument = containingDocument,
-                  eventTarget        = selfControl,
-                  locationData       = getLocationData,
-                  nodeInfo           = boundNode,
-                  valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) + v) mkString " ",
-                  source             = "select",
-                  isCalculate        = false
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) + v) mkString " ",
+                  source       = "select",
+                  isCalculate  = false
                 )
               case Right(v) =>
                 XFormsAPI.insert(

@@ -82,13 +82,13 @@ object XFormsAPI {
         for (action <- actionInterpreterDyn.value)
           yield
             DataModel.logAndNotifyValueChange(
-              containingDocument = action.containingDocument,
               source             = "scala setvalue",
               nodeInfo           = nodeInfo,
               oldValue           = oldValue,
               newValue           = value,
               isCalculate        = false,
               collector          = Dispatch.dispatchEvent)(
+              containingDocument = action.containingDocument,
               logger             = action.indentedLogger
             )
 

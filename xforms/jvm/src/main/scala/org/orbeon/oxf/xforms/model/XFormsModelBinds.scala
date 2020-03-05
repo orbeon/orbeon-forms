@@ -23,8 +23,10 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -42,12 +44,12 @@ class XFormsModelBinds(protected val model: XFormsModel)
      with ValidationBindOps
      with CalculateBindOps {
 
-  protected val containingDocument = model.containingDocument
-  protected val dependencies       = containingDocument.getXPathDependencies
-  protected val staticModel        = model.staticModel
+  protected implicit val containingDocument: XFormsContainingDocument = model.containingDocument
+  protected implicit def logger            : IndentedLogger           = model.indentedLogger
+  protected implicit def reporter          : XPath.Reporter           = containingDocument.getRequestStats.addXPathStat
 
-  protected implicit def logger = model.indentedLogger
-  protected implicit def reporter: XPath.Reporter = containingDocument.getRequestStats.addXPathStat
+  protected val dependencies               : XPathDependencies        = containingDocument.getXPathDependencies
+  protected val staticModel                : Model                    = model.staticModel
 
   // Support for `xxf:evaluate-bind-property` function
   def evaluateBindByType(bind: RuntimeBind, position: Int, mipType: QName): Option[AtomicValue] = {

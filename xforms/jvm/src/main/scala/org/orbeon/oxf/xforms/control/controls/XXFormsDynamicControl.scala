@@ -221,7 +221,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       // Instance mirror listener
       val instanceListener =
         newListenerWithCycleDetector(
-          containingDocument,
           toInnerInstanceNode(boundElem, partAnalysis, childContainer, findOuterInstanceDetailsDynamic)
         )
 
@@ -242,7 +241,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // change to the related node in the source
     val innerListener = toEventListener(
       newListenerWithCycleDetector(
-        containingDocument,
         toOuterInstanceNodeDynamic(outerInstance, boundElem, partAnalysis)
       )
     )

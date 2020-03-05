@@ -73,13 +73,13 @@ object InstanceMirror {
 
   // Factory function to create listeners which check whether they called as the result of an action caused by another
   // listener. If a cycle is detected, we interrupt it and just say that we have processed the event.
-  class ListenerCycleDetector(implicit logger: IndentedLogger)
-    extends ((XFormsContainingDocument, NodeMatcher) => MirrorEventListener) {
+  class ListenerCycleDetector(implicit containingDocument: XFormsContainingDocument, logger: IndentedLogger)
+    extends (NodeMatcher => MirrorEventListener) {
 
     private var inListener = false
 
-    def apply(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher): MirrorEventListener =
-      wrap(mirrorListener(containingDocument, findMatchingNode))
+    def apply(findMatchingNode: NodeMatcher): MirrorEventListener =
+      wrap(mirrorListener(findMatchingNode))
 
     private def wrap(listener: MirrorEventListener): MirrorEventListener = {
       event =>
@@ -293,8 +293,8 @@ object InstanceMirror {
 
   // Listener that mirrors changes from one document to the other
   def mirrorListener(
-    containingDocument : XFormsContainingDocument,
     findMatchingNode   : NodeMatcher)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): MirrorEventListener = {
 
@@ -305,7 +305,6 @@ object InstanceMirror {
             nodeInfo  = matchingNode,
             newValue  = valueChanged.newValue,
             onSuccess = oldValue => DataModel.logAndNotifyValueChange(
-              containingDocument = containingDocument,
               source             = "mirror",
               nodeInfo           = matchingNode,
               oldValue           = oldValue,

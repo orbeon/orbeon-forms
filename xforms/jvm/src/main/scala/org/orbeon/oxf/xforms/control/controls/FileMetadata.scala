@@ -146,7 +146,6 @@ trait FileMetadata extends XFormsValueControl {
               nodeInfo  = currentSingleNode,
               newValue  = value,
               onSuccess = oldValue => DataModel.logAndNotifyValueChange(
-                containingDocument = self.container.getContainingDocument,
                 source             = "file metadata",
                 nodeInfo           = currentSingleNode,
                 oldValue           = oldValue,

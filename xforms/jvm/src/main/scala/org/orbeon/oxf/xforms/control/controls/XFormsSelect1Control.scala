@@ -168,13 +168,12 @@ class XFormsSelect1Control(
             deselect.itemValue match {
               case Left(_)  =>
                 DataModel.setValueIfChangedHandleErrors(
-                  containingDocument = containingDocument,
-                  eventTarget        = selfControl,
-                  locationData       = getLocationData,
-                  nodeInfo           = boundNode,
-                  valueToSet         = "",
-                  source             = "select",
-                  isCalculate        = false
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = "",
+                  source       = "select",
+                  isCalculate  = false
                 )
               case Right(v) =>
 
@@ -203,13 +202,12 @@ class XFormsSelect1Control(
             select.itemValue match {
               case Left(v)  =>
                 DataModel.setValueIfChangedHandleErrors(
-                  containingDocument = containingDocument,
-                  eventTarget        = selfControl,
-                  locationData       = getLocationData,
-                  nodeInfo           = boundNode,
-                  valueToSet         = v,
-                  source             = "select",
-                  isCalculate        = false
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = v,
+                  source       = "select",
+                  isCalculate  = false
                 )
               case Right(v) =>
                 XFormsAPI.delete(

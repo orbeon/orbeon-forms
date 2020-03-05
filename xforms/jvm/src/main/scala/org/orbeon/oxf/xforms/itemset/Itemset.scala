@@ -37,13 +37,17 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
 
   import Itemset._
 
-  def iterateSelectedItems(dataValue: Item.Value[om.NodeInfo]): Iterator[Item.ValueNode] =
+  def iterateSelectedItems(dataValue: Item.Value[om.NodeInfo], compareAtt: om.NodeInfo => Boolean): Iterator[Item.ValueNode] =
     allItemsWithValueIterator(reverse = false) collect {
-      case (item, itemValue) if isSelected(multiple, dataValue, itemValue) => item
+      case (item, itemValue) if isSelected(multiple, dataValue, itemValue, compareAtt) => item
     }
 
   // Return the list of items as a JSON tree with hierarchical information
-  def asJSON(controlValue: Option[Item.Value[om.NodeInfo]], encode: Boolean, locationData: LocationData): String = {
+  def asJSON(
+    controlValue : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
+    encode       : Boolean,
+    locationData : LocationData
+  ): String = {
 
     val sb = new StringBuilder
     // Array of top-level items
@@ -101,7 +105,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
 
           // Handle selection
           itemNode match {
-            case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
+            case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) => isSelected(multiple, dataValue, item.value, compareAtt) } =>
               sb.append(""","selected":true""")
             case _ =>
           }
@@ -135,7 +139,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
   // Return the list of items as an XML tree
   def asXML(
     configuration : Configuration,
-    controlValue  : Option[Item.Value[om.NodeInfo]],
+    controlValue  : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
     locationData  : LocationData
   ): DocumentInfo = {
 
@@ -160,7 +164,7 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
 
               val itemAttributes =
                 itemNode match {
-                  case item: Item.ValueNode if controlValue exists (isSelected(multiple, _, item.value)) =>
+                  case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) => isSelected(multiple, dataValue, item.value, compareAtt) } =>
                     List("selected" -> "true")
                   case _ =>
                     Nil

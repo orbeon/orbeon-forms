@@ -121,7 +121,7 @@ class XFormsSelectControl(
   override def findSelectedItems: List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
-        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem)).to(List)
+        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem), _ => true).to(List)
       case None =>
         Nil
     }
@@ -148,7 +148,6 @@ class XFormsSelectControl(
                 )
             }
           case None =>
-            // Q: Can this happen?
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
       case select: XFormsSelectEvent =>
@@ -173,7 +172,6 @@ class XFormsSelectControl(
                 )
             }
           case None =>
-            // Q: Can this happen?
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
       case _ =>
@@ -193,7 +191,7 @@ object XFormsSelectControl {
   ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
     def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
-      values exists (ItemsetSupport.compareSingleItemValues(_, value))
+      values exists (ItemsetSupport.compareSingleItemValues(_, value, _ => true))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
     val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)

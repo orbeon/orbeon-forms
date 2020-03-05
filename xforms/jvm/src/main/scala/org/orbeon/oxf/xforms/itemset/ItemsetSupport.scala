@@ -34,33 +34,73 @@ import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
+import org.orbeon.scaxon.SimplePath._
+
+import scala.collection.mutable.ListBuffer
 
 
 object ItemsetSupport {
 
-  def isSelected(isMultiple: Boolean, dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean = {
+  def isSelected(
+    isMultiple : Boolean,
+    dataValue  : Item.Value[om.NodeInfo],
+    itemValue  : Item.Value[om.Item],
+    compareAtt : om.NodeInfo => Boolean
+  ): Boolean =
     if (isMultiple)
       compareMultipleItemValues(dataValue, itemValue)
     else
-      compareSingleItemValues(dataValue, itemValue)
+      compareSingleItemValues(dataValue, itemValue, compareAtt)
+
+  def partitionAttributes(items: List[om.Item]): (List[om.NodeInfo], List[om.Item]) = {
+
+    val hasAtt = items exists {
+      case att: om.NodeInfo if att.isAttribute => true
+      case _                                   => false
+    }
+
+    if (hasAtt) {
+      val l = ListBuffer[om.NodeInfo]()
+      val r = ListBuffer[om.Item]()
+
+      items foreach {
+        case att: om.NodeInfo if att.isAttribute => l += att
+        case other                               => r += other
+      }
+
+      (l.result, r.result)
+    } else {
+      (Nil, items)
+    }
   }
 
-  def compareSingleItemValues(dataValue: Item.Value[om.Item], itemValue: Item.Value[om.Item]): Boolean =
+  def compareSingleItemValues(
+    dataValue  : Item.Value[om.Item],
+    itemValue  : Item.Value[om.Item],
+    compareAtt : om.NodeInfo => Boolean
+  ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
         dataValue == itemValue
       case (Right(dataXPathItems), Right(itemXPathItems)) =>
-        SaxonUtils.deepCompare(
-          XPath.GlobalConfiguration,
-          Implicits.itemSeqToSequenceIterator(dataXPathItems),
-          Implicits.itemSeqToSequenceIterator(itemXPathItems)
-        )
+
+        val (attItems, otherItems) = partitionAttributes(itemXPathItems)
+
+        (attItems forall compareAtt) &&
+          SaxonUtils.deepCompare(
+            XPath.GlobalConfiguration,
+            Implicits.itemSeqToSequenceIterator(dataXPathItems),
+            Implicits.itemSeqToSequenceIterator(otherItems)
+          )
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported for now
         false
     }
 
-  def compareMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean =
+  def compareMultipleItemValues(
+    dataValue : Item.Value[om.NodeInfo],
+    itemValue : Item.Value[om.Item]
+  ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(trimmedItemValue)) =>
         val trimmedControlValue = dataValue.trimAllToEmpty
@@ -85,7 +125,10 @@ object ItemsetSupport {
         false
     }
 
-  def findMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): List[om.NodeInfo] =
+  def findMultipleItemValues(
+    dataValue : Item.Value[om.NodeInfo],
+    itemValue : Item.Value[om.Item]
+  ): List[om.NodeInfo] =
     (dataValue, itemValue) match {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems collect { case oneDataXPathItem if
@@ -301,8 +344,6 @@ object ItemsetSupport {
                 withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) { currentBindingContext =>
                   val currentNodeset = currentBindingContext.nodeset.asScala.toList
                   currentNodeset.nonEmpty option currentNodeset
-
-
                 }(contextStack)
               }
 

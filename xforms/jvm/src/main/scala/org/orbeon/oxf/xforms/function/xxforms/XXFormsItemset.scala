@@ -21,6 +21,8 @@ import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
 import shapeless.syntax.typeable._
+import org.orbeon.saxon.om
+
 
 class XXFormsItemset extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
@@ -40,16 +42,18 @@ class XXFormsItemset extends XFormsFunction {
 
         val controlValueForSelection =
           if (selected)
-            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData
+            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData map { v =>
+              (v, XFormsSelect1Control.attCompare(select1Control.boundNodeOpt, _))
+            }
           else
             None
 
         if (format == "json")
           // Return a string
-          itemset.asJSON(controlValueForSelection, select1Control.mustEncodeValues, control.getLocationData): Item
+          itemset.asJSON(controlValueForSelection, select1Control.mustEncodeValues, control.getLocationData): om.Item
         else
           // Return an XML document
-          itemset.asXML(ctx.getConfiguration, controlValueForSelection, control.getLocationData): Item
+          itemset.asXML(ctx.getConfiguration, controlValueForSelection, control.getLocationData): om.Item
       }
 
     jsonOrXMLOpt.orNull

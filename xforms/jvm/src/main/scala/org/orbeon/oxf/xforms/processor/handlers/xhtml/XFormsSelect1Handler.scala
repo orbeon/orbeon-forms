@@ -59,7 +59,8 @@ object XFormsSelect1Handler {
           ItemsetSupport.isSelected(
             isMultiple = isMultiple,
             dataValue  = dataValue,
-            itemValue  = item.value
+            itemValue  = item.value,
+            compareAtt = XFormsSelect1Control.attCompare(control.boundNodeOpt, _)
           )
         )
       case _: Item.ChoiceNode =>
@@ -451,7 +452,7 @@ class XFormsSelect1Handler(
           val ch = new XMLReceiverHelper(xmlReceiver)
           for {
             dataValue   <- XFormsSelect1Handler.dataValueFromControl(control).iterator
-            currentItem <- itemset.iterateSelectedItems(dataValue)
+            currentItem <- itemset.iterateSelectedItems(dataValue, XFormsSelect1Control.attCompare(control.boundNodeOpt, _))
           } locally {
             if (selectedFound)
               ch.text(" - ")

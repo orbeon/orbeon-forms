@@ -127,7 +127,7 @@ class XFormsSelect1Control(
   def findSelectedItem: Option[Item.ValueNode] =
     boundItemOpt map getCurrentItemValueFromData flatMap { current =>
       getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
-        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(current, itemValue) => item
+        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(current, itemValue, XFormsSelect1Control.attCompare(boundNodeOpt, _)) => item
       }
     }
 
@@ -162,6 +162,41 @@ class XFormsSelect1Control(
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
+      case deselect: XFormsDeselectEvent =>
+        boundNodeOpt match {
+          case Some(boundNode) =>
+            deselect.itemValue match {
+              case Left(_)  =>
+                DataModel.setValueIfChangedHandleErrors(
+                  containingDocument = containingDocument,
+                  eventTarget        = selfControl,
+                  locationData       = getLocationData,
+                  nodeInfo           = boundNode,
+                  valueToSet         = "",
+                  source             = "select",
+                  isCalculate        = false
+                )
+              case Right(v) =>
+
+                // If the deselected value contains attributes, remove all of those from the bound node
+                val (atts, other) = ItemsetSupport.partitionAttributes(v)
+
+                if (atts.nonEmpty)
+                  XFormsAPI.delete(
+                    ref = atts flatMap (att => boundNode att (att.namespaceURI, att.localname))
+                  )
+
+                // If the deselected value contains a node that is not an attribute, then clear the element
+                // content. We could clear the element content no matter what but this enables the use case
+                // of selecting attributes independently from the element's content.
+                if (other.nonEmpty)
+                  XFormsAPI.delete(
+                    ref = boundNode child Node
+                  )
+            }
+          case None =>
+            throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+        }
       case select: XFormsSelectEvent =>
         boundNodeOpt match {
           case Some(boundNode) =>
@@ -206,7 +241,7 @@ class XFormsSelect1Control(
     itemset.allItemsWithValueIterator(reverse = true).foldLeft((Nil: List[XFormsSelectEvent], Nil: List[XFormsDeselectEvent])) {
       case (result @ (selected, deselected), (item, itemValue)) =>
 
-        val itemWasSelected = ItemsetSupport.compareSingleItemValues(dataValue, itemValue)
+        val itemWasSelected = ItemsetSupport.compareSingleItemValues(dataValue, itemValue, XFormsSelect1Control.attCompare(boundNodeOpt, _))
         val itemIsSelected  = item.externalValue(mustEncodeValues) == newExternalValue
 
         val getsSelected   = ! itemWasSelected &&   itemIsSelected
@@ -322,6 +357,9 @@ class XFormsSelect1Control(
 }
 
 object XFormsSelect1Control {
+
+  def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
+    boundNodeOpt exists (_.getAttributeValue(att.getFingerprint) == att.getStringValue)
 
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
   // lookup by id takes place and the control must have a static itemset or otherwise `None` is returned.

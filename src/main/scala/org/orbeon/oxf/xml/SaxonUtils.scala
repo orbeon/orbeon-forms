@@ -55,7 +55,7 @@ object SaxonUtils {
 
   // Convert a Java object to a Saxon Item using the Saxon API
   val anyToItem: Any => Item = new StandardObjectConverter(new SaxonXQDataFactory {
-    def getConfiguration = util.XPath.GlobalConfiguration
+    def getConfiguration: Configuration = util.XPath.GlobalConfiguration
   }).convertToItem(_: Any)
 
   // Convert a Java object to a Saxon Item but keep unchanged if already an Item

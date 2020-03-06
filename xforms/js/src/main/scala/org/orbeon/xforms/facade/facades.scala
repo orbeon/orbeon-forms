@@ -148,6 +148,8 @@ object Events extends js.Object {
   val mouseout                    : js.Function                    = js.native
   val click                       : js.Function                    = js.native
   val scrollOrResize              : js.Function                    = js.native
+
+  def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`
 }
 
 @JSGlobal("ORBEON.util.Property")

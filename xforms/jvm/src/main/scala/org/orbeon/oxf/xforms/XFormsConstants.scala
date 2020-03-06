@@ -323,6 +323,8 @@ object XFormsConstants {
   // See: https://github.com/orbeon/orbeon-forms/issues/418
   val XXFORMS_SEPARATOR_APPEARANCE_QNAME = QName("xxforms-separator")
 
+  val XXFORMS_LEFT_APPEARANCE_QNAME = QName("left", XXFORMS_NAMESPACE)
+
   val XXFORMS_TARGET_QNAME = QName("target", XXFORMS_NAMESPACE)
   val XXFORMS_UPLOADS_QNAME = QName("uploads", XXFORMS_NAMESPACE)
   val XXFORMS_XINCLUDE = QName("xinclude", XXFORMS_NAMESPACE)

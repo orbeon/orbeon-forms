@@ -62,7 +62,7 @@ class XFormsLHHAHandler(
 
         if (! mustOmitStaticReadonlyHint(staticLhha, currentControlOpt)) {
           val containerAtts =
-            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
+            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl, None)
 
           withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
             for {

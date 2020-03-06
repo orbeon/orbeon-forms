@@ -44,7 +44,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         // NOTE: attributes logic duplicated in XXFormsDialogControl
         // Get values statically so we can handle the case of the repeat template
         // TODO: 2020-02-27: There are no more repeat templates. Check this.
-        final StringBuilder classes = getInitialClasses(uri(), localname(), attributes(), null, false);
+        final StringBuilder classes = getInitialClasses(uri(), localname(), attributes(), null, false, scala.Option.apply(null));
         {
             classes.append(" xforms-initially-hidden");
             classes.append(" xforms-dialog-");

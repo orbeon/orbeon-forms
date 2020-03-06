@@ -119,10 +119,11 @@ abstract class XFormsBaseHandlerXHTML (
     controlName        : String,
     controlAttributes  : Attributes,
     control            : XFormsControl,
-    incrementalDefault : Boolean
+    incrementalDefault : Boolean,
+    staticLabel        : Option[LHHAAnalysis]
   ): jl.StringBuilder = {
 
-    implicit val sb = new jl.StringBuilder(50)
+    implicit val sb: jl.StringBuilder = new jl.StringBuilder(50)
 
     // User-defined classes go first
     appendControlUserClasses(controlAttributes, control)
@@ -179,6 +180,9 @@ abstract class XFormsBaseHandlerXHTML (
       case appearanceTrait: AppearanceTrait => appearanceTrait.encodeAndAppendAppearances(sb)
       case _ =>
     }
+
+    if (staticLabel exists (_.hasLocalLeftAppearance))
+      appendWithSpace("xxforms-label-appearance-left")
 
     sb
   }
@@ -335,13 +339,14 @@ abstract class XFormsBaseHandlerXHTML (
     attributes    : Attributes,
     prefixedId    : String,
     effectiveId   : String,
-    xformsControl : XFormsControl
+    xformsControl : XFormsControl,
+    staticLabel   : Option[LHHAAnalysis]
   ): AttributesImpl = {
 
     // Get classes
     // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
-    implicit val classes =
-      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
+    implicit val classes: jl.StringBuilder =
+      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental, staticLabel)
 
     // All MIP-related classes
     handleMIPClasses(prefixedId, xformsControl)

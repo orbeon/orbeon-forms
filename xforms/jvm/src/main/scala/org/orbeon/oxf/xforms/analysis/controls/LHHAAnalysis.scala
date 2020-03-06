@@ -71,6 +71,7 @@ class LHHAAnalysis(
 
   val hasLocalMinimalAppearance: Boolean = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
   val hasLocalFullAppearance   : Boolean = appearances(XFORMS_FULL_APPEARANCE_QNAME)
+  val hasLocalLeftAppearance   : Boolean = appearances(XXFORMS_LEFT_APPEARANCE_QNAME)
 
   // What we support for alert level/validation:
   //

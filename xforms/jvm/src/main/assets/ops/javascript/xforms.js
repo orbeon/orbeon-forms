@@ -2787,6 +2787,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 return;
             }
 
+            var handled = false;
             if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
@@ -2808,6 +2809,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
                         ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
                     }
+                    handled = true;
                 }
             } else if (target != null && ! $(target).is('.xforms-static') &&
                     $(target).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
@@ -2817,11 +2819,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-
+                handled = true;
             } else if (target != null && $(target).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
                 // Click on remove icon in upload control
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, "", "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
+                handled = true;
             } else if (target != null && $(target).is('.xforms-help')) {
                 // Help image
 
@@ -2836,7 +2839,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // we can avoid a round trip and show the help right away
                     ORBEON.xforms.Controls.showHelp(control);
                 }
+                handled = true;
             }
+
+            if (handled)
+                return;
 
             // Click on something that is not an XForms element, but which might still be in an repeat iteration,
             // in which case we want to let the server know about where in the iteration the click was.

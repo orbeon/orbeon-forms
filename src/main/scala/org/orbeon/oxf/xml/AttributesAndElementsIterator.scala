@@ -2,29 +2,33 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.saxon.pattern.NodeKindTest
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.om.{EmptyIterator, Axis, AxisIterator, NodeInfo}
+import org.orbeon.saxon.om.{Axis, AxisIterator, EmptyIterator, NodeInfo}
+
+import scala.annotation.tailrec
 
 /**
  * This Iterator returns a node's attributes and descendant nodes and attributes.
  *
  * It is based on the Saxon Navigator DescendantEnumeration, simplified and rewritten in Scala.
  */
-class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true) extends Iterator[NodeInfo] {
+class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true)
+  extends Iterator[NodeInfo] {
 
   private var current = findNext()
 
-  def next() = {
+  def next(): NodeInfo = {
     val result = current
     current = findNext()
     result
   }
 
-  def hasNext = current ne null
+  def hasNext: Boolean = current ne null
 
   private var attributes: AxisIterator = _
   private var descendants: Iterator[NodeInfo] = _
   private var children: AxisIterator = _
 
+  @tailrec
   private def findNext(): NodeInfo = {
 
     // Exhaust attributes if any
@@ -51,7 +55,7 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
       if (next ne null) {
         attributes = next.iterateAxis(Axis.ATTRIBUTE)
         if (next.hasChildNodes)
-          descendants = new AttributesAndElementsIterator(next, false)
+          descendants = new AttributesAndElementsIterator(next, includeSelf = false)
         next
       } else
         null
@@ -74,8 +78,8 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
 }
 
 object AttributesAndElementsIterator {
-  def apply(start: NodeInfo, includeSelf: Boolean = true)
-    = new AttributesAndElementsIterator(start, includeSelf)
+  def apply(start: NodeInfo, includeSelf: Boolean = true) =
+    new AttributesAndElementsIterator(start, includeSelf)
 }
 
 //

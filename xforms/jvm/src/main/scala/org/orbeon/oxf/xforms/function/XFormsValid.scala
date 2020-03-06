@@ -61,7 +61,7 @@ class XXFormsValid extends XXFormsMIPFunction with ValidSupport {
 
 trait ValidSupport extends XFormsFunction {
 
-  def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext) = {
+  def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext): Boolean = {
 
     val items = itemsArgumentOrContextOpt(0)
 
@@ -72,7 +72,7 @@ trait ValidSupport extends XFormsFunction {
   }
 
   // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
-  def isItemValid(item: Item, pruneNonRelevant: Boolean) = item match {
+  def isItemValid(item: Item, pruneNonRelevant: Boolean): Boolean = item match {
     case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
       pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
     case _ =>
@@ -80,7 +80,7 @@ trait ValidSupport extends XFormsFunction {
   }
 
   // Tree is valid unless one of its descendant-or-self nodes is invalid
-  def isTreeValid(item: Item, pruneNonRelevant: Boolean) = item match {
+  def isTreeValid(item: Item, pruneNonRelevant: Boolean): Boolean = item match {
     case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute =>
       ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
     case _ =>

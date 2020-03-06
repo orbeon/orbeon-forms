@@ -89,7 +89,7 @@ trait PartGlobalOps {
     }
 
   // LHHA
-  def getLHH(prefixedId: String, lhha: LHHA) =
+  def getLHH(prefixedId: String, lhha: LHHA): LHHAAnalysis =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha)) orNull
 
   def getAlerts(prefixedId: String) =

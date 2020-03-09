@@ -29,6 +29,7 @@ import org.orbeon.xforms.{EventNames, XFormsId}
 
 import scala.util.control.NonFatal
 
+
 /**
  * XForms (or just plain XML Events) event handler implementation.
  *
@@ -94,10 +95,18 @@ class EventHandlerImpl(
   val isCapturePhaseOnly     = phaseAtt == "capture"
   val isTargetPhase          = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
   val isBubblingPhase        = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
-  // "true" means "continue", "false" means "stop"
-  val isPropagate            = att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) != "stop"
-  // "true" means "perform", "false" means "cancel"
-  val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
+
+  val propagate: Propagate =
+    if (att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) == "stop")
+      Propagate.Stop
+    else
+      Propagate.Continue
+
+  val isPerformDefaultAction: Perform =
+    if (att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) == "cancel")
+      Perform.Cancel
+    else
+      Perform.Perform
 
   val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
   val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"

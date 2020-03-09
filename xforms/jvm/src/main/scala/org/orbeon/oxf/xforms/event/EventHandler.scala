@@ -17,7 +17,19 @@ import org.orbeon.oxf.util.Modifier
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
 
-// Static event handler
+
+sealed trait Propagate
+object Propagate {
+  case object Continue extends Propagate
+  case object Stop     extends Propagate
+}
+
+sealed trait Perform
+object Perform {
+  case object Perform extends Perform
+  case object Cancel  extends Perform
+}
+
 trait EventHandler {
 
   def scope: Scope
@@ -30,8 +42,8 @@ trait EventHandler {
   def isTargetPhase: Boolean
   def isBubblingPhase: Boolean
 
-  def isPropagate: Boolean
-  def isPerformDefaultAction: Boolean
+  def propagate: Propagate
+  def isPerformDefaultAction: Perform
 
   val isPhantom: Boolean
 

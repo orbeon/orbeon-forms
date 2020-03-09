@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
@@ -327,8 +327,8 @@ trait ElementEventHandlers {
       // - preventDefault: "the event must be canceled, meaning any default actions normally taken by the
       //   implementation as a result of the event must not occur"
       // - NOTE: DOM 3 introduces also stopImmediatePropagation
-      val propagate            = relevantHandlers forall (_.isPropagate)
-      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction)
+      val propagate            = relevantHandlers forall (_.propagate == Propagate.Continue)
+      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction == Perform.Perform)
 
       // See https://github.com/orbeon/orbeon-forms/issues/3844
       def placeInnerHandlersFirst(handlers: List[EventHandler]): List[EventHandler] = {

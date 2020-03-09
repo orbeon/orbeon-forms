@@ -23,6 +23,7 @@ import org.orbeon.xforms.EventNames
 import scala.collection.mutable
 import scala.collection.compat._
 
+
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
 
@@ -38,7 +39,7 @@ trait PartEventHandlerAnalysis {
   private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
   def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
   private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
-  def uniqueJsScripts = _uniqueJsScripts
+  def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
 
   // Register new event handlers
   def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
@@ -142,10 +143,10 @@ trait PartEventHandlerAnalysis {
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
   }
 
-  def getEventHandlers(observerPrefixedId: String) =
+  def getEventHandlers(observerPrefixedId: String): List[EventHandler] =
     _handlersForObserver.getOrElse(observerPrefixedId, Nil)
 
-  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
+  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean =
     _handlersForObserver.get(observerPrefixedId) exists
       (handlers => handlers exists (_.isMatchByName(eventName)))
 

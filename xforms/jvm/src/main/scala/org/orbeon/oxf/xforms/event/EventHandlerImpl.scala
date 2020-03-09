@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.{Logging, Modifier}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, Modifier}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
@@ -92,9 +92,9 @@ class EventHandlerImpl(
    // Q: is this going to be eliminated as a field?
   private val phaseAtt = att(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME)
 
-  val isCapturePhaseOnly     = phaseAtt == "capture"
-  val isTargetPhase          = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
-  val isBubblingPhase        = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
+  val isCapturePhaseOnly    : Boolean = phaseAtt == "capture"
+  val isTargetPhase         : Boolean = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
+  val isBubblingPhase       : Boolean = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
 
   val propagate: Propagate =
     if (att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) == "stop")
@@ -108,12 +108,12 @@ class EventHandlerImpl(
     else
       Perform.Perform
 
-  val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
-  val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
+  val isPhantom             : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
+  val isIfNonRelevant       : Boolean = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
 
   assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
 
-  val isXBLHandler = element.getQName == XBL_HANDLER_QNAME
+  val isXBLHandler          : Boolean = element.getQName == XBL_HANDLER_QNAME
 
   // Observers and targets
 
@@ -122,8 +122,8 @@ class EventHandlerImpl(
   private var _targetPrefixedIds: Set[String] = _
 
   // Question: should we just point to the ElementAnalysis instead of using ids?
-  def observersPrefixedIds = _observersPrefixedIds
-  def targetPrefixedIds = _targetPrefixedIds
+  def observersPrefixedIds: Set[String] = _observersPrefixedIds
+  def targetPrefixedIds: Set[String] = _targetPrefixedIds
 
   // Analyze the handler
   def analyzeEventHandler(): Unit = {
@@ -133,7 +133,7 @@ class EventHandlerImpl(
     assert(_targetPrefixedIds eq null)
 
     // Logging
-    implicit val logger = staticStateContext.partAnalysis.getIndentedLogger
+    implicit val logger: IndentedLogger = staticStateContext.partAnalysis.getIndentedLogger
 
     def unknownTargetId(id: String) = {
       warn("unknown id", Seq("id" -> id))
@@ -317,7 +317,7 @@ class EventHandlerImpl(
     }
   }
 
-  final def isMatchByName(eventName: String) =
+  final def isMatchByName(eventName: String): Boolean =
     isAllEvents || eventNames(eventName)
 
   // Match if no target id is specified, or if any specified target matches
@@ -325,7 +325,7 @@ class EventHandlerImpl(
     targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
 
   // Match both name and target
-  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String) =
+  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean =
     isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 }
 
@@ -338,7 +338,7 @@ object EventHandlerImpl extends Logging {
   val TargetIsObserver = "#observer"
 
   // Whether the element is an event handler (a known action element with @*:event)
-  def isEventHandler(element: Element) =
+  def isEventHandler(element: Element): Boolean =
     XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
 
   // Given a static handler, and concrete observer and target, try to find the concrete handler

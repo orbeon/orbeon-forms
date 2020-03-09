@@ -57,13 +57,13 @@ object DndRepeat {
 
               override val mirrorContainer: UndefOr[Element] = containerElem
 
-              override def isContainer(el: Element) =
+              override def isContainer(el: Element): UndefOr[Boolean] =
                 el eq containerElem
 
-              override def moves(el: Element, source: Element, handle: Element, sibling: Element) =
+              override def moves(el: Element, source: Element, handle: Element, sibling: Element): UndefOr[Boolean] =
                 $(el).is(IsDndMovesSelector)
 
-              override def accepts(el: Element, target: Element, source: Element, sibling: Element) = {
+              override def accepts(el: Element, target: Element, source: Element, sibling: Element): UndefOr[Boolean] = {
 
                 val jSibling = $(sibling)
 

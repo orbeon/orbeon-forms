@@ -55,15 +55,14 @@ class EventHandlerImpl(
 
   import EventHandlerImpl._
 
-  // NOTE: We check attributes in the ev:* or no namespace. We don't need to handle attributes in the xbl:* namespace.
-  private def att(name: QName)               : String         = element.attributeValue(name)
-  private def attOption(name: QName)         : Option[String] = element.attributeValueOpt(name)
-  // TODO: no null
-  private def att(name1: QName, name2: QName)          =  attOption(name1) orElse attOption(name2) orNull
+  // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
+  private def att   (name: QName)               : String         = element.attributeValue(name)
+  private def attOpt(name: QName)               : Option[String] = element.attributeValueOpt(name)
+  private def attOpt(name1: QName, name2: QName): Option[String] = attOpt(name1) orElse attOpt(name2)
 
   // These are only relevant when listening to keyboard events
-  val keyText      : Option[String] = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
+  val keyText      : Option[String] = attOpt(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOpt(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
 
   val eventNames: Set[String] = {
 
@@ -89,27 +88,34 @@ class EventHandlerImpl(
     else
       (eventNames, false)
 
-   // Q: is this going to be eliminated as a field?
-  private val phaseAtt = att(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME)
+  val (
+    isCapturePhaseOnly: Boolean,
+    isTargetPhase     : Boolean,
+    isBubblingPhase   : Boolean
+  ) = {
+    val phaseAsSet = attOpt(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME).toSet
 
-  val isCapturePhaseOnly    : Boolean = phaseAtt == "capture"
-  val isTargetPhase         : Boolean = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
-  val isBubblingPhase       : Boolean = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
+    val capture  = phaseAsSet("capture")
+    val target   = phaseAsSet.isEmpty || phaseAsSet.exists(TargetPhaseTestSet)
+    val bubbling = phaseAsSet.isEmpty || phaseAsSet.exists(BubblingPhaseTestSet)
+
+    (capture, target, bubbling)
+  }
 
   val propagate: Propagate =
-    if (att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) == "stop")
+    if (attOpt(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) contains "stop")
       Propagate.Stop
     else
       Propagate.Continue
 
   val isPerformDefaultAction: Perform =
-    if (att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) == "cancel")
+    if (attOpt(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) contains "cancel")
       Perform.Cancel
     else
       Perform.Perform
 
   val isPhantom             : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
-  val isIfNonRelevant       : Boolean = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
+  val isIfNonRelevant       : Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
 
   assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
 
@@ -337,6 +343,9 @@ object EventHandlerImpl extends Logging {
   // Special target id indicating that the target is the observer
   val TargetIsObserver = "#observer"
 
+  private val TargetPhaseTestSet   = Set("target", "default")
+  private val BubblingPhaseTestSet = Set("bubbling", "default")
+
   // Whether the element is an event handler (a known action element with @*:event)
   def isEventHandler(element: Element): Boolean =
     XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
@@ -355,6 +364,8 @@ object EventHandlerImpl extends Logging {
         targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
       } else if (handler.isPhantom) {
         // Special case of a phantom handler
+
+
         // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
         containingDocument.findObjectByEffectiveId(handler.prefixedId)
       } else {

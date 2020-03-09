@@ -13,13 +13,14 @@
   */
 package org.orbeon.facades
 
+import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLLinkElement
 
 import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
 
 @js.native
 trait Mousetrap extends js.Object {
@@ -64,4 +65,21 @@ object Html {
         element.parentElement.closest(selector)
     }
   }
+}
+
+@JSGlobalScope
+@js.native
+private object ResizeObserverGlobalScope extends js.Object {
+  val ResizeObserver: js.UndefOr[js.Any] = js.native
+}
+
+object ResizeObserver {
+  def isDefined: Boolean = ResizeObserverGlobalScope.ResizeObserver.isDefined
+}
+
+@js.native
+@JSGlobal
+class ResizeObserver(observer: js.Function0[Unit]) extends js.Object {
+  def observe  (element: dom.Element): Unit = js.native
+  def unobserve(element: dom.Element): Unit = js.native
 }

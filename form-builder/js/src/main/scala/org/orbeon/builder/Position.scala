@@ -14,6 +14,7 @@
 package org.orbeon.builder
 
 import org.orbeon.datatypes.Orientation
+import org.orbeon.facades.ResizeObserver
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.oxf.util.StringUtils._
@@ -64,7 +65,21 @@ object Position {
     Events.orbeonLoadedEvent.subscribe(fn)
     Events.ajaxResponseProcessedEvent.subscribe(fn)
     Events.componentChangedLayoutEvent.subscribe(fn)
+
+    // Can be removed once we only support Safari 14, which implements the `ResizeObserver`
     $(window).on("resize.orbeon.builder", fn)
+
+    // `ResizeObserver` catches window resizes, but also Form Builder being moved or resized by the embedding app
+    org.scalajs.dom.console.log("ResizeObserver.isDefined", ResizeObserver.isDefined)
+    if (ResizeObserver.isDefined) {
+      Events.orbeonLoadedEvent.subscribe(() => {
+        val jsFn: js.Function0[Unit] = fn
+        val resizeObserver = new ResizeObserver(jsFn)
+        val fbMainOpt      = Option(document.querySelector(".fb-main"))
+        org.scalajs.dom.console.log("fbMainOpt", fbMainOpt.isDefined)
+        fbMainOpt.foreach(resizeObserver.observe)
+      })
+    }
   }
 
   // Finds the container, if any, based on a vertical position

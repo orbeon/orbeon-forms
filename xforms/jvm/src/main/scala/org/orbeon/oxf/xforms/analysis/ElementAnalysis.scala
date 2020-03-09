@@ -304,8 +304,14 @@ trait ElementEventHandlers {
     // NOTE: For `phase == Target`, `observer eq element`.
     def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
 
-      // FIXME: This seems wrong!
-      val isPhantom = observer.scope != element.scope
+      // We gather observers with `relevantObserversFromLeafToRoot` and either:
+      //
+      // - they have the same XBL scope
+      // - OR there is at least one phantom handler for that observer
+      //
+      // So if the scopes are different, we must require that the handler is a phantom handler
+      // (and therefore ignore handlers on that observer which are not phantom handlers).
+      val requirePhantomHandler = observer.scope != selfElement.scope
 
       def matchesPhaseNameTarget(eventHandler: EventHandler) =
         (
@@ -316,7 +322,7 @@ trait ElementEventHandlers {
           eventHandler.isMatchByNameAndTarget(eventName, selfElement.prefixedId)
 
       def matches(eventHandler: EventHandler) =
-        if (isPhantom) // FIXME: This seems wrong!
+        if (requirePhantomHandler)
           eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
         else
           matchesPhaseNameTarget(eventHandler)

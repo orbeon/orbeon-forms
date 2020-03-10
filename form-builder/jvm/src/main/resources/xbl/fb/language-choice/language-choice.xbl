@@ -1,0 +1,72 @@
+<!--
+  Copyright (C) 2020 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+
+    <!--
+        FIXME: This logic is duplicated in view.xsl. To make this reusable:
+
+        - move to Form Runner
+        - don't use `fbf:resourcesRoot()`
+    -->
+    <xbl:binding
+        id="fb-language-choice"
+        element="fb|language-choice"
+        xxbl:mode="binding lhha custom-lhha">
+
+        <xbl:template>
+
+            <xf:var
+                name="available-languages"
+                value="frf:allLangs(fbf:resourcesRoot())"/>
+
+            <xf:group
+                ref="
+                    .[
+                        count($available-languages) gt 1 and                  (: show if there is more than one language :)
+                        xxf:is-blank(
+                            xxf:get-request-header('orbeon-liferay-language') (: AND no language selection via header    :)
+                        )
+                    ]">
+                <div class="navbar">
+                    <div class="navbar-inner">
+                        <xh:div class="fr-language-choice pull-right">
+                            <xf:select1 ref="xxf:binding('fb-language-choice')" appearance="bootstrap">
+                                <xf:label value="xxf:label('fb-language-choice')"/>
+                                <xf:itemset ref="$available-languages">
+                                    <xf:label
+                                        ref="
+                                            (
+                                                xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name,
+                                                context()
+                                            )[1]"/>
+                                    <xf:value ref="context()"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:div>
+                    </div>
+                </div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

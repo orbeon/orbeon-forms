@@ -78,7 +78,7 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         jSelect.select2(options)
         if (performsSearch)
-          jSelect.on("change", onChange(htmlSelect) _)
+          jSelect.on("change", onChange _)
       }
 
       initOrUpdatePlaceholder()
@@ -97,10 +97,27 @@ private class Select1SearchCompanion extends XBLCompanion {
     ))
   }
 
-  private def onChange(htmlSelect: html.Select)(event: JQueryEventObject): Unit = {
-    val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
-    val label = selectedOption.text
-    val value = selectedOption.value
+  private def onChange(event: JQueryEventObject): Unit = {
+    val htmlSelect = event.target.asInstanceOf[html.Select]
+    if (htmlSelect.selectedIndex == -1) {
+      // `selectedIndex` is -1 when the value was cleared
+      dispatchFrChange(
+        label = "",
+        value = ""
+      )
+    } else {
+      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+      dispatchFrChange(
+        label = selectedOption.text,
+        value = selectedOption.value
+      )
+    }
+  }
+
+  private def dispatchFrChange(
+    label : String,
+    value : String
+  ): Unit = {
     AjaxEvent.dispatchEvent(
       AjaxEvent(
         eventName  = "fr-change",

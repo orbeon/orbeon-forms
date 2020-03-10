@@ -48,7 +48,7 @@ object Tabbable {
 
       override def init(): Unit = {
 
-        if ($(containerElem).is(".fr-tabbable-dnd")) {
+        if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
           val firstRepeatContainer = $(containerElem).find(NavTabsSelector)(0)
 

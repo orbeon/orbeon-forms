@@ -341,7 +341,7 @@ object InitSupport {
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, valueOpt) =>
         Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
-          val jControl = $(control)
+          val classList = control.classList
           if (XBL.isComponent(control)) {
             // Custom XBL component initialization
             for {
@@ -350,13 +350,13 @@ object InitSupport {
             } locally {
               Controls.setCurrentValue(control, value)
             }
-          } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+          } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
               // Initialized visible dialogs
               Init._dialog(control)
-          } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+          } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
               // Legacy JavaScript initialization
               Init._compactSelect(control)
-          } else if (jControl.is(".xforms-range")) {
+          } else if (classList.contains("xforms-range")) {
               // Legacy JavaScript initialization
               Init._range(control)
           }

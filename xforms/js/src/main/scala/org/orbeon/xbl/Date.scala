@@ -50,7 +50,7 @@ private class DateCompanion extends XBLCompanionWithState {
     scribe.debug("init")
 
     // Add `readonly` attribute on the input if the control is readonly
-    val isReadonly = $(containerElem).is(".xforms-readonly")
+    val isReadonly = containerElem.classList.contains("xforms-readonly")
     xformsUpdateReadonly(isReadonly)
 
     if (iOS) {

@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
@@ -196,7 +196,7 @@ object Number {
               TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
 
           val changeType =
-            $("body").is(".xforms-mobile") &&
+            dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
               companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
 
           if (changeType) {

@@ -88,7 +88,7 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     require(
-      ! $(control).is(".xforms-output, .xforms-upload"),
+      ! (control.classList.contains("xforms-output") || control.classList.contains("xforms-upload")),
       s"Cannot set the value of an output or upload control for id `${control.id}`"
     )
 

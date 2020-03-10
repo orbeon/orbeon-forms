@@ -278,7 +278,7 @@ object Controls {
     sourceEffectiveId : String,
     targetPrefixedId  : String
   ): (Option[String], List[Int], List[String]) = {
-    // Check preconditions
+
     require(sourceEffectiveId ne null, "Source effective id is required.")
 
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)

@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsA
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -116,9 +116,6 @@ class EventHandlerImpl(
 
   val isPhantom             : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
   val isIfNonRelevant       : Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
-
-  assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
-
   val isXBLHandler          : Boolean = element.getQName == XBL_HANDLER_QNAME
 
   // Observers and targets
@@ -268,7 +265,7 @@ class EventHandlerImpl(
         case _ =>
 
           // Resolve the concrete handler
-          EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
+          EventHandlerImpl.resolveHandler(containingDocument, self, eventObserver, event.targetObject) match {
             case Some(concreteHandler) =>
 
               val handlerContainer   = concreteHandler.container
@@ -338,20 +335,16 @@ class EventHandlerImpl(
 object EventHandlerImpl extends Logging {
 
   // Special observer id indicating that the observer is the preceding sibling control
-  val ObserverIsPrecedingSibling = "#preceding-sibling"
+  private val ObserverIsPrecedingSibling = "#preceding-sibling"
 
   // Special target id indicating that the target is the observer
-  val TargetIsObserver = "#observer"
+  private val TargetIsObserver = "#observer"
 
   private val TargetPhaseTestSet   = Set("target", "default")
   private val BubblingPhaseTestSet = Set("bubbling", "default")
 
-  // Whether the element is an event handler (a known action element with @*:event)
-  def isEventHandler(element: Element): Boolean =
-    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
-
   // Given a static handler, and concrete observer and target, try to find the concrete handler
-  def resolveHandler(
+  private def resolveHandler(
     containingDocument : XFormsContainingDocument,
     handler            : EventHandlerImpl,
     eventObserver      : XFormsEventTarget,
@@ -362,12 +355,29 @@ object EventHandlerImpl extends Logging {
       if (targetObject.scope == handler.scope) {
         // The scopes match so we can resolve the id relative to the target
         targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
-      } else if (handler.isPhantom) {
-        // Special case of a phantom handler
-
-
-        // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
+      } else if (handler.isPhantom && ! handler.isWithinRepeat) {
+        // Optimize for non-repeated phantom handler
         containingDocument.findObjectByEffectiveId(handler.prefixedId)
+      } else if (handler.isPhantom) {
+        // Repeated phantom handler
+
+        val zeroOrOneControl =
+          for {
+            controls           <- Option(containingDocument.getControls).toList
+            effectiveControlId <-
+              Controls.resolveControlsEffectiveIds(
+                containingDocument.getStaticOps,
+                controls.getCurrentControlTree,
+                targetObject.getEffectiveId,
+                handler.staticId,
+                followIndexes = true // so this will return 0 or 1 element
+              )
+            control            <- controls.findObjectByEffectiveId(effectiveControlId)
+          } yield
+            control
+
+        zeroOrOneControl.headOption
+
       } else {
         // See https://github.com/orbeon/orbeon-forms/issues/243
         warn(
@@ -387,6 +397,10 @@ object EventHandlerImpl extends Logging {
 
     resolvedObject map (_.asInstanceOf[XFormsEventHandler])
   }
+
+  // Whether the element is an event handler (a known action element with @*:event)
+  def isEventHandler(element: Element): Boolean =
+    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
 
   def parseKeyModifiers(value: Option[String]): Set[Modifier] =
     value match {

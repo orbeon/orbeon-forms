@@ -39,8 +39,8 @@ object Bowser extends js.Object {
   val msedge  : js.UndefOr[Boolean] = js.native
   val ios     : js.UndefOr[Boolean] = js.native
   val mobile  : js.UndefOr[Boolean] = js.native
-  val version : String  = js.native
-  val name    : String  = js.native
+  val version : String              = js.native
+  val name    : String              = js.native
 }
 
 object Html {

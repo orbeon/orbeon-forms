@@ -122,10 +122,10 @@ object InitSupport {
 
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
-        jBody.addClass(Constants.XFormsIosClass)
+      jBody.addClass(Constants.XFormsIosClass)
 
     if (Bowser.mobile.contains(true))
-        jBody.addClass(Constants.XFormsMobileClass)
+      jBody.addClass(Constants.XFormsMobileClass)
   }
 
   @JSExport

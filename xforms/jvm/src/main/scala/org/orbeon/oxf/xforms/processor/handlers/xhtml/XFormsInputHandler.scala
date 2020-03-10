@@ -246,7 +246,7 @@ class XFormsInputHandler(
       super.handleLabel()
 
   protected override def handleHint(): Unit =
-    if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
+    if (placeHolderInfo forall (_.isLabelPlaceholder))
       super.handleHint()
 }
 

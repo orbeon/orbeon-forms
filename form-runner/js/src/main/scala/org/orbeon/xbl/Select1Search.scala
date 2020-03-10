@@ -67,7 +67,6 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         object options extends Select2.Options {
           allowClear     = true
-          dropdownParent = jContainer
           ajax           = if (performsSearch) Select2Ajax else null
           width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =

@@ -529,12 +529,12 @@
                                     <xf:var name="var2" value="xs:date(error[6])"/>                                     <!-- XPath error on variable value -->
                                     <xf:input ref=".[xs:date(error[7]) = current-date()]"/>                             <!-- XPath error on control binding -->
                                     <xf:output value="xs:date(error[8])"/>                                              <!-- XPath error on control value -->
-                                    <xf:select ref="select">
+                                    <xf:select1 ref="select">
                                         <xf:itemset ref=".[1]">
                                             <xf:label value="xs:date(../error[9])"/>                                    <!-- XPath error on itemset label -->
                                             <xf:value/>
                                         </xf:itemset>
-                                    </xf:select>
+                                    </xf:select1>
                                 </xf:group>
                             </xh:body>
                         </xh:html>

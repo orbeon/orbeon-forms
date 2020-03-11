@@ -2765,6 +2765,118 @@
         </output>
     </test>
 
+    <test description="Support phantom handlers in repeats #4462" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance" xxf:exclude-result-prefixes="#all">
+                            <values>
+                                <outer>
+                                    <inner1/>
+                                    <inner2/>
+                                    <inner2/>
+                                </outer>
+                                <outer>
+                                    <inner1/>
+                                    <inner1/>
+                                    <inner2/>
+                                </outer>
+                            </values>
+                        </xf:instance>
+
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding element="fr|foo">
+                            <xbl:template>
+                                <xf:group id="fr-foo-inner-group"/>
+                                <xf:dispatch
+                                    event="xforms-enabled"
+                                    target="fr-foo-inner-group"
+                                    name="foo-event"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+
+                    <xf:group id="my-outer-group">
+                        <xf:repeat id="my-outer-repeat" ref="outer">
+
+                            <xf:repeat id="my-inner-repeat-1" ref="inner1">
+                                <fr:foo id="my-foo"/>
+                                <xf:message
+                                    observer="my-foo"
+                                    xxf:phantom="true"
+                                    event="foo-event"
+                                    value="concat('inner scope event caught in inner repeat 1 from ', event('xxf:absolute-targetid'))"/>
+                            </xf:repeat>
+
+                            <xf:repeat id="my-inner-repeat-2" ref="inner2">
+                                <xf:message
+                                    observer="my-foo"
+                                    xxf:phantom="true"
+                                    event="foo-event"
+                                    value="concat('inner scope event caught in inner repeat 2 from ', event('xxf:absolute-targetid'))"/>
+                            </xf:repeat>
+
+                            <xf:message
+                                observer="my-foo"
+                                xxf:phantom="true"
+                                event="foo-event"
+                                value="concat('inner scope event caught in outer repeat from ', event('xxf:absolute-targetid'))"/>
+
+                        </xf:repeat>
+                    </xf:group>
+
+                    <!-- Must not run! -->
+                    <xf:message
+                        observer="my-outer-group"
+                        event="foo-event"
+                        value="concat('outer scope event caught in outer group from ', event('xxf:absolute-targetid'))"/>
+
+                    <xf:message
+                        observer="my-outer-group"
+                        xxf:phantom="true"
+                        event="foo-event"
+                        value="concat('inner scope event caught in outer group from ', event('xxf:absolute-targetid'))"/>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <controls>
+                            <control effective-id="my-outer-repeat" index="1"/>
+                            <control effective-id="my-inner-repeat-1⊙1" index="1"/>
+                            <control effective-id="my-inner-repeat-2⊙1" index="1"/>
+                            <control effective-id="my-inner-repeat-1⊙2" index="1"/>
+                            <control effective-id="my-inner-repeat-2⊙2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 1 from |my-foo≡fr-foo-inner-group⊙1-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 2 from |my-foo≡fr-foo-inner-group⊙1-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer repeat from |my-foo≡fr-foo-inner-group⊙1-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer group from |my-foo≡fr-foo-inner-group⊙1-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 1 from |my-foo≡fr-foo-inner-group⊙2-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 2 from |my-foo≡fr-foo-inner-group⊙2-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer repeat from |my-foo≡fr-foo-inner-group⊙2-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer group from |my-foo≡fr-foo-inner-group⊙2-1|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 1 from |my-foo≡fr-foo-inner-group⊙2-2|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in inner repeat 2 from |my-foo≡fr-foo-inner-group⊙2-2|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer repeat from |my-foo≡fr-foo-inner-group⊙2-2|</xxf:message>
+                    <xxf:message level="modal">inner scope event caught in outer group from |my-foo≡fr-foo-inner-group⊙2-2|</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 <!--
 
 TODO:

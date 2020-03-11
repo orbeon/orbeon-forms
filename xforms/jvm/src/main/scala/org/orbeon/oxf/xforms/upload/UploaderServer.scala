@@ -38,7 +38,7 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}

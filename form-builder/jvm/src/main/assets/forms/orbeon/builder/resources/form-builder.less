@@ -1292,6 +1292,25 @@ div.orbeon.orbeon-portlet-div {
         margin-right: 0;
     }
 
+    .xforms-dialog {
+
+        // Make the language choice selector smaller and floating to the top right
+        .xbl-fb-language-choice {
+            float: right;
+
+            .navbar {
+                margin-bottom: 0;
+                .navbar-inner {
+                    min-height: 10px;
+                }
+
+                .nav > li >a {
+                    padding: 5px;
+                }
+            }
+        }
+    }
+
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder
     .xbl-fr-xforms-inspector {
         display: none;

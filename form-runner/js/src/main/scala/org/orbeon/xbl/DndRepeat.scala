@@ -17,7 +17,7 @@ import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
-import org.scalajs.dom.html.Element
+import org.scalajs.dom.html//.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
@@ -40,9 +40,9 @@ object DndRepeat {
     new XBLCompanion {
 
       case class DragState(
-        currentDragStartPrev     : Element,
+        currentDragStartPrev     : html.Element,
         currentDragStartPosition : Int,
-        excludedTargets          : List[Element]
+        excludedTargets          : List[html.Element]
       )
 
       private var dragState : Option[DragState] = None
@@ -55,15 +55,15 @@ object DndRepeat {
             js.Array(),
             new DragulaOptions {
 
-              override val mirrorContainer: UndefOr[Element] = containerElem
+              override val mirrorContainer: UndefOr[html.Element] = containerElem
 
-              override def isContainer(el: Element): UndefOr[Boolean] =
+              override def isContainer(el: html.Element): UndefOr[Boolean] =
                 el eq containerElem
 
-              override def moves(el: Element, source: Element, handle: Element, sibling: Element): UndefOr[Boolean] =
+              override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
                 $(el).is(IsDndMovesSelector)
 
-              override def accepts(el: Element, target: Element, source: Element, sibling: Element): UndefOr[Boolean] = {
+              override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] = {
 
                 val jSibling = $(sibling)
 
@@ -77,11 +77,11 @@ object DndRepeat {
             }
           )
 
-        newDrake.onDrag((el: Element, source: Element) => {
+        newDrake.onDrag((el: html.Element, source: html.Element) => {
 
           val jEl = $(el)
 
-          def findElemLevel(el: Element) =
+          def findElemLevel(el: html.Element) =
             el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) => level.toInt }
 
           val startLevelOpt = findElemLevel(el)
@@ -106,11 +106,11 @@ object DndRepeat {
           )
         })
 
-        newDrake.onDragend((el: Element) => {
+        newDrake.onDragend((el: html.Element) => {
           dragState = None
         })
 
-        newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) => {
+        newDrake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
           dragState foreach { dragState =>
 
             val dndEnd     = $(el).prevAll(IsDndItemSelector).length

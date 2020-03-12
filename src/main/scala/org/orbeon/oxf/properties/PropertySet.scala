@@ -44,7 +44,7 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
 
 private class PropertyNode {
   var property: Option[Property] = None
-  var children: Map[String, PropertyNode] = Map.empty
+  var children = mutable.LinkedHashMap[String, PropertyNode]()
 }
 
 /**

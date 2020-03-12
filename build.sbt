@@ -19,7 +19,7 @@ val ScalatTestVersion             = "3.1.1"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.5.15"
-val EnumeratumCirceVersion        = "1.5.22"
+val EnumeratumCirceVersion        = "1.5.23"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -34,12 +34,12 @@ val ScalaCollectionCompatVersion  = "2.1.3"
 val JUnitInterfaceVersion         = "0.11"
 val JodaConvertVersion            = "2.2.1"
 val Slf4jVersion                  = "1.7.30"
-val HttpComponentsVersion         = "4.5.11"
+val HttpComponentsVersion         = "4.5.12"
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.6"
 val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.3.0"
-val JacksonVersion                = "2.10.2"
+val JacksonVersion                = "2.10.3"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.2"
 
@@ -95,7 +95,7 @@ val CoreLibraryDependencies = Seq(
   "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.19"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.10" % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.11" % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,

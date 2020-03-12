@@ -17,11 +17,6 @@ env:
   - TARGET=orbeon-dist
 addons:
   postgresql: "9.5"
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
   artifacts:
     paths:
     - $(ls build/distrib/* | egrep -v '(embedding|proxy-portlet|xforms-filter|orbeon-auth)' | egrep -v '\-[CP]E\.(tgz|war)' | tr "\n" ":")
@@ -57,6 +52,7 @@ before_script:
 - if [ "$TARGET" == "test-unit" ]; then docker pull tomcat:8.0; fi
 - if [ "$TARGET" == "test-unit" ]; then docker pull haproxy:1.7; fi
 # Create `orbeon` user on MySQL
+- if [ "$TARGET" == "test-unit" ]; then sleep 10; fi
 - if [ "$TARGET" == "test-unit" ]; then docker run -it --network="host" --rm mysql:5.7 mysql --protocol=TCP --host=localhost --user root -e "CREATE USER 'orbeon'@'%' IDENTIFIED BY 'password'"; fi
 - if [ "$TARGET" == "test-unit" ]; then docker run -it --network="host" --rm mysql:5.7 mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'%' WITH GRANT OPTION"; fi
 script:

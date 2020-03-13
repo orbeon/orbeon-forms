@@ -1422,7 +1422,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                ORBEON.xforms.Page.getForm(formID).loadingIndicator.show();
+                ORBEON.xforms.Page.loadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
         } catch (e) {

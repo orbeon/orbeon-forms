@@ -455,11 +455,11 @@ object AjaxClient {
       FutureUtils.withFutureSideEffects(
         before = {
           EventQueue.ajaxRequestInProgress = true
-          Page.loadingIndicator.requestStarted()
+          Page.loadingIndicator().requestStarted()
         },
         after  = {
           EventQueue.ajaxRequestInProgress = false
-          Page.loadingIndicator.requestEnded()
+          Page.loadingIndicator().requestEnded()
         }
       ) {
         Support.fetchText(
@@ -611,7 +611,7 @@ object AjaxClient {
         Page.getForm(currentFormId).clearDiscardableTimerIds()
 
       // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
-      Page.loadingIndicator.setNextConnectShow(showProgress)
+      Page.loadingIndicator().setNextConnectShow(showProgress)
 
       // Don't ignore errors if any of the events tell us not to ignore errors
       // So we only ignore errors if all of the events tell us to ignore errors

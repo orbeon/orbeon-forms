@@ -69,7 +69,6 @@ object BlockCache {
 
     // Keep caches current
     Position.onOffsetMayHaveChanged(() => {
-      org.scalajs.dom.console.log("onOffsetMayHaveChanged")
 
       locally {
 

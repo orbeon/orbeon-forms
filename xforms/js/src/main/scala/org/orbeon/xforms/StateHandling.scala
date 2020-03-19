@@ -18,6 +18,7 @@ import io.circe.parser._
 import io.circe.syntax._
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
+import org.scalajs.dom.HashChangeEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -49,7 +50,7 @@ object StateHandling {
   def initializeState(formId: String, initialUuid: String): StateResult = {
 
     def setInitialState(uuid: String): Unit =
-      StateHandling.updateClientState(
+      updateClientState(
         formId,
         ClientState(
           uuid     = uuid,
@@ -57,7 +58,7 @@ object StateHandling {
         )
       )
 
-    StateHandling.findClientState(formId) match {
+    findClientState(formId) match {
       case None =>
 
         scribe.debug("no state found, setting initial state")
@@ -78,7 +79,7 @@ object StateHandling {
 
         scribe.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
-        StateHandling.clearClientState(formId)
+        clearClientState(formId)
         StateResult.Reload
 
       case Some(state) =>
@@ -127,24 +128,32 @@ object StateHandling {
     scribe.debug(s"updating client state for form `$formId` with value `$serialized`")
 
     dict(formId) = serialized
-
-    dom.window.history.replaceState(
-      statedata = dict,
-      title     = "",
-      url       = null
-    )
+    Private.replaceState(dict)
   }
 
   def clearClientState(formId: String): Unit =
     findRawState foreach { state =>
+      state -= formId
+      Private.replaceState(state)
+    }
+
+  private object Private {
+
+    // Restore state after hash changes
+    dom.window.addEventListener("hashchange", (_: HashChangeEvent) => {
+      Private.rawState.foreach(replaceState)
+    })
+
+    var rawState: Option[Dictionary[String]] = None
+
+    def replaceState(state: Dictionary[String]): Unit = {
+      Private.rawState = Some(state)
       dom.window.history.replaceState(
-        statedata = state -= formId,
+        statedata = state,
         title     = "",
         url       = null
       )
     }
-
-  private object Private {
 
     // Assume the state is a `js.Dictionary[String]` mapping form ids to serialized state
     def findRawState: Option[Dictionary[String]] =

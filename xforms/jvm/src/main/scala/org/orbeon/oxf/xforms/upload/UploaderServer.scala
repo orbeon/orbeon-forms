@@ -44,6 +44,7 @@ import scala.collection.{mutable => m}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 import scala.collection.compat._
+import shapeless.syntax.typeable._
 
 // Separate checking logic for sanity and testing
 trait UploadCheckerLogic {
@@ -262,17 +263,15 @@ object UploaderServer {
           case AllowedMediatypes.AllowedAnyMediatype =>
           case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
 
-            val untrustedPartMediatypeOpt =
+            def findHeaderValue(name: String) =
               for {
-                headersSupport    <- collectByErasedType[FileItemHeadersSupport](fileItem)
-                headers           <- Option(headersSupport.getHeaders)
-                contentTypeString <- Option(headers.getHeader(Headers.ContentType))
-                mediatypeString   <- ContentTypes.getContentTypeMediaType(contentTypeString)
-                mediatype         <- Mediatype.unapply(mediatypeString)
+                support <- fileItem.cast[FileItemHeadersSupport]
+                headers <- Option(support.getHeaders)
+                value   <- Option(headers.getHeader(name))
               } yield
-                mediatype
+                value
 
-            untrustedPartMediatypeOpt match {
+            Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
               case None =>
                 throw DisallowedMediatypeException(allowedMediatypeRanges, None)
               case Some(untrustedPartMediatype) =>

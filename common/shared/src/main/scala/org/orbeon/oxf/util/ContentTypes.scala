@@ -24,6 +24,7 @@ object ContentTypes {
   val JavaScriptContentType     = "application/javascript"
   val CssContentType            = "text/css"
   val SoapContentType           = "application/soap+xml"
+  val OctetStreamContentType    = "application/octet-stream"
   val UnknownContentType        = "content/unknown"
 
   val CharsetParameter          = "charset"

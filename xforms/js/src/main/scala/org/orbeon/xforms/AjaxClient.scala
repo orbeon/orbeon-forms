@@ -245,10 +245,6 @@ object AjaxClient {
   def hasEventsToProcess: Boolean =
     EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
-  def isRequestInProgress(): Boolean =
-    EventQueue.ajaxRequestInProgress
-
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
     EventQueue.changedIdsRequest.contains(controlId)

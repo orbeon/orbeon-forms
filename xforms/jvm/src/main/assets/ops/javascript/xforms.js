@@ -2134,17 +2134,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             // Position the dialog either at the center of the viewport or relative of a neighbor
             if (neighbor == null) {
-                // Center dialog in page, delaying until the end of the request to give a chance to the content of the dialog
-                // to show itself.
-                if (ORBEON.xforms.server.AjaxServer.isRequestInProgress()) {
-                    var centerDialog = function() {
-                        yuiDialog.center();
-                        ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);
-                    };
-                    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(centerDialog);
-                } else {
-                    yuiDialog.center();
-                }
+                // Center dialog in page after the whole Ajax request has been processed,
+                // giving a chance to the content of the dialog to show itself
+                  var centerDialog = function() {
+                      yuiDialog.center();
+                      ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);
+                  };
+                  ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(centerDialog);
             } else {
                 // Align dialog relative to neighbor
                 yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);

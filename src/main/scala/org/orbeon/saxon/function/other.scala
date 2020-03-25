@@ -20,7 +20,7 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.DefaultFunctionSupport
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
@@ -43,7 +43,7 @@ class ImageMetadata extends DefaultFunctionSupport {
     def findMetadata(is: InputStream) =
       stringArgument(1) match {
         case "mediatype" => findImageMediatype(is) map stringToStringValue
-        case name        => findKnownMetadata(is, name)
+        case name        => findKnownMetadata(is, name) map SaxonUtils.anyToItem
       }
 
     argumentAsString map createStream flatMap findMetadata orNull

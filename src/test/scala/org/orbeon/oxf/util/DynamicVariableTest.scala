@@ -13,25 +13,31 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpec
 
+class DynamicVariableTest extends AnyFunSpec {
 
-class DynamicVariableTest extends AssertionsForJUnit {
+  describe("Basic usage") {
 
-  @Test def basicUsage() {
     val v1 =  new DynamicVariable[String]
-    assert(v1.value === None)
-
-    v1.withValue("foo") {
-      assert(v1.value === Some("foo"))
-
-      v1.withValue("bar") {
-        assert(v1.value === Some("bar"))
-      }
-
-      assert(v1.value === Some("foo"))
+    it("must be initially empty") {
+      assert(v1.value.isEmpty)
     }
-    assert(v1.value === None)
+
+    it("must scope nested values") {
+      v1.withValue("foo") {
+        assert(v1.value.contains("foo"))
+
+        v1.withValue("bar") {
+          assert(v1.value.contains("bar"))
+        }
+
+        assert(v1.value.contains("foo"))
+      }
+    }
+
+    it("must be finally empty") {
+      assert(v1.value.isEmpty)
+    }
   }
 }

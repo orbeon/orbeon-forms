@@ -14,34 +14,41 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 
-class StringReplacerTest extends AssertionsForJUnit {
+class StringReplacerTest extends AnyFunSpecLike {
 
   implicit def logger = ResourceManagerTestBase.newIndentedLogger
 
-  @Test def simpleReplacements(): Unit = {
+  describe("Simple replacements") {
 
     val TestString = "abcdabcd"
 
-    // Valid replacements
-    assert("AbCdAbCd"             === StringReplacer("""{ "a": "A", "c": "C" }""")     (logger)(TestString))
-    assert("BcdBcd"               === StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
-    assert("dcbadcba"             === StringReplacer("""{ "abcd": "dcba" }""")         (logger)(TestString))
-    assert("""between "quotes"""" === StringReplacer("""{ "'": "\"" }""")              (logger)("between 'quotes'"))
+    it("must pass valid replacements") {
+      assert("AbCdAbCd" == StringReplacer("""{ "a": "A", "c": "C" }""")     (logger)(TestString))
+      assert("BcdBcd"   == StringReplacer("""{ "a": "aaa", "aaab": "B" }""")(logger)(TestString))
+      assert("dcbadcba" == StringReplacer("""{ "abcd": "dcba" }""")         (logger)(TestString))
+    }
 
-    // Empty map
-    assert(TestString === StringReplacer("""{}""")(logger)(TestString))
+    it("must pass between quotes") {
+      assert("""between "quotes"""" == StringReplacer("""{ "'": "\"" }""")(logger)("between 'quotes'"))
+    }
 
-    // Not a map
-    assert(TestString === StringReplacer("""[]""")(logger)(TestString))
+    it("must pass with an empty map") {
+      assert(TestString == StringReplacer("""{}""")(logger)(TestString))
+    }
 
-    // Map not to a string
-    assert(TestString === StringReplacer("""{ "a": 1 }""")(logger)(TestString))
+    it("must ignore a non-map") {
+      assert(TestString == StringReplacer("""[]""")(logger)(TestString))
+    }
 
-    // Invalid JSON
-    assert(TestString === StringReplacer("""{ 'a': 'A' }""")(logger)(TestString))
+    it("must ignore a non-string") {
+      assert(TestString == StringReplacer("""{ "a": 1 }""")(logger)(TestString))
+    }
+
+    it("must ignore invalid JSON") {
+      assert(TestString == StringReplacer("""{ 'a': 'A' }""")(logger)(TestString))
+    }
   }
 }

@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
+
 import scala.collection.compat._
 
-class URLFinderTest extends AssertionsForJUnit {
+
+class URLFinderTest extends AnyFunSpecLike {
 
   import URLFinder._
 
-  @Test def testFindURLs(): Unit = {
+  describe("The `findURLs` function") {
 
     val expected = List(
       """www.google.com"""                                           -> List("""www.google.com"""),
@@ -45,11 +46,13 @@ class URLFinderTest extends AssertionsForJUnit {
       """this mailto:info@orbeon.com works"""                        -> List("""info@orbeon.com""")
     )
 
-    for ((in, out) <- expected)
-      assert(out === findURLs(in).to(List))
+    it("must find all the URLs") {
+      for ((in, out) <- expected)
+        assert(out == findURLs(in).to(List))
+    }
   }
 
-  @Test def testReplaceURLs(): Unit = {
+  describe("The `replaceURLs` function ") {
 
     val input =
       """- Music is an art (https://en.wikipedia.org/wiki/Art).
@@ -75,10 +78,12 @@ class URLFinderTest extends AssertionsForJUnit {
         |- <a href="http://d1api.com/">d1api.com/</a>&quot;,k
         |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
-    assert(expected === replaceURLs(input, replaceWithHyperlink))
+    it("must replace all the URLs") {
+      assert(expected == replaceURLs(input, replaceWithHyperlink))
+    }
   }
 
-  @Test def testEmail(): Unit = {
+  describe("The `isEmail` function ") {
 
     val expected = List(
       """www.google.com"""         -> false,
@@ -91,7 +96,9 @@ class URLFinderTest extends AssertionsForJUnit {
       """mailto:info@orbeon.com""" -> false
     )
 
-    for ((in, out) <- expected)
-      assert(out === isEmail(in))
+    it("must pass all") {
+      for ((in, out) <- expected)
+        assert(out == isEmail(in))
+    }
   }
 }

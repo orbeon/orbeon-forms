@@ -121,11 +121,6 @@
 
                 <!-- Don't keep potentially large instances -->
                 <xf:insert ref="instance('fr-form')" origin="xf:element('dummy')"/>
-                <xf:send submission="reset-toolbox"/>
-
-                <!-- Following doesn't work because instance is readonly and insert code thinks it's mutating -->
-                <!-- Ideal would be an xxf:reset-instance(s) action -->
-                <!--<xf:insert context="instance('fr-components')/root()" origin="xf:element('dummy')"/>-->
             </xf:action>
 
             <xf:instance id="fr-form-instance">
@@ -433,12 +428,6 @@
                             name="new-available"
                             value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
 
-                        <!-- If we upgrade the form definition: retrieve toolbox -->
-                        <xf:send if="$upgrade-form-definition" submission="read-toolbox">
-                            <xf:property name="app"  value="$app"/>
-                            <xf:property name="form" value="$form"/>
-                        </xf:send>
-
                         <xf:send if="instance()/error = ''" submission="publish-submission">
                             <xf:property name="doc"                      value="instance('fr-form')"/>
                             <xf:property name="document-id"              value="''"/>
@@ -515,32 +504,7 @@
 
             </xf:submission>
 
-            <!-- Components (see also Form Builder model.xml) -->
-            <!-- NOTE: Bother caching as we invalidate all instances first, and then we might go through many libraries,
-                 therefore emptying the cache. -->
-            <!-- NOTE: This is not ideal, because toolbox.xpl expects both app/form names, and this means we can't
-                 properly cache libraries anymore. Ideally we should be able to cache per library -->
-            <xf:instance id="fr-components"><dummy/></xf:instance>
-
-            <xf:submission
-                id="read-toolbox"
-                serialization="none"
-                method="get"
-                resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
-                replace="instance"
-                instance="fr-components"
-                xxf:readonly="true"/>
-
-            <xf:submission
-                id="reset-toolbox"
-                ref="xf:element('dummy')"
-                method="put"
-                resource="echo:"
-                replace="instance"
-                instance="fr-components"
-                xxf:readonly="true"/>
-
-            <xf:action event="xforms-submit-error" observer="read-form read-toolbox publish-submission">
+            <xf:action event="xforms-submit-error" observer="read-form publish-submission">
 
                 <xf:setvalue
                     ref="error"

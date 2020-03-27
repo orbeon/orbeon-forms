@@ -2136,11 +2136,15 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (neighbor == null) {
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
-                  var centerDialog = function() {
-                      yuiDialog.center();
-                      ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);
-                  };
-                  ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(centerDialog);
+                if (ORBEON.xforms.server.AjaxServer.isRequestInProgress()) {
+                    var centerDialog = function() {
+                        yuiDialog.center();
+                        ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(centerDialog);
+                    };
+                    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(centerDialog);
+                } else {
+                    yuiDialog.center();
+                }
             } else {
                 // Align dialog relative to neighbor
                 yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);

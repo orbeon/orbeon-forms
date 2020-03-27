@@ -245,6 +245,10 @@ object AjaxClient {
   def hasEventsToProcess: Boolean =
     EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty
 
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
+   def isRequestInProgress(): Boolean =
+     EventQueue.ajaxRequestInProgress
+
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
     EventQueue.changedIdsRequest.contains(controlId)
@@ -448,24 +452,18 @@ object AjaxClient {
         controller.abort()
       }
 
-      FutureUtils.withFutureSideEffects(
-        before = {
-          EventQueue.ajaxRequestInProgress = true
-          Page.loadingIndicator().requestStarted()
-        },
-        after  = {
-          EventQueue.ajaxRequestInProgress = false
-          Page.loadingIndicator().requestEnded()
-        }
-      ) {
-        Support.fetchText(
+      EventQueue.ajaxRequestInProgress = true
+      Page.loadingIndicator().requestStarted()
+
+      Support.fetchText(
           url         = requestForm.xformsServerPath,
           requestBody = requestBody,
           contentType = "application/xml".some,
           formId      = requestFormId,
           abortSignal = controller.signal.some
-        )
-      } onComplete { response =>
+
+      ).onComplete { response =>
+
         // Ignore response if for a form we don't have anymore on the page
         if (dom.document.body.contains(requestForm.elem)) {
           response match {
@@ -483,6 +481,9 @@ object AjaxClient {
               retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
           }
         }
+
+        EventQueue.ajaxRequestInProgress = false
+        Page.loadingIndicator().requestEnded()
       }
     }
 

@@ -30,19 +30,15 @@ import scala.util.Try
 
 trait FormRunnerHome {
 
-  private def appForm(s: String) = {
-    val parts = s.splitTo[List]("/")
-    parts(0) -> parts(1)
-  }
-
   private case class AvailableAndTime(available: Boolean, time: Long)
 
   private case class Form(
-    app    : String,
-    form   : String,
-    local  : Option[AvailableAndTime],
-    remote : Option[AvailableAndTime],
-    ops    : Set[String]
+    app     : String,
+    form    : String,
+    version : String,
+    local   : Option[AvailableAndTime],
+    remote  : Option[AvailableAndTime],
+    ops     : Set[String]
   ) {
 
     import Form._
@@ -77,6 +73,7 @@ trait FormRunnerHome {
       Form(
         form elemValue Names.AppName,
         form elemValue Names.FormName,
+        form elemValue Names.FormVersion,
         localTime  map (v => AvailableAndTime((form elemValue "available")        != "false", DateUtils.parseISODateOrDateTime(v))),
         remoteTime map (v => AvailableAndTime((form elemValue "remote-available") != "false", DateUtils.parseISODateOrDateTime(v))),
         form attTokens "operations"
@@ -84,15 +81,20 @@ trait FormRunnerHome {
     }
   }
 
-  private def collectForms(forms: SequenceIterator, p: NodeInfo => Boolean = _ => true) =
+  private def collectForms(forms: SequenceIterator, p: NodeInfo => Boolean = _ => true): Iterator[Form] =
     asScalaIterator(forms) collect { case form: NodeInfo if p(form) => Form(form) }
 
   private def formsForSelection(selection: String, forms: SequenceIterator) = {
 
-    val appFormsSet = selection.splitTo[List]() map appForm toSet
+    def appFormVersion(s: String) = {
+      val parts = s.splitTo[List]("/")
+      (parts(0), parts(1), parts(2))
+    }
+
+    val appFormsSet = selection.splitTo[List]() map appFormVersion toSet
 
     def formIsSelected(form: NodeInfo) =
-      appFormsSet((form elemValue Names.AppName) -> (form elemValue Names.FormName))
+      appFormsSet((form elemValue Names.AppName, form elemValue Names.FormName, form elemValue Names.FormVersion))
 
     collectForms(forms, formIsSelected)
   }
@@ -190,18 +192,18 @@ trait FormRunnerHome {
 
     val combinedIndexIterator = {
 
-      def makeAppFormKey(node: NodeInfo) =
-        (node elemValue Names.AppName, node elemValue Names.FormName)
+      def makeKey(node: NodeInfo) =
+        (node elemValue Names.AppName, node elemValue Names.FormName, node elemValue Names.FormVersion)
 
       def createIndex(it: SequenceIterator) = asScalaIterator(it) collect {
-        case node: NodeInfo => makeAppFormKey(node) -> node
+        case node: NodeInfo => makeKey(node) -> node
       } toMap
 
-      val localIndex = createIndex(local)
+      val localIndex  = createIndex(local)
       val remoteIndex = createIndex(remote)
 
       (localIndex.keySet ++ remoteIndex.keySet).iterator map { key =>
-        key ->(localIndex.get(key), remoteIndex.get(key))
+        (localIndex.get(key), remoteIndex.get(key))
       }
     }
 
@@ -224,7 +226,10 @@ trait FormRunnerHome {
           localNode
         case (None, Some(remoteNode)) =>
           // Don't just use remoteNode, because we need `remote-` prefixes for remote data
-          elementInfo("form", (remoteNode / Names.AppName head) :: (remoteNode / Names.FormName head) :: remoteElements(remoteNode))
+          elementInfo(
+            "form",
+            (remoteNode / Names.AppName head) :: (remoteNode / Names.FormName head) :: remoteElements(remoteNode)
+          )
         case (Some(localNode), Some(remoteNode)) =>
           insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)
           localNode
@@ -233,8 +238,7 @@ trait FormRunnerHome {
       }
     }
 
-    for (((app, form), localAndOrRemote) <- combinedIndexIterator)
-      yield createNode(localAndOrRemote)
+    combinedIndexIterator map createNode
   }
 
   // Return remote servers information:

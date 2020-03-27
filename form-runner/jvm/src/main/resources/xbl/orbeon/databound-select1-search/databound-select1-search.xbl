@@ -114,8 +114,7 @@
                             <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
                             <xh:a
                                 href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
-                                target="_blank">
-                                <xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
+                                target="_blank"><xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
                             </xh:a>
                         </xh:td>
                     </xh:tr>

@@ -2532,6 +2532,35 @@
             <stage-name>Nom de l'étape</stage-name>
             <default-stage>Défaut</default-stage>
 
+            <operations>
+                <label>Opérations</label>
+                <item>
+                    <label>Remplir un nouveau formulaire</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Lister et rechercher les données</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder pour l'édition</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder pour la lecture</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder le PDF/TIFF</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width>Largeur du champs</field-width>
@@ -3812,6 +3841,35 @@
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
 
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
@@ -5091,6 +5149,35 @@
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
 
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
@@ -6362,6 +6449,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -7635,6 +7751,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -8911,6 +9056,35 @@
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
 
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
@@ -10182,6 +10356,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+            
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -11434,6 +11637,35 @@
 
             <stage-name>Stadium naam</stage-name>
             <default-stage>Standaard</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -12714,6 +12946,35 @@
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
 
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width todo="true">[Field width]</field-width>
@@ -13993,6 +14254,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>

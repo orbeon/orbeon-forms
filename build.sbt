@@ -39,7 +39,6 @@ val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.6"
 val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.3.0"
-val JacksonVersion                = "2.10.3"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.2"
 
@@ -86,8 +85,10 @@ val CoreLibraryDependencies = Seq(
   "log4j"                       % "log4j"                           % Log4jVersion,
   "com.jcraft"                  % "jsch"                            % "0.1.55",
   "jcifs"                       % "jcifs"                           % "1.3.17",
-  "com.google.crypto.tink"      % "tink"                            % TinkVersion,
-  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion,
+  "com.google.crypto.tink"      % "tink"                            % TinkVersion excludeAll (
+    ExclusionRule(organization = "com.amazonaws"),
+    ExclusionRule(organization = "com.fasterxml.jackson.core")
+  ),
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,

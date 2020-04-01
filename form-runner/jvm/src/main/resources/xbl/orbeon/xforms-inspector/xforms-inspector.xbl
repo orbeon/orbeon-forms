@@ -67,9 +67,23 @@
                         </xf:action>
                     </xf:action>
                     <xf:delete context="instance('inspector-itemset')" ref="model[starts-with(@id, 'orbeon-')]"/>
-                    <xf:setvalue ref="instance('inspector-instance')/current-model" value="instance('inspector-itemset')/model[1]/@id"/>
-                    <xf:setvalue ref="instance('inspector-instance')/current-instance"
-                                     value="instance('inspector-itemset')/model[1]/instance[1]/@id"/>
+                    <xf:setvalue
+                        ref="instance('inspector-instance')/current-model"
+                        value="
+                            instance('inspector-itemset')/(
+                                (: Default to `fr-form-model` if exists :)
+                                model[@id = '|fr-form-model|'],
+                                model[1]
+                            )[1]/@id"/>
+                    <xf:setvalue
+                        ref="instance('inspector-instance')/current-instance"
+                        value="
+                            instance('inspector-itemset')/
+                            model[@id = instance('inspector-instance')/current-model]/(
+                                (: Default to `fr-form-instance` if exists :)
+                                instance[@id = '|fr-form-instance|'],
+                                instance[1]
+                            )/@id"/>
                 </xf:action>
 
                 <xf:instance id="inspector-itemset">

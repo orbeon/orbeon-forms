@@ -56,7 +56,7 @@ object Html {
 
   implicit class HTMLElementOps(private val element: html.Element) extends AnyVal {
 
-    @tailrec def closest(selector: String): Option[html.Element] = {
+    @tailrec final def closest(selector: String): Option[html.Element] = {
       if (element.matches(selector))
         Some(element)
       else if (element.parentElement == null)

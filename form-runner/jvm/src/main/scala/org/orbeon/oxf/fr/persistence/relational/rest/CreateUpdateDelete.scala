@@ -212,20 +212,33 @@ trait CreateUpdateDelete
     req.dataPart match {
       case Some(dataPart) if ! req.forAttachment =>
 
-        // First delete from orbeon_i_control_text, which requires a join
-        val deleteFromControlIndexSql =
-          s"""|DELETE FROM orbeon_i_control_text
-              |      WHERE data_id IN
-              |          (
-              |              SELECT data_id
-              |                FROM orbeon_i_current
-              |               WHERE document_id = ?   AND
-              |                     draft       = 'Y'
-              |          )
+        val fromControlIndexWhere =
+          s"""|WHERE data_id IN
+              |    (
+              |        SELECT data_id
+              |          FROM orbeon_i_current
+              |         WHERE document_id = ?   AND
+              |               draft       = 'Y'
+              |    )
               |""".stripMargin
-        useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
-          ps.setString(1, dataPart.documentId)
-          ps.executeUpdate()
+
+        val fromControlIndexCount = "SELECT count(*) FROM orbeon_i_control_text " + fromControlIndexWhere
+
+        val count =
+          useAndClose(connection.prepareStatement(fromControlIndexCount)) { ps =>
+            ps.setString(1, dataPart.documentId)
+            useAndClose(ps.executeQuery()) { rs ⇒
+              rs.next()
+              rs.getInt(1)
+            }
+          }
+
+        if (count > 0) {
+          val deleteFromControlIndexSql = "DELETE FROM orbeon_i_control_text " + fromControlIndexWhere
+          useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
+            ps.setString(1, dataPart.documentId)
+            ps.executeUpdate()
+          }
         }
 
         // Then delete from all the other tables

@@ -66,20 +66,21 @@
 
             .fr-summary-search-item {
                 display: inline-block;
+                vertical-align: top;
                 margin-bottom: @spacing;
 
                 padding-right: @spacing / 2;
                 margin-right: @spacing / 2;
-                border-right: 1px dashed #ddd;
+                width: 215px;
 
                 .xforms-label {
-                    display: table;
                     margin-bottom: 2px;
+                    display: block;
                 }
 
-                .xforms-input:not(.xforms-type-time) input, select {
-                    width: 12em;
-                }
+                // Fields to use all the available horizontal space
+                input[type = "text"] { width: 100%; }
+                .input-prepend, .input-append { display: flex; }
 
                 .xbl-fr-time .input-append .xforms-input .xforms-type-time {
                     background-image: none;

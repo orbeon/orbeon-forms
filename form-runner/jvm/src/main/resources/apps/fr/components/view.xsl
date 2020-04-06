@@ -1173,19 +1173,34 @@
                                     return
                                         concat(
                                             'map:entry(''',
-                                                $p/fr:name,
+                                                $p/fr:name[1],
                                                 ''',',
-                                                if (exists($p/fr:expr)) then
+                                                if ($p/@type = 'ExpressionParam') then
                                                     concat(
                                                         'string((',
                                                         $p/fr:expr,
                                                         ')[1])'
                                                     )
-                                                else if (exists($p/fr:controlName)) then
+                                                else if ($p/@type = 'ControlValueParam') then
                                                     concat(
                                                         'for $a in fr:control-typed-value(''',
                                                         $p/fr:controlName,
                                                         ''', false()) return if (array:size($a) = 0) then () else array:get($a, 1)'
+                                                    )
+                                                else if (
+                                                    $p/@type = (
+                                                        'LinkToEditPageParam',
+                                                        'LinkToViewPageParam',
+                                                        'LinkToNewPageParam',
+                                                        'LinkToSummaryPageParam',
+                                                        'LinkToHomePageParam',
+                                                        'LinkToPdfParam'
+                                                    )
+                                                ) then
+                                                    concat(
+                                                        'frf:buildLinkBackToFormRunner(''',
+                                                         $p/@type,
+                                                        ''')'
                                                     )
                                                 else
                                                     error(),

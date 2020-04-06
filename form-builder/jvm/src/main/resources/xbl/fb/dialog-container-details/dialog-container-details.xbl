@@ -784,7 +784,7 @@
                                     </fr:tinymce>
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
-                                    <fb:parameters-editor ref="." resources-ref="$resources">
+                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
                                         <xf:label ref="$resources/dialog-control-details/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>

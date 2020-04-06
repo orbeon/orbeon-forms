@@ -328,6 +328,12 @@
                     <item id="0">Control Value</item>
                     <item id="1">XPath Expression</item>
                     <item id="2">All Control Values</item>
+                    <item id="3">Link to the "edit" page</item>
+                    <item id="4">Link to the "view" page</item>
+                    <item id="5">Link to the "new" page</item>
+                    <item id="6">Link to the "summary" page</item>
+                    <item id="7">Link to the "home" page</item>
+                    <item id="8">Link to the PDF file</item>
                 </type>
             </parameters-editor>
         </components>
@@ -1579,6 +1585,12 @@
                     <item id="0">Valeur de contrôle</item>
                     <item id="1">Expression XPath</item>
                     <item id="2">Toutes les valeurs</item>
+                    <item id="3">Lien à la page d'édition</item>
+                    <item id="4">Lien à la page de visualisation</item>
+                    <item id="5">Lien à la page de création</item>
+                    <item id="6">Lien à la page de sommaire</item>
+                    <item id="7">Lien à la page d'accueil</item>
+                    <item id="8">Lien au fichier PDF</item>
                 </type>
             </parameters-editor>
         </components>
@@ -2813,6 +2825,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -4075,6 +4093,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -5337,6 +5361,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -6591,6 +6621,12 @@
                     <item id="0">Steuerelement-Wert</item>
                     <item id="1">XPath Ausdruck</item>
                     <item id="2">Werte aller Steuerelemente</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -7848,6 +7884,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -9102,6 +9144,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -10357,6 +10405,12 @@
                     <item id="0">Control-waarde</item>
                     <item id="1">XPath expressie</item>
                     <item id="2">Alle control-waarden</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -11591,6 +11645,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -12852,6 +12912,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>

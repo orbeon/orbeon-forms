@@ -114,6 +114,17 @@
                                             string-join($data//*[empty(*) and name() = $p/fr:controlName]/string(), ', ')
                                         else if ($p/@type = 'AllControlValuesParam') then
                                             metadata:findAllControlsWithValues($is-html)
+                                        else if (
+                                            $p/@type = (
+                                                'LinkToEditPageParam',
+                                                'LinkToViewPageParam',
+                                                'LinkToNewPageParam',
+                                                'LinkToSummaryPageParam',
+                                                'LinkToHomePageParam',
+                                                'LinkToPdfParam'
+                                            )
+                                        ) then
+                                            frf:buildLinkBackToFormRunner($p/@type)
                                         else
                                             error()
                                     )

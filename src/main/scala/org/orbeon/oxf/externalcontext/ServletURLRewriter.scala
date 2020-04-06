@@ -32,15 +32,6 @@ class ServletURLRewriter(private val request: ExternalContext.Request) extends U
   def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
     URLRewriterUtils.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
-  def rewriteResourceURL(urlString: String, generateAbsoluteURL: Boolean): String =
-    rewriteResourceURL(
-      urlString,
-      if (generateAbsoluteURL)
-        URLRewriter.REWRITE_MODE_ABSOLUTE
-      else
-        URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-    )
-
   def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
     URLRewriterUtils.rewriteResourceURL(
       request,

@@ -15,6 +15,9 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <!-- === General properties === -->
+    <property as="xs:string"  name="oxf.fr.external-base-url"                                   value=""/>
+
     <!-- === Persistence configuration === -->
 
     <!-- Default provider is "exist" -->

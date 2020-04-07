@@ -243,7 +243,7 @@ trait ResourcesOps extends BaseOps {
     lang              : String,
     resourcesRootElem : NodeInfo
   ): Option[NodeInfo] =
-    findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resourcesRootElem) collectFirst
+    findResourceHoldersWithLang(controlName ensuring (_.nonAllBlank), resourcesRootElem) collectFirst
       { case (`lang`, holder) => holder }
 
   // Find control resource holders
@@ -281,7 +281,7 @@ trait ResourcesOps extends BaseOps {
       val holders = findResourceHoldersWithLangUseDocUseContext(controlName)
 
       val allBlankOrMissing =
-        holders forall { case (_, controlHolder) => (controlHolder child lhhaName stringValue).isBlank }
+        holders forall { case (_, controlHolder) => (controlHolder child lhhaName stringValue).isAllBlank }
 
       allBlankOrMissing -> (
         if (allBlankOrMissing)

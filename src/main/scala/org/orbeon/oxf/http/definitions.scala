@@ -188,7 +188,7 @@ object HttpClientSettings {
 }
 
 case class Credentials(username: String, password: Option[String], preemptiveAuth: Boolean, domain: Option[String]) {
-  require(username.nonBlank)
+  require(username.nonAllBlank)
   def getPrefix: String = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
 }
 

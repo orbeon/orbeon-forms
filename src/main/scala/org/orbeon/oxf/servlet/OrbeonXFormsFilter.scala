@@ -116,7 +116,7 @@ class OrbeonXFormsFilter extends Filter {
                   responseWrapper.content
 
                 val nonEmptyContent = content match {
-                  case Some(s: String) => s.nonBlank
+                  case Some(s: String) => s.nonAllBlank
                   case Some(_)         => true
                   case None            => false
                 }

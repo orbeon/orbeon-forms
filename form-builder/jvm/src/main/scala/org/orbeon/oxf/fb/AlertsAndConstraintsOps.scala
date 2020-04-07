@@ -579,7 +579,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
   // Same as `findZeroBasedIndexFromAlertRef` but handle case of a blank value which returns `Some(None)`.
   def findZeroBasedIndexFromAlertRefHandleBlankRef(refAtt: String, resourceName: String): Option[Option[Int]] =
-    findZeroBasedIndexFromAlertRef(refAtt, resourceName) orElse (refAtt.isBlank option None)
+    findZeroBasedIndexFromAlertRef(refAtt, resourceName) orElse (refAtt.isAllBlank option None)
 
   // NOTE: The index is 0-based.
   def buildResourcePointer(controlName: String, lhhaName: String, indexOpt: Option[Int]) =

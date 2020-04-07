@@ -102,7 +102,7 @@ object XXFormsComponentParam {
     // such a way. So if the value is a blank string (which means the value is actually a blank `xs:string` or maybe
     // `xs:anyURI`), consider the property missing. We could revise this in the future to make a distinction between
     // a blank or empty string and a missing property.
-    propertyNameOpt flatMap Property.property filter (_.getStringValue.nonBlank)
+    propertyNameOpt flatMap Property.property filter (_.getStringValue.nonAllBlank)
   }
 
   // For example `xbl.fr.number.decimal-separator`

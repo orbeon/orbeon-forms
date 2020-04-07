@@ -206,7 +206,7 @@ class XFormsOutputControl(
   override def getRelevantEscapedExternalValue: String =
     if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype)) {
       val externalValue = getExternalValue
-      if (externalValue.nonBlank) {
+      if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif

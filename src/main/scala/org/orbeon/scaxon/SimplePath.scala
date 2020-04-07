@@ -176,7 +176,7 @@ object SimplePath {
 
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
       case Seq() => None
-      case s     => Some(s.stringValue) filter (_.nonBlank)
+      case s     => Some(s.stringValue) filter (_.nonAllBlank)
     }
 
     def attValueNonBlankOrThrow(attName: String): String =

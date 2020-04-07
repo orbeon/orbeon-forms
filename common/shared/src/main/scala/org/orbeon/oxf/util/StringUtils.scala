@@ -123,8 +123,9 @@ object StringUtils {
     private def isZeroWidthChar(c: Int) =
       c == '\u200b' || c == '\u200c' || c == '\u200d' || c == '\ufeff'
 
-    def isBlank  = trimAllToEmpty.isEmpty
-    def nonBlank = trimAllToEmpty.nonEmpty
+    // https://github.com/orbeon/orbeon-forms/issues/4490
+    def isAllBlank  = trimAllToEmpty.isEmpty
+    def nonAllBlank = trimAllToEmpty.nonEmpty
 
     def trimAllToEmpty = trimControlAndAllWhitespaceToEmptyCP
 
@@ -177,7 +178,7 @@ object StringUtils {
 
     // NOTE: Special the case where the string is blank for performance
     def toIntOpt: Option[Int] =
-      if (isBlank) None else Try(s.toInt).toOption
+      if (isAllBlank) None else Try(s.toInt).toOption
 
     // Like the XPath `translate` function
     def translate(mapString: String, transString: String): String = {

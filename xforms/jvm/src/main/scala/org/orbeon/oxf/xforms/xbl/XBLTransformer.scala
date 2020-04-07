@@ -188,7 +188,7 @@ object XBLTransformer {
           currentElem.detach()
 
           resultingNodes = contentToInsert
-          if (scopeAttribute.nonBlank) {
+          if (scopeAttribute.nonAllBlank) {
             // If author specified scope attribute, use it
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
           } else {

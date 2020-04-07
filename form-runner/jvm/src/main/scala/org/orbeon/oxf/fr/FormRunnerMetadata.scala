@@ -429,8 +429,8 @@ object FormRunnerMetadata {
                     val itemOpt =
                       if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
                         select1Control.findSelectedItem filter (_.value match {
-                          case Left(v) if v.nonBlank => true
-                          case _                     => false
+                          case Left(v) if v.nonAllBlank => true
+                          case _                        => false
                         })
                       else
                         select1Control.findSelectedItem

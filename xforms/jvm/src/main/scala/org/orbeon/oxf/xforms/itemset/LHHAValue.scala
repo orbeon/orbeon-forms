@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 case class LHHAValue(label: String, isHTML: Boolean) {
 
   def streamAsHTML(locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
-    if (label.nonBlank) {
+    if (label.nonAllBlank) {
       if (isHTML)
         streamHTMLFragment(xmlReceiver, label, locationData, "")
       else

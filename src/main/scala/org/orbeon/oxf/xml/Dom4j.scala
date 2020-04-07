@@ -72,7 +72,7 @@ object Dom4j {
   // Only keep the nodes we care about
   private def filterOut(l: Seq[Node]) = l collect {
     case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
-    case t: Text if t.getText.nonBlank => t
+    case t: Text if t.getText.nonAllBlank => t
   }
 
   private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String => String) =

@@ -54,7 +54,7 @@ object FormRunnerXblSupport extends XBLSupport {
 
           fromAttribute(paramName)               orElse
             fromMetadataAndProperties(paramName) exists
-            (_.nonBlank)
+            (_.nonAllBlank)
 
         case None => true
       }

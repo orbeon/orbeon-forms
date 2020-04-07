@@ -90,7 +90,7 @@ object PathUtils {
   // Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
   // The given query string is appended without further encoding.
   def appendQueryString(pathQuery: String, queryString: String): String =
-    pathQuery + (if (queryString.isBlank) "" else (if (pathQuery.contains("?")) "&" else "?") + queryString)
+    pathQuery + (if (queryString.isAllBlank) "" else (if (pathQuery.contains("?")) "&" else "?") + queryString)
 
   def removeQueryString(pathQuery: String): String = {
     val questionIndex = pathQuery.indexOf('?')

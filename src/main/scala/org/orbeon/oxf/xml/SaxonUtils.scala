@@ -18,18 +18,36 @@ import java.net.URI
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
-import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
-import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
+import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer, NodeOrderComparer}
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
+
+// Like Saxon's `GlobalOrderComparer` but in reverse.
+// NOTE: Later Saxon versions `NodeOrderComparer` renamed to `ItemOrderComparer`.
+object ReverseGlobalOrderComparer extends NodeOrderComparer {
+  def compare(a: NodeInfo, b: NodeInfo): Int =
+    if ((a eq b) || a.isSameNodeInfo(b)) {
+      0
+    } else {
+      - {
+        val d1 = a.getDocumentNumber
+        val d2 = b.getDocumentNumber
+        if (d1 == d2)
+          a.compareOrder(b)
+        else
+          d1 - d2
+      }
+    }
+}
 
 object SaxonUtils {
 

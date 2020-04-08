@@ -357,6 +357,7 @@ object XFormsConstants {
   val XXFORMS_CONTEXT_QNAME = QName("context", XXFORMS_NAMESPACE)
 
   val XXFORMS_REFRESH_ITEMS_QNAME = QName("refresh-items", XXFORMS_NAMESPACE)
+  val EXCLUDE_WHITESPACE_TEXT_NODES_QNAME = QName("exclude-whitespace-text-nodes", XXFORMS_NAMESPACE)
   val XXFORMS_REPEAT_INDEXES_QNAME = QName("repeat-indexes", XXFORMS_NAMESPACE)
   val XXFORMS_REPEAT_STARTINDEX_QNAME = QName("startindex")
   val XXFORMS_DND_QNAME = QName("dnd", XXFORMS_NAMESPACE)

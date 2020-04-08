@@ -44,10 +44,10 @@ object XFormsSelect1Handler {
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def dataValueFromControl(control: XFormsValueControl): Option[Item.Value[om.NodeInfo]] =
+  def dataValueFromControl(control: XFormsValueControl): Option[(Item.Value[om.NodeInfo], Boolean)] =
     control match {
-      case c: XFormsSelect1Control => c.boundItemOpt map c.getCurrentItemValueFromData
-      case c: XFormsValueControl   => Option(c.getValue) map Left.apply
+      case c: XFormsSelect1Control => c.boundItemOpt     map (i => c.getCurrentItemValueFromData(i) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
+      case c: XFormsValueControl   => Option(c.getValue) map (v => Left(v)                          -> false)
       case null                    => None
     }
 
@@ -55,14 +55,15 @@ object XFormsSelect1Handler {
   def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean): Boolean =
     itemNode match {
       case item: Item.ValueNode =>
-        dataValueFromControl(control) exists (dataValue =>
+        dataValueFromControl(control) exists { case (dataValue, excludeWhitespaceTextNodes) =>
           ItemsetSupport.isSelected(
-            isMultiple = isMultiple,
-            dataValue  = dataValue,
-            itemValue  = item.value,
-            compareAtt = XFormsSelect1Control.attCompare(control.boundNodeOpt, _)
+            isMultiple                 = isMultiple,
+            dataValue                  = dataValue,
+            itemValue                  = item.value,
+            compareAtt                 = XFormsSelect1Control.attCompare(control.boundNodeOpt, _),
+            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
-        )
+        }
       case _: Item.ChoiceNode =>
         false
     }
@@ -451,8 +452,8 @@ class XFormsSelect1Handler(
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)
           for {
-            dataValue   <- XFormsSelect1Handler.dataValueFromControl(control).iterator
-            currentItem <- itemset.iterateSelectedItems(dataValue, XFormsSelect1Control.attCompare(control.boundNodeOpt, _))
+            (dataValue, excludeWhitespaceTextNodes) <- XFormsSelect1Handler.dataValueFromControl(control).iterator
+            currentItem                             <- itemset.iterateSelectedItems(dataValue, XFormsSelect1Control.attCompare(control.boundNodeOpt, _), excludeWhitespaceTextNodes)
           } locally {
             if (selectedFound)
               ch.text(" - ")

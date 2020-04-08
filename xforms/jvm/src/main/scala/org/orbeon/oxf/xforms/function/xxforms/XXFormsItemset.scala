@@ -18,14 +18,13 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import shapeless.syntax.typeable._
-import org.orbeon.saxon.om
 
 
 class XXFormsItemset extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): om.Item = {
 
     implicit val ctx: XPathContext = xpathContext
 
@@ -50,10 +49,20 @@ class XXFormsItemset extends XFormsFunction {
 
         if (format == "json")
           // Return a string
-          itemset.asJSON(controlValueForSelection, select1Control.mustEncodeValues, control.getLocationData): om.Item
+          itemset.asJSON(
+            controlValue               = controlValueForSelection,
+            encode                     = select1Control.mustEncodeValues,
+            excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+            locationData               = control.getLocationData
+          ): om.Item
         else
           // Return an XML document
-          itemset.asXML(ctx.getConfiguration, controlValueForSelection, control.getLocationData): om.Item
+          itemset.asXML(
+            configuration              = ctx.getConfiguration,
+            controlValue               = controlValueForSelection,
+            excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+            locationData               = control.getLocationData
+          ): om.Item
       }
 
     jsonOrXMLOpt.orNull

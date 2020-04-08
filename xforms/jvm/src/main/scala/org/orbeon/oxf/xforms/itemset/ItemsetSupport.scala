@@ -26,9 +26,10 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUt
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
+import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.XFormsId
 
@@ -42,15 +43,16 @@ import scala.collection.mutable.ListBuffer
 object ItemsetSupport {
 
   def isSelected(
-    isMultiple : Boolean,
-    dataValue  : Item.Value[om.NodeInfo],
-    itemValue  : Item.Value[om.Item],
-    compareAtt : om.NodeInfo => Boolean
+    isMultiple                 : Boolean,
+    dataValue                  : Item.Value[om.NodeInfo],
+    itemValue                  : Item.Value[om.Item],
+    compareAtt                 : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes : Boolean
   ): Boolean =
     if (isMultiple)
       compareMultipleItemValues(dataValue, itemValue)
     else
-      compareSingleItemValues(dataValue, itemValue, compareAtt)
+      compareSingleItemValues(dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes)
 
   def partitionAttributes(items: List[om.Item]): (List[om.NodeInfo], List[om.Item]) = {
 
@@ -75,9 +77,10 @@ object ItemsetSupport {
   }
 
   def compareSingleItemValues(
-    dataValue  : Item.Value[om.Item],
-    itemValue  : Item.Value[om.Item],
-    compareAtt : om.NodeInfo => Boolean
+    dataValue                  : Item.Value[om.Item],
+    itemValue                  : Item.Value[om.Item],
+    compareAtt                 : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes : Boolean
   ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
@@ -86,12 +89,30 @@ object ItemsetSupport {
 
         val (attItems, otherItems) = partitionAttributes(itemXPathItems)
 
-        (attItems forall compareAtt) &&
+        val attResult = attItems forall { attItem =>
+          val r = compareAtt(attItem)
+          println(s"xxx comparing attribute `${attItem.getDisplayName}`, value = `${attItem.stringValue}` result = `$r` ")
+          r
+        }
+
+        def compareContent =
           SaxonUtils.deepCompare(
-            XPath.GlobalConfiguration,
-            Implicits.itemSeqToSequenceIterator(dataXPathItems),
-            Implicits.itemSeqToSequenceIterator(otherItems)
+            config                     = XPath.GlobalConfiguration,
+            it1                        = dataXPathItems.iterator,
+            it2                        = otherItems.iterator,
+            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
+
+        val otherString = otherItems collect { case n: om.NodeInfo => TransformerUtils.tinyTreeToDom4j(n) } mkString (" / ")
+
+        println(s"xxx attResult = $attResult, restResult = $compareContent, toString: `$otherString`")
+
+        val r =
+        (attItems forall compareAtt) && compareContent
+
+        if (r)
+          println(s"xxx r = $r")
+        r
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported for now
         false
@@ -112,9 +133,10 @@ object ItemsetSupport {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems exists { oneDataXPathItem =>
           SaxonUtils.deepCompare(
-            XPath.GlobalConfiguration,
-            Implicits.itemToSequenceIterator(oneDataXPathItem),
-            Implicits.itemToSequenceIterator(firstItemXPathItem)
+            config                     = XPath.GlobalConfiguration,
+            it1                        = Iterator(oneDataXPathItem),
+            it2                        = Iterator(firstItemXPathItem),
+            excludeWhitespaceTextNodes = false
           )
         }
       case (Right(_), Right(Nil)) =>
@@ -133,9 +155,10 @@ object ItemsetSupport {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems collect { case oneDataXPathItem if
           SaxonUtils.deepCompare(
-            XPath.GlobalConfiguration,
-            Implicits.itemToSequenceIterator(oneDataXPathItem),
-            Implicits.itemToSequenceIterator(firstItemXPathItem)
+            config                     = XPath.GlobalConfiguration,
+            it1                        = Iterator(oneDataXPathItem),
+            it2                        = Iterator(firstItemXPathItem),
+            excludeWhitespaceTextNodes = false
           ) => oneDataXPathItem
         }
       case _ =>

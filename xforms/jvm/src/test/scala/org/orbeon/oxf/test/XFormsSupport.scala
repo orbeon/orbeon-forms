@@ -146,7 +146,7 @@ trait XFormsSupport extends MockitoSugar {
 
   def getItemset(controlEffectiveId: String): String = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
-    select1.getItemset.asJSON(None, select1.mustEncodeValues, null)
+    select1.getItemset.asJSON(None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
   }
 
   def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {

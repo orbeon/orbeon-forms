@@ -127,7 +127,12 @@ class XFormsSelect1Control(
   def findSelectedItem: Option[Item.ValueNode] =
     boundItemOpt map getCurrentItemValueFromData flatMap { current =>
       getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
-        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(current, itemValue, XFormsSelect1Control.attCompare(boundNodeOpt, _)) => item
+        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(
+          dataValue                  = current,
+          itemValue                  = itemValue,
+          compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+          excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
+        ) => item
       }
     }
 
@@ -239,8 +244,16 @@ class XFormsSelect1Control(
     itemset.allItemsWithValueIterator(reverse = true).foldLeft((Nil: List[XFormsSelectEvent], Nil: List[XFormsDeselectEvent])) {
       case (result @ (selected, deselected), (item, itemValue)) =>
 
-        val itemWasSelected = ItemsetSupport.compareSingleItemValues(dataValue, itemValue, XFormsSelect1Control.attCompare(boundNodeOpt, _))
-        val itemIsSelected  = item.externalValue(mustEncodeValues) == newExternalValue
+        val itemWasSelected =
+          ItemsetSupport.compareSingleItemValues(
+            dataValue                  = dataValue,
+            itemValue                  = itemValue,
+            compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+            excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
+          )
+
+        val itemIsSelected =
+          item.externalValue(mustEncodeValues) == newExternalValue
 
         val getsSelected   = ! itemWasSelected &&   itemIsSelected
         val getsDeselected =   itemWasSelected && ! itemIsSelected
@@ -323,7 +336,7 @@ class XFormsSelect1Control(
       val itemset = getItemset
       if (itemset ne null) {
 
-        val result = itemset.asJSON(None, mustEncodeValues, getLocationData)
+        val result = itemset.asJSON(None, mustEncodeValues, staticControl.excludeWhitespaceTextNodesForCopy, getLocationData)
         if (result.nonEmpty)
           ch.text(result)
       }

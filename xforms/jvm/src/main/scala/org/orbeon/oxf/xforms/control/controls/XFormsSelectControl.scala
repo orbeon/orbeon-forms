@@ -74,7 +74,7 @@ class XFormsSelectControl(
     }
 
     val (newlySelectedValues, newlyDeselectedValues, _) =
-      updateSelection(dataItemValues, itemsetItemValues, incomingItemValues)
+      updateSelection(dataItemValues, itemsetItemValues, incomingItemValues, staticControl.excludeWhitespaceTextNodesForCopy)
 
     // 2016-01-29: Switching order of event dispatch as `xf:select1` does it this way and XForms 1.1 says: "Newly
     // selected items receive the event xforms-select immediately after all newly deselected items receive the
@@ -121,7 +121,7 @@ class XFormsSelectControl(
   override def findSelectedItems: List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
-        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem), _ => true).to(List)
+        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem), _ => true, staticControl.excludeWhitespaceTextNodesForCopy).to(List)
       case None =>
         Nil
     }
@@ -183,13 +183,14 @@ class XFormsSelectControl(
 object XFormsSelectControl {
 
   def updateSelection(
-    dataValues     : List[Item.Value[om.NodeInfo]],
-    itemsetValues  : List[Item.Value[om.Item]],
-    incomingValues : List[Item.Value[om.Item]]
+    dataValues                 : List[Item.Value[om.NodeInfo]],
+    itemsetValues              : List[Item.Value[om.Item]],
+    incomingValues             : List[Item.Value[om.Item]],
+    excludeWhitespaceTextNodes : Boolean
   ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
     def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
-      values exists (ItemsetSupport.compareSingleItemValues(_, value, _ => true))
+      values exists (ItemsetSupport.compareSingleItemValues(_, value, _ => true, excludeWhitespaceTextNodes))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
     val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)

@@ -33,7 +33,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
-import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE, TEXT_NODE}
+import org.w3c.dom.Node._
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -423,8 +423,17 @@ object InstanceMirror {
                 case _ =>
                   (None, NextListener)
               }
-            case TEXT_NODE =>
-              NextListener // TODO
+            case TEXT_NODE | PROCESSING_INSTRUCTION_NODE | COMMENT_NODE =>
+              withNewParent {
+                case newParentElement: Element =>
+                  val content = newParentElement.content
+                  if (content.size > removedNodeIndex)
+                    (Some(content.get(removedNodeIndex)), Stop)
+                  else
+                    (None, NextListener) // out of sync, so probably safer
+                case _ =>
+                  (None, NextListener)
+              }
             case _ =>
               NextListener // we don't know how to propagate the change
           }

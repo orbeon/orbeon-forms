@@ -131,10 +131,10 @@ trait FormRunnerEmail {
     linkType match {
       case "LinkToEditPageParam"    => build("edit",    documentOpt)
       case "LinkToViewPageParam"    => build("view",    documentOpt)
-      case "LinkToPdfPageParam"     => build("pdf",     documentOpt)
       case "LinkToNewPageParam"     => build("new",     None)
       case "LinkToSummaryPageParam" => build("summary", None)
       case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToPdfParam"         => build("pdf",     documentOpt)
       case _ => throw new IllegalArgumentException(linkType)
     }
   }

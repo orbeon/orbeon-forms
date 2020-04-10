@@ -240,7 +240,7 @@ class XFormsControl(
   }
 
   // Whether focus can be set to this control
-  def isFocusable = false
+  def isDirectlyFocusable = false
 
   // By default, a control doesn't accept focus
   def focusableControls: Iterator[XFormsControl] = Iterator.empty

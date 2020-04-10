@@ -1735,6 +1735,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
+        setReadonlyOnFormElement: function (element, disabled) {
+            if (disabled) {
+                element.setAttribute("readonly", "readonly");
+            } else {
+                element.removeAttribute("readonly");
+            }
+        },
+
         setRelevant: function (control, isRelevant) {
             var FN = ORBEON.xforms.FlatNesting;
 
@@ -1800,8 +1808,23 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 } else {
                     YAHOO.util.Dom.removeClass(control, "xforms-readonly");
                 }
-            } else if (jControl.is('.xforms-input, .xforms-secret, .xforms-select1-appearance-full, .xforms-select-appearance-full')) {
-                // Input fields, radio buttons, or checkboxes
+            } else if (jControl.is('.xforms-input, .xforms-secret')) {
+                // Input fields
+
+                // Add/remove xforms-readonly on span
+                if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
+                else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
+
+                // Update disabled on input fields
+                var inputs = control.getElementsByTagName("input");
+                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                    var input = inputs[inputIndex];
+                    ORBEON.xforms.Controls.setReadonlyOnFormElement(input, isReadonly);
+                }
+                if (control.tagName.toLowerCase() == "input")
+                    ORBEON.xforms.Controls.setReadonlyOnFormElement(control, isReadonly);
+            } else if (jControl.is('.xforms-select1-appearance-full, .xforms-select-appearance-full')) {
+                // Radio buttons, or checkboxes
 
                 // Add/remove xforms-readonly on span
                 if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
@@ -1830,7 +1853,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             } else if (jControl.is('.xforms-textarea')) {
                 // Textarea
                 var textarea = control.getElementsByTagName("textarea")[0];
-                ORBEON.xforms.Controls.setDisabledOnFormElement(textarea, isReadonly);
+                ORBEON.xforms.Controls.setReadonlyOnFormElement(textarea, isReadonly);
             } else if ((jControl.is('.xforms-trigger')
                     && ! jControl.is('.xforms-trigger-appearance-minimal'))
                     || jControl.is('.xforms-submit')) {

@@ -24,7 +24,7 @@ object Focus {
 
   // Focus on the given control and dispatch appropriate focus events
   def focusWithEvents(control: XFormsControl): Unit =
-    if (control.isFocusable && ! isHidden(control)) {
+    if (control.isDirectlyFocusable) {
 
       val doc = control.containingDocument
 
@@ -117,7 +117,7 @@ object Focus {
               // Control might be a ghost that has been removed from the tree (iteration removed)
               onRemoveFocus(focusedBefore)
 
-            case Some(newReference) if ! (newReference.isFocusable && ! isHidden(newReference)) =>
+            case Some(newReference) if ! (newReference.isDirectlyFocusable) =>
               // New reference exists, but is not focusable
               onRemoveFocus(focusedBefore)
 

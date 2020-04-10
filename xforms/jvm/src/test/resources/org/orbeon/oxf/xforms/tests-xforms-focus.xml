@@ -366,6 +366,7 @@
                             <instance>
                                 <value relevant="true" readonly="false"/>
                                 <value relevant="true" readonly="false"/>
+                                <value relevant="true" readonly="false"/>
                             </instance>
                         </xf:instance>
 
@@ -387,12 +388,24 @@
                             <xf:setvalue ref="value[2]/@relevant">false</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
-
                             <!-- Initial control -->
                             <xf:setvalue ref="value[2]/@relevant">true</xf:setvalue>
                             <xf:setfocus control="my-input-111"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
-                            <!-- Try to focus on readonly control (must fail) -->
+
+                            <!-- Try to focus on readonly `input` control (must succeed) -->
+                            <xf:setvalue ref="value[3]/@readonly">true</xf:setvalue>
+                            <xf:setfocus control="my-input-311"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
+                            <!-- Make control readwrite again (nothing must change) -->
+                            <xf:setvalue ref="value[3]/@readonly">false</xf:setvalue>
+                            <xf:setfocus control="my-input-311"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
+                            <!-- Make control readonly again (nothing must change) -->
+                            <xf:setvalue ref="value[3]/@readonly">true</xf:setvalue>
+                            <xf:setfocus control="my-input-311"/>
+
+                            <!-- Try to focus on readonly `select` control (must fail) -->
                             <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
@@ -403,6 +416,7 @@
                             <!-- Make control readonly again (focus must go away) -->
                             <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
+
                         </xf:action>
 
                     </xf:model>
@@ -428,7 +442,12 @@
                     </xf:group>
                     <xf:group id="my-group-2">
                         <xf:group id="my-group-21">
-                            <xf:input id="my-input-211" ref="value[2]"/>
+                            <xf:select1 id="my-input-211" ref="value[2]"/>
+                        </xf:group>
+                    </xf:group>
+                    <xf:group id="my-group-3">
+                        <xf:group id="my-group-31">
+                            <xf:input id="my-input-311" ref="value[3]"/>
                         </xf:group>
                     </xf:group>
 
@@ -443,6 +462,7 @@
                             <instance id="instance" model-id="model">
                                 <instance>
                                     <value relevant="true" readonly="false"/>
+                                    <value relevant="true" readonly="true"/>
                                     <value relevant="true" readonly="true"/>
                                 </instance>
                             </instance>
@@ -468,10 +488,18 @@
                                     <event type="DOMFocusIn" target="my-group-11"/>
                                     <event type="DOMFocusIn" target="my-input-111"/>
                                     <separator/>
-                                    <separator/>
                                     <event type="DOMFocusOut" target="my-input-111"/>
                                     <event type="DOMFocusOut" target="my-group-11"/>
                                     <event type="DOMFocusOut" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-3"/>
+                                    <event type="DOMFocusIn" target="my-group-31"/>
+                                    <event type="DOMFocusIn" target="my-input-311"/>
+                                    <separator/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-311"/>
+                                    <event type="DOMFocusOut" target="my-group-31"/>
+                                    <event type="DOMFocusOut" target="my-group-3"/>
                                     <event type="DOMFocusIn" target="my-group-2"/>
                                     <event type="DOMFocusIn" target="my-group-21"/>
                                     <event type="DOMFocusIn" target="my-input-211"/>
@@ -492,6 +520,9 @@
                         <xxf:control id="my-group-2" visited="true"/>
                         <xxf:control id="my-group-21" visited="true"/>
                         <xxf:control id="my-input-211" visited="true" readonly="true"/>
+                        <xxf:control id="my-group-3" visited="true"/>
+                        <xxf:control id="my-group-31" visited="true"/>
+                        <xxf:control id="my-input-311" visited="true" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

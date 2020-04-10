@@ -51,7 +51,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
     // Add `readonly` attribute on the input if the control is readonly
     val isReadonly = containerElem.classList.contains("xforms-readonly")
-    xformsUpdateReadonly(isReadonly)
+    updateReadonly(isReadonly)
 
     if (iOS) {
       // On iOS, use native date picker
@@ -129,7 +129,7 @@ private class DateCompanion extends XBLCompanionWithState {
   }
 
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
-    inputEl.prop("disabled", readonly)
+    updateReadonly(readonly)
 
   override def xformsFocus(): Unit =
     inputEl.focus()
@@ -138,6 +138,9 @@ private class DateCompanion extends XBLCompanionWithState {
 
     private def getInputFieldValue: String =
       inputEl.prop("value").asInstanceOf[String]
+
+    def updateReadonly(readonly: Boolean): Unit =
+      inputEl.prop("readonly", readonly)
 
     // Send the new value to the server when it changes
     def onDateSelectedUpdateStateAndSendValueToServer(): Unit =

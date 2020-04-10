@@ -132,7 +132,7 @@ object Number {
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
         scribe.debug(s"xformsUpdateReadonly: $readonly")
-        companion.visibleInputElem.disabled = readonly
+        updateReadonly(readonly)
       }
 
       override def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
@@ -145,7 +145,7 @@ object Number {
 
         // Also update disabled because this might be called upon an iteration being moved, in which
         // case all the control properties must be updated.
-        visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
+        updateReadonly($(containerElem).hasClass("xforms-readonly"))
       }
 
       override def xformsFocus(): Unit = {
@@ -159,6 +159,12 @@ object Number {
 
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
+
+        def updateReadonly(readonly: Boolean): Unit =
+          if (readonly)
+            companion.visibleInputElem.setAttribute("readonly", "readonly")
+          else
+            companion.visibleInputElem.removeAttribute("readonly")
 
         def updateStateAndSendValueToServer(): Unit =
           stateOpt foreach { state =>

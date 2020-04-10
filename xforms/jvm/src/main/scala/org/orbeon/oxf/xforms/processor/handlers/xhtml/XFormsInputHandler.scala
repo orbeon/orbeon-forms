@@ -170,8 +170,8 @@ class XFormsInputHandler(
             xmlReceiver.startElement(XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
             xmlReceiver.endElement(XHTML_NAMESPACE_URI, "img", imgQName)
           } else {
-            if (isHTMLDisabled(inputControl))
-              outputDisabledAttribute(reusableAttributes)
+            if (isXFormsReadonlyButNotStaticReadonly(inputControl))
+              outputReadonlyAttribute(reusableAttributes)
 
             handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
 
@@ -205,8 +205,8 @@ class XFormsInputHandler(
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
           }
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
-          if (isHTMLDisabled(inputControl))
-            outputDisabledAttribute(reusableAttributes)
+          if (isXFormsReadonlyButNotStaticReadonly(inputControl))
+            outputReadonlyAttribute(reusableAttributes)
 
           // TODO: set @size and @maxlength
 

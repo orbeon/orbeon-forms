@@ -68,20 +68,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return forwarding;
     }
 
-    /**
-     * Whether the control is disabled in the resulting HTML. Occurs when:
-     *
-     * o control is readonly but not static readonly
-     *
-     * @param control   control to check or null if no concrete control available
-     * @return          whether the control is to be marked as disabled
-     */
-    public boolean isHTMLDisabled(XFormsControl control) {
-        return (control instanceof XFormsSingleNodeControl)
-            && ((XFormsSingleNodeControl) control).isReadonly()
-            && ! containingDocument.staticReadonly();
-    }
-
     public boolean isNonRelevant(XFormsControl control) {
         return control == null || ! control.isRelevant();
     }

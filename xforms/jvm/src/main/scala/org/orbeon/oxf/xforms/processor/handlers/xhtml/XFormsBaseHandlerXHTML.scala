@@ -62,6 +62,12 @@ abstract class XFormsBaseHandlerXHTML (
   protected def isDefaultIncremental                                                = false
   protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
 
+  def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
+    control match {
+      case c: XFormsSingleNodeControl => c.isReadonly && ! containingDocument.staticReadonly
+      case _ => false
+    }
+
   // Output MIP classes
   // TODO: Move this to to control itself, like writeMIPsAsAttributes
   final def handleMIPClasses(controlPrefixedId: String, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
@@ -481,9 +487,9 @@ object XFormsBaseHandlerXHTML {
         xmlReceiver.characters(value.toCharArray, 0, value.length)
   }
 
-  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit = {
-    // @disabled="disabled"
-    // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
+  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled")
-  }
+
+  def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
+    newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
 }

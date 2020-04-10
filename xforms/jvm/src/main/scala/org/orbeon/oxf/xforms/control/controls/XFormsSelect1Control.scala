@@ -357,11 +357,8 @@ class XFormsSelect1Control(
     super.findAriaByControlEffectiveId
 
   // Don't accept focus if we have the internal appearance
-  override def focusableControls: Iterator[XFormsControl] =
-    if (! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME))
-      super.focusableControls
-    else
-      Iterator.empty
+  override def isDirectlyFocusable: Boolean =
+    ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.isDirectlyFocusable
 
   override def supportAjaxUpdates: Boolean =
     ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)

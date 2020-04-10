@@ -103,9 +103,9 @@ object XFormsControlFactory {
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
     (false, false) -> (new XFormsComponentControl     (_, _, _, _)                         ),
-    (false, true)  -> (new XFormsComponentControl     (_, _, _, _) with FocusableTrait),
+    (false, true)  -> (new XFormsComponentControl     (_, _, _, _) with FocusableTrait), // `ReadonlyFocusableTrait`?
     (true,  false) -> (new XFormsValueComponentControl(_, _, _, _)                    ),
-    (true,  true)  -> (new XFormsValueComponentControl(_, _, _, _) with FocusableTrait)
+    (true,  true)  -> (new XFormsValueComponentControl(_, _, _, _) with ReadonlyFocusableTrait)
   )
 
   // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension

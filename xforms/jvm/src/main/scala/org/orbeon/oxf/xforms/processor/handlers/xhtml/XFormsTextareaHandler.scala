@@ -67,8 +67,8 @@ class XFormsTextareaHandler(
       // Output xxf:* extension attributes
       textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
 
-      if (isHTMLDisabled(textareaControl))
-        XFormsBaseHandlerXHTML.outputDisabledAttribute(htmlTextareaAttributes)
+      if (isXFormsReadonlyButNotStaticReadonly(textareaControl))
+        XFormsBaseHandlerXHTML.outputReadonlyAttribute(htmlTextareaAttributes)
 
       XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
 

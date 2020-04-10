@@ -204,7 +204,7 @@ object XFormsSelect1Handler {
           if (isFirst)
             XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
         }
-        if (baseHandler.isHTMLDisabled(control))
+        if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
           outputDisabledAttribute(reusableAttributes)
 
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = reusableAttributes)
@@ -389,7 +389,7 @@ class XFormsSelect1Handler(
       if (control ne null)
         control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
 
-      if (isHTMLDisabled(control))
+      if (isXFormsReadonlyButNotStaticReadonly(control))
         outputDisabledAttribute(containerAttributes)
 
       if (control ne null)

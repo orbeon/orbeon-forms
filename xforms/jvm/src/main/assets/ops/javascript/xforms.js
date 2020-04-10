@@ -888,48 +888,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
             },
 
-            addSuffixToIdsAndRemoveDisabled: function(element, idSuffix, repeatDepth) {
-
-                // Remove disabled, as form fields have a 'disabled' attribute so tabbing skips over form elements in the repeat template
-                element.removeAttribute("disabled");
-
-                // Compute new id
-                var idSuffixWithDepth = idSuffix;
-                for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-                    idSuffixWithDepth += XF_REPEAT_INDEX_SEPARATOR + "1";
-
-                // Update id attribute
-                if (element.id) {
-                    element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
-                }
-
-                // Update for attribute (which can be an DOMSettableTokenList underneath in the case of <output>)
-                var jElement = $(element);
-                var jFor = jElement.attr('for');
-                if (! _.isUndefined(jFor)) {
-                    jElement.attr(
-                        'for',
-                        _.map($.trim(jFor).split(/\s+/), function(s) {
-                            return ORBEON.util.Utils.appendRepeatSuffix(s, idSuffixWithDepth);
-                        }).join(' ')
-                    );
-                }
-
-                // Update name attribute
-                if (element.name)
-                    element.name = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
-
-                // Recurse through children
-                for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                    var childNode = element.childNodes[childIndex];
-                    if (childNode.nodeType == ELEMENT_TYPE) {
-                        if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
-                        ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(childNode, idSuffix, repeatDepth);
-                        if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
-                    }
-                }
-            },
-
             getClassForRepeatId: function(formID, repeatId) {
                 var depth = 1;
                 var currentRepeatId = repeatId;

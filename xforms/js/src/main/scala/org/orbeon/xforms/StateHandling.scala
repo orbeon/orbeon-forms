@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
+import enumeratum._
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.HashChangeEvent
@@ -29,12 +30,15 @@ object StateHandling {
 
   import Private._
 
+  // Restore state after hash changes
+  dom.window.addEventListener("hashchange", (_: HashChangeEvent) => {
+    Private.rawState.foreach(Private.replaceState)
+  })
+
   case class ClientState(
     uuid     : String,
     sequence : Int
   )
-
-  import enumeratum._
 
   sealed abstract class StateResult extends EnumEntry
 
@@ -138,11 +142,6 @@ object StateHandling {
     }
 
   private object Private {
-
-    // Restore state after hash changes
-    dom.window.addEventListener("hashchange", (_: HashChangeEvent) => {
-      Private.rawState.foreach(replaceState)
-    })
 
     var rawState: Option[Dictionary[String]] = None
 

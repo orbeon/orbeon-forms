@@ -204,6 +204,9 @@
             <xf:var
                 name="binding"
                 value="xxf:binding('fr-attachment')"/>
+            <xf:var
+                name="readonly"
+                value="xxf:readonly($binding)"/>
 
             <xf:upload
                 id="xf-upload"
@@ -247,10 +250,10 @@
             </xf:upload>
 
             <xh:label
-                class="btn btn-default btn-file"
+                class="btn btn-default btn-file{if ($readonly) then ' disabled' else ''}"
                 for="xf-upload≡xforms-input"
                 role="button"
-                tabindex="0">
+                tabindex="{if ($readonly) then '-1' else '0'}">
                 <xf:output value="xxf:r('select')"/>
             </xh:label>
 

@@ -151,6 +151,11 @@
                 select="fr:find-emails('fr-email-sender', 'oxf.fr.email.from')[1]"/>
 
             <xsl:variable
+                name="reply-to-email-addresses"
+                as="xs:string*"
+                select="fr:find-emails('fr-email-reply-to', 'oxf.fr.email.reply-to')"/>
+
+            <xsl:variable
                 name="to-email-addresses"
                 as="xs:string*"
                 select="fr:find-emails('fr-email-recipient', 'oxf.fr.email.to')"/>
@@ -210,6 +215,14 @@
                         <xsl:value-of select="."/>
                     </email>
                 </from>
+            </xsl:for-each>
+            <!-- Reply-To -->
+            <xsl:for-each select="$reply-to-email-addresses">
+                <reply-to>
+                    <email>
+                        <xsl:value-of select="."/>
+                    </email>
+                </reply-to>
             </xsl:for-each>
             <!-- Recipients -->
             <xsl:for-each select="$to-email-addresses">

@@ -172,6 +172,16 @@ class EmailProcessor extends ProcessorImpl {
     // Set From
     message.addFrom(createAddresses(messageElement.element("from")))
 
+    // Set Reply-To
+    locally {
+      val replyTo = createAddresses(messageElement.element("reply-to"))
+
+      // We might be able to just call `setReplyTo` with the above, but it's unclear
+      // what's the behavior in there is nothing set. Also, can there be a default?
+      if (replyTo.nonEmpty)
+        message.setReplyTo(replyTo)
+    }
+
     // Set To
     propertySet.getNonBlankString(TestTo) match {
       case Some(testTo) => message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))

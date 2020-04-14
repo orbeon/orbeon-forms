@@ -493,6 +493,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label>Email reply-to</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label>Include as email attachment</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -1750,6 +1754,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label>"Répondre à" email</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label>Inclure à l'email comme fichier joint</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -2988,6 +2996,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -4258,6 +4270,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -5526,6 +5542,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -6784,6 +6804,10 @@
                 <item>
                     <label>E-Mail Absender</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Als E-Mail Anhang einfügen</label>
@@ -8049,6 +8073,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -9307,6 +9335,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Incluir como Adjuntos al Mail</label>
@@ -10570,6 +10602,10 @@
                     <value>fr-email-sender</value>
                 </item>
                 <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
+                </item>
+                <item>
                     <label>Voeg toe als e-mailbijlage</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -11808,6 +11844,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -13075,6 +13115,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Lägg till som mejlbilaga</label>

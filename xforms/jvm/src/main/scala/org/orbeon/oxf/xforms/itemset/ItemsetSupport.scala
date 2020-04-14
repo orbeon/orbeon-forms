@@ -89,12 +89,6 @@ object ItemsetSupport {
 
         val (attItems, otherItems) = partitionAttributes(itemXPathItems)
 
-        val attResult = attItems forall { attItem =>
-          val r = compareAtt(attItem)
-          println(s"xxx comparing attribute `${attItem.getDisplayName}`, value = `${attItem.stringValue}` result = `$r` ")
-          r
-        }
-
         def compareContent =
           SaxonUtils.deepCompare(
             config                     = XPath.GlobalConfiguration,
@@ -103,16 +97,8 @@ object ItemsetSupport {
             excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
 
-        val otherString = otherItems collect { case n: om.NodeInfo => TransformerUtils.tinyTreeToDom4j(n) } mkString (" / ")
-
-        println(s"xxx attResult = $attResult, restResult = $compareContent, toString: `$otherString`")
-
-        val r =
         (attItems forall compareAtt) && compareContent
 
-        if (r)
-          println(s"xxx r = $r")
-        r
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported for now
         false

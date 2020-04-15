@@ -14,9 +14,9 @@
 package org.orbeon.oxf.util
 
 import java.util.{List => JList}
-import javax.xml.transform.sax.SAXSource
-import javax.xml.transform._
 
+import javax.xml.transform._
+import javax.xml.transform.sax.SAXSource
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
@@ -26,16 +26,15 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
-import org.orbeon.saxon.event.{PipelineConfiguration, Receiver, Sender}
+import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
-import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
-import org.xml.sax.{InputSource, SAXException, XMLReader}
+import org.xml.sax.{InputSource, XMLReader}
 
 import scala.util.Try
 import scala.util.control.NonFatal

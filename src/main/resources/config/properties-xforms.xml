@@ -183,8 +183,6 @@
 
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year.*.*"         value="()"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year.*.*"           value="()"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
         year-from-date(current-date())

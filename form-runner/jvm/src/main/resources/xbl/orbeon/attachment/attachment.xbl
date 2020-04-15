@@ -65,10 +65,10 @@
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <allow-download default="true"/>
                             <show-size      default="true"/>
-                        </local>
+                        </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">

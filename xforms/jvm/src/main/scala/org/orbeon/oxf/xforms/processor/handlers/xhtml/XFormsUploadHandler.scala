@@ -71,7 +71,7 @@ class XFormsUploadHandler(
         reusableAttributes.addAttribute("", "unselectable", "unselectable", XMLReceiverHelper.CDATA, "on")
         // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
-        if (isHTMLDisabled(currentControl))
+        if (isXFormsReadonlyButNotStaticReadonly(currentControl))
           outputDisabledAttribute(reusableAttributes)
 
         // @accept

@@ -17,7 +17,6 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLLinkElement
 
-import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
@@ -44,25 +43,13 @@ object Bowser extends js.Object {
   val name    : String              = js.native
 }
 
-object Html {
+object HTMLFacades {
 
   implicit class HTMLLinkElementOps(private val link: HTMLLinkElement) extends AnyVal {
     def onloadF: Future[Unit] = {
       val promise = Promise[Unit]()
       link.asInstanceOf[js.Dynamic].onload = () => promise.success(())
       promise.future
-    }
-  }
-
-  implicit class HTMLElementOps(private val element: html.Element) extends AnyVal {
-
-    @tailrec final def closest(selector: String): Option[html.Element] = {
-      if (element.matches(selector))
-        Some(element)
-      else if (element.parentElement == null)
-        None
-      else
-        element.parentElement.closest(selector)
     }
   }
 }

@@ -152,6 +152,7 @@
         <xsl:if test="exists($control-events)">
             <xf:action
                 observer="{for $c in $control-names return concat($c, '-control')}"
+                target="#observer"
                 event="{
                     for $e in $control-events
                     return $controls-xforms-action-names[index-of($controls-2018.2-action-names, $e)]

@@ -129,6 +129,7 @@
 
                 <xf:action
                     observer="my-control-control"
+                    target="#observer"
                     event="xforms-enabled xforms-value-changed DOMActivate"
                     if="fr:mode() = ('new')">
                     <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">

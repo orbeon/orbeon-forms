@@ -108,7 +108,7 @@ class XFormsVariableControl(
     }
   }
 
-  override def isValueChangedCommit() = {
+  override def isValueChangedCommit(): Boolean = {
     val result = ! SaxonUtils.compareValueRepresentations(_previousValue, _value)
     _previousValue = _value
     result

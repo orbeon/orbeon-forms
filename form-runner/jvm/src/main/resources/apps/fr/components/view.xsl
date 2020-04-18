@@ -491,7 +491,7 @@
                 <!-- Success: remember the captcha passed, which also influences validity -->
                 <xf:action ev:event="fr-verify-done">
                     <xf:setvalue ref="$captcha">true</xf:setvalue>
-                    <xf:revalidate model="fr-persistence-model"/>
+                    <xf:recalculate model="fr-persistence-model"/>
                     <xf:refresh/>
                 </xf:action>
                 <!-- Failure: load another challenge -->

@@ -578,9 +578,8 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -601,9 +600,8 @@
 
         <xf:action>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -629,9 +627,8 @@
 
         <xf:action>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:var
                 xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
@@ -745,9 +742,8 @@
             <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
             <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -777,9 +773,8 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -803,9 +798,8 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>

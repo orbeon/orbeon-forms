@@ -28,7 +28,7 @@ val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
-val ScalaCollectionCompatVersion  = "2.1.5"
+val ScalaCollectionCompatVersion  = "2.1.6"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"

@@ -147,7 +147,7 @@
                                                 'ExpressionParam'
                                             else if (@id = 2 and xxf:component-param-value('all-control-values') = 'true') then
                                                 'AllControlValuesParam'
-                                            else if (xxf:component-param-value('form-runner-links') = 'true') then
+                                            else if (@id = (3, 4, 5, 6, 7, 8) and xxf:component-param-value('form-runner-links') = 'true') then
                                                 if (@id = 3) then
                                                     'LinkToEditPageParam'
                                                 else if (@id = 4) then
@@ -165,15 +165,19 @@
                                             else
                                                 (),
                                             $template := instance('values-template')/fr:param[@type = $type]
-                                        return (
-                                            $template/@type,
-                                            if ($type = $current-param/@type) then
-                                                $current-param/*             (: keep the currently-selected value as is :)
-                                            else (
-                                                $current-param/fr:name,      (: always keep the parameter name          :)
-                                                $template/(* except fr:name) (: but use the other elements if any       :)
-                                            )
-                                        )"/>
+                                        return
+                                            if (exists($type)) then
+                                                 (
+                                                    $template/@type,
+                                                    if ($type = $current-param/@type) then
+                                                        $current-param/*             (: keep the currently-selected value as is :)
+                                                    else (
+                                                        $current-param/fr:name,      (: always keep the parameter name          :)
+                                                        $template/(* except fr:name) (: but use the other elements if any       :)
+                                                    )
+                                                )
+                                            else
+                                                ()"/>
                             </xf:itemset>
                         </xf:select1>
 

@@ -25,10 +25,12 @@ object JSDateUtils {
   def isoDateToStringUsingLocalTimezone(dateString: String): Option[js.Date] = Try {
 
     // Use `substring` to trim potential timezone
-    val dateParts = dateString.substring(0, 10).splitTo[List]("-")
+    val beforeChrist = dateString.startsWith("-")
+    val dateLength   = if (beforeChrist) 11 else 10
+    val dateParts    = dateString.substring(0, dateLength).splitTo[List]("-")
 
     new js.Date(
-      year    = dateParts(0).toInt,
+      year    = dateParts(0).toInt * (if (beforeChrist) -1 else 1),
       month   = dateParts(1).toInt - 1,
       date    = dateParts(2).toInt,
       hours   = 0,

@@ -40,6 +40,7 @@ object Globals {
   var lastDialogZIndex            : Int                       = 1050                         // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
 
   var modalProgressPanel          : js.Object                 = null                         // overlay modal panel for displaying progress bar
+  var modalProgressPanelShown     : Boolean                   = false                        // whether the panel is shown (or scheduled to show)
   var modalProgressPanelTimerId   : js.Any                    = null                         // timer id for modal progress panels shown asynchronously (iOS)
 
   var changeListeners             : js.Dictionary[js.Any]     = js.Dictionary.empty          // maps control id to DOM element for which we have registered a change listener

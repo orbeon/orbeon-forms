@@ -92,7 +92,7 @@ object AjaxClient {
     // We remove the modal progress panel before handling DOM response, as script actions may dispatch
     // events and we don't want them to be filtered. If there are server events, we don't remove the
     // panel until they have been processed, i.e. the request sending the server events returns.
-    def mustHideProgressDialog: Boolean = {
+    val mustHideProgressDialog = {
 
       // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
       val serverSaysToKeepModelProgressPanelDisplayed =

@@ -244,12 +244,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              *   [2]: https://github.com/orbeon/orbeon-forms/issues/747
              *   [3]: https://github.com/orbeon/orbeon-forms/issues/755
              */
-            focus: function(element) {
+            focus: function(element) { // 2020-04-23: 2 usages.
                 try { element.focus(); }
                 catch (e) { /* NOP */ }
             },
 
-            blur: function(element) {
+            blur: function(element) { // 2020-04-23: 2 usages.
                 try { element.blur(); }
                 catch (e) { /* NOP */ }
             },
@@ -758,7 +758,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             hideModalProgressPanel: function() {
-                if (ORBEON.xforms.Globals.modalProgressPanel) {
+                if (ORBEON.xforms.Globals.modalProgressPanelShown && ORBEON.xforms.Globals.modalProgressPanel) {
+
+                    ORBEON.xforms.Globals.modalProgressPanelShown = false;
+
                     // Remove timer so that the modal progress panel doesn't show just after we try to hide it
                     if (ORBEON.xforms.Globals.modalProgressPanelTimerId) {
                         clearTimeout(ORBEON.xforms.Globals.modalProgressPanelTimerId);
@@ -769,7 +772,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             displayModalProgressPanel: function(formID) {
-                if (! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
+                if (! ORBEON.xforms.Globals.modalProgressPanelShown && ! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
+
+                    ORBEON.xforms.Globals.modalProgressPanelShown = true;
+
                     if (! ORBEON.xforms.Globals.modalProgressPanel) {
                         ORBEON.xforms.Globals.modalProgressPanel =
                             new YAHOO.widget.Panel(ORBEON.xforms.Page.namespaceIdIfNeeded(formID, "orbeon-spinner"), {
@@ -2420,6 +2426,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         focus: function (event) {
+
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+                event.preventDefault();
+                return;
+            }
+
             var eventTarget = YAHOO.util.Event.getTarget(event);
             // If the browser does not support capture, register listener for change on capture
             if (_.isUndefined(document.addEventListener)) {
@@ -2471,6 +2483,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         blurEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         blur: function (event) {
+
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+                event.preventDefault();
+                return;
+            }
+
             if (! ORBEON.xforms.Globals.maskFocusEvents) {
                 var target = YAHOO.util.Event.getTarget(event);
                 var control = ORBEON.xforms.Events._findAncestorFocusableControl(target);
@@ -2579,6 +2597,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keydown: function (event) {
 
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+                event.preventDefault();
+                return;
+            }
+
             // Prevent default behavior when the esc key is pressed, which would otherwise reset all the form fields on IE,
             // up to IE11 included. See https://github.com/orbeon/orbeon-forms/issues/131
             if (event.keyCode == 27)
@@ -2596,6 +2619,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         keypressEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keypress: function (event) {
+
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+                event.preventDefault();
+                return;
+            }
+
             var target = YAHOO.util.Event.getTarget(event);
             var control = ORBEON.xforms.Events._findParentXFormsControl(target);
             if (control != null) {
@@ -2622,6 +2651,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         keyup: function (event) {
+
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+               event.preventDefault();
+               return;
+            }
+
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
                 // Remember we have received the keyup for this element
@@ -2740,6 +2775,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         clickEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         click: function (event) {
+
+            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+               event.preventDefault();
+               return;
+            }
+
             // Stop processing if the mouse button that was clicked is not the left button
             // See: http://www.quirksmode.org/js/events_properties.html#button
             if (event.button != 0 && event.button != 1) return;
@@ -2752,7 +2793,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // To make processing more similar on all browsers, we stop going further here if we go a click on a disabled control.
                 return;
             }
-
+            
             var handled = false;
             if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger

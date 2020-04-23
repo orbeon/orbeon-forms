@@ -19,8 +19,11 @@ import java.sql.{Array => _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.io.IOUtils._
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
+import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
@@ -31,9 +34,6 @@ import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
-import org.orbeon.io.StringBuilderWriter
-import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{NetUtils, Whitespace, XPath}
 import org.orbeon.oxf.xml.{JXQName, _}
@@ -449,7 +449,7 @@ trait CreateUpdateDelete
 
       // Commit before reindexing, as reindexing will read back the form definition, which can
       // cause a deadlock since we're still in the transaction writing the form definition
-      useAndClose(connection.prepareStatement("COMMIT"))(_.execute())
+      connection.commit()
 
       debug("CRUD: after commit")
 

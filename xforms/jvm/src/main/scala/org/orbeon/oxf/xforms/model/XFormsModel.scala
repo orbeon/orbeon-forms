@@ -151,13 +151,11 @@ class XFormsModel(
         doRebuild()
       case _: XFormsModelDestructEvent =>
         containingDocument.getXPathDependencies.modelDestruct(selfModel)
-      case _: XFormsRecalculateEvent =>
+      case _: XFormsRecalculateEvent | _: XFormsRevalidateEvent =>
+        // 4.3.5 The xforms-revalidate Event
         // 4.3.6 The xforms-recalculate Event
         // Recalculate and revalidate are unified
         // See https://github.com/orbeon/orbeon-forms/issues/1650
-        doRecalculateRevalidate()
-      case _: XFormsRevalidateEvent =>
-        // 4.3.5 The xforms-revalidate Event
         doRecalculateRevalidate()
       case _: XFormsRefreshEvent =>
         // 4.3.4 The xforms-refresh Event

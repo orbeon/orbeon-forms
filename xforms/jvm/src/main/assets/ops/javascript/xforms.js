@@ -227,17 +227,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 return null;
             },
 
-            stringToDom: function(xmlString) {
-                try {
-                    return (new DOMParser()).parseFromString(xmlString, "application/xml");
-                } catch (ex) {
-                    // If `xmlString` can't be parsed, `parseFromString()` is expected to return an error document, but some
-                    // browsers (at least IE11) throws an exception instead, so here we catch it to return an error document instead.
-                    return document.createElement("parsererror");
-                }
-                return null;
-            },
-
             /**
              * A safe way to focus on a form element, as IE can complains when we try to set the focus on non-visible
              * control. This can happen because of error in the XForms code, or in cases where we try to restore

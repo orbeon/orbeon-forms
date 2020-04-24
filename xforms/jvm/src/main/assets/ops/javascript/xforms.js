@@ -768,11 +768,26 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.xforms.Globals.modalProgressPanelTimerId = null;
                     }
                     ORBEON.xforms.Globals.modalProgressPanel.hide();
+
+                    // Restore focus
+                    // See https://github.com/orbeon/orbeon-forms/issues/4511
+                    if (ORBEON.xforms.Globals.modalProgressFocusControlId != null) {
+                        ORBEON.xforms.Controls.setFocus(ORBEON.xforms.Globals.modalProgressFocusControlId);
+                        ORBEON.xforms.Globals.modalProgressFocusControlId = null;
+                    }
                 }
             },
 
             displayModalProgressPanel: function(formID) {
                 if (! ORBEON.xforms.Globals.modalProgressPanelShown && ! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
+
+                    // Take out the focus from the current control
+                    // See https://github.com/orbeon/orbeon-forms/issues/4511
+                    if (ORBEON.xforms.Globals.currentFocusControlId != null) {
+                        var focusControlId = ORBEON.xforms.Globals.currentFocusControlId;
+                        ORBEON.xforms.Controls.removeFocus(ORBEON.xforms.Globals.currentFocusControlId);
+                        ORBEON.xforms.Globals.modalProgressFocusControlId = focusControlId;
+                    }
 
                     ORBEON.xforms.Globals.modalProgressPanelShown = true;
 
@@ -2808,12 +2823,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
                     if ($(target).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
-                        // If click on a modal trigger, we want to prevent any further interaction with the form until
-                        // we get a response to this Ajax request from the server.
-                        // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
-                        // the progress panel is displayed.
-                        target.blur();
-                        // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
                         ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
                     }
                     handled = true;

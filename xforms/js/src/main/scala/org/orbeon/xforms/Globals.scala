@@ -42,6 +42,7 @@ object Globals {
   var modalProgressPanel          : js.Object                 = null                         // overlay modal panel for displaying progress bar
   var modalProgressPanelShown     : Boolean                   = false                        // whether the panel is shown (or scheduled to show)
   var modalProgressPanelTimerId   : js.Any                    = null                         // timer id for modal progress panels shown asynchronously (iOS)
+  var modalProgressFocusControlId : String                    = null
 
   var changeListeners             : js.Dictionary[js.Any]     = js.Dictionary.empty          // maps control id to DOM element for which we have registered a change listener
   var topLevelListenerRegistered  : Boolean                   = false                        // have we already registered the listeners on the top-level elements, which never change

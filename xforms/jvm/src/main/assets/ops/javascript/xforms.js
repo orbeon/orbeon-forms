@@ -2448,16 +2448,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
 
             var eventTarget = YAHOO.util.Event.getTarget(event);
-            // If the browser does not support capture, register listener for change on capture
-            if (_.isUndefined(document.addEventListener)) {
-                YAHOO.util.Dom.generateId(eventTarget);
-                var changeListenerElement = ORBEON.xforms.Globals.changeListeners[eventTarget.id];
-                var needToRegisterChangeListener = _.isUndefined(changeListenerElement) || changeListenerElement != eventTarget;
-                if (needToRegisterChangeListener) {
-                    YAHOO.util.Event.addListener(eventTarget, "change", ORBEON.xforms.Events.change);
-                    ORBEON.xforms.Globals.changeListeners[eventTarget.id] = eventTarget;
-                }
-            }
             if (! ORBEON.xforms.Globals.maskFocusEvents) {
                 // Control elements
                 var newFocusControlElement = ORBEON.xforms.Events._findAncestorFocusableControl(eventTarget);

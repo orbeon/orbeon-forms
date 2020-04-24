@@ -23,8 +23,6 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object Globals {
 
-  lazy val isRenderingEngineTrident: Boolean                   = Bowser.msie.getOrElse(false) // one usage left to check as of 2019-12-09
-
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : js.Object                 = null                         // id of the control that got the focus last

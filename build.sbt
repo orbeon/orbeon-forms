@@ -95,7 +95,7 @@ val CoreLibraryDependencies = Seq(
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
   "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.19"          % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.20"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.12" % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,

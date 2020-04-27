@@ -2792,8 +2792,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         click: function (event) {
 
             if (ORBEON.xforms.Globals.modalProgressPanelShown) {
-               event.preventDefault();
-               return;
+                event.preventDefault();
+                return;
             }
 
             // Stop processing if the mouse button that was clicked is not the left button
@@ -2808,7 +2808,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // To make processing more similar on all browsers, we stop going further here if we go a click on a disabled control.
                 return;
             }
-            
+
             var handled = false;
             if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger

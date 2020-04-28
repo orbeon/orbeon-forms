@@ -121,7 +121,7 @@ object Tabbable {
                 AjaxClient.ajaxResponseReceived.add(moveBack)
 
                 // Thinking this should instead block input, but only after a while show a modal screen.
-                // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
+                // XFormsUI.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
 
                 AjaxEvent.dispatchEvent(
                   AjaxEvent(

@@ -104,7 +104,7 @@ object AjaxClient {
     }
 
     if (mustHideProgressDialog)
-      Utils.hideModalProgressPanel()
+      XFormsUI.hideModalProgressPanel()
 
     AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formId, ignoreErrors)
     // Reset changes, as changes are included in this batch of events

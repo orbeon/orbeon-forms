@@ -25,7 +25,7 @@ object Globals {
 
   var maskFocusEvents             : Boolean                   = false                        // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = false                        // avoid catching a dialog close event received from the server, so we don't sent it back to the server
-  var currentFocusControlId       : js.Object                 = null                         // id of the control that got the focus last
+  var currentFocusControlId       : String                    = null                         // id of the control that got the focus last
   var currentFocusControlElement  : js.Object                 = null                         // element for the control that got the focus last
   var yuiCalendar                 : js.Object                 = null                         // reusable calendar widget
   var tooltipLibraryInitialized   : Boolean                   = false
@@ -38,11 +38,6 @@ object Globals {
   var helpTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty          // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
   var sliderYui                   : js.Dictionary[js.Any]     = js.Dictionary.empty          // maps slider id to the YUI object for that slider
   var lastDialogZIndex            : Int                       = 1050                         // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
-
-  var modalProgressPanel          : js.Object                 = null                         // overlay modal panel for displaying progress bar
-  var modalProgressPanelShown     : Boolean                   = false                        // whether the panel is shown (or scheduled to show)
-  var modalProgressPanelTimerId   : js.Any                    = null                         // timer id for modal progress panels shown asynchronously (iOS)
-  var modalProgressFocusControlId : String                    = null
 
   var topLevelListenerRegistered  : Boolean                   = false                        // have we already registered the listeners on the top-level elements, which never change
 }

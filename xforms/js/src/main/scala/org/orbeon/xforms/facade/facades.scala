@@ -121,6 +121,7 @@ object Controls extends js.Object {
   def setCurrentValue(control: html.Element, newControlValue: String): Unit                  = js.native
   def getCurrentValue(elem: html.Element)                            : js.UndefOr[String]    = js.native
   def setFocus(controlId: String)                                    : Unit                  = js.native
+  def removeFocus(controlId: String)                                 : Unit                  = js.native
   def getForm(control: dom.Element)                                  : js.UndefOr[html.Form] = js.native
 }
 
@@ -185,5 +186,7 @@ object Utils extends js.Object {
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
-  def hideModalProgressPanel()                                              : Unit             = js.native
+  def isIOS()                                                               : Boolean          = js.native
+  def getZoomLevel()                                                        : Double           = js.native
+  def resetIOSZoom()                                                        : Unit             = js.native
 }

@@ -135,7 +135,7 @@ object DndRepeat {
               AjaxClient.ajaxResponseReceived.add(moveBack)
 
               // Thinking this should instead block input, but only after a while show a modal screen.
-              // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(container).id)
+              // XFormsUI.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(container).id)
 
               AjaxEvent.dispatchEvent(
                 AjaxEvent(

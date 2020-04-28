@@ -757,73 +757,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
             },
 
-            hideModalProgressPanel: function() {
-                if (ORBEON.xforms.Globals.modalProgressPanelShown && ORBEON.xforms.Globals.modalProgressPanel) {
-
-                    ORBEON.xforms.Globals.modalProgressPanelShown = false;
-
-                    // Remove timer so that the modal progress panel doesn't show just after we try to hide it
-                    if (ORBEON.xforms.Globals.modalProgressPanelTimerId) {
-                        clearTimeout(ORBEON.xforms.Globals.modalProgressPanelTimerId);
-                        ORBEON.xforms.Globals.modalProgressPanelTimerId = null;
-                    }
-                    ORBEON.xforms.Globals.modalProgressPanel.hide();
-
-                    // Restore focus
-                    // See https://github.com/orbeon/orbeon-forms/issues/4511
-                    if (ORBEON.xforms.Globals.modalProgressFocusControlId != null) {
-                        ORBEON.xforms.Controls.setFocus(ORBEON.xforms.Globals.modalProgressFocusControlId);
-                        ORBEON.xforms.Globals.modalProgressFocusControlId = null;
-                    }
-                }
-            },
-
-            displayModalProgressPanel: function(formID) {
-                if (! ORBEON.xforms.Globals.modalProgressPanelShown && ! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
-
-                    // Take out the focus from the current control
-                    // See https://github.com/orbeon/orbeon-forms/issues/4511
-                    if (ORBEON.xforms.Globals.currentFocusControlId != null) {
-                        var focusControlId = ORBEON.xforms.Globals.currentFocusControlId;
-                        ORBEON.xforms.Controls.removeFocus(ORBEON.xforms.Globals.currentFocusControlId);
-                        ORBEON.xforms.Globals.modalProgressFocusControlId = focusControlId;
-                    }
-
-                    ORBEON.xforms.Globals.modalProgressPanelShown = true;
-
-                    if (! ORBEON.xforms.Globals.modalProgressPanel) {
-                        ORBEON.xforms.Globals.modalProgressPanel =
-                            new YAHOO.widget.Panel(ORBEON.xforms.Page.namespaceIdIfNeeded(formID, "orbeon-spinner"), {
-                                width: "60px",
-                                fixedcenter: true,
-                                close: false,
-                                draggable: false,
-                                zindex: 4,
-                                modal: true,
-                                visible: true
-                            });
-                        ORBEON.xforms.Globals.modalProgressPanel.setBody('<div class="xforms-modal-progress"/>');
-                        ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
-                    }
-
-                    function showSpinner() {
-                        ORBEON.xforms.Globals.modalProgressPanel.show();
-                    }
-
-                    if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
-                        ORBEON.util.Utils.resetIOSZoom();
-                        var timerId = setTimeout(function() {
-                            ORBEON.xforms.Globals.modalProgressPanelTimerId = null;
-                            showSpinner();
-                        }, 200);
-
-                        ORBEON.xforms.Globals.modalProgressPanelTimerId = timerId;
-                    } else {
-                        showSpinner();
-                    }
-                }
-            },
-
             /**
              * See: http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Problem-and-solution
              */
@@ -2813,7 +2746,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
                     if ($(target).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
-                        ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
+                        ORBEON.util.Utils.displayModalProgressPanel();
                     }
                     handled = true;
                 }

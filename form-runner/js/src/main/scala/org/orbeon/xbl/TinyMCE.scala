@@ -37,7 +37,7 @@ object TinyMCE {
 
       override def init(): Unit = {
 
-        if (!baseUrlInitialized) {
+        if (! baseUrlInitialized) {
           // Tell TinyMCE about base URL, which it can't guess in combined resources
 
           val href = dom.document.querySelector(".tinymce-base-url").getAttribute("href")

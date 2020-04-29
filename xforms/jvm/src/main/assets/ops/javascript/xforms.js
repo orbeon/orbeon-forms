@@ -2060,11 +2060,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (neighbor == null) {
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
-                if (ORBEON.xforms.server.AjaxServer.isRequestInProgress()) {
-                    ORBEON.xforms.server.AjaxServer.ajaxResponseProcessedForCurrentEventQueueP().then(function() { yuiDialog.center(); });
-                } else {
-                    yuiDialog.center();
-                }
+                ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedP().then(
+                    function() { yuiDialog.center(); }
+                );
             } else {
                 // Align dialog relative to neighbor
                 yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);

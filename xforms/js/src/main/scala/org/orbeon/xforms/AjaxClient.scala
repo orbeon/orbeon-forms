@@ -58,6 +58,13 @@ object AjaxClient {
   def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] =
     ajaxResponseProcessedForCurrentEventQueueF.map(_ => ()).toJSPromise
 
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedP")
+  def currentAjaxResponseProcessedP(): js.Promise[Unit] =
+    if (EventQueue.ajaxRequestInProgress)
+      ajaxResponseF(ajaxResponseProcessed, forCurrentEventQueue = false).map(_ => ()).toJSPromise
+    else
+      Future.successful(()).toJSPromise
+
   // 2020-04-28: Only used by legacy autocomplete
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.addAjaxResponseProcessed")
   def addAjaxResponseProcessed(fn: js.Function0[js.Any]): Unit =
@@ -65,18 +72,18 @@ object AjaxClient {
 
   // FIXME: This is not done per form. There used to be a `formId` but it was unused.
   def ajaxResponseReceivedForCurrentEventQueueF: Future[AjaxResponseDetails] =
-    ajaxResponseForCurrentEventQueueF(ajaxResponseReceived)
+    ajaxResponseF(ajaxResponseReceived, forCurrentEventQueue = true)
 
   // FIXME: This is not done per form. There used to be a `formId` but it was unused.
   def ajaxResponseProcessedForCurrentEventQueueF: Future[AjaxResponseDetails] =
-    ajaxResponseForCurrentEventQueueF(ajaxResponseProcessed)
+    ajaxResponseF(ajaxResponseProcessed, forCurrentEventQueue = true)
 
-  private def ajaxResponseForCurrentEventQueueF[T](cb: CallbackList[T]): Future[T] = {
+  private def ajaxResponseF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean): Future[T] = {
 
     val result = Promise[T]()
 
     // When there is a request in progress, we need to wait for the response after the next response processed
-    var skipNext = EventQueue.ajaxRequestInProgress
+    var skipNext = forCurrentEventQueue && EventQueue.ajaxRequestInProgress
 
     lazy val callback: T => Unit =
       (v: T) => {

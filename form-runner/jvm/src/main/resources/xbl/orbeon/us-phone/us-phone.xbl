@@ -79,9 +79,9 @@
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <field-width/>
-                        </local>
+                        </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-datetime-grid">

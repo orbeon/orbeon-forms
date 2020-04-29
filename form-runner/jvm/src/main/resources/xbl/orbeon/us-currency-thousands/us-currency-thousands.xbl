@@ -58,7 +58,7 @@
             <!-- Local model -->
             <xf:model>
                 <xf:instance>
-                    <value/>
+                    <_/>
                 </xf:instance>
                 <xf:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
                 <!-- FR HACK: Make instance read-only when the form must be read-only -->

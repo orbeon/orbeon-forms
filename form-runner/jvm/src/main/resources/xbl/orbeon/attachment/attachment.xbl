@@ -78,7 +78,7 @@
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
-                        <resources>
+                        <_>
                             <resource xml:lang="en">
                                 <allow-download>Allow download</allow-download>
                                 <show-size>Show size</show-size>
@@ -87,7 +87,7 @@
                                 <allow-download>Permettre le téléchargement</allow-download>
                                 <ow-si>Montrer la taille</ow-si>
                             </resource>
-                        </resources>
+                        </_>
                     </xf:instance>
 
                 </xf:model>
@@ -147,7 +147,7 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en">
                             <download>Download</download>
                             <select>Select file</select>
@@ -196,7 +196,7 @@
                             <download>Hent</download>
                             <select todo="true">[Select file]</select>
                         </resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

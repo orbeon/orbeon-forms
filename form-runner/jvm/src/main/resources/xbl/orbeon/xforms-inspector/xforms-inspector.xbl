@@ -87,11 +87,11 @@
                 </xf:action>
 
                 <xf:instance id="inspector-itemset">
-                    <models xmlns=""/>
+                    <_ xmlns=""/>
                 </xf:instance>
 
                 <xf:instance id="inspector-instance">
-                    <instance xmlns="">
+                    <_ xmlns="">
                         <current-model/>
                         <current-instance/>
                         <mode>formatted</mode>
@@ -102,7 +102,7 @@
                         <shown-output/>
                         <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
                         <xsl:output method="xml" omit-xml-declaration="yes"/>
-                    </instance>
+                    </_>
                 </xf:instance>
 
                 <xf:var name="xml-indent"   value="instance('inspector-instance')/xsl:output[1]"/>

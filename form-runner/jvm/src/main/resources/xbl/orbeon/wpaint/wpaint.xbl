@@ -73,15 +73,15 @@
 
         <xbl:implementation>
             <xf:model id="wpaint-model">
-                <xf:instance id="wpaint-instance" xxbl:mirror="true"><dummy/></xf:instance>
+                <xf:instance id="wpaint-instance" xxbl:mirror="true"><_/></xf:instance>
                 <xf:instance id="template">
-                    <wpaint>
+                    <_>
                         <image filename="" mediatype="" size=""/>
                         <annotation/>
-                    </wpaint>
+                    </_>
                 </xf:instance>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en">
                             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annotated image</annotated-image>
@@ -114,7 +114,7 @@
                             <canvas-not-supported>For at annotere et billede, skal din browser understøtte HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annoteret billede</annotated-image>
                         </resource>
-                    </resources>
+                    </_>
                 </xf:instance>
                 <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"
                            context="instance()" origin="instance('template')/*"/>

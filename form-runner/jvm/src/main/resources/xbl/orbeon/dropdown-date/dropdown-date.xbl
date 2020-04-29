@@ -84,7 +84,7 @@
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
-                        <resources>
+                        <_>
                             <resource xml:lang="en">
                                 <start-year>Start date</start-year>
                                 <end-year>End date</end-year>
@@ -93,7 +93,7 @@
                                 <start-year>Date de début</start-year>
                                 <end-year>Date de fin</end-year>
                             </resource>
-                        </resources>
+                        </_>
                     </xf:instance>
 
                 </xf:model>

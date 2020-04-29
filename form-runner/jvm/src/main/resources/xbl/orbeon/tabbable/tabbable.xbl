@@ -47,7 +47,7 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><add>Add One</add></resource>
                         <resource xml:lang="fr"><add>Ajouter</add></resource>
                         <resource xml:lang="es"><add>Agregar Uno</add></resource>
@@ -59,7 +59,7 @@
                         <resource xml:lang="nl"><add>[Add One]</add></resource>
                         <resource xml:lang="pt"><add>[Add One]</add></resource>
                         <resource xml:lang="sv"><add>[Add One]</add></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

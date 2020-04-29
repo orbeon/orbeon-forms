@@ -1,9 +1,0 @@
-<!--
-    This file is an empty template for your own properties-local-prod.xml file. Please follow the instructions here:
-
-    https://doc.orbeon.com/configuration/properties/
--->
-<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors">
-
-</properties>

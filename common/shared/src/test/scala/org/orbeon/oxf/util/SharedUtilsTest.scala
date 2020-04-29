@@ -233,8 +233,10 @@ class SharedUtilsTest extends AnyFunSpec {
       funnyCharsString -> (rareChineseChar1 + allToTrim + rareChineseChar2)
     )
 
-    for ((in, out) <- expected)
-      assert(out === in.trimAllToEmpty)
+    it("must pass all") {
+      for ((in, out) <- expected)
+        assert(out === in.trimAllToEmpty)
+    }
   }
 
   describe("The `substringAfter` function") {

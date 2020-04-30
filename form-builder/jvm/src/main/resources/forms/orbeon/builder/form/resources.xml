@@ -1079,11 +1079,11 @@
             <event-condition>
                 <label>Condition</label>
                 <item>
-                    <label>Run always</label>
+                    <label>Run in all modes</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Run on creation only</label>
+                    <label>Run in "new" mode only</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -2341,11 +2341,11 @@
             <event-condition>
                 <label>Condition d'exécution</label>
                 <item>
-                    <label>Toujours</label>
+                    <label>Tous les modes</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Création seulement</label>
+                    <label>Mode "création" seulement</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -3613,11 +3613,11 @@
             <event-condition>
                 <label todo="true">[Condition]</label>
                 <item>
-                    <label todo="true">[Run always]</label>
+                    <label todo="true">[Run in all modes]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label todo="true">[Run on creation only]</label>
+                    <label todo="true">[Run in "new" mode only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -4884,11 +4884,11 @@
             <event-condition>
                 <label todo="true">[Condition]</label>
                 <item>
-                    <label todo="true">[Run always]</label>
+                    <label todo="true">[Run in all modes]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label todo="true">[Run on creation only]</label>
+                    <label todo="true">[Run in "new" mode only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>

@@ -60,7 +60,7 @@ class ErrorSummaryTest
         withContainingDocument(doc) {
           val errorSummary           = resolveObject[XFormsComponentControl]("error-summary").get
           val stateInstance          = errorSummary.nestedContainerOpt.get.models.head.getInstance("fr-state-instance").documentInfo
-          val visibleAlertCountAttr  = stateInstance / "state" / "visible-counts" /@ "alert"
+          val visibleAlertCountAttr  = stateInstance / * / "visible-counts" /@ "alert"
           val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")
 
           assert(visibleAlertCountValue === "1")

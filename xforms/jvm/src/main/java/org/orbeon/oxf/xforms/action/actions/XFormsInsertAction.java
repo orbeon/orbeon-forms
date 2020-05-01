@@ -189,7 +189,8 @@ public class XFormsInsertAction extends XFormsAction {
             true,
             true,
             setRequireDefaultValues,
-            true
+            true,
+                true
         );
     }
 
@@ -204,7 +205,8 @@ public class XFormsInsertAction extends XFormsAction {
         boolean doClone,
         boolean doDispatch,
         boolean requireDefaultValues,
-        boolean searchForInstance
+        boolean searchForInstance,
+        boolean removeInstanceDataFromClonedNodes
     ) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
@@ -310,42 +312,49 @@ public class XFormsInsertAction extends XFormsAction {
                 }
             }
 
-            // Remove instance data from cloned nodes and perform Document node adjustment
-            for (int i = 0; i < clonedNodesTemp.size(); i++) {
-                final Node clonedNodeTemp = clonedNodesTemp.get(i);
+            if (removeInstanceDataFromClonedNodes) {
+                // Remove instance data from cloned nodes and perform Document node adjustment
+                for (int i = 0; i < clonedNodesTemp.size(); i++) {
+                    final Node clonedNodeTemp = clonedNodesTemp.get(i);
 
-                if (clonedNodeTemp instanceof Element) {
-                    // Element node
-                    if (applyDefaults)
-                        InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
-                    else
-                        InstanceDataOps.removeRecursively(clonedNodeTemp);
-                    clonedNodeTemp.detach();
-                } else if (clonedNodeTemp instanceof Attribute) {
-                    // Attribute node
-                    if (applyDefaults)
-                        InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
-                    else
-                        InstanceDataOps.removeRecursively(clonedNodeTemp);
-                    clonedNodeTemp.detach();
-                } else if (clonedNodeTemp instanceof Document) {
-                    // Document node
-                    final Element clonedNodeTempRootElement = clonedNodeTemp.getDocument().getRootElement();
-
-                    if (clonedNodeTempRootElement == null) {
-                        // Can be null in rare cases of documents without root element
-                        clonedNodesTemp.set(i, null); // we support having a null node further below, so set this to null
-                    } else {
+                    if (clonedNodeTemp instanceof Element) {
+                        // Element node
                         if (applyDefaults)
-                            InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTempRootElement);
+                            InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
                         else
-                            InstanceDataOps.removeRecursively(clonedNodeTempRootElement);
-                        // We can never really insert a document into anything at this point, but we assume that this means the root element
-                        clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
+                            InstanceDataOps.removeRecursively(clonedNodeTemp);
+                        clonedNodeTemp.detach();
+                    } else if (clonedNodeTemp instanceof Attribute) {
+                        // Attribute node
+                        if (applyDefaults)
+                            InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTemp);
+                        else
+                            InstanceDataOps.removeRecursively(clonedNodeTemp);
+                        clonedNodeTemp.detach();
+                    } else if (clonedNodeTemp instanceof Document) {
+                        // Document node
+                        final Element clonedNodeTempRootElement = clonedNodeTemp.getDocument().getRootElement();
+
+                        if (clonedNodeTempRootElement == null) {
+                            // Can be null in rare cases of documents without root element
+                            clonedNodesTemp.set(i, null); // we support having a null node further below, so set this to null
+                        } else {
+                            if (applyDefaults)
+                                InstanceDataOps.setRequireDefaultValueRecursively(clonedNodeTempRootElement);
+                            else
+                                InstanceDataOps.removeRecursively(clonedNodeTempRootElement);
+                            // We can never really insert a document into anything at this point, but we assume that this means the root element
+                            clonedNodesTemp.set(i, clonedNodeTempRootElement.detach());
+                        }
+                    } else {
+                        // Other nodes
+                        clonedNodeTemp.detach();
                     }
-                } else {
-                    // Other nodes
-                    clonedNodeTemp.detach();
+                }
+            } else {
+                // Just make sure the cloned nodes are detached
+                for (int i = 0; i < clonedNodesTemp.size(); i++) {
+                    clonedNodesTemp.get(i).detach();
                 }
             }
             clonedNodes = clonedNodesTemp;
@@ -590,6 +599,14 @@ public class XFormsInsertAction extends XFormsAction {
                         // Add other node to element
                         insertContextElement.content().add(otherNodeIndex++, clonedNode);
                         insertedNodes.add(clonedNode);
+
+                        for (final Node node:  insertContextElement.content()) {
+                            if (node.getParent() == null  && ! (node instanceof Namespace))
+                                System.out.println("xxxx null parent for node " + node);
+                        }
+
+
+
                     } else {
                         // "If a cloned node cannot be placed at the target location due to a node type conflict, then the
                         // insertion for that particular clone node is ignored."

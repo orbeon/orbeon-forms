@@ -117,9 +117,10 @@ object MigrationOps20191 extends MigrationOps {
         val gridContent = content flatMap (p => gridElem child p.value)
 
         insert(
-          after      = gridElem,
-          origin     = gridContent,
-          doDispatch = false
+          after                             = gridElem,
+          origin                            = gridContent,
+          doDispatch                        = false,
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4519
         )
 
         delete(

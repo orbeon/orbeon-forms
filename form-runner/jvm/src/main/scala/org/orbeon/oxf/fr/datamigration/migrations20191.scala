@@ -101,7 +101,7 @@ object MigrationOps20191 extends MigrationOps {
     parser.decode[MigrationSet20191](jsonString).fold(Failure.apply, Success.apply) getOrElse
       (throw new IllegalArgumentException(s"illegal format `$jsonString`"))
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {
@@ -133,7 +133,7 @@ object MigrationOps20191 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {

@@ -110,7 +110,7 @@ object MigrationOps48 extends MigrationOps {
     MigrationSet48(migrations.flatten.to(List))
   }
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult = {
@@ -145,7 +145,7 @@ object MigrationOps48 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult =

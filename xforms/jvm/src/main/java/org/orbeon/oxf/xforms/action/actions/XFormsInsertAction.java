@@ -599,14 +599,6 @@ public class XFormsInsertAction extends XFormsAction {
                         // Add other node to element
                         insertContextElement.content().add(otherNodeIndex++, clonedNode);
                         insertedNodes.add(clonedNode);
-
-                        for (final Node node:  insertContextElement.content()) {
-                            if (node.getParent() == null  && ! (node instanceof Namespace))
-                                System.out.println("xxxx null parent for node " + node);
-                        }
-
-
-
                     } else {
                         // "If a cloned node cannot be placed at the target location due to a node type conflict, then the
                         // insertion for that particular clone node is ignored."

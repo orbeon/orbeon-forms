@@ -147,7 +147,7 @@
                                                 'ExpressionParam'
                                             else if (@id = 2 and xxf:component-param-value('all-control-values') = 'true') then
                                                 'AllControlValuesParam'
-                                            else if (@id = (3, 4, 5, 6, 7, 8) and xxf:component-param-value('form-runner-links') = 'true') then
+                                            else if (@id = (3 to 8) and xxf:component-param-value('form-runner-links') = 'true') then
                                                 if (@id = 3) then
                                                     'LinkToEditPageParam'
                                                 else if (@id = 4) then

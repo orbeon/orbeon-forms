@@ -303,7 +303,7 @@ object AjaxClient {
     // check for this anymore.
     EventQueue.eventQueue ++:= events
 
-    // Fire them with a delay to give us a change to aggregate events together
+    // Fire them with a delay to give us a chance to aggregate events together
     EventQueue.executeEventFunctionQueued += 1
     if (incremental && ! (currentTime - EventQueue.oldestEventScheduledTime > Properties.delayBeforeIncrementalRequest.get())) {
       // After a delay (e.g. 500 ms), run `executeNextRequest()` and send queued events to server

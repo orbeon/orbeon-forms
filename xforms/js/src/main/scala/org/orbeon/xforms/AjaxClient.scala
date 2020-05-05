@@ -117,8 +117,8 @@ object AjaxClient {
     ajaxResponseProcessed.fire(details)
 
     // Go ahead with next request, if any
-    EventQueue.executeEventFunctionQueued += 1
-    executeNextRequest(bypassRequestQueue = false)
+    if (EventQueue.executeEventFunctionQueued == 0)
+      executeNextRequestIfNeeded()
   }
 
   // Unless we get a clear indication from the server that an error occurred, we retry to send the request to
@@ -310,7 +310,21 @@ object AjaxClient {
       // if there are no other `executeNextRequest()` that have been added to the queue after this
       // request.
       timers.setTimeout(Properties.delayBeforeIncrementalRequest.get().millis) {
-        executeNextRequest(bypassRequestQueue = false)
+
+        // `executeEventFunctionQueued`:
+        //
+        // - incremented
+        //     - before `executeNextRequest()` is called directly after an Ajax response
+        //     - above when `executeNextRequest()` is scheduled to be called
+        // - decremented before `executeNextRequestIfNeeded()` below
+        //
+        // The idea is that if you keep scheduling events with an incremental delay, they won't be sent as
+        // long as the user types within that delay, unless some other non-incremental event sends the request
+        // in the meanwhile (with `bypassRequestQueue = true`).
+
+        EventQueue.executeEventFunctionQueued -= 1
+        if (EventQueue.executeEventFunctionQueued == 0)
+          executeNextRequestIfNeeded()
       }
     } else {
       // After a very short delay (e.g. 20 ms), run `executeNextRequest()` and force queued events
@@ -318,7 +332,8 @@ object AjaxClient {
       // The small delay is here so we don't send multiple requests to the server when the
       // browser gives us a sequence of events (e.g. focus out, change, focus in).
       timers.setTimeout(Properties.internalShortDelay.get().millis) {
-        executeNextRequest(bypassRequestQueue = true)
+        EventQueue.executeEventFunctionQueued -= 1
+        executeNextRequestIfNeeded()
       }
     }
     // Used by heartbeat
@@ -408,29 +423,8 @@ object AjaxClient {
         timers.setTimeout(delay.millis)(requestFunction())
     }
 
-    def executeNextRequest(bypassRequestQueue: Boolean): Unit = {
-
-      // `executeEventFunctionQueued`:
-      //
-      // - incremented
-      //     - just before `executeNextRequest()` is called directly after an Ajax response (so in effect it's a NOP as it's decremented below)
-      //     - OR before `executeNextRequest()` is *scheduled* to be called
-      // - decremented here
-      //
-      // The idea is that if you keep scheduling events with an incremental delay, they won't be sent as
-      // long as the user types within that delay, unless some other non-incremental event sends the request
-      // in the meanwhile (with `bypassRequestQueue = true`).
-      //
-      // Bottom line: `executeEventFunctionQueued` is only used for incremental events... except that upon
-      // Ajax response, we pass `bypassRequestQueue = false`, which means that if there is either an
-      // incremental or a non-incremental `executeNextRequest()` scheduled when that happens, the actual
-      // check of the queue will wait until that completes, which could be up to the incremental delay.
-      //
-      // Q: Should we then call `executeNextRequest(bypassRequestQueue = true)` instead?
-
-      EventQueue.executeEventFunctionQueued -= 1
-
-      if (! EventQueue.ajaxRequestInProgress && EventQueue.eventQueue.nonEmpty && (bypassRequestQueue || EventQueue.executeEventFunctionQueued == 0)) {
+    def executeNextRequestIfNeeded(): Unit =
+      if (! EventQueue.ajaxRequestInProgress && EventQueue.eventQueue.nonEmpty) {
         findEventsToProcess match {
           case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
             // Remove from this list of ids that changed the id of controls for
@@ -444,7 +438,6 @@ object AjaxClient {
             EventQueue.eventQueue = Nil
         }
       }
-    }
 
     def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
 

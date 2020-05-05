@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.facades.TinyMce._
 import org.orbeon.xforms.facade._
-import org.orbeon.xforms.{$, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.raw
 import org.scalajs.jquery.JQueryEventObject
@@ -96,7 +96,7 @@ object TinyMCE {
         val rawContent = myEditor.getContent()
         // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
         val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName  = "fr-set-client-value",
             targetId   = containerElem.id,

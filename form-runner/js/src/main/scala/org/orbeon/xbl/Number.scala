@@ -114,7 +114,7 @@ object Number {
 
             if (Set(10, 13)(e.which)) {
               updateStateAndSendValueToServer()
-              AjaxEvent.dispatchEvent(
+              AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName = EventNames.DOMActivate,
                   targetId  = containerElem.id

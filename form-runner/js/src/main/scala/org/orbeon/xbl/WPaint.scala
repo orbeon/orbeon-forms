@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
@@ -93,7 +93,7 @@ object WPaint {
       // Send the image data from wPaint to the server, which will put it in <annotation>
       private def sendAnnotationToServer(): Unit = {
         val annotationImgData = wpaintElC.asInstanceOf[Dynamic].wPaint("image")
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName  = "fr-update-annotation",
             targetId   = containerElem.id,

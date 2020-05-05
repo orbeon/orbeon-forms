@@ -78,9 +78,6 @@ object AjaxEvent {
       )
     )
 
-  def dispatchEvent(event: AjaxEvent): Unit =
-    AjaxClient.fireEvent(event)
-
   private val EventsWithoutTargetId = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
 }
 

@@ -58,7 +58,7 @@ object FormRunnerWizardAPI {
     // Separate variable due to type inference fail when put inline below
     val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
 
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = "fr-wizard-focus",
         targetId   = Names.ViewComponent,

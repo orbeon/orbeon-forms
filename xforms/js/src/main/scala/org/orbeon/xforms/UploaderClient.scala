@@ -63,7 +63,7 @@ object UploaderClient {
     // Keep asking for progress update at regular interval until there is no upload in progress
     js.timers.setTimeout(Properties.delayBeforeUploadProgressRefresh.get()) {
       currentEventOpt foreach { processingEvent =>
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName    = EventNames.XXFormsUploadProgress,
             targetId     = processingEvent.upload.container.id,
@@ -84,7 +84,7 @@ object UploaderClient {
       currentAbortControllerOpt foreach (_.abort())
 
     currentEventOpt foreach { processingEvent =>
-      AjaxEvent.dispatchEvent(
+      AjaxClient.fireEvent(
           AjaxEvent(
             eventName = eventName,
             targetId  = processingEvent.upload.container.id
@@ -137,7 +137,7 @@ object UploaderClient {
         currentEvent.upload.setState("progress")
 
         // Tell server we're starting uploads
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName    = EventNames.XXFormsUploadStart,
             targetId     = currentEvent.upload.container.id,

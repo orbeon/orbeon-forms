@@ -335,7 +335,7 @@ object AjaxClient {
   // determined by the `session-heartbeat-delay` property.
   def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
     if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
-      AjaxEvent.dispatchEvent(
+      AjaxClient.fireEvent(
         AjaxEvent(
           eventName = EventNames.XXFormsSessionHeartbeat,
           form      = Support.getFirstForm

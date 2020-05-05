@@ -34,6 +34,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
+import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
 
@@ -116,9 +117,8 @@ object AjaxClient {
     // Notify listeners that we are done processing this request
     ajaxResponseProcessed.fire(details)
 
-    // Go ahead with next request, if any
-    if (EventQueue.executeEventFunctionQueued == 0)
-      executeNextRequestIfNeeded()
+    // Schedule next requests as needed
+    EventQueue.updateQueueSchedule()
   }
 
   // Unless we get a clear indication from the server that an error occurred, we retry to send the request to
@@ -226,18 +226,15 @@ object AjaxClient {
     val form = Page.getForm(formId)
 
     val timerId = timers.setTimeout(delay) {
-      fireEvents(
-        js.Array(
-          new AjaxEvent(
-            js.Dictionary[js.Any](
-              "form"         -> form.elem,
-              "value"        -> encodedEvent,
-              "eventName"    -> EventNames.XXFormsServerEvents,
-              "showProgress" -> showProgress
-            )
+      fireEvent(
+        new AjaxEvent(
+          js.Dictionary[js.Any](
+            "form"         -> form.elem,
+            "value"        -> encodedEvent,
+            "eventName"    -> EventNames.XXFormsServerEvents,
+            "showProgress" -> showProgress
           )
-        ),
-        incremental = false
+        )
       )
     }
 
@@ -277,67 +274,21 @@ object AjaxClient {
       EventQueue.changedIdsRequest += controlId -> (v - 1)
     }
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvents")
-  def fireEvents(events: js.Array[AjaxEvent], incremental: Boolean): Unit = {
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvent")
+  def fireEvent(event: AjaxEvent): Unit = {
 
-    // NOTE: Only `keypress` passes two events, and with `incremental == false`
-    // NOTE: `incremental == true` for `focus` and `keyup` event processing
+    // - `event.incremental == true` for `focus` and `keyup` event processing only.
+    // - We do not filter events when the modal progress panel is shown.
+    //   It is tempting to filter all the events that happen when the modal progress panel is shown.
+    //   However, if we do so we would loose the delayed events that become mature when the modal
+    //   progress panel is shown. So we either need to make sure that it is not possible for the
+    //   browser to generate events while the modal progress panel is up, or we need to filter those
+    //   event before this method is called.
 
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
-
-    // We do not filter events when the modal progress panel is shown.
-    //      It is tempting to filter all the events that happen when the modal progress panel is shown.
-    //      However, if we do so we would loose the delayed events that become mature when the modal
-    //      progress panel is shown. So we either need to make sure that it is not possible for the
-    //      browser to generate events while the modal progress panel is up, or we need to filter those
-    //      event before this method is called.
-
-    // Store the time of the first event to be sent in the queue
-    val currentTime = System.currentTimeMillis()
-    if (EventQueue.eventQueue.isEmpty)
-      EventQueue.oldestEventScheduledTime = currentTime
-
-    // Add events to the queue
-    // We used to filter out events with `targetIdOpt.contains("")`. This should not happen so we don't
-    // check for this anymore.
-    EventQueue.eventQueue ++:= events
-
-    // Fire them with a delay to give us a chance to aggregate events together
-    EventQueue.executeEventFunctionQueued += 1
-    if (incremental && ! (currentTime - EventQueue.oldestEventScheduledTime > Properties.delayBeforeIncrementalRequest.get())) {
-      // After a delay (e.g. 500 ms), run `executeNextRequest()` and send queued events to server
-      // if there are no other `executeNextRequest()` that have been added to the queue after this
-      // request.
-      timers.setTimeout(Properties.delayBeforeIncrementalRequest.get().millis) {
-
-        // `executeEventFunctionQueued`:
-        //
-        // - incremented
-        //     - before `executeNextRequest()` is called directly after an Ajax response
-        //     - above when `executeNextRequest()` is scheduled to be called
-        // - decremented before `executeNextRequestIfNeeded()` below
-        //
-        // The idea is that if you keep scheduling events with an incremental delay, they won't be sent as
-        // long as the user types within that delay, unless some other non-incremental event sends the request
-        // in the meanwhile (with `bypassRequestQueue = true`).
-
-        EventQueue.executeEventFunctionQueued -= 1
-        if (EventQueue.executeEventFunctionQueued == 0)
-          executeNextRequestIfNeeded()
-      }
-    } else {
-      // After a very short delay (e.g. 20 ms), run `executeNextRequest()` and force queued events
-      // to be sent to the server, even if there are other `executeNextRequest()` queued.
-      // The small delay is here so we don't send multiple requests to the server when the
-      // browser gives us a sequence of events (e.g. focus out, change, focus in).
-      timers.setTimeout(Properties.internalShortDelay.get().millis) {
-        EventQueue.executeEventFunctionQueued -= 1
-        executeNextRequestIfNeeded()
-      }
-    }
-    // Used by heartbeat
-    EventQueue.newestEventScheduledTime = System.currentTimeMillis()
+    EventQueue.updateQueue(event)
+    EventQueue.updateQueueSchedule()
   }
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -383,7 +334,7 @@ object AjaxClient {
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
   def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
-    if ((System.currentTimeMillis() - EventQueue.newestEventScheduledTime) >= heartBeatDelay)
+    if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
       AjaxEvent.dispatchEvent(
         AjaxEvent(
           eventName = EventNames.XXFormsSessionHeartbeat,
@@ -393,17 +344,62 @@ object AjaxClient {
 
   private object EventQueue {
 
-    var eventQueue                 : List[AjaxEvent]  = Nil
+    private case class EventSchedule(handle: SetTimeoutHandle, time: Long)
 
-    var oldestEventScheduledTime   : Long             = 0
-    var newestEventScheduledTime   : Long             = System.currentTimeMillis
+    var eventQueue              : List[AjaxEvent]  = Nil
 
-    var ajaxRequestInProgress      : Boolean          = false
+    private var schedule        : Option[EventSchedule] = None
+    private var oldestEventTime : Long                  = 0
 
-    var requestTryCount            : Int              = 0         // how many attempts to run the current Ajax request we have done so far
-    var executeEventFunctionQueued : Int              = 0         // number of `ORBEON.xforms.server.AjaxServer.executeNextRequest` waiting to be executed
+    var newestEventTime         : Long    = System.currentTimeMillis // used by heartbeat only
+    var ajaxRequestInProgress   : Boolean = false
+    var requestTryCount         : Int     = 0                        // attempts to run the current Ajax request done so far
 
-    var changedIdsRequest          : Map[String, Int] = Map.empty // see https://github.com/orbeon/orbeon-forms/issues/1732
+    var changedIdsRequest       : Map[String, Int] = Map.empty       // see https://github.com/orbeon/orbeon-forms/issues/1732
+
+    def updateQueue(event: AjaxEvent): Unit = {
+
+      val currentTime = System.currentTimeMillis()
+
+      if (eventQueue.isEmpty)
+        oldestEventTime = currentTime
+
+      newestEventTime = currentTime
+      eventQueue +:= event
+    }
+
+    def updateQueueSchedule(): Unit =
+      schedule = {
+
+        val newScheduleDelay =
+          if (eventQueue exists (! _.incremental))
+            Properties.internalShortDelay.get().toInt.millis
+          else
+            Properties.delayBeforeIncrementalRequest.get().millis
+
+        val newScheduleTime =
+          oldestEventTime + newScheduleDelay.toMillis
+
+        // There is only *one* timer set at a time at most
+        def scheduleEvents(delay: FiniteDuration): SetTimeoutHandle =
+          timers.setTimeout(delay) {
+            schedule = None
+            executeNextRequestIfNeeded()
+          }
+
+        def newSchedule =
+          EventSchedule(scheduleEvents(newScheduleDelay), newScheduleTime)
+
+        schedule match {
+          case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
+            timers.clearTimeout(existingSchedule.handle)
+            newSchedule.some
+          case None =>
+            newSchedule.some
+          case existingScheduleOpt =>
+            existingScheduleOpt
+        }
+      }
 
     def debugEventQueue(): Unit =
       println(s"Event queue: ${eventQueue mkString ", "}")

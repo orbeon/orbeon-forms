@@ -79,10 +79,7 @@ object AjaxEvent {
     )
 
   def dispatchEvent(event: AjaxEvent): Unit =
-    AjaxClient.fireEvents(
-      events      = js.Array(event),
-      incremental = event.incremental
-    )
+    AjaxClient.fireEvent(event)
 
   private val EventsWithoutTargetId = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
 }

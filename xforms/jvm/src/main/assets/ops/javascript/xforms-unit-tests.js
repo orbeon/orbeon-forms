@@ -212,7 +212,7 @@ ORBEON.testcases = {
                         // Send change event to the server
                         var event = new ORBEON.xforms.Server.Event(ORBEON.xforms.Controls.getForm(control), control.id,
                                 ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value", false, false, false);
-                        ORBEON.xforms.Server.fireEvents([event], false);
+                        ORBEON.xforms.Server.fireEvents(event);
                     }, function() {
                         // Check that the values are the one we set
                         YAHOO.util.Assert.areEqual("aTb", firstInput.value);

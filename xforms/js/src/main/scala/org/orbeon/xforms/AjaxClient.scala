@@ -296,9 +296,9 @@ object AjaxClient {
 
   private object EventQueue {
 
-    private case class EventSchedule(handle: SetTimeoutHandle, time: Long)
+    private case class EventSchedule(handle: SetTimeoutHandle, time: Long, done: Future[Unit])
 
-    var eventQueue              : List[AjaxEvent]  = Nil
+    var eventQueue              : List[AjaxEvent]       = Nil
 
     private var schedule        : Option[EventSchedule] = None
     private var oldestEventTime : Long                  = 0
@@ -321,37 +321,51 @@ object AjaxClient {
     }
 
     def updateQueueSchedule(): Unit =
-      schedule = {
+      schedule = updatedQueueSchedule(schedule) match {
+        case newScheduleOpt @ Some(EventSchedule(_, _, done)) =>
 
-        val newScheduleDelay =
-          if (eventQueue exists (! _.incremental))
-            Properties.internalShortDelay.get().toInt.millis
-          else
-            Properties.delayBeforeIncrementalRequest.get().millis
-
-        val newScheduleTime =
-          oldestEventTime + newScheduleDelay.toMillis
-
-        // There is only *one* timer set at a time at most
-        def scheduleEvents(delay: FiniteDuration): SetTimeoutHandle =
-          timers.setTimeout(delay) {
+          done foreach { _ =>
             schedule = None
             executeNextRequestIfNeeded()
           }
 
-        def newSchedule =
-          EventSchedule(scheduleEvents(newScheduleDelay), newScheduleTime)
-
-        schedule match {
-          case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
-            timers.clearTimeout(existingSchedule.handle)
-            newSchedule.some
-          case None =>
-            newSchedule.some
-          case existingScheduleOpt =>
-            existingScheduleOpt
-        }
+          newScheduleOpt
+        case None =>
+          schedule
       }
+
+    // Return `None` if we don't need to create a new schedule
+    private def updatedQueueSchedule(existingSchedule: Option[EventSchedule]): Option[EventSchedule] = {
+
+      val newScheduleDelay =
+        if (eventQueue exists (! _.incremental))
+          Properties.internalShortDelay.get().toInt.millis
+        else
+          Properties.delayBeforeIncrementalRequest.get().millis
+
+      val newScheduleTime =
+        oldestEventTime + newScheduleDelay.toMillis
+
+      // There is only *one* timer set at a time at most
+      def createNewSchedule = {
+        val p = Promise[Unit]()
+        EventSchedule(
+          handle = timers.setTimeout(newScheduleDelay) { p.success(())},
+          time   = newScheduleTime,
+          done   = p.future
+        )
+      }
+
+      existingSchedule match {
+        case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
+          timers.clearTimeout(existingSchedule.handle)
+          createNewSchedule.some
+        case None =>
+          createNewSchedule.some
+        case Some(_) =>
+          None
+      }
+    }
 
     def debugEventQueue(): Unit =
       println(s"Event queue: ${eventQueue mkString ", "}")
@@ -373,6 +387,7 @@ object AjaxClient {
       lazy val callback: T => Unit =
         (v: T) => {
           if (skipNext) {
+            scribe.debug(s"skipping callback future until next for `$debugName`")
             skipNext = false
           } else {
             cb.remove(callback)

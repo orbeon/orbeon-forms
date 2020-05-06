@@ -70,16 +70,8 @@ object LabelEditor {
       labelInputOpt.get.hide()
     }
 
-    def showLabelEditor(clickInterceptor: JQuery): Unit = {
-
-      if (AjaxClient.hasEventsToProcess) {
-
-        // If we have a request in progress or events in the queue, try this again later
-        js.timers.setTimeout(Properties.internalShortDelay.get()) {
-          showLabelEditor(clickInterceptor)
-        }
-
-      } else {
+    def showLabelEditor(clickInterceptor: JQuery): Unit =
+      AjaxClient.allEventsProcessedF("showLabelEditor") foreach { _ =>
 
         // Clear interceptor click hint, if any
         clickInterceptor.text("")
@@ -128,7 +120,6 @@ object LabelEditor {
         labelInput.width(clickInterceptor.width() - 10)
         labelInput.focus()
       }
-    }
 
     // Update highlight of section title, as a hint users can click to edit
     def updateHighlight(

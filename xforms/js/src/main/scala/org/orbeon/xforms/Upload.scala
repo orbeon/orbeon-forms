@@ -103,7 +103,7 @@ class Upload {
 
     // After the file is uploaded, in general at the next Ajax response, we get the file name
     // NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
-    AjaxClient.ajaxResponseProcessedForCurrentEventQueueF foreach { _ =>
+    AjaxClient.allEventsProcessedF("upload") foreach { _ =>
       // If progress indicator is still shown, this means some XForms reset the file name
       // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
       if ($(_container).hasClass(StateClassPrefix + "progress"))

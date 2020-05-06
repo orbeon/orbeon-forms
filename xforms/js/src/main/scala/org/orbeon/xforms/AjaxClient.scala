@@ -55,16 +55,23 @@ object AjaxClient {
   // Used by `OrbeonClientTest`
   // This uses a JavaScript `Promise` as the API is used across Scala.js compilation contexts and Scala
   // classes cannot go through that boundary.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.ajaxResponseProcessedForCurrentEventQueueP")
-  def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] =
-    ajaxResponseProcessedForCurrentEventQueueF.map(_ => ()).toJSPromise
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.allEventsProcessedP")
+  def allEventsProcessedP(): js.Promise[Unit] =
+    allEventsProcessedF("response processed as `js.Promise`").map(_ => ()).toJSPromise
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedP")
-  def currentAjaxResponseProcessedP(): js.Promise[Unit] =
+  // 2020-05-05: Used by dialog centering only.
+  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedOrImmediatelyP")
+  def currentAjaxResponseProcessedOrImmediatelyP(): js.Promise[Unit] =
     if (EventQueue.ajaxRequestInProgress)
-      ajaxResponseF(ajaxResponseProcessed, forCurrentEventQueue = false).map(_ => ()).toJSPromise
+      callbackF(ajaxResponseProcessed, forCurrentEventQueue = false, "current response processed as `js.Promise`").map(_ => ()).toJSPromise
     else
-      Future.successful(()).toJSPromise
+      Future.unit.toJSPromise
+
+  def allEventsProcessedF(debugName: String): Future[Unit] =
+    if (EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty)
+      callbackF(ajaxResponseProcessed, forCurrentEventQueue = EventQueue.eventQueue.nonEmpty, debugName).map(_ => ())
+    else
+      Future.unit
 
   // 2020-04-28: Only used by legacy autocomplete
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.addAjaxResponseProcessed")
@@ -72,54 +79,8 @@ object AjaxClient {
     ajaxResponseProcessed.add(_ => fn.apply())
 
   // FIXME: This is not done per form. There used to be a `formId` but it was unused.
-  def ajaxResponseReceivedForCurrentEventQueueF: Future[AjaxResponseDetails] =
-    ajaxResponseF(ajaxResponseReceived, forCurrentEventQueue = true)
-
-  // FIXME: This is not done per form. There used to be a `formId` but it was unused.
-  def ajaxResponseProcessedForCurrentEventQueueF: Future[AjaxResponseDetails] =
-    ajaxResponseF(ajaxResponseProcessed, forCurrentEventQueue = true)
-
-  private def ajaxResponseF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean): Future[T] = {
-
-    val result = Promise[T]()
-
-    // When there is a request in progress, we need to wait for the response after the next response processed
-    var skipNext = forCurrentEventQueue && EventQueue.ajaxRequestInProgress
-
-    lazy val callback: T => Unit =
-      (v: T) => {
-        if (skipNext) {
-          skipNext = false
-        } else {
-          cb.remove(callback)
-          result.success(v)
-        }
-      }
-
-    cb.add(callback)
-
-    result.future
-  }
-
-  private def handleResponseAjax(responseXML: dom.Document, formId: String, ignoreErrors: Boolean): Unit = {
-
-    val details = new AjaxResponseDetails(responseXML, formId)
-
-    ajaxResponseReceived.fire(details)
-
-    AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
-
-    // Reset changes, as changes are included in this batch of events
-    EventQueue.changedIdsRequest = Map.empty
-
-    ServerValueStore.purgeExpired()
-
-    // Notify listeners that we are done processing this request
-    ajaxResponseProcessed.fire(details)
-
-    // Schedule next requests as needed
-    EventQueue.updateQueueSchedule()
-  }
+  def ajaxResponseReceivedForCurrentEventQueueF(debugName: String): Future[AjaxResponseDetails] =
+    callbackF(ajaxResponseReceived, forCurrentEventQueue = true, debugName)
 
   // Unless we get a clear indication from the server that an error occurred, we retry to send the request to
   // the AjaxServer.
@@ -242,17 +203,8 @@ object AjaxClient {
       form.addDiscardableTimerId(timerId)
   }
 
-  // NOTE: Used from JS only from obsolete `ORBEON.util.Test.executeCausingAjaxRequest`. So
-  // currently we don't export it.
-  def hasEventsToProcess: Boolean =
-    EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty
-
   def hasShowProgressEvent: Boolean =
     EventQueue.eventQueue exists (_.showProgress)
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.isRequestInProgress")
-  def isRequestInProgress(): Boolean =
-    EventQueue.ajaxRequestInProgress
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
@@ -352,7 +304,7 @@ object AjaxClient {
     private var oldestEventTime : Long                  = 0
 
     var newestEventTime         : Long    = System.currentTimeMillis // used by heartbeat only
-    var ajaxRequestInProgress   : Boolean = false
+    var ajaxRequestInProgress   : Boolean = false                    // actual Ajax request has started and not yet successfully completed including response processing
     var requestTryCount         : Int     = 0                        // attempts to run the current Ajax request done so far
 
     var changedIdsRequest       : Map[String, Int] = Map.empty       // see https://github.com/orbeon/orbeon-forms/issues/1732
@@ -409,6 +361,64 @@ object AjaxClient {
 
     val Indent: String = " " * 4
 
+    def callbackF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean, debugName: String): Future[T] = {
+
+      scribe.debug(s"creating callback future for `$debugName`")
+
+      val result = Promise[T]()
+
+      // When there is a request in progress, we need to wait for the response after the next response processed
+      var skipNext = forCurrentEventQueue && EventQueue.ajaxRequestInProgress
+
+      lazy val callback: T => Unit =
+        (v: T) => {
+          if (skipNext) {
+            skipNext = false
+          } else {
+            cb.remove(callback)
+            scribe.debug(s"completing callback future for `$debugName`")
+            result.success(v)
+          }
+        }
+
+      cb.add(callback)
+
+      result.future
+    }
+
+    def handleResponse(responseXML: dom.Document, formId: String, ignoreErrors: Boolean): Unit = {
+
+      // This is a little tricky. Some code registers callbacks or `Future`s for the Ajax response received.
+      // However, scheduling futures in the JavaScript contact is done via a global queue. We want to make sure
+      // that those callbacks or `Future`s run *before* we process the response, otherwise it's pointless. So
+      // we schedule processing the response as a `Future` as well, with the guarantee that it will run last
+      // since the execution context is an ordered queue. It would be nice if there was a cleaner, less
+      // error-prone way of doing this!
+
+      callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
+
+        scribe.debug("before `handleResponseDom`")
+        AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
+        scribe.debug("after `handleResponseDom`")
+
+        // Reset changes, as changes are included in this batch of events
+        EventQueue.changedIdsRequest = Map.empty
+        ServerValueStore.purgeExpired()
+
+        EventQueue.ajaxRequestInProgress = false
+        Page.loadingIndicator().requestEnded()
+
+        // Notify listeners that we are done processing this request
+        ajaxResponseProcessed.fire(details)
+
+        // Schedule next requests as needed
+        EventQueue.updateQueueSchedule()
+      }
+
+      // And then we fire the callback, which triggers both direct callbacks and `Future`s
+      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, formId))
+    }
+
     // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
     // a maximum delay.
     def retryRequestAfterDelay(requestFunction: () => Unit): Unit = {
@@ -462,7 +472,7 @@ object AjaxClient {
           response match {
             case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
               // We ignore HTTP status and just check that we have a well-formed response document
-              handleResponseAjax(responseXml, requestFormId, ignoreErrors)
+              handleResponse(responseXml, requestFormId, ignoreErrors)
             case Success((503, _, _)) =>
               // We return an explicit 503 when the Ajax server is still busy
               retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
@@ -474,9 +484,6 @@ object AjaxClient {
               retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
           }
         }
-
-        EventQueue.ajaxRequestInProgress = false
-        Page.loadingIndicator().requestEnded()
       }
     }
 
@@ -646,7 +653,7 @@ object AjaxClient {
         requestDocumentString.append(currentSequenceNumber)
 
         // `require(EventQueue.ajaxRequestInProgress == false)`
-        AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { _ =>
+        AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("sequence number") foreach { _ =>
           // Increment sequence number, now that we know the server processed our request
           // If we were to do this after the request was processed, we might fail to increment the sequence
           // if we were unable to process the response (i.e. JS error). Doing this here, before the
@@ -654,7 +661,6 @@ object AjaxClient {
           // garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
           StateHandling.updateSequence(currentFormId, currentSequenceNumber.toInt + 1)
         }
-
       }
       requestDocumentString.append("</xxf:sequence>")
       newLine()

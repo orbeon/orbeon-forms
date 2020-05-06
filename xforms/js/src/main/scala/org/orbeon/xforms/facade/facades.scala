@@ -61,7 +61,7 @@ object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {
-  def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] = js.native
+  def allEventsProcessedP(): js.Promise[Unit] = js.native
 }
 
 @js.native

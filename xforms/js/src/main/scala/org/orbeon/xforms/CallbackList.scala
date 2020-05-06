@@ -13,19 +13,20 @@
  */
 package org.orbeon.xforms
 
+import scala.collection.mutable
 import scala.util.control.NonFatal
 
 
 // Minimal implementation of a callback list
 class CallbackList[T] {
 
-  private var fns: List[T => Unit] = Nil
+  private val fns = mutable.Queue[T => Unit]()
 
   def add(fn: T => Unit): Unit =
-    fns ::= fn
+    fns += fn
 
   def remove(fn: T => Unit): Unit =
-    fns = fns filterNot (_ eq fn)
+    fns.dequeueAll(_ eq fn)
 
   def fire(v: T): Unit =
     fns foreach { fn =>

@@ -107,7 +107,7 @@ object InitSupport {
   def liferayF: Future[Unit] = {
     scribe.debug("checking for Liferay object")
     dom.window.Liferay.toOption match {
-      case None          => Future.successful(())
+      case None          => Future.unit
       case Some(liferay) => liferay.allPortletsReadyF
     }
   }

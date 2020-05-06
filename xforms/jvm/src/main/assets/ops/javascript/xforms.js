@@ -2060,7 +2060,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (neighbor == null) {
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
-                ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedP().then(
+                ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedOrImmediatelyP().then(
                     function() { yuiDialog.center(); }
                 );
             } else {

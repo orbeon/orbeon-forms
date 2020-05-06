@@ -59,7 +59,7 @@ object XFormsUI {
           None
         }
 
-      AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { details =>
+      AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("modal panel") foreach { details =>
 
         // If neither of these two conditions is met, hide the modal progress panel:
         //

@@ -128,7 +128,7 @@ object DndRepeat {
               // the event below. However, we should move the element back to its original location before *any*
               // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
               // doing this is probably the right thing to do.
-              AjaxClient.ajaxResponseReceivedForCurrentEventQueueF foreach { _ =>
+              AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("dndrepeat") foreach { _ =>
                 $(beforeEl).after(el)
               }
 

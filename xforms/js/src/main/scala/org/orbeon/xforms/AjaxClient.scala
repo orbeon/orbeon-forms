@@ -33,7 +33,6 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
-import org.orbeon.oxf.util.CoreUtils._
 
 
 object AjaxClient {
@@ -236,7 +235,7 @@ object AjaxClient {
 
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
-    EventQueue.addEventAndUpdateQueueSchedule(event)
+    EventQueue.addEventAndUpdateQueueSchedule(event, event.incremental)
   }
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -292,16 +291,12 @@ object AjaxClient {
 
   private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 
-    def eventsReady(events: NonEmptyList[AjaxEvent]): Option[List[AjaxEvent]] =
-      ! EventQueue.ajaxRequestInProgress option {
-        findEventsToProcess(events) match {
-          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
+    def eventsReady(events: NonEmptyList[AjaxEvent]): Unit =
+      if (! EventQueue.ajaxRequestInProgress)
+        findEventsToProcess(events) foreach {
+          case (currentForm, eventsForCurrentForm, _) =>
             processEvents(currentForm, eventsForCurrentForm.reverse)
-            eventsForOtherForms
-          case None =>
-            Nil
         }
-      }
 
     val shortDelay                                  : FiniteDuration          = Properties.internalShortDelay.get().toInt.millis
     val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis

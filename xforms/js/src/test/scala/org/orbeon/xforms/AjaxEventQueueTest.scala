@@ -14,11 +14,10 @@
 package org.orbeon.xforms
 
 import cats.data.NonEmptyList
-import cats.syntax.option._
 import org.scalatest.funspec.AsyncFunSpec
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Promise}
 
 
 class AjaxEventQueueTest extends AsyncFunSpec {
@@ -34,21 +33,20 @@ class AjaxEventQueueTest extends AsyncFunSpec {
 
   describe("AjaxEventQueue") {
 
-    case class MyEventType(name: String, incremental: Boolean)
+    case class MyEventType(name: String)
 
     it("must eventually dispatch events") {
 
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def eventsReady(events: NonEmptyList[MyEventType]): Option[List[MyEventType]] = {
+        def eventsReady(events: NonEmptyList[MyEventType]): Unit = {
           p.success(events)
-          Nil.some // consume all events
         }
       }
 
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo", incremental = false))
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar", incremental = false))
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = false)
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar"), incremental = false)
 
       p.future map { events =>
         assert(events.size == 2)
@@ -61,17 +59,16 @@ class AjaxEventQueueTest extends AsyncFunSpec {
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def scheduleDone(events: NonEmptyList[MyEventType]): Option[List[MyEventType]] = {
+        def eventsReady(events: NonEmptyList[MyEventType]): Unit = {
           p.success(events)
-          Nil.some // consume all events
         }
       }
 
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo", incremental = true))
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = true)
       val t1 = EventQueue.debugScheduledTime.get
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar", incremental = false))
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar"), incremental = false)
       val t2 = EventQueue.debugScheduledTime.get
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("baz", incremental = true))
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("baz"), incremental = true)
       val t3 = EventQueue.debugScheduledTime.get
 
       p.future map { events =>
@@ -79,27 +76,6 @@ class AjaxEventQueueTest extends AsyncFunSpec {
         assert(t3 == t2)
         assert(events.size == 3)
         assert(EventQueue.isEmpty)
-      }
-    }
-
-    it("must update the queue with events returned") {
-
-      val p = Promise[NonEmptyList[MyEventType]]()
-
-      object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def scheduleDone(events: NonEmptyList[MyEventType]): Option[List[MyEventType]] = {
-          NonEmptyList.fromList(events filter (_.name == "use")) foreach p.success
-          Some(events filter (_.name == "keep"))
-        }
-      }
-
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("keep", incremental = false))
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("use",  incremental = false))
-      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("keep", incremental = false))
-
-      p.future map { events =>
-        assert(events.size == 1)
-        assert(EventQueue.events.size == 2)
       }
     }
   }

@@ -29,60 +29,54 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 // - sends them in groups via `eventsReady` when the schedule is ready
 // - handles two different delays: "incremental" and "non-incremental" events
 //
-// The `eventsReady` function supports returning events to the queue. This was designed so that
-// events for multiple forms could be supported:
-//
-// - send events for the first event's form
-// - return events for other forms to the queue
-// - next time the schedule is updated, events for the other form are handled, etc.
-//
-// But this part doesn't work 100% correctly right now. In particular, the oldest/newest event times
-// are not updated as events are returned to the queue as we dont have individual time information for
-// each event.
-//
-// Q: Would it make more sense to have one event queue for each form?
+// This implementation removes support for multiple "forms", specifically the ability to
+// update the queue with remaining events. Instead, use multiple queues to handle multiple
+// forms.
 
-trait AjaxEventQueue[EventType <: { val incremental: Boolean }] {
+trait AjaxEventQueue[EventType] {
 
   import Private._
 
   // The event queue calls this when events are ready, that is when a delay has passed
   // and they are ready to be dispatched as a group. The implementation of this function
   // can return some of the events to the queue.
-  def eventsReady(events: NonEmptyList[EventType]): Option[List[EventType]]
+  def eventsReady(events: NonEmptyList[EventType]): Unit
 
   // Configurable delays
-  val shortDelay                                  : FiniteDuration
-  val incrementalDelay                            : FiniteDuration
+  val shortDelay      : FiniteDuration
+  val incrementalDelay: FiniteDuration
 
-  def newestEventTime: Long            = _newestEventTime // used by heartbeat only
-  def events         : List[EventType] = eventQueue
-  def isEmpty        : Boolean         = eventQueue.isEmpty
+  def newestEventTime: Long            = state.newestEventTime // used by heartbeat only
+  def events         : List[EventType] = state.events
+  def isEmpty        : Boolean         = events.isEmpty
 
-  def addEventAndUpdateQueueSchedule(event: EventType): Unit = {
-    addEvent(event: EventType)
+  def addEventAndUpdateQueueSchedule(event: EventType, incremental: Boolean): Unit = {
+    addEvent(event, incremental)
     updateQueueSchedule()
   }
 
   def updateQueueSchedule(): Unit =
-    schedule = updatedQueueSchedule(schedule) match {
-      case newScheduleOpt @ Some(EventSchedule(_, _, done)) =>
+    state = state.copy(
+      schedule = updatedQueueSchedule(state.schedule) match {
+        case newScheduleOpt @ Some(EventSchedule(_, _, done)) =>
 
-        done foreach { _ =>
-          schedule   = None
-          eventQueue = NonEmptyList.fromList(eventQueue) flatMap eventsReady getOrElse eventQueue
-        }
+          done foreach { _ =>
+            val events = state.events
+            state = emptyState
+            NonEmptyList.fromList(events) foreach eventsReady
+          }
 
-        newScheduleOpt
-      case None =>
-        schedule
-    }
+          newScheduleOpt
+        case None =>
+          state.schedule
+      }
+    )
 
   def debugScheduledTime: Option[Long] =
-    schedule map (_.time)
+    state.schedule map (_.time)
 
   def debugPrintEventQueue(): Unit =
-    println(s"Event queue: ${eventQueue mkString ", "}")
+    println(s"Event queue: ${events mkString ", "}")
 
   object Private {
 
@@ -92,33 +86,46 @@ trait AjaxEventQueue[EventType <: { val incremental: Boolean }] {
       done   : Future[Unit]
     )
 
-    var eventQueue       : List[EventType]       = Nil
-    var oldestEventTime  : Long                  = 0
-    var _newestEventTime : Long                  = 0
-    var schedule         : Option[EventSchedule] = None
+    case class State(
+      events           : List[EventType],
+      hasNonIncremental: Boolean,
+      oldestEventTime  : Long,
+      newestEventTime  : Long,
+      schedule         : Option[EventSchedule]
+    )
 
-    def addEvent(event: EventType): Unit = {
+    def emptyState: State =
+      State(
+        events            = Nil,
+        hasNonIncremental = false,
+        oldestEventTime   = 0,
+        newestEventTime   = 0,
+        schedule          = None
+      )
 
+    var state: State = emptyState
+
+    def addEvent(event: EventType, incremental: Boolean): Unit = {
       val currentTime = System.currentTimeMillis()
-
-      if (eventQueue.isEmpty)
-        oldestEventTime = currentTime
-
-      _newestEventTime = currentTime
-      eventQueue +:= event
+      state = state.copy(
+        events            = state.events ::: event :: Nil, // append is not efficient, use `Queue` instead? or reverse when done?
+        hasNonIncremental = state.hasNonIncremental | ! incremental,
+        oldestEventTime   = if (events.isEmpty) currentTime else state.oldestEventTime,
+        newestEventTime   = currentTime
+      )
     }
 
     // Return `None` if we don't need to create a new schedule
     def updatedQueueSchedule(existingSchedule: Option[EventSchedule]): Option[EventSchedule] = {
 
       val newScheduleDelay =
-        if (eventQueue exists (! _.incremental))
+        if (state.hasNonIncremental)
           shortDelay
         else
           incrementalDelay
 
       val newScheduleTime =
-        oldestEventTime + newScheduleDelay.toMillis
+        state.oldestEventTime + newScheduleDelay.toMillis
 
       // There is only *one* timer set at a time at most
       def createNewSchedule = {

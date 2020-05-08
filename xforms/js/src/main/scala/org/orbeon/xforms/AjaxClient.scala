@@ -31,9 +31,9 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
-import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
+import org.orbeon.oxf.util.CoreUtils._
 
 
 object AjaxClient {
@@ -65,8 +65,8 @@ object AjaxClient {
       Future.unit.toJSPromise
 
   def allEventsProcessedF(debugName: String): Future[Unit] =
-    if (EventQueue.ajaxRequestInProgress || EventQueue.eventQueue.nonEmpty)
-      callbackF(ajaxResponseProcessed, forCurrentEventQueue = EventQueue.eventQueue.nonEmpty, debugName).map(_ => ())
+    if (EventQueue.ajaxRequestInProgress || ! EventQueue.isEmpty)
+      callbackF(ajaxResponseProcessed, forCurrentEventQueue = ! EventQueue.isEmpty, debugName).map(_ => ())
     else
       Future.unit
 
@@ -201,7 +201,7 @@ object AjaxClient {
   }
 
   def hasShowProgressEvent: Boolean =
-    EventQueue.eventQueue exists (_.showProgress)
+    EventQueue.events exists (_.showProgress)
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
@@ -236,8 +236,7 @@ object AjaxClient {
 
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
-    EventQueue.updateQueue(event)
-    EventQueue.updateQueueSchedule()
+    EventQueue.addEventAndUpdateQueueSchedule(event)
   }
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
@@ -291,81 +290,25 @@ object AjaxClient {
         )
       )
 
-  private object EventQueue {
+  private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 
-    private case class EventSchedule(handle: SetTimeoutHandle, time: Long, done: Future[Unit])
-
-    var eventQueue              : List[AjaxEvent]       = Nil
-
-    private var schedule        : Option[EventSchedule] = None
-    private var oldestEventTime : Long                  = 0
-
-    var newestEventTime         : Long    = System.currentTimeMillis // used by heartbeat only
-    var ajaxRequestInProgress   : Boolean = false                    // actual Ajax request has started and not yet successfully completed including response processing
-    var requestTryCount         : Int     = 0                        // attempts to run the current Ajax request done so far
-
-    var changedIdsRequest       : Map[String, Int] = Map.empty       // see https://github.com/orbeon/orbeon-forms/issues/1732
-
-    def updateQueue(event: AjaxEvent): Unit = {
-
-      val currentTime = System.currentTimeMillis()
-
-      if (eventQueue.isEmpty)
-        oldestEventTime = currentTime
-
-      newestEventTime = currentTime
-      eventQueue +:= event
-    }
-
-    def updateQueueSchedule(): Unit =
-      schedule = updatedQueueSchedule(schedule) match {
-        case newScheduleOpt @ Some(EventSchedule(_, _, done)) =>
-
-          done foreach { _ =>
-            schedule = None
-            executeNextRequestIfNeeded()
-          }
-
-          newScheduleOpt
-        case None =>
-          schedule
+    def eventsReady(events: NonEmptyList[AjaxEvent]): Option[List[AjaxEvent]] =
+      ! EventQueue.ajaxRequestInProgress option {
+        findEventsToProcess(events) match {
+          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
+            processEvents(currentForm, eventsForCurrentForm.reverse)
+            eventsForOtherForms
+          case None =>
+            Nil
+        }
       }
 
-    // Return `None` if we don't need to create a new schedule
-    private def updatedQueueSchedule(existingSchedule: Option[EventSchedule]): Option[EventSchedule] = {
+    val shortDelay                                  : FiniteDuration          = Properties.internalShortDelay.get().toInt.millis
+    val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis
 
-      val newScheduleDelay =
-        if (eventQueue exists (! _.incremental))
-          Properties.internalShortDelay.get().toInt.millis
-        else
-          Properties.delayBeforeIncrementalRequest.get().millis
-
-      val newScheduleTime =
-        oldestEventTime + newScheduleDelay.toMillis
-
-      // There is only *one* timer set at a time at most
-      def createNewSchedule = {
-        val p = Promise[Unit]()
-        EventSchedule(
-          handle = timers.setTimeout(newScheduleDelay) { p.success(())},
-          time   = newScheduleTime,
-          done   = p.future
-        )
-      }
-
-      existingSchedule match {
-        case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
-          timers.clearTimeout(existingSchedule.handle)
-          createNewSchedule.some
-        case None =>
-          createNewSchedule.some
-        case Some(_) =>
-          None
-      }
-    }
-
-    def debugEventQueue(): Unit =
-      println(s"Event queue: ${eventQueue mkString ", "}")
+    var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
+    var requestTryCount       : Int     = 0                  // attempts to run the current Ajax request done so far
+    var changedIdsRequest     : Map[String, Int] = Map.empty // see https://github.com/orbeon/orbeon-forms/issues/1732
   }
 
   private object Private {
@@ -439,22 +382,6 @@ object AjaxClient {
         timers.setTimeout(delay.millis)(requestFunction())
     }
 
-    def executeNextRequestIfNeeded(): Unit =
-      if (! EventQueue.ajaxRequestInProgress && EventQueue.eventQueue.nonEmpty) {
-        findEventsToProcess match {
-          case Some((currentForm, eventsForCurrentForm, eventsForOtherForms)) =>
-            // Remove from this list of ids that changed the id of controls for
-            // which we have received the keyup corresponding to the keydown.
-            // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
-            // Q: Should we do this only for the controls in the form we are currently processing?
-            EventQueue.changedIdsRequest = EventQueue.changedIdsRequest filterNot (_._2 == 0)
-            EventQueue.eventQueue = eventsForOtherForms
-            processEvents(currentForm, eventsForCurrentForm.reverse)
-          case None =>
-            EventQueue.eventQueue = Nil
-        }
-      }
-
     def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
 
       val requestForm = Page.getForm(requestFormId)
@@ -497,7 +424,7 @@ object AjaxClient {
       }
     }
 
-    def findEventsToProcess: Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
+    def findEventsToProcess(originalEvents: NonEmptyList[AjaxEvent]): Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
       // Ignore events for form that are no longer part of the document
       def eventsForFormsInDocument(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
@@ -558,7 +485,6 @@ object AjaxClient {
       }
 
       for {
-        originalEvents           <- NonEmptyList.fromList(EventQueue.eventQueue)
         eventsForFormsInDocument <- eventsForFormsInDocument(originalEvents)
         coalescedEvents          <- coalescedProgressEvents(coalesceValueEvents(eventsForFormsInDocument))
       } yield
@@ -566,6 +492,12 @@ object AjaxClient {
     }
 
     def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
+
+      // Remove from this list of ids that changed the id of controls for
+      // which we have received the keyup corresponding to the keydown.
+      // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
+      // Q: Should we do this only for the controls in the form we are currently processing?
+      EventQueue.changedIdsRequest = EventQueue.changedIdsRequest filterNot (_._2 == 0)
 
       events.toList foreach { event =>
 

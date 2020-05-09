@@ -40,15 +40,15 @@ trait AjaxEventQueue[EventType] {
   // The event queue calls this when events are ready, that is when a delay has passed
   // and they are ready to be dispatched as a group. The implementation of this function
   // can return some of the events to the queue.
-  def eventsReady(events: NonEmptyList[EventType]): Unit
+  def eventsReady(eventsReversed: NonEmptyList[EventType]): Unit
 
   // Configurable delays
   val shortDelay      : FiniteDuration
   val incrementalDelay: FiniteDuration
 
   def newestEventTime: Long            = state.newestEventTime // used by heartbeat only
-  def events         : List[EventType] = state.events
-  def isEmpty        : Boolean         = events.isEmpty
+  def eventsReversed : List[EventType] = state.events
+  def isEmpty        : Boolean         = state.events.isEmpty
 
   def addEventAndUpdateQueueSchedule(event: EventType, incremental: Boolean): Unit = {
     addEvent(event, incremental)
@@ -76,7 +76,7 @@ trait AjaxEventQueue[EventType] {
     state.schedule map (_.time)
 
   def debugPrintEventQueue(): Unit =
-    println(s"Event queue: ${events mkString ", "}")
+    println(s"Event queue: ${state.events.reverse mkString ", "}")
 
   object Private {
 
@@ -108,9 +108,9 @@ trait AjaxEventQueue[EventType] {
     def addEvent(event: EventType, incremental: Boolean): Unit = {
       val currentTime = System.currentTimeMillis()
       state = state.copy(
-        events            = state.events ::: event :: Nil, // append is not efficient, use `Queue` instead? or reverse when done?
+        events            = event :: state.events,
         hasNonIncremental = state.hasNonIncremental | ! incremental,
-        oldestEventTime   = if (events.isEmpty) currentTime else state.oldestEventTime,
+        oldestEventTime   = if (state.events.isEmpty) currentTime else state.oldestEventTime,
         newestEventTime   = currentTime
       )
     }

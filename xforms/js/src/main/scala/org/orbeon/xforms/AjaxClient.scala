@@ -200,7 +200,7 @@ object AjaxClient {
   }
 
   def hasShowProgressEvent: Boolean =
-    EventQueue.events exists (_.showProgress)
+    EventQueue.eventsReversed exists (_.showProgress)
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =
@@ -291,9 +291,9 @@ object AjaxClient {
 
   private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 
-    def eventsReady(events: NonEmptyList[AjaxEvent]): Unit =
+    def eventsReady(eventsReversed: NonEmptyList[AjaxEvent]): Unit =
       if (! EventQueue.ajaxRequestInProgress)
-        findEventsToProcess(events) foreach {
+        findEventsToProcess(eventsReversed) foreach {
           case (currentForm, eventsForCurrentForm, _) =>
             processEvents(currentForm, eventsForCurrentForm.reverse)
         }

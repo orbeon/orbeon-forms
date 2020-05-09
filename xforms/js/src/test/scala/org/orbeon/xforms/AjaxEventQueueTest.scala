@@ -35,21 +35,21 @@ class AjaxEventQueueTest extends AsyncFunSpec {
 
     case class MyEventType(name: String)
 
-    it("must eventually dispatch events") {
+    it("must eventually dispatch events and in order") {
 
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def eventsReady(events: NonEmptyList[MyEventType]): Unit = {
-          p.success(events)
+        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit = {
+          p.success(eventsReversed)
         }
       }
 
       EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = false)
       EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar"), incremental = false)
 
-      p.future map { events =>
-        assert(events.size == 2)
+      p.future map { eventsReversed =>
+        assert(List(MyEventType("bar"), MyEventType("foo")) == eventsReversed.toList)
         assert(EventQueue.isEmpty)
       }
     }
@@ -59,8 +59,8 @@ class AjaxEventQueueTest extends AsyncFunSpec {
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def eventsReady(events: NonEmptyList[MyEventType]): Unit = {
-          p.success(events)
+        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit = {
+          p.success(eventsReversed)
         }
       }
 
@@ -71,10 +71,10 @@ class AjaxEventQueueTest extends AsyncFunSpec {
       EventQueue.addEventAndUpdateQueueSchedule(MyEventType("baz"), incremental = true)
       val t3 = EventQueue.debugScheduledTime.get
 
-      p.future map { events =>
+      p.future map { eventsReversed =>
         assert(t2 < t1)
         assert(t3 == t2)
-        assert(events.size == 3)
+        assert(List(MyEventType("baz"), MyEventType("bar"), MyEventType("foo")) == eventsReversed.toList)
         assert(EventQueue.isEmpty)
       }
     }

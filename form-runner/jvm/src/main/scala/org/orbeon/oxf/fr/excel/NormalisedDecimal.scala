@@ -93,28 +93,15 @@ object NormalisedDecimal {
 }
 
 case class NormalisedDecimal(
-  /**
-   * The whole part of the significand (typically 15 digits).
-   *
-   * 47-50 bits long (MSB may be anywhere from bit 46 to 49)
-   * LSB is units bit.
-   */
-  wholePart: Long,
-
-  /**
-   * The fractional part of the significand.
-   * 24 bits (only top 14-17 bits significant): a value between 0x000000 and 0xFFFF80
-   */
-  fractionalPart: Int,
-
-  /**
-   * The decimal exponent increased by one less than the digit count of `_wholePart`
-   */
-  relativeDecimalExponent: Int
+  wholePart               : Long, // whole part of the significand (typically 15 digits)
+                                  // 47-50 bits long (MSB may be anywhere from bit 46 to 49)
+                                  // LSB is units bit
+  fractionalPart          : Int,  // fractional part of the significand.
+                                  // 24 bits (only top 14-17 bits significant): a value between 0x000000 and 0xFFFF80
+  relativeDecimalExponent : Int   // decimal exponent increased by one less than the digit count of `wholePart`
 ) {
-  /**
-   * Rounds at the digit with value 10<sup>decimalExponent</sup>
-   */
+
+  // Rounds at the digit with value 10<sup>decimalExponent</sup>
   def roundUnits: NormalisedDecimal = {
 
     var wp = wholePart
@@ -132,8 +119,8 @@ case class NormalisedDecimal(
    * Convert to an equivalent `ExpandedDouble` representation (binary frac and exponent).
    * The resulting transformed object is easily converted to a 64 bit IEEE double:
    *
-   * - bits 2-53 of the `getSignificand()` become the 52 bit 'fraction'.
-   * - `getBinaryExponent()` is biased by 1023 to give the 'exponent'.
+   * - bits 2-53 of the `significand` become the 52 bit 'fraction'.
+   * - `binaryExponent` is biased by 1023 to give the 'exponent'.
    *
    * The sign bit must be obtained from somewhere else.
    *
@@ -146,9 +133,7 @@ case class NormalisedDecimal(
     cc.createExpandedDouble
   }
 
-  /**
-   * @return the significand as a fixed point number (with 24 fraction bits and 47-50 whole bits)
-   */
+  // Return the significand as a fixed point number (with 24 fraction bits and 47-50 whole bits)
   private def composeFrac: BigInteger = {
     val wp = wholePart
     val fp = fractionalPart
@@ -184,15 +169,12 @@ case class NormalisedDecimal(
     sb.toString
   }
 
-  /**
-   * @return the number of powers of 10 which have been extracted from the significand and binary exponent.
-   */
+  // Return the number of powers of 10 which have been extracted from the significand and
+  // binary exponent.
   def getDecimalExponent: Int =
     relativeDecimalExponent + NormalisedDecimal.ExponentOffset
 
-  /**
-   * assumes both this and other are normalised
-   */
+  // Assumes both this and other are normalised
   def compareNormalised(other: NormalisedDecimal): Int = {
     val cmp = relativeDecimalExponent - other.relativeDecimalExponent
     if (cmp != 0)

@@ -21,6 +21,7 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
@@ -48,7 +49,7 @@ object Tabbable {
 
       override def init(): Unit = {
 
-        if ($(containerElem).is(".fr-tabbable-dnd")) {
+        if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
           val firstRepeatContainer = $(containerElem).find(NavTabsSelector)(0)
 
@@ -107,23 +108,19 @@ object Tabbable {
 
               if (dndStart != dndEnd) {
 
-                lazy val moveBack: js.Function = () => {
-                  $(beforeEl).after(el)
-                  // TODO: Fix this if we switch to `jquery-facade`
-                  AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
-                }
-
                 // Restore order once we get an Ajax response back
                 // NOTE: You might think that we should wait for the specific response to the Ajax request corresponding to
                 // the event below. However, we should move the element back to its original location before *any*
                 // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
                 // doing this is probably the right thing to do.
-                AjaxClient.ajaxResponseReceived.add(moveBack)
+                AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("tabbable") foreach { _ =>
+                  $(beforeEl).after(el)
+                }
 
                 // Thinking this should instead block input, but only after a while show a modal screen.
-                // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
+                // XFormsUI.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
 
-                AjaxEvent.dispatchEvent(
+                AjaxClient.fireEvent(
                   AjaxEvent(
                     eventName  = EventNames.XXFormsDnD,
                     targetId   = repeatId,

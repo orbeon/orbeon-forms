@@ -110,7 +110,7 @@ object Credentials {
     credentials     : String,
     decodeForHeader : Boolean
   ): Option[Credentials] =
-    if (credentials.isBlank) {
+    if (credentials.isAllBlank) {
       None
     } else {
 

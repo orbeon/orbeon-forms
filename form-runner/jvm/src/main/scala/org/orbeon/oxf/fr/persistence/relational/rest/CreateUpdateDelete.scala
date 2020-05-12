@@ -19,8 +19,11 @@ import java.sql.{Array => _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.io.IOUtils._
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
+import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
@@ -31,9 +34,6 @@ import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
-import org.orbeon.io.StringBuilderWriter
-import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{NetUtils, Whitespace, XPath}
 import org.orbeon.oxf.xml.{JXQName, _}
@@ -212,20 +212,33 @@ trait CreateUpdateDelete
     req.dataPart match {
       case Some(dataPart) if ! req.forAttachment =>
 
-        // First delete from orbeon_i_control_text, which requires a join
-        val deleteFromControlIndexSql =
-          s"""|DELETE FROM orbeon_i_control_text
-              |      WHERE data_id IN
-              |          (
-              |              SELECT data_id
-              |                FROM orbeon_i_current
-              |               WHERE document_id = ?   AND
-              |                     draft       = 'Y'
-              |          )
+        val fromControlIndexWhere =
+          s"""|WHERE data_id IN
+              |    (
+              |        SELECT data_id
+              |          FROM orbeon_i_current
+              |         WHERE document_id = ?   AND
+              |               draft       = 'Y'
+              |    )
               |""".stripMargin
-        useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
-          ps.setString(1, dataPart.documentId)
-          ps.executeUpdate()
+
+        val fromControlIndexCount = "SELECT count(*) FROM orbeon_i_control_text " + fromControlIndexWhere
+
+        val count =
+          useAndClose(connection.prepareStatement(fromControlIndexCount)) { ps =>
+            ps.setString(1, dataPart.documentId)
+            useAndClose(ps.executeQuery()) { rs ⇒
+              rs.next()
+              rs.getInt(1)
+            }
+          }
+
+        if (count > 0) {
+          val deleteFromControlIndexSql = "DELETE FROM orbeon_i_control_text " + fromControlIndexWhere
+          useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps =>
+            ps.setString(1, dataPart.documentId)
+            ps.executeUpdate()
+          }
         }
 
         // Then delete from all the other tables
@@ -436,7 +449,7 @@ trait CreateUpdateDelete
 
       // Commit before reindexing, as reindexing will read back the form definition, which can
       // cause a deadlock since we're still in the transaction writing the form definition
-      useAndClose(connection.prepareStatement("COMMIT"))(_.execute())
+      connection.commit()
 
       debug("CRUD: after commit")
 

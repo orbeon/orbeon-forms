@@ -129,6 +129,7 @@
 
                 <xf:action
                     observer="my-control-control"
+                    target="#observer"
                     event="xforms-enabled xforms-value-changed DOMActivate"
                     if="fr:mode() = ('new')">
                     <xf:dispatch name="fr-call-user-my-action-action" targetid="fr-form-model">
@@ -163,7 +164,7 @@
                     <xf:action>
                         <xf:var name="value" value="'before'"/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-before', true())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
@@ -209,7 +210,7 @@
                     <xf:action>
                         <xf:var name="value" value="/response/foo"/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-foo', true())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
@@ -217,7 +218,7 @@
                     <xf:action>
                         <xf:var name="value" value="/response/bar"/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-bar', true())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
@@ -288,7 +289,7 @@
                     <xf:action>
                         <xf:var name="value" value="'after'"/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-after', true())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
@@ -306,7 +307,7 @@
                         <xf:action>
                             <xf:var name="value" value="'in-if'"/>
                             <xf:rebuild/>
-                            <xf:revalidate/>
+                            <xf:recalculate/>
                             <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-in-if', true())">
                                 <xf:setvalue ref="." value="$value"/>
                             </xf:action>
@@ -331,7 +332,7 @@
                             <xf:action>
                                 <xf:var name="value" value="name"/>
                                 <xf:rebuild/>
-                                <xf:revalidate/>
+                                <xf:recalculate/>
                                 <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-name')[last()]">
                                    <xf:setvalue ref="." value="$value"/>
                                </xf:action>
@@ -339,7 +340,7 @@
                             <xf:action>
 
                                 <xf:rebuild/>
-                                <xf:revalidate/>
+                                <xf:recalculate/>
 
                                 <xf:var
                                     xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
@@ -395,7 +396,7 @@
                                 <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
                                 <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
                                 <xf:rebuild/>
-                                <xf:revalidate/>
+                                <xf:recalculate/>
                                 <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
                                     <xf:setvalue ref="image, ." value="$value"/>
                                     <xf:setvalue ref="image/@mediatype, ./@mediatype" value="$mediatype"/>
@@ -405,7 +406,7 @@
                             <xf:action>
                                 <xf:var name="value" value="'My Image.png'"/>
                                 <xf:rebuild/>
-                                <xf:revalidate/>
+                                <xf:recalculate/>
                                 <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
                                     <xf:setvalue ref="@filename" value="$value"/>
                                 </xf:action>
@@ -413,7 +414,7 @@
                             <xf:action>
                                  <xf:var name="value" value="'image/png'"/>
                                  <xf:rebuild/>
-                                 <xf:revalidate/>
+                                 <xf:recalculate/>
                                  <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
                                      <xf:setvalue ref="image/@mediatype, ./@mediatype" value="$value"/>
                                  </xf:action>
@@ -464,7 +465,7 @@
                         <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
                         <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-attachment')[last()]">
                             <xf:setvalue ref="image, ." value="$value"/>
                             <xf:setvalue ref="image/@mediatype, ./@mediatype" value="$mediatype"/>
@@ -806,7 +807,7 @@
                                     <xf:action>
                                         <xf:var name="value" value="."/>
                                         <xf:rebuild/>
-                                        <xf:revalidate/>
+                                        <xf:recalculate/>
                                         <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-control-foo')[last()]">
                                             <xf:setvalue ref="." value="$value"/>
                                         </xf:action>
@@ -824,7 +825,7 @@
                     <xf:action>
                         <xf:var name="value" value="."/>
                         <xf:rebuild/>
-                        <xf:revalidate/>
+                        <xf:recalculate/>
                         <xf:action iterate="frf:resolveTargetRelativeToActionSourceFromBinds('fr-form-model', 'my-control-bar')[last()]">
                             <xf:setvalue ref="." value="$value"/>
                         </xf:action>

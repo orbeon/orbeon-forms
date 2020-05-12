@@ -153,7 +153,6 @@ object DataModel {
    * Return true if the value was changed.
    */
   def setValueIfChangedHandleErrors(
-    containingDocument : XFormsContainingDocument,
     eventTarget        : XFormsEventTarget,
     locationData       : LocationData,
     nodeInfo           : NodeInfo,
@@ -161,6 +160,7 @@ object DataModel {
     source             : String,
     isCalculate        : Boolean,
     collector          : XFormsEvent => Unit = Dispatch.dispatchEvent)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Boolean = {
 
@@ -170,20 +170,20 @@ object DataModel {
     setValueIfChanged(
       nodeInfo  = nodeInfo,
       newValue  = valueToSet,
-      onSuccess = logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate, collector),
+      onSuccess = logAndNotifyValueChange(source, nodeInfo, _, valueToSet, isCalculate, collector),
       onError   = reason => collector(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
     )
   }
 
   // Standard success behavior: log and notify
   def logAndNotifyValueChange(
-    containingDocument : XFormsContainingDocument,
     source             : String,
     nodeInfo           : NodeInfo,
     oldValue           : String,
     newValue           : String,
     isCalculate        : Boolean,
     collector          : XFormsEvent => Unit)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Unit = {
     logValueChange(source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))

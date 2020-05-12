@@ -14,33 +14,47 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
-import org.orbeon.oxf.http.Headers
-import Headers._
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.orbeon.oxf.http.Headers._
+import org.scalatest.funspec.AnyFunSpec
+
 import scala.collection.compat._
 
-class HeadersTest extends AssertionsForJUnit {
+class HeadersTest extends AnyFunSpec {
 
-  @Test def testCapitalizeHeader(): Unit = {
-    assert("Accept"       === capitalizeCommonOrSplitHeader("aCcEpT"))
-    assert("Content-Type" === capitalizeCommonOrSplitHeader("cOnTeNt-tYpE"))
-    assert("SOAPAction"   === capitalizeCommonOrSplitHeader("sOaPaCtIoN"))
-    assert("TE"           === capitalizeCommonOrSplitHeader("tE"))
-    assert("Content-MD5"  === capitalizeCommonOrSplitHeader("cOnTeNt-Md5"))
+  describe("Capitalize headers") {
+
+    val Expected = List(
+      "Accept"       -> "aCcEpT",
+      "Content-Type" -> "cOnTeNt-tYpE",
+      "SOAPAction"   -> "sOaPaCtIoN",
+      "TE"           -> "tE",
+      "Content-MD5"  -> "cOnTeNt-Md5"
+    )
+
+    for ((capitalized, original) <- Expected)
+      it(s"must capitalize to `$capitalized") {
+        assert(capitalized == capitalizeCommonOrSplitHeader(original))
+      }
   }
 
-  @Test def testFilterAndCapitalizeHeaders(): Unit = {
+  describe("Filter and capitalize headers") {
 
     val arrays = List("Foo" -> Array("foo1", "foo2"), "Bar" -> Array("bar1", "bar2"))
     val lists  = List("Foo" -> List("foo1", "foo2"),  "Bar" -> List("bar1", "bar2"))
 
-    val toFilterInRequest  = RequestHeadersToRemove  map (_ -> List("NOT!"))
-    val toFilterInResponse = ResponseHeadersToRemove map (_ -> List("NOT!"))
+    it("must handle `Array` and `List`") {
+      assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) => k -> v.to(List)}))
+      assert(lists === proxyAndCapitalizeHeaders(lists, request = true))
+    }
 
-    assert(lists === (proxyAndCapitalizeHeaders(arrays, request = true) map { case (k, v) => k -> v.to(List)}))
-    assert(lists === proxyAndCapitalizeHeaders(lists, request = true))
-    assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
-    assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))
+    it("must filter request headers") {
+      val toFilterInRequest  = RequestHeadersToRemove  map (_ -> List("NOT!"))
+      assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInRequest, request = true))
+    }
+
+    it("must filter response headers") {
+      val toFilterInResponse = ResponseHeadersToRemove map (_ -> List("NOT!"))
+      assert(lists === proxyAndCapitalizeHeaders(lists ++ toFilterInResponse, request = false))
+    }
   }
 }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml._
@@ -69,6 +70,9 @@ class XFormsUploadHandler(
         // disable pasting in the file. See http://tinyurl.com/6dcd6a
         reusableAttributes.addAttribute("", "unselectable", "unselectable", XMLReceiverHelper.CDATA, "on")
         // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
+
+        if (isXFormsReadonlyButNotStaticReadonly(currentControl))
+          outputDisabledAttribute(reusableAttributes)
 
         // @accept
         uploadControl       flatMap

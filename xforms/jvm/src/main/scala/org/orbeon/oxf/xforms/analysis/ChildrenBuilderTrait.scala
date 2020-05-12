@@ -29,7 +29,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
   // This element's children (valid after build() has been called)
   private var _children = Seq[ElementAnalysis]()
-  final def children = _children
+  final def children: Seq[ElementAnalysis] = _children
 
   // NOTE: Should probably make it so that controls add themselves to their container upon creation
   final def addChildren(children: IterableOnce[ElementAnalysis]): Unit =

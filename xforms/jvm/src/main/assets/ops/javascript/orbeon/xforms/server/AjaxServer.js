@@ -37,7 +37,7 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID, ignoreErrors) {
+    AjaxServer.handleResponseDom = function(responseXML, formID, ignoreErrors) {
 
         try {
             var responseRoot = responseXML.documentElement;
@@ -1422,7 +1422,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                ORBEON.xforms.Page.getForm(formID).loadingIndicator.show();
+                ORBEON.xforms.Page.loadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
         } catch (e) {

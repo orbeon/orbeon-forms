@@ -17,11 +17,10 @@ import org.scalajs.dom
 import org.scalajs.dom.raw
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 // Store for values as we think they are known to the server
 @JSExportTopLevel("ORBEON.xforms.ServerValueStore")
-@JSExportAll
 object ServerValueStore {
 
   private case class ControlValue(controlElem: raw.Element, value: String)
@@ -29,6 +28,7 @@ object ServerValueStore {
   private var idToControlValue = Map[String, ControlValue]()
 
   // Store a value for a given control by id
+  @JSExport
   def set(id: String, valueOrUndef: js.UndefOr[String]): Unit =
     for {
       controlElem <- Option(dom.document.getElementById(id)) // unclear if callers are sure the element exists
@@ -38,6 +38,7 @@ object ServerValueStore {
     }
 
   // Return the value of a control as known by the server or null
+  @JSExport
   def get(id: String): String =
     idToControlValue.get(id) match {
       case None =>
@@ -53,6 +54,7 @@ object ServerValueStore {
     }
 
   // Remove the value we know for a specific control
+  @JSExport
   def remove(id: String): Unit = idToControlValue -= id
 
   // Purge controls which are no longer in the DOM

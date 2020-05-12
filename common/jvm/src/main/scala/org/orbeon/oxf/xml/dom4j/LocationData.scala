@@ -24,7 +24,7 @@ object LocationData {
     if (locator ne null) {
       val file = locator.getSystemId
       val line = locator.getLineNumber
-      if (file.nonBlank && line != -1)
+      if (file.nonAllBlank && line != -1)
         LocationData(file, line, locator.getColumnNumber)
       else
         null

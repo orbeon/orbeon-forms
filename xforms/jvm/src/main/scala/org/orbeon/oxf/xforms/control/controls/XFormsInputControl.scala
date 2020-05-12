@@ -42,7 +42,7 @@ class XFormsInputControl(
   element,
   effectiveId
 ) with XFormsValueControl
-  with FocusableTrait {
+  with ReadonlyFocusableTrait {
 
   override type Control <: InputControl
 

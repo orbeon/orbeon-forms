@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
@@ -101,7 +101,7 @@ object Number {
             // edit value hasn't changed.
             //
             val formId = $(containerElem).parents("form").attr("id").get
-            AjaxClient.ajaxResponseProcessedForCurrentEventQueueF(formId) foreach { _ =>
+            AjaxClient.allEventsProcessedF("number") foreach { _ =>
               updateVisibleValue()
             }
           }
@@ -114,7 +114,7 @@ object Number {
 
             if (Set(10, 13)(e.which)) {
               updateStateAndSendValueToServer()
-              AjaxEvent.dispatchEvent(
+              AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName = EventNames.DOMActivate,
                   targetId  = containerElem.id
@@ -132,7 +132,7 @@ object Number {
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
         scribe.debug(s"xformsUpdateReadonly: $readonly")
-        companion.visibleInputElem.disabled = readonly
+        updateReadonly(readonly)
       }
 
       override def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
@@ -145,7 +145,7 @@ object Number {
 
         // Also update disabled because this might be called upon an iteration being moved, in which
         // case all the control properties must be updated.
-        visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
+        updateReadonly($(containerElem).hasClass("xforms-readonly"))
       }
 
       override def xformsFocus(): Unit = {
@@ -159,6 +159,12 @@ object Number {
 
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
+
+        def updateReadonly(readonly: Boolean): Unit =
+          if (readonly)
+            companion.visibleInputElem.setAttribute("readonly", "readonly")
+          else
+            companion.visibleInputElem.removeAttribute("readonly")
 
         def updateStateAndSendValueToServer(): Unit =
           stateOpt foreach { state =>
@@ -196,7 +202,7 @@ object Number {
               TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
 
           val changeType =
-            $("body").is(".xforms-mobile") &&
+            dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
               companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
 
           if (changeType) {

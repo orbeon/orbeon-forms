@@ -18,7 +18,6 @@ import java.net.URI
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
-import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
 import org.orbeon.saxon.functions.DeepEqual
@@ -27,9 +26,11 @@ import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
+
 
 object SaxonUtils {
 
@@ -55,7 +56,7 @@ object SaxonUtils {
 
   // Convert a Java object to a Saxon Item using the Saxon API
   val anyToItem: Any => Item = new StandardObjectConverter(new SaxonXQDataFactory {
-    def getConfiguration = util.XPath.GlobalConfiguration
+    def getConfiguration: Configuration = util.XPath.GlobalConfiguration
   }).convertToItem(_: Any)
 
   // Convert a Java object to a Saxon Item but keep unchanged if already an Item
@@ -253,15 +254,29 @@ object SaxonUtils {
     false
   }
 
-  def deepCompare(config: Configuration, it1: SequenceIterator, it2: SequenceIterator): Boolean =
+  def deepCompare(
+    config                     : Configuration,
+    it1                        : Iterator[om.Item],
+    it2                        : Iterator[om.Item],
+    excludeWhitespaceTextNodes : Boolean
+  ): Boolean = {
+
+    // Do our own filtering of top-level items as Saxon's `DeepEqual` doesn't
+    def filterWhitespaceNodes(item: om.Item) = item match {
+      case n: om.NodeInfo => ! Whitespace.isWhite(n.getStringValueCS)
+      case _ => true
+    }
+
     DeepEqual.deepEquals(
-      it1,
-      it2,
+      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it1 filter filterWhitespaceNodes else it1),
+      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it2 filter filterWhitespaceNodes else it2),
       new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
       config,
-      DeepEqual.INCLUDE_PREFIXES |
-        DeepEqual.INCLUDE_COMMENTS |
-        DeepEqual.COMPARE_STRING_VALUES |
-        DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS
+      DeepEqual.INCLUDE_PREFIXES                  |
+        DeepEqual.INCLUDE_COMMENTS                |
+        DeepEqual.COMPARE_STRING_VALUES           |
+        DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS |
+        (if (excludeWhitespaceTextNodes) DeepEqual.EXCLUDE_WHITESPACE_TEXT_NODES else 0)
     )
+  }
 }

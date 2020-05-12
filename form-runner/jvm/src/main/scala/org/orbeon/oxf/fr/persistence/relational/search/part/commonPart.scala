@@ -15,12 +15,9 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import java.sql.Connection
 
-import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
-import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{FilterType, Request}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.util.StringUtils._
 
 object commonPart  {
 
@@ -29,7 +26,7 @@ object commonPart  {
       sql = {
         val columnFilterTables =
           request.columns
-            .filter(_.filterWith.nonEmpty)
+            .filter(_.filterType != FilterType.None)
             .zipWithIndex
             .map { case (_, i) => s", orbeon_i_control_text tf$i" }
             .mkString(" ")

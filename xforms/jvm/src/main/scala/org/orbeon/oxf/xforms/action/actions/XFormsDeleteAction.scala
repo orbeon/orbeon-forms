@@ -13,8 +13,11 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import java.{util => ju}
+
 import cats.syntax.option._
 import org.orbeon.dom.{Attribute, Document}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
@@ -25,9 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
-import scala.collection.compat._
 import scala.language.postfixOps
-
 
 /**
  * 9.3.6 The delete Element
@@ -107,13 +108,14 @@ object XFormsDeleteAction extends Logging {
     indentedLogger     : IndentedLogger
   ): Option[DeletionDescriptor] = {
 
+    require(containingDocument ne null)
     require(nodeInfo ne null)
 
-    doDelete(
-      containingDocumentOpt = containingDocument.some,
-      collectionToUpdate    = List(nodeInfo),
-      deleteIndexOpt        = Some(1),
-      doDispatch            = doDispatch
+    doDeleteItems(
+      containingDocumentOpt  = containingDocument.some,
+      itemsToDelete          = List(nodeInfo),
+      deleteIndexForEventOpt = None,
+      doDispatch             = doDispatch
     ).headOption
   }
 
@@ -128,93 +130,133 @@ object XFormsDeleteAction extends Logging {
     require(collectionToUpdate ne null)
 
     if (collectionToUpdate.isEmpty) {
-      debugAllowNull("empty collection, terminating")
+      debugAllowNull("empty collection, nothing to delete")
       Nil
     } else {
-
-      val collectionToUpdateWithDefiniteSize =
-        if (collectionToUpdate.hasDefiniteSize) collectionToUpdate else collectionToUpdate.to(List)
-
-      val deletionDescriptors =
-        deleteIndexOpt match {
-          case Some(index) => doDeleteOneImpl(collectionToUpdateWithDefiniteSize(index - 1)).to(List)
-          case None        => collectionToUpdateWithDefiniteSize.flatMap(doDeleteOneImpl).to(List)
-        }
-
-      if (deletionDescriptors.nonEmpty)
-        containingDocumentOpt foreach { containingDocument =>
-
-          // Identify the instance that actually changes
-          // NOTE: More than one instance may be modified! For now we look at the first one only.
-          val modifiedInstanceOpt = containingDocument.instanceForNodeOpt(deletionDescriptors.head.nodeInfo)
-
-          debugAllowNull(
-            "deleted nodes",
-            List("count" -> deletionDescriptors.size.toString) ++ (modifiedInstanceOpt map ("instance" -> _.getEffectiveId))
+      deleteIndexOpt match {
+        case Some(index) =>
+          doDeleteItems(
+            containingDocumentOpt,
+            collectionToUpdate.lift(index - 1).toList,
+            deleteIndexOpt,
+            doDispatch
           )
-
-          // Instance can be missing if document into which delete is performed is not in an instance!
-          modifiedInstanceOpt foreach { modifiedInstance =>
-
-            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            modifiedInstance.markModified()
-            modifiedInstance.model.markStructuralChange(modifiedInstanceOpt, NoDefaultsStrategy)
-
-            // "4. If the delete is successful, the event xforms-delete is dispatched."
-            if (doDispatch)
-              Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deletionDescriptors, deleteIndexOpt))
-          }
-        }
-
-      deletionDescriptors
+        case None =>
+          doDeleteItems(
+            containingDocumentOpt,
+            collectionToUpdate,
+            deleteIndexOpt,
+            doDispatch
+          )
+      }
     }
   }
 
-  private def doDeleteOneImpl(
-    itemToRemove   : Item)(implicit
-    indentedLogger : IndentedLogger
-  ): Option[DeletionDescriptor] =
-    itemToRemove match {
-      case nodeInfoToRemove: NodeInfo =>
+  def doDeleteItems(
+    containingDocumentOpt  : Option[XFormsContainingDocument],
+    itemsToDelete          : Seq[Item],
+    deleteIndexForEventOpt : Option[Int],
+    doDispatch             : Boolean)(implicit
+    indentedLogger         : IndentedLogger
+): List[DeletionDescriptor] = {
 
-        val nodeToRemove   = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CannotDeleteReadonlyMessage)
-        val parentNodeInfo = nodeInfoToRemove.getParent // obtain *before* deletion
-        val parentElement  = nodeToRemove.getParent
+    // Delete back to front and per DOM document
+    // https://github.com/orbeon/orbeon-forms/issues/4492
 
-        val (contentToUpdate, mustNormalize) =
-          if (nodeToRemove.isInstanceOf[Attribute]) {
-            (parentElement.attributes, false)
-          } else if (parentElement ne null) {
-            (parentElement.content, true)
-          } else if ((nodeToRemove.getDocument ne null) && (nodeToRemove eq nodeToRemove.getDocument.getRootElement)) {
-            (nodeToRemove.getDocument.content, false)
-          } else if (nodeToRemove.isInstanceOf[Document]) {
-            debugAllowNull("ignoring attempt to delete document node")
-            return None
-          } else {
-            debugAllowNull("ignoring attempt to delete parentless node")
-            return None
-          }
+    val nodesToDelete = (itemsToDelete.iterator collect { case n: NodeInfo => n }).toList
 
-        val indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove)
+    // `groupByKeepOrder` uses universal equality but it works because `==` is `equals()` is `isSameNodeInfo()`.
+    // NOTE: `getDocumentRoot` can be `null`.
+    val instancesWithDescriptors =
+      nodesToDelete.groupByKeepOrder(n => n.getDocumentRoot) map { case (docNodeOrNull, nodesToDelete) =>
 
-        // Actual remove operation
-        contentToUpdate.remove(indexInContentToUpdate)
+        val nodeArray = nodesToDelete.toArray
+        ju.Arrays.sort(nodeArray, ReverseLocalOrderComparator)
+        val descriptors = nodeArray.iterator.flatMap(n => doDeleteOneImpl(n).iterator).toList
 
-        if (mustNormalize)
-          Dom4jUtils.normalizeTextNodes(parentElement)
+        val modifiedInstanceOpt =
+          for {
+            docNode  <- Option(docNodeOrNull)
+            doc      <- containingDocumentOpt
+            instance <- doc.instanceForNodeOpt(docNode)
+          } yield
+            instance
 
-        Some(DeletionDescriptor(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate))
-      case _ =>
-        debugAllowNull("ignoring attempt to delete atomic value")
-        None
+        modifiedInstanceOpt -> descriptors
+      }
+
+    // Side-effects: notify instances if needed
+    instancesWithDescriptors foreach {
+      case (Some(modifiedInstance), descriptors) =>
+
+        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+        modifiedInstance.markModified()
+        modifiedInstance.model.markStructuralChange(modifiedInstance.some, NoDefaultsStrategy)
+
+        debugAllowNull(
+          "deleted nodes for instance",
+          List(
+            "instance" -> modifiedInstance.getEffectiveId,
+            "count"    -> descriptors.size.toString)
+        )
+
+        if (doDispatch)
+          Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, descriptors, deleteIndexForEventOpt))
+
+      case (None, descriptors) =>
+        debugAllowNull(
+          "deleted nodes outside instance",
+          List("count" -> descriptors.size.toString)
+        )
     }
+
+    instancesWithDescriptors flatMap (_._2)
+  }
+
+  private object ReverseLocalOrderComparator extends ju.Comparator[NodeInfo] {
+    def compare(o1: NodeInfo, o2: NodeInfo): Int =
+      -o1.compareOrder(o2)
+  }
+
+  private def doDeleteOneImpl(
+    nodeInfoToRemove : NodeInfo)(implicit
+    indentedLogger   : IndentedLogger
+): Option[DeletionDescriptor] = {
+
+    val nodeToRemove   = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CannotDeleteReadonlyMessage)
+    val parentNodeInfo = nodeInfoToRemove.getParent // obtain *before* deletion
+    val parentElement  = nodeToRemove.getParent
+
+    val (contentToUpdate, mustNormalize) =
+      if (nodeToRemove.isInstanceOf[Attribute]) {
+        (parentElement.attributes, false)
+      } else if (parentElement ne null) {
+        (parentElement.content, true)
+      } else if ((nodeToRemove.getDocument ne null) && (nodeToRemove eq nodeToRemove.getDocument.getRootElement)) {
+        (nodeToRemove.getDocument.content, false)
+      } else if (nodeToRemove.isInstanceOf[Document]) {
+        debugAllowNull("ignoring attempt to delete document node")
+        return None
+      } else {
+        debugAllowNull("ignoring attempt to delete parentless node")
+        return None
+      }
+
+    val indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove)
+
+    contentToUpdate.remove(indexInContentToUpdate)
+
+    if (mustNormalize)
+      Dom4jUtils.normalizeTextNodes(parentElement)
+
+    Some(DeletionDescriptor(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate))
+  }
 
   private def debugAllowNull(
     message        : => String,
     parameters     : => Seq[(String, String)] = Nil)(implicit
     indentedLogger : IndentedLogger
-  ) =
+  ): Unit =
     if (indentedLogger ne null)
       debug(message, parameters)
 }

@@ -52,6 +52,92 @@
                     </fr:attachment>
                 </view>
             </templates>
+            <control-details>
+                <xf:model xmlns="">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="(instance()/@*[name() = name($c)], $c/@default)[1]"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <allow-download default="true"/>
+                            <show-size      default="true"/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="allow-download"
+                            type="xs:boolean"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <allow-download>Allow download</allow-download>
+                                <show-size>Show size</show-size>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <allow-download>Permettre le téléchargement</allow-download>
+                                <ow-si>Montrer la taille</ow-si>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-download-grid">
+                    <fr:c x="1" y="1" w="12">
+                        <fr:checkbox-input ref="instance('local')/allow-download" id="allow-download-control">
+                            <xf:label ref="xxf:r('allow-download')"/>
+                        </fr:checkbox-input>
+                    </fr:c>
+                    <!-- For now, don't support this, see comments in #4414.
+                    <fr:c x="1" y="2" w="12">
+                        <fr:checkbox-input ref="instance('local')/show-size" id="show-size-control">
+                            <xf:label ref="xxf:r('show-size')"/>
+                        </fr:checkbox-input>
+                    </fr:c>
+                    -->
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-download-action"
+                    event="xforms-value-changed"
+                    observer="
+                        allow-download-control
+                        show-size-control">
+
+                    <xf:var
+                        name="name"
+                        value="name(event('xxf:binding'))"/>
+
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $binding := event('xxf:binding'),
+                                $v       := string($binding),
+                                $default := $binding/@default/string()
+                            return
+                                if ($v != $default) then
+                                    $v
+                                else
+                                    ()
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>
@@ -61,7 +147,7 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en">
                             <download>Download</download>
                             <select>Select file</select>
@@ -110,7 +196,7 @@
                             <download>Hent</download>
                             <select todo="true">[Select file]</select>
                         </resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>
@@ -118,6 +204,9 @@
             <xf:var
                 name="binding"
                 value="xxf:binding('fr-attachment')"/>
+            <xf:var
+                name="readonly"
+                value="xxf:readonly($binding)"/>
 
             <xf:upload
                 id="xf-upload"
@@ -161,14 +250,16 @@
             </xf:upload>
 
             <xh:label
-                class="btn btn-default btn-file"
+                class="btn btn-default btn-file{if ($readonly) then ' disabled' else ''}"
                 for="xf-upload≡xforms-input"
                 role="button"
-                tabindex="0">
+                tabindex="{if ($readonly) then '-1' else '0'}">
                 <xf:output value="xxf:r('select')"/>
             </xh:label>
 
-            <xf:output appearance="xxf:download" ref="$binding[xxf:non-blank()]">
+            <xf:output
+                appearance="xxf:download"
+                ref="$binding[xxf:non-blank() and not(fr:component-param-value('allow-download') = 'false')]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>

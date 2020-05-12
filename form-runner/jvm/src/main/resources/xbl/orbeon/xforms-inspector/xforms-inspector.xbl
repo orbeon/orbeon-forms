@@ -67,17 +67,31 @@
                         </xf:action>
                     </xf:action>
                     <xf:delete context="instance('inspector-itemset')" ref="model[starts-with(@id, 'orbeon-')]"/>
-                    <xf:setvalue ref="instance('inspector-instance')/current-model" value="instance('inspector-itemset')/model[1]/@id"/>
-                    <xf:setvalue ref="instance('inspector-instance')/current-instance"
-                                     value="instance('inspector-itemset')/model[1]/instance[1]/@id"/>
+                    <xf:setvalue
+                        ref="instance('inspector-instance')/current-model"
+                        value="
+                            instance('inspector-itemset')/(
+                                (: Default to `fr-form-model` if exists :)
+                                model[@id = '|fr-form-model|'],
+                                model[1]
+                            )[1]/@id"/>
+                    <xf:setvalue
+                        ref="instance('inspector-instance')/current-instance"
+                        value="
+                            instance('inspector-itemset')/
+                            model[@id = instance('inspector-instance')/current-model]/(
+                                (: Default to `fr-form-instance` if exists :)
+                                instance[@id = '|fr-form-instance|'],
+                                instance[1]
+                            )/@id"/>
                 </xf:action>
 
                 <xf:instance id="inspector-itemset">
-                    <models xmlns=""/>
+                    <_ xmlns=""/>
                 </xf:instance>
 
                 <xf:instance id="inspector-instance">
-                    <instance xmlns="">
+                    <_ xmlns="">
                         <current-model/>
                         <current-instance/>
                         <mode>formatted</mode>
@@ -88,7 +102,7 @@
                         <shown-output/>
                         <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
                         <xsl:output method="xml" omit-xml-declaration="yes"/>
-                    </instance>
+                    </_>
                 </xf:instance>
 
                 <xf:var name="xml-indent"   value="instance('inspector-instance')/xsl:output[1]"/>
@@ -124,7 +138,7 @@
                         <xf:action ev:event="xforms-value-changed">
                             <xf:setvalue  if=". = 'view-console'" ref="instance('inspector-instance')/shown-output"/>
                         </xf:action>
-                        <xf:label>Mode: </xf:label>
+                        <xf:label>Mode</xf:label>
                         <xf:item>
                             <xf:label>View instance</xf:label>
                             <xf:value>view-instance</xf:value>
@@ -141,14 +155,17 @@
                 </xh:div>
 
                 <!-- Model / instance -->
-                <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
+                <xh:div class="
+                        fr-xforms-inspector-block
+                        fr-xforms-inspector-model-instance
+                        fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
                     <xf:group appearance="xxf:internal">
                         <xf:dispatch ev:event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
                         <!-- Model -->
                         <xf:var name="models" value="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
-                            <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
-                                <xf:label>Model: </xf:label>
+                            <xf:select1 ref="instance('inspector-instance')/current-model" appearance="search">
+                                <xf:label>Model</xf:label>
                                 <xf:itemset ref="$models">
                                     <xf:label ref="@id"/>
                                     <xf:value ref="@id"/>
@@ -160,13 +177,13 @@
                         </xf:group>
                         <xf:group ref=".[count($models) = 1]" class="fr-xforms-inspector-model">
                             <xf:output value="instance('inspector-instance')/current-model">
-                                <xf:label>Model: </xf:label>
+                                <xf:label>Model</xf:label>
                             </xf:output>
                         </xf:group>
                         <!-- Instance -->
                         <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
-                            <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="minimal">
-                                <xf:label>Instance: </xf:label>
+                            <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="search">
+                                <xf:label>Instance</xf:label>
                                 <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
                                     <xf:label ref="@id"/>
                                     <xf:value ref="@id"/>
@@ -175,14 +192,17 @@
                         </xf:group>
                         <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) = 1]" class="fr-xforms-inspector-instance">
                             <xf:output value="instance('inspector-instance')/current-instance">
-                                <xf:label>Instance: </xf:label>
+                                <xf:label>Instance</xf:label>
                             </xf:output>
                         </xf:group>
                     </xf:group>
                 </xh:div>
 
                 <!-- Evaluate XPath -->
-                <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
+                <xh:div class="
+                        fr-xforms-inspector-block
+                        fr-xforms-inspector-xpath
+                        fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
                     <xf:group ref="instance('inspector-instance')/xpath" appearance="xxf:internal">
                         <!-- XPath expression and trigger -->
                         <xf:action ev:event="DOMActivate">
@@ -193,7 +213,7 @@
                                         saxon:evaluate(instance('inspector-instance')/xpath)"/>
                         </xf:action>
                         <xf:input ref="." id="inspector-xpath">
-                            <xf:label>XPath: </xf:label>
+                            <xf:label>XPath</xf:label>
                         </xf:input>
                         <xf:trigger ref=".">
                             <xf:label>Evaluate</xf:label>
@@ -241,7 +261,7 @@
                 <!-- Mode for formatting -->
                 <xh:div class="fr-xforms-inspector-mode">
                     <fr:link-select1 appearance="full" ref="instance('inspector-instance')/mode">
-                        <xf:label>Output: </xf:label>
+                        <xf:label>Output</xf:label>
                         <xf:item>
                             <xf:label>Pretty</xf:label>
                             <xf:value>formatted</xf:value>

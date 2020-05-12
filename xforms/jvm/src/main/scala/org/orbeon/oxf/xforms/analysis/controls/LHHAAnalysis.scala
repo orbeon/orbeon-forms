@@ -30,6 +30,8 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.scaxon.SimplePath._
 
+import scala.annotation.tailrec
+
 class LHHAAnalysis(
   staticStateContext : StaticStateContext,
   element            : Element,
@@ -47,14 +49,14 @@ class LHHAAnalysis(
 
   require(parent.isDefined)
 
-  def getParent = parent.get // TODO: rename `parent` to `parentOpt`, and this `def` to `parent`
+  def getParent: ElementAnalysis = parent.get // TODO: rename `parent` to `parentOpt`, and this `def` to `parent`
 
   def lhhaType: LHHA = LHHA.withNameOption(localName) getOrElse LHHA.Label // FIXME: Because `SelectionControlTrait` calls this for `value`!
 
-  val forStaticIdOpt = element.attributeValueOpt(FOR_QNAME)
-  val isLocal        = forStaticIdOpt.isEmpty
-  val defaultToHTML  = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
-  val containsHTML   = LHHAAnalysis.containsHTML(element)
+  val forStaticIdOpt: Option[String] = element.attributeValueOpt(FOR_QNAME)
+  val isLocal       : Boolean        = forStaticIdOpt.isEmpty
+  val defaultToHTML : Boolean        = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
+  val containsHTML  : Boolean        = LHHAAnalysis.containsHTML(element)
 
   // Updated in `attachToControl()`
   private var _isForRepeat                          : Boolean                                 = false
@@ -62,13 +64,14 @@ class LHHAAnalysis(
   private var _directTargetControlOpt               : Option[StaticLHHASupport]               = None
   private var _effectiveTargetControlOrPrefixedIdOpt: Option[StaticLHHASupport Either String] = None
 
-  def isForRepeat                           = _isForRepeat
-  def forRepeatNesting                      = _forRepeatNesting
-  def directTargetControl                   = _directTargetControlOpt getOrElse (throw new IllegalStateException)
-  def effectiveTargetControlOrPrefixedIdOpt = _effectiveTargetControlOrPrefixedIdOpt
+  def isForRepeat                          : Boolean           = _isForRepeat
+  def forRepeatNesting                     : Int               = _forRepeatNesting
+  def directTargetControl                  : StaticLHHASupport = _directTargetControlOpt getOrElse (throw new IllegalStateException)
+  def effectiveTargetControlOrPrefixedIdOpt: Option[Either[StaticLHHASupport, String]] = _effectiveTargetControlOrPrefixedIdOpt
 
-  val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
-  val hasLocalFullAppearance    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
+  val hasLocalMinimalAppearance: Boolean = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
+  val hasLocalFullAppearance   : Boolean = appearances(XFORMS_FULL_APPEARANCE_QNAME)
+  val hasLocalLeftAppearance   : Boolean = appearances(XXFORMS_LEFT_APPEARANCE_QNAME)
 
   // What we support for alert level/validation:
   //
@@ -80,17 +83,17 @@ class LHHAAnalysis(
   // - <xf:alert level="" validation="c1 c2">      -> same, blank attribute is same as missing attribute [SHOULD WARN]
   // - <xf:alert level="error" validation="c1 c2"> -> same, level is ignored when a validation is present [SHOULD WARN]
 
-  val forValidations =
+  val forValidations: Set[String] =
     if (localName == "alert")
-      gatherAlertValidations(Option(element.attributeValue(VALIDATION_QNAME)))
+      gatherAlertValidations(element.attributeValueOpt(VALIDATION_QNAME))
     else
-      Set.empty[String]
+      Set.empty
 
-  val forLevels =
+  val forLevels: Set[ValidationLevel] =
     if (localName == "alert")
-      gatherAlertLevels(Option(element.attributeValue(LEVEL_QNAME)))
+      gatherAlertLevels(element.attributeValueOpt(LEVEL_QNAME))
     else
-      Set.empty[ValidationLevel]
+      Set.empty
 
   // Placeholder is only supported for label or hint. This in fact only makes sense for a limited set
   // of controls, namely text fields or text areas at this point.
@@ -115,6 +118,7 @@ class LHHAAnalysis(
       def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
         part.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e}
 
+      @tailrec
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
         e match {
           case xbl: ComponentControl =>
@@ -178,7 +182,7 @@ class LHHAAnalysis(
   //
   // TODO: figure out whether to allow HTML or not (could default to true?)
   //
-  val staticValue =
+  val staticValue: Option[String] =
     LHHAAnalysis.hasStaticValue(staticStateContext, element) option
       XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
 
@@ -187,8 +191,8 @@ class LHHAAnalysis(
       println("static value for control " + prefixedId + " => " + staticValue.get)
 
   // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
-  override protected def computeContextAnalysis = None
-  override protected def computeBindingAnalysis = None
+  override protected def computeContextAnalysis: Option[XPathAnalysis] = None
+  override protected def computeBindingAnalysis: Option[XPathAnalysis] = None
 
   override protected def computeValueAnalysis: Option[XPathAnalysis] = {
     if (staticValue.isEmpty) {
@@ -218,7 +222,7 @@ class LHHAAnalysis(
         var combinedAnalysis: XPathAnalysis = StringAnalysis()
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener {
-          val hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs
+          val hostLanguageAVTs: Boolean = XFormsProperties.isHostLanguageAVTs
           def startElement(element: Element): Unit = {
             if (element.getQName == XFORMS_OUTPUT_QNAME) {
               // Add dependencies
@@ -242,8 +246,8 @@ class LHHAAnalysis(
             }
           }
 
-          def endElement(element: Element) = ()
-          def text(text: Text) = ()
+          def endElement(element: Element): Unit = ()
+          def text(text: Text): Unit = ()
         })
 
         // Result of all combined analyses
@@ -257,8 +261,8 @@ class LHHAAnalysis(
 
 object LHHAAnalysis {
 
-  def isHTML(e: Element)      = e.attributeValue(MEDIATYPE_QNAME) == "text/html"
-  def isPlainText(e: Element) = e.attributeValue(MEDIATYPE_QNAME) == "text/plain"
+  def isHTML     (e: Element): Boolean = e.attributeValue(MEDIATYPE_QNAME) == "text/html"
+  def isPlainText(e: Element): Boolean = e.attributeValue(MEDIATYPE_QNAME) == "text/plain"
 
   private def containsHTML(lhhaElement: Element) = {
 
@@ -309,9 +313,9 @@ object LHHAAnalysis {
     ).asInstanceOf[Boolean]
   }
 
-  def gatherAlertValidations(validationAtt: Option[String]) =
+  def gatherAlertValidations(validationAtt: Option[String]): Set[String] =
     stringOptionToSet(validationAtt)
 
-  def gatherAlertLevels(levelAtt: Option[String]) =
+  def gatherAlertLevels(levelAtt: Option[String]): Set[ValidationLevel] =
     stringOptionToSet(levelAtt) collect LevelByName
 }

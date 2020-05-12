@@ -15,31 +15,30 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.1"
+val ScalatTestVersion             = "3.1.2"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
-val EnumeratumVersion             = "1.5.15"
-val EnumeratumCirceVersion        = "1.5.22"
+val EnumeratumVersion             = "1.6.0"
+val EnumeratumCirceVersion        = "1.6.0"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.2.6"
-val SbinaryVersion                = "0.5.0"
+val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
-val ScalaCollectionCompatVersion  = "2.1.3"
+val ScalaCollectionCompatVersion  = "2.1.6"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
 val JodaConvertVersion            = "2.2.1"
 val Slf4jVersion                  = "1.7.30"
-val HttpComponentsVersion         = "4.5.11"
+val HttpComponentsVersion         = "4.5.12"
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.6"
 val FlyingSaucerVersion           = "9.1.20"
-val TinkVersion                   = "1.2.2"
-val JacksonVersion                = "2.10.2"
+val TinkVersion                   = "1.3.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.2"
 
@@ -57,9 +56,9 @@ val CoreLibraryDependencies = Seq(
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
-  "joda-time"                   %  "joda-time"                      % "2.10.5",
+  "joda-time"                   %  "joda-time"                      % "2.10.6",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.9",
+  "org.apache.commons"          %  "commons-lang3"                  % "3.10",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.14",
@@ -86,16 +85,18 @@ val CoreLibraryDependencies = Seq(
   "log4j"                       % "log4j"                           % Log4jVersion,
   "com.jcraft"                  % "jsch"                            % "0.1.55",
   "jcifs"                       % "jcifs"                           % "1.3.17",
-  "com.google.crypto.tink"      % "tink"                            % TinkVersion,
-  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion,
+  "com.google.crypto.tink"      % "tink"                            % TinkVersion excludeAll (
+    ExclusionRule(organization = "com.amazonaws"),
+    ExclusionRule(organization = "com.fasterxml.jackson.core")
+  ),
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
   "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.19"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.10" % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.20"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.12" % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,

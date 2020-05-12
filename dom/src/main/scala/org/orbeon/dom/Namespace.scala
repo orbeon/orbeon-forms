@@ -72,5 +72,5 @@ abstract case class Namespace private[Namespace] (prefix: String, uri: String) e
   override def getText: String = uri
   override def getStringValue: String = uri
 
-  def accept(visitor: Visitor) = visitor.visit(this)
+  def accept(visitor: Visitor): Unit = visitor.visit(this)
 }

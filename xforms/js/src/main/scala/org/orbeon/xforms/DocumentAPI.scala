@@ -32,7 +32,7 @@ object DocumentAPI {
   // Q: Can we type `eventObject`?
   @JSExport
   def dispatchEvent(eventObject: js.Dictionary[js.Any]): Unit =
-    AjaxEvent.dispatchEvent(new AjaxEvent(eventObject))
+    AjaxClient.fireEvent(new AjaxEvent(eventObject))
 
   // Dispatch an event
   // We do NOT document this as of 2015-10 for JavaScript callers. This should be
@@ -88,7 +88,7 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     require(
-      ! $(control).is(".xforms-output, .xforms-upload"),
+      ! (control.classList.contains("xforms-output") || control.classList.contains("xforms-upload")),
       s"Cannot set the value of an output or upload control for id `${control.id}`"
     )
 
@@ -96,7 +96,7 @@ object DocumentAPI {
     Controls.setCurrentValue(control, newStringValue)
 
     // And also fire server event
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = EventNames.XXFormsValue,
         targetId   = control.id,
@@ -114,7 +114,7 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     Controls.setFocus(control.id)
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName = EventNames.XFormsFocus,
         targetId  = control.id

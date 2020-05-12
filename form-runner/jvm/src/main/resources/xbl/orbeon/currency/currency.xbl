@@ -133,7 +133,7 @@
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <prefix/>
                             <suffix/>
                             <decimal-separator/>
@@ -142,7 +142,7 @@
                             <round-when-formatting/>
                             <round-when-storing/>
                             <field-width/>
-                        </local>
+                        </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">

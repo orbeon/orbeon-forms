@@ -61,17 +61,16 @@ object Init extends InitTrait
 
 @js.native
 trait AjaxServerTrait extends js.Object {
-  def ajaxResponseProcessedForCurrentEventQueueP(): js.Promise[Unit] = js.native
+  def allEventsProcessedP(): js.Promise[Unit] = js.native
 }
 
 @js.native
 @JSGlobal("ORBEON.xforms.server.AjaxServer")
 object AjaxServer extends AjaxServerTrait {
   def handleResponseDom(
-    responseXML                  : dom.Document,
-    isResponseToBackgroundUpload : Boolean,
-    formId                       : String,
-    ignoreErrors                 : Boolean
+    responseXML  : dom.Document,
+    formId       : String,
+    ignoreErrors : Boolean
   ): Unit = js.native
 }
 
@@ -121,6 +120,7 @@ object Controls extends js.Object {
   def setCurrentValue(control: html.Element, newControlValue: String): Unit                  = js.native
   def getCurrentValue(elem: html.Element)                            : js.UndefOr[String]    = js.native
   def setFocus(controlId: String)                                    : Unit                  = js.native
+  def removeFocus(controlId: String)                                 : Unit                  = js.native
   def getForm(control: dom.Element)                                  : js.UndefOr[html.Form] = js.native
 }
 
@@ -129,7 +129,7 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @JSGlobal("ORBEON.xforms.Events")
 @js.native
 object Events extends js.Object {
-  val ajaxResponseProcessedEvent  : YUICustomEvent = js.native
+
   val errorEvent                  : YUICustomEvent = js.native
   val orbeonLoadedEvent           : YUICustomEvent = js.native
   val componentChangedLayoutEvent : YUICustomEvent = js.native
@@ -185,5 +185,7 @@ object Utils extends js.Object {
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native
-  def hideModalProgressPanel()                                              : Unit             = js.native
+  def isIOS()                                                               : Boolean          = js.native
+  def getZoomLevel()                                                        : Double           = js.native
+  def resetIOSZoom()                                                        : Unit             = js.native
 }

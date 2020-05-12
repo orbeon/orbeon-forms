@@ -37,12 +37,12 @@
             <!-- Local model -->
             <xf:model id="recaptcha-model">
                 <xf:instance id="verify-request">
-                    <verify-request>
+                    <_>
                         <secret/>
                         <response/>
-                    </verify-request>
+                    </_>
                 </xf:instance>
-                <xf:instance id="verify-response"><verify-response/></xf:instance>
+                <xf:instance id="verify-response"><_/></xf:instance>
                 <xf:submission
                     id="verify-submission"
                     resource="https://www.google.com/recaptcha/api/siteverify"

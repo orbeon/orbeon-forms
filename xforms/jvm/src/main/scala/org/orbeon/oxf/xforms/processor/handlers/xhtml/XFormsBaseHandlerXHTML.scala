@@ -62,6 +62,12 @@ abstract class XFormsBaseHandlerXHTML (
   protected def isDefaultIncremental                                                = false
   protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
 
+  def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
+    control match {
+      case c: XFormsSingleNodeControl => c.isReadonly && ! containingDocument.staticReadonly
+      case _ => false
+    }
+
   // Output MIP classes
   // TODO: Move this to to control itself, like writeMIPsAsAttributes
   final def handleMIPClasses(controlPrefixedId: String, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
@@ -119,10 +125,11 @@ abstract class XFormsBaseHandlerXHTML (
     controlName        : String,
     controlAttributes  : Attributes,
     control            : XFormsControl,
-    incrementalDefault : Boolean
+    incrementalDefault : Boolean,
+    staticLabel        : Option[LHHAAnalysis]
   ): jl.StringBuilder = {
 
-    implicit val sb = new jl.StringBuilder(50)
+    implicit val sb: jl.StringBuilder = new jl.StringBuilder(50)
 
     // User-defined classes go first
     appendControlUserClasses(controlAttributes, control)
@@ -179,6 +186,9 @@ abstract class XFormsBaseHandlerXHTML (
       case appearanceTrait: AppearanceTrait => appearanceTrait.encodeAndAppendAppearances(sb)
       case _ =>
     }
+
+    if (staticLabel exists (_.hasLocalLeftAppearance))
+      appendWithSpace("xxforms-label-appearance-left")
 
     sb
   }
@@ -335,13 +345,14 @@ abstract class XFormsBaseHandlerXHTML (
     attributes    : Attributes,
     prefixedId    : String,
     effectiveId   : String,
-    xformsControl : XFormsControl
+    xformsControl : XFormsControl,
+    staticLabel   : Option[LHHAAnalysis]
   ): AttributesImpl = {
 
     // Get classes
     // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
-    implicit val classes =
-      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
+    implicit val classes: jl.StringBuilder =
+      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental, staticLabel)
 
     // All MIP-related classes
     handleMIPClasses(prefixedId, xformsControl)
@@ -476,9 +487,9 @@ object XFormsBaseHandlerXHTML {
         xmlReceiver.characters(value.toCharArray, 0, value.length)
   }
 
-  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit = {
-    // @disabled="disabled"
-    // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
+  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled")
-  }
+
+  def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
+    newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
 }

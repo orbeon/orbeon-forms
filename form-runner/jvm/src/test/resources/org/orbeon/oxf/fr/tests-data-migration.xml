@@ -1,0 +1,177 @@
+<!--
+    Copyright (C) 2019 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group
+    description="Data Migration"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <test description="#4519: Missing `fr:relevant='false'`" name="oxf:pipeline">
+        <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+                        <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                            <form>
+                                <my-section>
+                                    <my-grid>
+                                        <control-1/>
+                                        <control-2/>
+                                    </my-grid>
+                                    <my-repeated-grid>
+                                        <my-repeated-grid-iteration>
+                                            <control-3/>
+                                            <control-4/>
+                                        </my-repeated-grid-iteration>
+                                        <my-repeated-grid-iteration>
+                                            <control-3/>
+                                            <control-4/>
+                                        </my-repeated-grid-iteration>
+                                    </my-repeated-grid>
+                                </my-section>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                                <xf:bind id="my-grid-bind" name="my-grid" ref="my-grid">
+                                    <xf:bind id="control-1-bind" name="control-1" ref="control-1" xxf:whitespace="trim"/>
+                                    <xf:bind id="control-2-bind" name="control-2" ref="control-2" xxf:whitespace="trim" relevant="false()"/>
+                                </xf:bind>
+                                <xf:bind id="my-repeated-grid-bind" name="my-repeated-grid" ref="my-repeated-grid">
+                                    <xf:bind id="my-repeated-grid-iteration-bind" name="my-repeated-grid-iteration" ref="my-repeated-grid-iteration">
+                                        <xf:bind id="control-3-bind" name="control-3" ref="control-3" xxf:whitespace="trim"/>
+                                        <xf:bind id="control-4-bind" name="control-4" ref="control-4" xxf:whitespace="trim" relevant="false()"/>
+                                    </xf:bind>
+                                </xf:bind>
+                            </xf:bind>
+                        </xf:bind>
+
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                            <metadata>
+                                <application-name>acme</application-name>
+                                <form-name>data-migration-test</form-name>
+                                <title xml:lang=""/>
+                                <description xml:lang=""/>
+                                <migration version="4.8.0">
+                                  [
+                                    {
+                                      "path": "my-section/my-repeated-grid",
+                                      "iteration-name": "my-repeated-grid-iteration"
+                                    }
+                                  ]
+                                </migration>
+                                <migration version="2019.1.0">
+                                  {
+                                    "migrations": [
+                                      {
+                                        "containerPath": [
+                                          {
+                                            "value": "my-section"
+                                          }
+                                        ],
+                                        "newGridElem": {
+                                          "value": "my-grid"
+                                        },
+                                        "afterElem": null,
+                                        "content": [
+                                          {
+                                            "value": "control-1"
+                                          },
+                                          {
+                                            "value": "control-2"
+                                          }
+                                        ],
+                                        "topLevel" : true
+                                      }
+                                    ]
+                                  }
+                                </migration>
+                            </metadata>
+                        </xf:instance>
+
+                        <xf:submission
+                            xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"
+
+                            id="fr-test-submission"
+                            resource="echo:"
+
+                            validate="false"
+                            nonrelevant="keep"
+                            xxf:relevant-attribute="fr:relevant"
+                            xxf:annotate="relevant=fr:relevant"
+                            method="put"
+
+                            serialization="application/xml"
+
+                            ref="
+                                migration:dataMaybeMigratedFromEdge(
+                                    xxf:instance('fr-form-metadata')/application-name,
+                                    xxf:instance('fr-form-metadata')/form-name,
+                                    xxf:instance('fr-form-instance')/root(),
+                                    xxf:instance('fr-form-metadata')/root(),
+                                    '4.0.0',
+                                    false()
+                                )"
+                            replace="instance"
+                            instance="fr-test-submission-response"/>
+
+                        <xf:instance id="fr-test-submission-response">
+                            <_/>
+                        </xf:instance>
+
+                        <xf:action event="xforms-model-construct-done">
+                            <xf:send submission="fr-test-submission"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fr-test-submission-response" model-id="fr-form-model">
+                                <form>
+                                    <my-section>
+                                        <control-1/>
+                                        <control-2 xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:relevant="false"/>
+                                        <my-repeated-grid>
+                                            <control-3/>
+                                            <control-4 xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:relevant="false"/>
+                                        </my-repeated-grid>
+                                        <my-repeated-grid>
+                                            <control-3/>
+                                            <control-4 xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:relevant="false"/>
+                                        </my-repeated-grid>
+                                    </my-section>
+                                </form>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+</group>

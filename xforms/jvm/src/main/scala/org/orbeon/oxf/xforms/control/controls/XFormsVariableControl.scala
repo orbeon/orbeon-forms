@@ -57,7 +57,7 @@ class XFormsVariableControl(
   override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
 
   override def supportAjaxUpdates = false
-  override def focusableControls = Iterator.empty
+  override def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
@@ -108,7 +108,7 @@ class XFormsVariableControl(
     }
   }
 
-  override def isValueChangedCommit() = {
+  override def isValueChangedCommit(): Boolean = {
     val result = ! SaxonUtils.compareValueRepresentations(_previousValue, _value)
     _previousValue = _value
     result

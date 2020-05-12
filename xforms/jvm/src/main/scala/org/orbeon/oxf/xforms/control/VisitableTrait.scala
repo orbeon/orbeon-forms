@@ -14,9 +14,8 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -28,7 +27,7 @@ trait VisitableTrait extends XFormsControl {
   // Previous values for refresh
   private[this] var _wasVisited = false
 
-  override def visited = _visited
+  override def visited: Boolean = _visited
 
   def visited_=(visited: Boolean): Unit =
     if (visited != _visited && ! (visited && isStaticReadonly)) {
@@ -58,7 +57,7 @@ trait VisitableTrait extends XFormsControl {
     }
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean) = {
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
     _visited = state match {
       case Some(state) => state.visited
@@ -72,7 +71,7 @@ trait VisitableTrait extends XFormsControl {
     result
   }
 
-  override def commitCurrentUIState() = {
+  override def commitCurrentUIState(): Unit = {
     super.commitCurrentUIState()
     wasVisitedCommit()
   }
@@ -111,7 +110,7 @@ trait VisitableTrait extends XFormsControl {
     }
 
   // Dispatch change events (between the control becoming enabled and disabled)
-  override def dispatchChangeEvents() = {
+  override def dispatchChangeEvents(): Unit = {
     // Gather change first for consistency with XFormsSingleNodeControl
     val visitedChanged = wasVisitedCommit() != visited
 

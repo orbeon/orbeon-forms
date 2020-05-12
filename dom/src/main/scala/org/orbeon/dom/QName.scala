@@ -115,5 +115,5 @@ class QName private (val localName: String, val namespace: Namespace, val qualif
     }
 
   override def toString: String =
-    if (namespace.uri == "") localName else s"Q{$namespace.uri}$localName"
+    if (namespace.uri == "") localName else s"Q{${namespace.uri}}$localName"
 }

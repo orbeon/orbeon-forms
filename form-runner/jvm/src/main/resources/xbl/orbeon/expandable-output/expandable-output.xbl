@@ -29,13 +29,13 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance>
-                    <state>
+                    <_>
                         <full-value/>
                         <short-value/>
                         <show-full/>
                         <max-characters/>
                         <tolerance/>
-                    </state>
+                    </_>
                 </xf:instance>
                 <xf:var
                     name="model-max-characters"

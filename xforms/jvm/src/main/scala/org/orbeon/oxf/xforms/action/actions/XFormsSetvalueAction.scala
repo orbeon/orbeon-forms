@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.model.DataModel
@@ -31,10 +31,10 @@ class XFormsSetvalueAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val actionInterpreter = actionContext.interpreter
-    val actionElement = actionContext.element
+    val actionElement     = actionContext.element
+    val contextStack      = actionInterpreter.actionXPathContext
 
-    val containingDocument = actionInterpreter.containingDocument
-    val contextStack       = actionInterpreter.actionXPathContext
+    implicit val containingDocument: XFormsContainingDocument = actionInterpreter.containingDocument
 
     val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 
@@ -67,7 +67,6 @@ class XFormsSetvalueAction extends XFormsAction {
           nodeInfo   = node,
           newValue   = valueToSet,
           onSuccess  = oldValue => DataModel.logAndNotifyValueChange(
-            containingDocument = containingDocument,
             source             = "setvalue",
             nodeInfo           = node,
             oldValue           = oldValue,

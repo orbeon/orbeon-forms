@@ -201,7 +201,6 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
           nodeInfo  = writableNode,
           newValue  = newValue,
           onSuccess = oldValue => DataModel.logAndNotifyValueChange(
-            containingDocument = containingDocument,
             source             = "toggle",
             nodeInfo           = writableNode,
             oldValue           = oldValue,

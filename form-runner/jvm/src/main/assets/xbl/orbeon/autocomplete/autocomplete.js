@@ -43,7 +43,7 @@
 
             // This is mostly useful for the dynamic and resources cases, but this code is also useful in static mode, allowing us
             // to open the suggestions in static mode when the button is pressed
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(_.bind(this.ajaxResponseProcessed, this));
+            ORBEON.xforms.server.AjaxServer.addAjaxResponseProcessed(_.bind(this.ajaxResponseProcessed, this));
 
             // Build data source
             var dataSource;

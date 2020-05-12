@@ -192,17 +192,18 @@ class XFormsRepeatControl(
 
     // 3. Insert node into destination
     XFormsInsertAction.doInsert(
-      /* containingDocument    = */ containingDocument,
-      /* indentedLogger        = */ containingDocument.getControls.indentedLogger,
-      /* positionAttribute     = */ destinationBeforeAfter,
-      /* collectionToBeUpdated = */ destinationItemsCopy,
-      /* insertContextNodeInfo = */ null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
-      /* originItems           = */ List(deletedNodeInfo: Item).asJava,
-      /* insertionIndex        = */ actualDestinationIndex,
-      /* doClone               = */ false, // do not clone the node as we know the node it is ready for insertion
-      /* doDispatch            = */ true,
-      /* requireDefaultValues  = */ false,
-      /* searchForInstance     = */ true
+      /* containingDocument                = */ containingDocument,
+      /* indentedLogger                    = */ containingDocument.getControls.indentedLogger,
+      /* positionAttribute                 = */ destinationBeforeAfter,
+      /* collectionToBeUpdated             = */ destinationItemsCopy,
+      /* insertContextNodeInfo             = */ null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
+      /* originItems                       = */ List(deletedNodeInfo: Item).asJava,
+      /* insertionIndex                    = */ actualDestinationIndex,
+      /* doClone                           = */ false, // do not clone the node as we know the node it is ready for insertion
+      /* doDispatch                        = */ true,
+      /* requireDefaultValues              = */ false,
+      /* searchForInstance                 = */ true,
+      /* removeInstanceDataFromClonedNodes = */ true
     )
 
     // TODO: should dispatch xxforms-move instead of xforms-insert?

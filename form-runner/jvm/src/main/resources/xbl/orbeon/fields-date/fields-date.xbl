@@ -73,7 +73,7 @@
             <!-- Local model -->
             <xf:model id="date-model">
                 <xf:instance id="i">
-                    <date>
+                    <_>
                         <!-- Individual components of the date -->
                         <year/>
                         <month/>
@@ -82,7 +82,7 @@
                         <is-valid/>
                         <!-- Whether the values are readonly -->
                         <is-readonly/>
-                    </date>
+                    </_>
                 </xf:instance>
                 <!-- Set the validity on the whole instance -->
                 <xf:bind ref="." constraint="is-valid = 'true'"/>

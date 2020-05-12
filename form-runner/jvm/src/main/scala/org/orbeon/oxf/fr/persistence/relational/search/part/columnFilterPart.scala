@@ -15,35 +15,50 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, Request}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, Request}
 
 object columnFilterPart {
 
   def apply(request: Request) =
-    if (! request.columns.exists(_.filterWith.nonEmpty))
+    if (! request.columns.exists(_.filterType != FilterType.None))
         NilPart
     else
         StatementPart(
           sql =
             request.columns
-              // Just consider the columns for which we have a filter
-              .filter(_.filterWith.nonEmpty)
+              // Only consider column with a filter
+              .filter(_.filterType != FilterType.None)
               // Add index, used to refer the appropriate tf table
               .zipWithIndex
-              .map{ case (_, i) =>
-                s"""AND tf$i.data_id    =    c.data_id
-                   |AND tf$i.control    =    ?
-                   |AND ${Provider.textContains(request.provider, s"tf$i.val")}
-                   |""".stripMargin }
+              .flatMap { case (column, i) =>
+                val dataControlWhere =
+                  s"""AND tf$i.data_id = c.data_id
+                     |AND tf$i.control = ?
+                     |""".stripMargin
+                val valueWhere =
+                  column.filterType match {
+                    case FilterType.None              => List.empty
+                    case FilterType.Exact    (_)      => List(s"AND tf$i.val = ?")
+                    case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
+                    case FilterType.Token    (tokens) =>
+                      tokens.map { _ =>
+                        "AND " + Provider.textContains(request.provider, s"concat(' ', tf$i.val, ' ')")
+                      }
+                  }
+                dataControlWhere :: valueWhere
+              }
               .mkString(" "),
-          setters =
-            request.columns
-              // Just consider the columns for which we have a filter
-              .collect { case Column(path, Some(filter)) =>
-                List[Setter](
-                  _.setString(_, path),
-                  _.setString(_, s"%${filter.toLowerCase}%")
-                )}
-              .flatten
+          setters = {
+            val values =
+              request.columns.flatMap { case Column(path, matchType) =>
+                matchType match {
+                  case FilterType.None              => List.empty
+                  case FilterType.Exact(filter)     => path :: List(filter.toLowerCase)
+                  case FilterType.Substring(filter) => path :: List(s"%${filter.toLowerCase}%")
+                  case FilterType.Token(tokens)     => path :: tokens.map(token => s"% $token %")
+                }
+              }
+            values.map(value => (_.setString(_, value)): Setter)
+          }
         )
 }

@@ -19,7 +19,7 @@ package org.orbeon.oxf.fr.excel
 import java.math.BigInteger
 
 
-object FPNumber {
+private object FPNumber {
 
   // TODO - what about values between (10<sup>14</sup>-0.5) and (10<sup>14</sup>-0.05) ?
   /**
@@ -35,22 +35,22 @@ object FPNumber {
    *
    * This frac value rounds to '1' followed by fourteen zeros with an incremented decimal exponent
    */
-  private val BigMinBase = new BigInteger("0B5E620F47FFFE666", 16)
+  val BigMinBase = new BigInteger("0B5E620F47FFFE666", 16)
 
   /**
    * For 'Base-10 normalised form'
    * The maximum `_frac` value when `_binaryExponent` == 49
    * (10^15-0.5) * 2^14
    */
-  private val BigMaxBase = new BigInteger("0E35FA9319FFFE000", 16)
+  val BigMaxBase = new BigInteger("0E35FA9319FFFE000", 16)
 
   // Width of a long
-  private val C64 = 64
+  val C64 = 64
 
   // Minimum precision after discarding whole 32-bit words from the significand
-  private val MinPrecision = 72
+  val MinPrecision = 72
 
-  private object Rounder {
+  object Rounder {
 
     private val HalfBits: Array[BigInteger] = {
       val bis = new Array[BigInteger](33)
@@ -73,7 +73,7 @@ object FPNumber {
   }
 
   // Holds values for quick multiplication and division by 10
-  private object TenPower {
+  object TenPower {
 
     private val Five = new BigInteger("5")
     private val _cache = new Array[TenPower](350)
@@ -92,33 +92,34 @@ object FPNumber {
       val fivePowIndex = Five.pow(index)
 
       var bitsDueToFiveFactors = fivePowIndex.bitLength
-      val px = 80 + bitsDueToFiveFactors
-      val fx = BigInteger.ONE.shiftLeft(px).divide(fivePowIndex)
-      val adj = fx.bitLength - 80
-      val _divisor = fx.shiftRight(adj)
+      val px      = 80 + bitsDueToFiveFactors
+      val fx      = BigInteger.ONE.shiftLeft(px).divide(fivePowIndex)
+      val adj     = fx.bitLength - 80
+      val divisor = fx.shiftRight(adj)
+
       bitsDueToFiveFactors -= adj
 
-      val _divisorShift = -(bitsDueToFiveFactors + index + 80)
+      val divisorShift = -(bitsDueToFiveFactors + index + 80)
 
       val sc = fivePowIndex.bitLength - 68
       if (sc > 0)
         TenPower(
           fivePowIndex.shiftRight(sc),
-          _divisor,
-          _divisorShift,
+          divisor,
+          divisorShift,
           index + sc
         )
       else
         TenPower(
           fivePowIndex,
-          _divisor,
-          _divisorShift,
+          divisor,
+          divisorShift,
           index
         )
     }
   }
 
-  private case class TenPower(
+  case class TenPower(
     multiplicand    : BigInteger,
     divisor         : BigInteger,
     divisorShift    : Int,
@@ -128,13 +129,15 @@ object FPNumber {
 
 case class FPNumber(significand: BigInteger, binaryExponent: Int) {
 
+  import FPNumber._
+
   def normalise64bit: FPNumber = {
 
     var newSignificand    = significand
     var newBinaryExponent = binaryExponent
 
     var oldBitLen = newSignificand.bitLength
-    var sc = oldBitLen - FPNumber.C64
+    var sc = oldBitLen - C64
 
     if (sc == 0) {
       this
@@ -150,7 +153,7 @@ case class FPNumber(significand: BigInteger, binaryExponent: Int) {
       }
       if (sc < 1)
         throw new IllegalStateException
-      newSignificand = FPNumber.Rounder.round(newSignificand, sc)
+      newSignificand = Rounder.round(newSignificand, sc)
       if (newSignificand.bitLength > oldBitLen) {
         sc += 1
         newBinaryExponent += 1
@@ -162,28 +165,28 @@ case class FPNumber(significand: BigInteger, binaryExponent: Int) {
   }
 
   def get64BitNormalisedExponent: Int =
-    binaryExponent + significand.bitLength - FPNumber.C64
+    binaryExponent + significand.bitLength - C64
 
   def isBelowMaxRep: Boolean = {
-    val sc = significand.bitLength - FPNumber.C64
-    significand.compareTo(FPNumber.BigMaxBase.shiftLeft(sc)) < 0
+    val sc = significand.bitLength - C64
+    significand.compareTo(BigMaxBase.shiftLeft(sc)) < 0
   }
 
   def isAboveMinRep: Boolean = {
-    val sc = significand.bitLength - FPNumber.C64
-    significand.compareTo(FPNumber.BigMinBase.shiftLeft(sc)) > 0
+    val sc = significand.bitLength - C64
+    significand.compareTo(BigMinBase.shiftLeft(sc)) > 0
   }
 
   def createNormalisedDecimal(pow10: Int): NormalisedDecimal = {
     // missingUnderBits is (0..3)
     val missingUnderBits = binaryExponent - 39
     val fracPart = (significand.intValue << missingUnderBits) & 0xFFFF80
-    val wholePart = significand.shiftRight(FPNumber.C64 - binaryExponent - 1).longValue
+    val wholePart = significand.shiftRight(C64 - binaryExponent - 1).longValue
     new NormalisedDecimal(wholePart, fracPart, pow10)
   }
 
   def multiplyByPowerOfTen(pow10: Int): FPNumber = {
-    val tp = FPNumber.TenPower(Math.abs(pow10))
+    val tp = TenPower(Math.abs(pow10))
     if (pow10 < 0)
       mulShift(tp.divisor, tp.divisorShift)
     else
@@ -201,7 +204,7 @@ case class FPNumber(significand: BigInteger, binaryExponent: Int) {
     newSignificand = newSignificand.multiply(multiplicand)
     newBinaryExponent += multiplierShift
     // check for too much precision
-    val sc = (newSignificand.bitLength - FPNumber.MinPrecision) & 0xFFFFFFE0
+    val sc = (newSignificand.bitLength - MinPrecision) & 0xFFFFFFE0
     // mask makes multiples of 32 which optimises BigInteger.shiftRight
     if (sc > 0) { // no need to round because we have at least 8 bits of extra precision
       newSignificand = newSignificand.shiftRight(sc)

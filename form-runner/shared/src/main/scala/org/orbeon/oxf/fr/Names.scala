@@ -39,6 +39,7 @@ object Names {
 
   val AppName             = "application-name"
   val FormName            = "form-name"
+  val FormVersion         = "form-version"
   val CreatedWithVersion  = "created-with-version"
 
   val LibraryFormName     = "library"

@@ -121,7 +121,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
   def getUploadUniqueId: String = getEffectiveId
 
-  // Called either upon Ajax xxforms-upload-done or upon client form POST (`replace="all"`)
+  // Called either upon Ajax `xxforms-upload-done` or upon client form POST (`replace="all"`)
   def handleUploadedFile(value: String, filename: String, mediatype: String, size: String): Unit =
     if (size != "0" || filename != "") {
       // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)

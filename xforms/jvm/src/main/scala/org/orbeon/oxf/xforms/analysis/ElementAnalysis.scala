@@ -14,20 +14,22 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
+import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsId
 
+import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.control.Breaks
@@ -47,13 +49,13 @@ abstract class ElementAnalysis(
   val preceding : Option[ElementAnalysis]
 ) extends ElementEventHandlers with ElementRepeats {
 
-  self =>
+  selfElement =>
 
   import ElementAnalysis._
 
   require(element ne null)
 
-  implicit def logger = part.getIndentedLogger
+  implicit def logger: IndentedLogger = part.getIndentedLogger
 
   // xml:lang, inherited from parent unless overridden locally
   lazy val lang: Option[LangRef] = {
@@ -69,14 +71,14 @@ abstract class ElementAnalysis(
       Some(LiteralLangRef(lang))
     else {
       val staticId   = lang.substring(1)
-      val prefixedId = XFormsId.getRelatedEffectiveId(self.prefixedId, staticId)
+      val prefixedId = XFormsId.getRelatedEffectiveId(selfElement.prefixedId, staticId)
       Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
     }
 
   val namespaceMapping: NamespaceMapping
 
   // Element local name
-  def localName = element.getName
+  def localName: String = element.getName
 
   // Scope and model
   val scope: Scope
@@ -85,14 +87,15 @@ abstract class ElementAnalysis(
   // In-scope variables (for XPath analysis)
   val inScopeVariables: Map[String, VariableTrait]
 
-  def removeFromParent() =
+  def removeFromParent(): Unit =
     parent foreach
-      { case parent: ChildrenBuilderTrait => parent.removeChild(self); case _ => }
+      { case parent: ChildrenBuilderTrait => parent.removeChild(selfElement); case _ => }
 
   lazy val treeInScopeVariables: Map[String, VariableTrait] = {
 
+    @tailrec
     def findPreceding(element: ElementAnalysis): Option[ElementAnalysis] = element.preceding match {
-      case Some(preceding) if preceding.scope == self.scope => Some(preceding)
+      case Some(preceding) if preceding.scope == selfElement.scope => Some(preceding)
       case Some(preceding) => findPreceding(preceding)
       case None => element.parent match {
         case Some(parent: Model) =>
@@ -102,7 +105,7 @@ abstract class ElementAnalysis(
       }
     }
 
-    findPreceding(self) match {
+    findPreceding(selfElement) match {
       case Some(preceding: VariableAnalysisTrait) => preceding.treeInScopeVariables + (preceding.name -> preceding)
       case Some(preceding) => preceding.treeInScopeVariables
       case None => Map.empty
@@ -124,21 +127,22 @@ abstract class ElementAnalysis(
   def containerScope: Scope
 
   // Ids
-  val staticId = getElementId(element)
-  val prefixedId = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
+  val staticId  : String = getElementId(element)
+  val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
 
   // Location
-  val locationData = ElementAnalysis.createLocationData(element)
+  val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
 
   // Element attributes: @context, @ref, @bind, @value
-  val context = element.attributeValueOpt(XFormsConstants.CONTEXT_QNAME)
-  val ref = ElementAnalysis.getBindingExpression(element)
-  val bind = element.attributeValueOpt(XFormsConstants.BIND_QNAME)
-  val value = element.attributeValueOpt(XFormsConstants.VALUE_QNAME)
+  val context: Option[String] = element.attributeValueOpt(XFormsConstants.CONTEXT_QNAME)
+  val ref    : Option[String] = ElementAnalysis.getBindingExpression(element)
+  val bind   : Option[String] = element.attributeValueOpt(XFormsConstants.BIND_QNAME)
+  val value  : Option[String] = element.attributeValueOpt(XFormsConstants.VALUE_QNAME)
 
   // Other
-  def hasBinding = ref.isDefined || bind.isDefined
-  val bindingXPathEvaluations = (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
+  def hasBinding: Boolean = ref.isDefined || bind.isDefined
+  val bindingXPathEvaluations: Int =
+    (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
 
   // Classes (not used at this time)
   val classes = ""
@@ -163,11 +167,11 @@ abstract class ElementAnalysis(
   private var _bindingAnalyzed = false
   private var valueAnalysis: Option[XPathAnalysis] = None
   private var _valueAnalyzed = false
-  def valueAnalyzed = _valueAnalyzed
+  def valueAnalyzed: Boolean = _valueAnalyzed
 
-  final def getContextAnalysis = { assert(_contextAnalyzed); contextAnalysis }
-  final def getBindingAnalysis = { assert(_bindingAnalyzed); bindingAnalysis }
-  final def getValueAnalysis   = { assert(_valueAnalyzed)  ; valueAnalysis   }
+  final def getContextAnalysis: Option[XPathAnalysis] = { assert(_contextAnalyzed); contextAnalysis }
+  final def getBindingAnalysis: Option[XPathAnalysis] = { assert(_bindingAnalyzed); bindingAnalysis }
+  final def getValueAnalysis  : Option[XPathAnalysis] = { assert(_valueAnalyzed)  ; valueAnalysis   }
 
   def analyzeXPath(): Unit = {
     contextAnalysis = computeContextAnalysis
@@ -189,14 +193,14 @@ abstract class ElementAnalysis(
    */
   def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
 
-  val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
+  val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   def toXMLAttributes: Seq[(String, String)] = Seq(
     "scope"             -> scope.scopeId,
     "prefixed-id"       -> prefixedId,
     "model-prefixed-id" -> (model map (_.prefixedId) orNull),
     "binding"           -> hasBinding.toString,
-    "value"             -> self.isInstanceOf[ValueTrait].toString,
+    "value"             -> selfElement.isInstanceOf[ValueTrait].toString,
     "name"              -> element.attributeValue("name")
   )
 
@@ -239,7 +243,7 @@ abstract class ElementAnalysis(
 
 trait ElementEventHandlers {
 
-  element: ElementAnalysis =>
+  selfElement: ElementAnalysis =>
 
   import ElementAnalysis._
   import ElementAnalysis.propagateBreaks.{break, breakable}
@@ -282,16 +286,15 @@ trait ElementEventHandlers {
     handlersForObserver(observer) exists (_.isPhantom)
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
-  private[analysis] def relevantObserversFromLeafToRoot: List[ElementAnalysis] = {
+  protected def relevantObserversFromLeafToRoot: List[ElementAnalysis] = {
 
     def observersInAncestorParts =
       part.elementInParent.toList flatMap (_.relevantObserversFromLeafToRoot)
 
     def relevant(observer: ElementAnalysis) =
-      observer.scope == element.scope || hasPhantomHandler(observer)
+      observer.scope == selfElement.scope || hasPhantomHandler(observer)
 
-    (ancestorOrSelfIterator(element) filter relevant) ++: observersInAncestorParts
+    (ancestorOrSelfIterator(selfElement) filter relevant) ++: observersInAncestorParts
   }
 
   // Find all the handlers for the given event name if an event with that name is dispatched to this element.
@@ -301,8 +304,14 @@ trait ElementEventHandlers {
     // NOTE: For `phase == Target`, `observer eq element`.
     def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
 
-      // FIXME: This seems wrong!
-      val isPhantom = observer.scope != element.scope
+      // We gather observers with `relevantObserversFromLeafToRoot` and either:
+      //
+      // - they have the same XBL scope
+      // - OR there is at least one phantom handler for that observer
+      //
+      // So if the scopes are different, we must require that the handler is a phantom handler
+      // (and therefore ignore handlers on that observer which are not phantom handlers).
+      val requirePhantomHandler = observer.scope != selfElement.scope
 
       def matchesPhaseNameTarget(eventHandler: EventHandler) =
         (
@@ -310,10 +319,10 @@ trait ElementEventHandlers {
           eventHandler.isTargetPhase      && phase == Target  ||
           eventHandler.isBubblingPhase    && phase == Bubbling
         ) &&
-          eventHandler.isMatchByNameAndTarget(eventName, element.prefixedId)
+          eventHandler.isMatchByNameAndTarget(eventName, selfElement.prefixedId)
 
       def matches(eventHandler: EventHandler) =
-        if (isPhantom) // FIXME: This seems wrong!
+        if (requirePhantomHandler)
           eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
         else
           matchesPhaseNameTarget(eventHandler)
@@ -322,13 +331,13 @@ trait ElementEventHandlers {
 
       // DOM 3:
       //
-      // - stopPropagation: "Prevents other event listeners from being triggered but its effect must be deferred
+      // - `stopPropagation`: "Prevents other event listeners from being triggered but its effect must be deferred
       //   until all event listeners attached on the Event.currentTarget have been triggered."
-      // - preventDefault: "the event must be canceled, meaning any default actions normally taken by the
+      // - `preventDefault`: "the event must be canceled, meaning any default actions normally taken by the
       //   implementation as a result of the event must not occur"
       // - NOTE: DOM 3 introduces also stopImmediatePropagation
-      val propagate            = relevantHandlers forall (_.isPropagate)
-      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction)
+      val propagate            = relevantHandlers forall (_.propagate == Propagate.Continue)
+      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction == Perform.Perform)
 
       // See https://github.com/orbeon/orbeon-forms/issues/3844
       def placeInnerHandlersFirst(handlers: List[EventHandler]): List[EventHandler] = {
@@ -415,10 +424,10 @@ trait ElementRepeats {
 
   // This control's closest ancestor in the same scope
   // NOTE: This doesn't need to go across parts, because parts don't share scopes at this time.
-  lazy val ancestorRepeatInScope = ancestorRepeats find (_.scope == scope)
+  lazy val ancestorRepeatInScope: Option[RepeatControl] = ancestorRepeats find (_.scope == scope)
 
   // Whether this is within a repeat
-  def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
+  def isWithinRepeat: Boolean = ancestorRepeatsAcrossParts.nonEmpty
 }
 
 object ElementAnalysis {
@@ -432,14 +441,16 @@ object ElementAnalysis {
    *
    * NOTE: As in XPath, this does not include ancestors of the element.
    */
-  def getClosestPrecedingInScope(element: ElementAnalysis)(scope: Scope = element.scope): Option[ElementAnalysis] = element.preceding match {
-    case Some(preceding) if preceding.scope == scope => Some(preceding)
-    case Some(preceding) => getClosestPrecedingInScope(preceding)(scope)
-    case None => element.parent match {
-      case Some(parent) => getClosestPrecedingInScope(parent)(scope)
-      case _ => None
+  @tailrec
+  def getClosestPrecedingInScope(element: ElementAnalysis)(scope: Scope = element.scope): Option[ElementAnalysis] =
+    element.preceding match {
+      case Some(preceding) if preceding.scope == scope => Some(preceding)
+      case Some(preceding) => getClosestPrecedingInScope(preceding)(scope)
+      case None => element.parent match {
+        case Some(parent) => getClosestPrecedingInScope(parent)(scope)
+        case _ => None
+      }
     }
-  }
 
   abstract class IteratorBase(start: ElementAnalysis) extends Iterator[ElementAnalysis] {
 
@@ -448,8 +459,8 @@ object ElementAnalysis {
 
     private[this] var theNext = initialNext
 
-    def hasNext = theNext.isDefined
-    def next() = {
+    def hasNext: Boolean = theNext.isDefined
+    def next(): ElementAnalysis = {
       val newResult = theNext.get
       theNext = subsequentNext(newResult)
       newResult
@@ -460,24 +471,24 @@ object ElementAnalysis {
    * Return an iterator over all the element's ancestors.
    */
   def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext = start.parent
-    def subsequentNext(e: ElementAnalysis) = e.parent
+    def initialNext: Option[ElementAnalysis] = start.parent
+    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.parent
   }
 
   /**
    * Iterator over the element and all its ancestors.
    */
   def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext = Option(start)
-    def subsequentNext(e: ElementAnalysis) = e.parent
+    def initialNext: Option[ElementAnalysis] = Option(start)
+    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.parent
   }
 
   /**
    * Iterator over the element's preceding siblings.
    */
   def precedingSiblingIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext = start.preceding
-    def subsequentNext(e: ElementAnalysis) = e.preceding
+    def initialNext: Option[ElementAnalysis] = start.preceding
+    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.preceding
   }
 
   /**
@@ -530,6 +541,6 @@ object ElementAnalysis {
   /**
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
-  def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping) =
-    attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping.asJava, _, true))
+  def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
+    attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping.asJava, _, unprefixedIsNoNamespace = true))
 }

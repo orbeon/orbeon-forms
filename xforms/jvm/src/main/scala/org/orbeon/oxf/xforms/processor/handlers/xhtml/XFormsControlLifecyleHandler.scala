@@ -74,7 +74,15 @@ abstract class XFormsControlLifecyleHandler(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName,
-          getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
+          getContainerAttributes(
+            uri,
+            localname,
+            attributes,
+            getPrefixedId,
+            getEffectiveId,
+            currentControl,
+            Option(getStaticLHHA(getPrefixedId, LHHA.Label))
+          )
         )
 
       // 2012-12-17: Removed nested `<a name="effective-id">` because the enclosing `<span`> for the control has the

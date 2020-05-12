@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.datatypes.Mediatype
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLParsing}
 import org.xml.sax.Attributes
@@ -57,6 +59,22 @@ object Mediatypes {
     } yield
       mapping.extension
 
+  def fromHeadersOrFilename(
+    header  : String => Option[String],
+    filename: => Option[String]
+  ): Option[Mediatype] = {
+
+    def fromHeaders =
+      header(Headers.ContentType)            flatMap
+        ContentTypes.getContentTypeMediaType filterNot
+        (_ == ContentTypes.OctetStreamContentType)
+
+    def fromFilename =
+      filename flatMap findMediatypeForPath
+
+    fromHeaders orElse fromFilename flatMap Mediatype.unapply
+  }
+
   private object Private {
 
     class MimeTypesContentHandler extends ForwardingXMLReceiver {
@@ -70,7 +88,7 @@ object Mediatypes {
 
       private var buffer = ListBuffer[Mapping]()
 
-      def resultAsList = buffer.result()
+      def resultAsList: List[Mapping] = buffer.result()
 
       private def extensionFromPattern(pattern: String) =
         pattern.toLowerCase.trimAllToOpt flatMap findExtension getOrElse ""

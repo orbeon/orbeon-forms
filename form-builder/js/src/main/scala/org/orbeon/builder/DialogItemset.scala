@@ -36,7 +36,7 @@ object DialogItemset {
         val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
         val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
 
-        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
+        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isAllBlank)) {
           DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>
             DocumentAPI.setValue(valueXFormsInput, suggestedValue)
           }

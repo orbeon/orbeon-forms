@@ -18,12 +18,13 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import shapeless.syntax.typeable._
 
+
 class XXFormsItemset extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): Item = {
+  override def evaluateItem(xpathContext: XPathContext): om.Item = {
 
     implicit val ctx: XPathContext = xpathContext
 
@@ -40,16 +41,28 @@ class XXFormsItemset extends XFormsFunction {
 
         val controlValueForSelection =
           if (selected)
-            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData
+            select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData map { v =>
+              (v, XFormsSelect1Control.attCompare(select1Control.boundNodeOpt, _))
+            }
           else
             None
 
         if (format == "json")
           // Return a string
-          itemset.asJSON(controlValueForSelection, select1Control.mustEncodeValues, control.getLocationData): Item
+          itemset.asJSON(
+            controlValue               = controlValueForSelection,
+            encode                     = select1Control.mustEncodeValues,
+            excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+            locationData               = control.getLocationData
+          ): om.Item
         else
           // Return an XML document
-          itemset.asXML(ctx.getConfiguration, controlValueForSelection, control.getLocationData): Item
+          itemset.asXML(
+            configuration              = ctx.getConfiguration,
+            controlValue               = controlValueForSelection,
+            excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+            locationData               = control.getLocationData
+          ): om.Item
       }
 
     jsonOrXMLOpt.orNull

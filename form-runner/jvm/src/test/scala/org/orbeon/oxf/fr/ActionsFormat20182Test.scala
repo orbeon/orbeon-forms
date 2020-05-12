@@ -48,7 +48,7 @@ class ActionsFormat20182Test
                   assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
                   assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
                 case None =>
-                  assert(value.isBlank)
+                  assert(value.isAllBlank)
               }
             }
           }

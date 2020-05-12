@@ -81,12 +81,12 @@ trait MigrationOps {
     jsonString : String
   ): M
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : M
   ): MigrationResult
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : M
   ): MigrationResult

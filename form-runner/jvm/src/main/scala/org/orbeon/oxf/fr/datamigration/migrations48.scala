@@ -110,7 +110,7 @@ object MigrationOps48 extends MigrationOps {
     MigrationSet48(migrations.flatten.to(List))
   }
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult = {
@@ -130,9 +130,10 @@ object MigrationOps48 extends MigrationOps {
           (container / * toList) map (iteration => (iteration /@ @*) ++ (iteration / Node) toList) // force
 
         insert(
-          after      = container,
-          origin     = contentForEachIteration map (elementInfo(container.name, _)),
-          doDispatch = false
+          after                             = container,
+          origin                            = contentForEachIteration map (elementInfo(container.name, _, removeInstanceDataFromClonedNodes = false)),
+          doDispatch                        = false,
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4519
         )
 
         delete(
@@ -144,7 +145,7 @@ object MigrationOps48 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult =

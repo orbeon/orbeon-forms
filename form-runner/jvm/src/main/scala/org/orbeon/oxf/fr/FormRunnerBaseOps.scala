@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -27,6 +28,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.PathUtils._
 
 import scala.util.Try
 
@@ -333,6 +335,20 @@ trait FormRunnerBaseOps {
   def errorMessage(message: String): Unit =
     dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" -> Some(message)))
 
+  def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
+
+    def baseUrlFromProperty: Option[String] =
+      propertySet.getNonBlankString("oxf.fr.external-base-url")
+
+    def baseUrlFromContext: String =
+      URLRewriterUtils.rewriteURL(
+        req,
+        "/",
+        URLRewriter.REWRITE_MODE_ABSOLUTE
+      )
+
+    (baseUrlFromProperty getOrElse baseUrlFromContext).appendSlash
+  }
 }
 
 object FormRunnerBaseOps extends FormRunnerBaseOps

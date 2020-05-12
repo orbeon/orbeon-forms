@@ -642,7 +642,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val someNode = params.headOption orElse existingParams.headOption get
         val config   = someNode.getConfiguration
 
-        ! SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator)
+        ! SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator, excludeWhitespaceTextNodes = false)
       }
     }
 

@@ -762,7 +762,7 @@
         </output>
     </test>
 
-    <test description="Readonly xf:textarea has disabled attribute" name="oxf:pipeline">
+    <test description="Readonly xf:textarea has `readonly` attribute" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -790,7 +790,7 @@
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span id="my-new-textarea" class="xforms-control xforms-textarea xforms-invalid xforms-readonly xforms-required xforms-filled xforms-type-NCName">
                     <xh:label class="xforms-label" for="my-new-textarea≡≡c">My label</xh:label>
-                    <xh:textarea id="my-new-textarea≡≡c" name="my-new-textarea" disabled="disabled" aria-required="true" aria-invalid="true">Hello!</xh:textarea>
+                    <xh:textarea id="my-new-textarea≡≡c" name="my-new-textarea" readonly="readonly" aria-required="true" aria-invalid="true">Hello!</xh:textarea>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
@@ -1171,7 +1171,7 @@
         </output>
     </test>
 
-    <test description="Placement of HTML @disabled attribute with non-relevant, readonly, and case visibility" name="oxf:pipeline">
+    <test description="Placement of HTML `readonly` attribute with non-relevant, readonly, and case visibility" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -1258,7 +1258,7 @@
                     </xh:span>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
-                        <xh:input id="s1c1i3≡xforms-input-1" type="text" name="s1c1i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                        <xh:input id="s1c1i3≡xforms-input-1" type="text" name="s1c1i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                     </xh:span>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="xforms-case-end-s1c1" class="xforms-case-begin-end"/>
@@ -1273,7 +1273,7 @@
                     </xh:span>
                     <xh:span class="xforms-case-selected"/>
                     <xh:span id="s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
-                        <xh:input id="s1c2i3≡xforms-input-1" type="text" name="s1c2i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                        <xh:input id="s1c2i3≡xforms-input-1" type="text" name="s1c2i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                     </xh:span>
                     <xh:span class="xforms-case-selected"/>
                     <xh:span id="xforms-case-end-s1c2" class="xforms-case-begin-end"/>
@@ -1293,7 +1293,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="s2c1s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
-                            <xh:input id="s2c1s1c1i3≡xforms-input-1" type="text" name="s2c1s1c1i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                            <xh:input id="s2c1s1c1i3≡xforms-input-1" type="text" name="s2c1s1c1i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                         </xh:span>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="xforms-case-end-s2c1s1c1" class="xforms-case-begin-end"/>
@@ -1308,7 +1308,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="s2c1s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
-                            <xh:input id="s2c1s1c2i3≡xforms-input-1" type="text" name="s2c1s1c2i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                            <xh:input id="s2c1s1c2i3≡xforms-input-1" type="text" name="s2c1s1c2i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                         </xh:span>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="xforms-case-end-s2c1s1c2" class="xforms-case-begin-end"/>
@@ -1329,7 +1329,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="s2c2s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
-                            <xh:input id="s2c2s1c1i3≡xforms-input-1" type="text" name="s2c2s1c1i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                            <xh:input id="s2c2s1c1i3≡xforms-input-1" type="text" name="s2c2s1c1i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                         </xh:span>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="xforms-case-end-s2c2s1c1" class="xforms-case-begin-end"/>
@@ -1344,7 +1344,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="s2c2s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
-                            <xh:input id="s2c2s1c2i3≡xforms-input-1" type="text" name="s2c2s1c2i3≡xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                            <xh:input id="s2c2s1c2i3≡xforms-input-1" type="text" name="s2c2s1c2i3≡xforms-input-1" value="" class="xforms-input-input" readonly="readonly"/>
                         </xh:span>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="xforms-case-end-s2c2s1c2" class="xforms-case-begin-end"/>

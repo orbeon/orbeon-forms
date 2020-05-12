@@ -41,7 +41,7 @@ class XFormsOutputControl(
   id        : String
 ) extends XFormsSingleNodeControl(container, parent, element, id)
   with XFormsValueControl
-  with FocusableTrait
+  with ReadonlyFocusableTrait
   with VisitableTrait
   with FileMetadata {
 
@@ -206,7 +206,7 @@ class XFormsOutputControl(
   override def getRelevantEscapedExternalValue: String =
     if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype)) {
       val externalValue = getExternalValue
-      if (externalValue.nonBlank) {
+      if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
@@ -234,8 +234,8 @@ class XFormsOutputControl(
 
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
   // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
-  override def isFocusable: Boolean =
-    isRelevant && staticControl.hasLHHA(LHHA.Label)
+  override def isDirectlyFocusable: Boolean =
+    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusable
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)

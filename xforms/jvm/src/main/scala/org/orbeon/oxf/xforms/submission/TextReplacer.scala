@@ -120,17 +120,16 @@ object TextReplacer {
           submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).rootElement
       }
 
-
     def handleSetValueSuccess(oldValue: String): Unit =
       DataModel.logAndNotifyValueChange(
-        containingDocument = containingDocument,
         source             = "submission",
         nodeInfo           = destinationNodeInfo,
         oldValue           = oldValue,
         newValue           = value,
         isCalculate        = false,
         collector          = Dispatch.dispatchEvent)(
-        containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
+        containingDocument = containingDocument,
+        logger             = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
       )
 
     def handleSetValueError(reason: Reason) =

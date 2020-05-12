@@ -15,13 +15,10 @@
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <!--
@@ -60,6 +57,93 @@
                     </fr:dropdown-date>
                 </view>
             </templates>
+            <control-details>
+                <xf:model xmlns="">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="(instance()/@*[name() = name($c)], $c/@default)[1]"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <start-year default=""/>
+                            <end-year   default=""/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="start-year | end-year"
+                            xxf:whitespace="trim"
+                            type="xxf:xpath2"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <start-year>Start date</start-year>
+                                <end-year>End date</end-year>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <start-year>Date de début</start-year>
+                                <end-year>Date de fin</end-year>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-dropdown-date-grid">
+                    <fr:c x="1" y="1" w="12">
+                        <xf:input ref="instance('local')/start-year" id="start-year-control">
+                            <xf:label ref="xxf:r('start-year')"/>
+                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                        </xf:input>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="12">
+                        <xf:input ref="instance('local')/end-year" id="end-year-control">
+                            <xf:label ref="xxf:r('end-year')"/>
+                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                        </xf:input>
+                    </fr:c>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-download-action"
+                    event="xforms-value-changed"
+                    observer="
+                        start-year-control
+                        end-year-control">
+
+                    <xf:var
+                        name="name"
+                        value="name(event('xxf:binding'))"/>
+
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $binding := event('xxf:binding'),
+                                $v       := string($binding),
+                                $default := $binding/@default/string()
+                            return
+                                if ($v != $default) then
+                                    $v
+                                else
+                                    ()
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>
@@ -77,7 +161,7 @@
             <!-- Local model -->
             <xf:model id="date-model">
                 <xf:instance id="i">
-                    <date>
+                    <_>
                         <!-- Individual components of the date -->
                         <year/>
                         <month/>
@@ -86,7 +170,7 @@
                         <is-valid/>
                         <!-- Whether the values are readonly -->
                         <is-readonly/>
-                    </date>
+                    </_>
                 </xf:instance>
 
                 <!-- Make instance read-only when the form must be read-only -->
@@ -94,39 +178,46 @@
 
                 <!-- Q: Could we have a global instance? Only for the same start/end. -->
                 <xf:instance id="years-itemset">
-                    <years start="" end=""/>
+                    <_ start="" end=""/>
                 </xf:instance>
 
                 <!-- Would be good to have a global instance -->
                 <xf:instance id="months-itemset">
-                    <months/>
+                    <_/>
                 </xf:instance>
 
                 <!-- Would be good to have a global instance -->
                 <xf:instance id="days-itemset">
-                    <days/>
+                    <_/>
                 </xf:instance>
 
                 <!-- Initialize itemsets upon initialization -->
-                <!-- Only do this if not initialized yet. See https://github.com/orbeon/orbeon-forms/issues/2993. Remove `if` once #2994 is fixed. -->
+                <!--
+                    Only do this if not initialized yet.
+                    See https://github.com/orbeon/orbeon-forms/issues/2993.
+                    Remove `if` once #2994 is fixed.
+                -->
                 <xf:action ev:event="xforms-model-construct-done" if="empty(instance('years-itemset')/*)">
 
-                    <!-- Figure start-end years -->
+                    <!--
+                        Compute start and end years
+                        See https://github.com/orbeon/orbeon-forms/issues/4501
+                    -->
                     <xf:action iterate="instance('years-itemset')/@*">
                         <xf:var name="start-end" value="."/>
-                        <xf:var name="prop-name" value="concat('oxf.xforms.xbl.fr.dropdown-date.', local-name($start-end), '-year')"/>
-                        <!-- If in Form Runner, try using app/form property -->
-                        <xf:action if="exists(xxf:instance('fr-form-instance'))">
-                            <xf:setvalue
-                                ref="$start-end"
-                                value="saxon:evaluate(xxf:property(string-join(($prop-name, fr:app-name(), fr:form-name()), '.')))"/>
-                        </xf:action>
-                        <!-- In all cases, if we haven't found an app/form property, use the global property -->
                         <xf:setvalue
-                            if="$start-end = ''"
                             ref="$start-end"
-                            value="saxon:evaluate(xxf:property($prop-name))"/>
+                            value="
+                                let $param-name := concat(local-name($start-end), '-year'),
+                                    $r          := trace(fr:component-param-value($param-name), .)
+                                return
+                                    if ($r castable as xs:integer) then
+                                        $r cast as xs:integer
+                                    else
+                                        saxon:evaluate($r) (: for backward compatibility :)
+                            "/>
                     </xf:action>
+
                     <xf:var name="start-year" value="instance('years-itemset')/@start" as="xs:integer"/>
                     <xf:var name="end-year"   value="instance('years-itemset')/@end  " as="xs:integer"/>
 

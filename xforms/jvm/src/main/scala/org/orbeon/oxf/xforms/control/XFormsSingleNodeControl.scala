@@ -403,7 +403,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // distinction between value controls and plain single-node controls. However it seems that it is
   // still reasonable to dispatch those events to xf:group, xf:switch, and even repeat
   // iterations if they are bound.
-  override def dispatchChangeEvents() = {
+  override def dispatchChangeEvents(): Unit = {
 
     super.dispatchChangeEvents()
 

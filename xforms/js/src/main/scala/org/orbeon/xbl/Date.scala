@@ -17,7 +17,7 @@ import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxEvent, EventNames, Language}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Language}
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -50,8 +50,8 @@ private class DateCompanion extends XBLCompanionWithState {
     scribe.debug("init")
 
     // Add `readonly` attribute on the input if the control is readonly
-    val isReadonly = $(containerElem).is(".xforms-readonly")
-    xformsUpdateReadonly(isReadonly)
+    val isReadonly = containerElem.classList.contains("xforms-readonly")
+    updateReadonly(isReadonly)
 
     if (iOS) {
       // On iOS, use native date picker
@@ -129,7 +129,7 @@ private class DateCompanion extends XBLCompanionWithState {
   }
 
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
-    inputEl.prop("disabled", readonly)
+    updateReadonly(readonly)
 
   override def xformsFocus(): Unit =
     inputEl.focus()
@@ -138,6 +138,9 @@ private class DateCompanion extends XBLCompanionWithState {
 
     private def getInputFieldValue: String =
       inputEl.prop("value").asInstanceOf[String]
+
+    def updateReadonly(readonly: Boolean): Unit =
+      inputEl.prop("readonly", readonly)
 
     // Send the new value to the server when it changes
     def onDateSelectedUpdateStateAndSendValueToServer(): Unit =
@@ -171,7 +174,7 @@ private class DateCompanion extends XBLCompanionWithState {
     def onKeypress(e: JQueryEventObject): Unit =
       if (Set(10, 13)(e.which)) {
         onDateSelectedUpdateStateAndSendValueToServer()
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName = EventNames.DOMActivate,
             targetId  = containerElem.id

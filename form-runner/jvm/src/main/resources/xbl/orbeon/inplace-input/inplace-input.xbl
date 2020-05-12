@@ -68,7 +68,7 @@
         <xbl:implementation>
             <!-- Local model and instance -->
             <xf:model id="model">
-                <xf:instance id="instance"><value/></xf:instance>
+                <xf:instance id="instance"><_/></xf:instance>
             </xf:model>
         </xbl:implementation>
         <xbl:template>

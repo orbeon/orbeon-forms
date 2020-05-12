@@ -50,8 +50,7 @@ class XFormsTriggerFullHandler(
     addAttribute(containerAttributes, "type", "button")
 
     // Disabled attribute when needed
-    val disabled = isHTMLDisabled(triggerControl)
-    if (disabled)
+    if (isXFormsReadonlyButNotStaticReadonly(triggerControl))
       outputDisabledAttribute(containerAttributes)
 
     // Determine bootstrap classes, which go on the <button> element

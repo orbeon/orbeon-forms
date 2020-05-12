@@ -103,13 +103,10 @@ trait ContainerOps extends ControlOps {
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
-      // NOTE: Deleting is tricky because NodeInfo is mutation-averse as it keeps a node's index, among others
-      // (no longer the case with #3630!).
-      // So deleting a node under a given NodeInfo can cause the position of following siblings to be out of date
-      // and cause errors. So we delete from back to front. But a safer solution should be found.
+      // So we delete from back to front, but it's probably no longer needed (#3630).
 
       // Go depth-first so we delete containers after all their content has been deleted
-      // NOTE: Use toList to make sure we are not lazy, otherwise items might be deleted as we go!
+      // NOTE: Use `toList` to make sure we are not lazy, otherwise items might be deleted as we go!
       val children = childrenContainers(container).reverse.toList flatMap recurse
 
       val gridContent =

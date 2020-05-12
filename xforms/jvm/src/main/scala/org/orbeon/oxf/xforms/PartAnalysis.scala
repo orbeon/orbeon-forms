@@ -53,9 +53,9 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
   def dumpAnalysis()
 
   // The element in our parent that created the current part
-  def elementInParent =
-    parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing component separator
+  def elementInParent: Option[ElementAnalysis] =
+    parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // `.init` removes the trailing component separator
 
-  def repeatDepthAcrossParts =
+  def repeatDepthAcrossParts: Int =
     if (repeats.isEmpty) 0 else (repeats map (_.ancestorRepeatsAcrossParts.size)).max + 1
 }

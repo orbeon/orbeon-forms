@@ -93,7 +93,11 @@ extends InputValueControl
     hasCopyElem
   }
 
-  val isNorefresh: Boolean = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
+  val excludeWhitespaceTextNodesForCopy: Boolean =
+    element.attributeValue(EXCLUDE_WHITESPACE_TEXT_NODES_QNAME) == "true"
+
+  val isNorefresh: Boolean =
+    element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
 
   val mustEncodeValues: Option[Boolean] =
     if (useCopy)

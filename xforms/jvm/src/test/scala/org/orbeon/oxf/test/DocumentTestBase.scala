@@ -24,7 +24,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
 
   // FIXME: change to avoid global document
   private var _document: XFormsContainingDocument = _
-  def document = _document
+  implicit def document: XFormsContainingDocument = _document
 
   def setupDocument(documentURL: String): XFormsContainingDocument =
     setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))

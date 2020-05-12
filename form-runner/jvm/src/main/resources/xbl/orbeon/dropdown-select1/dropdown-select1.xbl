@@ -61,7 +61,7 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><select>Please select:</select></resource>
                         <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
                         <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
@@ -75,7 +75,7 @@
                         <resource xml:lang="sv"><select>Välj:</select></resource>
                         <resource xml:lang="da"><select>Vælg:</select></resource>
                         <resource xml:lang="pl"><select>Wybierz:</select></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

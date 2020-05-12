@@ -26,40 +26,88 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUt
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
+import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
+import scala.collection.JavaConverters._
+import org.orbeon.scaxon.SimplePath._
+
+import scala.collection.mutable.ListBuffer
 
 
 object ItemsetSupport {
 
-  def isSelected(isMultiple: Boolean, dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean = {
+  def isSelected(
+    isMultiple                 : Boolean,
+    dataValue                  : Item.Value[om.NodeInfo],
+    itemValue                  : Item.Value[om.Item],
+    compareAtt                 : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes : Boolean
+  ): Boolean =
     if (isMultiple)
       compareMultipleItemValues(dataValue, itemValue)
     else
-      compareSingleItemValues(dataValue, itemValue)
+      compareSingleItemValues(dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes)
+
+  def partitionAttributes(items: List[om.Item]): (List[om.NodeInfo], List[om.Item]) = {
+
+    val hasAtt = items exists {
+      case att: om.NodeInfo if att.isAttribute => true
+      case _                                   => false
+    }
+
+    if (hasAtt) {
+      val l = ListBuffer[om.NodeInfo]()
+      val r = ListBuffer[om.Item]()
+
+      items foreach {
+        case att: om.NodeInfo if att.isAttribute => l += att
+        case other                               => r += other
+      }
+
+      (l.result, r.result)
+    } else {
+      (Nil, items)
+    }
   }
 
-  def compareSingleItemValues(dataValue: Item.Value[om.Item], itemValue: Item.Value[om.Item]): Boolean =
+  def compareSingleItemValues(
+    dataValue                  : Item.Value[om.Item],
+    itemValue                  : Item.Value[om.Item],
+    compareAtt                 : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes : Boolean
+  ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
         dataValue == itemValue
       case (Right(dataXPathItems), Right(itemXPathItems)) =>
-        SaxonUtils.deepCompare(
-          XPath.GlobalConfiguration,
-          Implicits.itemSeqToSequenceIterator(dataXPathItems),
-          Implicits.itemSeqToSequenceIterator(itemXPathItems)
-        )
+
+        val (attItems, otherItems) = partitionAttributes(itemXPathItems)
+
+        def compareContent =
+          SaxonUtils.deepCompare(
+            config                     = XPath.GlobalConfiguration,
+            it1                        = dataXPathItems.iterator,
+            it2                        = otherItems.iterator,
+            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
+          )
+
+        (attItems forall compareAtt) && compareContent
+
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported for now
         false
     }
 
-  def compareMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): Boolean =
+  def compareMultipleItemValues(
+    dataValue : Item.Value[om.NodeInfo],
+    itemValue : Item.Value[om.Item]
+  ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(trimmedItemValue)) =>
         val trimmedControlValue = dataValue.trimAllToEmpty
@@ -71,9 +119,10 @@ object ItemsetSupport {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems exists { oneDataXPathItem =>
           SaxonUtils.deepCompare(
-            XPath.GlobalConfiguration,
-            Implicits.itemToSequenceIterator(oneDataXPathItem),
-            Implicits.itemToSequenceIterator(firstItemXPathItem)
+            config                     = XPath.GlobalConfiguration,
+            it1                        = Iterator(oneDataXPathItem),
+            it2                        = Iterator(firstItemXPathItem),
+            excludeWhitespaceTextNodes = false
           )
         }
       case (Right(_), Right(Nil)) =>
@@ -84,14 +133,18 @@ object ItemsetSupport {
         false
     }
 
-  def findMultipleItemValues(dataValue: Item.Value[om.NodeInfo], itemValue: Item.Value[om.Item]): List[om.NodeInfo] =
+  def findMultipleItemValues(
+    dataValue : Item.Value[om.NodeInfo],
+    itemValue : Item.Value[om.Item]
+  ): List[om.NodeInfo] =
     (dataValue, itemValue) match {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems collect { case oneDataXPathItem if
           SaxonUtils.deepCompare(
-            XPath.GlobalConfiguration,
-            Implicits.itemToSequenceIterator(oneDataXPathItem),
-            Implicits.itemToSequenceIterator(firstItemXPathItem)
+            config                     = XPath.GlobalConfiguration,
+            it1                        = Iterator(oneDataXPathItem),
+            it2                        = Iterator(firstItemXPathItem),
+            excludeWhitespaceTextNodes = false
           ) => oneDataXPathItem
         }
       case _ =>
@@ -152,9 +205,7 @@ object ItemsetSupport {
                   var levelAndStack: (Int, List[om.Item]) = (0, Nil)
 
                   for (currentPosition <- 1 to currentSequence.size)
-                    withIteration(currentPosition) {
-
-                      val currentXPathItem = currentSequence.get(currentPosition - 1)
+                    withIteration(currentPosition) { currentXPathItem =>
 
                       // We support relevance of items as an extension to XForms
                       // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
@@ -299,30 +350,9 @@ object ItemsetSupport {
 
                 val sourceEffectiveId = getElementEffectiveId(copyElem)
 
-                withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) {
-
-                  val currentBindingContext = contextStack.getCurrentBindingContext
-                  val currentNodeset        = currentBindingContext.nodeset
-
-                  try {
-                    ! currentNodeset.isEmpty option
-                      XPathCache.evaluateKeepItems(
-                        contextItems       = currentNodeset,
-                        contextPosition    = currentBindingContext.position,
-                        xpathString        = refAtt,
-                        namespaceMapping   = container.getNamespaceMappings(copyElem),
-                        variableToValueMap = currentBindingContext.getInScopeVariables,
-                        functionLibrary    = container.getContainingDocument.getFunctionLibrary,
-                        functionContext    = contextStack.getFunctionContext(sourceEffectiveId),
-                        baseURI            = null,
-                        locationData       = copyElem.getData.asInstanceOf[LocationData],
-                        reporter           = container.getContainingDocument.getRequestStats.getReporter
-                      )
-                  } catch {
-                    case NonFatal(t) =>
-                      XFormsError.handleNonFatalXPathError(container, t)
-                      None
-                  }
+                withBinding(copyElem, sourceEffectiveId, select1Control.getChildElementScope(copyElem)) { currentBindingContext =>
+                  val currentNodeset = currentBindingContext.nodeset.asScala.toList
+                  currentNodeset.nonEmpty option currentNodeset
                 }(contextStack)
               }
 
@@ -438,7 +468,7 @@ object ItemsetSupport {
     defaultHTML        : Boolean
   ): (Option[String], Boolean) = {
     val contextStack = container.getContextStack
-    withBinding(childElement, sourceEffectiveId, scope) {
+    withBinding(childElement, sourceEffectiveId, scope) { _ =>
       val containsHTML = Array[Boolean](false)
       Option(XFormsUtils.getElementValue(
         container,

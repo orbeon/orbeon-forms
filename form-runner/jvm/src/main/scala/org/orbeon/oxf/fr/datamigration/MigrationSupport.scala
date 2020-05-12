@@ -168,9 +168,9 @@ object MigrationSupport {
 
           val migrate =
             if (migrateUp)
-              ops.migrateDataTo(dataRootElem, _)
+              ops.migrateDataUp(dataRootElem, _)
             else
-              ops.migrateDataFrom(dataRootElem, _)
+              ops.migrateDataDown(dataRootElem, _)
 
           val newResultOpt = findMigrationSet.find(ops) map migrate
 

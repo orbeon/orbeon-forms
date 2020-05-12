@@ -143,13 +143,12 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       case Some(boundNode) =>
         translateExternalValue(boundNode, externalValue) foreach { translatedValue =>
           DataModel.setValueIfChangedHandleErrors(
-            containingDocument = containingDocument,
-            eventTarget        = this,
-            locationData       = getLocationData,
-            nodeInfo           = boundNode,
-            valueToSet         = translatedValue,
-            source             = "client",
-            isCalculate        = false
+            eventTarget  = this,
+            locationData = getLocationData,
+            nodeInfo     = boundNode,
+            valueToSet   = translatedValue,
+            source       = "client",
+            isCalculate  = false
           )
         }
     }

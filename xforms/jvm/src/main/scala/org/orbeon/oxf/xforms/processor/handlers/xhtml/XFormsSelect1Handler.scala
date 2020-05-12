@@ -44,10 +44,10 @@ object XFormsSelect1Handler {
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
-  def dataValueFromControl(control: XFormsValueControl): Option[Item.Value[om.NodeInfo]] =
+  def dataValueFromControl(control: XFormsValueControl): Option[(Item.Value[om.NodeInfo], Boolean)] =
     control match {
-      case c: XFormsSelect1Control => c.boundItemOpt map c.getCurrentItemValueFromData
-      case c: XFormsValueControl   => Option(c.getValue) map Left.apply
+      case c: XFormsSelect1Control => c.boundItemOpt     map (i => c.getCurrentItemValueFromData(i) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
+      case c: XFormsValueControl   => Option(c.getValue) map (v => Left(v)                          -> false)
       case null                    => None
     }
 
@@ -55,13 +55,15 @@ object XFormsSelect1Handler {
   def isItemSelected(control: XFormsValueControl, itemNode: ItemNode, isMultiple: Boolean): Boolean =
     itemNode match {
       case item: Item.ValueNode =>
-        dataValueFromControl(control) exists (dataValue =>
+        dataValueFromControl(control) exists { case (dataValue, excludeWhitespaceTextNodes) =>
           ItemsetSupport.isSelected(
-            isMultiple = isMultiple,
-            dataValue  = dataValue,
-            itemValue  = item.value
+            isMultiple                 = isMultiple,
+            dataValue                  = dataValue,
+            itemValue                  = item.value,
+            compareAtt                 = XFormsSelect1Control.attCompare(control.boundNodeOpt, _),
+            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
-        )
+        }
       case _: Item.ChoiceNode =>
         false
     }
@@ -186,12 +188,12 @@ object XFormsSelect1Handler {
         reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, itemNamespacedId)
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, fullItemType)
 
-        // Get group name from selection control if possible, otherwise use effective id
+        // Get group name from selection control if possible
         val name =
-          if (! isMultiple && control.isInstanceOf[XFormsSelect1Control])
-            control.asInstanceOf[XFormsSelect1Control].getGroupName
-          else
-            itemName
+          control match {
+            case c: XFormsSelect1Control if ! isMultiple => c.getGroupName // TODO: fix select/select1 inheritance
+            case _ => itemName
+          }
 
         reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, name)
         reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode))
@@ -202,7 +204,7 @@ object XFormsSelect1Handler {
           if (isFirst)
             XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
         }
-        if (baseHandler.isHTMLDisabled(control))
+        if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
           outputDisabledAttribute(reusableAttributes)
 
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = reusableAttributes)
@@ -316,10 +318,8 @@ class XFormsSelect1Handler(
   def handleControlStart(): Unit = {
 
     // Get items, dynamic or static, if possible
-    val xformsSelect1Control = currentControl.asInstanceOf[XFormsSelect1Control]
-
-    // TODO: ugly
-    val staticSelectionControl = staticControlOpt.get.asInstanceOf[SelectionControlTrait]
+    val xformsSelect1Control   = currentControl.asInstanceOf[XFormsSelect1Control]
+    val staticSelectionControl = xformsSelect1Control.staticControl
 
     // Get items if:
     // 1. The itemset is static
@@ -389,7 +389,7 @@ class XFormsSelect1Handler(
       if (control ne null)
         control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
 
-      if (isHTMLDisabled(control))
+      if (isXFormsReadonlyButNotStaticReadonly(control))
         outputDisabledAttribute(containerAttributes)
 
       if (control ne null)
@@ -452,8 +452,8 @@ class XFormsSelect1Handler(
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)
           for {
-            dataValue   <- XFormsSelect1Handler.dataValueFromControl(control).iterator
-            currentItem <- itemset.iterateSelectedItems(dataValue)
+            (dataValue, excludeWhitespaceTextNodes) <- XFormsSelect1Handler.dataValueFromControl(control).iterator
+            currentItem                             <- itemset.iterateSelectedItems(dataValue, XFormsSelect1Control.attCompare(control.boundNodeOpt, _), excludeWhitespaceTextNodes)
           } locally {
             if (selectedFound)
               ch.text(" - ")

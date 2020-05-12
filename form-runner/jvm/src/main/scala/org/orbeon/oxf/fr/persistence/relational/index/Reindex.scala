@@ -89,8 +89,7 @@ trait Reindex extends FormDefinition {
         case Provider.MySQL => " ORDER BY data_id"
         case _              => ""
       }
-
-      val deleteFromValueIndexSql = "DELETE FROM orbeon_i_control_text " + (
+      val deleteFromValueIndexWhereSql =
         whatToReindex match {
           case AllData => ""
           case _ =>
@@ -101,18 +100,32 @@ trait Reindex extends FormDefinition {
                 | )
                 |""".stripMargin
         }
-      )
+
+      val countFromValueIndexSql  = "SELECT count(*) FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+      val deleteFromValueIndexSql = "DELETE          FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+
+      // Check if there is anything to delete from the value index
+      val countFromValueIndex =
+        useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps ⇒
+          paramSetter(ps)
+          useAndClose(ps.executeQuery()) { rs ⇒
+            rs.next()
+            rs.getInt(1)
+          }
+        }
 
       val deleteFromCurrentIndex =
         s"""|DELETE FROM orbeon_i_current
             |$deleteWhereClause
             |""".stripMargin
 
-      Iterator(
-        deleteFromValueIndexSql,
-        deleteFromCurrentIndex
-      ).foreach { deleteSql =>
-        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps =>
+      val deleteSql = List(
+        if (countFromValueIndex > 0) Some(deleteFromValueIndexSql) else None,
+        Some(deleteFromCurrentIndex)
+      ).flatten
+
+      deleteSql.foreach { deleteSql =>
+        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps ⇒
           paramSetter(ps)
           ps.executeUpdate()
         }

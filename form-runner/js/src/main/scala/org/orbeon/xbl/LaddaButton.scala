@@ -66,12 +66,12 @@ object LaddaButton {
           }
         )
 
-        AjaxClient.beforeSendingEvent.add(() => {
+        AjaxClient.beforeSendingEvent.add(_ => {
           if (state == State.Clicked)
             state = State.Sent
         })
 
-        AjaxClient.ajaxResponseReceived.add(() => {
+        AjaxClient.ajaxResponseReceived.add(_ => {
           if (state == State.Sent) {
             ladda.foreach (_.stop())
             state = State.Begin
@@ -80,6 +80,7 @@ object LaddaButton {
       }
 
       override def destroy(): Unit = {
+        // TODO: remove from `AjaxClient.beforeSendingEvent` and `AjaxClient.ajaxResponseReceived`
         findButton.off(events = ClickEventName, selector = null)
         ladda.foreach (_.remove())
         ladda = None

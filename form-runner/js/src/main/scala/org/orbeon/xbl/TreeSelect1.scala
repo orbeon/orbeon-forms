@@ -38,7 +38,7 @@ object TreeSelect1 {
 
       override def init(): Unit = {
         logDebug("init")
-        this.isReadonly        = $(containerElem).is(".xforms-readonly")
+        this.isReadonly        = containerElem.classList.contains("xforms-readonly")
         this.hasJavaScriptTree = ! $(containerElem).find(".xbl-fr-tree-select1-container-static-readonly").is(":not('.xforms-disabled')")
       }
 

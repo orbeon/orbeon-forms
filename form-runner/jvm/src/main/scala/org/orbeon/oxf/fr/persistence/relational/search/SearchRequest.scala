@@ -65,13 +65,22 @@ trait SearchRequest {
             queryEls
               // First is for free text search
               .drop(1)
-              .map(c =>
+              .map { c =>
+                val filterOpt = trimAllToOpt(c.stringValue)
                 Column(
                   // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
                   path       = c.attValue("path").replaceAllLiterally("[1]", ""),
-                  filterWith = trimAllToOpt(c.stringValue)
+                  filterType  = filterOpt match {
+                    case None => FilterType.None
+                    case Some(filter) =>
+                      c.attValue("control") match {
+                        case "input" | "textarea" => FilterType.Substring(filter)
+                        case "select"             => FilterType.Token(filter.splitTo[List]())
+                        case _                    => FilterType.Exact(filter)
+                      }
+                  }
                 )
-              ),
+              },
           drafts         =
             username match {
               case None =>

@@ -323,6 +323,8 @@ object XFormsConstants {
   // See: https://github.com/orbeon/orbeon-forms/issues/418
   val XXFORMS_SEPARATOR_APPEARANCE_QNAME = QName("xxforms-separator")
 
+  val XXFORMS_LEFT_APPEARANCE_QNAME = QName("left", XXFORMS_NAMESPACE)
+
   val XXFORMS_TARGET_QNAME = QName("target", XXFORMS_NAMESPACE)
   val XXFORMS_UPLOADS_QNAME = QName("uploads", XXFORMS_NAMESPACE)
   val XXFORMS_XINCLUDE = QName("xinclude", XXFORMS_NAMESPACE)
@@ -355,6 +357,7 @@ object XFormsConstants {
   val XXFORMS_CONTEXT_QNAME = QName("context", XXFORMS_NAMESPACE)
 
   val XXFORMS_REFRESH_ITEMS_QNAME = QName("refresh-items", XXFORMS_NAMESPACE)
+  val EXCLUDE_WHITESPACE_TEXT_NODES_QNAME = QName("exclude-whitespace-text-nodes", XXFORMS_NAMESPACE)
   val XXFORMS_REPEAT_INDEXES_QNAME = QName("repeat-indexes", XXFORMS_NAMESPACE)
   val XXFORMS_REPEAT_STARTINDEX_QNAME = QName("startindex")
   val XXFORMS_DND_QNAME = QName("dnd", XXFORMS_NAMESPACE)

@@ -78,10 +78,10 @@ class EmailProcessor extends ProcessorImpl {
 
       // Get credentials if any
       val (usernameOption, passwordOption) = {
-        Option(messageElement.element("credentials")) match {
+        messageElement.elementOpt("credentials") match {
           case Some(credentials) =>
-            val usernameElement = credentials.element(Username)
-            val passwordElement = credentials.element(Password)
+            val usernameElement = credentials.elementOpt(Username)
+            val passwordElement = credentials.elementOpt(Password)
 
             (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
           case None =>
@@ -155,8 +155,8 @@ class EmailProcessor extends ProcessorImpl {
     def createAddresses(addressElement: Element): Array[Address] = {
       val email = addressElement.element("email").getTextTrim // required
 
-      val result = Option(addressElement.element("name")) match {
-        case Some(nameElement) => Seq(new InternetAddress(email, nameElement.getTextTrim))
+      val result = addressElement.elementOpt("name") match {
+        case Some(nameElement) => List(new InternetAddress(email, nameElement.getTextTrim))
         case None              => InternetAddress.parse(email).toList
       }
 
@@ -171,6 +171,16 @@ class EmailProcessor extends ProcessorImpl {
 
     // Set From
     message.addFrom(createAddresses(messageElement.element("from")))
+
+    // Set Reply-To
+    locally {
+      val replyTo = createAddresses(messageElement.element("reply-to"))
+
+      // We might be able to just call `setReplyTo` with the above, but it's unclear
+      // what's the behavior in there is nothing set. Also, can there be a default?
+      if (replyTo.nonEmpty)
+        message.setReplyTo(replyTo)
+    }
 
     // Set To
     propertySet.getNonBlankString(TestTo) match {
@@ -369,11 +379,12 @@ private object EmailProcessor {
   val DefaultCharacterEncoding = CharsetNames.Utf8
 
   // Get Some(trimmed value of the element) or None if the element is null
-  def optionalValueTrim(e: Element) = (Option(e) map(_.getStringValue) orNull).trimAllToOpt
+  def optionalValueTrim(e: Option[Element]): Option[String] =
+    e map (_.getStringValue) flatMap (_.trimAllToOpt)
 
   // First try to get the value from a child element, then from the properties
-  def valueFromElementOrProperty(e: Element, name: String)(implicit propertySet: PropertySet) =
-    optionalValueTrim(e.element(name)) orElse propertySet.getNonBlankString(name)
+  def valueFromElementOrProperty(e: Element, name: String)(implicit propertySet: PropertySet): Option[String] =
+    optionalValueTrim(e.elementOpt(name)) orElse propertySet.getNonBlankString(name)
 
   trait ReadonlyDataSource extends DataSource {
     def getOutputStream = throw new IOException("Write operation not supported")

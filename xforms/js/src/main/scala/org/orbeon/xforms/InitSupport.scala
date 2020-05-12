@@ -107,7 +107,7 @@ object InitSupport {
   def liferayF: Future[Unit] = {
     scribe.debug("checking for Liferay object")
     dom.window.Liferay.toOption match {
-      case None          => Future.successful(())
+      case None          => Future.unit
       case Some(liferay) => liferay.allPortletsReadyF
     }
   }
@@ -122,10 +122,10 @@ object InitSupport {
 
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
-        jBody.addClass(Constants.XFormsIosClass)
+      jBody.addClass(Constants.XFormsIosClass)
 
     if (Bowser.mobile.contains(true))
-        jBody.addClass(Constants.XFormsMobileClass)
+      jBody.addClass(Constants.XFormsMobileClass)
   }
 
   @JSExport
@@ -170,7 +170,7 @@ object InitSupport {
           case StateResult.Uuid(uuid) =>
             uuid
           case StateResult.Restore(uuid) =>
-            AjaxEvent.dispatchEvent(
+            AjaxClient.fireEvent(
               AjaxEvent(
                 eventName = EventNames.XXFormsAllEventsRequired,
                 form      = formElem
@@ -341,7 +341,7 @@ object InitSupport {
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, valueOpt) =>
         Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
-          val jControl = $(control)
+          val classList = control.classList
           if (XBL.isComponent(control)) {
             // Custom XBL component initialization
             for {
@@ -350,13 +350,13 @@ object InitSupport {
             } locally {
               Controls.setCurrentValue(control, value)
             }
-          } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+          } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
               // Initialized visible dialogs
               Init._dialog(control)
-          } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+          } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
               // Legacy JavaScript initialization
               Init._compactSelect(control)
-          } else if (jControl.is(".xforms-range")) {
+          } else if (classList.contains("xforms-range")) {
               // Legacy JavaScript initialization
               Init._range(control)
           }
@@ -387,7 +387,7 @@ object InitSupport {
             Map(KeyTextPropertyName -> (keyText: js.Any)) ++
               (modifiers map (_ => KeyModifiersPropertyName -> (modifierString: js.Any)))
 
-          AjaxEvent.dispatchEvent(
+          AjaxClient.fireEvent(
             AjaxEvent(
               eventName   = e.`type`,
               targetId    = observer,

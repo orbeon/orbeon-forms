@@ -13,13 +13,13 @@
   */
 package org.orbeon.facades
 
+import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLLinkElement
 
-import scala.annotation.tailrec
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
 
 @js.native
 trait Mousetrap extends js.Object {
@@ -39,11 +39,11 @@ object Bowser extends js.Object {
   val msedge  : js.UndefOr[Boolean] = js.native
   val ios     : js.UndefOr[Boolean] = js.native
   val mobile  : js.UndefOr[Boolean] = js.native
-  val version : String  = js.native
-  val name    : String  = js.native
+  val version : String              = js.native
+  val name    : String              = js.native
 }
 
-object Html {
+object HTMLFacades {
 
   implicit class HTMLLinkElementOps(private val link: HTMLLinkElement) extends AnyVal {
     def onloadF: Future[Unit] = {
@@ -52,16 +52,21 @@ object Html {
       promise.future
     }
   }
+}
 
-  implicit class HTMLElementOps(private val element: html.Element) extends AnyVal {
+@JSGlobalScope
+@js.native
+private object ResizeObserverGlobalScope extends js.Object {
+  val ResizeObserver: js.UndefOr[js.Any] = js.native
+}
 
-    @tailrec def closest(selector: String): Option[html.Element] = {
-      if (element.matches(selector))
-        Some(element)
-      else if (element.parentElement == null)
-        None
-      else
-        element.parentElement.closest(selector)
-    }
-  }
+object ResizeObserver {
+  def isDefined: Boolean = ResizeObserverGlobalScope.ResizeObserver.isDefined
+}
+
+@js.native
+@JSGlobal
+class ResizeObserver(observer: js.Function0[Unit]) extends js.Object {
+  def observe  (element: dom.Element): Unit = js.native
+  def unobserve(element: dom.Element): Unit = js.native
 }

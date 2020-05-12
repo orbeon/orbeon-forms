@@ -39,15 +39,15 @@
             <!-- Local model -->
             <xf:model id="simple-captcha-model">
                 <xf:instance id="instance">
-                    <instance>
+                    <_>
                         <user-answer/>
                         <expected-answer/>
                         <image/>
-                    </instance>
+                    </_>
                 </xf:instance>
                 <xf:bind ref="image" type="xs:base64Binary"/>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><ask-to-type-word>Type the word above:</ask-to-type-word></resource>
                         <resource xml:lang="es"><ask-to-type-word>Digite la palabra de la imagen:</ask-to-type-word></resource>
                         <resource xml:lang="fi"><ask-to-type-word>Kirjoita yläpuolella oleva sana tähän:</ask-to-type-word></resource>
@@ -58,7 +58,7 @@
                         <resource xml:lang="nl"><ask-to-type-word>Voer bovenstaand woord in:</ask-to-type-word></resource>
                         <resource xml:lang="pt"><ask-to-type-word>Insira a palavra na imagem:</ask-to-type-word></resource>
                         <resource xml:lang="pl"><ask-to-type-word>Przepisz słowo z obrazka:</ask-to-type-word></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

@@ -345,35 +345,40 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
         warn("ghost target")
 
-      } else (eventTarget, event) match {
-        // Controls accept event only if they are relevant
-        case (control: XFormsControl, _) if ! control.isRelevant =>
-          warn("non-relevant control")
+      } else {
 
-        // Output control not subject to readonly condition below
-        case (control: XFormsOutputControl, _) =>
-          true
+        def allowFocusEvent(c: XFormsControl, e: XFormsEvent) =
+          c.focusableControls.nonEmpty && (
+            e.isInstanceOf[XFormsFocusEvent] ||
+              e.isInstanceOf[XXFormsBlurEvent] && (doc.getControls.getFocusedControl exists (_ eq c))
+          )
 
-        // Single node controls accept event only if they are not readonly
-        case (control: XFormsSingleNodeControl, _) if control.isReadonly =>
-          warn("read-only control")
+        (eventTarget, event) match {
+          // Controls accept event only if they are relevant
+          case (c: XFormsControl, _) if ! c.isRelevant =>
+            warn("non-relevant control")
 
-        // Disallow focus/blur if the control is not focusable
-        // Relevance and read-only above are already caught. This catches hidden controls, which must not be
-        // focusable from the client.
-        case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! (control.isFocusable && ! Focus.isHidden(control)) =>
-          warn(s"non-focusable control for ${e.name}")
+          // These controls can accept focus events
+          case (c: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if allowFocusEvent(c, e) =>
+            true
 
-        // The client must dispatch xxforms-blur only to a control which had the focus
-        case (control: XFormsControl, e: XXFormsBlurEvent) if ! (doc.getControls.getFocusedControl exists (_ eq control)) =>
-          warn(s"control doesn't have focus control for ${e.name}")
+          // Other readonly single node controls accept events only if they are not readonly
+          case (c: XFormsSingleNodeControl, _) if c.isReadonly =>
+            warn("read-only control")
 
-        case _ =>
-          true
+          // Disallow focus/blur if the control is not focusable
+          // Relevance and read-only above are already caught. This catches hidden controls, which must not be
+          // focusable from the client.
+          case (c: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! allowFocusEvent(c, e) =>
+            warn(s"non-focusable control for `${e.name}`")
+
+          case _ =>
+            true
+        }
       }
     }
 
-    def dispatchEventCheckTarget(event: XFormsEvent) =
+    def dispatchEventCheckTarget(event: XFormsEvent): Unit =
       if (checkEventTarget(event))
         Dispatch.dispatchEvent(event)
 

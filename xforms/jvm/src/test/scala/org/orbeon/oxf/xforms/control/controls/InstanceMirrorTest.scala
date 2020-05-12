@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -72,7 +73,7 @@ class InstanceMirrorTest
             <xh:body/>
           </xh:html>
 
-        implicit val logger = document.indentedLogger
+        implicit val logger: IndentedLogger = document.indentedLogger
 
         val outerInstance = document.findInstance("form-instance").get
         val innerInstance = document.findInstance("my-instance").get
@@ -89,7 +90,6 @@ class InstanceMirrorTest
 
           val outerMirrorListener =
             mirrorListener(
-              document,
               toInnerInstanceNode(
                 outerInstance.rootElement,
                 document.getStaticState.topLevelPart,

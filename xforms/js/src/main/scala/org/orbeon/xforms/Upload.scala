@@ -23,6 +23,7 @@ import org.scalajs.jquery.JQueryEventObject
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Upload {
 
@@ -100,19 +101,14 @@ class Upload {
 
     scribe.debug("done")
 
-    lazy val ajaxResponseProcessed: js.Function = () => {
-      scribe.debug("removing listener for ajaxResponseProcessed")
-      Events.ajaxResponseProcessedEvent.unsubscribe(ajaxResponseProcessed)
+    // After the file is uploaded, in general at the next Ajax response, we get the file name
+    // NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
+    AjaxClient.allEventsProcessedF("upload") foreach { _ =>
       // If progress indicator is still shown, this means some XForms reset the file name
       // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
       if ($(_container).hasClass(StateClassPrefix + "progress"))
         setState("empty") // switch back to the file selector, as we won't get a file name anymore
     }
-
-    // After the file is uploaded, in general at the next Ajax response, we get the file name
-    // NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
-    Events.ajaxResponseProcessedEvent.subscribe(ajaxResponseProcessed)
-    scribe.debug("adding listener for ajaxResponseProcessed")
   }
 
   // Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"

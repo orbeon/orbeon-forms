@@ -82,13 +82,13 @@ object XFormsAPI {
         for (action <- actionInterpreterDyn.value)
           yield
             DataModel.logAndNotifyValueChange(
-              containingDocument = action.containingDocument,
               source             = "scala setvalue",
               nodeInfo           = nodeInfo,
               oldValue           = oldValue,
               newValue           = value,
               isCalculate        = false,
               collector          = Dispatch.dispatchEvent)(
+              containingDocument = action.containingDocument,
               logger             = action.indentedLogger
             )
 
@@ -113,13 +113,14 @@ object XFormsAPI {
   // xf:insert
   // @return the inserted nodes
   def insert[T <: Item](
-    origin               : Seq[T],
-    into                 : Seq[NodeInfo] = Nil,
-    after                : Seq[NodeInfo] = Nil,
-    before               : Seq[NodeInfo] = Nil,
-    doDispatch           : Boolean       = true,
-    requireDefaultValues : Boolean       = false,
-    searchForInstance    : Boolean       = true
+    origin                            : Seq[T],
+    into                              : Seq[NodeInfo] = Nil,
+    after                             : Seq[NodeInfo] = Nil,
+    before                            : Seq[NodeInfo] = Nil,
+    doDispatch                        : Boolean       = true,
+    requireDefaultValues              : Boolean       = false,
+    searchForInstance                 : Boolean       = true,
+    removeInstanceDataFromClonedNodes : Boolean       = true
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
@@ -143,7 +144,8 @@ object XFormsAPI {
         true, // doClone
         doDispatch,
         requireDefaultValues,
-        searchForInstance
+        searchForInstance,
+        removeInstanceDataFromClonedNodes
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil

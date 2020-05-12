@@ -3,7 +3,7 @@ package org.orbeon.xbl
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.KeyboardEvent
-import org.orbeon.facades.Html.HTMLElementOps
+import org.orbeon.polyfills.HTMLPolyfills.HTMLElementOps
 
 object Attachment {
 

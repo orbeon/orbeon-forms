@@ -33,7 +33,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
-import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE, TEXT_NODE}
+import org.w3c.dom.Node._
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -73,13 +73,13 @@ object InstanceMirror {
 
   // Factory function to create listeners which check whether they called as the result of an action caused by another
   // listener. If a cycle is detected, we interrupt it and just say that we have processed the event.
-  class ListenerCycleDetector(implicit logger: IndentedLogger)
-    extends ((XFormsContainingDocument, NodeMatcher) => MirrorEventListener) {
+  class ListenerCycleDetector(implicit containingDocument: XFormsContainingDocument, logger: IndentedLogger)
+    extends (NodeMatcher => MirrorEventListener) {
 
     private var inListener = false
 
-    def apply(containingDocument: XFormsContainingDocument, findMatchingNode: NodeMatcher): MirrorEventListener =
-      wrap(mirrorListener(containingDocument, findMatchingNode))
+    def apply(findMatchingNode: NodeMatcher): MirrorEventListener =
+      wrap(mirrorListener(findMatchingNode))
 
     private def wrap(listener: MirrorEventListener): MirrorEventListener = {
       event =>
@@ -293,8 +293,8 @@ object InstanceMirror {
 
   // Listener that mirrors changes from one document to the other
   def mirrorListener(
-    containingDocument : XFormsContainingDocument,
     findMatchingNode   : NodeMatcher)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): MirrorEventListener = {
 
@@ -305,7 +305,6 @@ object InstanceMirror {
             nodeInfo  = matchingNode,
             newValue  = valueChanged.newValue,
             onSuccess = oldValue => DataModel.logAndNotifyValueChange(
-              containingDocument = containingDocument,
               source             = "mirror",
               nodeInfo           = matchingNode,
               oldValue           = oldValue,
@@ -424,8 +423,17 @@ object InstanceMirror {
                 case _ =>
                   (None, NextListener)
               }
-            case TEXT_NODE =>
-              NextListener // TODO
+            case TEXT_NODE | PROCESSING_INSTRUCTION_NODE | COMMENT_NODE =>
+              withNewParent {
+                case newParentElement: Element =>
+                  val content = newParentElement.content
+                  if (content.size > removedNodeIndex)
+                    (Some(content.get(removedNodeIndex)), Stop)
+                  else
+                    (None, NextListener) // out of sync, so probably safer
+                case _ =>
+                  (None, NextListener)
+              }
             case _ =>
               NextListener // we don't know how to propagate the change
           }

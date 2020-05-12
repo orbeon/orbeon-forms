@@ -756,6 +756,18 @@
                                                     <xf:value ref="value"/>
                                                 </xf:itemset>
                                             </xf:select1>
+                                            <!-- select -->
+                                            <fr:box-select ref=".[frf:isMultipleSelectionControl(@control)]" id="search-select">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                                <xf:item>
+                                                    <xf:label ref="$fr-resources/summary/labels/any"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <xf:itemset model="fr-resources-model" ref="$resources/item">
+                                                    <xf:label ref="label"/>
+                                                    <xf:value ref="value"/>
+                                                </xf:itemset>
+                                            </fr:box-select>
                                         </xf:group>
                                     </xf:repeat>
                                 </xh:div>

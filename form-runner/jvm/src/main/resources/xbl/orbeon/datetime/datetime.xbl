@@ -61,9 +61,9 @@
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <field-width/>
-                        </local>
+                        </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-datetime-grid">
@@ -113,7 +113,7 @@
 
             <xf:model id="datetime-model">
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><date>Date</date>      <time>Time</time></resource>
                         <resource xml:lang="es"><date>Fecha</date>     <time>Hora</time></resource>
                         <resource xml:lang="fi"><date>Päivämäärä</date><time>kellonaika</time></resource>
@@ -125,14 +125,14 @@
                         <resource xml:lang="sv"><date>Datum</date>     <time>Tid</time></resource>
                         <resource xml:lang="pt"><date>Data</date>      <time>Hora</time></resource>
                         <resource xml:lang="pl"><date>Data</date>      <time>Godzina</time></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
                 <xf:instance id="i">
-                    <datetime>
+                    <_>
                         <date/>
                         <time/>
                         <is-readonly/>
-                    </datetime>
+                    </_>
                 </xf:instance>
                 <xf:bind ref="instance('i')">
                     <xf:bind ref="date" type="xf:date" readonly="../is-readonly = 'true'"/>

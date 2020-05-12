@@ -15,6 +15,9 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <!-- === General properties === -->
+    <property as="xs:string"  name="oxf.fr.external-base-url"                                   value=""/>
+
     <!-- === Persistence configuration === -->
 
     <!-- Default provider is "exist" -->
@@ -225,6 +228,7 @@
     <!-- Blank, tls, or ssl -->
     <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                           value=""/>
     <property as="xs:string"  name="oxf.fr.email.from.*.*"                                      value=""/>
+    <property as="xs:string"  name="oxf.fr.email.reply-to.*.*"                                  value=""/>
     <property as="xs:string"  name="oxf.fr.email.to.*.*"                                        value=""/>
     <property as="xs:string"  name="oxf.fr.email.cc.*.*"                                        value=""/>
     <property as="xs:string"  name="oxf.fr.email.bcc.*.*"                                       value=""/>

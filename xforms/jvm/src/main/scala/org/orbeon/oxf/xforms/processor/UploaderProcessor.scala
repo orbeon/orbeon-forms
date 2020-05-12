@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
+import org.orbeon.datatypes.Mediatype
+import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -39,7 +40,7 @@ class UploaderProcessor extends ProcessorImpl {
               // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
               // handle more than one here.
               val files = nameValues collect {
-                case (name, fileItem: FileItem) if fileItem.getName.nonBlank =>
+                case (name, fileItem: FileItem) if fileItem.getName.nonAllBlank =>
 
                   // Get size before renaming below
                   val size = fileItem.getSize
@@ -58,14 +59,17 @@ class UploaderProcessor extends ProcessorImpl {
 
               val serverEvents =
                 <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
-                  for ((name, fileItem, sessionURL, size) <- files)
-                  yield
+                  for {
+                    (name, fileItem, sessionURL, size) <- files
+                    headers      = Map(Headers.ContentType -> fileItem.getContentType.trimAllToOpt)
+                    mediatypeOpt = Mediatypes.fromHeadersOrFilename(n => headers.get(n).flatten, fileItem.getName.trimAllToOpt)
+                  } yield
                     <xxf:event
                       name="xxforms-upload-done"
                       source-control-id={name}
                       file={sessionURL}
                       filename={fileItem.getName.trimAllToEmpty}
-                      content-type={fileItem.getContentType.trimAllToEmpty}
+                      content-type={mediatypeOpt map (_.toString) getOrElse ""}
                       content-length={size.toString}/>
                 }</xxf:events>
 

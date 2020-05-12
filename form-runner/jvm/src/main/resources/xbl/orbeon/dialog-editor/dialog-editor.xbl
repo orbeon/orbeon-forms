@@ -36,12 +36,12 @@
                 <xf:label ref="label"/>
                 <xf:model id="fr-dialog-editor-model">
                     <xf:instance id="fr-dialog-editor-instance">
-                        <instance>
+                        <_>
                             <readonly/>
                             <label/>
                             <text/>
                             <callback-id/>
-                        </instance>
+                        </_>
                     </xf:instance>
                     <xf:bind ref="text" readonly="../readonly = 'true'"/>
                 </xf:model>

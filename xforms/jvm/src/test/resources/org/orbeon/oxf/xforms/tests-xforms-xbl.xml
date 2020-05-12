@@ -5068,6 +5068,103 @@
         </output>
     </test>
 
+    <test description="#4492: Instance mirror fails when deleting sibling nodes" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
+                            <_>
+                                <gaga1 a1="v1">
+                                    t1
+                                    <e1/>
+                                    t2
+                                    <e2/>
+                                    t3
+                                </gaga1>
+                                <gaga2 a2="v2">
+                                    t1
+                                    <e1/>
+                                    t2
+                                    <e2/>
+                                    t3
+                                </gaga2>
+                            </_>
+                        </xf:instance>
+                        <xf:action event="xforms-ready">
+                            <xf:dispatch name="my-delete" targetid="my-gaga1">
+                                <xf:property name="what">all</xf:property>
+                            </xf:dispatch>
+                            <xf:dispatch name="my-delete" targetid="my-gaga2">
+                                <xf:property name="what">elems</xf:property>
+                            </xf:dispatch>
+                        </xf:action>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                            <xbl:handlers>
+                                <xbl:handler event="my-delete" phase="target">
+                                    <xf:delete
+                                        ref="
+                                            if (event('what') = 'all') then
+                                                instance()/(@* | node())
+                                            else
+                                                instance()/*
+                                    "/>
+                                </xbl:handler>
+                            </xbl:handlers>
+                            <xbl:template>
+                                <xf:model id="gaga-model">
+                                    <xf:instance id="gaga-instance" xxbl:mirror="true">
+                                        <_/>
+                                    </xf:instance>
+                                </xf:model>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="my-gaga1" ref="instance()/gaga1"/>
+                    <fr:gaga id="my-gaga2" ref="instance()/gaga2"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="outer-instance" model-id="model">
+                                <_>
+                                    <gaga1/>
+                                    <gaga2 a2="v2">
+                                        t1
+                                        t2
+                                        t3
+                                    </gaga2>
+                                </_>
+                            </instance>
+                            <instance id="gaga-instance" model-id="my-gaga1≡gaga-model">
+                                <gaga1/>
+                            </instance>
+                            <instance id="gaga-instance" model-id="my-gaga2≡gaga-model">
+                                <gaga2 a2="v2">
+                                    t1
+                                    t2
+                                    t3
+                                </gaga2>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

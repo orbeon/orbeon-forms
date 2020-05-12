@@ -17,7 +17,7 @@ import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.toJQuerySelect2
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxEvent, ServerValueStore}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -67,7 +67,6 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         object options extends Select2.Options {
           allowClear     = true
-          dropdownParent = jContainer
           ajax           = if (performsSearch) Select2Ajax else null
           width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =
@@ -78,8 +77,7 @@ private class Select1SearchCompanion extends XBLCompanion {
         }
 
         jSelect.select2(options)
-        if (performsSearch)
-          jSelect.on("change", onChange(htmlSelect) _)
+        jSelect.on("change", onChange _)
       }
 
       initOrUpdatePlaceholder()
@@ -98,11 +96,28 @@ private class Select1SearchCompanion extends XBLCompanion {
     ))
   }
 
-  private def onChange(htmlSelect: html.Select)(event: JQueryEventObject): Unit = {
-    val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
-    val label = selectedOption.text
-    val value = selectedOption.value
-    AjaxEvent.dispatchEvent(
+  private def onChange(event: JQueryEventObject): Unit = {
+    val htmlSelect = event.target.asInstanceOf[html.Select]
+    if (htmlSelect.selectedIndex == -1) {
+      // `selectedIndex` is -1 when the value was cleared
+      dispatchFrChange(
+        label = "",
+        value = ""
+      )
+    } else {
+      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+      dispatchFrChange(
+        label = selectedOption.text,
+        value = selectedOption.value
+      )
+    }
+  }
+
+  private def dispatchFrChange(
+    label : String,
+    value : String
+  ): Unit = {
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = "fr-change",
         targetId   = containerElem.id,
@@ -141,7 +156,7 @@ private class Select1SearchCompanion extends XBLCompanion {
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
       select2SuccessCallbacks.enqueue(success)
-      AjaxEvent.dispatchEvent(
+      AjaxClient.fireEvent(
         AjaxEvent(
           eventName  = "fr-search",
           targetId   = containerElem.id,

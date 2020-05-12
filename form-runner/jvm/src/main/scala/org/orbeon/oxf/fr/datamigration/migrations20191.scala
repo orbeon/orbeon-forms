@@ -101,7 +101,7 @@ object MigrationOps20191 extends MigrationOps {
     parser.decode[MigrationSet20191](jsonString).fold(Failure.apply, Success.apply) getOrElse
       (throw new IllegalArgumentException(s"illegal format `$jsonString`"))
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {
@@ -117,9 +117,10 @@ object MigrationOps20191 extends MigrationOps {
         val gridContent = content flatMap (p => gridElem child p.value)
 
         insert(
-          after      = gridElem,
-          origin     = gridContent,
-          doDispatch = false
+          after                             = gridElem,
+          origin                            = gridContent,
+          doDispatch                        = false,
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4519
         )
 
         delete(
@@ -132,7 +133,7 @@ object MigrationOps20191 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {

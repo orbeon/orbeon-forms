@@ -12,6 +12,405 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <mime-types>
+
+    <!-- General -->
+    <mime-type>
+        <name>application/octet-stream</name>
+        <pattern>*.bin</pattern>
+    </mime-type>
+
+    <!-- Common image formats -->
+    <mime-type>
+        <name>image/jpeg</name>
+        <pattern>*.jpeg</pattern>
+        <pattern>*.jpg</pattern>
+        <pattern>*.jpe</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/png</name>
+        <pattern>*.png</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/svg+xml</name>
+        <pattern>*.svg</pattern>
+        <pattern>*.svgz</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/tiff</name>
+        <pattern>*.tiff</pattern>
+        <pattern>*.tif</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/bmp</name>
+        <pattern>*.bmp</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/gif</name>
+        <pattern>*.gif</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/heic</name>
+        <pattern>*.heic</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/heif</name>
+        <pattern>*.heif</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/webp</name>
+        <pattern>*.webp</pattern>
+    </mime-type>
+    <mime-type>
+        <name>image/vnd.microsoft.icon</name>
+        <pattern>*.ico</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/xhtml+xml</name>
+        <pattern>*.xhtml</pattern>
+    </mime-type>
+
+    <!-- Common video formats -->
+    <mime-type>
+        <name>video/mpeg</name>
+        <pattern>*.mpeg</pattern>
+        <pattern>*.mpg</pattern>
+        <pattern>*.mpe</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/webm</name>
+        <pattern>*.webm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/x-msvideo</name>
+        <pattern>*.avi</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/ogg</name>
+        <pattern>*.ogv</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/quicktime</name>
+        <pattern>*.qt</pattern>
+        <pattern>*.mov</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/mp4</name>
+        <pattern>*.mp4</pattern>
+    </mime-type>
+    <mime-type>
+        <name>video/x-ms-wmv</name>
+        <pattern>*.wmv</pattern>
+    </mime-type>
+
+    <!-- Common audio formats -->
+    <mime-type>
+        <name>audio/aac</name>
+        <pattern>*.aac</pattern>
+    </mime-type>
+    <mime-type>
+        <name>audio/aac</name>
+        <pattern>*.aac</pattern>
+    </mime-type>
+    <mime-type>
+        <name>audio/wav</name>
+        <pattern>*.wav</pattern>
+    </mime-type>
+    <mime-type>
+        <name>audio/midi</name>
+        <pattern>*.mid</pattern>
+        <pattern>*.midi</pattern>
+        <pattern>*.kar</pattern>
+    </mime-type>
+    <mime-type>
+        <name>audio/mpeg</name>
+        <pattern>*.mp3</pattern>
+<!--        <pattern>*.mpga</pattern>-->
+<!--        <pattern>*.mpega</pattern>-->
+<!--        <pattern>*.mp2</pattern>-->
+    </mime-type>
+    <mime-type>
+        <name>audio/webm</name>
+        <pattern>*.weba</pattern><!-- can also be webm -->
+    </mime-type>
+    <mime-type>
+        <name>audio/opus</name>
+        <pattern>*.opus</pattern>
+    </mime-type>
+    <mime-type>
+        <name>audio/ogg</name>
+        <pattern>*.oga</pattern>
+        <pattern>*.ogg</pattern>
+    </mime-type>
+
+    <!-- Other common formats -->
+    <mime-type>
+        <name>text/html</name>
+        <pattern>*.html</pattern>
+        <pattern>*.htm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>text/css</name>
+        <pattern>*.css</pattern>
+    </mime-type>
+    <!-- Put this as first entry with *.xml -->
+    <mime-type>
+        <name>application/xml</name>
+        <pattern>*.xml</pattern>
+        <pattern>*.xsl</pattern>
+    </mime-type>
+    <!-- RFC 4627 -->
+    <mime-type>
+        <name>application/json</name>
+        <pattern>*.json</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/postscript</name>
+        <pattern>*.ps</pattern>
+        <pattern>*.ai</pattern>
+        <pattern>*.eps</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/pdf</name>
+        <pattern>*.pdf</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/rtf</name>
+        <pattern>*.rtf</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/mathml+xml</name>
+        <pattern>*.mml</pattern>
+    </mime-type>
+    <mime-type>
+        <name>text/plain</name>
+        <pattern>*.asc</pattern>
+        <pattern>*.txt</pattern>
+        <pattern>*.text</pattern>
+        <pattern>*.diff</pattern>
+    </mime-type>
+    <mime-type>
+        <!-- `application/javascript` supposedly standard, but Mozilla recommends `text/javascript` -->
+        <name>text/javascript</name>
+        <pattern>*.js</pattern>
+        <pattern>*.mjs</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/zip</name>
+        <pattern>*.zip</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-7z-compressed</name>
+        <pattern>*.7z</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-tar</name>
+        <pattern>*.tar</pattern>
+    </mime-type>
+    <mime-type>
+        <name>text/csv</name>
+        <pattern>*.csv</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/java-archive</name>
+        <pattern>*.jar</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.apple.installer+xml</name>
+        <pattern>*.mpkg</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/php</name>
+        <pattern>*.php</pattern>
+        <pattern>*.phtml</pattern>
+        <pattern>*.pht</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/gzip</name>
+        <pattern>*.gz</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.rar</name>
+        <pattern>*.rar</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-bzip</name>
+        <pattern>*.bz</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-bzip2</name>
+        <pattern>*.bz2</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-sh</name>
+        <pattern>*.sh</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-csh</name>
+        <pattern>*.csh</pattern>
+    </mime-type>
+    <mime-type>
+        <name>text/calendar</name>
+        <pattern>*.ics</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/x-shockwave-flash</name>
+        <pattern>*.swf</pattern>
+    </mime-type>
+
+    <!-- Fonts -->
+    <mime-type>
+        <name>font/otf</name>
+        <pattern>*.otf</pattern>
+    </mime-type>
+    <mime-type>
+        <name>font/sfnt</name>
+        <pattern>*.sfnt</pattern>
+    </mime-type>
+    <mime-type>
+        <name>font/ttf</name>
+        <pattern>*.ttf</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/woff</name>
+        <pattern>*.woff</pattern>
+    </mime-type>
+    <mime-type>
+        <name>font/woff2</name>
+        <pattern>*.woff2</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-fontobject</name>
+        <pattern>*.eot</pattern>
+    </mime-type>
+
+    <!-- Ebook formats -->
+    <mime-type>
+        <name>application/vnd.amazon.ebook</name>
+        <pattern>*.azw</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/epub+zip</name>
+        <pattern>*.epub</pattern>
+    </mime-type>
+
+    <!-- OpenDocument formats -->
+    <mime-type>
+        <name>application/vnd.oasis.opendocument.presentation</name>
+        <pattern>*.odp</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.oasis.opendocument.spreadsheet</name>
+        <pattern>*.ods</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/application/vnd.oasis.opendocument.text</name>
+        <pattern>*.odt</pattern>
+    </mime-type>
+
+    <!-- MS Word -->
+    <mime-type>
+        <name>application/msword</name>
+        <pattern>*.doc</pattern>
+        <pattern>*.dot</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.wordprocessingml.document</name>
+        <pattern>*.docx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.wordprocessingml.template</name>
+        <pattern>*.dotx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-word.document.macroEnabled.12</name>
+        <pattern>*.docm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-word.template.macroEnabled.12</name>
+        <pattern>*.dotm</pattern>
+    </mime-type>
+
+    <!-- MS Excel -->
+    <mime-type>
+        <name>application/vnd.ms-excel</name>
+        <pattern>*.xls</pattern>
+        <pattern>*.xlt</pattern>
+        <pattern>*.xla</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</name>
+        <pattern>*.xlsx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.spreadsheetml.template</name>
+        <pattern>*.xltx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-excel.sheet.macroEnabled.12</name>
+        <pattern>*.xlsm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-excel.template.macroEnabled.12</name>
+        <pattern>*.xltm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-excel.addin.macroEnabled.12</name>
+        <pattern>*.xlam</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-excel.sheet.binary.macroEnabled.12</name>
+        <pattern>*.xlsb</pattern>
+    </mime-type>
+
+    <!-- MS Powerpoint -->
+    <mime-type>
+        <name>application/vnd.ms-powerpoint</name>
+        <pattern>*.ppt</pattern>
+        <pattern>*.pot</pattern>
+        <pattern>*.pps</pattern>
+        <pattern>*.ppa</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.presentationml.presentation</name>
+        <pattern>*.pptx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.presentationml.template</name>
+        <pattern>*.potx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.openxmlformats-officedocument.presentationml.slideshow</name>
+        <pattern>*.ppsx</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-powerpoint.addin.macroEnabled.12</name>
+        <pattern>*.ppam</pattern>
+    </mime-type>
+
+    <mime-type>
+        <name>application/vnd.ms-powerpoint.presentation.macroEnabled.12</name>
+        <pattern>*.pptm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-powerpoint.template.macroEnabled.12</name>
+        <pattern>*.potm</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/vnd.ms-powerpoint.slideshow.macroEnabled.12</name>
+        <pattern>*.ppsm</pattern>
+    </mime-type>
+
+    <!-- MS Outlook -->
+    <mime-type>
+        <name>application/vnd.ms-outlook</name>
+        <pattern>*.msg</pattern>
+    </mime-type>
+
+    <!-- Old types (probably many can be removed) -->
+    <mime-type>
+        <name>text/x-component</name>
+        <pattern>*.htc</pattern>
+    </mime-type>
     <mime-type>
         <name>application/andrew-inset</name>
         <pattern>*.ez</pattern>
@@ -46,51 +445,17 @@
         <pattern>*.mdb</pattern>
     </mime-type>
     <mime-type>
-        <name>application/msword</name>
-        <pattern>*.doc</pattern>
-        <pattern>*.dot</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/octet-stream</name>
-        <pattern>*.bin</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/oda</name>
         <pattern>*.oda</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/pdf</name>
-        <pattern>*.pdf</pattern>
     </mime-type>
     <mime-type>
         <name>application/pgp-signature</name>
         <pattern>*.pgp</pattern>
     </mime-type>
     <mime-type>
-        <name>application/postscript</name>
-        <pattern>*.ps</pattern>
-        <pattern>*.ai</pattern>
-        <pattern>*.eps</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/rtf</name>
-        <pattern>*.rtf</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/smil</name>
         <pattern>*.smi</pattern>
         <pattern>*.smil</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/vnd.ms-excel</name>
-        <pattern>*.xls</pattern>
-        <pattern>*.xlb</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/vnd.ms-powerpoint</name>
-        <pattern>*.ppt</pattern>
-        <pattern>*.pps</pattern>
-        <pattern>*.pot</pattern>
     </mime-type>
     <mime-type>
         <name>application/vnd.stardivision.writer</name>
@@ -133,24 +498,8 @@
         <pattern>*.smd</pattern>
     </mime-type>
     <mime-type>
-        <name>application/vnd.wap.wbxml</name>
-        <pattern>*.wbxml</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/vnd.wap.wmlc</name>
-        <pattern>*.wmlc</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/vnd.wap.wmlscriptc</name>
-        <pattern>*.wmlsc</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/wordperfect5.1</name>
         <pattern>*.wp5</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/zip</name>
-        <pattern>*.zip</pattern>
     </mime-type>
     <mime-type>
         <name>application/x-123</name>
@@ -217,18 +566,12 @@
     <mime-type>
         <name>application/x-gtar</name>
         <pattern>*.gtar</pattern>
-        <pattern>*.tgz</pattern>
+        <pattern>*.tgz</pattern><!-- application/gzip -->
         <pattern>*.taz</pattern>
     </mime-type>
     <mime-type>
         <name>application/x-hdf</name>
         <pattern>*.hdf</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/x-httpd-php</name>
-        <pattern>*.phtml</pattern>
-        <pattern>*.pht</pattern>
-        <pattern>*.php</pattern>
     </mime-type>
     <mime-type>
         <name>application/x-httpd-php-source</name>
@@ -251,10 +594,6 @@
         <pattern>*.ica</pattern>
     </mime-type>
     <mime-type>
-        <name>application/x-java-archive</name>
-        <pattern>*.jar</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/x-java-jnlp-file</name>
         <pattern>*.jnlp</pattern>
     </mime-type>
@@ -265,10 +604,6 @@
     <mime-type>
         <name>application/x-java-vm</name>
         <pattern>*.class</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/javascript;charset=utf-8</name>
-        <pattern>*.js</pattern>
     </mime-type>
     <mime-type>
         <name>application/x-kchart</name>
@@ -354,10 +689,6 @@
         <pattern>*.o</pattern>
     </mime-type>
     <mime-type>
-        <name>application/x-ogg</name>
-        <pattern>*.ogg</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/x-oz-application</name>
         <pattern>*.oza</pattern>
     </mime-type>
@@ -379,15 +710,6 @@
         <pattern>*.shar</pattern>
     </mime-type>
     <mime-type>
-        <name>application/x-shockwave-flash</name>
-        <pattern>*.swf</pattern>
-        <pattern>*.swfl</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/x-sh</name>
-        <pattern>*.sh</pattern>
-    </mime-type>
-    <mime-type>
         <name>application/x-stuffit</name>
         <pattern>*.sit</pattern>
     </mime-type>
@@ -398,10 +720,6 @@
     <mime-type>
         <name>application/x-sv4crc</name>
         <pattern>*.sv4crc</pattern>
-    </mime-type>
-    <mime-type>
-        <name>application/x-tar</name>
-        <pattern>*.tar</pattern>
     </mime-type>
     <mime-type>
         <name>application/x-tcl</name>
@@ -474,19 +792,6 @@
         <pattern>*.snd</pattern>
     </mime-type>
     <mime-type>
-        <name>audio/midi</name>
-        <pattern>*.mid</pattern>
-        <pattern>*.midi</pattern>
-        <pattern>*.kar</pattern>
-    </mime-type>
-    <mime-type>
-        <name>audio/mpeg</name>
-        <pattern>*.mpga</pattern>
-        <pattern>*.mpega</pattern>
-        <pattern>*.mp2</pattern>
-        <pattern>*.mp3</pattern>
-    </mime-type>
-    <mime-type>
         <name>audio/mpegurl</name>
         <pattern>*.m3u</pattern>
     </mime-type>
@@ -523,10 +828,6 @@
         <pattern>*.pls</pattern>
     </mime-type>
     <mime-type>
-        <name>audio/x-wav</name>
-        <pattern>*.wav</pattern>
-    </mime-type>
-    <mime-type>
         <name>chemical/x-pdb</name>
         <pattern>*.pdb</pattern>
     </mime-type>
@@ -534,52 +835,13 @@
         <name>chemical/x-xyz</name>
         <pattern>*.xyz</pattern>
     </mime-type>
-    <!-- Put this as first entry with *.xml -->
-    <mime-type>
-        <name>application/xml</name>
-        <pattern>*.xml</pattern>
-        <pattern>*.xsl</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/bmp</name>
-        <pattern>*.bmp</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/gif</name>
-        <pattern>*.gif</pattern>
-    </mime-type>
     <mime-type>
         <name>image/ief</name>
         <pattern>*.ief</pattern>
     </mime-type>
     <mime-type>
-        <name>image/jpeg</name>
-        <pattern>*.jpeg</pattern>
-        <pattern>*.jpg</pattern>
-        <pattern>*.jpe</pattern>
-    </mime-type>
-    <mime-type>
         <name>image/pcx</name>
         <pattern>*.pcx</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/png</name>
-        <pattern>*.png</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/svg+xml</name>
-        <pattern>*.xml</pattern>
-        <pattern>*.svg</pattern>
-        <pattern>*.svgz</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/tiff</name>
-        <pattern>*.tiff</pattern>
-        <pattern>*.tif</pattern>
-    </mime-type>
-    <mime-type>
-        <name>image/vnd.wap.wbmp</name>
-        <pattern>*.wbmp</pattern>
     </mime-type>
     <mime-type>
         <name>image/x-cmu-raster</name>
@@ -663,43 +925,12 @@
         <pattern>*.vrml</pattern>
     </mime-type>
     <mime-type>
-        <name>text/comma-separated-values</name>
-        <pattern>*.csv</pattern>
-    </mime-type>
-    <mime-type>
-        <name>text/css</name>
-        <pattern>*.css</pattern>
-    </mime-type>
-    <mime-type>
-        <name>text/mathml</name>
-        <pattern>*.mml</pattern>
-    </mime-type>
-    <mime-type>
-        <name>text/plain</name>
-        <pattern>*.asc</pattern>
-        <pattern>*.txt</pattern>
-        <pattern>*.text</pattern>
-        <pattern>*.diff</pattern>
-    </mime-type>
-    <mime-type>
         <name>text/richtext</name>
         <pattern>*.rtx</pattern>
     </mime-type>
     <mime-type>
-        <name>text/rtf</name>
-        <pattern>*.rtf</pattern>
-    </mime-type>
-    <mime-type>
         <name>text/tab-separated-values</name>
         <pattern>*.tsv</pattern>
-    </mime-type>
-    <mime-type>
-        <name>text/vnd.wap.wml</name>
-        <pattern>*.wml</pattern>
-    </mime-type>
-    <mime-type>
-        <name>text/vnd.wap.wmlscript</name>
-        <pattern>*.wmls</pattern>
     </mime-type>
     <mime-type>
         <name>text/x-c</name>
@@ -783,17 +1014,6 @@
         <pattern>*.gl</pattern>
     </mime-type>
     <mime-type>
-        <name>video/mpeg</name>
-        <pattern>*.mpeg</pattern>
-        <pattern>*.mpg</pattern>
-        <pattern>*.mpe</pattern>
-    </mime-type>
-    <mime-type>
-        <name>video/quicktime</name>
-        <pattern>*.qt</pattern>
-        <pattern>*.mov</pattern>
-    </mime-type>
-    <mime-type>
         <name>video/vnd.mpegurl</name>
         <pattern>*.mxu</pattern>
     </mime-type>
@@ -805,14 +1025,6 @@
         <name>video/x-ms-asf</name>
         <pattern>*.asf</pattern>
         <pattern>*.asx</pattern>
-    </mime-type>
-    <mime-type>
-        <name>video/x-ms-wmv</name>
-        <pattern>*.wmv</pattern>
-    </mime-type>
-    <mime-type>
-        <name>video/x-msvideo</name>
-        <pattern>*.avi</pattern>
     </mime-type>
     <mime-type>
         <name>video/x-sgi-movie</name>
@@ -828,39 +1040,31 @@
         <pattern>*.vrml</pattern>
         <pattern>*.wrl</pattern>
     </mime-type>
+
+    <!-- Remember WAP? -->
     <mime-type>
-        <name>text/html</name>
-        <pattern>*.html</pattern>
-        <pattern>*.htm</pattern>
-    </mime-type>
-    <!-- RFC 4627 -->
-    <mime-type>
-        <name>application/json</name>
-        <pattern>*.json</pattern>
+        <name>application/vnd.wap.wbxml</name>
+        <pattern>*.wbxml</pattern>
     </mime-type>
     <mime-type>
-        <name>text/x-component</name>
-        <pattern>*.htc</pattern>
+        <name>application/vnd.wap.wmlc</name>
+        <pattern>*.wmlc</pattern>
     </mime-type>
     <mime-type>
-        <name>image/vnd.microsoft.icon</name>
-        <pattern>*.ico</pattern>
-    </mime-type>
-    <!-- Web fonts -->
-    <mime-type>
-        <name>application/vnd.ms-fontobject</name>
-        <pattern>*.eot</pattern>
+        <name>application/vnd.wap.wmlscriptc</name>
+        <pattern>*.wmlsc</pattern>
     </mime-type>
     <mime-type>
-        <name>font/truetype</name>
-        <pattern>*.ttf</pattern>
+        <name>image/vnd.wap.wbmp</name>
+        <pattern>*.wbmp</pattern>
     </mime-type>
     <mime-type>
-        <name>application/font-woff</name>
-        <pattern>*.woff</pattern>
+        <name>text/vnd.wap.wml</name>
+        <pattern>*.wml</pattern>
     </mime-type>
     <mime-type>
-        <name>font/woff2</name>
-        <pattern>*.woff2</pattern>
+        <name>text/vnd.wap.wmlscript</name>
+        <pattern>*.wmls</pattern>
     </mime-type>
+
 </mime-types>

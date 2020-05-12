@@ -23,8 +23,10 @@ object Page {
 
   import Private._
 
-  // https://github.com/orbeon/orbeon-forms/issues/4430
-  lazy val loadingIndicator = new LoadingIndicator
+  @JSExport
+  // Make the `lazy val` accessible to JavaScript through a function
+  // We can remove the `()` once we got rid of the call in `AjaxServer.js`
+  def loadingIndicator(): LoadingIndicator = Private.loadingIndicator
 
   def registerForm(namespacedFormId: String, form: Form): Unit = {
     formsByNamespacedFormId += namespacedFormId -> form
@@ -102,9 +104,10 @@ object Page {
 
     case class ConstructorPredicate(controlConstructor: () => Upload, predicate: html.Element => Boolean)
 
-    var formsByNamespacedFormId = Map[String, Form]()
-    var formsByUuid             = Map[String, Form]()
-    var controlConstructors     = List[ConstructorPredicate]()
-    var idToControl             = Map[String, Upload]()
+    lazy val loadingIndicator        = new LoadingIndicator
+    var      formsByNamespacedFormId = Map[String, Form]()
+    var      formsByUuid             = Map[String, Form]()
+    var      controlConstructors     = List[ConstructorPredicate]()
+    var      idToControl             = Map[String, Upload]()
   }
 }

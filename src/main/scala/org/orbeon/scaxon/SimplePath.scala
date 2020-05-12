@@ -127,6 +127,7 @@ object SimplePath {
 
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
+    // Q: If the QName is specified, zero or one attribute can be returned. Should return `Option`?
     def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
     def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.localName), Some(Type.ATTRIBUTE)))
     def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
@@ -175,7 +176,7 @@ object SimplePath {
 
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
       case Seq() => None
-      case s     => Some(s.stringValue) filter (_.nonBlank)
+      case s     => Some(s.stringValue) filter (_.nonAllBlank)
     }
 
     def attValueNonBlankOrThrow(attName: String): String =

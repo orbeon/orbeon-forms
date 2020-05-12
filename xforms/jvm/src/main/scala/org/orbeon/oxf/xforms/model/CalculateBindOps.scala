@@ -169,14 +169,13 @@ trait CalculateBindOps {
           bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip =>
             if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Model.Whitespace, null)) {
               DataModel.setValueIfChangedHandleErrors(
-                containingDocument = containingDocument,
-                eventTarget        = model,
-                locationData       = bindNode.locationData,
-                nodeInfo           = bindNode.node,
-                valueToSet         = applyPolicy(DataModel.getValue(bindNode.item), mip.policy),
-                source             = "whitespace",
-                isCalculate        = true,
-                collector          = collector
+                eventTarget  = model,
+                locationData = bindNode.locationData,
+                nodeInfo     = bindNode.node,
+                valueToSet   = applyPolicy(DataModel.getValue(bindNode.item), mip.policy),
+                source       = "whitespace",
+                isCalculate  = true,
+                collector    = collector
               )
             }
           }
@@ -252,14 +251,13 @@ trait CalculateBindOps {
           }
 
         DataModel.setValueIfChangedHandleErrors(
-          containingDocument = containingDocument,
-          eventTarget        = model,
-          locationData       = bindNode.locationData,
-          nodeInfo           = bindNode.node,
-          valueToSet         = valueToSet,
-          source             = mip.name,
-          isCalculate        = true,
-          collector          = collector
+          eventTarget  = model,
+          locationData = bindNode.locationData,
+          nodeInfo     = bindNode.node,
+          valueToSet   = valueToSet,
+          source       = mip.name,
+          isCalculate  = true,
+          collector    = collector
         )
       }
   }

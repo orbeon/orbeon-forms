@@ -72,14 +72,4 @@ object FutureUtils {
     def toTry(implicit executor: ExecutionContext): Future[Try[T]] =
       f map Success.apply recover { case t => Failure(t) }
   }
-
-  def withFutureSideEffects[T](
-    before      : => Unit,
-    after       : => Unit)(
-    body        : => Future[T])(implicit
-    execContext : ExecutionContext
-  ): Future[T] = {
-    before
-    body andThen { case _ => after } // make sure to sequence `after` *before* the result
-  }
 }

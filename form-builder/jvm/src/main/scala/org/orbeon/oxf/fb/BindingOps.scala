@@ -134,11 +134,12 @@ trait BindingOps {
         }
 
         // See also toolbox.xml which duplicates some of this logic
-        val displayNameOpt = findMetadata(metadata / FBDisplayNameTest)
-        val iconClasses    = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
-        val iconPathOpt    = findMetadata(metadata / FBIconTest / FBSmallIconTest)
+        val displayNameOpt           = findMetadata(metadata / FBDisplayNameTest)
+        val iconClasses              = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
+        val iconPathOpt              = findMetadata(metadata / FBIconTest / FBSmallIconTest)
+        val appearanceDisplayNameOpt = findMetadata(metadata / FBAppearanceDisplayNameTest)
 
-        (appearanceOpt, displayNameOpt, iconPathOpt, iconClasses)
+        (appearanceOpt, appearanceDisplayNameOpt orElse displayNameOpt, iconPathOpt, iconClasses)
     } collect {
       case (appearanceOpt, Some(displayName), iconPathOpt, iconClasses) =>
         (appearanceOpt, displayName, iconPathOpt, iconClasses)

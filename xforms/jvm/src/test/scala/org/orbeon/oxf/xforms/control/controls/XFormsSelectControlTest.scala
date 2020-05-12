@@ -46,7 +46,7 @@ class XFormsSelectControlTest
         ).to(Set)
 
       val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) = XFormsSelectControl.updateSelection(
-        setToList(dataValues), setToList(itemsetValues), setToList(incomingValues)
+        setToList(dataValues), setToList(itemsetValues), setToList(incomingValues), excludeWhitespaceTextNodes = false
       )
 
       (listToSet(newlySelectedValues), listToSet(newlyDeselectedValues), listToSet(newInstanceValue))

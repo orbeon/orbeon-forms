@@ -145,16 +145,16 @@
                         <!-- NOTE: declared here instead of in xbl:implementation so we can use XSLT -->
                         <xf:model id="autocomplete-model">
                             <xf:instance id="local">
-                                <autocomplete>
+                                <_>
                                     <readonly>false</readonly>
                                     <textfield-value/>
-                                </autocomplete>
+                                </_>
                             </xf:instance>
 
                             <xf:bind ref="textfield-value" readonly="../readonly = 'true'"/>
 
                             <!-- In resource mode, the suggestions -->
-                            <xf:instance id="suggestions-instance"><dummy/></xf:instance>
+                            <xf:instance id="suggestions-instance"><_/></xf:instance>
                             <!-- What do when doing a refresh -->
                             <xf:submission
                                 id="get-itemset"

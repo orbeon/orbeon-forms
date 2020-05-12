@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import collection.mutable.LinkedHashMap
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.xforms.XFormsId
+
+import scala.collection.{mutable => m}
 
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
@@ -42,19 +46,19 @@ class SimpleElementAnalysis(
   require(scope ne null)
 
   // Index of the element in the view
-  def index = staticStateContext.index
+  def index: Int = staticStateContext.index
 
   // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
   // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
-  lazy val model = findContainingModel
+  lazy val model: Option[Model] = findContainingModel
 
-  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
+  val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
   protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
-  def containerScope = part.containingScope(prefixedId)
+  def containerScope: Scope = part.containingScope(prefixedId)
 
   /**
    * Find the model associated with the given element, whether explicitly set with @model, or inherited.
@@ -78,7 +82,7 @@ class SimpleElementAnalysis(
         }
     }
 
-  protected def computeContextAnalysis = {
+  protected def computeContextAnalysis: Option[XPathAnalysis] = {
     context match {
       case Some(context) =>
         // @context attribute, use the overridden in-scope context
@@ -89,7 +93,7 @@ class SimpleElementAnalysis(
     }
   }
 
-  protected def computeBindingAnalysis = {
+  protected def computeBindingAnalysis: Option[XPathAnalysis] = {
     bind match {
       case Some(bindStaticId) =>
         // Use @bind analysis directly from model
@@ -127,7 +131,7 @@ class SimpleElementAnalysis(
     }
   }
 
-  def getChildElementScope(childElement: Element) = {
+  def getChildElementScope(childElement: Element): Scope = {
     val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
     part.scopeForPrefixedId(childPrefixedId)
   }
@@ -153,16 +157,16 @@ class SimpleElementAnalysis(
   class SimplePathMapContext {
 
     // Current element
-    def element = self
+    def element: SimpleElementAnalysis = self
 
     // Return the analysis for the context in scope
-    def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
+    def context: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
 
     // Return a map of static id => analysis for all the ancestor-or-self in scope.
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
-      LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*)
+      m.LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*)
 
     // Return analysis for closest ancestor repeat in scope.
-    def getInScopeRepeat = self.ancestorRepeatInScope
+    def getInScopeRepeat: Option[RepeatControl] = self.ancestorRepeatInScope
   }
 }

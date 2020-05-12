@@ -305,6 +305,17 @@
         </fr:image>
     </xsl:template>
 
+    <!-- Convert Autocomplete to Dynamic Dropdown with Search -->
+    <xsl:template match="fr:autocomplete"
+                  mode="within-body">
+        <fr:databound-select1 appearance="search"
+                              service-performs-search="true"
+                              service-supports-paging="false"
+                              is-last-page="">
+            <xsl:apply-templates select="@* except (@appearance, @labelref) | node()" mode="#current"/>
+        </fr:databound-select1>
+    </xsl:template>
+
     <!-- Upgrade "form load" actions from `xforms-ready` to `fr-run-form-load-action-after-controls` -->
     <!-- See https://github.com/orbeon/orbeon-forms/issues/3126 -->
     <xsl:template

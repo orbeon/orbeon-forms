@@ -113,7 +113,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val boundNodes =
       findControls collect {
-        case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNodeOpt
+        case control: XFormsSingleNodeControl if control.isRelevant => control.boundNodeOpt
       } flatten
 
     boundNodes.nonEmpty option boundNodes.iterator
@@ -129,20 +129,20 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
       def findBindForSource =
         container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
-          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
-          case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+          case control: XFormsSingleNodeControl if control.isRelevant => control.bind
+          case runtimeBind: RuntimeBind                               => Some(runtimeBind)
         } flatten
 
       def findBindNodeForSource =
-        for (sourceRuntimeBind ← findBindForSource)
+        for (sourceRuntimeBind <- findBindForSource)
         yield
           sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
 
       for {
-        model             ← modelOpt
-        modelBinds        ← model.modelBindsOpt
-        targetStaticBind  ← model.staticModel.bindsById.get(bindId(targetControlName))
-        value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
+        model             <- modelOpt
+        modelBinds        <- model.modelBindsOpt
+        targetStaticBind  <- model.staticModel.bindsById.get(bindId(targetControlName))
+        value             <- BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
       } yield
         value
     }
@@ -198,11 +198,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       )
 
     remainingRepeatPrefixedIdsLeafToRoot.lastOption match {
-      case None ⇒
+      case None =>
         None
-      case Some(_) ⇒
+      case Some(_) =>
         ancestorRepeatPrefixedIdOpt match {
-          case Some(ancestorRepeatPrefixedId) ⇒
+          case Some(ancestorRepeatPrefixedId) =>
 
             val tree = doc.getControls.getCurrentControlTree
 
@@ -215,7 +215,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
             // For section templates we must make sure we don't return a node which is not within the template instance
             iterationBoundNode filter (_.root == formInstance.root) orElse Some(formInstance)
 
-          case None ⇒
+          case None =>
             Some(formInstance)
         }
     }
@@ -236,7 +236,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
   //@XPathFunction
   def addToItemsetMap(map: String, controlName: String, itemsetId: String): String =
-    encodeSimpleQuery((controlName → itemsetId) :: decodeSimpleQuery(removeFromItemsetMap(map, controlName)))
+    encodeSimpleQuery((controlName -> itemsetId) :: decodeSimpleQuery(removeFromItemsetMap(map, controlName)))
 
   //@XPathFunction
   def removeFromItemsetMap(map: String, controlName: String): String =
@@ -263,9 +263,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       val map = allMappings.toMap
       val allNames = map.keySet
 
-      newDoc descendant * filter { e ⇒
+      newDoc descendant * filter { e =>
         allNames(e.localname)
-      } foreach { e ⇒
+      } foreach { e =>
         XFormsAPI.insert(
           into   = e,
           origin = NodeInfoFactory.attributeInfo(FRItemsetIdQName, map(e.localname))
@@ -283,14 +283,14 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       instance.rootElement descendantOrSelf * att test map (_.stringValue)
 
     val uniqueIdsFromItemsetIds  = attributesValues(XMLNames.FRItemsetId).to(Set)
-    val uniqueIdsFromItemsetMaps = (attributesValues(XMLNames.FRItemsetMap) flatMap (mapValue ⇒ decodeSimpleQuery(mapValue) map (_._2))).to(Set)
+    val uniqueIdsFromItemsetMaps = (attributesValues(XMLNames.FRItemsetMap) flatMap (mapValue => decodeSimpleQuery(mapValue) map (_._2))).to(Set)
 
     uniqueIdsFromItemsetIds ++ uniqueIdsFromItemsetMaps
   }
 
   //@XPathFunction
   def garbageCollectMetadataItemsets(instance: NodeInfo): Unit =
-    (instance.rootElement child XMLNames.FRMetadata headOption) foreach { metadataElem ⇒
+    (instance.rootElement child XMLNames.FRMetadata headOption) foreach { metadataElem =>
 
       val uniqueIdsInUse = itemsetIdsInUse(instance)
 
@@ -310,28 +310,28 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     def fromString(s: String): PositionType =
       s match {
-        case "start"  ⇒ Start
-        case "end"    ⇒ End
-        case "none"   ⇒ None
-        case maybeInt ⇒ maybeInt.toIntOpt map Specific.apply getOrElse (throw new IllegalArgumentException(maybeInt))
+        case "start"  => Start
+        case "end"    => End
+        case "none"   => None
+        case maybeInt => maybeInt.toIntOpt map Specific.apply getOrElse (throw new IllegalArgumentException(maybeInt))
       }
 
     def asString(p: PositionType): String =
       p match {
-        case Start       ⇒ "start"
-        case End         ⇒ "end"
-        case None        ⇒ "none"
-        case Specific(i) ⇒ i.toString
+        case Start       => "start"
+        case End         => "end"
+        case None        => "none"
+        case Specific(i) => i.toString
       }
   }
 
   private def findChildElemAtPosition(contextElem: NodeInfo, position: PositionType): Option[NodeInfo] = {
     val children = contextElem child *
     position match {
-      case PositionType.Start       ⇒ children.headOption
-      case PositionType.End         ⇒ children.lastOption
-      case PositionType.None        ⇒ None
-      case PositionType.Specific(i) ⇒ children.lift(i - 1)
+      case PositionType.Start       => children.headOption
+      case PositionType.End         => children.lastOption
+      case PositionType.None        => None
+      case PositionType.Specific(i) => children.lift(i - 1)
     }
   }
 
@@ -347,28 +347,28 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val containerDetails =
       containerDetailsString.splitTo[List]().grouped(3).to(List) map {
-        case name :: isRepeat :: position :: Nil ⇒ (name, isRepeat.toBoolean, PositionType.fromString(position))
-        case _                                   ⇒ throw new IllegalArgumentException
+        case name :: isRepeat :: position :: Nil => (name, isRepeat.toBoolean, PositionType.fromString(position))
+        case _                                   => throw new IllegalArgumentException
       }
 
     val parentContextElemOpt =
       containerDetails.init.foldLeft(formInstance.rootElement.some) {
-        case (Some(elem), (name, isRepeat, position)) ⇒ processOne(elem, name, isRepeat, position)
-        case (None, _) ⇒ None
+        case (Some(elem), (name, isRepeat, position)) => processOne(elem, name, isRepeat, position)
+        case (None, _) => None
       }
 
-    parentContextElemOpt flatMap { parentContextElem ⇒
+    parentContextElemOpt flatMap { parentContextElem =>
       val (repeatName, _, position) = containerDetails.last
       (parentContextElem child repeatName).headOption map
-        (repeatContextElem ⇒ (repeatContextElem, repeatName, position))
+        (repeatContextElem => (repeatContextElem, repeatName, position))
     }
   }
 
   //@XPathFunction
   def repeatAddIteration(containerDetailsString: String, applyDefaults: Boolean): Unit =
     for {
-      (repeatContextElem, repeatName, position) ← findInsertDeleteElem(containerDetailsString)
-      templateInstance                          ← topLevelInstance(Names.FormModel, templateId(repeatName))
+      (repeatContextElem, repeatName, position) <- findInsertDeleteElem(containerDetailsString)
+      templateInstance                          <- topLevelInstance(Names.FormModel, templateId(repeatName))
       repeatTemplate                            = templateInstance.rootElement
     } locally {
       XFormsAPI.insert(
@@ -382,7 +382,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   //@XPathFunction
   def repeatRemoveIteration(containerDetailsString: String): Unit =
     for {
-      (repeatContextElem, _, position) ← findInsertDeleteElem(containerDetailsString)
+      (repeatContextElem, _, position) <- findInsertDeleteElem(containerDetailsString)
     } locally {
       XFormsAPI.delete(ref = findChildElemAtPosition(repeatContextElem, position).toList)
     }
@@ -390,7 +390,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   //@XPathFunction
   def repeatClear(containerDetailsString: String): Unit =
     for {
-      (repeatContextElem, _, _) ← findInsertDeleteElem(containerDetailsString)
+      (repeatContextElem, _, _) <- findInsertDeleteElem(containerDetailsString)
     } locally {
       XFormsAPI.delete(ref = repeatContextElem child *)
     }
@@ -408,7 +408,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     val namesWithIsRepeat =
       FormRunner.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
         (FormRunner.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
-        (e ⇒ (FormRunner.controlNameFromId(e.id), FormRunner.isRepeat(e)))
+        (e => (FormRunner.controlNameFromId(e.id), FormRunner.isRepeat(e)))
 
     val repeatDepth = namesWithIsRepeat count (_._2)
 
@@ -428,8 +428,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
 
     namesWithIsRepeat.reverseIterator flatMap {
-      case (name, isRepeat @ true)  ⇒ List(name, isRepeat.toString, PositionType.asString(positionsIt.next()))
-      case (name, isRepeat @ false) ⇒ List(name, isRepeat.toString, "none")
+      case (name, isRepeat @ true)  => List(name, isRepeat.toString, PositionType.asString(positionsIt.next()))
+      case (name, isRepeat @ false) => List(name, isRepeat.toString, "none")
     }
   }
 }

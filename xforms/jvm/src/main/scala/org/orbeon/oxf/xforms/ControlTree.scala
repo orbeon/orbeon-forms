@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.collection.compat._
 
 private class ControlIndex {
@@ -40,9 +40,9 @@ private class ControlIndex {
   private val _controlTypes = new ju.HashMap[String, ju.LinkedHashMap[String, XFormsControl]]
 
   private def mustMapControl(control: XFormsControl): Boolean = control match {
-    case _: XFormsUploadControl | _: XFormsRepeatControl | _: XXFormsDialogControl ⇒ true
-    case s: XFormsSelectControl if s.isFullAppearance                              ⇒ true
-    case _                                                                         ⇒ false
+    case _: XFormsUploadControl | _: XFormsRepeatControl | _: XXFormsDialogControl => true
+    case s: XFormsSelectControl if s.isFullAppearance                              => true
+    case _                                                                         => false
   }
 
   // Index a single controls
@@ -50,7 +50,7 @@ private class ControlIndex {
     // Remember by effective id
     _effectiveIdsToControls.put(control.getEffectiveId, control)
     // Also index children actions
-    for (actionControl ← control.childrenActions)
+    for (actionControl <- control.childrenActions)
       _effectiveIdsToControls.put(actionControl.getEffectiveId, actionControl)
 
     // Remember by control type (for certain controls we know we need)
@@ -70,7 +70,7 @@ private class ControlIndex {
     // Remove by effective id
     _effectiveIdsToControls.remove(control.getEffectiveId)
     // Also remove children actions
-    for (actionControl ← control.childrenActions)
+    for (actionControl <- control.childrenActions)
       _effectiveIdsToControls.remove(actionControl.getEffectiveId)
 
     // Remove by control type (for certain controls we know we need)
@@ -131,13 +131,13 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         dispatchRefreshEvents(controlIds, isInitial = true)
       } else {
         // Make sure all control state such as relevance, value changed, etc. does not mark a difference
-        for (control ← allControls) {
+        for (control <- allControls) {
           updateValueControl(control)
           control.commitCurrentUIState()
         }
       }
 
-      debugResults(List("controls created" → allControls.size.toString))
+      debugResults(List("controls created" -> allControls.size.toString))
     }
 
   def updateValueControls(controlsEffectiveIds: List[String]): Unit =
@@ -145,8 +145,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
 
   def updateValueControl(control: XFormsControl): Unit =
     control match {
-      case vc: XFormsValueControl if vc.isRelevant ⇒ vc.getValue
-      case _ ⇒
+      case vc: XFormsValueControl if vc.isRelevant => vc.getValue
+      case _ =>
     }
 
   def dispatchRefreshEvents(controlsEffectiveIds: List[String], isInitial: Boolean): Unit = {
@@ -173,7 +173,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
           }
         }
 
-      for (controlEffectiveId ← controlsEffectiveIds)
+      for (controlEffectiveId <- controlsEffectiveIds)
         findControl(controlEffectiveId) foreach dispatchRefreshEvents
     }
   }
@@ -211,14 +211,14 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       )
       // Dispatch events
       for {
-        effectiveId ← controlsEffectiveIds
-        control     ← effectiveIdsToControls.get(effectiveId)
+        effectiveId <- controlsEffectiveIds
+        control     <- effectiveIdsToControls.get(effectiveId)
         if XFormsControl.controlSupportsRefreshEvents(control)
       } locally {
         // Directly call destruction events as we know the iteration is going away
         control.dispatchDestructionEvents()
       }
-      debugResults(List("controls" → controlsEffectiveIds.size.toString))
+      debugResults(List("controls" -> controlsEffectiveIds.size.toString))
     }
 
   def getBackCopy: Any = {
@@ -226,13 +226,13 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     val cloned = super.clone.asInstanceOf[ControlTree]
 
     _root match {
-      case Some(root) ⇒
+      case Some(root) =>
         // Gather repeat indexes if any
         // Do this before cloning controls so that initial/current locals are still different
         cloned._initialRepeatIndexes = XFormsRepeatControl.initialIndexes(root.containingDocument)
         // Clone children if any
         cloned._root = Some(root.getBackCopy.asInstanceOf[XFormsContainerControl])
-      case None ⇒
+      case None =>
     }
     // NOTE: The cloned tree does not make use of this so we clear it
     cloned._controlIndex = null
@@ -269,8 +269,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     ControlsIterator(containerControl, includeCurrent) foreach _controlIndex.deindexControl
 
   def children: Seq[XFormsControl] = _root match {
-    case Some(root) ⇒ root.children
-    case None       ⇒ Nil
+    case Some(root) => root.children
+    case None       => Nil
   }
 
   def effectiveIdsToControls: collection.Map[String, XFormsControl] = _controlIndex.effectiveIdsToControls

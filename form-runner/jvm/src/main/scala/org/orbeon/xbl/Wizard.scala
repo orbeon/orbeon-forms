@@ -41,9 +41,9 @@ object Wizard {
   //@XPathFunction
   def normalizeWizardMode(mode: String): String =
     mode match {
-      case "true" | "lax" ⇒ "lax"
-      case "strict"       ⇒ "strict"
-      case _              ⇒ "free"
+      case "true" | "lax" => "lax"
+      case "strict"       => "strict"
+      case _              => "free"
     }
 
   //@XPathFunction
@@ -66,8 +66,8 @@ object Wizard {
 
     val resultOpt =
       for {
-        model    ← findWizardModel
-        instance ← model.findInstance("available-top-level-sections")
+        model    <- findWizardModel
+        instance <- model.findInstance("available-top-level-sections")
         root     = instance.rootElement
       } yield
         root.stringValue.tokenizeToSet
@@ -95,7 +95,7 @@ object Wizard {
 
   //@XPathFunction
   def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
-    gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to(List)) map { sectionStatus ⇒
+    gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to(List)) map { sectionStatus =>
       MapFunctions.createValue(
         Map[AtomicValue, ValueRepresentation](
           (SaxonUtils.fixStringValue("name")                         , sectionStatus.name),
@@ -112,9 +112,9 @@ object Wizard {
   //@XPathFunction
   def caseIdsForTopLevelSection(topLevelSectionId: String): SequenceIterator =
     for {
-      control               ← inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, s"$topLevelSectionId-switch", None).toList
-      switchControl         ← control.narrowTo[XFormsSwitchControl].toList
-      subsectionCaseControl ← switchControl.getChildrenCases
+      control               <- inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, s"$topLevelSectionId-switch", None).toList
+      switchControl         <- control.narrowTo[XFormsSwitchControl].toList
+      subsectionCaseControl <- switchControl.getChildrenCases
     } yield
       subsectionCaseControl.getId
 
@@ -135,15 +135,15 @@ object Wizard {
 
     def findWizardModel: Option[XFormsModel] =
       for {
-        container ← findWizardContainer
-        model     ← container.defaultModel
+        container <- findWizardContainer
+        model     <- container.defaultModel
       } yield
         model
 
     def findWizardState: Option[NodeInfo] =
       for {
-        model     ← findWizardModel
-        instance  ← model.defaultInstanceOpt
+        model     <- findWizardModel
+        instance  <- model.defaultInstanceOpt
       } yield
         instance.rootElement
 
@@ -151,8 +151,8 @@ object Wizard {
       XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
 
     def booleanValue(value: ValueRepresentation) = value match {
-      case v: Value    ⇒ v.effectiveBooleanValue
-      case _           ⇒ false
+      case v: Value    => v.effectiveBooleanValue
+      case _           => false
     }
 
     def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
@@ -168,7 +168,7 @@ object Wizard {
       val wizardMode = getWizardValidatedMode
 
       val sectionStatusesWithDummyHead =
-        relevantTopLevelSectionIds.scanLeft(None: Option[SectionStatus]) { case (prevOpt, sectionId) ⇒
+        relevantTopLevelSectionIds.scanLeft(None: Option[SectionStatus]) { case (prevOpt, sectionId) =>
 
           val sectionName = controlNameFromId(sectionId)
 
@@ -179,15 +179,15 @@ object Wizard {
 
           def strictIsAccessible =
             prevOpt match {
-              case Some(prev) ⇒ prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
-              case None       ⇒ true
+              case Some(prev) => prev.isAccessible && ! (prev.hasIncompleteFields || prev.hasErrorFields)
+              case None       => true
             }
 
           val isAccessible =
             wizardMode match {
-              case "free"   ⇒ true
-              case "lax"    ⇒ isVisited || strictIsAccessible
-              case "strict" ⇒ strictIsAccessible
+              case "free"   => true
+              case "lax"    => isVisited || strictIsAccessible
+              case "strict" => strictIsAccessible
             }
 
           val incompleteAndErrorCounts        = topLevelSectionNamesWithErrorsMap.get(sectionName)

@@ -21,12 +21,12 @@ import org.orbeon.xforms.XFormsId
 class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def effectiveAndAbsolute(): Unit = {
     val pairs = Map(
-      "foo"             → "|foo|",
-      "foo≡bar"         → "|foo≡bar|",
-      "foo≡bar≡baz⊙1-2" → "|foo≡bar≡baz⊙1-2|"
+      "foo"             -> "|foo|",
+      "foo≡bar"         -> "|foo≡bar|",
+      "foo≡bar≡baz⊙1-2" -> "|foo≡bar≡baz⊙1-2|"
     )
 
-    for ((effective, absolute) ← pairs) {
+    for ((effective, absolute) <- pairs) {
       assert(XFormsId.isAbsoluteId(absolute))
       assert(effective === XFormsId.absoluteIdToEffectiveId(absolute))
       assert(absolute  === XFormsId.effectiveIdToAbsoluteId(effective))

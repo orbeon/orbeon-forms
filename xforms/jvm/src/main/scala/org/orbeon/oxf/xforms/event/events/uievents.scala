@@ -43,8 +43,8 @@ class XFormsFocusEvent(target: XFormsEventTarget, properties: PropertyGetter)
     this(
       target,
       Map(
-        "includes" → Some(includes),
-        "excludes" → Some(excludes)
+        "includes" -> Some(includes),
+        "excludes" -> Some(excludes)
       )
     )
 
@@ -141,7 +141,7 @@ private object XFormsValueChangeEvent {
   val XXFValue = xxfName("value")
 
   def properties(target: XFormsEventTarget): PropertyGetter = {
-    case XXFValue ⇒ Option(target) collect { case v: XFormsValueControl ⇒ v.getValue }
+    case XXFValue => Option(target) collect { case v: XFormsValueControl => v.getValue }
   }
 }
 
@@ -162,16 +162,16 @@ private object XXFormsConstraintsChangedEvent {
   }
 
   def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
-    case "level"            ⇒ level map (_.entryName)
-    case "constraints"      ⇒ Option(current map (_.id))
-    case "errors"           ⇒ Some(validationsForLevel(current, ErrorLevel))
-    case "warnings"         ⇒ Some(validationsForLevel(current, WarningLevel))
-    case "infos"            ⇒ Some(validationsForLevel(current, InfoLevel))
-    case "added-errors"     ⇒ Some(diffValidations(previous, current, ErrorLevel))
-    case "removed-errors"   ⇒ Some(diffValidations(current, previous, ErrorLevel))
-    case "added-warnings"   ⇒ Some(diffValidations(previous, current, WarningLevel))
-    case "removed-warnings" ⇒ Some(diffValidations(current, previous, WarningLevel))
-    case "added-infos"      ⇒ Some(diffValidations(previous, current, InfoLevel))
-    case "removed-infos"    ⇒ Some(diffValidations(current, previous, InfoLevel))
+    case "level"            => level map (_.entryName)
+    case "constraints"      => Option(current map (_.id))
+    case "errors"           => Some(validationsForLevel(current, ErrorLevel))
+    case "warnings"         => Some(validationsForLevel(current, WarningLevel))
+    case "infos"            => Some(validationsForLevel(current, InfoLevel))
+    case "added-errors"     => Some(diffValidations(previous, current, ErrorLevel))
+    case "removed-errors"   => Some(diffValidations(current, previous, ErrorLevel))
+    case "added-warnings"   => Some(diffValidations(previous, current, WarningLevel))
+    case "removed-warnings" => Some(diffValidations(current, previous, WarningLevel))
+    case "added-infos"      => Some(diffValidations(previous, current, InfoLevel))
+    case "removed-infos"    => Some(diffValidations(current, previous, InfoLevel))
   }
 }

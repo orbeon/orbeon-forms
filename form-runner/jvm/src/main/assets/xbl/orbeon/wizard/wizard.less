@@ -36,6 +36,11 @@
         display: table-row;
     }
 
+    // https://github.com/orbeon/orbeon-forms/issues/4450
+    .fr-wizard-cell-placeholder {
+        display: table-cell;
+    }
+
     .fr-wizard-toc, .fr-wizard-body {
         vertical-align: top;
     }
@@ -151,6 +156,10 @@
             display: block;
             position: static;
             width: 100%;
+        }
+
+        .fr-wizard-cell-placeholder {
+            display: none;
         }
 
         .fr-wizard-toc {

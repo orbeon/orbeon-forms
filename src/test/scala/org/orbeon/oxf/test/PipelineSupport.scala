@@ -28,16 +28,16 @@ object PipelineSupport {
 
   def createPipelineContextWithExternalContext(
     requestURL       : String = DefaultRequestUrl,
-    sessionCreated   : Session ⇒ Any = _ ⇒ (),
-    sessionDestroyed : Session ⇒ Any = _ ⇒ ()
+    sessionCreated   : Session => Any = _ => (),
+    sessionDestroyed : Session => Any = _ => ()
   ): PipelineContext =
     new PipelineContext |!> (setExternalContext(_, requestURL, sessionCreated, sessionDestroyed))
 
   def setExternalContext(
     pipelineContext  : PipelineContext,
     requestURL       : String = DefaultRequestUrl,
-    sessionCreated   : Session ⇒ Any = _ ⇒ (),
-    sessionDestroyed : Session ⇒ Any = _ ⇒ ()
+    sessionCreated   : Session => Any = _ => (),
+    sessionDestroyed : Session => Any = _ => ()
   ): ExternalContext =
     new TestExternalContext(
         pipelineContext,

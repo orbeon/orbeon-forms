@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLSupport}
-import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
+import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
 import org.orbeon.oxf.xml.{XMLReceiver, _}
@@ -86,7 +86,7 @@ class XFormsStaticStateImpl(
 
   private def loadClass[T : ClassTag](propertyName: String): Option[T] =
     staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap trimAllToOpt match {
-      case Some(className) ⇒
+      case Some(className) =>
 
         def tryFromScalaObject: Try[AnyRef] = Try {
           Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
@@ -96,13 +96,13 @@ class XFormsStaticStateImpl(
           Class.forName(className).getDeclaredMethod("instance").invoke(null)
 
         tryFromScalaObject getOrElse fromJavaClass match {
-          case instance: T ⇒ Some(instance)
-          case _ ⇒
+          case instance: T => Some(instance)
+          case _ =>
             throw new ClassCastException(
               s"property `$propertyName` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
             )
         }
-      case None ⇒ None
+      case None => None
     }
 
   // This is a bit tricky because during analysis, XPath expression require the function library. This means this
@@ -111,11 +111,11 @@ class XFormsStaticStateImpl(
   // use `staticStateDocument.nonDefaultProperties` instead.
   lazy val functionLibrary: FunctionLibrary =
     loadClass[FunctionLibrary](FUNCTION_LIBRARY_PROPERTY) match {
-      case Some(library) ⇒
+      case Some(library) =>
         new FunctionLibraryList                         |!>
           (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
           (_.addFunctionLibrary(library))
-      case None ⇒
+      case None =>
         XFormsFunctionLibrary
     }
 
@@ -137,8 +137,8 @@ class XFormsStaticStateImpl(
 
     val compiledExpressionOpt =
       for {
-        rawProperty ← staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY).trimAllToOpt
-        model       ← topLevelPart.defaultModel // ∃ property ⇒ ∃ model, right?
+        rawProperty <- staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY).trimAllToOpt
+        model       <- topLevelPart.defaultModel // ∃ property => ∃ model, right?
       } yield
         XPath.compileExpression(
           xpathString      = rawProperty,
@@ -154,11 +154,11 @@ class XFormsStaticStateImpl(
     }
 
     compiledExpressionOpt match {
-      case Some(CompiledExpression(expr, _, _)) if getExpressionType(expr) == BuiltInAtomicType.INTEGER ⇒
+      case Some(CompiledExpression(expr, _, _)) if getExpressionType(expr) == BuiltInAtomicType.INTEGER =>
         compiledExpressionOpt
-      case Some(_) ⇒
+      case Some(_) =>
         throw new IllegalArgumentException(s"property `$UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY` must return `xs:integer` type")
-      case None ⇒
+      case None =>
         None
     }
   }
@@ -167,15 +167,15 @@ class XFormsStaticStateImpl(
   def isServerStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
 
   private lazy val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
-    staticStateDocument.nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) ⇒
-      name → {
+    staticStateDocument.nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>
+      name -> {
         val maybeAVT = XFormsUtils.maybeAVT(rawPropertyValue)
         topLevelPart.defaultModel match {
-          case Some(model) if isInline && maybeAVT ⇒
+          case Some(model) if isInline && maybeAVT =>
             Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))
-          case None if isInline && maybeAVT ⇒
+          case None if isInline && maybeAVT =>
             throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
-          case _ ⇒
+          case _ =>
             Left(P.getPropertyDefinition(name).parseProperty(rawPropertyValue))
         }
       }
@@ -200,23 +200,23 @@ class XFormsStaticStateImpl(
   // 2014-05-02: Used by XHTMLHeadHandler only
   def clientNonDefaultProperties: Map[String, AnyRef] =
     for {
-      (propertyName, _) ← staticStateDocument.nonDefaultProperties
+      (propertyName, _) <- staticStateDocument.nonDefaultProperties
       if getPropertyDefinition(propertyName).isPropagateToClient
     } yield
-      propertyName → staticProperty(propertyName)
+      propertyName -> staticProperty(propertyName)
 }
 
 object XFormsStaticStateImpl {
 
   val BASIC_NAMESPACE_MAPPING =
     NamespaceMapping(Map(
-      XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
-      XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
-      XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
-      XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
-      XML_EVENTS_PREFIX    → XML_EVENTS_NAMESPACE_URI,
-      XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
-      XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI
+      XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
+      XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,
+      XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
+      XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
+      XML_EVENTS_PREFIX    -> XML_EVENTS_NAMESPACE_URI,
+      XHTML_PREFIX         -> XMLConstants.XHTML_NAMESPACE_URI,
+      XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI
     ))
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
@@ -252,7 +252,7 @@ object XFormsStaticStateImpl {
       digest,
       startScope,
       metadata,
-      staticStateDocument.template map (_ ⇒ template),    // only keep the template around if needed
+      staticStateDocument.template map (_ => template),    // only keep the template around if needed
       staticStateDocument
     )
   }
@@ -271,7 +271,7 @@ object XFormsStaticStateImpl {
         digest,
         startScope,
         metadata,
-        staticStateDocument.template map (_ ⇒ template),    // only keep the template around if needed
+        staticStateDocument.template map (_ => template),    // only keep the template around if needed
         staticStateDocument
       )
     }
@@ -282,7 +282,7 @@ object XFormsStaticStateImpl {
   // Create template and analyzed part for the given XForms document.
   // Used by `xxf:dynamic`.
   def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope): (SAXStore, PartAnalysisImpl) =
-    createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) ⇒ {
+    createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) => {
       val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
       part.analyze()
       part
@@ -314,12 +314,12 @@ object XFormsStaticStateImpl {
         if (metadata.getNamespaceMapping(prefixedId).isDefined) {
           if (startScope.contains(staticId))
             throw new OXFException("Duplicate id found for static id: " + staticId)
-          startScope += staticId → prefixedId
+          startScope += staticId -> prefixedId
 
           if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
             val forStaticId = attributes.getValue("for")
             val forPrefixedId = prefix + forStaticId
-            startScope += forStaticId → forPrefixedId
+            startScope += forStaticId -> forPrefixedId
           }
         }
       }
@@ -346,7 +346,7 @@ object XFormsStaticStateImpl {
   private def createFromDocument[T](
     formDocument : Document,
     startScope   : Scope,
-    create       : (Document, String, Metadata, AnnotatedTemplate) ⇒ T
+    create       : (Document, String, Metadata, AnnotatedTemplate) => T
   ): (SAXStore, T) = {
     val identity = TransformerUtils.getIdentityTransformerHandler
 
@@ -427,12 +427,12 @@ object XFormsStaticStateImpl {
     // NOTE: XFormsExtractor takes care of propagating only non-default properties
     val nonDefaultProperties: Map[String, (String, Boolean)] = {
       for {
-        element       ← Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
+        element       <- Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
         propertyName  = element.attributeValue("name")
         propertyValue = element.attributeValue("value")
         isInline      = element.attributeValue("inline") == true.toString
       } yield
-        (propertyName, propertyValue → isInline)
+        (propertyName, propertyValue -> isInline)
     } toMap
 
     val isHTMLDocument: Boolean =

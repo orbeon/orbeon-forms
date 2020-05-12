@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.http.HttpStatusCodeException;
@@ -990,18 +991,22 @@ public class URLGenerator extends ProcessorImpl {
                 } catch (URISyntaxException e) {
                     throw new OXFException(e);
                 }
+
+                final ExternalContext externalContext = NetUtils.getExternalContext();
+
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
                     Connection.jBuildConnectionHeadersCapitalizedIfNeeded(
-                        url.getScheme(),
+                        url,
                         credentials != null,
                         newHeaders,
                         config.getForwardHeaders(),
-                        Connection.getHeaderFromRequest(NetUtils.getExternalContext().getRequest()),
-                        indentedLogger
+                        Connection.getHeaderFromRequest(externalContext.getRequest()),
+                        indentedLogger,
+                        externalContext
                     );
 
                 connectionResult =
-                    Connection.jApply(HttpMethod.GET$.MODULE$, url, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    Connection.jApply(HttpMethod.GET$.MODULE$, url, credentials, null, headers, true, false, indentedLogger, externalContext).connect(true);
 
                 inputStream = connectionResult.content().inputStream();
 

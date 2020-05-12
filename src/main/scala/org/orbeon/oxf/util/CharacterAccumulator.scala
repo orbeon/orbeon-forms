@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.Whitespace._
-import org.orbeon.saxon.value.{Whitespace ⇒ SWhitespace}
+import org.orbeon.saxon.value.{Whitespace => SWhitespace}
 
 class CharacterAccumulator {
 
@@ -59,12 +59,12 @@ class CharacterAccumulator {
       var i = 0
       while (i < length) {
         cs.charAt(i) match {
-          case c @ ('\n' | '\r' | '\t' | ' ') ⇒
+          case c @ ('\n' | '\r' | '\t' | ' ') =>
             if (! inWhitespace) {
               sb.append(' ')
               inWhitespace = true
             }
-          case c ⇒
+          case c =>
             sb.append(c)
             inWhitespace = false
         }

@@ -58,9 +58,9 @@ object APISupport {
     val url = formRunnerURL(baseURL, path, embeddable = true)
 
     callService(RequestDetails(None, url, path, headers, params))._1 match {
-      case content: StreamedContent ⇒
+      case content: StreamedContent =>
         useAndClose(content)(writeResponseBody(mustRewriteForMediatype))
-      case Redirect(_, _) ⇒
+      case Redirect(_, _) =>
         throw new UnsupportedOperationException
     }
   }
@@ -71,7 +71,7 @@ object APISupport {
     namespace    : String,
     resourcePath : String
   ): Unit =
-    withSettings(req, res.getWriter) { settings ⇒
+    withSettings(req, res.getWriter) { settings =>
 
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         req,
@@ -82,7 +82,7 @@ object APISupport {
       )
 
       APISupport.sanitizeResourceId(resourcePath, settings.FormRunnerResourcePathRegex) match {
-        case Some(sanitizedResourcePath) ⇒
+        case Some(sanitizedResourcePath) =>
 
           val url = formRunnerURL(settings.formRunnerURL, sanitizedResourcePath, embeddable = false)
 
@@ -105,7 +105,7 @@ object APISupport {
             )
           )
 
-        case None ⇒
+        case None =>
           ctx.setStatusCode(HttpServletResponse.SC_NOT_FOUND)
       }
     }
@@ -114,7 +114,7 @@ object APISupport {
     req : HttpServletRequest,
     res : HttpServletResponse
   ): Unit =
-    withSettings(req, res.getWriter) { settings ⇒
+    withSettings(req, res.getWriter) { settings =>
 
       Logger.debug("proxying submission")
 
@@ -144,11 +144,11 @@ object APISupport {
         ))
 
       contentOrRedirect match {
-        case Redirect(location, true) ⇒
+        case Redirect(location, true) =>
           res.sendRedirect(location)
-        case Redirect(_, false) ⇒
+        case Redirect(_, false) =>
           throw new NotImplementedError
-        case content: StreamedContent ⇒
+        case content: StreamedContent =>
 
           ctx.setStatusCode(httpResponse.statusCode)
           httpResponse.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
@@ -170,7 +170,7 @@ object APISupport {
 
     proxyCapitalizeAndCombineHeaders(res.headers, request = false) foreach (ctx.setHeader _).tupled
 
-    useAndClose(res.content)(writeResponseBody(mediatype ⇒ mustRewriteForMediatype(mediatype) || mustRewriteForPath(requestDetails.path)))
+    useAndClose(res.content)(writeResponseBody(mediatype => mustRewriteForMediatype(mediatype) || mustRewriteForPath(requestDetails.path)))
   }
 
   def formRunnerPath(app: String, form: String, mode: String, documentId: Option[String], query: Option[String]) =
@@ -184,19 +184,19 @@ object APISupport {
 
   def requestHeaders(req: HttpServletRequest) =
     for {
-      name   ← req.getHeaderNames.asScala
+      name   <- req.getHeaderNames.asScala
       values = req.getHeaders(name).asScala.toList
     } yield
-      name → values
+      name -> values
 
   // Match on headers in a case-insensitive way, but the header we sent follows the capitalization of the
   // header specified in the init parameter.
   def headersToForward(clientHeaders: List[(String, List[String])], configuredHeaders: Map[String, String]) =
     for {
-      (name, value) ← proxyAndCombineRequestHeaders(clientHeaders)
-      originalName  ← configuredHeaders.get(name.toLowerCase)
+      (name, value) <- proxyAndCombineRequestHeaders(clientHeaders)
+      originalName  <- configuredHeaders.get(name.toLowerCase)
     } yield
-      originalName → value
+      originalName -> value
 
   // Call the Orbeon service at the other end
   def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse) = {
@@ -213,7 +213,7 @@ object APISupport {
       } else
         cx.content
 
-    redirectOrContent → cx
+    redirectOrContent -> cx
   }
 
   def mustRewriteForMediatype(mediatype: String): Boolean =
@@ -226,13 +226,13 @@ object APISupport {
 
   def mustRewriteForPath(path: String): Boolean =
     path match {
-      case FormDynamicResourcesRegex(_) ⇒ true
-      case _                            ⇒ false
+      case FormDynamicResourcesRegex(_) => true
+      case _                            => false
     }
 
-  def writeResponseBody(doRewrite: String ⇒ Boolean)(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
+  def writeResponseBody(doRewrite: String => Boolean)(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
     content.contentType flatMap ContentTypes.getContentTypeMediaType match {
-      case Some(mediatype) if doRewrite(mediatype) ⇒
+      case Some(mediatype) if doRewrite(mediatype) =>
         // Text/JSON/XML content type: rewrite response content
         val encoding        = content.contentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
         val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
@@ -249,23 +249,23 @@ object APISupport {
           decodeURL,
           ctx.writer
         )
-      case other ⇒
+      case other =>
         // All other types: just copy
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
         useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
     }
 
-  def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: ⇒ T): T = {
+  def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: => T): T = {
     req.setAttribute(SettingsKey, settings)
     try body
     finally req.removeAttribute(SettingsKey)
   }
 
-  def withSettings[T](req: HttpServletRequest, writer: ⇒ Writer)(body: EmbeddingSettings ⇒ T): Unit =
+  def withSettings[T](req: HttpServletRequest, writer: => Writer)(body: EmbeddingSettings => T): Unit =
     Option(req.getAttribute(SettingsKey).asInstanceOf[EmbeddingSettings]) match {
-      case Some(settings) ⇒
+      case Some(settings) =>
         body(settings)
-      case None ⇒
+      case None =>
         val msg = "ERROR: Orbeon Forms embedding filter is not configured."
         Logger.error(msg)
         writer.write(msg)
@@ -275,8 +275,8 @@ object APISupport {
 
     val newValue =
       Option(req.getAttribute(LastNamespaceIndexKey).asInstanceOf[Integer]) match {
-        case Some(value) ⇒ value + 1
-        case None        ⇒ 0
+        case Some(value) => value + 1
+        case None        => 0
       }
 
     req.setAttribute(LastNamespaceIndexKey, newValue)
@@ -384,7 +384,7 @@ object APISupport {
       ! s.contains("/..") && ! s.contains("../")
 
     Option(s) map sanitizeResourcePath filter hasNoParent collect {
-      case FormRunnerResourcePath(resourcePath) ⇒ resourcePath
+      case FormRunnerResourcePath(resourcePath) => resourcePath
     }
   }
 
@@ -411,18 +411,18 @@ object APISupport {
         credentials = None,
         cookieStore = getOrCreateCookieStore,
         method      = if (requestDetails.content.isEmpty) GET else POST,
-        headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient → List(ctx.client)),
+        headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
         content     = requestDetails.content
       )
 
     // Parse a string containing WSRP encodings and encode the URLs and namespaces
-    def decodeWSRPContent(content: String, ns: String, decodeURL: String ⇒ String, writer: Writer): Unit = {
+    def decodeWSRPContent(content: String, ns: String, decodeURL: String => String, writer: Writer): Unit = {
 
       val stringLength = content.length
       var currentIndex = 0
       var index        = 0
 
-      import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL ⇒ _, _}
+      import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL => _, _}
 
       while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
 

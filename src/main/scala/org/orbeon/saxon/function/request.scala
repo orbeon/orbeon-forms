@@ -49,7 +49,7 @@ class GetRequestHeader extends RequestFunction {
     GetRequestHeader.getAndDecodeHeader(
       name     = name,
       encoding = stringArgumentOpt(1),
-      getter   = s ⇒ Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(s)) map (_.toList)
+      getter   = s => Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(s)) map (_.toList)
     )
 }
 
@@ -58,16 +58,16 @@ object GetRequestHeader {
   def getAndDecodeHeader(
     name     : String,
     encoding : Option[String],
-    getter   : String ⇒ Option[List[String]]
+    getter   : String => Option[List[String]]
   ): Option[List[String]] = {
 
     import CharsetNames._
 
-    val decode: String ⇒ String =
+    val decode: String => String =
       encoding map (_.toUpperCase) match {
-        case None | Some(Iso88591) ⇒ identity
-        case Some(Utf8)            ⇒ (s: String) ⇒ new String(s.getBytes(Iso88591), Utf8)
-        case Some(other)           ⇒ throw new IllegalArgumentException(s"invalid `$$encoding` argument `$other`")
+        case None | Some(Iso88591) => identity
+        case Some(Utf8)            => (s: String) => new String(s.getBytes(Iso88591), Utf8)
+        case Some(other)           => throw new IllegalArgumentException(s"invalid `$$encoding` argument `$other`")
       }
 
     getter(name.toLowerCase) map (_ map decode)
@@ -109,9 +109,9 @@ class UserOrganizations extends DefaultFunctionSupport with RuntimeDependentFunc
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     stringSeqToSequenceIterator(
       for {
-        credentials ← NetUtils.getExternalContext.getRequest.credentials.toList
-        org         ← credentials.organizations
-        leafOrg     ← org.levels.lastOption.toList
+        credentials <- NetUtils.getExternalContext.getRequest.credentials.toList
+        org         <- credentials.organizations
+        leafOrg     <- org.levels.lastOption.toList
       } yield
         leafOrg
     )
@@ -126,16 +126,16 @@ class AncestorOrganizations extends DefaultFunctionSupport with RuntimeDependent
     // There should be only one match if the organizations are well-formed
     val foundOrgs =
       for {
-          credentials ← NetUtils.getExternalContext.getRequest.credentials.toList
-          org         ← credentials.organizations
+          credentials <- NetUtils.getExternalContext.getRequest.credentials.toList
+          org         <- credentials.organizations
           if org.levels.lastOption contains leafOrgParam
         } yield
           org
 
     stringSeqToSequenceIterator(
       foundOrgs.headOption match {
-        case Some(foundOrg) ⇒ foundOrg.levels.init.reverse
-        case None           ⇒ Nil
+        case Some(foundOrg) => foundOrg.levels.init.reverse
+        case None           => Nil
 
       }
     )
@@ -159,7 +159,7 @@ class GetSessionAttribute extends DefaultFunctionSupport with RuntimeDependentFu
     implicit val ctx = xpathContext
 
     NetUtils.getExternalContext.getRequest.sessionOpt match {
-      case Some(session) ⇒
+      case Some(session) =>
 
         val attributeName = stringArgument(0)
 
@@ -168,7 +168,7 @@ class GetSessionAttribute extends DefaultFunctionSupport with RuntimeDependentFu
           stringArgumentOpt(1),
           attributeName
         )
-      case None ⇒
+      case None =>
         EmptyIterator.getInstance
     }
   }

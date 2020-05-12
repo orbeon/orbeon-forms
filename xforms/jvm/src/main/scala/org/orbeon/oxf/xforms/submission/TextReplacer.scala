@@ -36,9 +36,9 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     p2               : SecondPassParameters
   ): Unit =
     connectionResult.readTextResponseBody match {
-      case s @ Some(_) ⇒
+      case s @ Some(_) =>
         this.responseBodyOpt = s
-      case None ⇒
+      case None =>
         // Non-text/non-XML result
 
         // Don't store anything for now as per the spec, but we could do something better by going beyond the spec
@@ -51,8 +51,8 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         // xforms-submit-error with appropriate context information, including an error-type of resource-error."
         val message =
           connectionResult.mediatype match {
-            case Some(mediatype) ⇒ s"""Mediatype is neither text nor XML for replace="text": $mediatype"""
-            case None            ⇒ s"""No mediatype received for replace="text""""
+            case Some(mediatype) => s"""Mediatype is neither text nor XML for replace="text": $mediatype"""
+            case None            => s"""No mediatype received for replace="text""""
           }
 
         throw new XFormsSubmissionException(
@@ -104,7 +104,7 @@ object TextReplacer {
     // Find target location
     val destinationNodeInfo =
       submission.staticSubmission.targetrefOpt match {
-        case Some(targetRef) ⇒
+        case Some(targetRef) =>
           // Evaluate destination node
           XPathCache.evaluateSingleWithContext(
             xpathContext = p.refContext.xpathContext,
@@ -112,33 +112,32 @@ object TextReplacer {
             xpathString  = targetRef,
             reporter     = containingDocument.getRequestStats.addXPathStat
           ) match {
-            case n: NodeInfo ⇒ n
-            case _           ⇒ throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
+            case n: NodeInfo => n
+            case _           => throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
           }
-        case None ⇒
+        case None =>
           // Use default destination
           submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).rootElement
       }
 
-
     def handleSetValueSuccess(oldValue: String): Unit =
       DataModel.logAndNotifyValueChange(
-        containingDocument = containingDocument,
         source             = "submission",
         nodeInfo           = destinationNodeInfo,
         oldValue           = oldValue,
         newValue           = value,
         isCalculate        = false,
         collector          = Dispatch.dispatchEvent)(
-        containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
+        containingDocument = containingDocument,
+        logger             = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
       )
 
     def handleSetValueError(reason: Reason) =
       throwSubmissionException(
         reason match {
-          case DisallowedNodeReason ⇒
+          case DisallowedNodeReason =>
             s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${p.replaceType}"`."""
-          case ReadonlyNodeReason   ⇒
+          case ReadonlyNodeReason   =>
             s"""`targetref` attribute points to a readonly node for `replace="${p.replaceType}"`."""
         }
       )

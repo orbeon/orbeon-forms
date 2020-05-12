@@ -32,9 +32,19 @@ case class Request(
 ) extends
   RequestCommon
 
+sealed trait FilterType
+
+object FilterType {
+  case object None                             extends FilterType
+  case class  Substring (filter: String)       extends FilterType
+  case class  Exact     (filter: String)       extends FilterType
+  case class  Token     (filter: List[String]) extends FilterType
+}
+
+
 case class Column(
   path           : String,
-  filterWith     : Option[String]
+  filterType     : FilterType
 )
 
 sealed trait Drafts

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml
 
 import java.lang.reflect.Constructor
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
@@ -45,10 +45,10 @@ class ElementHandlerController
 
 object ElementHandlerController {
 
-  type Matcher[T <: AnyRef] = (Attributes, AnyRef) ⇒ T
+  type Matcher[T <: AnyRef] = (Attributes, AnyRef) => T
 
   // For Java callers
-  abstract class Function2Base[V1, V2, R] extends ((V1, V2) ⇒ R)
+  abstract class Function2Base[V1, V2, R] extends ((V1, V2) => R)
 
   private[xml] case class HandlerInfo(level: Int, elementHandler: ElementHandler, locator: Locator) {
 
@@ -59,7 +59,7 @@ object ElementHandlerController {
       saxStore foreach (_.setDocumentLocator(locator))
   }
 
-  private[xml] val AllMatcher: Matcher[jl.Boolean] = (_: Attributes, _: AnyRef) ⇒ jl.Boolean.TRUE
+  private[xml] val AllMatcher: Matcher[jl.Boolean] = (_: Attributes, _: AnyRef) => jl.Boolean.TRUE
 
   private[xml] type HandlerAndMatcher = (String, Matcher[_ <: AnyRef])
 
@@ -81,7 +81,7 @@ object ElementHandlerController {
     val constructor =
       classNameToHandlerClass.computeIfAbsent(
         handlerClassName,
-        _ ⇒ withWrapThrowable {
+        _ => withWrapThrowable {
           Class.forName(handlerClassName).asInstanceOf[Class[ElementHandler]]
             .getConstructor(classOf[String], classOf[String], classOf[String], classOf[Attributes], classOf[AnyRef], classOf[AnyRef])
         }
@@ -101,11 +101,11 @@ object ElementHandlerController {
     }
   }
 
-  private[xml] def withWrapThrowable[T](thunk: ⇒ T)(implicit locator: OutputLocator): T =
+  private[xml] def withWrapThrowable[T](thunk: => T)(implicit locator: OutputLocator): T =
     try {
       thunk
     } catch {
-      case NonFatal(e) ⇒
+      case NonFatal(e) =>
         throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator))
     }
 }
@@ -194,11 +194,11 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
 
         override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
           findHandler(uri, localname, qName, attributes)  map (_.elementHandler) match {
-            case Some(_: NullHandler | _: TransparentHandler) ⇒
-            case Some(elementHandler) ⇒
+            case Some(_: NullHandler | _: TransparentHandler) =>
+            case Some(elementHandler) =>
               result = Some(Left(elementHandler))
               break()
-            case None ⇒
+            case None =>
               result = Some(Right(new StructuredQName(XMLUtils.prefixFromQName(qName), uri, localname)))
               break()
           }
@@ -238,12 +238,12 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
       findWithMatchers(_customMatchers, uri, localname, qName, attributes, _elementHandlerContext)
 
     def fromFullMatchers =
-      Option(_handlerMatchers.get(XMLUtils.buildExplodedQName(uri, localname))) flatMap { handlerMatchers ⇒
+      Option(_handlerMatchers.get(XMLUtils.buildExplodedQName(uri, localname))) flatMap { handlerMatchers =>
         findWithMatchers(handlerMatchers, uri, localname, qName, attributes, _elementHandlerContext)
       }
 
     def fromUriBasedHandler =
-      Option(_uriHandlers.get(uri)) map { uriHandlerClassName ⇒
+      Option(_uriHandlers.get(uri)) map { uriHandlerClassName =>
         HandlerInfo(
           level,
           getHandlerByClassName(uriHandlerClassName, uri, localname, qName, attributes, null, _elementHandlerContext),
@@ -263,10 +263,10 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
     handlerContext : AnyRef
   ): Option[HandlerInfo] =
     matchers.asScala.iterator map {
-      case (handlerClassName, matcher) ⇒
-        handlerClassName → matcher(attributes, _elementHandlerContext)
+      case (handlerClassName, matcher) =>
+        handlerClassName -> matcher(attributes, _elementHandlerContext)
     } collectFirst {
-      case (handlerClassName, matched) if matched ne null ⇒
+      case (handlerClassName, matched) if matched ne null =>
         HandlerInfo(
           level,
           getHandlerByClassName(handlerClassName, uri, localname, qName, attributes, matched, handlerContext),
@@ -341,13 +341,13 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
       _namespaceContext.startElement()
 
       currentHandlerInfoOpt match {
-        case Some(currentHandlerInfo) if _isFillingUpSAXStore ⇒
+        case Some(currentHandlerInfo) if _isFillingUpSAXStore =>
           currentHandlerInfo.saxStore foreach (_.startElement(uri, localname, qName, attributes))
-        case Some(currentHandlerInfo) if ! currentHandlerInfo.elementHandler.isForwarding ⇒
+        case Some(currentHandlerInfo) if ! currentHandlerInfo.elementHandler.isForwarding =>
           // NOP
-        case _ ⇒
+        case _ =>
           findHandler(uri, localname, qName, attributes) match {
-            case Some(handlerInfo) ⇒
+            case Some(handlerInfo) =>
               pushHandler(handlerInfo)
               if (handlerInfo.elementHandler.isRepeating) {
                 // Repeating handler will process its body later
@@ -356,7 +356,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
                 // Non-repeating handler processes its body immediately
                 handlerInfo.elementHandler.start()
               }
-            case None ⇒
+            case None =>
               // New handler not found, send to output
               getOutput.startElement(uri, localname, qName, attributes)
           }
@@ -366,7 +366,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
   def endElement(uri: String, localname: String, qName: String): Unit =
     withWrapThrowable {
       currentHandlerInfoOpt match {
-        case Some(currentHandlerInfo) if currentHandlerInfo.level == _level ⇒
+        case Some(currentHandlerInfo) if currentHandlerInfo.level == _level =>
           // End of current handler
           if (_isFillingUpSAXStore) {
             // Was filling-up SAXStore
@@ -379,11 +379,11 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
             currentHandlerInfo.elementHandler.end()
           }
           popHandler()
-        case Some(currentHandlerInfo) if _isFillingUpSAXStore ⇒
+        case Some(currentHandlerInfo) if _isFillingUpSAXStore =>
           currentHandlerInfo.saxStore foreach (_.endElement(uri, localname, qName))
-        case Some(currentHandlerInfo) if ! currentHandlerInfo.elementHandler.isForwarding ⇒
+        case Some(currentHandlerInfo) if ! currentHandlerInfo.elementHandler.isForwarding =>
           // NOP
-        case _ ⇒
+        case _ =>
           // Just forward
           getOutput.endElement(uri, localname, qName)
       }
@@ -394,7 +394,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
     }
 
   def startPrefixMapping(prefix: String, uri: String): Unit =
-    fillOrForward { r ⇒
+    fillOrForward { r =>
       _namespaceContext.startPrefixMapping(prefix, uri)
       r.startPrefixMapping(prefix, uri)
     }
@@ -414,7 +414,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
   def startCDATA           ()                                                : Unit = fillOrForward(_.startCDATA())
   def endCDATA             ()                                                : Unit = fillOrForward(_.endCDATA())
 
-  private def fillOrForward[T](thunk: XMLReceiver ⇒ T): Unit =
+  private def fillOrForward[T](thunk: XMLReceiver => T): Unit =
     withWrapThrowable {
       if (_isFillingUpSAXStore)
         currentHandlerInfoOpt flatMap (_.saxStore) foreach thunk

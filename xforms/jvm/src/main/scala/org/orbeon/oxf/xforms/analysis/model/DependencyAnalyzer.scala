@@ -45,7 +45,7 @@ object DependencyAnalyzer {
       staticBind     : StaticBind,
       mipOpt         : Option[StaticBind#XPathMIP]
     ): Option[BindDetails] =
-      mipOpt map { mip ⇒
+      mipOpt map { mip =>
 
       val compiledExpr = mip.compiledExpression
       val expr         = compiledExpr.expression.getInternalExpression
@@ -58,7 +58,7 @@ object DependencyAnalyzer {
 
   private def iterateExternalVariableReferences(expr: Expression): Iterator[String] =
     SaxonUtils.iterateExpressionTree(expr) collect {
-      case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] ⇒
+      case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] =>
         vr.getBinding.getVariableQName.getLocalName
     }
 
@@ -86,12 +86,12 @@ object DependencyAnalyzer {
     val bindsWithMIPDetails = {
 
       def iterateBinds(binds: Seq[StaticBind]): Iterator[StaticBind] =
-        binds.iterator flatMap (b ⇒ Iterator(b) ++ iterateBinds(b.children))
+        binds.iterator flatMap (b => Iterator(b) ++ iterateBinds(b.children))
 
       val validBindNames = allBindsByName.keySet
 
       val bindsIt   = iterateBinds(tree.topLevelBinds)
-      val detailsIt = bindsIt flatMap (b ⇒ BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
+      val detailsIt = bindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
       detailsIt.to(List)
     }
@@ -105,8 +105,8 @@ object DependencyAnalyzer {
       val namesToAdd        = referredBindNames -- existingBindNames
 
       for {
-        name       ← namesToAdd
-        staticBind ← allBindsByName.get(name)
+        name       <- namesToAdd
+        staticBind <- allBindsByName.get(name)
       } yield
         BindDetails.apply(staticBind, staticBind.nameOpt, Set.empty)
     }
@@ -118,16 +118,16 @@ object DependencyAnalyzer {
       @tailrec
       def visit(bindDetails: List[BindDetails], done: List[StaticBind]): List[StaticBind] =
         bindDetails partition (_.refs.isEmpty) match {
-          case (Nil, Nil) ⇒
+          case (Nil, Nil) =>
             done
-          case (Nil, head :: _) ⇒
+          case (Nil, head :: _) =>
             throw new ValidationException(
               s"MIP dependency cycle found for bind id `${head.staticBind.staticId}`",
               head.staticBind.locationData
             )
-          case (noRefs, withRefs) ⇒
+          case (noRefs, withRefs) =>
             visit(
-              bindDetails = withRefs map (b ⇒ b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
+              bindDetails = withRefs map (b => b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
               done        = noRefs.map(_.staticBind).reverse ::: done
             )
         }
@@ -138,7 +138,7 @@ object DependencyAnalyzer {
     def logResult(result: List[StaticBind]) =
       if (result.nonEmpty && Logger.isDebugEnabled) {
 
-        val idsToRefs = bindsWithMIPDetails map (b ⇒ b.staticBind.staticId → b.refs) toMap
+        val idsToRefs = bindsWithMIPDetails map (b => b.staticBind.staticId -> b.refs) toMap
 
         val maxStaticId = result map (_.staticId.size) max
 
@@ -160,6 +160,6 @@ object DependencyAnalyzer {
     // We are only interested in the binds containing the MIP
     val idsToKeep = bindsWithMIPDetails map (_.staticBind.staticId) toSet
 
-    (sortTopologically(bindsWithMIPDetails ++ otherBindDetailsIt) filter (b ⇒ idsToKeep(b.staticId))) |!> logResult
+    (sortTopologically(bindsWithMIPDetails ++ otherBindDetailsIt) filter (b => idsToKeep(b.staticId))) |!> logResult
   }
 }

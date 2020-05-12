@@ -52,7 +52,7 @@ class JVMOnlyUtilsTest extends AnyFunSpec {
     }
 
     they("must encode special characters") {
-      assert("name=%C3%89rik" === encodeSimpleQuery(Seq("name" → "Érik")))
+      assert("name=%C3%89rik" === encodeSimpleQuery(Seq("name" -> "Érik")))
     }
   }
 }

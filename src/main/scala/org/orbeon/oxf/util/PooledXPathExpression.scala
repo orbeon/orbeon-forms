@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.apache.commons.pool.ObjectPool
 import org.orbeon.oxf.common.OXFException
@@ -85,9 +85,15 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    *
    * NOTE: Used by XPathCache.
    */
-  def evaluateKeepItems(functionContext: FunctionContext): ju.List[Item] =
+  def evaluateKeepItemsJava(functionContext: FunctionContext): ju.List[Item] =
     withFunctionContext(functionContext) {
       scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()))
+    }
+
+  // NOTE: Used by XPathCache.
+  def evaluateKeepItems(functionContext: FunctionContext): List[Item] =
+    withFunctionContext(functionContext) {
+      Implicits.asScalaIterator(evaluate()).toList
     }
 
   /**
@@ -125,18 +131,18 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     new ju.ArrayList(i.to(mutable.ArrayBuffer).asJava)
 
   private def itemToJavaKeepNodeInfoOrNull(item: Item) = item match {
-    case v: AtomicValue ⇒ Value.convertToJava(v)
-    case v              ⇒ v
+    case v: AtomicValue => Value.convertToJava(v)
+    case v              => v
   }
 
   private def singleItemToJavaOrNull(item: Item) = item match {
-    case null ⇒ null
-    case item ⇒ Value.convertToJava(item)
+    case null => null
+    case item => Value.convertToJava(item)
   }
 
   private def singleItemToJavaKeepNodeInfoOrNull(item: Item) = item match {
-    case null ⇒ null
-    case item ⇒ itemToJavaKeepNodeInfoOrNull(item)
+    case null => null
+    case item => itemToJavaKeepNodeInfoOrNull(item)
   }
 
   /**
@@ -164,7 +170,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    */
   def evaluateSingleToJavaReturnToPoolOrNull: AnyRef =
     try singleItemToJavaOrNull(evaluate().next())
-    catch { case NonFatal(e) ⇒ throw new OXFException(e) } // so Java callers can catch a RuntimeException
+    catch { case NonFatal(e) => throw new OXFException(e) } // so Java callers can catch a RuntimeException
     finally returnToPool()
 
   private def evaluate(): SequenceIterator = {
@@ -183,7 +189,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
   // Called from exf:sort(), indirectly from xxf:evaluate-avt(), and evaluate()
   def prepareDynamicContext(xpathContext: XPathContextMajor): Unit =
     if (variableToValueMap ne null) {
-      for ((name, variable) ← variables) {
+      for ((name, variable) <- variables) {
         val value = variableToValueMap.get(name)
         if (value ne null) // FIXME: this should never happen, right?
           xpathContext.setLocalVariable(variable.getLocalSlotNumber, value)

@@ -182,8 +182,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
   private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean) =
     FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes) match {
-      case value: Value   ⇒ asScalaIterator(value.iterate()) map (_.getStringValue) toList
-      case node: NodeInfo ⇒ List(node.getStringValue)
+      case value: Value   => asScalaIterator(value.iterate()) map (_.getStringValue) toList
+      case node: NodeInfo => List(node.getStringValue)
     }
 
   @Test def resolveTarget(): Unit =
@@ -201,7 +201,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
         val numberControls = {
 
           val result =
-            for (index ← 1 to 3)
+            for (index <- 1 to 3)
             yield {
               setindex("grid-control-repeat", index)
               resolveObject[XFormsValueControl]("number-control").get
@@ -213,23 +213,23 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
         }
 
         // Resolve from buttonControl
-        for (followIndexes ← List(true, false))
+        for (followIndexes <- List(true, false))
           assert(List(resultControl.getValue) === resolveAllNodeValues(buttonControl.absoluteId, "result", followIndexes))
 
-        for (index ← 1 to 3) {
+        for (index <- 1 to 3) {
           setindex("grid-control-repeat", index)
           assert(List(index.toString) === resolveAllNodeValues(buttonControl.absoluteId, "number", followIndexes = true))
         }
 
-        for (index ← 1 to 3) {
+        for (index <- 1 to 3) {
           setindex("grid-control-repeat", index)
           assert(((1 to 3) map (_.toString)) === resolveAllNodeValues(buttonControl.absoluteId, "number", followIndexes = false))
         }
 
         // Resolve from numberControls
         for {
-          followIndexes ← List(true, false)
-          numberControl ← numberControls
+          followIndexes <- List(true, false)
+          numberControl <- numberControls
         } locally {
           assert(List(s"o${numberControl.getValue}") === resolveAllNodeValues(numberControl.absoluteId, "other", followIndexes))
           assert(List(resultControl.getValue)        === resolveAllNodeValues(numberControl.absoluteId, "result", followIndexes))
@@ -237,7 +237,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
         // 2. Resolution via binds
 
-        for (followIndexes ← List(true, false))
+        for (followIndexes <- List(true, false))
           assert((4 to 6 map (_.toString)) === resolveAllNodeValues(buttonControl.absoluteId, "hidden-number", followIndexes))
       }
     }

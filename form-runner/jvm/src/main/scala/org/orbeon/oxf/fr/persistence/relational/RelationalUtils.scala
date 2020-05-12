@@ -33,19 +33,19 @@ object RelationalUtils extends Logging {
 
   implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.relational"))
 
-  def withConnection[T](thunk: Connection ⇒ T): T =
+  def withConnection[T](thunk: Connection => T): T =
     withConnection(getDataSourceNameFromHeaders)(thunk)
 
-  def withConnection[T](datasourceName: String)(thunk: Connection ⇒ T): T =
-    useAndClose(getConnection(getDataSource(datasourceName))) { connection ⇒
+  def withConnection[T](datasourceName: String)(thunk: Connection => T): T =
+    useAndClose(getConnection(getDataSource(datasourceName))) { connection =>
       try {
         val result = withDebug("executing block with connection")(thunk(connection))
         debug("about to commit")
         connection.commit()
         result
       } catch {
-        case NonFatal(t) ⇒
-          debug("about to rollback", List("throwable" → Exceptions.getRootThrowable(t).toString))
+        case NonFatal(t) =>
+          debug("about to rollback", List("throwable" -> Exceptions.getRootThrowable(t).toString))
           connection.rollback()
           throw t
       }
@@ -85,7 +85,7 @@ object RelationalUtils extends Logging {
       try {
         connection.setAutoCommit(false)
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           connection.close()
           throw t
       }
@@ -100,18 +100,18 @@ object RelationalUtils extends Logging {
       .headOption
 
   def authorizedOperationsBasedOnRoles(permissionsElOpt: Option[NodeInfo]): Set[String] =
-    crudOperationsIfNoPermissions(permissionsElOpt, (permissionsEl) ⇒ {
+    crudOperationsIfNoPermissions(permissionsElOpt, (permissionsEl) => {
       FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
     })
 
   private def crudOperationsIfNoPermissions[T](
     permissionsElOpt: Option[NodeInfo],
-    operationsFromPermissions: NodeInfo ⇒ Set[String]
+    operationsFromPermissions: NodeInfo => Set[String]
   ): Set[String] =
     permissionsElOpt match {
-      case None ⇒
+      case None =>
         Set("create", "read", "update", "delete")
-      case Some(permissionsEl) ⇒
+      case Some(permissionsEl) =>
         operationsFromPermissions(permissionsEl)
     }
 
@@ -120,7 +120,7 @@ object RelationalUtils extends Logging {
     query
       .split('\n')
       .zipWithIndex
-      .map(line ⇒ if (line._2 == 0) line._1 else (" " * amount) + line._1)
+      .map(line => if (line._2 == 0) line._1 else (" " * amount) + line._1)
       .mkString("\n")
   }
 }

@@ -41,7 +41,7 @@ class XFormsOutputControl(
   id        : String
 ) extends XFormsSingleNodeControl(container, parent, element, id)
   with XFormsValueControl
-  with FocusableTrait
+  with ReadonlyFocusableTrait
   with VisitableTrait
   with FileMetadata {
 
@@ -68,10 +68,10 @@ class XFormsOutputControl(
       val bc = bindingContext
       val value =
         valueAttributeOpt match {
-          case Some(valueAttribute) ⇒
+          case Some(valueAttribute) =>
             // Value from the `value` attribute
             evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)
-          case None ⇒
+          case None =>
             // Value from the binding
             bc.singleItemOpt map DataModel.getValue // using `singleItemOpt` directly so we can handle the case of a missing binding
       }
@@ -103,10 +103,10 @@ class XFormsOutputControl(
       } else {
         // Other mediatypes
         valueAttributeOpt match {
-          case Some(_) ⇒
+          case Some(_) =>
             // There is a @value attribute, don't use format
             internalValue
-          case None ⇒
+          case None =>
             // There is a single-node binding, so the format may be used
             getValueUseFormat(format) getOrElse internalValue
         }
@@ -122,7 +122,7 @@ class XFormsOutputControl(
     val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
     try SubmissionHeaders.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
     catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         XFormsError.handleNonFatalXPathError(container, t)
         Map()
     }
@@ -132,7 +132,7 @@ class XFormsOutputControl(
     try {
       // If the value is a file: we make sure it is signed otherwise we return the default value
 
-      def verifiedValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
+      def verifiedValueOrDefault(initial: String, value: => String, default: => String) =
         if ("file".equals(NetUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
           default
         else
@@ -150,9 +150,9 @@ class XFormsOutputControl(
       )
 
       internalValue.trimAllToOpt match {
-        case Some(trimmedInternalValue) ⇒
+        case Some(trimmedInternalValue) =>
           getBuiltinTypeName match {
-            case null | "anyURI" ⇒
+            case null | "anyURI" =>
               val (maybeResolved, maybeProxied) =
                 if (! urlNorewrite) {
                   // Resolve xml:base and try to obtain a path which is an absolute path without the context
@@ -179,24 +179,24 @@ class XFormsOutputControl(
                 maybeProxied,
                 defaultValue
               )
-            case "base64Binary" ⇒
+            case "base64Binary" =>
               // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
               doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
-            case _ ⇒
+            case _ =>
               defaultValue
           }
-        case None ⇒
+        case None =>
           defaultValue
       }
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         // We don't want to fail if there is an issue proxying, for example if the resource is not found.
         // Ideally, this would indicate some condition on the control (not found? out of range?).
         warn(
           "exception while proxying value",
           Seq(
-            "value"     → internalValue,
-            "throwable" → OrbeonFormatter.format(t)
+            "value"     -> internalValue,
+            "throwable" -> OrbeonFormatter.format(t)
           )
         )
 
@@ -204,9 +204,9 @@ class XFormsOutputControl(
     }
 
   override def getRelevantEscapedExternalValue: String =
-    if (staticControlOpt exists (c ⇒ c.isDownloadAppearance || c.isImageMediatype)) {
+    if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype)) {
       val externalValue = getExternalValue
-      if (externalValue.nonBlank) {
+      if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
@@ -234,8 +234,8 @@ class XFormsOutputControl(
 
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
   // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
-  override def isFocusable: Boolean =
-    isRelevant && staticControl.hasLHHA(LHHA.Label)
+  override def isDirectlyFocusable: Boolean =
+    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusable
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
@@ -248,15 +248,15 @@ class XFormsOutputControl(
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XFormsOutputControl) ⇒
+      case Some(other: XFormsOutputControl) =>
         compareFileMetadata(other) &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
     }
 
   override def findAriaByControlEffectiveId: Option[String] =
     if (appearances(XXFORMS_TEXT_APPEARANCE_QNAME) ||
-        (staticControlOpt exists (c ⇒ c.isDownloadAppearance || c.isImageMediatype || c.isHtmlMediatype)))
+        (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isHtmlMediatype)))
       None
     else
       super.findAriaByControlEffectiveId

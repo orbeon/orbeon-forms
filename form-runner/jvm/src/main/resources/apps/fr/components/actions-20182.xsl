@@ -152,6 +152,7 @@
         <xsl:if test="exists($control-events)">
             <xf:action
                 observer="{for $c in $control-names return concat($c, '-control')}"
+                target="#observer"
                 event="{
                     for $e in $control-events
                     return $controls-xforms-action-names[index-of($controls-2018.2-action-names, $e)]
@@ -577,15 +578,37 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
                 <xf:setvalue
                     ref="."
                     value="$value"/>
+            </xf:action>
+        </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-clear" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+
+        <xf:action>
+
+            <xf:rebuild/>
+            <xf:recalculate/>
+
+            <xf:action>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <!-- Clear all possible elements and attributes -->
+                <xf:setvalue
+                    iterate="., @filename, @mediatype, @size, image, image/@filename, image/@mediatype, image/@size, @label"
+                    ref="."/>
             </xf:action>
         </xf:action>
 
@@ -604,9 +627,8 @@
 
         <xf:action>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:var
                 xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
@@ -720,9 +742,8 @@
             <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
             <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -752,9 +773,8 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
@@ -778,14 +798,13 @@
         <xf:action>
             <xf:var name="value" value="{$value-expr}"/>
 
-            <!-- Will run only if needed, right? -->
             <xf:rebuild/>
-            <xf:revalidate/>
+            <xf:recalculate/>
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
                 <xf:setvalue
-                    ref="@mediatype"
+                    ref="image/@mediatype, ./@mediatype"
                     value="$value"/>
             </xf:action>
 

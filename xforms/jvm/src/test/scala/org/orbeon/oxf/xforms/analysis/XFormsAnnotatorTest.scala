@@ -114,7 +114,7 @@ class XFormsAnnotatorTest
         "span"
       )
 
-      assert(ids forall (id ⇒ metadata.getNamespaceMapping(id).isDefined))
+      assert(ids forall (id => metadata.getNamespaceMapping(id).isDefined))
     }
 
     it("doesn't provide namespace information for elements processed as part of shadow tree processing") {
@@ -124,7 +124,7 @@ class XFormsAnnotatorTest
         "div-in-xbl"
       )
 
-      assert(ids forall (id ⇒ metadata.getNamespaceMapping(id).isEmpty))
+      assert(ids forall (id => metadata.getNamespaceMapping(id).isEmpty))
     }
 
     it("doesn't provide namespace information for elements in instances or schemas") {
@@ -137,7 +137,7 @@ class XFormsAnnotatorTest
         "schema-element"
       )
 
-      assert(ids forall (id ⇒ metadata.getNamespaceMapping(id).isEmpty))
+      assert(ids forall (id => metadata.getNamespaceMapping(id).isEmpty))
     }
   }
 
@@ -149,11 +149,11 @@ class XFormsAnnotatorTest
     val docWrapper   = new DocumentWrapper(annotatedDoc, null, XPath.GlobalConfiguration)
 
     val elemNames = List(
-      "html" → "lang",
-      "span" → "style"
+      "html" -> "lang",
+      "span" -> "style"
     )
 
-    for ((elemName, attName) ← elemNames)
+    for ((elemName, attName) <- elemNames)
       it(s"creates an `xxf:attribute` for the `$elemName` element") {
 
         val result =
@@ -171,9 +171,9 @@ class XFormsAnnotatorTest
 
         assert(1 == result.size)
 
-        val resultElement = result collectFirst { case v: VirtualNode ⇒ unsafeUnwrapElement(v) }
+        val resultElement = result collectFirst { case v: VirtualNode => unsafeUnwrapElement(v) }
 
-        assert(resultElement exists (XFormsUtils.getElementId(_).nonBlank))
+        assert(resultElement exists (XFormsUtils.getElementId(_).nonAllBlank))
         assert(resultElement exists (_.attributeValue(XFormsConstants.NAME_QNAME) == attName))
       }
   }

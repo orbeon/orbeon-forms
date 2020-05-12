@@ -28,7 +28,7 @@ trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
     Some(analyzeXPath(getChildrenContext, subExpression))
   }
 
-  override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
+  override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedValueBoundItem(item)
 
   // TODO: Move value handling from ElementAnalysis to here? Need base trait to handle value controls, variables, and LHHA.
 }

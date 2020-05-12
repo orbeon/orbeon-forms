@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
@@ -46,7 +46,7 @@ object XFormsAPI {
   private val actionInterpreterDyn  = new DynamicVariable[XFormsActionInterpreter]
 
   // Every block of action must be run within this
-  def withScalaAction[T](interpreter: XFormsActionInterpreter)(body: XFormsActionInterpreter ⇒ T): T = {
+  def withScalaAction[T](interpreter: XFormsActionInterpreter)(body: XFormsActionInterpreter => T): T = {
     actionInterpreterDyn.withValue(interpreter) {
       body(interpreter)
     }
@@ -59,7 +59,7 @@ object XFormsAPI {
     }
 
   // Every block of action must be run within this
-  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: ⇒ T): T = {
+  def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T = {
     containingDocumentDyn.withValue(containingDocument) {
       body
     }
@@ -76,19 +76,19 @@ object XFormsAPI {
   // xf:setvalue
   // @return the node whose value was set, if any
   def setvalue(ref: Seq[NodeInfo], value: String): Option[(NodeInfo, Boolean)] =
-    ref.headOption map { nodeInfo ⇒
+    ref.headOption map { nodeInfo =>
 
       def onSuccess(oldValue: String): Unit =
-        for (action ← actionInterpreterDyn.value)
+        for (action <- actionInterpreterDyn.value)
           yield
             DataModel.logAndNotifyValueChange(
-              containingDocument = action.containingDocument,
               source             = "scala setvalue",
               nodeInfo           = nodeInfo,
               oldValue           = oldValue,
               newValue           = value,
               isCalculate        = false,
               collector          = Dispatch.dispatchEvent)(
+              containingDocument = action.containingDocument,
               logger             = action.indentedLogger
             )
 
@@ -104,26 +104,28 @@ object XFormsAPI {
   // - Some(0)     if the control is non-relevant or doesn't have any iterations
   // - Some(index) otherwise, where index is the control's new index
   def setindex(repeatStaticId: String, index: Int): Option[Int] =
-    actionInterpreterDyn.value map { interpreter ⇒
+    actionInterpreterDyn.value map { interpreter =>
       XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index)(interpreter.indentedLogger)
     } collect {
-      case newIndex if newIndex >= 0 ⇒ newIndex
+      case newIndex if newIndex >= 0 => newIndex
     }
 
   // xf:insert
   // @return the inserted nodes
   def insert[T <: Item](
-    origin               : Seq[T],
-    into                 : Seq[NodeInfo] = Nil,
-    after                : Seq[NodeInfo] = Nil,
-    before               : Seq[NodeInfo] = Nil,
-    doDispatch           : Boolean       = true,
-    requireDefaultValues : Boolean       = false,
-    updateRepeats        : Boolean       = true,
-    searchForInstance    : Boolean       = true
+    origin                            : Seq[T],
+    into                              : Seq[NodeInfo] = Nil,
+    after                             : Seq[NodeInfo] = Nil,
+    before                            : Seq[NodeInfo] = Nil,
+    doDispatch                        : Boolean       = true,
+    requireDefaultValues              : Boolean       = false,
+    searchForInstance                 : Boolean       = true,
+    removeInstanceDataFromClonedNodes : Boolean       = true
   ): Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
+
       val action = actionInterpreterDyn.value
+      val doc    = action map (_.containingDocument) orElse containingDocumentDyn.value
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
@@ -132,7 +134,7 @@ object XFormsAPI {
           ("after", after)
 
       XFormsInsertAction.doInsert(
-        action map (_.containingDocument) orNull,
+        doc.orNull,
         action map (_.indentedLogger) orNull,
         positionAttribute,
         collectionToUpdate.asJava,
@@ -142,8 +144,8 @@ object XFormsAPI {
         true, // doClone
         doDispatch,
         requireDefaultValues,
-        updateRepeats,
-        searchForInstance
+        searchForInstance,
+        removeInstanceDataFromClonedNodes
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil
@@ -154,15 +156,17 @@ object XFormsAPI {
     doDispatch    : Boolean = true
   ): Seq[NodeInfo] =
     if (ref.nonEmpty) {
-      val action = actionInterpreterDyn.value
+
+      val actionOpt = actionInterpreterDyn.value
+      val docOpt    = actionOpt map (_.containingDocument) orElse containingDocumentDyn.value
 
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
-          containingDocument = action map (_.containingDocument) orNull,
-          collectionToUpdate = ref,
-          deleteIndexOpt     = None,
-          doDispatch         = doDispatch)(
-          indentedLogger     = action map (_.indentedLogger) orNull
+          containingDocumentOpt = docOpt,
+          collectionToUpdate    = ref,
+          deleteIndexOpt        = None,
+          doDispatch            = doDispatch)(
+          indentedLogger        = actionOpt map (_.indentedLogger) orNull
         )
 
       deletionDescriptors map (_.nodeInfo)
@@ -180,8 +184,8 @@ object XFormsAPI {
     val oldName: QName = nodeInfo.uriQualifiedName
     if (oldName != newName) {
       val newNodeInfo = nodeInfo.getNodeKind match {
-        case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo /@ @*) ++ (nodeInfo / Node))
-        case _              ⇒ throw new IllegalArgumentException
+        case ELEMENT_NODE   => elementInfo(newName, (nodeInfo /@ @*) ++ (nodeInfo / Node))
+        case _              => throw new IllegalArgumentException
       }
 
       insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo)
@@ -222,12 +226,12 @@ object XFormsAPI {
   // nodes.
   def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
     element /@ attName match {
-      case Seq()        ⇒ insert(into = element, origin = attributeInfo(attName, value))
-      case Seq(att, _*) ⇒ setvalue(att, value)
+      case Seq()        => insert(into = element, origin = attributeInfo(attName, value))
+      case Seq(att, _*) => setvalue(att, value)
     }
 
   // NOTE: The value is by-name and used only if needed
-  def toggleAttribute(element: NodeInfo, attName: QName, value: ⇒ String, set: Boolean): Unit =
+  def toggleAttribute(element: NodeInfo, attName: QName, value: => String, set: Boolean): Unit =
     if (set)
       ensureAttribute(element, attName, value)
     else
@@ -250,8 +254,8 @@ object XFormsAPI {
   def topLevelModel(modelId: String): Option[XFormsModel] =
     inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
 
-  def context[T](xpath: String)(body: ⇒ T): T = ???
-  def context[T](item: Item)(body: ⇒ T): T = ???
+  def context[T](xpath: String)(body: => T): T = ???
+  def context[T](item: Item)(body: => T): T = ???
   def event[T](attributeName: String): Seq[Item] = ???
 
   // The xf:dispatch action
@@ -282,13 +286,13 @@ object XFormsAPI {
 
   // xf:send
   // Send the given submission and applies the body with the resulting event if the submission completed
-  def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent ⇒ T): Option[T] = {
-    resolveAs[XFormsModelSubmission](submissionId) flatMap { submission ⇒
+  def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent => T): Option[T] = {
+    resolveAs[XFormsModelSubmission](submissionId) flatMap { submission =>
 
       var result: Option[Try[T]] = None
 
       // Listener runs right away but stores the Try
-      val listener: Dispatch.EventListener = { e ⇒
+      val listener: Dispatch.EventListener = { e =>
         result = Some(Try(body(e)))
       }
 
@@ -315,8 +319,8 @@ object XFormsAPI {
   // xf:send which throws a SubmitException in case of error
   def sendThrowOnError(submissionId: String, properties: PropertyGetter = EmptyGetter): Option[XFormsSubmitDoneEvent] =
     send(submissionId, properties) {
-      case done:  XFormsSubmitDoneEvent  ⇒ done
-      case error: XFormsSubmitErrorEvent ⇒ throw new SubmitException(error)
+      case done:  XFormsSubmitDoneEvent  => done
+      case error: XFormsSubmitErrorEvent => throw new SubmitException(error)
     }
 
   // NOTE: There is no source id passed so we resolve relative to the document

@@ -49,7 +49,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
 
   def capitalizedHeaders =
     _lowerCaseHeaders.toList map
-    { case (k, v) ⇒ Headers.capitalizeCommonOrSplitHeader(k) → v } toMap
+    { case (k, v) => Headers.capitalizeCommonOrSplitHeader(k) -> v } toMap
 
   def getInputStream: InputStream = {
     if (_inputStream eq null) {
@@ -67,10 +67,10 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   }
 
   def setHeader(name: String, value: String): Unit =
-    _lowerCaseHeaders += name.toLowerCase → List(value)
+    _lowerCaseHeaders += name.toLowerCase -> List(value)
 
   def addHeader(name: String, value: String): Unit =
-    _lowerCaseHeaders += name.toLowerCase  → (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
+    _lowerCaseHeaders += name.toLowerCase  -> (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
 
   def getCharacterEncoding = null
 

@@ -16,16 +16,16 @@ package org.orbeon.oxf.util
 object ScalaLogging {
 
   def withDebug[T](
-    message    : ⇒ String,
-    parameters : ⇒ Seq[(String, String)] = Nil)(
-    body       : ⇒ T)(implicit
+    message    : => String,
+    parameters : => Seq[(String, String)] = Nil)(
+    body       : => T)(implicit
     logger     : com.typesafe.scalalogging.Logger
   ): T =
     try {
       logger.debug(
         s"start $message",
         parameters collect {
-          case (k, v) if (k ne null) && (v ne null) ⇒ s"""$k: "$v""""
+          case (k, v) if (k ne null) && (v ne null) => s"""$k: "$v""""
         } mkString ("{", ", ", "}")
       )
 

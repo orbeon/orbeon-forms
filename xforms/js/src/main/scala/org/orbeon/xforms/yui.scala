@@ -25,7 +25,7 @@ import scala.scalajs.js.annotation.JSGlobal
 trait YUICustomEvent extends js.Object {
   def subscribe(fn: js.Function)   : Unit = js.native
   def unsubscribe(fn: js.Function) : Unit = js.native
-  def fire(args: js.Any*)          : Unit = js.native
+  def fire(args: Any*)             : Unit = js.native
 }
 
 @JSGlobal("YAHOO.widget.ProgressBar")

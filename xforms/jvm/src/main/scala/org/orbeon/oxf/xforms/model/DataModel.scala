@@ -41,7 +41,7 @@ object DataModel {
    *
    * NOTE: As of 2012-04-26, we allow binding non-value controls to any node type.
    */
-  def isAllowedBoundItem(item: Item) = item ne null
+  def isAllowedBoundItem(item: Item): Boolean = item ne null
 
   /**
    * Whether the given item is acceptable as a bound item storing a value.
@@ -50,11 +50,11 @@ object DataModel {
    * not disallowed by per XForms, however doing so might lead to funny results when writing values back. In
    * particular, writing an empty value to a text node causes the control to become non-relevant.
    */
-  def isAllowedValueBoundItem(item: Item) = item match {
-    case _: AtomicValue                                                                     ⇒ true
-    case node: NodeInfo if node.isAttribute || node.isElement && node.supportsSimpleContent ⇒ true
-    case node: NodeInfo if node self (Text || PI || Comment) effectiveBooleanValue          ⇒ true
-    case _                                                                                  ⇒ false
+  def isAllowedValueBoundItem(item: Item): Boolean = item match {
+    case _: AtomicValue                                                                     => true
+    case node: NodeInfo if node.isAttribute || node.isElement && node.supportsSimpleContent => true
+    case node: NodeInfo if node self (Text || PI || Comment) effectiveBooleanValue          => true
+    case _                                                                                  => false
   }
 
   /**
@@ -68,11 +68,11 @@ object DataModel {
    * - items not backed by a mutable node (which are read-only)
    */
   def isWritableItem(item: Item): VirtualNode Either Reason = item match {
-    case _: AtomicValue                            ⇒ Right(ReadonlyNodeReason)
-    case _: DocumentInfo                           ⇒ Right(DisallowedNodeReason)
-    case node: VirtualNode if node.hasChildElement ⇒ Right(DisallowedNodeReason)
-    case node: VirtualNode                         ⇒ Left(node)
-    case _                                         ⇒ Right(ReadonlyNodeReason)
+    case _: AtomicValue                            => Right(ReadonlyNodeReason)
+    case _: DocumentInfo                           => Right(DisallowedNodeReason)
+    case node: VirtualNode if node.hasChildElement => Right(DisallowedNodeReason)
+    case node: VirtualNode                         => Left(node)
+    case _                                         => Right(ReadonlyNodeReason)
   }
 
   /**
@@ -87,8 +87,8 @@ object DataModel {
    * - XFormsModelBinds gets node value for validation
    */
   def getValue(item: Item): String = item match {
-    case null ⇒ null
-    case item ⇒ item.getStringValue
+    case null => null
+    case item => item.getStringValue
   }
 
   /**
@@ -104,19 +104,19 @@ object DataModel {
   def setValue(
     nodeInfo  : NodeInfo,
     newValue  : String,
-    onSuccess : () ⇒ Unit     = () ⇒ (),
-    onError   : Reason ⇒ Unit = _ ⇒ ()
-  ) = {
+    onSuccess : () => Unit     = () => (),
+    onError   : Reason => Unit = _ => ()
+  ): Boolean = {
 
     assert(nodeInfo ne null)
     assert(newValue ne null)
 
     isWritableItem(nodeInfo) match {
-      case Left(virtualNode) ⇒
+      case Left(virtualNode) =>
         setValueForNode(virtualNode.getUnderlyingNode.asInstanceOf[dom.Node], newValue)
         onSuccess()
         true
-      case Right(reason) ⇒
+      case Right(reason) =>
         onError(reason)
         false
     }
@@ -130,8 +130,8 @@ object DataModel {
   def setValueIfChanged(
     nodeInfo  : NodeInfo,
     newValue  : String,
-    onSuccess : String ⇒ Unit = _ ⇒ (),
-    onError   : Reason ⇒ Unit = _ ⇒ ()
+    onSuccess : String => Unit = _ => (),
+    onError   : Reason => Unit = _ => ()
   ): Boolean = {
 
     assert(nodeInfo ne null)
@@ -142,25 +142,25 @@ object DataModel {
 
     // Do not require RRR / mark the instance dirty if the value hasn't actually changed
     doUpdate &&
-      setValue(nodeInfo, newValue, () ⇒ onSuccess(oldValue), onError)
+      setValue(nodeInfo, newValue, () => onSuccess(oldValue), onError)
   }
 
   /**
-   * Same as setValueIfChanged but with default error handling.
+   * Same as `setValueIfChanged` but with default error handling.
    *
    * Used by MIPs and when setting external values on controls.
    *
    * Return true if the value was changed.
    */
   def setValueIfChangedHandleErrors(
-    containingDocument : XFormsContainingDocument,
     eventTarget        : XFormsEventTarget,
     locationData       : LocationData,
     nodeInfo           : NodeInfo,
     valueToSet         : String,
     source             : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent ⇒ Unit = Dispatch.dispatchEvent)(implicit
+    collector          : XFormsEvent => Unit = Dispatch.dispatchEvent)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Boolean = {
 
@@ -170,22 +170,22 @@ object DataModel {
     setValueIfChanged(
       nodeInfo  = nodeInfo,
       newValue  = valueToSet,
-      onSuccess = logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate, collector),
-      onError   = reason ⇒ collector(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
+      onSuccess = logAndNotifyValueChange(source, nodeInfo, _, valueToSet, isCalculate, collector),
+      onError   = reason => collector(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
     )
   }
 
   // Standard success behavior: log and notify
   def logAndNotifyValueChange(
-    containingDocument : XFormsContainingDocument,
     source             : String,
     nodeInfo           : NodeInfo,
     oldValue           : String,
     newValue           : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent ⇒ Unit)(implicit
+    collector          : XFormsEvent => Unit)(implicit
+    containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
-  ) = {
+  ): Unit = {
     logValueChange(source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
     notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate, collector)
   }
@@ -199,7 +199,7 @@ object DataModel {
     newValue            : String,
     instanceEffectiveId : Option[String])(implicit
     logger              : IndentedLogger
-  ) =
+  ): Unit =
     if (logger.isDebugEnabled)
       logger.logDebug("xf:setvalue", "setting instance value", "source", source,
         "old value", oldValue, "new value", newValue,
@@ -211,43 +211,43 @@ object DataModel {
     oldValue           : String,
     newValue           : String,
     isCalculate        : Boolean,
-    collector          : XFormsEvent ⇒ Unit
-  ) =
+    collector          : XFormsEvent => Unit
+  ): Unit =
     containingDocument.instanceForNodeOpt(nodeInfo) match {
-      case Some(modifiedInstance) ⇒
+      case Some(modifiedInstance) =>
         // Tell the model about the value change
         modifiedInstance.markModified()
         modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
 
         // Dispatch extension event to instance
         collector(new XXFormsValueChangedEvent(modifiedInstance, nodeInfo, oldValue, newValue))
-      case None ⇒
+      case None =>
         // Value modified is not in an instance
         // Q: Is the code below the right thing to do?
         containingDocument.getControls.markDirtySinceLastRequest(true)
     }
 
-  private def setValueForNode(node: dom.Node, newValue: String) =
+  private def setValueForNode(node: dom.Node, newValue: String): Unit =
     node match {
-      case element   : dom.Element                   ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
-      case attribute : dom.Attribute                 ⇒ attribute.setValue(newValue)
-      case text      : dom.Text if newValue.nonEmpty ⇒ text.setText(newValue)
-      case text      : dom.Text                      ⇒ text.getParent.remove(text)
-      case pi        : dom.ProcessingInstruction     ⇒ pi.setText(newValue)
-      case comment   : dom.Comment                   ⇒ comment.setText(newValue)
+      case element   : dom.Element                   => element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
+      case attribute : dom.Attribute                 => attribute.setValue(newValue)
+      case text      : dom.Text if newValue.nonEmpty => text.setText(newValue)
+      case text      : dom.Text                      => text.getParent.remove(text)
+      case pi        : dom.ProcessingInstruction     => pi.setText(newValue)
+      case comment   : dom.Comment                   => comment.setText(newValue)
       // Should not happen as caller checks for isWritableItem()
-      case _ ⇒ throw new IllegalStateException(s"Setting value on disallowed node type: ${dom.Node.nodeTypeName(node)}")
+      case _ => throw new IllegalStateException(s"Setting value on disallowed node type: ${dom.Node.nodeTypeName(node)}")
     }
 
   // Whether the item is an element node.
-  def isElement(item: Item) = isNodeType(item, ELEMENT_NODE)
+  def isElement(item: Item): Boolean = isNodeType(item, ELEMENT_NODE)
 
   // Whether the an item is a document node.
-  def isDocument(item: Item) = isNodeType(item, DOCUMENT_NODE)
+  def isDocument(item: Item): Boolean = isNodeType(item, DOCUMENT_NODE)
 
   private def isNodeType(item: Item, nodeType: Int) = item match {
-    case nodeInfo: NodeInfo if nodeInfo.getNodeKind == nodeType ⇒ true
-    case _ ⇒ false
+    case nodeInfo: NodeInfo if nodeInfo.getNodeKind == nodeType => true
+    case _ => false
   }
 
   // Return the given node's first child element
@@ -256,8 +256,8 @@ object DataModel {
     var next = iterator.next()
     while (next ne null) {
       next match {
-        case child: NodeInfo if child.getNodeKind == ELEMENT_NODE ⇒ return child
-        case _ ⇒
+        case child: NodeInfo if child.getNodeKind == ELEMENT_NODE => return child
+        case _ =>
       }
       next = iterator.next()
     }
@@ -266,7 +266,7 @@ object DataModel {
 
   // Visit the given element, its attributes, and its children nodes recursively
   // NOTE: Because this can be a hot spot, this is written more Java-like. Make changes carefully.
-  def visitElement(e: NodeInfo, visit: NodeInfo ⇒ Unit): Unit = {
+  def visitElement(e: NodeInfo, visit: NodeInfo => Unit): Unit = {
 
     visit(e)
 
@@ -285,8 +285,8 @@ object DataModel {
       var next = iterator.next()
       while (next ne null) {
         next match {
-          case node: NodeInfo if node.getNodeKind == ELEMENT_NODE ⇒ visitElement(node, visit)
-          case _ ⇒
+          case node: NodeInfo if node.getNodeKind == ELEMENT_NODE => visitElement(node, visit)
+          case _ =>
         }
         next = iterator.next()
       }

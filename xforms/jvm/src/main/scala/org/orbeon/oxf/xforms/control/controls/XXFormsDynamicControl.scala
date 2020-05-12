@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
+import org.orbeon.saxon.`type`.{Type => SaxonType}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -79,7 +79,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // TODO: This might blow if the control is non-relevant
   override def bindingContextForChildOpt: Option[BindingContext] =
-    _nested map { case Nested(container, _, _, _) ⇒
+    _nested map { case Nested(container, _, _, _) =>
       val contextStack = container.getContextStack
       contextStack.setParentBindingContext(bindingContext)
       contextStack.resetBindingContext()
@@ -89,9 +89,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
     getBoundElement match {
-      case Some(boundElem) ⇒
+      case Some(boundElem) =>
         updateSubTree(create = true, boundElem)
-      case _ ⇒
+      case _ =>
         // Don't create binding (maybe we could for a read-only instance)
         _nested = None
     }
@@ -110,7 +110,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       containingDocument.addControlStructuralChange(prefixedId)
     }
 
-    getBoundElement foreach { boundElem ⇒
+    getBoundElement foreach { boundElem =>
       updateSubTree(create = false, boundElem)
     }
   }
@@ -157,7 +157,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       clearChildren()
     }
 
-    _nested foreach { case Nested(container, partAnalysis, _, outerListener) ⇒
+    _nested foreach { case Nested(container, partAnalysis, _, outerListener) =>
       // Remove container and associated models
       container.destroy()
       // Remove part and associated scopes
@@ -199,29 +199,28 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val outerListener: EventListener = {
 
       // Mark an unknown change, which will require a complete rebuild of the part
-      val unknownChange: MirrorEventListener = { _ ⇒
+      val unknownChange: MirrorEventListener = { _ =>
         fullUpdateChange = true
         containingDocument.addControlStructuralChange(prefixedId)
         ListenerResult.Stop
       }
 
-      def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): ListenerResult = {
+      def recordChanges(findChange: NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): ListenerResult = {
         val newChanges = nodes flatMap (findChange(_))
         changes ++= newChanges
         if (newChanges.nonEmpty) ListenerResult.Stop else ListenerResult.NextListener
       }
 
-      def changeListener(record: Seq[NodeInfo] ⇒ ListenerResult): MirrorEventListener = {
-        case insert: XFormsInsertEvent              ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
-        case delete: XFormsDeleteEvent              ⇒ record(delete.deletedNodes)
-        case valueChanged: XXFormsValueChangedEvent ⇒ record(List(valueChanged.node))
-        case _                                      ⇒ ListenerResult.NextListener
+      def changeListener(record: Seq[NodeInfo] => ListenerResult): MirrorEventListener = {
+        case insert: XFormsInsertEvent              => record(insert.insertedNodes collect { case n: NodeInfo => n })
+        case delete: XFormsDeleteEvent              => record(delete.deletedNodes)
+        case valueChanged: XXFormsValueChangedEvent => record(List(valueChanged.node))
+        case _                                      => ListenerResult.NextListener
       }
 
       // Instance mirror listener
       val instanceListener =
         newListenerWithCycleDetector(
-          containingDocument,
           toInnerInstanceNode(boundElem, partAnalysis, childContainer, findOuterInstanceDetailsDynamic)
         )
 
@@ -242,13 +241,12 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // change to the related node in the source
     val innerListener = toEventListener(
       newListenerWithCycleDetector(
-        containingDocument,
         toOuterInstanceNodeDynamic(outerInstance, boundElem, partAnalysis)
       )
     )
 
     partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
-      _.instances.values filter (_.useInlineContent) foreach { instance ⇒
+      _.instances.values filter (_.useInlineContent) foreach { instance =>
         val innerInstance = childContainer.findInstance(instance.staticId).get
         InstanceMirror.addListener(innerInstance, innerListener)
       }
@@ -277,29 +275,29 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       )
 
     stateToRestore match {
-      case Some(state) ⇒ withDynamicStateToRestore(state)(createAndInitializeDynamicSubTree())
-      case None        ⇒ createAndInitializeDynamicSubTree()
+      case Some(state) => withDynamicStateToRestore(state)(createAndInitializeDynamicSubTree())
+      case None        => createAndInitializeDynamicSubTree()
     }
   }
 
   // We want to remember the state of switches
   private def gatherRelevantSwitchState(start: XFormsControl) =
     ControlsIterator(start, includeSelf = false) collect
-      { case switch: XFormsSwitchControl if switch.isRelevant ⇒ switch.getEffectiveId → switch.controlState.get } toMap
+      { case switch: XFormsSwitchControl if switch.isRelevant => switch.getEffectiveId -> switch.controlState.get } toMap
 
   // If more than one change touches a given id, processed it once using the last element
   private def groupChanges(changes: Seq[(String, Element)]): List[(String, Element)] =
-    changes groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) ⇒
-      prefixedId → (prefixedIdsToElemsInSource map (_._2) last)
+    changes groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) =>
+      prefixedId -> (prefixedIdsToElemsInSource map (_._2) last)
     }
 
   private def processXBLUpdates(): Unit = {
 
     val tree = containingDocument.getControls.getCurrentControlTree
 
-    for ((prefixedId, elemInSource) ← groupChanges(xblChanges)) {
+    for ((prefixedId, elemInSource) <- groupChanges(xblChanges)) {
       tree.findControl(prefixedId) match { // TODO: should use effective id if in repeat and process all
-        case Some(componentControl: XFormsComponentControl) ⇒
+        case Some(componentControl: XFormsComponentControl) =>
           // Update and restore switch state
           // LATER: See above comments
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
@@ -309,7 +307,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             componentControl.recreateNestedContainer()
             updateDynamicShadowTree(componentControl)
           }
-        case _ ⇒
+        case _ =>
       }
     }
 
@@ -320,7 +318,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     val partAnalysis = _nested.get.partAnalysis
 
-    for ((modelId, modelElement) ← groupChanges(bindChanges)) {
+    for ((modelId, modelElement) <- groupChanges(bindChanges)) {
 
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
       val staticModel = partAnalysis.getModel(modelPrefixedId)
@@ -340,8 +338,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   private def getBoundElement: Option[VirtualNode] =
     bindingContext.singleNodeOpt match {
-      case Some(node: VirtualNode) if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
-      case _                                                           ⇒ None
+      case Some(node: VirtualNode) if node.getNodeKind == ELEMENT_NODE => Some(node)
+      case _                                                           => None
     }
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
@@ -364,7 +362,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   // LATER: what about new scripts?
   final override def outputAjaxDiff(
     previousControlOpt : Option[XFormsControl],
-    content            : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content            : Option[XMLReceiverHelper => Unit])(implicit
     ch                 : XMLReceiverHelper
   ): Unit = ()
 
@@ -376,24 +374,24 @@ object XXFormsDynamicControl {
 
   // Compose a Seq of listeners by calling them in order until one has successfully processed the event
   def composeListeners(listeners: Seq[MirrorEventListener]): MirrorEventListener =
-    e ⇒
+    e =>
       listeners find (_(e) == ListenerResult.Stop) match {
-        case Some(_) ⇒ ListenerResult.Stop
-        case None    ⇒ ListenerResult.NextListener
+        case Some(_) => ListenerResult.Stop
+        case None    => ListenerResult.NextListener
       }
 
-  // Find whether the given node is a bind element or attribute and return the associated model id → element mapping
+  // Find whether the given node is a bind element or attribute and return the associated model id -> element mapping
   def findBindChange(node: NodeInfo): Option[(String, Element)] = {
 
     val XF = XFORMS_NAMESPACE_URI
 
     // Any change to a model bind element or a descendant element or attribute
     val modelOption =
-      node ancestorOrSelf (XF → "bind") ancestor (XF → "model") headOption
+      node ancestorOrSelf (XF -> "bind") ancestor (XF -> "model") headOption
 
-    modelOption map { modelNode ⇒
+    modelOption map { modelNode =>
       val modelElement = unsafeUnwrapElement(modelNode)
-      XFormsUtils.getElementId(modelElement) → modelElement
+      XFormsUtils.getElementId(modelElement) -> modelElement
     }
   }
 
@@ -410,17 +408,17 @@ object XXFormsDynamicControl {
       // Go from root to leaf
       val ancestorsFromRoot = node ancestor * reverse
 
-      // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
+      // Find first element whose prefixed id has a binding and return the mapping prefixedId -> element
       val all =
         for {
-          ancestor   ← ancestorsFromRoot
+          ancestor   <- ancestorsFromRoot
           id         = ancestor.id
           if id.nonEmpty
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          _          ← partAnalysis.xblBindings.getBinding(prefixedId)
+          _          <- partAnalysis.xblBindings.getBinding(prefixedId)
           if ! (isNodeLHHA && ancestor == node.getParent)
         } yield
-          prefixedId → unsafeUnwrapElement(ancestor)
+          prefixedId -> unsafeUnwrapElement(ancestor)
 
       all.headOption
     }
@@ -446,7 +444,7 @@ object XXFormsDynamicControl {
     val doc             = componentControl.containingDocument
     val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
 
-    templateTreeOpt foreach { templateTree ⇒
+    templateTreeOpt foreach { templateTree =>
       doc.getControls.getCurrentControlTree.createAndInitializeDynamicSubTree(
         container        = componentControl.nestedContainerOpt getOrElse (throw new IllegalStateException),
         containerControl = componentControl,

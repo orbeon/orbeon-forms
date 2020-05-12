@@ -284,7 +284,7 @@
                             <xxf:itemset>[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
                         </xxf:control>
                         <xxf:control id="select-3">
-                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"","children":[{"label":"2.3.2","value":"","children":[{"label":"2.three.4","value":"2.three.4"}]}]}]}]</xxf:itemset>
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.three.4","value":"2.three.4"}]}]</xxf:itemset>
                         </xxf:control>
                     </xxf:control-values>
                 </xxf:action>

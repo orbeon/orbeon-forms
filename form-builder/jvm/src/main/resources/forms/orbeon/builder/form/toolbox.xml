@@ -296,14 +296,15 @@
                                                     toolboxOps:insertNewControl($binding)
                                                 </xf:action>
                                                 <xf:var
-                                                    name="effective-id"
-                                                    value="fbf:buildFormBuilderControlEffectiveIdOrEmpty($selected-cell)"/>
+                                                    name="namespaced-id"
+                                                    value="fbf:buildFormBuilderControlNamespacedIdOrEmpty($selected-cell)"/>
                                                 <xf:action type="javascript">
                                                     <xf:param
-                                                        name="effectiveId"
-                                                        value="$effective-id"/>
+                                                        name="namespacedId"
+                                                        value="$namespaced-id"/>
                                                     <xf:body>
-                                                        ORBEON.builder.controlAdded.fire(effectiveId);
+                                                        console.log("namespacedId", namespacedId);
+                                                        ORBEON.builder.controlAdded.fire(namespacedId);
                                                     </xf:body>
                                                 </xf:action>
                                             </xf:action>

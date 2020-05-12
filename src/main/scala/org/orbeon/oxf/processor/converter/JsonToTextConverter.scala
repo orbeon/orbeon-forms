@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.XMLReceiver
 
 class JsonToTextConverter extends ProcessorImpl {
 
-  self ⇒
+  self =>
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))

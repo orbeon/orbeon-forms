@@ -56,26 +56,26 @@ object BlockCache {
   val fbMainCache      = new BlockCache
   val cellCache        = new BlockCache
 
-  def onExitFbMainOrOffsetMayHaveChanged(fn: () ⇒ Unit): Unit = {
+  def onExitFbMainOrOffsetMayHaveChanged(fn: () => Unit): Unit = {
     Position.onOffsetMayHaveChanged(fn)
     Position.currentContainerChanged(
       containerCache = BlockCache.fbMainCache,
-      wasCurrent     = (_: Block) ⇒ fn(),
-      becomesCurrent = (_: Block) ⇒ ()
+      wasCurrent     = (_: Block) => fn(),
+      becomesCurrent = (_: Block) => ()
     )
   }
 
   locally {
 
     // Keep caches current
-    Position.onOffsetMayHaveChanged(() ⇒ {
+    Position.onOffsetMayHaveChanged(() => {
 
       locally {
 
         val sectionsIt =
           for {
-            e       ← collectElems(s"$SectionSelector:visible")
-            section ← elemNotInSectionTemplateOpt(e).iterator
+            e       <- collectElems(s"$SectionSelector:visible")
+            section <- elemNotInSectionTemplateOpt(e).iterator
             // Mix of jQuery and Option is not pretty
             mostOuterSection =
               section.parents(SectionSelector)
@@ -98,8 +98,8 @@ object BlockCache {
 
         val gridsIt =
           for {
-            e    ← collectElems(s"$GridSelector:visible")
-            grid ← elemNotInSectionTemplateOpt(e).iterator
+            e    <- collectElems(s"$GridSelector:visible")
+            grid <- elemNotInSectionTemplateOpt(e).iterator
           } yield
             Block(grid)
 
@@ -109,7 +109,7 @@ object BlockCache {
       locally {
 
         val gridBodiesIt =
-          for (gridBody ← collectElems(s".fr-grid.fr-editable $GridBodySelector"))
+          for (gridBody <- collectElems(s".fr-grid.fr-editable $GridBodySelector"))
             yield Block($(gridBody))
 
         gridBodyCache._elems = gridBodiesIt.to(List)
@@ -120,7 +120,7 @@ object BlockCache {
       locally {
 
         val cellsIt =
-          for (cell ← collectElems(".fr-grid.fr-editable .fr-grid-td"))
+          for (cell <- collectElems(".fr-grid.fr-editable .fr-grid-td"))
             yield Block($(cell))
 
         cellCache._elems = cellsIt.to(List)
@@ -128,7 +128,7 @@ object BlockCache {
     })
 
     def collectElems(selector: String): Iterator[dom.Element] =
-      $(selector).toArray.iterator collect { case e: dom.Element ⇒ e }
+      $(selector).toArray.iterator collect { case e: dom.Element => e }
 
     def elemNotInSectionTemplateOpt(domEl: dom.Element): Option[JQuery] = {
       val el = $(domEl)

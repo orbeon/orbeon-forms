@@ -33,16 +33,16 @@ trait SAXMachine[S, D] extends FSM[S, SAXEvents.SAXEvent, D] with ContentHandler
 
   // Forward the given SAX event to the output
   final protected def forward(out: ContentHandler with LexicalHandler, saxEvent: SAXEvent) = saxEvent match {
-    case StartDocument                                   ⇒ out.startDocument()
-    case EndDocument                                     ⇒ out.endDocument()
-    case StartElement(qName: QName, atts: Atts)          ⇒ out.startElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart), atts)
-    case EndElement(qName: QName)                        ⇒ out.endElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart))
-    case Characters(text)                                ⇒ out.characters(text.toCharArray, 0, text.length)
-    case Comment(text)                                   ⇒ out.comment(text.toCharArray, 0, text.length)
-    case PI(target: String, data: String)                ⇒ out.processingInstruction(target, data)
-    case StartPrefixMapping(prefix: String, uri: String) ⇒ out.startPrefixMapping(prefix, uri)
-    case EndPrefixMapping(prefix: String)                ⇒ out.endPrefixMapping(prefix)
-    case DocumentLocator(locator)                        ⇒ out.setDocumentLocator(locator)
+    case StartDocument                                   => out.startDocument()
+    case EndDocument                                     => out.endDocument()
+    case StartElement(qName: QName, atts: Atts)          => out.startElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart), atts)
+    case EndElement(qName: QName)                        => out.endElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart))
+    case Characters(text)                                => out.characters(text.toCharArray, 0, text.length)
+    case Comment(text)                                   => out.comment(text.toCharArray, 0, text.length)
+    case PI(target: String, data: String)                => out.processingInstruction(target, data)
+    case StartPrefixMapping(prefix: String, uri: String) => out.startPrefixMapping(prefix, uri)
+    case EndPrefixMapping(prefix: String)                => out.endPrefixMapping(prefix)
+    case DocumentLocator(locator)                        => out.setDocumentLocator(locator)
   }
 
   // Useful SAX events

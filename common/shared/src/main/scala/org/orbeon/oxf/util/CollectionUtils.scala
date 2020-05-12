@@ -29,10 +29,10 @@ object CollectionUtils {
   def combineValues[Key, U, T[_]](parameters: Seq[(Key, U)])(implicit cbf: Factory[U, T[U]]): Seq[(Key, T[U])] = {
     val result = mutable.LinkedHashMap[Key, mutable.Builder[U, T[U]]]()
 
-    for ((name, value) ← parameters)
+    for ((name, value) <- parameters)
       result.getOrElseUpdate(name, cbf.newBuilder) += value
 
-    result map { case (k, v) ⇒ k → v.result } toList
+    result map { case (k, v) => k -> v.result } toList
   }
 
   // Extensions on Iterator[T]
@@ -52,7 +52,7 @@ object CollectionUtils {
 
   // Extensions on Iterator object
   object IteratorExt {
-    def iterateFrom[T](start: T, gen: T ⇒ Option[T]): Iterator[T] = {
+    def iterateFrom[T](start: T, gen: T => Option[T]): Iterator[T] = {
       var next: Option[T] = Some(start)
       iterateWhileDefined {
         val result = next
@@ -60,13 +60,13 @@ object CollectionUtils {
         result
       }
     }
-    def iterateWhile[T](cond: ⇒ Boolean, elem: ⇒ T): Iterator[T] =
+    def iterateWhile[T](cond: => Boolean, elem: => T): Iterator[T] =
       iterateWhileDefined(cond option elem)
 
-    def iterateWhileDefined[T](elemOpt: ⇒ Option[T]): Iterator[T] =
+    def iterateWhileDefined[T](elemOpt: => Option[T]): Iterator[T] =
       Iterator.continually(elemOpt).takeWhile(_.isDefined).flatten
 
-    def iterateOpt[T <: AnyRef](start: T)(f: T ⇒ Option[T]): Iterator[T] = new AbstractIterator[T] {
+    def iterateOpt[T <: AnyRef](start: T)(f: T => Option[T]): Iterator[T] = new AbstractIterator[T] {
 
       private[this] var _next: Option[T] = Some(start)
 
@@ -74,11 +74,11 @@ object CollectionUtils {
 
       def next(): T =
         _next match {
-          case Some(result) ⇒
+          case Some(result) =>
             // Advance on `next()` for simplicity
             _next = _next flatMap f
             result
-          case None ⇒
+          case None =>
             throw new NoSuchElementException("next on empty iterator")
         }
     }
@@ -87,29 +87,29 @@ object CollectionUtils {
 
   // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
-  def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T ⇒ t }
+  def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T => t }
 
   implicit class IterableLikeOps[A, Repr](private val t: IterableLike[A, Repr]) extends AnyVal {
 
-    def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: Factory[A, Repr]): List[(K, Repr)] = {
+    def groupByKeepOrder[K](f: A => K)(implicit cbf: Factory[A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
-      for (elem ← t) {
+      for (elem <- t) {
         val key = f(elem)
         val bldr = m.getOrElseUpdate(key, cbf.newBuilder)
         bldr += elem
       }
       val b = List.newBuilder[(K, Repr)]
-      for ((k, v) ← m)
+      for ((k, v) <- m)
         b += ((k, v.result()))
 
       b.result()
     }
 
-    def keepDistinctBy[K, U](key: A ⇒ K): List[A] = {
+    def keepDistinctBy[K, U](key: A => K): List[A] = {
       val result = mutable.ListBuffer[A]()
       val seen   = mutable.Set[K]()
 
-      for (x ← t) {
+      for (x <- t) {
         val k = key(x)
         if (! seen(k)) {
           result += x
@@ -125,7 +125,7 @@ object CollectionUtils {
     def findDuplicates: List[A] = {
       val result = mutable.LinkedHashSet[A]()
       val seen   = mutable.HashSet[A]()
-      for (x ← t) {
+      for (x <- t) {
         if (seen(x))
           result += x
         else
@@ -154,14 +154,14 @@ object CollectionUtils {
 
     def insertAt(index: Int, value: T, position: InsertPosition): Vector[T] =
       position match {
-        case InsertBefore ⇒ (values.take(index)     :+ value) ++ values.drop(index)
-        case InsertAfter  ⇒ (values.take(index + 1) :+ value) ++ values.drop(index + 1)
+        case InsertBefore => (values.take(index)     :+ value) ++ values.drop(index)
+        case InsertAfter  => (values.take(index + 1) :+ value) ++ values.drop(index + 1)
       }
 
     def insertAt(index: Int, newValues: Iterable[T], position: InsertPosition): Vector[T] =
       position match {
-        case InsertBefore ⇒ values.take(index)     ++ newValues ++ values.drop(index)
-        case InsertAfter  ⇒ values.take(index + 1) ++ newValues ++ values.drop(index + 1)
+        case InsertBefore => values.take(index)     ++ newValues ++ values.drop(index)
+        case InsertAfter  => values.take(index + 1) ++ newValues ++ values.drop(index + 1)
       }
 
     def removeAt(index: Int): Vector[T] =

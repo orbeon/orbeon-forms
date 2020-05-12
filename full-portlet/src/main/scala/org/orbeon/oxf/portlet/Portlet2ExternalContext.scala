@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet
 
 import java.io._
 import java.util.Locale
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.portlet._
 import org.orbeon.io.StringBuilderWriter
@@ -189,7 +189,7 @@ class Portlet2ExternalContext(
     def getCharacterEncoding      : String            = clientDataRequestOpt map (_.getCharacterEncoding)  orNull
     def getContentLength          : Int               = clientDataRequestOpt map (_.getContentLength)      getOrElse -1
     def getContentType            : String            = clientDataRequestOpt map (_.getContentType)        orNull
-    def getMethod                 : HttpMethod        = clientDataRequestOpt map (c ⇒ HttpMethod.withNameInsensitive(c.getMethod)) getOrElse HttpMethod.GET
+    def getMethod                 : HttpMethod        = clientDataRequestOpt map (c => HttpMethod.withNameInsensitive(c.getMethod)) getOrElse HttpMethod.GET
     def getInputStream            : InputStream       = clientDataRequestOpt map (_.getPortletInputStream) orNull
 
     // Not available or not implemented
@@ -207,8 +207,8 @@ class Portlet2ExternalContext(
       // In that case, remove the query string part of the resource id, that's handled by getParameterMap()
       val rawResult =
         portletRequest match {
-          case rr: ResourceRequest ⇒ PathUtils.splitQuery(rr.getResourceID)._1
-          case _                   ⇒ portletRequest.getParameter(WSRPURLRewriter.PathParameterName)
+          case rr: ResourceRequest => PathUtils.splitQuery(rr.getResourceID)._1
+          case _                   => portletRequest.getParameter(WSRPURLRewriter.PathParameterName)
         }
 
       rawResult.trimAllToEmpty.prependSlash
@@ -220,8 +220,8 @@ class Portlet2ExternalContext(
       // Example of property: javax.portlet.markup.head.element.support = true
 
       val propertiesIt =
-        for (name ← portletRequest.getPropertyNames.asScala)
-          yield name.toLowerCase → StringConversions.stringEnumerationToArray(portletRequest.getProperties(name))
+        for (name <- portletRequest.getPropertyNames.asScala)
+          yield name.toLowerCase -> StringConversions.stringEnumerationToArray(portletRequest.getProperties(name))
 
       // PLT.11.1.5 Request Properties: "client request HTTP headers may not be always available. Portlets
       // should not rely on the presence of headers to function properly. The PortletRequest interface
@@ -230,9 +230,9 @@ class Portlet2ExternalContext(
       // NOTE: It seems like while Liferay 5 was making headers available, Liferay 6 doesn't anymore.
 
       val headersIt =
-        clientDataRequestOpt.iterator flatMap { cdr ⇒
-          ((cdr.getContentType ne null) iterator (Headers.ContentTypeLower   → Array(cdr.getContentType))) ++
-          ((cdr.getContentLength != -1) iterator (Headers.ContentLengthLower → Array(cdr.getContentLength.toString)))
+        clientDataRequestOpt.iterator flatMap { cdr =>
+          ((cdr.getContentType ne null) iterator (Headers.ContentTypeLower   -> Array(cdr.getContentType))) ++
+          ((cdr.getContentLength != -1) iterator (Headers.ContentLengthLower -> Array(cdr.getContentLength.toString)))
         }
 
       propertiesIt ++ headersIt toMap
@@ -254,16 +254,16 @@ class Portlet2ExternalContext(
         Multipart.getParameterMapMultipart(pipelineContext, getRequest, ExternalContext.StandardFormCharacterEncoding).asJava
       } else {
         portletRequest match {
-          case rr: ResourceRequest ⇒
+          case rr: ResourceRequest =>
             // We encoded query parameters directly into the resource id in this case
             val (_, queryString) = PathUtils.splitQueryDecodeParams(rr.getResourceID)
             CollectionUtils.combineValues[String, AnyRef, Array](queryString).toMap.asJava
-          case _ ⇒
+          case _ =>
             // Use native request parameters
             // Filter out `PathParameterName`, make values `Array[AnyRef]` (not great), and make immutable `Map`.
             val filteredParams =
               portletRequest.getParameterMap.asScala collect {
-                case pair @ (k, v) if k != WSRPURLRewriter.PathParameterName ⇒ (k, v.toArray[AnyRef])
+                case pair @ (k, v) if k != WSRPURLRewriter.PathParameterName => (k, v.toArray[AnyRef])
               }
             filteredParams.asJava
         }

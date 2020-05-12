@@ -17,12 +17,12 @@ object Version {
 
   def apply(documentId: Option[String], version: Option[String]): Version =
     documentId match {
-      case Some(id) ⇒ ForDocument(id)
-      case None     ⇒
+      case Some(id) => ForDocument(id)
+      case None     =>
         version match {
-          case None         ⇒ Unspecified
-          case Some("next") ⇒ Next
-          case Some(v)      ⇒ Specific(v.toInt)
+          case None         => Unspecified
+          case Some("next") => Next
+          case Some(v)      => Specific(v.toInt)
         }
     }
 }

@@ -40,7 +40,7 @@ object XXFormsCustomMIP {
 
   def findCustomMip(binding: Item, qName: QName): Option[String] =
     binding match {
-      case nodeInfo: NodeInfo ⇒ InstanceData.findCustomMip(nodeInfo, Model.buildInternalCustomMIPName(qName))
-      case _                  ⇒ None
+      case nodeInfo: NodeInfo => InstanceData.findCustomMip(nodeInfo, Model.buildInternalCustomMIPName(qName))
+      case _                  => None
     }
 }

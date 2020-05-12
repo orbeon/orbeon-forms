@@ -17,7 +17,6 @@ import java.io.InputStream
 import java.net.URI
 
 import org.orbeon.dom.{Document, Element, VisitorSupport}
-import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
@@ -44,7 +43,7 @@ object SubmissionUtils {
       new VisitorSupport {
         override def visit(element: Element): Unit =
           if (element.elements.isEmpty)
-            builder += element.getName → element.getText
+            builder += element.getName -> element.getText
       }
     )
 
@@ -76,39 +75,37 @@ object SubmissionUtils {
   def dataNodeHash(node: NodeInfo): String =
     SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
-  def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
-    processGETConnection(model, resolvedURL) { is ⇒
+  def readByteArray(model: XFormsModel, resolvedAbsoluteUrl: URI): Array[Byte] =
+    processGETConnection(model, resolvedAbsoluteUrl) { is =>
       NetUtils.inputStreamToByteArray(is)
     }
 
-  def readTinyTree(model: XFormsModel, resolvedURL: String, handleXInclude: Boolean): DocumentInfo =
-    processGETConnection(model, resolvedURL) { is ⇒
+  def readTinyTree(model: XFormsModel, resolvedAbsoluteUrl: URI, handleXInclude: Boolean): DocumentInfo =
+    processGETConnection(model, resolvedAbsoluteUrl) { is =>
       TransformerUtils.readTinyTree(
         XPath.GlobalConfiguration,
         is,
-        resolvedURL,
+        resolvedAbsoluteUrl.toString,
         handleXInclude,
         true
       )
     }
 
-  def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream ⇒ T): T =
-    ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedURL), closeOnSuccess = true)(body)
+  private def processGETConnection[T](model: XFormsModel, resolvedAbsoluteUrl: URI)(body: InputStream => T): T =
+    ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedAbsoluteUrl), closeOnSuccess = true)(body)
 
-  def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
+  private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {
 
     implicit val _logger          = model.indentedLogger
     implicit val _externalContext = NetUtils.getExternalContext
 
-    val url = new URI(resolvedURL)
-
     Connection(
       method          = GET,
-      url             = url,
+      url             = resolvedAbsoluteUrl,
       credentials     = None,
       content         = None,
       headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.withName(url.getScheme),
+        url              = resolvedAbsoluteUrl,
         hasCredentials   = false,
         customHeaders    = Map(),
         headersToForward = Connection.headersToForwardFromProperty,
@@ -136,7 +133,7 @@ object SubmissionUtils {
       )
 
     } catch {
-      case e: OXFException ⇒
+      case e: OXFException =>
         throw new XFormsSubmissionException(
           submission  = submission,
           message     = e.getMessage,
@@ -156,10 +153,10 @@ object SubmissionUtils {
       //
       val toForward =
         for {
-          name   ← List("user-agent", "accept")
-          values ← allHeaders.get(name)
+          name   <- List("user-agent", "accept")
+          values <- allHeaders.get(name)
         } yield
-          name → values
+          name -> values
 
       // Give priority to explicit headers
       toForward.toMap
@@ -169,8 +166,8 @@ object SubmissionUtils {
 
   def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
     for {
-      (headerName, headerValues) ← http.Headers.proxyHeaders(cxr.headers, request = false)
-      headerValue                ← headerValues
+      (headerName, headerValues) <- http.Headers.proxyHeaders(cxr.headers, request = false)
+      headerValue                <- headerValues
     } locally {
       response.addHeader(headerName, headerValue)
     }
@@ -181,19 +178,19 @@ object SubmissionUtils {
     instanceOpt : Option[XFormsInstance]
   ): Boolean =
     instanceOpt match {
-      case Some(instance) if doc.countPendingUploads > 0 ⇒
+      case Some(instance) if doc.countPendingUploads > 0 =>
 
         val boundRelevantPendingUploadControlsIt =
           for {
-            uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
+            uploadControl <- doc.getControls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
-            node          ← uploadControl.boundNodeOpt
+            node          <- uploadControl.boundNodeOpt
             if (instance.model.findInstanceForNode(node) exists (_ eq instance))
           } yield
             uploadControl
 
         boundRelevantPendingUploadControlsIt.nonEmpty
-      case _ ⇒
+      case _ =>
         false
     }
 

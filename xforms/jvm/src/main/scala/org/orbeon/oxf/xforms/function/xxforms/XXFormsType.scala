@@ -23,9 +23,9 @@ class XXFormsType extends XXFormsMIPFunction {
 
   override def evaluateItem(xpathContext: XPathContext): QNameValue =
     itemArgumentOrContextOpt(0)(xpathContext) match {
-      case Some(atomicValue: AtomicValue) ⇒
+      case Some(atomicValue: AtomicValue) =>
         atomicValue.getItemType(null) match {
-          case atomicType: BuiltInAtomicType ⇒
+          case atomicType: BuiltInAtomicType =>
             val fingerprint = atomicType.getFingerprint
             new QNameValue(
               StandardNames.getPrefix(fingerprint),
@@ -33,23 +33,23 @@ class XXFormsType extends XXFormsMIPFunction {
               StandardNames.getLocalName(fingerprint),
               null
             )
-          case _ ⇒
+          case _ =>
             null
         }
-      case Some(node: NodeInfo) ⇒
+      case Some(node: NodeInfo) =>
         // Get type from node
         Option(InstanceData.getType(node)) match {
-          case Some(typeQName) ⇒
+          case Some(typeQName) =>
             new QNameValue(
               "",
               typeQName.namespace.uri,
               typeQName.localName,
               null
             )
-          case _ ⇒
+          case _ =>
             null
         }
-      case _ ⇒
+      case _ =>
         null
     }
 }

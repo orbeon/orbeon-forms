@@ -96,15 +96,15 @@ object SubmissionHeaders {
         def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
 
         // Append/prepend/replace
-        headerNameValues += headerName → (combine match {
-          case "append"  ⇒ existingHeaderValues :+ headerValue
-          case "prepend" ⇒ headerValue +: existingHeaderValues
-          case _         ⇒ List(headerValue)
+        headerNameValues += headerName -> (combine match {
+          case "append"  => existingHeaderValues :+ headerValue
+          case "prepend" => headerValue +: existingHeaderValues
+          case _         => List(headerValue)
         })
       }
 
       // Process all nested <header> elements
-      for (headerElement ← headerElements.asScala) {
+      for (headerElement <- headerElements.asScala) {
         val headerScope =
           xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
 
@@ -112,7 +112,7 @@ object SubmissionHeaders {
 
         if (contextStack.getCurrentBindingContext.newBind) {
           // There is a binding so a possible iteration
-          for (position ← 1 to contextStack.getCurrentBindingContext.nodeset.size) {
+          for (position <- 1 to contextStack.getCurrentBindingContext.nodeset.size) {
             contextStack.pushIteration(position)
             handleHeaderElement(headerElement)
             contextStack.popBinding()

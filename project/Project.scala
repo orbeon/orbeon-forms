@@ -18,7 +18,7 @@ object OrbeonSupport {
     (base * (filter -- excl) +++ (base / config.name).descendantsExcept(filter, excl)).classpath
   }
 
-  val FileIsMinifiedVersionFilter = new SimpleFileFilter(f ⇒ {
+  val FileIsMinifiedVersionFilter = new SimpleFileFilter(f => {
       val path   = f.absolutePath
       val prefix = path.substring(0, path.length - ".js".length)
 
@@ -29,25 +29,25 @@ object OrbeonSupport {
     }
   )
 
-  val FileHasNoMinifiedVersionFilter = new SimpleFileFilter(f ⇒ {
+  val FileHasNoMinifiedVersionFilter = new SimpleFileFilter(f => {
       val path   = f.absolutePath
       val prefix = path.substring(0, path.length - ".js".length)
 
-      def hasNoMin           = Seq("-min.js", ".min.js") forall (suffix ⇒ ! new File(prefix + suffix).exists)
+      def hasNoMin           = Seq("-min.js", ".min.js") forall (suffix => ! new File(prefix + suffix).exists)
       def isNotSourceWithMin = ! (path.endsWith("_src.js") && new File(path.substring(0, path.length - "_src.js".length) + ".js").exists)
 
       hasNoMin && isNotSourceWithMin
     }
   )
 
-  def copyJarFile(sourceJarFile: File, destination: String, excludes: String ⇒ Boolean, matchRawJarName: Boolean): Option[File] = {
+  def copyJarFile(sourceJarFile: File, destination: String, excludes: String => Boolean, matchRawJarName: Boolean): Option[File] = {
 
     val sourceJarNameOpt = Some(sourceJarFile.name) collect {
-      case MatchRawJarNameRE(name) if matchRawJarName ⇒ name
-      case MatchJarNameRE(name)                       ⇒ name
+      case MatchRawJarNameRE(name) if matchRawJarName => name
+      case MatchJarNameRE(name)                       => name
     }
 
-    sourceJarNameOpt flatMap { sourceJarName ⇒
+    sourceJarNameOpt flatMap { sourceJarName =>
 
       val targetJarFile = new File(destination + '/' + sourceJarName + ".jar")
 
@@ -55,7 +55,7 @@ object OrbeonSupport {
           ! excludes(sourceJarName)                    &&
           (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
         println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
-        IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
+        IO.copy(List(sourceJarFile -> targetJarFile), overwrite = false, preserveLastModified = false)
         Some(targetJarFile)
       } else {
         None
@@ -70,7 +70,7 @@ object OrbeonWebappPlugin {
   import OrbeonSupport._
 
   lazy val webappPrepare       = taskKey[Seq[(File, String)]]("prepare webapp contents for packaging")
-  lazy val webappPostProcess   = taskKey[File ⇒ Unit]("additional task after preparing the webapp")
+  lazy val webappPostProcess   = taskKey[File => Unit]("additional task after preparing the webapp")
   lazy val webappWebInfClasses = settingKey[Boolean]("use WEB-INF/classes instead of WEB-INF/lib")
 
   def projectSettings: Seq[Setting[_]] =
@@ -78,7 +78,7 @@ object OrbeonWebappPlugin {
       sourceDirectory in webappPrepare := (sourceDirectory in Compile).value / "webapp",
       target          in webappPrepare := (target in Compile).value / "webapp",
       webappPrepare                    := webappPrepareTask.value,
-      webappPostProcess                := { _ ⇒ () },
+      webappPostProcess                := { _ => () },
       webappWebInfClasses              := false,
       watchSources                     ++= ((sourceDirectory in webappPrepare).value ** "*").get
     ) ++
@@ -86,21 +86,21 @@ object OrbeonWebappPlugin {
 
   private def webappPrepareTask = Def.task {
 
-    def cacheify(name: String, dest: File ⇒ Option[File], in: Set[File]): Set[File] =
+    def cacheify(name: String, dest: File => Option[File], in: Set[File]): Set[File] =
       cached(streams.value.cacheDirectory / "xsbt-orbeon-web-plugin" / name)(lastModified, exists)({
-        (inChanges, outChanges) ⇒
+        (inChanges, outChanges) =>
           // toss out removed files
           for {
-            removed  ← inChanges.removed
-            toRemove ← dest(removed)
+            removed  <- inChanges.removed
+            toRemove <- dest(removed)
           } locally {
             IO.delete(toRemove)
           }
 
           // apply and report changes
           for {
-            in  ← inChanges.added ++ inChanges.modified -- inChanges.removed
-            out ← dest(in)
+            in  <- inChanges.added ++ inChanges.modified -- inChanges.removed
+            out <- dest(in)
             _   = IO.copyFile(in, out)
           } yield
             out
@@ -118,11 +118,11 @@ object OrbeonWebappPlugin {
     if (! isDevelopmentMode) {
       cacheify(
         "webapp",
-        { in ⇒
+        { in =>
           for {
-            f ← Some(in)
+            f <- Some(in)
             if !f.isDirectory
-            r ← IO.relativizeFile(webappSrcDir, f)
+            r <- IO.relativizeFile(webappSrcDir, f)
           } yield
             IO.resolve(webappTarget, r)
         },
@@ -139,26 +139,26 @@ object OrbeonWebappPlugin {
 
     val onlyJars =
       for {
-        item         ← classpath.toList
+        item         <- classpath.toList
         if ! item.data.isDirectory
       } yield
         item
 
     val candidates =
       for {
-        item         ← onlyJars
+        item         <- onlyJars
         artifactOpt  = item.metadata.entries collectFirst {
-          case AttributeEntry(key, value: Artifact) if value.configurations.to[Set].contains(Compile) ⇒ value
+          case AttributeEntry(key, value: Artifact) if value.configurations.to[Set].contains(Compile) => value
         }
       } yield
-        item → artifactOpt
+        item -> artifactOpt
 
     val (compiled, notCompiled) =
       candidates.partition(_._2.isDefined)
 
     for {
-      (item, artifactOpt) ← compiled
-      artifact            ← artifactOpt
+      (item, artifactOpt) <- compiled
+      artifact            <- artifactOpt
       if artifact != thisArtifact
     } locally {
       IO.copyFile(item.data, webappLibDir / (artifact.name + ".jar"))
@@ -175,7 +175,7 @@ object OrbeonWebappPlugin {
 
     cacheify(
       "lib-deps",
-      { in ⇒ Some(webappTarget / "WEB-INF" / "lib" / in.getName) },
+      { in => Some(webappTarget / "WEB-INF" / "lib" / in.getName) },
       // Include non-compiled dependencies but exclude "provided" JARs
       notCompiled.map(_._1.data).to[Set] -- providedJars
     )

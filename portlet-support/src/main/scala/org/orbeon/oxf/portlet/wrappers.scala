@@ -37,7 +37,7 @@ trait RequestPrependHeaders extends PortletRequestWrapper {
 
 trait RequestRemoveHeaders extends PortletRequestWrapper {
 
-  def headersToRemove: String ⇒ Boolean
+  def headersToRemove: String => Boolean
 
   override def getPropertyNames = (super.getPropertyNames.asScala filterNot headersToRemove).asJavaEnumeration
 

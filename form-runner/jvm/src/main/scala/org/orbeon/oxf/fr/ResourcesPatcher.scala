@@ -62,19 +62,17 @@ object ResourcesPatcher {
   ): Unit = {
 
     val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
-    val propertyNames = properties.propertiesStartsWith(Prefix :: appForm.toList :: Nil mkString ".")
+    val propertyNames = properties.propertiesStartsWith((Prefix :: appForm.toList).mkString("."))
 
     // In 4.6 summary/detail buttons are at the top level
     def filterPathForBackwardCompatibility(path: List[String]): List[String] = path match {
-      case ("detail" | "summary") :: "buttons" :: _ ⇒ path drop 1
-      case _                                        ⇒ path
+      case ("detail" | "summary") :: "buttons" :: _ => path drop 1
+      case _                                        => path
     }
 
-    val langPathValue = propertyNames flatMap { propertyName ⇒
+    val langPathValue = propertyNames flatMap { propertyName =>
 
       val _ :: _ :: _ :: _ :: _ :: lang :: resourceTokens = propertyName.splitTo[List](".")
-
-      val pathString = filterPathForBackwardCompatibility(resourceTokens) mkString "/"
 
       // Property name with possible `*` replaced by actual app/form name
       val expandedPropertyName = Prefix :: appForm.toList ::: lang :: resourceTokens mkString "."
@@ -82,7 +80,7 @@ object ResourcesPatcher {
       // Had a case where value was null (more details would be useful)
       val value = properties.getNonBlankString(expandedPropertyName)
 
-      value.map((lang, pathString, _))
+      value.map((lang, filterPathForBackwardCompatibility(resourceTokens), _))
     }
 
     // Return all languages or the language specified if it exists
@@ -106,11 +104,13 @@ object ResourcesPatcher {
 
     // Update or create elements and set values
     for {
-      (langOrWildcard, path, value) ← langPathValue.distinct
-      lang                          ← findConcreteLanguages(langOrWildcard)
-      rootForLang                   ← resourceElemsForLang(lang)
+      (langOrWildcard, path, value) <- langPathValue.distinct
+      lang                          <- findConcreteLanguages(langOrWildcard)
+      rootForLang                   <- resourceElemsForLang(lang)
     } locally {
-      Dom4j.ensurePath(rootForLang, path split "/" map dom.QName.apply).setText(value)
+      val elem = Dom4j.ensurePath(rootForLang, path map dom.QName.apply)
+      elem.attributeOpt("todo") foreach elem.remove
+      elem.setText(value)
     }
 
     def hasTodo(e: NodeInfo) =
@@ -119,12 +119,12 @@ object ResourcesPatcher {
     def isBracketed(s: String) =
       s.startsWith("[") && s.endsWith("]")
 
-    resourceElems descendant * filter
-      (e ⇒ ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)) foreach { e ⇒
-
-      val elem = unsafeUnwrapElement(e)
-
-      elem.remove(elem.attribute("todo"))
+    for {
+      e <- resourceElems descendant *
+      if ! e.hasChildElement && hasTodo(e) && ! isBracketed(e.stringValue)
+      elem = unsafeUnwrapElement(e)
+    } locally {
+      elem.attributeOpt("todo") foreach elem.remove
       elem.setText(s"[${elem.getText}]")
     }
   }

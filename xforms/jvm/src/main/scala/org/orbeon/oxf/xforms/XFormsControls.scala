@@ -149,7 +149,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
   // Set the items for a given control id
   def setConstantItems(controlPrefixedId: String, itemset: Itemset): Unit =
-    constantItems += controlPrefixedId → itemset
+    constantItems += controlPrefixedId -> itemset
 
   def doRefresh(): Unit = {
 
@@ -195,8 +195,8 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
             // dispatched.
 
             // `None` if bindings are clean
-            for (updater ← updateControlBindings())
-              yield updater → gatherControlsForRefresh
+            for (updater <- updateControlBindings())
+              yield updater -> gatherControlsForRefresh
 
           } finally {
 
@@ -207,7 +207,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
             refreshDone()
           }
 
-        resultOpt foreach { case (updater, controlsEffectiveIds) ⇒
+        resultOpt foreach { case (updater, controlsEffectiveIds) =>
           // Dispatch events
           currentControlTree.updateValueControls(controlsEffectiveIds)
           currentControlTree.dispatchRefreshEvents(controlsEffectiveIds, isInitial = false)
@@ -215,7 +215,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
           Focus.updateFocusWithEvents(focusedBeforeOpt, updater.partialFocusRepeat)(containingDocument)
 
           // Dispatch to the root control
-          getCurrentControlTree.rootOpt foreach { root ⇒
+          getCurrentControlTree.rootOpt foreach { root =>
             Dispatch.dispatchEvent(new XXFormsRefreshDoneEvent(root))
           }
         }
@@ -290,7 +290,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
         val updater =
           withDebug("controls: updating bindings") {
             Controls.updateBindings(containingDocument) |!>
-              (updater ⇒ debugResults(updaterDebugResults(updater)))
+              (updater => debugResults(updaterDebugResults(updater)))
           }
 
         // Controls are clean
@@ -306,17 +306,17 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
       cloneInitialStateIfNeeded()
 
-      withDebug("controls: updating bindings", List("container" → containerControl.effectiveId)) {
+      withDebug("controls: updating bindings", List("container" -> containerControl.effectiveId)) {
         Controls.updateBindings(containerControl) |!>
-          (updater ⇒ debugResults(updaterDebugResults(updater)))
+          (updater => debugResults(updaterDebugResults(updater)))
       }
     }
 
     private def updaterDebugResults(updater: BindingUpdater) =
       List(
-        "controls visited"   → updater.visitedCount.toString,
-        "bindings evaluated" → updater.updatedCount.toString,
-        "bindings optimized" → updater.optimizedCount.toString
+        "controls visited"   -> updater.visitedCount.toString,
+        "bindings evaluated" -> updater.updatedCount.toString,
+        "bindings optimized" -> updater.optimizedCount.toString
       )
 
     def gatherControlsForRefresh: List[String] =

@@ -55,7 +55,7 @@ trait ResourcesOps extends BaseOps {
     ctx          : FormBuilderDocContext
   ): List[NodeInfo] =
     findCurrentResourceHolder(controlName).toList flatMap
-      (n ⇒ n / resourceName)
+      (n => n / resourceName)
 
   // NOTE: Doesn't enforce that the same number of e.g. <alert> elements are present per lang
   def getControlResourcesWithLang(
@@ -66,7 +66,7 @@ trait ResourcesOps extends BaseOps {
   ): Seq[(String, Seq[NodeInfo])] = {
     val langsSet = langs.toSet
     findResourceHoldersWithLang(controlName, resourcesRoot) collect {
-      case (lang, holder) if langsSet(lang) ⇒ lang → (holder child resourceName)
+      case (lang, holder) if langsSet(lang) => lang -> (holder child resourceName)
     }
   }
 
@@ -92,9 +92,9 @@ trait ResourcesOps extends BaseOps {
     if (maxResources > 0) {
       val valuesMap = langValues.toMap
       for {
-        (lang, holders) ← ensureResourceHoldersForLangs(controlName, resourceName, maxResources, langs)
-        valuesForLang   ← valuesMap.get(lang)
-        (holder, value) ← holders zip valuesForLang
+        (lang, holders) <- ensureResourceHoldersForLangs(controlName, resourceName, maxResources, langs)
+        valuesForLang   <- valuesMap.get(lang)
+        (holder, value) <- holders zip valuesForLang
       } locally {
         setvalue(holder, value)
       }
@@ -102,7 +102,7 @@ trait ResourcesOps extends BaseOps {
   }
 
   def hasItemHintEditor(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    findControlByName(ctx.formDefinitionRootElem, controlName) exists (e ⇒ FormBuilder.hasEditor(e, "item-hint"))
+    findControlByName(ctx.formDefinitionRootElem, controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
   def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {
@@ -114,8 +114,8 @@ trait ResourcesOps extends BaseOps {
     // All unique values in the order they appear
     val distinctValues = (
       for {
-        (lang, holder) ← holdersWithLang
-        item           ← holder / "item"
+        (lang, holder) <- holdersWithLang
+        item           <- holder / "item"
       } yield
         item / "value" stringValue
     ).distinct
@@ -136,11 +136,11 @@ trait ResourcesOps extends BaseOps {
     val addHints = hasItemHintEditor(controlName)
 
     val newItemElems =
-      for (value ← distinctValues)
+      for (value <- distinctValues)
       yield
         <item>
           {
-            for (lang ← allLangs)
+            for (lang <- allLangs)
             yield
               <label lang={lang}>{lhhaForLangAndValue(lang, value, "label")}</label> ::
               (addHints list <hint lang={lang}>{lhhaForLangAndValue(lang, value, "hint")}</hint>)
@@ -151,7 +151,7 @@ trait ResourcesOps extends BaseOps {
     def emptyItemElem =
       <item>
         {
-          for (lang ← allLangs)
+          for (lang <- allLangs)
           yield
             <label lang={lang}/> :: (addHints list <hint lang={lang}/>)
         }
@@ -181,7 +181,7 @@ trait ResourcesOps extends BaseOps {
 //    // For simplicity and consistency, delete and recreate
 //    delete(getControlResources(controlName, resourceName))
 //    val resourceHolders = ensureResourceHoldersForCurrentLang(controlName, resourceName, values.size)
-//    resourceHolders zip values foreach { case (holder, value) ⇒ setvalue(holder, value) }
+//    resourceHolders zip values foreach { case (holder, value) => setvalue(holder, value) }
 //  }
 
   // Ensure the existence of the resource holder for the current language
@@ -222,7 +222,7 @@ trait ResourcesOps extends BaseOps {
     else
       insertElementsImposeOrder(
         into   = controlHolder,
-        origin = 1 to count - existing.size map (_ ⇒ elementInfo(resourceName)),
+        origin = 1 to count - existing.size map (_ => elementInfo(resourceName)),
         order  = LHHAInOrder
       )
   }
@@ -236,15 +236,15 @@ trait ResourcesOps extends BaseOps {
     ctx          : FormBuilderDocContext
   ): Seq[(String, Seq[NodeInfo])] =
     allLangs(resourcesRoot) map
-      (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
+      (lang => lang -> ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
   def findResourceHolderForLang(
     controlName       : String,
     lang              : String,
     resourcesRootElem : NodeInfo
   ): Option[NodeInfo] =
-    findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resourcesRootElem) collectFirst
-      { case (`lang`, holder) ⇒ holder }
+    findResourceHoldersWithLang(controlName ensuring (_.nonAllBlank), resourcesRootElem) collectFirst
+      { case (`lang`, holder) => holder }
 
   // Find control resource holders
   def findResourceHolders(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
@@ -257,9 +257,9 @@ trait ResourcesOps extends BaseOps {
     resourcesRootElem : NodeInfo
   ): Iterator[NodeInfo] =
     for {
-      bindNode ← FormBuilder.iterateSelfAndDescendantBinds(rootBind)
-      bindName ← findBindName(bindNode)
-      holder   ← findResourceHolderForLang(bindName, lang, resourcesRootElem)
+      bindNode <- FormBuilder.iterateSelfAndDescendantBinds(rootBind)
+      bindName <- findBindName(bindNode)
+      holder   <- findResourceHolderForLang(bindName, lang, resourcesRootElem)
     } yield
       holder
 
@@ -272,20 +272,20 @@ trait ResourcesOps extends BaseOps {
   ): (Boolean, Seq[NodeInfo]) = {
 
     val hasParams =
-      lhhaElements exists (e ⇒ FormBuilder.lhhatChildrenParams(e).nonEmpty)
+      lhhaElements exists (e => FormBuilder.lhhatChildrenParams(e).nonEmpty)
 
     if (hasParams) {
-      false → Nil
+      false -> Nil
     } else {
 
       val holders = findResourceHoldersWithLangUseDocUseContext(controlName)
 
       val allBlankOrMissing =
-        holders forall { case (_, controlHolder) ⇒ (controlHolder child lhhaName stringValue).isBlank }
+        holders forall { case (_, controlHolder) => (controlHolder child lhhaName stringValue).isAllBlank }
 
-      allBlankOrMissing → (
+      allBlankOrMissing -> (
         if (allBlankOrMissing)
-          holders flatMap { case (_, controlHolder) ⇒ controlHolder child lhhaName}
+          holders flatMap { case (_, controlHolder) => controlHolder child lhhaName}
         else
           Nil
       )

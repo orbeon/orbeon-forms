@@ -21,8 +21,8 @@ trait JsonSerializers extends autowire.Serializers[Json, Decoder, Encoder] {
 
   def read[Result : Decoder](json: Json): Result =
     json.as[Result] match {
-      case Left(t)  ⇒ throw t// TODO: DecodingFailure
-      case Right(r) ⇒ r
+      case Left(t)  => throw t// TODO: DecodingFailure
+      case Right(r) => r
     }
 
   def write[Result : Encoder](r: Result): Json = r.asJson

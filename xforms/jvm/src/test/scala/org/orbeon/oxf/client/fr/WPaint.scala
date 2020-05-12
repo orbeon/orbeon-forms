@@ -22,16 +22,16 @@ trait WPaint extends AssertionsForJUnit with FormRunnerOps {
   @Test def loadEditSaveWorkflow(): Unit = {
 
     for {
-      _ ← loadOrbeonPage("/fr/orbeon/controls/new")
+      _ <- loadOrbeonPage("/fr/orbeon/controls/new")
       // switch to attachments tab
       // select image
-      // ⇒ image is shown (annotation == image)
+      // => image is shown (annotation == image)
       // draw on image
-      // ⇒ annotation shows (annotation changes, save it)
+      // => annotation shows (annotation changes, save it)
       // save form
-      // ⇒ check URL is now edit/id
+      // => check URL is now edit/id
       // reload page
-      // ⇒ check the annotation is the same as before
+      // => check the annotation is the same as before
       // clear
       // check the annotation is the same as the original image
     }()

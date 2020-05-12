@@ -33,10 +33,10 @@ object FormRunnerAPI {
       .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
       .toArray() collect {
       // The result must be an `html.Element` already
-      case e: html.Element ⇒ e
+      case e: html.Element => e
     } filter {
       // Check the id matches the requested name
-      e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
+      e => (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray
   }
 
@@ -44,7 +44,6 @@ object FormRunnerAPI {
     formElem    : js.UndefOr[html.Form] = js.undefined
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
-
 }
 
 @JSExportTopLevel("ORBEON.fr.API.wizard")
@@ -59,13 +58,13 @@ object FormRunnerWizardAPI {
     // Separate variable due to type inference fail when put inline below
     val indexesString = repeatIndexes map (_.mkString(" ")) getOrElse ""
 
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = "fr-wizard-focus",
         targetId   = Names.ViewComponent,
         properties = Map(
-          "fr-control-name"   → controlName,
-          "fr-repeat-indexes" → indexesString
+          "fr-control-name"   -> controlName,
+          "fr-repeat-indexes" -> indexesString
         )
       )
     )

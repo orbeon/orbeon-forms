@@ -517,7 +517,7 @@
 
             <xf:action if="$diff != 0">
                 <xf:rebuild/>
-                <xf:revalidate/>
+                <xf:recalculate/>
             </xf:action>
 
             <!-- Update all values -->
@@ -628,7 +628,7 @@
                 <xf:action if="event('xxf:type') = 'fr-iteration-added'">
 
                     <xf:rebuild/>
-                    <xf:revalidate/>
+                    <xf:recalculate/>
 
                     <xf:var
                         name="new-p"

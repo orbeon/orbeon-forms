@@ -90,7 +90,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     // 1. Wraps a Document within a DocumentInfo if needed
     // 2. Performs text nodes adjustments if needed
     try {
-      ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is ⇒
+      ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
 
         if (! isReadonly) {
           if (logger.isDebugEnabled)
@@ -122,7 +122,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         }
       }
     } catch {
-      case e: Exception ⇒
+      case e: Exception =>
         throw new XFormsSubmissionException(
           submission       = submission,
           message          = "xf:submission: exception while reading XML response.",
@@ -146,7 +146,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     // Set new instance document to replace the one submitted
 
     Option(submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt)) match {
-      case None ⇒
+      case None =>
 
         // Replacement instance or node was specified but not found
         //
@@ -167,7 +167,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             connectionResult = connectionResult
           )
         )
-      case Some(replaceInstanceNoTargetref) ⇒
+      case Some(replaceInstanceNoTargetref) =>
 
         val destinationNodeInfo =
           submission.evaluateTargetRef(
@@ -259,9 +259,9 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // Optimized insertion for instance root element replacement
           if (applyDefaults)
             newDocumentInfo match {
-              case node: VirtualNode ⇒
+              case node: VirtualNode =>
                 InstanceDataOps.setRequireDefaultValueRecursively(node.getUnderlyingNode.asInstanceOf[Node])
-              case _ ⇒
+              case _ =>
             }
 
           instanceToUpdate.replace(

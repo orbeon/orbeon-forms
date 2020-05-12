@@ -15,7 +15,7 @@ package org.orbeon.xforms.rpc
 
 import io.circe.parser._
 import io.circe.{Decoder, Encoder, Json}
-import org.orbeon.xforms.{AjaxEvent, Constants, EventNames}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, Constants, EventNames}
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js.URIUtils
@@ -40,20 +40,20 @@ object RpcClient
     lastSequenceNumber += 1
     val id = lastSequenceNumber
 
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = EventNames.XXFormsRpcRequest,
         targetId   = Constants.DocumentId,
         properties = Map(
-          "id"   → id,
-          "path" → pathValue,
-          "args" → argsValue
+          "id"   -> id,
+          "path" -> pathValue,
+          "args" -> argsValue
         )
       )
     )
 
     val p = Promise[Json]()
-    pending += id → p
+    pending += id -> p
     p.future
   }
 
@@ -63,10 +63,10 @@ object RpcClient
   @JSExport
   def processResponse(id: String, response: String): Unit = {
     pending.get(id.toInt) match {
-      case Some(promise) ⇒
+      case Some(promise) =>
         pending -= id.toInt
         promise.complete(Success(parse(URIUtils.decodeURIComponent(response)).right.get))
-      case None ⇒
+      case None =>
         println(s"RPC: got incorrect id in response: $id")
     }
   }

@@ -19,30 +19,30 @@ import org.apache.log4j.Level
 trait Logging {
 
   // Error with optional parameters
-  def error(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
+  def error(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     logger.logError("", message, flattenTuples(parameters): _*)
 
   // Warn with optional parameters
-  def warn(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
+  def warn(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     logger.logWarning("", message, flattenTuples(parameters): _*)
 
   // Info with optional parameters
-  def info(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
+  def info(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.isInfoEnabled)
       logger.logInfo("", message, flattenTuples(parameters): _*)
 
   // Debug with optional parameters
-  def debug(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
+  def debug(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.isDebugEnabled)
       logger.logDebug("", message, flattenTuples(parameters): _*)
 
   // Debug with optional parameters
-  def log(logLevel: Level, message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
+  def log(logLevel: Level, message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
     if (logger.isDebugEnabled)
       logger.log(logLevel, "", message, flattenTuples(parameters): _*)
 
   // Debug block with optional parameters
-  def withDebug[T](message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Nil)(body: ⇒ T)(implicit logger: IndentedLogger): T =
+  def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T =
     try {
       if (logger.isDebugEnabled)
         logger.startHandleOperation("", message, flattenTuples(parameters): _*)
@@ -54,7 +54,7 @@ trait Logging {
     }
 
   // Run the given block only in debug mode
-  def ifDebug[T](body: ⇒ T)(implicit logger: IndentedLogger): Unit =
+  def ifDebug[T](body: => T)(implicit logger: IndentedLogger): Unit =
     if (logger.isDebugEnabled)
       body
 
@@ -62,12 +62,12 @@ trait Logging {
   def debugEnabled(implicit logger: IndentedLogger): Boolean = logger.isDebugEnabled
 
   // Call from a result block to set result parameters
-  def debugResults(parameters: ⇒ Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
+  def debugResults(parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
     if (logger.isDebugEnabled)
       logger.setDebugResults(flattenTuples(parameters): _*)
 
   private def flattenTuples(tuples: Seq[(String, String)]) =
-    tuples flatMap { case (n, v) ⇒ Seq(n, v) }
+    tuples flatMap { case (n, v) => Seq(n, v) }
 }
 
 object Logging extends Logging

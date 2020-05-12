@@ -14,7 +14,7 @@
 package org.orbeon.oxf.controller
 
 import java.util.regex.Pattern
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List => JList, Map => JMap}
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
@@ -69,18 +69,18 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val path    = request.getRequestPath
     val method  = request.getMethod
 
-    lazy val logParams = Seq("controller" → pageFlow.file.orNull, "method" → method.entryName, "path" → path)
+    lazy val logParams = Seq("controller" -> pageFlow.file.orNull, "method" -> method.entryName, "path" -> path)
 
     // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g.
     // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
     // actually know what a "resource" is.
     if (pageFlow.pathMatchers.nonEmpty) {
       Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[PathMatcher]]) match {
-        case Some(existingPathMatchers) ⇒
+        case Some(existingPathMatchers) =>
           // Add if we come after others (in case of nested page flows)
           val allMatchers = existingPathMatchers.asScala ++ pageFlow.pathMatchers
           pc.setAttribute(PathMatchers, allMatchers.asJava)
-        case None ⇒
+        case None =>
           // Set if we are the first
           pc.setAttribute(PathMatchers, pageFlow.pathMatchers.asJava)
       }
@@ -94,16 +94,16 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     def logNotFound(t: Option[Throwable]) = {
 
       def rootResource = t map getRootThrowable collect {
-        case e: ResourceNotFoundException ⇒ e.resource
-        case HttpStatusCodeException(_, Some(resource), _) ⇒ resource
+        case e: ResourceNotFoundException => e.resource
+        case HttpStatusCodeException(_, Some(resource), _) => resource
       }
 
-      info("not found", logParams ++ (rootResource map ("resource" → _)))
+      info("not found", logParams ++ (rootResource map ("resource" -> _)))
     }
 
     def logHttpStatusCode(e: HttpStatusCodeException) = {
       val code = e.code.toString
-      info(s"HTTP status code $code", logParams :+ ("status-code" → code))
+      info(s"HTTP status code $code", logParams :+ ("status-code" -> code))
     }
 
     def logMethodNotAllowed() =
@@ -121,13 +121,13 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       if (log) logError(t)
 
       pageFlow.errorRoute match {
-        case Some(errorRoute) ⇒
+        case Some(errorRoute) =>
           // Run the error route
           ec.getResponse.setStatus(StatusCode.InternalServerError)
           if (ProcessorService.showExceptions)
             pc.setAttribute(ProcessorService.Throwable, t)
           errorRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
-        case None ⇒
+        case None =>
           // We don't have an error route so throw instead
           throw t
       }
@@ -138,12 +138,12 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       logNotFound(t)
 
       pageFlow.notFoundRoute match {
-        case Some(notFoundRoute) ⇒
+        case Some(notFoundRoute) =>
           // Run the not found route
           ec.getResponse.setStatus(StatusCode.NotFound)
           try notFoundRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
-          catch { case NonFatal(t) ⇒ runErrorRoute(t) }
-        case None ⇒
+          catch { case NonFatal(t) => runErrorRoute(t) }
+        case None =>
           // We don't have a not found route so try the error route instead
           // Don't log because we already logged above
           runErrorRoute(t getOrElse HttpStatusCodeException(StatusCode.NotFound), log = false)
@@ -155,11 +155,11 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       logHttpStatusCode(e)
 
       pageFlow.unauthorizedRoute match {
-        case Some(unauthorizedRoute) ⇒
+        case Some(unauthorizedRoute) =>
           // Run the unauthorized route
           ec.getResponse.setStatus(e.code)
           unauthorizedRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
-        case None ⇒
+        case None =>
           // We don't have an unauthorized route so throw instead
           throw e
       }
@@ -168,44 +168,44 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     // Run the first matching entry if any
     val routOpt = (
       pageFlow.routes.iterator
-      map  (route ⇒ route → MatchResult(route.routeElement.pattern, path))
+      map  (route => route -> MatchResult(route.routeElement.pattern, path))
       find (_._2.matches)
     )
 
     routOpt match {
-      case Some((route: FileRoute, matchResult)) ⇒
+      case Some((route: FileRoute, matchResult)) =>
         // Run the given route and let the caller handle errors
         debug("processing file", logParams)
         route.process(pc, ec, matchResult)
-      case Some((route: PageOrServiceRoute, matchResult)) if route.routeElement.supportedMethods(request.getMethod) ⇒
+      case Some((route: PageOrServiceRoute, matchResult)) if route.routeElement.supportedMethods(request.getMethod) =>
         debug("processing page/service", logParams)
         // Run the given route and handle "not found" and error conditions
         try route.process(pc, ec, matchResult)
-        catch { case NonFatal(t) ⇒
+        catch { case NonFatal(t) =>
           getRootThrowable(t) match {
-            case e: HttpRedirectException ⇒
+            case e: HttpRedirectException =>
               ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
             // We don't have a "deleted" route at this point, and thus run the not found route when we
             // found a "resource" to be deleted
-            case e: HttpStatusCodeException ⇒
+            case e: HttpStatusCodeException =>
               e.code match {
-                case StatusCode.NotFound | StatusCode.Gone ⇒
+                case StatusCode.NotFound | StatusCode.Gone =>
                   if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-                case StatusCode.Unauthorized | StatusCode.Forbidden ⇒
+                case StatusCode.Unauthorized | StatusCode.Forbidden =>
                   if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
-                case _ ⇒
+                case _ =>
                   sendHttpStatusCode(e)
               }
-            case e: ResourceNotFoundException ⇒
+            case e: ResourceNotFoundException =>
               if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-            case e ⇒
+            case e =>
               if (route.isPage)     runErrorRoute(t)          else sendError(t)
           }
         }
-      case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) ⇒
+      case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) =>
         // Method not allowed on service
         sendMethodNotAllowed()
-      case _ ⇒
+      case _ =>
         // Handle "not found"
         runNotFoundRoute(None)
     }
@@ -274,7 +274,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
      // Prepend a synthetic page for submissions if configured
     val syntheticRoutes: List[RouteElement] =
       (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
-        case (Some(submissionPath), submissionModel @ Some(_)) ⇒
+        case (Some(submissionPath), submissionModel @ Some(_)) =>
           List(
             PageOrServiceElement(
               id                = None,
@@ -289,34 +289,34 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
               isPage            = true
             )
           )
-        case _ ⇒
+        case _ =>
           Nil
       }
 
     val explicitRoutes: Seq[RouteElement] =
-      for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
+      for (e <- topLevelElements filter (e => Set("files", "page", "service")(e.getName)))
         yield e.getName match {
-          case "files" ⇒
+          case "files" =>
             FileElement(e, defaultMatcher, defaultVersioned)
-          case "page" | "service" ⇒
+          case "page" | "service" =>
             PageOrServiceElement(e, defaultMatcher, defaultPagePublicMethods, defaultServicePublicMethods)
         }
 
     val routeElements = syntheticRoutes ++ explicitRoutes
 
     val pagesElementsWithIds =
-      routeElements collect { case page: PageOrServiceElement if page.id.isDefined ⇒ page }
+      routeElements collect { case page: PageOrServiceElement if page.id.isDefined => page }
 
     val pathIdToPath =
-      pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
+      pagesElementsWithIds map (p => p.id.get -> p.path) toMap
 
     val pageIdToSetValuesDocument =
-      pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
+      pagesElementsWithIds map (p => p.id.get -> getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
 
     val pathMatchers = (
       routeElements
-      collect { case files: FileElement if files.versioned ⇒ files }
-      map     (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+      collect { case files: FileElement if files.versioned => files }
+      map     (f => new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
     )
 
     // Compile the pipeline for the given page element
@@ -339,7 +339,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         ast.walk(astDocumentHandler)
         debug(
           "created PFC pipeline",
-          Seq("path" → page.path, "pipeline" → ('\n' + astDocumentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
+          Seq("path" -> page.path, "pipeline" -> ('\n' + astDocumentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
         )
       }
 
@@ -348,16 +348,16 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
     // All routes
     val routes: Seq[Route] =
-      for (e ← routeElements)
+      for (e <- routeElements)
       yield e match {
-        case files: FileElement         ⇒ FileRoute(files)
-        case page: PageOrServiceElement ⇒ PageOrServiceRoute(page, compile)
+        case files: FileElement         => FileRoute(files)
+        case page: PageOrServiceElement => PageOrServiceRoute(page, compile)
       }
 
     // Find a handler route
     def handler(elementNames: Set[String]) =
-      topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap { pageId ⇒
-        routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) ⇒ page }
+      topLevelElements find (e => elementNames(e.getName)) flatMap (att(_, "page")) flatMap { pageId =>
+        routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id.contains(pageId) => page }
       }
 
     PageFlow(
@@ -472,8 +472,8 @@ object PageFlowControllerProcessor {
     model             : Option[String],
     view              : Option[String],
     element           : Element,
-    supportedMethods  : HttpMethod ⇒ Boolean,
-    publicMethods     : HttpMethod ⇒ Boolean,
+    supportedMethods  : HttpMethod => Boolean,
+    publicMethods     : HttpMethod => Boolean,
     isPage            : Boolean
   ) extends RouteElement
 
@@ -503,8 +503,8 @@ object PageFlowControllerProcessor {
       val isPage = e.getName == "page"
 
       def methodAttributeFn(attName: String) = att(e, attName) map {
-        case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
-        case att                            ⇒ att.tokenizeToSet map HttpMethod.withNameInsensitive
+        case att if att == AllPublicMethods => (_: HttpMethod) => true
+        case att                            => att.tokenizeToSet map HttpMethod.withNameInsensitive
       }
 
       def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
@@ -518,7 +518,7 @@ object PageFlowControllerProcessor {
         model             = att(e, "model"),
         view              = att(e, "view"),
         element           = e,
-        supportedMethods  = methodAttributeFn("methods")        getOrElse (_ ⇒ true),
+        supportedMethods  = methodAttributeFn("methods")        getOrElse (_ => true),
         publicMethods     = methodAttributeFn("public-methods") getOrElse defaultPublicMethods,
         isPage            = isPage
       )
@@ -546,7 +546,7 @@ object PageFlowControllerProcessor {
       mustAuthorize : Boolean = true)(implicit
       logger        : IndentedLogger
     ) = {
-      debug("processing route", Seq("route" → this.toString))
+      debug("processing route", Seq("route" -> this.toString))
       if (ec.getRequest.getMethod == HttpMethod.GET)
         ResourceServer.serveResource(ec.getRequest.getRequestPath, routeElement.versioned)
       else
@@ -556,7 +556,7 @@ object PageFlowControllerProcessor {
 
   case class PageOrServiceRoute(
     routeElement    : PageOrServiceElement,
-    compile         : PageOrServiceElement ⇒ PipelineConfig)(implicit
+    compile         : PageOrServiceElement => PipelineConfig)(implicit
     val propertySet : PropertySet
   ) extends Route with Authorization with Logging {
 
@@ -575,7 +575,7 @@ object PageFlowControllerProcessor {
       logger        : IndentedLogger
     ): Unit = {
 
-      debug("processing route", Seq("route" → this.toString))
+      debug("processing route", Seq("route" -> this.toString))
 
       // Make sure the request is authorized
       if (mustAuthorize)
@@ -599,7 +599,7 @@ object PageFlowControllerProcessor {
 
   trait Authorization {
 
-    self: PageOrServiceRoute ⇒
+    self: PageOrServiceRoute =>
 
     // Require authorization based on whether the request method is considered publicly accessible or not. If it
     // is public, then authorization does not take place.

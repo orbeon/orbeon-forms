@@ -26,10 +26,10 @@ class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: B
 
   protected def evaluateValueImpl =
     for {
-      lhh   ← control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
-      value ← evaluateOne(lhh)
+      lhh   <- control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
+      value <- evaluateOne(lhh)
     } yield
-      value → lhh.containsHTML
+      value -> lhh.containsHTML
 }
 
 class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, supportsHTML: Boolean)
@@ -41,11 +41,11 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, sup
 
     val valuesWithIsHtml =
       for {
-        (_, activeAlerts) ← activeAlertsOpt.toList
-        activeAlert       ← activeAlerts
-        valueWithIsHTML   ← evaluateOne(activeAlert)
+        (_, activeAlerts) <- activeAlertsOpt.toList
+        activeAlert       <- activeAlerts
+        valueWithIsHTML   <- evaluateOne(activeAlert)
       } yield
-        valueWithIsHTML → activeAlert.containsHTML
+        valueWithIsHTML -> activeAlert.containsHTML
 
     if (valuesWithIsHtml.size < 2)
       valuesWithIsHtml.headOption
@@ -53,11 +53,11 @@ class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, sup
       // Combine multiple values as a single HTML value using ul/li
       val combined = (
         valuesWithIsHtml
-        map { case (value, isHTML) ⇒ if (! isHTML) value.escapeXmlMinimal else value }
+        map { case (value, isHTML) => if (! isHTML) value.escapeXmlMinimal else value }
         mkString ("<ul><li>", "</li><li>", "</li></ul>")
       )
 
-      Some(combined → true)
+      Some(combined -> true)
     }
   }
 }
@@ -75,10 +75,10 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   // TODO: `isHTML` now uses the static `containsHTML` except for multiple alerts. Do this more statically?
   protected def evaluateValue() =
     evaluateValueImpl match {
-      case Some((value: String, isHTML)) ⇒
+      case Some((value: String, isHTML)) =>
         _isHTML = isHTML
         value
-      case _ ⇒
+      case _ =>
         _isHTML = false
         null
     }
@@ -143,7 +143,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
       } else {
         // LHHA is somewhere else. We resolve the control and ask for its value.
         Controls.resolveControlsById(control.containingDocument, control.effectiveId, lhhaAnalysis.staticId, followIndexes = true).headOption collect {
-          case control: XFormsLHHAControl ⇒ control.getValue
+          case control: XFormsLHHAControl => control.getValue
         }
       }
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
@@ -28,12 +28,12 @@ object URLGeneratorBase {
 
     val headerPairs =
       for {
-        headerElem  ← Dom4j.elements(configElement, "header")
+        headerElem  <- Dom4j.elements(configElement, "header")
         headerName  = headerElem.element("name").getStringValue
-        valueElem   ← headerElem.elements("value").asScala
+        valueElem   <- headerElem.elements("value").asScala
         headerValue = valueElem.getStringValue
       } yield
-        headerName → headerValue
+        headerName -> headerValue
 
     CollectionUtils.combineValues[String, String, List](headerPairs).toMap
   }
@@ -48,8 +48,8 @@ object URLGeneratorBase {
     lastModifiedOrNull : jl.Long
   ): ju.Map[String, Array[String]] = {
 
-    val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) ⇒ (k, v.to(Array)) }} getOrElse Map.empty[String, Array[String]]
-    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to(List)
+    val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) => (k, v.to(Array)) }} getOrElse Map.empty[String, Array[String]]
+    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified => "If-Modified-Since" -> Array(DateUtils.RFC1123Date.print(lastModified))).to(List)
 
     headersOrEmpty ++ newHeaderAsList
   }.asJava
@@ -58,13 +58,13 @@ object URLGeneratorBase {
   def collectHeaders(connectionResult: ConnectionResult, readHeader: ju.List[String]): List[(String, String)] =
     if ((readHeader ne null) && ! readHeader.isEmpty) {
       for {
-        nameMaybeMixed ← readHeader.asScala.to(List)
+        nameMaybeMixed <- readHeader.asScala.to(List)
         list           = connectionResult.getHeaderIgnoreCase(nameMaybeMixed)
         if list.nonEmpty // only support headers with one value
         value          = list.head
         nameLower      = nameMaybeMixed.toLowerCase
       } yield {
-        nameMaybeMixed → value
+        nameMaybeMixed -> value
       }
     } else {
       Nil
@@ -72,7 +72,7 @@ object URLGeneratorBase {
 
   def storeHeadersIntoRequest(connectionResult: ConnectionResult, headers: List[(String, String)]): Unit = {
     val requestAttributes = NetUtils.getExternalContext.getRequest.getAttributesMap
-    headers foreach { case (name, value) ⇒
+    headers foreach { case (name, value) =>
       requestAttributes.put("oxf.url-generator.header." + name.toLowerCase, value)
     }
   }

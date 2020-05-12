@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io._
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
@@ -41,8 +41,8 @@ object TestExternalContext {
 class TestExternalContext(
   var pipelineContext : PipelineContext,
   var requestDocument : Document,
-  sessionCreated      : Session ⇒ Any = _ ⇒ (),
-  sessionDestroyed    : Session ⇒ Any = _ ⇒ ()
+  sessionCreated      : Session => Any = _ => (),
+  sessionDestroyed    : Session => Any = _ => ()
 ) extends ExternalContext {
 
   // For Java callers
@@ -50,7 +50,7 @@ class TestExternalContext(
     pipelineContext : PipelineContext,
     requestDocument : Document
   ) =
-    this(pipelineContext, requestDocument, _ ⇒ (), _ ⇒ ())
+    this(pipelineContext, requestDocument, _ => (), _ => ())
 
   private val webAppContext: WebAppContext = new TestWebAppContext(TestExternalContext.Logger, mutable.LinkedHashMap[String, AnyRef]())
 
@@ -75,7 +75,7 @@ class TestExternalContext(
       val result = new ju.LinkedHashMap[String, AnyRef]
 
       for {
-        node  ← XPathUtils.selectNodeIterator(requestDocument, "/*/attributes/attribute").asScala
+        node  <- XPathUtils.selectNodeIterator(requestDocument, "/*/attributes/attribute").asScala
         elem  = node.asInstanceOf[Element]
         name  = XPathUtils.selectStringValueNormalize(elem, "name")
         value = XPathUtils.selectStringValueNormalize(elem, "value[1]")
@@ -188,10 +188,10 @@ class TestExternalContext(
       val result = new ju.LinkedHashMap[String, Array[String]]
 
       for {
-        headerNode ← XPathUtils.selectNodeIterator(requestDocument, "/*/headers/header").asScala
+        headerNode <- XPathUtils.selectNodeIterator(requestDocument, "/*/headers/header").asScala
         headerElem = headerNode.asInstanceOf[Element]
         name       = XPathUtils.selectStringValueNormalize(headerElem, "name")
-        valueNode  ← XPathUtils.selectNodeIterator(headerElem, "value").asScala
+        valueNode  <- XPathUtils.selectNodeIterator(headerElem, "value").asScala
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {
@@ -212,10 +212,10 @@ class TestExternalContext(
       val result = new ju.LinkedHashMap[String, Array[AnyRef]]
 
       for {
-        paramNode  ← XPathUtils.selectNodeIterator(requestDocument, "/*/parameters/parameter").asScala
+        paramNode  <- XPathUtils.selectNodeIterator(requestDocument, "/*/parameters/parameter").asScala
         paramElem  = paramNode.asInstanceOf[Element]
         name       = XPathUtils.selectStringValueNormalize(paramElem, "name")
-        valueNode  ← XPathUtils.selectNodeIterator(paramElem, "value").asScala
+        valueNode  <- XPathUtils.selectNodeIterator(paramElem, "value").asScala
         valueElem  = valueNode.asInstanceOf[Element]
         value      = XPathUtils.selectStringValueNormalize(valueElem, ".")
       } locally {

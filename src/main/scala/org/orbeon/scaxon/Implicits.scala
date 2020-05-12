@@ -33,6 +33,7 @@ object Implicits {
   implicit def stringToStringValue                 (v: String)             : StringValue      = StringValue.makeStringValue(v)
   implicit def booleanToBooleanValue               (v: Boolean)            : BooleanValue     = BooleanValue.get(v)
 
+  implicit def itemToSequenceIterator              (v: Item)               : SequenceIterator = SingletonIterator.makeIterator(v)
   implicit def stringIteratorToSequenceIterator    (v: Iterator[String])   : SequenceIterator = v map stringToStringValue
   implicit def stringSeqToSequenceIterator         (v: Seq[String])        : SequenceIterator = new ListIterator (v map stringToStringValue asJava)
   implicit def stringArrayToSequenceIterator       (v: Array[String])      : SequenceIterator = new ArrayIterator(v map stringToStringValue)

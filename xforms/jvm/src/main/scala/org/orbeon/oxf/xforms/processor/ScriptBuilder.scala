@@ -38,8 +38,8 @@ object ScriptBuilder {
     // Method from https://stackoverflow.com/a/23983448/5295
     org.apache.commons.lang3.StringUtils.replace(js, "</script", "</scr\\ipt")
 
-  def writeScripts(shareableScripts: Iterable[ShareableScript], write: String ⇒ Unit): Unit =
-    for (shareableScript ← shareableScripts) {
+  def writeScripts(shareableScripts: Iterable[ShareableScript], write: String => Unit): Unit =
+    for (shareableScript <- shareableScripts) {
 
       val paramsString =
         if (shareableScript.paramNames.nonEmpty)
@@ -57,10 +57,10 @@ object ScriptBuilder {
     val controlsToInitialize = ListBuffer[(String, Option[String])]()
 
     def addControlToInitialize(effectiveId: String, value: Option[String]) =
-      controlsToInitialize += effectiveId → value
+      controlsToInitialize += effectiveId -> value
 
     Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
-      case c: XFormsValueComponentControl ⇒
+      case c: XFormsValueComponentControl =>
         if (c.isRelevant) {
           val abstractBinding = c.staticControl.abstractBinding
           if (abstractBinding.modeJavaScriptLifecycle)
@@ -72,10 +72,10 @@ object ScriptBuilder {
                 None
             )
         }
-      case c: XFormsComponentControl ⇒
+      case c: XFormsComponentControl =>
         if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
           addControlToInitialize(c.getEffectiveId, None)
-      case c ⇒
+      case c =>
         // Legacy JavaScript initialization
         // As of 2016-08-04: xxf:dialog, xf:select1[appearance = compact], xf:range
         if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
@@ -96,12 +96,12 @@ object ScriptBuilder {
 
     val dynamicProperties = {
 
-      def dynamicProperty(p: ⇒ Boolean, name: String, value: Any) =
-        p option (name → value)
+      def dynamicProperty(p: => Boolean, name: String, value: Any) =
+        p option (name -> value)
 
       // Heartbeat delay is dynamic because it depends on session duration
       def heartbeatOpt =
-        Some(SESSION_HEARTBEAT_DELAY_PROPERTY → heartbeatDelay)
+        Some(SESSION_HEARTBEAT_DELAY_PROPERTY -> heartbeatDelay)
 
       // Help events are dynamic because they depend on whether the xforms-help event is used
       // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
@@ -130,9 +130,9 @@ object ScriptBuilder {
     }
 
     val globalProperties = List(
-      DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY → getAjaxTimeout,
-      RETRY_DELAY_INCREMENT              → getRetryDelayIncrement,
-      RETRY_MAX_DELAY                    → getRetryMaxDelay
+      DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY -> getAjaxTimeout,
+      RETRY_DELAY_INCREMENT              -> getRetryDelayIncrement,
+      RETRY_MAX_DELAY                    -> getRetryMaxDelay
     )
 
     // combine all static and dynamic properties
@@ -144,7 +144,7 @@ object ScriptBuilder {
 
       sb append "var opsXFormsProperties = {"
 
-      for (((propertyName, propertyValue), index) ← clientProperties.toList.zipWithIndex) {
+      for (((propertyName, propertyValue), index) <- clientProperties.toList.zipWithIndex) {
 
         if (index != 0)
           sb append ','
@@ -154,11 +154,11 @@ object ScriptBuilder {
         sb append "\":"
 
         propertyValue match {
-          case s: String ⇒
+          case s: String =>
             sb append '"'
             sb append s
             sb append '"'
-          case _ ⇒
+          case _ =>
             sb append propertyValue.toString
         }
       }
@@ -171,7 +171,7 @@ object ScriptBuilder {
 
   def buildJavaScriptInitialData(
     containingDocument   : XFormsContainingDocument,
-    rewriteResource      : String ⇒ String,
+    rewriteResource      : String => String,
     controlsToInitialize : List[(String, Option[String])]
   ): String = {
 
@@ -193,25 +193,25 @@ object ScriptBuilder {
         calendarImagePath      = rewriteResource("/ops/images/xforms/calendar.png"),
         controls  =
           for {
-            (id, valueOpt) ← controlsToInitialize
+            (id, valueOpt) <- controlsToInitialize
           } yield
             rpc.Control(namespaceId(containingDocument, id), valueOpt),
         listeners =
           (
             for {
-              handler  ← containingDocument.getStaticOps.keyboardHandlers
-              observer ← handler.observersPrefixedIds
-              keyText  ← handler.keyText
+              handler  <- containingDocument.getStaticOps.keyboardHandlers
+              observer <- handler.observersPrefixedIds
+              keyText  <- handler.keyText
             } yield
               rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
             ).distinct,
         events    =
           for {
-            delayedEvent ← containingDocument.delayedEvents
+            delayedEvent <- containingDocument.delayedEvents
           } yield
             delayedEvent.toServerEvent(currentTime),
         userScripts =
-          for (script ← containingDocument.getScriptsToRun.to(List) collect { case Right(s) ⇒ s })
+          for (script <- containingDocument.getScriptsToRun.to(List) collect { case Right(s) => s })
             yield
               rpc.UserScript(
                 functionName = script.script.shared.clientName,
@@ -232,13 +232,13 @@ object ScriptBuilder {
 
     val dialogsToOpen =
       for {
-        dialogControl ← containingDocument.getControls.getCurrentControlTree.getDialogControls
+        dialogControl <- containingDocument.getControls.getCurrentControlTree.getDialogControls
         if dialogControl.isVisible
       } yield
         dialogControl
 
     val javascriptLoads =
-      containingDocument.getScriptsToRun collect { case Left(l) ⇒ l }
+      containingDocument.getScriptsToRun collect { case Left(l) => l }
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||
@@ -258,7 +258,7 @@ object ScriptBuilder {
         // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
 
         // javascript: loads
-        for (load ← javascriptLoads) {
+        for (load <- javascriptLoads) {
           val body = escapeJavaScript(load.resource.substring("javascript:".size))
           sb append s"""(function(){$body})();"""
         }
@@ -267,16 +267,16 @@ object ScriptBuilder {
 
         // Initial modal xf:message to run if present
         if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m ⇒ s""""${escapeJavaScript(m.message)}"""")
+          val quotedMessages = messagesToRun map (m => s""""${escapeJavaScript(m.message)}"""")
           quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
         }
 
         // Initial dialogs to open
-        for (dialogControl ← dialogsToOpen) {
+        for (dialogControl <- dialogsToOpen) {
           val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
           val neighbor = (
             dialogControl.neighborControlId
-            map (n ⇒ s""""${namespaceId(containingDocument, n)}"""")
+            map (n => s""""${namespaceId(containingDocument, n)}"""")
             getOrElse "null"
           )
 
@@ -285,7 +285,7 @@ object ScriptBuilder {
 
         // Initial setfocus if present
         // Seems reasonable to do this after dialogs as focus might be within a dialog
-        focusElementIdOpt foreach { id ⇒
+        focusElementIdOpt foreach { id =>
           sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
         }
 

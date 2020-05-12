@@ -40,15 +40,15 @@ class ContentTypesTest extends AnyFunSpec {
 
   describe("The getContentTypeParameters method") {
     it("must parse parameters and ignore spaces") {
-      assert(Map("charset" → "utf8", "foo" → "bar")  === getContentTypeParameters(" text/html ; charset=utf8; foo =  bar "))
+      assert(Map("charset" -> "utf8", "foo" -> "bar")  === getContentTypeParameters(" text/html ; charset=utf8; foo =  bar "))
     }
 
     it("must ignore blank names") {
-      assert(Map("charset" → "utf8")  === getContentTypeParameters(" text/html ; charset=utf8; =  bar "))
+      assert(Map("charset" -> "utf8")  === getContentTypeParameters(" text/html ; charset=utf8; =  bar "))
     }
 
     it("must return blank values") {
-      assert(Map("charset" → "utf8", "foo" → "")  === getContentTypeParameters(" text/html ; charset=utf8; foo =  "))
+      assert(Map("charset" -> "utf8", "foo" -> "")  === getContentTypeParameters(" text/html ; charset=utf8; foo =  "))
     }
   }
 

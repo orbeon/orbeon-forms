@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.datatypes.Mediatype
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLParsing}
 import org.xml.sax.Attributes
@@ -34,16 +36,16 @@ object Mediatypes {
     }
 
     (
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) ⇒ mediatype   → m }).toMap,
-      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         ⇒ m.extension → m }).toMap
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, mediatype) => mediatype   -> m }).toMap,
+      combineValues[String, Mapping, List](list map { case m @ Mapping(_, _)         => m.extension -> m }).toMap
     )
   }
 
   def findMediatypeForPath(path: String): Option[String] =
     for {
-      extension ← findExtension(path.toLowerCase)
-      mappings  ← mappingsByExtension.get(extension)
-      mapping   ← mappings.headOption
+      extension <- findExtension(path.toLowerCase)
+      mappings  <- mappingsByExtension.get(extension)
+      mapping   <- mappings.headOption
     } yield
       mapping.mediatype
 
@@ -52,10 +54,26 @@ object Mediatypes {
 
   def findExtensionForMediatype(mediatype: String): Option[String] =
     for {
-      mappings  ← mappingsByMediatype.get(mediatype)
-      mapping   ← mappings.headOption
+      mappings  <- mappingsByMediatype.get(mediatype)
+      mapping   <- mappings.headOption
     } yield
       mapping.extension
+
+  def fromHeadersOrFilename(
+    header  : String => Option[String],
+    filename: => Option[String]
+  ): Option[Mediatype] = {
+
+    def fromHeaders =
+      header(Headers.ContentType)            flatMap
+        ContentTypes.getContentTypeMediaType filterNot
+        (_ == ContentTypes.OctetStreamContentType)
+
+    def fromFilename =
+      filename flatMap findMediatypeForPath
+
+    fromHeaders orElse fromFilename flatMap Mediatype.unapply
+  }
 
   private object Private {
 
@@ -70,16 +88,16 @@ object Mediatypes {
 
       private var buffer = ListBuffer[Mapping]()
 
-      def resultAsList = buffer.result()
+      def resultAsList: List[Mapping] = buffer.result()
 
       private def extensionFromPattern(pattern: String) =
         pattern.toLowerCase.trimAllToOpt flatMap findExtension getOrElse ""
 
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
         localname match {
-          case NameElement    ⇒ state = NameState
-          case PatternElement ⇒ state = PatternState
-          case _              ⇒ state = DefaultState
+          case NameElement    => state = NameState
+          case PatternElement => state = PatternState
+          case _              => state = DefaultState
         }
 
       override def characters(chars: Array[Char], start: Int, length: Int): Unit =
@@ -88,10 +106,10 @@ object Mediatypes {
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
         localname match {
-          case NameElement     ⇒ name = builder.toString.trimAllToEmpty
-          case PatternElement  ⇒ buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
-          case MimeTypeElement ⇒ name = null
-          case _               ⇒
+          case NameElement     => name = builder.toString.trimAllToEmpty
+          case PatternElement  => buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
+          case MimeTypeElement => name = null
+          case _               =>
         }
         builder.setLength(0)
       }

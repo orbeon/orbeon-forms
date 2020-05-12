@@ -51,9 +51,9 @@ object SecondPassParameters {
     // actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
     val actionOrResource =
       stringAvtTrimmedOpt(staticSubmission.avtActionOrResource) match {
-        case Some(resolved) ⇒
+        case Some(resolved) =>
           NetUtils.encodeHRRI(resolved, true)
-        case None ⇒
+        case None =>
           throw new XFormsSubmissionException(
             submission  = dynamicSubmission,
             message     = s"xf:submission: mandatory `resource` or `action` evaluated to an empty sequence for attribute value: `${staticSubmission.avtActionOrResource}`",
@@ -63,7 +63,7 @@ object SecondPassParameters {
 
     val credentialsOpt =
       staticSubmission.avtXxfUsernameOpt flatMap
-        stringAvtTrimmedOpt              map { username ⇒
+        stringAvtTrimmedOpt              map { username =>
 
         Credentials(
           username       = username,

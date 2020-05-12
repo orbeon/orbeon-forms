@@ -29,12 +29,12 @@ abstract class ElementHandler(
 
   // Use of `attributes`:
   //
-  // `handleAccessibilityAttributes`: `navindex`, `tabindex`, `accesskey`, `role` → should be static
+  // `handleAccessibilityAttributes`: `navindex`, `tabindex`, `accesskey`, `role` -> should be static
   // `xh:body` / `xh:head`: `startElement()`
   // `HandlerContext.getEffectiveId(attributes())` / `HandlerContext.getEffectiveId(attributes())`
   // getting `class` in `appendControlUserClasses`
-  // `xxf:dialog`: `close`, `draggable`, `visible` → get from static control!
-  // `getInitialClasses`: `incremental`, `mediatype` → should come from static
+  // `xxf:dialog`: `close`, `draggable`, `visible` -> get from static control!
+  // `getInitialClasses`: `incremental`, `mediatype` -> should come from static
   // `xxf:dialog`, `XFormsLHHAHandler`: `start()`: copies all attributes in XHTML namespace
   // `XHTMLElementHandler`: AVTs
   //

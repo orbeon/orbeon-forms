@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.om.Item
 
 
 class XFormsTextareaControl(
@@ -28,9 +29,9 @@ class XFormsTextareaControl(
   parent,
   element,
   id
-) with XFormsValueControl with FocusableTrait {
+) with XFormsValueControl with ReadonlyFocusableTrait {
 
   // Replacement-based input sanitation
-  override def translateExternalValue(externalValue: String) =
+  override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] =
     Option(containingDocument.getStaticState.sanitizeInput(externalValue))
 }

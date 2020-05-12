@@ -26,14 +26,14 @@ object CSSParser {
     val selectors = StringUtils.split(cssSelector, ',')
 
     var firstSelector = true
-    for (selector ← selectors) {
+    for (selector <- selectors) {
       if (! firstSelector)
         sb append '|'
 
       val pathsElements = StringUtils.split(selector.trimAllToEmpty, ' ')
       var firstElement = true
       var wasChildAxis = false
-      for (pathElement ← pathsElements) {
+      for (pathElement <- pathsElements) {
 
         def appendPathElement() = {
           if (Set(":root", "*:root")(pathElement))

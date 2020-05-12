@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -27,6 +28,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.util.PathUtils._
 
 import scala.util.Try
 
@@ -116,9 +118,9 @@ trait FormRunnerBaseOps {
 
     def fromIndex =
       Option(inDoc.getDocumentRoot.selectID(id)) match {
-        case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) ⇒ elemOpt
-        case Some(_)                                                   ⇒ fromSearch
-        case None                                                      ⇒ None
+        case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) => elemOpt
+        case Some(_)                                                   => fromSearch
+        case None                                                      => None
       }
 
     if (hasIndex)
@@ -174,7 +176,7 @@ trait FormRunnerBaseOps {
 
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
-    getModelElem(inDoc) / XFInstanceTest filter (e ⇒ isTemplateId(e.id))
+    getModelElem(inDoc) / XFInstanceTest filter (e => isTemplateId(e.id))
 
   // Get the root element of instances
   //@XPathFunction
@@ -195,7 +197,7 @@ trait FormRunnerBaseOps {
   def findTopLevelBindFromModelElem(modelElem: NodeInfo): Option[NodeInfo] =
     modelElem / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-      bind ⇒ TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
+      bind => TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
 
   def properties: PropertySet = Properties.instance.getPropertySet
@@ -215,7 +217,7 @@ trait FormRunnerBaseOps {
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
-    properties.getPropertyOpt(buildPropertyName(name)) map { p ⇒ (p.value.toString, p.namespaceMapping) }
+    properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.value.toString, p.namespaceMapping) }
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
@@ -289,24 +291,24 @@ trait FormRunnerBaseOps {
     val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
     val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
     captchaPropertyOpt match {
-      case None ⇒ Array.empty
-      case Some(captchaProperty) ⇒
+      case None => Array.empty
+      case Some(captchaProperty) =>
         val propertyValue = captchaProperty.value.asInstanceOf[String]
         propertyValue match {
-          case ""              ⇒ Array.empty
-          case "reCAPTCHA"     ⇒ Array(XMLNames.FR, "fr:recaptcha")
-          case "SimpleCaptcha" ⇒ Array(XMLNames.FR, "fr:simple-captcha")
-          case captchaName     ⇒
+          case ""              => Array.empty
+          case "reCAPTCHA"     => Array(XMLNames.FR, "fr:recaptcha")
+          case "SimpleCaptcha" => Array(XMLNames.FR, "fr:simple-captcha")
+          case captchaName     =>
             captchaName.splitTo[List](":") match {
-              case List(prefix, _) ⇒
+              case List(prefix, _) =>
                 captchaProperty.namespaces.get(prefix) match {
-                  case Some(namespaceURI) ⇒
+                  case Some(namespaceURI) =>
                     Array(namespaceURI, captchaName)
-                  case None ⇒
+                  case None =>
                     logger.error(s"No namespace for captcha `$captchaName`")
                     Array.empty
                 }
-              case _ ⇒
+              case _ =>
                 logger.error(s"Invalid reference to captcha component `$captchaName`")
                 Array.empty
             }
@@ -331,8 +333,22 @@ trait FormRunnerBaseOps {
   // Display an error message
   //@XPathFunction
   def errorMessage(message: String): Unit =
-    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
+    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" -> Some(message)))
 
+  def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
+
+    def baseUrlFromProperty: Option[String] =
+      propertySet.getNonBlankString("oxf.fr.external-base-url")
+
+    def baseUrlFromContext: String =
+      URLRewriterUtils.rewriteURL(
+        req,
+        "/",
+        URLRewriter.REWRITE_MODE_ABSOLUTE
+      )
+
+    (baseUrlFromProperty getOrElse baseUrlFromContext).appendSlash
+  }
 }
 
 object FormRunnerBaseOps extends FormRunnerBaseOps

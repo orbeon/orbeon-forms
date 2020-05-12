@@ -1,12 +1,12 @@
 package org.orbeon.oxf.externalcontext
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Session, SessionListener, SessionScope}
 
 import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 
 class SimpleSession(sessionId: String) extends Session {
 
@@ -17,7 +17,7 @@ class SimpleSession(sessionId: String) extends Session {
   private var sessionAtts = i.HashMap[String, AnyRef]()
 
   def expireSession(): Unit = {
-    for (listener ← sessionListeners.asScala)
+    for (listener <- sessionListeners.asScala)
       listener.sessionDestroyed(this)
     expired = true
   }
@@ -39,7 +39,7 @@ class SimpleSession(sessionId: String) extends Session {
 
   def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit = {
     checkExpired()
-    sessionAtts += name → value
+    sessionAtts += name -> value
   }
 
   def removeAttribute(name: String, scope: SessionScope): Unit = {

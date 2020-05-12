@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.cache
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.properties.Properties
 
@@ -38,7 +38,7 @@ object ObjectCache {
   def instance(cacheName: String, defaultSize: Int): Cache =
     namedObjectCaches.computeIfAbsent(
       cacheName,
-      _ ⇒ {
+      _ => {
 
         val propertyName = s"$CachePropertyNamePrefix.$cacheName.$CachePropertyNameSizeSuffix"
         val size         = Properties.instance.getPropertySetOrThrow.getInteger(propertyName, defaultSize)

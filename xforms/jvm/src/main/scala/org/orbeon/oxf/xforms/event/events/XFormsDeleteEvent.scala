@@ -31,9 +31,9 @@ class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
     this(
       target,
       Map(
-        "deleted-nodes"   → Option(deletionDescriptors map (_.nodeInfo)),
-        "delete-location" → deleteIndexOpt,
-        "update-repeats"  → Some(false)
+        "deleted-nodes"   -> Option(deletionDescriptors map (_.nodeInfo)),
+        "delete-location" -> deleteIndexOpt,
+        "update-repeats"  -> Some(false)
       )
     )
     _deletionDescriptorsOpt = Option(deletionDescriptors)

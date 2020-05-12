@@ -13,9 +13,9 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.tinymce._
+import org.orbeon.facades.TinyMce._
 import org.orbeon.xforms.facade._
-import org.orbeon.xforms.{$, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.raw
 import org.scalajs.jquery.JQueryEventObject
@@ -37,14 +37,14 @@ object TinyMCE {
 
       override def init(): Unit = {
 
-        if (!baseUrlInitialized) {
+        if (! baseUrlInitialized) {
           // Tell TinyMCE about base URL, which it can't guess in combined resources
 
           val href = dom.document.querySelector(".tinymce-base-url").getAttribute("href")
           // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
           // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
           val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
-          TinyMce.baseURL = baseURL
+          GlobalTinyMce.baseURL = baseURL
 
           baseUrlInitialized = true
         }
@@ -55,21 +55,21 @@ object TinyMCE {
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
         tinyMceConfig.suffix      = ".min"
-        tinyMceConfig.content_css = TinyMce.baseURL + "/../../content.css"
+        tinyMceConfig.content_css = GlobalTinyMce.baseURL + "/../../content.css"
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tabindex = tinyMceDiv.getAttribute("tabindex")
-        myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, TinyMce.EditorManager)
+        myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
         val xformsValue = Document.getValue(serverValueOutputId).get
-        onInit(() ⇒ {
+        onInit(() => {
           // Send value to the server on blur
-          myEditor.on("blur", (_) ⇒ clientToServer())
+          myEditor.on("blur", (_) => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
           myEditor.setContent(xformsValue)
           val iframe = $(containerElem).find("iframe")
           // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
-          iframe.contents().on("click", (_: JQueryEventObject) ⇒ containerElem.click())
+          iframe.contents().on("click", (_: JQueryEventObject) => containerElem.click())
           $(iframe.get(0).asInstanceOf[raw.HTMLIFrameElement].contentWindow).on("focus", onFocus _)
           // Copy the tabindex on the iframe
           if (tabindex != null && tabindex != "") iframe.attr("tabindex", tabindex)
@@ -96,11 +96,11 @@ object TinyMCE {
         val rawContent = myEditor.getContent()
         // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
         val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-        AjaxEvent.dispatchEvent(
+        AjaxClient.fireEvent(
           AjaxEvent(
             eventName  = "fr-set-client-value",
             targetId   = containerElem.id,
-            properties = Map("fr-value" → cleanedContent)
+            properties = Map("fr-value" -> cleanedContent)
           )
         )
       }
@@ -132,15 +132,14 @@ object TinyMCE {
       }
 
       // Runs a function when the TinyMCE is initialized
-      private def onInit(thunk: () ⇒ Unit): Unit = {
+      private def onInit(thunk: () => Unit): Unit = {
         if (tinymceInitialized) thunk()
-        else myEditor.on("init", _ ⇒ thunk())
+        else myEditor.on("init", _ => thunk())
       }
 
       override def xformsFocus(): Unit = { onInit(myEditor.focus) }
-      def readonly   (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
-      def readwrite  (): Unit = { onInit(() ⇒ { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
+      def readonly   (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
+      def readwrite  (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
     }
   )
 }
-

@@ -33,7 +33,7 @@ import scala.util.control.NonFatal
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   // Children elements
   // TODO: Don't deal with elements here, this should be part of the ElementAnalysis
@@ -57,7 +57,7 @@ trait FileMetadata extends XFormsValueControl {
 
   // Supported file metadata properties
   private var props: Map[String, ControlProperty[String]] =
-    supportedFileMetadata map (name ⇒ name → new FileMetadataProperty(Evaluators(name))) toMap
+    supportedFileMetadata map (name => name -> new FileMetadataProperty(Evaluators(name))) toMap
 
   // Properties to support
   def supportedFileMetadata: Seq[String]
@@ -77,7 +77,7 @@ trait FileMetadata extends XFormsValueControl {
   def fileSize              = props("size")     .value.trimAllToOpt
 
   def iterateProperties = props.iterator map {
-    case (k, v) ⇒ k → Option(v.value)
+    case (k, v) => k -> Option(v.value)
   }
 
   def humanReadableFileSize = fileSize filter StringUtils.isNotBlank map humanReadableBytes
@@ -107,7 +107,7 @@ trait FileMetadata extends XFormsValueControl {
 
     var added: Boolean = false
 
-    def addAtt(name: String, getValue: FileMetadata ⇒ String): Unit = {
+    def addAtt(name: String, getValue: FileMetadata => String): Unit = {
       val value1 = previousControlOpt map getValue orNull
       val value2 = getValue(uploadControl2)
 
@@ -119,8 +119,8 @@ trait FileMetadata extends XFormsValueControl {
 
     // Add attributes for each property with a different value
     props foreach {
-      case (name @ "size", _) ⇒ addAtt(name, _.humanReadableFileSize.orNull) // special case size so we can format
-      case (name, _)          ⇒ addAtt(name, _.props(name).value)
+      case (name @ "size", _) => addAtt(name, _.humanReadableFileSize.orNull) // special case size so we can format
+      case (name, _)          => addAtt(name, _.props(name).value)
     }
 
     added
@@ -128,25 +128,24 @@ trait FileMetadata extends XFormsValueControl {
 
   // True if all metadata is the same (NOTE: the names must match)
   def compareFileMetadata(other: FileMetadata) =
-    props.size == other.props.size && (props forall { case (name, prop) ⇒ prop.value == other.props(name).value })
+    props.size == other.props.size && (props forall { case (name, prop) => prop.value == other.props(name).value })
 
   // Update other with an immutable version of the metadata
   def updateFileMetadataCopy(other: FileMetadata) =
-    other.props = props map { case (name, prop) ⇒ name → new ImmutableControlProperty(prop.value) }
+    other.props = props map { case (name, prop) => name -> new ImmutableControlProperty(prop.value) }
 
   private def setInfoValue(element: Option[Element], value: String) =
     if (value ne null)
-      element foreach { e ⇒
+      element foreach { e =>
         val contextStack = self.getContextStack
         contextStack.setBinding(self.bindingContext)
         contextStack.pushBinding(e, self.getEffectiveId, self.getChildElementScope(e))
 
-        contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode ⇒
+        contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode =>
             DataModel.setValueIfChanged(
               nodeInfo  = currentSingleNode,
               newValue  = value,
-              onSuccess = oldValue ⇒ DataModel.logAndNotifyValueChange(
-                containingDocument = self.container.getContainingDocument,
+              onSuccess = oldValue => DataModel.logAndNotifyValueChange(
                 source             = "file metadata",
                 nodeInfo           = currentSingleNode,
                 oldValue           = oldValue,
@@ -154,7 +153,7 @@ trait FileMetadata extends XFormsValueControl {
                 isCalculate        = false,
                 collector          = Dispatch.dispatchEvent
               ),
-              reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
+              reason => Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
             )
         }
       }
@@ -162,17 +161,17 @@ trait FileMetadata extends XFormsValueControl {
 
 object FileMetadata {
 
-  case class Evaluator(evaluate: FileMetadata ⇒ String, default: String)
+  case class Evaluator(evaluate: FileMetadata => String, default: String)
 
   // How to evaluate each property and default values used when control is non-relevant
   private val Evaluators = Map[String, Evaluator](
-    "state"             → Evaluator(m ⇒ if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
-    "mediatype"         → Evaluator(m ⇒ m.mediatypeElement map     (childMetadataValue(m, _))        orNull, null),
-    "filename"          → Evaluator(m ⇒ m.filenameElement  map     (childMetadataValue(m, _))        orNull, null),
-    "size"              → Evaluator(m ⇒ m.sizeElement      map     (childMetadataValue(m, _))        orNull, null),
-    "progress-state"    → Evaluator(m ⇒ progress(m)        map     (_.state.name)                    orNull, null),
-    "progress-received" → Evaluator(m ⇒ progress(m)        map     (_.receivedSize.toString)         orNull, null),
-    "progress-expected" → Evaluator(m ⇒ progress(m)        flatMap (_.expectedSize) map (_.toString) orNull, null)
+    "state"             -> Evaluator(m => if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
+    "mediatype"         -> Evaluator(m => m.mediatypeElement map     (childMetadataValue(m, _))        orNull, null),
+    "filename"          -> Evaluator(m => m.filenameElement  map     (childMetadataValue(m, _))        orNull, null),
+    "size"              -> Evaluator(m => m.sizeElement      map     (childMetadataValue(m, _))        orNull, null),
+    "progress-state"    -> Evaluator(m => progress(m)        map     (_.state.name)                    orNull, null),
+    "progress-received" -> Evaluator(m => progress(m)        map     (_.receivedSize.toString)         orNull, null),
+    "progress-expected" -> Evaluator(m => progress(m)        flatMap (_.expectedSize) map (_.toString) orNull, null)
   )
 
   // All possible property names
@@ -198,5 +197,5 @@ object FileMetadata {
   // If the input string doesn't represent a Long, return the string unchanged
   def humanReadableBytes(size: String): String =
     try FileUtils.byteCountToDisplaySize(size.toLong)
-    catch { case NonFatal(_) ⇒ size }
+    catch { case NonFatal(_) => size }
 }

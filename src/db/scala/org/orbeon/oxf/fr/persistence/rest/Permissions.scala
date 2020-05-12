@@ -27,14 +27,14 @@ private object Permissions {
   case class Permission(permissionFor: PermissionFor, operations: Set[String])
 
   def serialize(permissions: Permissions): Option[Elem] =
-    permissions map ( ps ⇒
-      <permissions>{ ps map ( p ⇒
+    permissions map ( ps =>
+      <permissions>{ ps map ( p =>
         <permission operations={p.operations.mkString(" ")}>{
           p.permissionFor match {
-            case Anyone  ⇒ ""
-            case Owner   ⇒ <owner/>
-            case Group   ⇒ <group-member/>
-            case Role(r) ⇒ <user-role any-of={r}/>
+            case Anyone  => ""
+            case Owner   => <owner/>
+            case Group   => <group-member/>
+            case Role(r) => <user-role any-of={r}/>
           }
         }</permission>
       )}</permissions>

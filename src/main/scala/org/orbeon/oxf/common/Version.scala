@@ -59,11 +59,11 @@ object Version {
   //@XPathFunction
   def compare(leftVersion: String, rightVersion: String): Option[Int] = {
     (majorMinor(leftVersion), majorMinor(rightVersion)) match {
-      case (Some((leftMajor, leftMinor)), Some((rightMajor, rightMinor))) ⇒
+      case (Some((leftMajor, leftMinor)), Some((rightMajor, rightMinor))) =>
         if      (leftMajor > rightMajor || (leftMajor == rightMajor && leftMinor > rightMinor)) Some( 1)
         else if (leftMajor < rightMajor || (leftMajor == rightMajor && leftMinor < rightMinor)) Some(-1)
         else                                                                                    Some( 0)
-      case _ ⇒
+      case _ =>
         None
     }
   }
@@ -80,7 +80,7 @@ object Version {
     val versionClassName = "org.orbeon.oxf.common." + Edition + "Version"
 
     def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         logger.info(message, t)
         None
     }
@@ -90,7 +90,7 @@ object Version {
       catch logContextClassLoaderIssue("Failed to obtain context ClassLoader")
 
     def fromContextClassLoaderOpt =
-      contextClassLoaderOpt flatMap { classLoader ⇒
+      contextClassLoaderOpt flatMap { classLoader =>
         try Some(classLoader.loadClass(versionClassName).asInstanceOf[Class[Version]])
         catch logContextClassLoaderIssue("Failed to load Version from context ClassLoader")
       }
@@ -98,7 +98,7 @@ object Version {
     def fromName =
       Class.forName(versionClassName).asInstanceOf[Class[Version]]
 
-    fromContextClassLoaderOpt getOrElse fromName newInstance
+    (fromContextClassLoaderOpt getOrElse fromName).getConstructor().newInstance()
   }
 
   //@XPathFunction

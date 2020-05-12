@@ -59,26 +59,26 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
       new DocumentWrapper(node.getDocument, null, config)
 
     obj match {
-      case document : Document ⇒ wrapDocument(document)
-      case node     : Node     ⇒ wrapDocument(node.getDocument).wrap(node)
-      case _                   ⇒ throw new IllegalStateException
+      case document : Document => wrapDocument(document)
+      case node     : Node     => wrapDocument(node.getDocument).wrap(node)
+      case _                   => throw new IllegalStateException
     }
   }
 
   private def convertXPathValueToObject(value: Value, targetClass: Class[_]): AnyRef =
     value match {
-      case singletonNode: SingletonNode ⇒
+      case singletonNode: SingletonNode =>
         singletonNode.getNode match {
-          case virtualNode: VirtualNode ⇒
+          case virtualNode: VirtualNode =>
             val underlying = virtualNode.getUnderlyingNode
             if (targetClass.isAssignableFrom(underlying.getClass))
               underlying
             else
               null
-          case _ ⇒
+          case _ =>
             null
         }
-      case _ ⇒
+      case _ =>
         null
     }
 

@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.upload.api.java
 
-import _root_.java.{util ⇒ ju}
+import _root_.java.{util => ju}
 
 import org.orbeon.oxf.xforms.upload.api
 import org.orbeon.oxf.xforms.upload.api.java
@@ -43,7 +43,7 @@ abstract class FileScanProvider extends api.FileScanProvider {
     Try(
       startStream(
         fileName,
-        mutable.LinkedHashMap(headers map { case (k, v) ⇒ k → v.to(Array) }: _*).asJava
+        mutable.LinkedHashMap(headers map { case (k, v) => k -> v.to(Array) }: _*).asJava
       )
     ) map (new FileScanWrapper(_))
 }

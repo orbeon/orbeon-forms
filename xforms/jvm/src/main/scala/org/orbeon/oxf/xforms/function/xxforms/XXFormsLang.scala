@@ -42,33 +42,33 @@ object XXFormsLang {
 
   def resolveXMLangHandleAVTs(containingDocument: XFormsContainingDocument, element: ElementAnalysis): Option[String] =
     element.lang match {
-      case Some(LiteralLangRef(value)) ⇒
+      case Some(LiteralLangRef(value)) =>
         Some(value)
-      case Some(AVTLangRef(att)) ⇒
+      case Some(AVTLangRef(att)) =>
         // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
         Option(attributeControl.getExternalValue())
-      case None ⇒
+      case None =>
         None
     }
 
   def addXMLLangDependency(pathMap: PathMap): Unit = {
     // Dependency on language
     val avtLangAnalysis = XFormsFunction.sourceElementAnalysis(pathMap).lang collect {
-      case ref: AVTLangRef ⇒ ref.att.getValueAnalysis.get
+      case ref: AVTLangRef => ref.att.getValueAnalysis.get
     }
 
     // Only add the dependency if xml:lang is not a literal
     avtLangAnalysis foreach {
-      case analysis: PathMapXPathAnalysis ⇒
+      case analysis: PathMapXPathAnalysis =>
         // There is a pathmap for the xml:lang AVT, so add the new roots
         pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)
         //pathMap.findFinalNodes // FIXME: needed?
         //pathMap.updateFinalNodes(finalNodes)
-      case analysis if ! analysis.figuredOutDependencies ⇒
+      case analysis if ! analysis.figuredOutDependencies =>
         // Dependencies not found
         pathMap.setInvalidated(true)
-      case _ ⇒ // NOP
+      case _ => // NOP
     }
   }
 }

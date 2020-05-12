@@ -18,13 +18,13 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.{Logging, NetUtils}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
@@ -61,43 +61,43 @@ class XFormsControl(
 
   require(container ne null)
 
-  final val containingDocument = container.getContainingDocument
+  implicit final val containingDocument: XFormsContainingDocument = container.getContainingDocument
+  implicit final def logger            : IndentedLogger = containingDocument.getControls.indentedLogger
 
-  final def part = container.getPartAnalysis
+  final def part: PartAnalysis = container.getPartAnalysis
 
   // Static information (never changes for the lifetime of the containing document)
   // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-  final val staticControl: Control = part.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)).asInstanceOf[Control]
-  final def staticControlOpt = Option(staticControl)
+  final val staticControl   : Control         = part.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)).asInstanceOf[Control]
+  final def staticControlOpt: Option[Control] = Option(staticControl)
 
   final val prefixedId = staticControlOpt map (_.prefixedId) getOrElse XFormsId.getPrefixedId(effectiveId)
-  final def absoluteId = XFormsId.effectiveIdToAbsoluteId(effectiveId)
+  final def absoluteId: String = XFormsId.effectiveIdToAbsoluteId(effectiveId)
 
   // Whether the control has been visited
   def visited = false
 
   parent match {
-    case container: XFormsContainerControl ⇒ container.addChild(this)
-    case _ ⇒
+    case container: XFormsContainerControl => container.addChild(this)
+    case _ =>
   }
 
-  final def getId = staticControl.staticId
-  final def getPrefixedId = prefixedId
+  final def getId: String = staticControl.staticId
+  final def getPrefixedId: String = prefixedId
 
-  final def scope = staticControl.scope
-  final def localName = staticControl.localName
+  final def scope: Scope = staticControl.scope
+  final def localName: String = staticControl.localName
 
-  def getContextStack = container.getContextStack
-  implicit final def logger = containingDocument.getControls.indentedLogger
+  def getContextStack: XFormsContextStack = container.getContextStack
 
-  final def getResolutionScope =
+  final def getResolutionScope: Scope =
     part.scopeForPrefixedId(prefixedId)
 
   // Resolve an object relative to this control
-  final def resolve(staticId: String, contextItem: Option[Item] = None) =
+  final def resolve(staticId: String, contextItem: Option[Item] = None): Option[XFormsObject] =
     container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
 
-  final def getChildElementScope(element: Element) =
+  final def getChildElementScope(element: Element): Scope =
     part.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 
   // Update this control's effective id based on the parent's effective id
@@ -107,15 +107,15 @@ class XFormsControl(
       val parentSuffix = XFormsId.getEffectiveIdSuffix(parentEffectiveId)
       effectiveId = XFormsId.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
       if (_childrenActions.nonEmpty)
-        for (actionControl ← _childrenActions)
+        for (actionControl <- _childrenActions)
           actionControl.updateEffectiveId()
     }
   }
 
-  def getEffectiveId = effectiveId
+  def getEffectiveId: String = effectiveId
 
   // Used by repeat iterations
-  def setEffectiveId(effectiveId: String) =
+  def setEffectiveId(effectiveId: String): Unit =
     this.effectiveId = effectiveId
 
   final def getLocationData: LocationData =
@@ -151,9 +151,9 @@ class XFormsControl(
   final def addChildAction(actionControl: XFormsActionControl): Unit =
     _childrenActions ::= actionControl
 
-  final def childrenActions = _childrenActions
+  final def childrenActions: List[XFormsActionControl] = _childrenActions
 
-  final def previousEffectiveIdCommit() = {
+  final def previousEffectiveIdCommit(): String = {
     val result = previousEffectiveId
     previousEffectiveId = effectiveId
     result
@@ -164,13 +164,13 @@ class XFormsControl(
     previousEffectiveIdCommit()
   }
 
-  final def appearances = XFormsControl.appearances(staticControl)
+  final def appearances: Set[QName] = XFormsControl.appearances(staticControl)
   def isStaticReadonly  = false
 
   // Optional mediatype
-  final def mediatype = staticControl match {
-    case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.mediatype
-    case _ ⇒ None
+  final def mediatype: Option[String] = staticControl match {
+    case appearanceTrait: AppearanceTrait => appearanceTrait.mediatype
+    case _ => None
   }
 
   def hasJavaScriptInitialization = false
@@ -191,18 +191,18 @@ class XFormsControl(
     previousControlOpt       : Option[XFormsControl]
   ): Boolean =
     previousControlOpt match {
-      case Some(other) ⇒
+      case Some(other) =>
         isRelevant == other.isRelevant &&
         compareLHHA(other)             &&
         compareExtensionAttributes(other)
-      case _ ⇒ false
+      case _ => false
     }
 
   // Evaluate the control's value and metadata
   final def evaluate(): Unit =
     try preEvaluateImpl(relevant = true, parentRelevant = true)
     catch {
-      case e: ValidationException ⇒
+      case e: ValidationException =>
         throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
     }
 
@@ -222,7 +222,7 @@ class XFormsControl(
 
   // Evaluate this control
   // NOTE: LHHA and extension attributes are computed lazily
-  def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean) = ()
+  def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = ()
 
   /**
    * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls
@@ -240,16 +240,16 @@ class XFormsControl(
   }
 
   // Whether focus can be set to this control
-  def isFocusable = false
+  def isDirectlyFocusable = false
 
   // By default, a control doesn't accept focus
   def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
-  def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
+  def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]): Unit =
     staticControl match {
-      case withChildren: ChildrenBuilderTrait ⇒ Controls.buildChildren(this, withChildren.children, buildTree, idSuffix)
-      case _ ⇒
+      case withChildren: ChildrenBuilderTrait => Controls.buildChildren(this, withChildren.children, buildTree, idSuffix)
+      case _ =>
     }
 }
 
@@ -261,9 +261,9 @@ object XFormsControl {
   // Whether the given item is allowed as a binding item for the given control
   // TODO: don't like pattern matching here and revisit hierarchy
   def isAllowedBoundItem(control: XFormsControl, item: Item): Boolean = control.staticControl match {
-    case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
-    case _: RepeatControl            ⇒ DataModel.isAllowedBoundItem(item)
-    case _                           ⇒ false
+    case singleNode: SingleNodeTrait => singleNode.isAllowedBoundItem(item)
+    case _: RepeatControl            => DataModel.isAllowedBoundItem(item)
+    case _                           => false
   }
 
   // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
@@ -289,7 +289,7 @@ object XFormsControl {
         sb.append(localname)
         val attributeCount = attributes.getLength
 
-        for (i ← 0 until attributeCount) {
+        for (i <- 0 until attributeCount) {
           val currentName = attributes.getLocalName(i)
           val currentValue = attributes.getValue(i)
           sb.append(' ')
@@ -327,8 +327,8 @@ object XFormsControl {
 
   // Immutable control property
   class ImmutableControlProperty[T >: Null](val value: T) extends ControlProperty[T] {
-    override def handleMarkDirty(force: Boolean) = ()
-    override def copy = this
+    def handleMarkDirty(force: Boolean): Unit = ()
+    def copy: ImmutableControlProperty[T] = this
   }
 
   // Mutable control property supporting optimization
@@ -373,7 +373,7 @@ object XFormsControl {
     def handleMarkDirty(force: Boolean): Unit = {
 
       def isDirty = ! isEvaluated
-      def markOptimized() = isOptimized = true
+      def markOptimized(): Unit = isOptimized = true
 
       if (! isDirty) {
         // don't do anything if we are already dirty
@@ -396,16 +396,16 @@ object XFormsControl {
       isOptimized = false
     }
 
-    def copy = super.clone.asInstanceOf[MutableControlProperty[T]]
+    def copy: MutableControlProperty[T] = super.clone.asInstanceOf[MutableControlProperty[T]]
   }
 
   // Return the set of appearances for the given element, if any
   def appearances(elementAnalysis: ElementAnalysis): Set[QName] = elementAnalysis match {
-    case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.appearances
-    case _                                ⇒ Set.empty[QName]
+    case appearanceTrait: AppearanceTrait => appearanceTrait.appearances
+    case _                                => Set.empty[QName]
   }
 
   // Whether the given control has the text/html mediatype
   private val HTMLMediatype = Some("text/html")
-  def isHTMLMediatype(control: XFormsControl) = control.mediatype == HTMLMediatype
+  def isHTMLMediatype(control: XFormsControl): Boolean = control.mediatype == HTMLMediatype
 }

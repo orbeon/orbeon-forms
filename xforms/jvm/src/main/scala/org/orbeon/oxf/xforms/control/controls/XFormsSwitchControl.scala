@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
@@ -55,13 +55,13 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // Ensure that the initial state is set, either from default value, or for state deserialization.
     state match {
-      case Some(state) ⇒
+      case Some(state) =>
         setLocal(new XFormsSwitchControlLocal(state.keyValues("case-id")))
-      case None if restoreState ⇒
+      case None if restoreState =>
         // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for a
         // particular control might not be found.
         setLocal(new XFormsSwitchControlLocal(findInitialSelectedCaseId))
-      case None ⇒
+      case None =>
         val local = getLocalForUpdate.asInstanceOf[XFormsSwitchControlLocal]
         local.selectedCaseControlId = findInitialSelectedCaseId
         // TODO: Deferred event dispatch for xforms-select/deselect?
@@ -87,7 +87,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
   }
 
   private def evaluateCaseRefBinding: Option[Item] =
-    staticControl.caseref flatMap { caseref ⇒
+    staticControl.caseref flatMap { caseref =>
 
       val caserefItem =
         Option(
@@ -106,7 +106,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         )
 
       caserefItem collect {
-        case item if DataModel.isAllowedValueBoundItem(item) ⇒ item
+        case item if DataModel.isAllowedValueBoundItem(item) => item
       }
 
       // TODO: deferred event dispatch for xforms-binding-error EXCEPT upon restoring state???
@@ -122,7 +122,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       caseIdFromSelected getOrElse firstCaseId
 
   private def caseIdFromCaseRefBinding: Option[String] =
-    _caserefBinding flatMap { item ⇒
+    _caserefBinding flatMap { item =>
       Some(item.getStringValue) flatMap caseForValue map (_.staticId)
     }
 
@@ -141,7 +141,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // FIXME: The expression is evaluated in the context of xf:switch, when in fact it should be evaluated in the
     // context of the xf:case, including variables and FunctionContext.
-    def fromExpression(c: CaseControl) = c.valueExpression flatMap { expr ⇒
+    def fromExpression(c: CaseControl) = c.valueExpression flatMap { expr =>
       Option(
         XPathCache.evaluateAsString(
           contextItems       = bindingContext.nodeset,
@@ -180,7 +180,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   // Filter because XXFormsVariableControl can also be a child
   def getChildrenCases =
-    children collect { case c: XFormsCaseControl ⇒ c }
+    children collect { case c: XFormsCaseControl => c }
 
   // Set the currently selected case.
   def setSelectedCase(caseControlToSelect: XFormsCaseControl): Unit = {
@@ -193,15 +193,14 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       // "by performing a setvalue action if the caseref attribute is specified and indicates a node. If the
       // node is readonly or if the toggle action does not indicate a case in the switch, then no value change
       // occurs and therefore no change of the selected case occurs"
-      _caserefBinding flatMap (item ⇒ DataModel.isWritableItem(item).left.toOption) foreach { writableNode ⇒
+      _caserefBinding flatMap (item => DataModel.isWritableItem(item).left.toOption) foreach { writableNode =>
 
         val newValue = caseValue(caseControlToSelect.staticControl)
 
         DataModel.setValueIfChanged(
           nodeInfo  = writableNode,
           newValue  = newValue,
-          onSuccess = oldValue ⇒ DataModel.logAndNotifyValueChange(
-            containingDocument = containingDocument,
+          onSuccess = oldValue => DataModel.logAndNotifyValueChange(
             source             = "toggle",
             nodeInfo           = writableNode,
             oldValue           = oldValue,
@@ -239,12 +238,12 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         // https://github.com/orbeon/orbeon-forms/issues/3494
         if (! Focus.isHidden(this)) {
 
-          def dispatch(start: XFormsControl, newEvent: XFormsControl ⇒ XFormsEvent): Unit =
+          def dispatch(start: XFormsControl, newEvent: XFormsControl => XFormsEvent): Unit =
             ControlsIterator(
               start         = start,
               includeSelf   = false,
               followVisible = true
-            ) filter (_.isRelevant) foreach { control ⇒
+            ) filter (_.isRelevant) foreach { control =>
               Dispatch.dispatchEvent(newEvent(control))
             }
 
@@ -306,7 +305,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     previousControlOpt    : Option[XFormsControl]
   ): Boolean =
     previousControlOpt match {
-      case Some(previousSwitchControl: XFormsSwitchControl) ⇒
+      case Some(previousSwitchControl: XFormsSwitchControl) =>
         getSelectedCaseEffectiveId == getOtherSelectedCaseEffectiveId(Some(previousSwitchControl)) &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
       case _ => false
@@ -314,7 +313,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   final override def outputAjaxDiff(
     previousControlOpt : Option[XFormsControl],
-    content            : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content            : Option[XMLReceiverHelper => Unit])(implicit
     ch                 : XMLReceiverHelper
   ): Unit = {
 
@@ -325,7 +324,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       ! staticControl.hasFullUpdate &&
       getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)
 
-    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+    val outputNestedContent = (ch: XMLReceiverHelper) => {
       // Output newly selected case id
       val selectedCaseEffectiveId = getSelectedCaseEffectiveId ensuring (_ ne null)
 
@@ -335,7 +334,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       )
 
       otherSwitchControl match {
-        case Some(control) if control.isRelevant ⇒
+        case Some(control) if control.isRelevant =>
           // Used to be relevant, simply output deselected case ids
           val previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl) ensuring (_ ne null)
 
@@ -343,10 +342,11 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
             "visibility", "hidden")
           )
-        case _ ⇒
+        case _ =>
           // Control was not relevant, send all deselected to be sure
           // TODO: This should not be needed because the repeat template should have a reasonable default.
-          getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl ⇒
+          // TODO: 2020-02-27: There are no more repeat templates. Check this.
+          getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl =>
             ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
               "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
               "visibility", "hidden")
@@ -363,11 +363,11 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   def getOtherSelectedCaseEffectiveId(previousSwitchControl: Option[XFormsSwitchControl]): String =
     previousSwitchControl match {
-      case Some(control) if control.isRelevant ⇒
+      case Some(control) if control.isRelevant =>
         val selectedCaseId = control.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
         assert(selectedCaseId ne null)
         XFormsId.getRelatedEffectiveId(control.getEffectiveId, selectedCaseId)
-      case _ ⇒
+      case _ =>
         null
     }
 

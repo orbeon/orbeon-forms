@@ -79,6 +79,10 @@ object UndoAction {
                                     direction  : Direction,
                                     size       : Int)                                     extends UndoAction
 
+  case class MigrateGridColumns    (gridId     : String,
+                                    from       : Int,
+                                    to         : Int)                                     extends UndoAction
+
   // From https://github.com/lloydmeta/enumeratum/blob/92b28ca1ceb72cebd58c1b3b1b763a6add875be3/enumeratum-core/src/main/scala/enumeratum/EnumEntry.scala#L34
   import java.util.regex.Pattern
 
@@ -141,7 +145,7 @@ object Undo {
 
     implicit val encodeNodeInfo: Encoder[NodeInfo] = Encoder.encodeString.contramap[NodeInfo](TransformerUtils.tinyTreeToString)
 
-    implicit val decodeNodeInfo: Decoder[NodeInfo] = Decoder.decodeString.emap { encoded ⇒
+    implicit val decodeNodeInfo: Decoder[NodeInfo] = Decoder.decodeString.emap { encoded =>
       Either.catchNonFatal(
         TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, encoded, false, false).rootElement
       ).leftMap(_.getMessage)
@@ -154,7 +158,7 @@ object Undo {
   private object Private {
 
     def popAction(undoOrRedo: UndoOrRedo)(implicit ctx: FormBuilderDocContext): Option[UndoAction] = {
-      ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo ⇒
+      ctx.undoRootElem / (undoOrRedo.entryName + "s") lastChildOpt * flatMap { lastUndoOrRedo =>
 
         val encoded = lastUndoOrRedo.stringValue
         val result  = JsonConverter.decode(encoded).toOption

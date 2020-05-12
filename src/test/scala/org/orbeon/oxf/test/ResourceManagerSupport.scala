@@ -57,10 +57,10 @@ object ResourceManagerSupport {
 
     val propsIt =
       for {
-        name ← properties.propertyNames.asScala collect { case s: String ⇒ s}
+        name <- properties.propertyNames.asScala collect { case s: String => s}
         if name.startsWith("oxf.resources.")
       } yield
-         name → (properties.getProperty(name): AnyRef) // `AnyRef` because we pass a `WebAppContext` in one case
+         name -> (properties.getProperty(name): AnyRef) // `AnyRef` because we pass a `WebAppContext` in one case
 
     val propsMap = propsIt.toMap
 

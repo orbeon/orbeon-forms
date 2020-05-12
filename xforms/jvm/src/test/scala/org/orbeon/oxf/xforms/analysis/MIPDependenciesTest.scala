@@ -155,9 +155,9 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Test all combinations of MIPs
     for {
-      required ← Seq(false, true)
-      valid    ← Seq(false, true)
-      readonly ← Seq(false, true)
+      required <- Seq(false, true)
+      valid    <- Seq(false, true)
+      readonly <- Seq(false, true)
       value    = Seq(required, valid, readonly) map (if (_) "1" else "0") mkString
     } yield {
       // Value looks like "000" to "111"

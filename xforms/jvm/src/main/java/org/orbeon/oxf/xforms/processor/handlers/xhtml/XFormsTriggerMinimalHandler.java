@@ -57,7 +57,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         {
             final String labelValue = getTriggerLabel(triggerControl);
             final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
-            outputLabelText(xmlReceiver, labelValue, xhtmlPrefix, mustOutputHTMLFragment, scala.Option.apply(triggerControl.getLocationData()));
+            outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, scala.Option.apply(triggerControl.getLocationData()), xmlReceiver);
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
     }

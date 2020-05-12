@@ -1,6 +1,6 @@
 package org.orbeon.dom.tree
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 import org.xml.sax.Attributes
@@ -13,7 +13,7 @@ private object ConcreteElement {
 
     val size = src.attributeCount
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       val att = src.attribute(i)
@@ -49,8 +49,8 @@ class ConcreteElement(var qname: QName)
 
   override def getParent: Element =
     _parentBranch match {
-      case element: Element ⇒ element
-      case _                ⇒ null
+      case element: Element => element
+      case _                => null
     }
 
   override def setParent(parent: Element): Unit = {
@@ -73,12 +73,12 @@ class ConcreteElement(var qname: QName)
       val contentIt = internalContent.iterator
       while (contentIt.hasNext) {
         contentIt.next() match {
-          case ns: Namespace ⇒
+          case ns: Namespace =>
             val prefix = ns.prefix
             val parentNamespace = parent.getNamespaceForPrefix(prefix)
             if (ns == parentNamespace)
               contentIt.remove()
-          case _ ⇒
+          case _ =>
         }
       }
     }
@@ -86,9 +86,9 @@ class ConcreteElement(var qname: QName)
 
   override def getDocument: Document =
     _parentBranch match {
-      case document: Document ⇒ document
-      case parent: Element    ⇒ parent.getDocument
-      case _                  ⇒ null
+      case document: Document => document
+      case parent: Element    => parent.getDocument
+      case _                  => null
     }
 
   override def setDocument(document: Document): Unit =
@@ -109,10 +109,10 @@ class ConcreteElement(var qname: QName)
 
   def accept(visitor: Visitor): Unit = {
     visitor.visit(this)
-    for (i ← 0 until attributeCount)
+    for (i <- 0 until attributeCount)
       visitor.visit(attribute(i))
 
-    for (i ← 0 until nodeCount)
+    for (i <- 0 until nodeCount)
       node(i).accept(visitor)
   }
 
@@ -153,8 +153,8 @@ class ConcreteElement(var qname: QName)
     import scala.collection.JavaConverters._
 
     internalContent.iterator.asScala exists {
-      case _: Element ⇒ true
-      case _          ⇒ false
+      case _: Element => true
+      case _          => false
     }
   }
 
@@ -162,12 +162,12 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case element: Element if name == element.getName ⇒ return element
-        case _ ⇒
+        case element: Element if name == element.getName => return element
+        case _ =>
       }
       i +=1
     }
@@ -179,12 +179,12 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case element: Element if qName == element.getQName ⇒ return element
-        case _ ⇒
+        case element: Element if qName == element.getQName => return element
+        case _ =>
       }
       i +=1
     }
@@ -196,12 +196,12 @@ class ConcreteElement(var qname: QName)
     val answer = new ju.ArrayList[Element]()
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case element: Element ⇒ answer.add(element)
-        case _ ⇒
+        case element: Element => answer.add(element)
+        case _ =>
       }
       i += 1
     }
@@ -213,14 +213,14 @@ class ConcreteElement(var qname: QName)
     val answer = new ju.ArrayList[Element]()
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case element: Element ⇒
+        case element: Element =>
           if (name == element.getName)
             answer.add(element)
-        case _ ⇒
+        case _ =>
       }
       i += 1
     }
@@ -232,14 +232,14 @@ class ConcreteElement(var qname: QName)
     val answer = new ju.ArrayList[Element]()
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case element: Element ⇒
+        case element: Element =>
           if (qName == element.getQName)
             answer.add(element)
-        case _ ⇒
+        case _ =>
       }
       i += 1
     }
@@ -316,7 +316,7 @@ class ConcreteElement(var qname: QName)
       } else {
         val list = _attributes
         list.clear()
-        // `for (i ← 0 until size)` is inefficient and shows in the profiler
+        // `for (i <- 0 until size)` is inefficient and shows in the profiler
         var i = 0
         while (i < size) {
           val attributeName = attributes.getQName(i)
@@ -388,14 +388,14 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case pi: ProcessingInstruction ⇒
+        case pi: ProcessingInstruction =>
           if (target == pi.getName)
             return pi
-        case _ ⇒
+        case _ =>
       }
       i += 1
     }
@@ -471,17 +471,17 @@ class ConcreteElement(var qname: QName)
   }
 
   override def add(node: Node) = node match {
-    case n: Attribute ⇒ add(n)
-    case n: Text      ⇒ add(n)
-    case n: Namespace ⇒ add(n)
-    case n            ⇒ super.add(n)
+    case n: Attribute => add(n)
+    case n: Text      => add(n)
+    case n: Namespace => add(n)
+    case n            => super.add(n)
   }
 
   override def remove(node: Node): Boolean = node match {
-    case n: Attribute ⇒ remove(n)
-    case n: Text      ⇒ remove(n)
-    case n: Namespace ⇒ remove(n)
-    case n            ⇒ super.remove(n)
+    case n: Attribute => remove(n)
+    case n: Text      => remove(n)
+    case n: Namespace => remove(n)
+    case n            => super.remove(n)
   }
 
   def add(namespace: Namespace)    : Unit    = addNode(namespace)
@@ -496,8 +496,8 @@ class ConcreteElement(var qname: QName)
       val it = allContent.iterator()
       while (it.hasNext) {
         it.next() match {
-          case _: Text ⇒ it.remove()
-          case _       ⇒
+          case _: Text => it.remove()
+          case _       =>
         }
       }
     }
@@ -508,8 +508,8 @@ class ConcreteElement(var qname: QName)
 
     def getContentAsStringValue(content: Node): String =
       content match {
-        case _: Text | _: Element ⇒ content.getStringValue
-        case _ ⇒ ""
+        case _: Text | _: Element => content.getStringValue
+        case _ => ""
       }
 
     val list = internalContent
@@ -520,7 +520,7 @@ class ConcreteElement(var qname: QName)
       } else {
         val buffer = new jl.StringBuilder
 
-        // `for (i ← 0 until size)` is inefficient and shows in the profiler
+        // `for (i <- 0 until size)` is inefficient and shows in the profiler
         var i = 0
         while (i < size) {
           val node = list.get(i)
@@ -543,7 +543,7 @@ class ConcreteElement(var qname: QName)
     while (i < list.size) {
       val node = list.get(i)
       node match {
-        case text: Text ⇒
+        case text: Text =>
           if (previousText ne null) {
             previousText.setText(previousText.getText + text.getText)
             remove(text)
@@ -556,11 +556,11 @@ class ConcreteElement(var qname: QName)
               i += 1
             }
           }
-        case _ ⇒
+        case _ =>
           node match {
-            case element: Element ⇒
+            case element: Element =>
               element.normalize()
-            case _ ⇒
+            case _ =>
           }
           previousText = null
           i += 1
@@ -585,13 +585,13 @@ class ConcreteElement(var qname: QName)
 
     val size = branch.nodeCount
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       val clone =
         branch.node(i) match {
-          case elem: ConcreteElement ⇒ elem.cloneInternal
-          case node                  ⇒ node.deepCopy
+          case elem: ConcreteElement => elem.cloneInternal
+          case node                  => node.deepCopy
         }
       add(clone: Node)
       i += 1
@@ -637,8 +637,8 @@ class ConcreteElement(var qname: QName)
         while (ancestorContentIt.hasNext) {
           // ORBEON TODO: This is wrong if there are more than one mapping for a prefix in the ancestor chain, because the one closer from the root wins, and it should be the opposite.
           ancestorContentIt.next() match {
-            case namespace: Namespace ⇒ namespaceSet.add(namespace)
-            case _ ⇒
+            case namespace: Namespace => namespaceSet.add(namespace)
+            case _ =>
           }
         }
         ancestor = ancestor.getParent
@@ -692,12 +692,12 @@ class ConcreteElement(var qname: QName)
       val list = internalContent
       val size = list.size
 
-      // `for (i ← 0 until size)` is inefficient and shows in the profiler
+      // `for (i <- 0 until size)` is inefficient and shows in the profiler
       var i = 0
       while (i < size) {
         list.get(i) match {
-          case namespace: Namespace if prefix == namespace.prefix ⇒ return namespace
-          case _ ⇒
+          case namespace: Namespace if prefix == namespace.prefix => return namespace
+          case _ =>
         }
         i+= 1
       }
@@ -724,14 +724,14 @@ class ConcreteElement(var qname: QName)
       val list = internalContent
       val size = list.size
 
-      // `for (i ← 0 until size)` is inefficient and shows in the profiler
+      // `for (i <- 0 until size)` is inefficient and shows in the profiler
       var i = 0
       while (i < size) {
         list.get(i) match {
-          case namespace: Namespace ⇒
+          case namespace: Namespace =>
             if (uri == namespace.uri)
               return namespace
-          case _ ⇒
+          case _ =>
         }
         i += 1
       }
@@ -745,12 +745,12 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case namespace: Namespace if namespace != getNamespace ⇒ answer.add(namespace)
-        case _ ⇒
+        case namespace: Namespace if namespace != getNamespace => answer.add(namespace)
+        case _ =>
       }
       i += 1
     }
@@ -762,12 +762,12 @@ class ConcreteElement(var qname: QName)
     val list = internalContent
     val size = list.size
 
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       list.get(i) match {
-        case namespace: Namespace ⇒ answer.add(namespace)
-        case _ ⇒
+        case namespace: Namespace => answer.add(namespace)
+        case _ =>
       }
       i += 1
     }

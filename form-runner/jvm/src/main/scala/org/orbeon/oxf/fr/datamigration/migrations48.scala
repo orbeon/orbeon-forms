@@ -61,7 +61,7 @@ object MigrationOps48 extends MigrationOps {
       MigrationSupport.buildGridMigrations(
         outerDocument         = outerDocument,
         availableXBLBindings  = availableXBLBindings,
-        migrationsForBinding  = (doc, _) ⇒ migrationsForBinding(doc, legacyGridsOnly),
+        migrationsForBinding  = (doc, _) => migrationsForBinding(doc, legacyGridsOnly),
         updateWithBindingPath = updateWithBindingPath
       )
 
@@ -90,17 +90,17 @@ object MigrationOps48 extends MigrationOps {
     // the "old" format as well for backward compatibility.
     val migrations =
       Iterator(json) collect {
-        case JsArray(m) ⇒
+        case JsArray(m) =>
           m.iterator collect {
-            case JsObject(fields) ⇒
+            case JsObject(fields) =>
 
               val path          = fields("path").asInstanceOf[JsString].value
               val iterationName = fields("iteration-name").asInstanceOf[JsString].value
 
               Migration48(
                 path.splitTo[List]("/") map {
-                  case PathElem.TrimPathElementRE(p) ⇒ PathElem(p)
-                  case name                          ⇒ throw new IllegalArgumentException(s"invalid migration name: `$name`")
+                  case PathElem.TrimPathElementRE(p) => PathElem(p)
+                  case name                          => throw new IllegalArgumentException(s"invalid migration name: `$name`")
                 },
                 PathElem(iterationName)
               )
@@ -110,7 +110,7 @@ object MigrationOps48 extends MigrationOps {
     MigrationSet48(migrations.flatten.to(List))
   }
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult = {
@@ -118,21 +118,22 @@ object MigrationOps48 extends MigrationOps {
     var result: MigrationResult = MigrationResult.None
 
     partitionNodes(dataRootElem, migrationSet.migrations) foreach {
-      case (_, Nil, _, _) ⇒
+      case (_, Nil, _, _) =>
         // This can happen if data is pruned
         // https://github.com/orbeon/orbeon-forms/issues/3172
-      case (_, container :: tail, _, _) ⇒
+      case (_, container :: tail, _, _) =>
         //assert(tail.isEmpty)
 
         result = MigrationResult.Some
 
         val contentForEachIteration =
-          (container / * toList) map (iteration ⇒ (iteration /@ @*) ++ (iteration / Node) toList) // force
+          (container / * toList) map (iteration => (iteration /@ @*) ++ (iteration / Node) toList) // force
 
         insert(
-          after      = container,
-          origin     = contentForEachIteration map (elementInfo(container.name, _)),
-          doDispatch = false
+          after                             = container,
+          origin                            = contentForEachIteration map (elementInfo(container.name, _, removeInstanceDataFromClonedNodes = false)),
+          doDispatch                        = false,
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4519
         )
 
         delete(
@@ -144,18 +145,18 @@ object MigrationOps48 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet48
   ): MigrationResult =
   partitionNodes(dataRootElem, migrationSet.migrations) match {
-    case Nil ⇒ MigrationResult.None
-    case partitioned ⇒
+    case Nil => MigrationResult.None
+    case partitioned =>
       partitioned foreach {
-        case (parentNode, iterations, repeatName, iterationElem) ⇒
+        case (parentNode, iterations, repeatName, iterationElem) =>
 
           iterations match {
-            case Nil ⇒
+            case Nil =>
               // Issue: we don't know, based just on the migration map, where to insert container elements to
               // follow bind order. This is not a new problem as we don't enforce order, see:
               //
@@ -170,10 +171,10 @@ object MigrationOps48 extends MigrationOps {
                 origin     = elementInfo(repeatName, Nil),
                 doDispatch = false
               )
-            case its ⇒
+            case its =>
 
               val contentForEachIteration =
-                its map (iteration ⇒ (iteration /@ @*) ++ (iteration / Node) toList) // force
+                its map (iteration => (iteration /@ @*) ++ (iteration / Node) toList) // force
 
               delete(its.head /@ @*,  doDispatch = false)
               delete(its.head / Node, doDispatch = false)
@@ -205,7 +206,7 @@ object MigrationOps48 extends MigrationOps {
     val migrations = migrationsForBinding(outerDocument, legacyGridsOnly = true)
 
     migrations foreach {
-      case Migration48(containerPath, iterationElem) ⇒
+      case Migration48(containerPath, iterationElem) =>
 
         val containerName = containerPath.last.value // `.last` as is never empty (`NEL`)
         val iterationName = iterationElem.value
@@ -233,7 +234,7 @@ object MigrationOps48 extends MigrationOps {
         )
     }
 
-    // Q: Should we migrate `repeat="true"` → `repeat="content"` here?
+    // Q: Should we migrate `repeat="true"` -> `repeat="content"` here?
 
     MigrationResult(migrations.nonEmpty)
   }
@@ -248,7 +249,7 @@ object MigrationOps48 extends MigrationOps {
     migrationSet : MigrationSet48,
     path         : List[PathElem]
   ): Option[List[PathElem]] =
-    (migrationSet.migrations exists (m ⇒ path.startsWith(m.containerPath))) option {
+    (migrationSet.migrations exists (m => path.startsWith(m.containerPath))) option {
       path.dropRight(2) ::: path.last :: Nil
     }
 
@@ -264,10 +265,10 @@ object MigrationOps48 extends MigrationOps {
 
     def migrationsForBinding(doc: DocumentInfo, legacyGridsOnly: Boolean): Seq[Migration48] =
       for {
-        gridElem               ← if (legacyGridsOnly) findLegacyRepeatedGrids(doc) else findAllGrids(doc, repeat = true)
+        gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids(doc) else findAllGrids(doc, repeat = true)
         gridName               = getControlName(gridElem)
         iterationName          = gridRepeatIterationName(gridElem)
-        BindPath(_, pathElems) ← findBindAndPathStatically(doc, gridName)
+        BindPath(_, pathElems) <- findBindAndPathStatically(doc, gridName)
       } yield
         Migration48(pathElems, PathElem(iterationName))
 
@@ -276,7 +277,7 @@ object MigrationOps48 extends MigrationOps {
       migration    : List[Migration48]
     ): List[(NodeInfo, List[NodeInfo], String, PathElem)] =
       migration flatMap {
-        case Migration48(containerPath, iterationElem) ⇒
+        case Migration48(containerPath, iterationElem) =>
 
           val (pathToParentNodes, pathToChildNodes) =
             (containerPath.init map (_.value) mkString "/", containerPath.last.value)
@@ -284,13 +285,13 @@ object MigrationOps48 extends MigrationOps {
           // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
           val parentNodes =
             scaxon.XPath.eval(dataRootElem, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
-            case node: NodeInfo ⇒ node
+            case node: NodeInfo => node
           }
 
-          parentNodes map { parentNode ⇒
+          parentNodes map { parentNode =>
 
             val nodes = scaxon.XPath.eval(parentNode, pathToChildNodes) collect {
-              case node: NodeInfo ⇒ node
+              case node: NodeInfo => node
             }
 
             // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which

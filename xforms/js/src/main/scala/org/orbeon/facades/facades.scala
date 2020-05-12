@@ -13,11 +13,13 @@
   */
 package org.orbeon.facades
 
+import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.dom.raw.HTMLLinkElement
 
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
-
+import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
 
 @js.native
 trait Mousetrap extends js.Object {
@@ -37,6 +39,34 @@ object Bowser extends js.Object {
   val msedge  : js.UndefOr[Boolean] = js.native
   val ios     : js.UndefOr[Boolean] = js.native
   val mobile  : js.UndefOr[Boolean] = js.native
-  val version : String  = js.native
-  val name    : String  = js.native
+  val version : String              = js.native
+  val name    : String              = js.native
+}
+
+object HTMLFacades {
+
+  implicit class HTMLLinkElementOps(private val link: HTMLLinkElement) extends AnyVal {
+    def onloadF: Future[Unit] = {
+      val promise = Promise[Unit]()
+      link.asInstanceOf[js.Dynamic].onload = () => promise.success(())
+      promise.future
+    }
+  }
+}
+
+@JSGlobalScope
+@js.native
+private object ResizeObserverGlobalScope extends js.Object {
+  val ResizeObserver: js.UndefOr[js.Any] = js.native
+}
+
+object ResizeObserver {
+  def isDefined: Boolean = ResizeObserverGlobalScope.ResizeObserver.isDefined
+}
+
+@js.native
+@JSGlobal
+class ResizeObserver(observer: js.Function0[Unit]) extends js.Object {
+  def observe  (element: dom.Element): Unit = js.native
+  def unobserve(element: dom.Element): Unit = js.native
 }

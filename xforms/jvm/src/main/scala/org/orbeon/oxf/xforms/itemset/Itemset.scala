@@ -13,46 +13,54 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import XFormsItemUtils.isSelected
-import collection.JavaConverters._
-import java.lang.{Iterable ⇒ JIterable}
-import org.orbeon.dom.Namespace
-import org.orbeon.dom.QName
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport.isSelected
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.Configuration
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder
+import org.orbeon.saxon.{Configuration, om}
 import org.xml.sax.SAXException
 
-/**
- * Represents an itemset.
- */
-class Itemset(multiple: Boolean) extends ItemContainer {
+
+trait ItemsetListener {
+  def startLevel(itemNode: ItemNode)
+  def endLevel()
+  def startItem(itemNode: ItemNode, first: Boolean)
+  def endItem(itemNode: ItemNode)
+}
+
+class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer {
 
   import Itemset._
 
-  // All of this itemset's selected items based on the given instance value
-  def jSelectedItems(value: String): JIterable[Item] =
-    selectedItems(value).asJava
-
-  // TODO: Not used by XFormsSelect1Control, why?
-  def selectedItems(value: String): List[Item] =
-    allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList
+  def iterateSelectedItems(
+    dataValue                  : Item.Value[om.NodeInfo],
+    compareAtt                 : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes : Boolean
+  ): Iterator[Item.ValueNode] =
+    allItemsWithValueIterator(reverse = false) collect {
+      case (item, itemValue) if isSelected(multiple, dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes) => item
+    }
 
   // Return the list of items as a JSON tree with hierarchical information
-  def asJSON(controlValue: String, encode: Boolean, locationData: LocationData): String = {
+  def asJSON(
+    controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
+    encode                     : Boolean,
+    excludeWhitespaceTextNodes : Boolean,
+    locationData               : LocationData
+  ): String = {
+
     val sb = new StringBuilder
     // Array of top-level items
     sb.append("[")
     try {
-      visit(null, new ItemsetListener[AnyRef] {
+      visit(new ItemsetListener {
 
-        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
+        def startItem(itemNode: ItemNode, first: Boolean): Unit = {
           if (! first)
             sb.append(',')
 
@@ -61,27 +69,35 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
           // Item LHH and value
           sb.append(""""label":"""")
-          sb.append(item.javaScriptLabel(locationData))
-          item.javaScriptHelp(locationData) foreach { h ⇒
-            sb.append("""","help":"""")
-            sb.append(h)
-          }
-          item.javaScriptHint(locationData) foreach { h ⇒
-            sb.append("""","hint":"""")
-            sb.append(h)
-          }
-          sb.append("""","value":"""")
-          sb.append(item.javaScriptValue(encode))
+          sb.append(itemNode.javaScriptLabel(locationData))
           sb.append('"')
 
+          itemNode match {
+            case item: Item.ValueNode =>
+              item.javaScriptHelp(locationData) foreach { h =>
+                sb.append(""","help":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              item.javaScriptHint(locationData) foreach { h =>
+                sb.append(""","hint":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              sb.append(""","value":"""")
+              sb.append(item.javaScriptValue(encode))
+              sb.append('"')
+            case _ =>
+          }
+
           // Item attributes if any
-          val attributes = item.attributes
+          val attributes = itemNode.attributes
           if (attributes.nonEmpty) {
             sb.append(""","attributes":{""")
 
             val nameValues =
               for {
-                (name, value) ← attributes
+                (name, value) <- attributes
                 escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
                 escapedValue  = XFormsUtils.escapeJavaScript(value)
               } yield
@@ -93,33 +109,32 @@ class Itemset(multiple: Boolean) extends ItemContainer {
           }
 
           // Handle selection
-          val itemValue = Option(item.value) getOrElse ""
-          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
-
-          if (itemSelected) {
-            sb.append(""","selected":""")
-            sb.append(itemSelected.toString)
+          itemNode match {
+            case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) =>
+              isSelected(multiple, dataValue, item.value, compareAtt, excludeWhitespaceTextNodes)
+            } => sb.append(""","selected":true""")
+            case _ =>
           }
 
           // Start array of children items
-          if (item.hasChildren)
+          if (itemNode.hasChildren)
             sb.append(""","children":[""")
         }
 
-        def endItem(o: AnyRef, item: Item): Unit = {
+        def endItem(itemNode: ItemNode): Unit = {
           // End array of children items
-          if (item.hasChildren)
+          if (itemNode.hasChildren)
             sb.append(']')
 
           // End object
           sb.append("}")
         }
 
-        def startLevel(o: AnyRef, item: Item) = ()
-        def endLevel(o: AnyRef) = ()
+        def startLevel(itemNode: ItemNode): Unit = ()
+        def endLevel(): Unit = ()
       })
     } catch {
-      case e: SAXException ⇒
+      case e: SAXException =>
         throw new ValidationException("Error while creating itemset tree", e, locationData)
     }
     sb.append("]")
@@ -128,63 +143,79 @@ class Itemset(multiple: Boolean) extends ItemContainer {
   }
 
   // Return the list of items as an XML tree
-  def asXML(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
+  def asXML(
+    configuration              : Configuration,
+    controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
+    excludeWhitespaceTextNodes : Boolean,
+    locationData               : LocationData
+  ): DocumentInfo = {
+
     val treeBuilder = new TinyBuilder
     val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
     identity.setResult(treeBuilder)
-    val ch = new XMLReceiverHelper(identity)
 
-    ch.startDocument()
-    ch.startElement("itemset")
-    if (hasChildren) {
-      visit(null, new ItemsetListener[AnyRef] {
-        def startLevel(o: AnyRef, item: Item): Unit =
-          ch.startElement("choices")
+    implicit val xmlReceiver: XMLReceiver = identity
 
-        def endLevel(o: AnyRef): Unit =
-          ch.endElement()
+    withDocument {
+      withElement("itemset") {
+        if (hasChildren) {
+          visit(new ItemsetListener {
 
-        def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
-          val itemValue = Option(item.value) getOrElse ""
-          val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
+            def startLevel(itemNode: ItemNode): Unit =
+              openElement("choices")
 
-          val itemAttributes =
-            if (itemSelected)
-              Array("selected", "true")
-            else
-              Array[String]()
+            def endLevel(): Unit =
+              closeElement("choices")
 
-          // TODO: Item attributes if any
+            def startItem(itemNode: ItemNode, first: Boolean): Unit = {
 
-          ch.startElement("item", itemAttributes)
+              val itemAttributes =
+                itemNode match {
+                  case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) =>
+                    isSelected(multiple, dataValue, item.value, compareAtt, excludeWhitespaceTextNodes)
+                  } =>
+                    List("selected" -> "true")
+                  case _ =>
+                    Nil
+                }
 
-          ch.startElement("label")
-          item.label.streamAsHTML(ch, locationData)
-          ch.endElement()
+              // TODO: Item attributes if any
 
-          item.help foreach { h ⇒
-            ch.startElement("help")
-            h.streamAsHTML(ch, locationData)
-            ch.endElement()
-          }
+              openElement("item", atts = itemAttributes)
 
-          item.hint foreach { h ⇒
-            ch.startElement("hint")
-            h.streamAsHTML(ch, locationData)
-            ch.endElement()
-          }
+              withElement("label") {
+                itemNode.label.streamAsHTML(locationData)
+              }
 
-          ch.startElement("value")
-          ch.text(itemValue)
-          ch.endElement()
+              itemNode match {
+                case item: Item.ValueNode =>
+                  item.help foreach { h =>
+                    withElement("help") {
+                      h.streamAsHTML(locationData)
+                    }
+                  }
+
+                  item.hint foreach { h =>
+                    withElement("hint") {
+                      h.streamAsHTML(locationData)
+                    }
+                  }
+
+                  val itemExternalValue = item.externalValue(encode = false)
+                  withElement("value") {
+                    if (itemExternalValue.nonEmpty)
+                      text(itemExternalValue)
+                  }
+                case _ =>
+              }
+            }
+
+            def endItem(itemNode: ItemNode): Unit =
+              closeElement("item")
+          })
         }
-
-        def endItem(o: AnyRef, item: Item): Unit =
-          ch.endElement()
-      })
+      }
     }
-    ch.endElement()
-    ch.endDocument()
 
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }

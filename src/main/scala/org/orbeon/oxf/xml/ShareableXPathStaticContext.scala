@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xml
 
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 import javax.xml.transform.{Source, SourceLocator}
 
 import org.orbeon.oxf.util.XPath._

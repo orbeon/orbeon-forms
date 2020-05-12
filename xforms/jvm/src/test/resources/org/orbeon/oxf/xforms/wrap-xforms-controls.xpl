@@ -80,9 +80,9 @@
                 <!-- Swallow item templates -->
                 <xsl:template match="xh:span[p:classes() = 'xforms-template']"/>
 
-                <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
+                <!-- Keep controls, LHHA, and elements with MIP classes like repeat/group elements in tables
                      Also keep content of elements with class xxforms-test-preserve-content and content of repeats. -->
-                <xsl:template match="xh:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
+                <xsl:template match="xh:*[p:classes() = ('xforms-control', 'xforms-label',
                                         'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-group', 'xforms-switch', 'xforms-group-begin-end',
                                         'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content',
                                         'xforms-repeat-begin-end', 'xforms-repeat-delimiter', 'xforms-repeat-selected-item-1', 'xforms-repeat-selected-item-2',

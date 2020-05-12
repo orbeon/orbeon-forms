@@ -34,17 +34,17 @@ object Transform {
   case class   InlineReadDocument(path: String, doc: Document, lastModified: Long) extends ReadDocument
 
   def lastModifiedByPath(path: String)(implicit logger: IndentedLogger): Long = {
-    debug("checking last modified", List("path" → path))
+    debug("checking last modified", List("path" -> path))
     rm.lastModified(path, true)
   }
 
   def existsByPath(path: String)(implicit logger: IndentedLogger): Boolean = {
-    debug("checking existence", List("path" → path))
+    debug("checking existence", List("path" -> path))
     rm.exists(path)
   }
 
   def contentAsDOM4J(path: String)(implicit logger: IndentedLogger): Document = {
-    debug("reading content", List("path" → path))
+    debug("reading content", List("path" -> path))
     rm.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
   }
 
@@ -59,7 +59,7 @@ object Transform {
     val (pipeline, domSerializerData) = createTransformPipeline(transform, data, transformQName)
 
     // Run the transformation
-    withPipelineContext { newPipelineContext ⇒
+    withPipelineContext { newPipelineContext =>
       pipeline.reset(newPipelineContext)
       domSerializerData.runGetDocument(newPipelineContext)
     }
@@ -137,7 +137,7 @@ object Transform {
     PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
 
     // Run the transformation
-    withPipelineContext { newPipelineContext ⇒
+    withPipelineContext { newPipelineContext =>
       pipeline.reset(newPipelineContext)
       domSerializerData.runGetDocument(newPipelineContext)
     }
@@ -149,8 +149,8 @@ object Transform {
 
     def normalizeReadDocument(doc: ReadDocument)(implicit logger: IndentedLogger): InlineReadDocument =
       doc match {
-        case FileReadDocument(path) ⇒ InlineReadDocument(path, contentAsDOM4J(path), lastModifiedByPath(path))
-        case d: InlineReadDocument  ⇒ d
+        case FileReadDocument(path) => InlineReadDocument(path, contentAsDOM4J(path), lastModifiedByPath(path))
+        case d: InlineReadDocument  => d
       }
 
     def createDomGenerator(doc: InlineReadDocument, name: String) =

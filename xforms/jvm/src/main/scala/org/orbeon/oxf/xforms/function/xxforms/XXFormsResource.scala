@@ -40,38 +40,38 @@ class XXFormsResource extends XFormsFunction {
 
     val resourceKeyArgument = stringArgument(0)
     val instanceArgumentOpt = stringArgumentOpt(1)
-    val templateParamsOpt   = itemsArgumentOpt(2) map (it ⇒ MapFunctions.collectMapValues(it.iterator).next())
+    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it.iterator).next())
 
     def findInstance = instanceArgumentOpt match {
-      case Some(instanceName) ⇒ resolveOrFindByStaticOrAbsoluteId(instanceName)
-      case None               ⇒ resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
+      case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
+      case None               => resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
     }
 
-    def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
+    def findResourcesElement = findInstance collect { case instance: XFormsInstance => instance.rootElement }
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
-        case Some(params) ⇒
+        case Some(params) =>
 
           val javaNamedParamsIt = params.iterator map {
-            case (key, value) ⇒
+            case (key, value) =>
               val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
-              key.getStringValue → javaParamOpt.orNull
+              key.getStringValue -> javaParamOpt.orNull
           }
 
           ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
 
-        case None ⇒
+        case None =>
           resourceOrTemplate
       }
 
     val resultOpt =
       for {
-        elementAnalysis ← elementAnalysisForSource
-        resources       ← findResourcesElement
-        requestedLang   ← XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
-        resourceRoot    ← findResourceElementForLang(resources, requestedLang)
-        leaf            ← pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
+        elementAnalysis <- elementAnalysisForSource
+        resources       <- findResourcesElement
+        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
+        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
+        leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
       } yield
         stringToStringValue(processResourceString(leaf.stringValue))
 
@@ -114,17 +114,17 @@ object XXFormsResource {
       @tailrec
       def findChild(parents: List[NodeInfo], tokens: List[String]): List[NodeInfo] =
         tokens match {
-          case Nil ⇒ parents
-          case token :: restTokens ⇒
+          case Nil => parents
+          case token :: restTokens =>
             parents match {
-              case Nil ⇒ Nil
-              case parents ⇒
+              case Nil => Nil
+              case parents =>
                 token match {
-                  case IndexRegex(index) ⇒
+                  case IndexRegex(index) =>
                     findChild(List(parents(index.toInt)), restTokens)
-                  case path if Name10Checker.getInstance.isValidNCName(token) ⇒
+                  case path if Name10Checker.getInstance.isValidNCName(token) =>
                     findChild(parents / token toList, restTokens)
-                  case _ ⇒
+                  case _ =>
                     throw new IllegalArgumentException(s"invalid resource path `${tokens mkString "."}`")
                 }
             }
@@ -151,9 +151,9 @@ object XXFormsResource {
     // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
     // function must work in either case, readonly and readwrite.
     val resourcePath = arguments.head match {
-      case s: StringLiteral ⇒
+      case s: StringLiteral =>
         flattenResourceName(s.getStringValue) // this removes the indexes if any
-      case _ ⇒
+      case _ =>
         pathMap.setInvalidated(true)
         return null
     }
@@ -182,7 +182,7 @@ object XXFormsResource {
       var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newInstanceExpression))
 
       // Add path elements to pathmap
-      "resource" :: resourcePath foreach { name ⇒
+      "resource" :: resourcePath foreach { name =>
         val test = new NameTest(Type.ELEMENT, "", name, namePool)
         target = new AxisExpression(Axis.CHILD, test).addToPathMap(pathMap, target)
       }

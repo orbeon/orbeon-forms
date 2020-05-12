@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
@@ -41,7 +41,7 @@ object Number {
   private def newXBLCompanion: XBLCompanion =
     new XBLCompanionWithState {
 
-      companion ⇒
+      companion =>
 
       import Private._
       import io.circe.generic.auto._
@@ -62,12 +62,12 @@ object Number {
 
         // Switch the input type after cleaning up the value for edition
         $(companion.visibleInputElem).on(s"${EventNames.TouchStart}$ListenerSuffix ${EventNames.FocusIn}$ListenerSuffix", {
-          (bound: html.Element, e: JQueryEventObject) ⇒ {
+          (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
             // Don't set value if not needed, so not to unnecessarily disturb the cursor position
-            stateOpt foreach { state ⇒
+            stateOpt foreach { state =>
               if (companion.visibleInputElem.value != state.editValue)
                 companion.visibleInputElem.value = state.editValue
             }
@@ -78,7 +78,7 @@ object Number {
 
         // Restore input type, send the value to the server, and updates value after server response
         $(companion.visibleInputElem).on(s"${EventNames.FocusOut}$ListenerSuffix", {
-          (bound: html.Element, e: JQueryEventObject) ⇒ {
+          (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
@@ -101,20 +101,20 @@ object Number {
             // edit value hasn't changed.
             //
             val formId = $(containerElem).parents("form").attr("id").get
-            AjaxClient.ajaxResponseProcessedForCurrentEventQueueF(formId) foreach { _ ⇒
+            AjaxClient.allEventsProcessedF("number") foreach { _ =>
               updateVisibleValue()
             }
           }
         }: js.ThisFunction)
 
         $(companion.visibleInputElem).on(s"${EventNames.KeyPress}$ListenerSuffix", {
-          (_: html.Element, e: JQueryEventObject) ⇒ {
+          (_: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
             if (Set(10, 13)(e.which)) {
               updateStateAndSendValueToServer()
-              AjaxEvent.dispatchEvent(
+              AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName = EventNames.DOMActivate,
                   targetId  = containerElem.id
@@ -132,7 +132,7 @@ object Number {
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
         scribe.debug(s"xformsUpdateReadonly: $readonly")
-        companion.visibleInputElem.disabled = readonly
+        updateReadonly(readonly)
       }
 
       override def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
@@ -145,7 +145,7 @@ object Number {
 
         // Also update disabled because this might be called upon an iteration being moved, in which
         // case all the control properties must be updated.
-        visibleInputElem.disabled = $(containerElem).hasClass("xforms-readonly")
+        updateReadonly($(containerElem).hasClass("xforms-readonly"))
       }
 
       override def xformsFocus(): Unit = {
@@ -160,8 +160,14 @@ object Number {
         private val hasToLocaleString =
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
+        def updateReadonly(readonly: Boolean): Unit =
+          if (readonly)
+            companion.visibleInputElem.setAttribute("readonly", "readonly")
+          else
+            companion.visibleInputElem.removeAttribute("readonly")
+
         def updateStateAndSendValueToServer(): Unit =
-          stateOpt foreach { state ⇒
+          stateOpt foreach { state =>
 
             val visibleInputElemValue = companion.visibleInputElem.value
 
@@ -179,7 +185,7 @@ object Number {
 
           val hasFocus = companion.visibleInputElem eq dom.document.activeElement
 
-          stateOpt foreach { state ⇒
+          stateOpt foreach { state =>
             companion.visibleInputElem.value =
               if (hasFocus)
                 state.editValue
@@ -196,8 +202,8 @@ object Number {
               TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
 
           val changeType =
-            $("body").is(".xforms-mobile") &&
-              companion.stateOpt.exists(state ⇒ hasNativeDecimalSeparator(state.decimalSeparator))
+            dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
+              companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
 
           if (changeType) {
             // With Firefox, changing the type synchronously interferes with the focus

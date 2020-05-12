@@ -37,7 +37,7 @@ trait SearchRequest {
       Logger.logDebug("search request", TransformerUtils.tinyTreeToString(searchDocument))
 
     httpRequest.getRequestPath match {
-      case SearchPath(provider, app, form) ⇒
+      case SearchPath(provider, app, form) =>
 
         val searchElement   = searchDocument.rootElement
         val queryEls        = searchElement.child("query").toList
@@ -65,39 +65,48 @@ trait SearchRequest {
             queryEls
               // First is for free text search
               .drop(1)
-              .map(c ⇒
+              .map { c =>
+                val filterOpt = trimAllToOpt(c.stringValue)
                 Column(
                   // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
                   path       = c.attValue("path").replaceAllLiterally("[1]", ""),
-                  filterWith = trimAllToOpt(c.stringValue)
+                  filterType  = filterOpt match {
+                    case None => FilterType.None
+                    case Some(filter) =>
+                      c.attValue("control") match {
+                        case "input" | "textarea" => FilterType.Substring(filter)
+                        case "select"             => FilterType.Token(filter.splitTo[List]())
+                        case _                    => FilterType.Exact(filter)
+                      }
+                  }
                 )
-              ),
+              },
           drafts         =
             username match {
-              case None ⇒
+              case None =>
                 ExcludeDrafts
-              case Some(_) ⇒
+              case Some(_) =>
                 draftsElOpt match {
-                  case None ⇒
+                  case None =>
                     IncludeDrafts
-                  case Some(draftsEl) ⇒
+                  case Some(draftsEl) =>
                     draftsEl.stringValue match {
-                      case "exclude" ⇒ ExcludeDrafts
-                      case "include" ⇒ IncludeDrafts
-                      case "only"    ⇒ OnlyDrafts(
+                      case "exclude" => ExcludeDrafts
+                      case "include" => IncludeDrafts
+                      case "only"    => OnlyDrafts(
                         draftsEl.attValueOpt("for-document-id") match {
-                          case Some(documentId) ⇒ DraftsForDocumentId(documentId)
-                          case None ⇒
+                          case Some(documentId) => DraftsForDocumentId(documentId)
+                          case None =>
                             draftsEl.attValueOpt("for-never-saved-document") match {
-                              case Some(_) ⇒ DraftsForNeverSavedDocs
-                              case None    ⇒ AllDrafts
+                              case Some(_) => DraftsForNeverSavedDocs
+                              case None    => AllDrafts
                             }
                         }
                       )
                     }
                 }
             },
-          anyOfOperations = operationsElOpt.map { operationsEl ⇒
+          anyOfOperations = operationsElOpt.map { operationsEl =>
             val operations: List[String] = operationsEl.attValue("any-of").splitTo[List]()
             operations.map(Operation.withName)
           }

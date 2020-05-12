@@ -62,19 +62,19 @@ class RollbackTest
       )
     )
 
-    for ((desc, process, expected, saveStatus) ← Expected)
+    for ((desc, process, expected, saveStatus) <- Expected)
       it(desc) {
 
         val (processorService, docOpt, _) =
           runFormRunner("tests", "process-rollback", "new", document = "", initialize = true)
 
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, docOpt.get) {
 
             XFormsAPI.dispatch(
               name       = "my-run-process",
               targetId   = Names.FormModel,
-              properties = Map("process" → Some(process))
+              properties = Map("process" -> Some(process))
             )
 
             assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, formInstance.root)

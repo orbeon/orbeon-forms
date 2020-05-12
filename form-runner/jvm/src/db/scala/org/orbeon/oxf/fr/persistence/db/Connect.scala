@@ -34,18 +34,18 @@ private[persistence] object Connect {
 
   def withOrbeonTables[T]
     (message: String)
-    (block: (java.sql.Connection, Provider) ⇒ T)
+    (block: (java.sql.Connection, Provider) => T)
     (implicit logger: IndentedLogger)
   : Unit = {
     Logging.withDebug(message) {
-      ProvidersTestedAutomatically.foreach { provider ⇒
-        Logging.withDebug("on database", List("provider" → provider.entryName)) {
-          Connect.withNewDatabase(provider) { connection ⇒
+      ProvidersTestedAutomatically.foreach { provider =>
+        Logging.withDebug("on database", List("provider" -> provider.entryName)) {
+          Connect.withNewDatabase(provider) { connection =>
             val statement = connection.createStatement
             // Create tables
             val sql = provider match {
-              case MySQL      ⇒ "mysql-2019_1.sql"
-              case PostgreSQL ⇒ "postgresql-2017_2.sql"
+              case MySQL      => "mysql-2019_1.sql"
+              case PostgreSQL => "postgresql-2017_2.sql"
             }
             val createDDL = SQL.read(sql)
             Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
@@ -58,22 +58,22 @@ private[persistence] object Connect {
 
   def withNewDatabase[T]
     (provider: Provider)
-    (block: Connection ⇒ T)
+    (block: Connection => T)
     (implicit logger: IndentedLogger)
   : T = {
 
     val datasourceDescriptor = DatasourceDescriptor(provider)
 
-    def logRunDocker[U](body: ⇒ U): U =
+    def logRunDocker[U](body: => U): U =
       Logging.withDebug("run Docker and wait for connection")(body)
 
     try {
 
-      withConnection(datasourceDescriptor) { connection ⇒
+      withConnection(datasourceDescriptor) { connection =>
 
         val createUser: PartialFunction[Provider, Unit] = {
-          case MySQL      ⇒ runStatements(connection, List("CREATE DATABASE orbeon"))
-          case PostgreSQL ⇒ runStatements(connection, List("CREATE SCHEMA   orbeon"))
+          case MySQL      => runStatements(connection, List("CREATE DATABASE orbeon"))
+          case PostgreSQL => runStatements(connection, List("CREATE SCHEMA   orbeon"))
         }
 
         if (createUser.isDefinedAt(provider)) {
@@ -89,8 +89,8 @@ private[persistence] object Connect {
     } finally {
       Logging.withDebug("drop `orbeon` objects") {
         provider match {
-          case MySQL      ⇒ runStatements(datasourceDescriptor, List("DROP DATABASE orbeon"))
-          case PostgreSQL ⇒ runStatements(datasourceDescriptor, List("DROP SCHEMA   orbeon    CASCADE"))
+          case MySQL      => runStatements(datasourceDescriptor, List("DROP DATABASE orbeon"))
+          case PostgreSQL => runStatements(datasourceDescriptor, List("DROP SCHEMA   orbeon    CASCADE"))
         }
       }
     }
@@ -103,7 +103,7 @@ private[persistence] object Connect {
   }
 
   private def waitUntilCanConnect(datasourceDescriptor: DatasourceDescriptor): Unit = {
-    def tryConnecting() = Try(withConnection(datasourceDescriptor)(_ ⇒ Unit))
+    def tryConnecting() = Try(withConnection(datasourceDescriptor)(_ => Unit))
     while (tryConnecting().isFailure) Thread.sleep(100)
   }
 
@@ -111,7 +111,7 @@ private[persistence] object Connect {
     datasourceDescriptor: DatasourceDescriptor,
     statements: List[String])
   : Unit = {
-    withConnection(datasourceDescriptor) { connection ⇒
+    withConnection(datasourceDescriptor) { connection =>
       statements.foreach(connection.createStatement.executeUpdate)
     }
   }
@@ -126,7 +126,7 @@ private[persistence] object Connect {
 
   private def withConnection[T](
     datasourceDescriptor : DatasourceDescriptor)(
-    block                : Connection ⇒ T)
+    block                : Connection => T)
   : T =
   {
     DataSourceSupport.withDatasources(List(datasourceDescriptor)) {
@@ -141,17 +141,17 @@ private[persistence] object Connect {
 
   def getTableNames(provider: Provider, connection: Connection): List[String] = {
     val query = provider match {
-      case MySQL ⇒
+      case MySQL =>
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'
           |       AND table_schema = DATABASE()"""
-      case PostgreSQL ⇒
+      case PostgreSQL =>
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
     }
-    useAndClose(connection.createStatement.executeQuery(query.stripMargin)) { tableNameResultSet ⇒
+    useAndClose(connection.createStatement.executeQuery(query.stripMargin)) { tableNameResultSet =>
       val tableNamesList = Iterator
         .iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1))
         .toList

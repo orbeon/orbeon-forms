@@ -54,7 +54,7 @@ trait ProxyPortletEdit extends GenericPortlet {
       <label>{pref.nameLabel.label}
         <select name={pref.nameLabel.name}>
           {
-            for (nameLabel ← nameLabels) yield {
+            for (nameLabel <- nameLabels) yield {
               val template = <option value={nameLabel.name} selected="selected">{nameLabel.label}</option>
               if (value == nameLabel.name) template else template.copy(attributes = template.attributes.remove("selected"))
             }
@@ -120,7 +120,7 @@ trait ProxyPortletEdit extends GenericPortlet {
             <fieldset>
               <legend>Form Runner Portlet Settings</legend>
               {
-                for (pref ← AllPreferences) yield
+                for (pref <- AllPreferences) yield
                   pref.tpe.render(pref, getPreference(request, pref))
               }
               <hr/>
@@ -137,15 +137,15 @@ trait ProxyPortletEdit extends GenericPortlet {
   def doEditAction(request: ActionRequest, response: ActionResponse): Unit =
     withRootException("view action", new PortletException(_)) {
       request.getParameter("save") match {
-        case "save" ⇒
+        case "save" =>
           def setPreference(pref: Pref, value: String) =
             request.getPreferences.setValue(pref.nameLabel.name, value)
 
-          for (pref ← AllPreferences)
+          for (pref <- AllPreferences)
             setPreference(pref, request.getParameter(pref.nameLabel.name))
 
           request.getPreferences.store()
-        case _ ⇒
+        case _ =>
       }
 
       // Go back to view mode

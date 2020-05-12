@@ -91,10 +91,10 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
       </xbl:xbl>
 
     val Docs = Map(
-      "/xbl/orbeon/foo/foo.xbl"   → FooXBL,
-      "/xbl/orbeon/bar/bar.xbl"   → BarXBL,
-      "/xbl/orbeon/baz/baz.xbl"   → BazXBL,
-      "/xbl/orbeon/gaga/gaga.xbl" → GagaXBL
+      "/xbl/orbeon/foo/foo.xbl"   -> FooXBL,
+      "/xbl/orbeon/bar/bar.xbl"   -> BarXBL,
+      "/xbl/orbeon/baz/baz.xbl"   -> BazXBL,
+      "/xbl/orbeon/gaga/gaga.xbl" -> GagaXBL
     )
 
     def getPropertySet = propertySet

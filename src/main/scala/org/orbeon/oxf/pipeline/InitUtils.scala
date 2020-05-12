@@ -45,7 +45,7 @@ object InitUtils {
   private val DefaultProcessors            = "oxf:/processors.xml"
 
   // Run with a pipeline context and destroy the pipeline when done
-  def withPipelineContext[T](body: PipelineContext ⇒ T): T = {
+  def withPipelineContext[T](body: PipelineContext => T): T = {
     var success = false
     val pipelineContext = new PipelineContext
     try {
@@ -84,20 +84,20 @@ object InitUtils {
       processor.start(pipelineContext)
       success = true
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         def locationData    = getRootLocationData(t)
         def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
 
         Exceptions.getRootThrowable(t) match {
-          case e: HttpStatusCodeException ⇒
+          case e: HttpStatusCodeException =>
             externalContext.getResponse.sendError(e.code)
             logger.info(e.toString + " " + locationMessage)
             if (logger.isDebugEnabled)
               logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
-          case e: ResourceNotFoundException ⇒
+          case e: ResourceNotFoundException =>
             externalContext.getResponse.sendError(404)
             logger.info("Resource not found" + (Option(e.resource) map (": " + _) getOrElse "") + " " + locationMessage)
-          case _ ⇒
+          case _ =>
             throw t
         }
     } finally {
@@ -108,7 +108,7 @@ object InitUtils {
       }
       try pipelineContext.destroy(success)
       catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(t))
       }
     }
@@ -120,28 +120,28 @@ object InitUtils {
     val processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName).createInstance
 
     // Connect its inputs based on the definition
-    for ((inputName, value) ← processorDefinition.getEntries.asScala) {
+    for ((inputName, value) <- processorDefinition.getEntries.asScala) {
 
       import DOMGenerator._
       import PipelineUtils._
       import ProcessorImpl.OUTPUT_DATA
 
-      def connectInput(file: Option[String], create: (String, Long, String) ⇒ DOMGenerator) =
+      def connectInput(file: Option[String], create: (String, Long, String) => DOMGenerator) =
         connect(create("init input", ZeroValidity, file getOrElse DefaultContext), OUTPUT_DATA, processor, inputName)
 
       value match {
-        case url: String ⇒
+        case url: String =>
           val urlGenerator = createURLGenerator(url)
           connect(urlGenerator, OUTPUT_DATA, processor, inputName)
-        case element: Element ⇒
+        case element: Element =>
           val locationData = ProcessorUtils.getElementLocationData(element)
           connectInput(Option(locationData) map (_.file), createDOMGenerator(element, _, _, _))
-        case document: Document ⇒
+        case document: Document =>
           val locationData = ProcessorUtils.getElementLocationData(document.getRootElement)
           connectInput(Option(locationData) map (_.file), createDOMGenerator(document, _, _, _))
-        case nodeInfo: NodeInfo ⇒
+        case nodeInfo: NodeInfo =>
           connectInput(Option(nodeInfo.getSystemId), createDOMGenerator(nodeInfo, _, _, _))
-        case value ⇒
+        case value =>
           throw new IllegalStateException("Incorrect type in processor definition: " + value.getClass)
       }
     }
@@ -173,12 +173,12 @@ object InitUtils {
       getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty) orElse
       getDefinitionFromServletContext(servletContext, uriNamePropertyPrefix, processorInputProperty)
 
-    processorDefinitionOption foreach { processorDefinition ⇒
+    processorDefinitionOption foreach { processorDefinition =>
       logger.info(logMessagePrefix + " - About to run processor: " + processorDefinition)
       val processor = createProcessor(processorDefinition)
       val externalContext = new WebAppExternalContext(webAppContext, session)
 
-      withPipelineContext { pipelineContext ⇒
+      withPipelineContext { pipelineContext =>
         runProcessor(processor, externalContext, pipelineContext)
       }
     }
@@ -193,7 +193,7 @@ object InitUtils {
       val registry = new XMLProcessorRegistry
       PipelineUtils.connect(processorDefinitions, "data", registry, "config")
 
-      withPipelineContext { pipelineContext ⇒
+      withPipelineContext { pipelineContext =>
         processorDefinitions.reset(pipelineContext)
         registry.reset(pipelineContext)
         registry.start(pipelineContext)
@@ -229,10 +229,10 @@ object InitUtils {
 
   // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used
   def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String): Option[ProcessorDefinition] =
-    map.get(uriNamePropertyPrefix + "name") map { processorName ⇒
+    map.get(uriNamePropertyPrefix + "name") map { processorName =>
       val processorDefinition = new ProcessorDefinition(Dom4jUtils.explodedQNameToQName(processorName))
 
-      for ((name, value) ← map)
+      for ((name, value) <- map)
         if (name.startsWith(inputPropertyPrefix))
           processorDefinition.addInput(name.substring(inputPropertyPrefix.length), value)
 
@@ -242,7 +242,7 @@ object InitUtils {
   // Read-only view of the properties as a Map
   private object PropertiesMap extends Map[String, String] {
     def get(key: String) = Properties.instance.getPropertySet.getObjectOpt(key) map (_.toString)
-    def iterator         = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key ⇒ key → this(key))
+    def iterator         = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key => key -> this(key))
 
     def -(key: String)                    = Map() ++ this - key
     def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
@@ -251,7 +251,7 @@ object InitUtils {
   // Read-only view of the ServletContext initialization parameters as a Map
   private class ServletContextInitMap(servletContext: ServletContext) extends Map[String, String] {
     def get(key: String) = Option(servletContext.getInitParameter(key))
-    def iterator         = servletContext.getInitParameterNames.asScala map (key ⇒ key → this(key))
+    def iterator         = servletContext.getInitParameterNames.asScala map (key => key -> this(key))
 
     def -(key: String)                    = Map() ++ this - key
     def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv

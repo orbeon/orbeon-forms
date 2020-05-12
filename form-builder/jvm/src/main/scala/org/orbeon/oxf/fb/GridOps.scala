@@ -75,33 +75,33 @@ trait GridOps extends ContainerOps {
       val adjustedRowPos = rowPos % allCells.size // modulo as index sent by client can be in repeated grid
 
       // Increment height of origin cells that don't end at the current row
-      collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell ⇒
+      collectDistinctOriginCellsSpanningAfter(allCells, adjustedRowPos) foreach { cell =>
         NodeInfoCellOps.updateH(cell.td, cell.h + 1)
       }
 
       // Increment the position of all cells on subsequent rows
       allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
-        case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
-        case _ ⇒
+        case Cell(Some(u), None, _, y, _, _) => NodeInfoCellOps.updateY(u, y + 1)
+        case _ =>
       }
 
       // Insert a cell in the new row
       // NOTE: This is not very efficient. We should be able to just iterate back in the grid.
       val precedingCellOpt = allCells.slice(0, adjustedRowPos + 1).flatten.reverse collectFirst {
-        case Cell(Some(u), None, _, _, _, _) ⇒ u
+        case Cell(Some(u), None, _, _, _, _) => u
       }
 
       // Cells that end at the current row
       val distinctCellsEndingAtCurrentRow =
         allCells(adjustedRowPos) collect {
-          case c @ Cell(Some(u), _, _, _, 1, _) ⇒ c
+          case c @ Cell(Some(u), _, _, _, 1, _) => c
         } keepDistinctBy (_.u)
 
       val idsIt =
         nextTmpIds(count = distinctCellsEndingAtCurrentRow.size).iterator
 
       val newCells =
-        distinctCellsEndingAtCurrentRow map { cell ⇒
+        distinctCellsEndingAtCurrentRow map { cell =>
           <fr:c
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             id={idsIt.next()}
@@ -129,21 +129,21 @@ trait GridOps extends ContainerOps {
 
         // Move all cells down one notch
         allCells.iterator.flatten foreach {
-          case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y + 1)
-          case _ ⇒
+          case Cell(Some(u), None, _, y, _, _) => NodeInfoCellOps.updateY(u, y + 1)
+          case _ =>
         }
 
         // Insert new first row
         val cellsStartingOnFirstRow =
           allCells.head collect {
-            case c @ Cell(Some(u), None, _, _, _, _) ⇒ c
+            case c @ Cell(Some(u), None, _, _, _, _) => c
           }
 
         val idsIt =
           nextTmpIds(count = cellsStartingOnFirstRow.size).iterator
 
         val newCells =
-          cellsStartingOnFirstRow map { cell ⇒
+          cellsStartingOnFirstRow map { cell =>
             <fr:c
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               id={idsIt.next()}
@@ -164,12 +164,12 @@ trait GridOps extends ContainerOps {
 
   private def collectDistinctOriginCellsSpanningAfter[Underlying](cells: List[List[Cell[Underlying]]], rowPos: Int): List[Cell[Underlying]] =
     cells(rowPos) collect {
-      case c @ Cell(Some(u), _, _, _, h, _) if h > 1 ⇒ c
+      case c @ Cell(Some(u), _, _, _, h, _) if h > 1 => c
     } keepDistinctBy (_.u)
 
   private def collectDistinctOriginCellsSpanningBefore[Underlying](cells: List[List[Cell[Underlying]]], rowPos: Int): List[Underlying] =
     cells(rowPos) collect {
-      case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y ⇒ u
+      case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y => u
     } distinct
 
   def canDeleteRow(gridId: String, rowPos: Int)(implicit ctx: FormBuilderDocContext): Boolean = {
@@ -199,17 +199,17 @@ trait GridOps extends ContainerOps {
         // Reduce height of cells which start on a previous row
         val distinctOriginCellsSpanning = collectDistinctOriginCellsSpanningBefore(allCells, adjustedRowPos)
 
-        distinctOriginCellsSpanning foreach (cell ⇒ NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
+        distinctOriginCellsSpanning foreach (cell => NodeInfoCellOps.updateH(cell, NodeInfoCellOps.h(cell).getOrElse(1) - 1))
 
         // Decrement the position of all cells on subsequent rows
         allCells.view.slice(adjustedRowPos + 1, allCells.size).flatten foreach {
-          case Cell(Some(u), None, _, y, _, _) ⇒ NodeInfoCellOps.updateY(u, y - 1)
-          case _ ⇒
+          case Cell(Some(u), None, _, y, _, _) => NodeInfoCellOps.updateY(u, y - 1)
+          case _ =>
         }
 
         val cellsToDelete =
           allCells(adjustedRowPos) collect {
-            case Cell(Some(u), None, _, _, _, _) ⇒ u
+            case Cell(Some(u), None, _, _, _, _) => u
           }
 
         // Find the new cell to select if we are removing the currently selected cell
@@ -255,7 +255,7 @@ trait GridOps extends ContainerOps {
 
   // Try to ensure that there is an empty cell after the current location, inserting a new row if possible
   def ensureEmptyCell()(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    findSelectedCell flatMap { currentCellNode ⇒
+    findSelectedCell flatMap { currentCellNode =>
       if (currentCellNode.hasChildElement) {
         // There is an element in the current cell, figure out what to do
 
@@ -272,13 +272,13 @@ trait GridOps extends ContainerOps {
 
         val availableCellOpt =
           gridModel.cells.iterator.flatten dropWhile (_ != currentCell) drop 1 collect {
-            case c @ Cell(Some(cellNode), None, _, _, _, _) if ! cellNode.hasChildElement ⇒ c
+            case c @ Cell(Some(cellNode), None, _, _, _, _) if ! cellNode.hasChildElement => c
           } nextOption()
 
         val newCell =
           availableCellOpt match {
-            case Some(Cell(Some(cellNode), _, _, _, _, _)) ⇒ Some(cellNode)
-            case _                                         ⇒ Option(rowInsertBelow(gridElem, currentCell.y - 1)._1)
+            case Some(Cell(Some(cellNode), _, _, _, _, _)) => Some(cellNode)
+            case _                                         => Option(rowInsertBelow(gridElem, currentCell.y - 1)._1)
           }
 
          newCell |!> selectCell
@@ -294,8 +294,8 @@ trait GridOps extends ContainerOps {
   private val SimpleAVTRegex = """^\{(.+)\}$""".r
 
   def trimSimpleAVT(s: String): String = s match {
-    case SimpleAVTRegex(v) ⇒ v.replaceAllLiterally("{{", "{").replaceAllLiterally("}}", "}")
-    case v                 ⇒ v
+    case SimpleAVTRegex(v) => v.replaceAllLiterally("{{", "{").replaceAllLiterally("}}", "}")
+    case v                 => v
   }
 
   private val NoMaximum = Set("none")
@@ -312,17 +312,17 @@ trait GridOps extends ContainerOps {
 
   // Convert a min/max/freeze value to a value suitable to be written to the @min/@max/@freeze attributes.
   //
-  // - blank value                → None
-  // - non-positive integer value → None
-  // - positive integer value     → Some(int: String)
-  // - any other value            → Some("{expression}")
+  // - blank value                -> None
+  // - non-positive integer value -> None
+  // - positive integer value     -> Some(int: String)
+  // - any other value            -> Some("{expression}")
   //
-  def minMaxFreezeForAttribute(s: String): Option[String] = s.trimAllToOpt flatMap { value ⇒
+  def minMaxFreezeForAttribute(s: String): Option[String] = s.trimAllToOpt flatMap { value =>
     try {
       val int = value.toInt
       int > 0 option int.toString
     } catch {
-      case _: NumberFormatException ⇒
+      case _: NumberFormatException =>
         val escaped = value.replaceAllLiterally("{", "{{").replaceAllLiterally("}", "}}")
         Some(s"{$escaped}")
     }
@@ -335,22 +335,22 @@ trait GridOps extends ContainerOps {
   ): Option[UndoAction] =
     Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-      findOriginCell(cells, cellElem) map { originCell ⇒
+      findOriginCell(cells, cellElem) map { originCell =>
         val neighbors = nonOverflowingNeighbors(cells, originCell, direction)
         val originalSize =
           direction match {
-            case Direction.Right ⇒
+            case Direction.Right =>
               val size = originCell.w
               NodeInfoCellOps.updateW(cellElem, size + neighbors.head.w)
               size
-            case Direction.Down ⇒
+            case Direction.Down =>
               val size = originCell.h
               NodeInfoCellOps.updateH(cellElem, size + neighbors.head.h)
               size
-            case _ ⇒
+            case _ =>
               throw new IllegalStateException
           }
-        neighbors.foreach(_.u.foreach { neighborCellElem ⇒
+        neighbors.foreach(_.u.foreach { neighborCellElem =>
           deleteControlWithinCell(neighborCellElem)
           delete(neighborCellElem)
         })
@@ -367,18 +367,18 @@ trait GridOps extends ContainerOps {
   ): Option[UndoAction] =
     Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val gridModel = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-      findOriginCell(gridModel, cellElem) map { originCell ⇒
+      findOriginCell(gridModel, cellElem) map { originCell =>
 
         direction match {
-          case Direction.Left ⇒
+          case Direction.Left =>
             val newCellW = size getOrElse (originCell.w + 1) / 2
             NodeInfoCellOps.updateW(cellElem, newCellW)
             insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x + newCellW, originCell.y, originCell.w - newCellW, originCell.h)
-          case Direction.Up ⇒
+          case Direction.Up =>
             val newCellH = size getOrElse (originCell.h + 1) / 2
             NodeInfoCellOps.updateH(cellElem, newCellH)
             insertCellAtBestPosition(gridModel, nextTmpId(), originCell.x, originCell.y + newCellH, originCell.w, originCell.h - newCellH)
-          case _ ⇒
+          case _ =>
             throw new IllegalStateException
           }
 
@@ -393,7 +393,7 @@ trait GridOps extends ContainerOps {
     implicit ctx : FormBuilderDocContext
   ): Option[UndoAction] = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false)
-    Cell.findOriginCell(cells, cellElem) map { originCell ⇒
+    Cell.findOriginCell(cells, cellElem) map { originCell =>
 
       def moveCellWall(
         cell   : Cell[NodeInfo],
@@ -401,19 +401,19 @@ trait GridOps extends ContainerOps {
         target : Int
       ): Int = {
         cell match {
-          case Cell(Some(u), _, x, y, h, w) ⇒
+          case Cell(Some(u), _, x, y, h, w) =>
             val (newX, newW, newY, newH, initial) = side match {
-              case Direction.Left  ⇒ (target + 1 , w - (target + 1 - x) , y          , h                    , x - 1)
-              case Direction.Right ⇒ (x          , target + 1 - x       , y          , h                    , x + w - 1)
-              case Direction.Up    ⇒ (x          , w                    , target + 1 , h - (target + 1 - y) , y - 1)
-              case Direction.Down  ⇒ (x          , w                    , y          , target + 1 - y       , y + h - 1)
+              case Direction.Left  => (target + 1 , w - (target + 1 - x) , y          , h                    , x - 1)
+              case Direction.Right => (x          , target + 1 - x       , y          , h                    , x + w - 1)
+              case Direction.Up    => (x          , w                    , target + 1 , h - (target + 1 - y) , y - 1)
+              case Direction.Down  => (x          , w                    , y          , target + 1 - y       , y + h - 1)
             }
             if (x != newX) NodeInfoCellOps.updateX(u, newX)
             if (w != newW) NodeInfoCellOps.updateW(u, newW)
             if (y != newY) NodeInfoCellOps.updateY(u, newY)
             if (h != newH) NodeInfoCellOps.updateH(u, newH)
             initial
-          case _ ⇒ throw new IllegalStateException
+          case _ => throw new IllegalStateException
         }
       }
 
@@ -430,7 +430,7 @@ trait GridOps extends ContainerOps {
 
   def deleteGridByIdIfPossible(gridId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     findContainerById(gridId) flatMap
-      (_ ⇒ deleteContainerById(canDeleteContainer, gridId))
+      (_ => deleteContainerById(canDeleteContainer, gridId))
 
   def canDeleteRow(gridElem: NodeInfo): Boolean =
     Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false).cells.lengthCompare(1) > 0
@@ -438,9 +438,9 @@ trait GridOps extends ContainerOps {
   // Find the new td to select if we are removing the currently selected td
   def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findSelectedCell match {
-      case Some(selectedCell) if cellsToDelete contains selectedCell ⇒
+      case Some(selectedCell) if cellsToDelete contains selectedCell =>
 
-        def findCells(find: Test ⇒ Seq[NodeInfo], selectedCell: NodeInfo) =
+        def findCells(find: Test => Seq[NodeInfo], selectedCell: NodeInfo) =
           find(CellTest)                                                            intersect
           (findAncestorContainersLeafToRoot(selectedCell).last descendant CellTest) filterNot
           (cellsToDelete contains _)                                                headOption
@@ -450,8 +450,57 @@ trait GridOps extends ContainerOps {
         // stay in section, etc.
         findCells(selectedCell following _, selectedCell) orElse
           findCells(selectedCell preceding  _, selectedCell)
-      case _ ⇒
+      case _ =>
         None
+    }
+
+  sealed trait ColumnMigrationType
+  case object To24ColumnMigrationType extends ColumnMigrationType
+  case object To12ColumnMigrationType extends ColumnMigrationType
+
+  def migrateGridColumns(
+    gridElem : NodeInfo,
+    from     : Int,
+    to       : Int
+  ): Option[UndoAction] =
+    findGridColumnMigrationType(gridElem, from, to) map { columnMigrationType =>
+
+      val migrationFunction =
+        columnMigrationType match {
+          case To24ColumnMigrationType =>
+            (u: NodeInfo, x: Int, w: Int) => {
+              NodeInfoCellOps.updateX(u, (x - 1) * 2 + 1)
+              NodeInfoCellOps.updateW(u, w * 2)
+            }
+          case To12ColumnMigrationType =>
+            (u: NodeInfo, x: Int, w: Int) => {
+                NodeInfoCellOps.updateX(u, (x - 1) / 2 + 1)
+                NodeInfoCellOps.updateW(u, w / 2)
+            }
+        }
+
+      collectAllOriginCells(gridElem) foreach migrationFunction.tupled
+
+      MigrateGridColumns(gridElem.id, from, to)
+    }
+
+  def findGridColumnMigrationType(
+    gridElem : NodeInfo,
+    from     : Int,
+    to       : Int
+  ): Option[ColumnMigrationType] =
+    (from, to) match {
+      case (12, 24) => Some(To24ColumnMigrationType)
+      case (24, 12) =>
+        collectAllOriginCells(gridElem) forall {
+          case (_, x, w) => w % 2 == 0 && (x - 1) % 2 == 0
+        } option To12ColumnMigrationType
+      case _ => None
+    }
+
+  private def collectAllOriginCells(gridElem: NodeInfo): Iterator[(NodeInfo, Int, Int)] =
+    Cell.originCells(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false)) collect {
+      case Cell(Some(u), None, x, _, _, w) => (u, x, w)
     }
 
   private def insertCellAtBestPosition(
@@ -463,7 +512,7 @@ trait GridOps extends ContainerOps {
     h         : Int
   ): Option[NodeInfo] = {
 
-    val originCells = Cell.originCells(gridModel)
+    val originCells = Cell.originCells(gridModel).toList
 
     require(originCells.nonEmpty)
 
@@ -497,7 +546,7 @@ trait GridOps extends ContainerOps {
 
       val afterCellOpt =
         originCells.sliding(2) collectFirst {
-          case Seq(c1, c2)  if lt(c1.x, c1.y, x, y) && lt(x, y, c2.x, c2.y) ⇒ c1
+          case Seq(c1, c2)  if lt(c1.x, c1.y, x, y) && lt(x, y, c2.x, c2.y) => c1
         }
 
       insert(into = Nil, after = (afterCellOpt flatMap (_.u)).toList, origin = newCell).headOption

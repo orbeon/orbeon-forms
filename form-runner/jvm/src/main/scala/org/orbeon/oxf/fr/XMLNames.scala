@@ -29,38 +29,38 @@ object XMLNames {
   val XS  = XSD_URI
   val XBL = XBL_NAMESPACE_URI
 
-  val XHHeadTest               : Test      = XH → "head"
-  val XHBodyTest               : Test      = XH → "body"
+  val XHHeadTest               : Test      = XH -> "head"
+  val XHBodyTest               : Test      = XH -> "body"
 
-  val XBLXBLTest               : Test      = XBL → "xbl"
-  val XBLBindingTest           : Test      = XBL → "binding"
-  val XBLTemplateTest          : Test      = XBL → "template"
-  val XBLImplementationTest    : Test      = XBL → "implementation"
+  val XBLXBLTest               : Test      = XBL -> "xbl"
+  val XBLBindingTest           : Test      = XBL -> "binding"
+  val XBLTemplateTest          : Test      = XBL -> "template"
+  val XBLImplementationTest    : Test      = XBL -> "implementation"
 
-  val XSSchemaTest             : Test      = XS → "schema"
+  val XSSchemaTest             : Test      = XS -> "schema"
 
-  val FRBodyTest               : Test      = FR → "body"
+  val FRBodyTest               : Test      = FR -> "body"
 
-  val FRGridTest               : Test      = FR → "grid"
-  val FRSectionTest            : Test      = FR → "section"
-  val FRRepeatTest             : Test      = FR → "repeat" // legacy
+  val FRGridTest               : Test      = FR -> "grid"
+  val FRSectionTest            : Test      = FR -> "section"
+  val FRRepeatTest             : Test      = FR -> "repeat" // legacy
 
-  val XFModelTest              : Test      = XF → "model"
-  val XFInstanceTest           : Test      = XF → "instance"
-  val XFBindTest               : Test      = XF → "bind"
-  val XFGroupTest              : Test      = XF → "group"
-  val XFActionTest             : Test      = XF → "action"
+  val XFModelTest              : Test      = XF -> "model"
+  val XFInstanceTest           : Test      = XF -> "instance"
+  val XFBindTest               : Test      = XF -> "bind"
+  val XFGroupTest              : Test      = XF -> "group"
+  val XFActionTest             : Test      = XF -> "action"
 
-  val FRMetadata               : Test      = FR → "metadata"
-  val FRItemsetId              : Test      = FR → "itemsetid"
-  val FRItemsetMap             : Test      = FR → "itemsetmap"
+  val FRMetadata               : Test      = FR -> "metadata"
+  val FRItemsetId              : Test      = FR -> "itemsetid"
+  val FRItemsetMap             : Test      = FR -> "itemsetmap"
 
-  val FRItemsetMapTest         : Test     = FR → "itemsetmap"
-  val FRParamTest              : Test     = FR → "param"
-  val FRControlNameTest        : Test     = FR → "controlName"
+  val FRItemsetMapTest         : Test     = FR -> "itemsetmap"
+  val FRParamTest              : Test     = FR -> "param"
+  val FRControlNameTest        : Test     = FR -> "controlName"
 
-  val FRListenerTest           : Test      = FR → "listener"
-  val FRActionTest             : Test      = FR → "action"
+  val FRListenerTest           : Test      = FR -> "listener"
+  val FRActionTest             : Test      = FR -> "action"
 
   val ControlsTest             : Test      = QName("controls")
   val ControlTest              : Test      = QName("control")

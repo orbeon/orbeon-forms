@@ -77,8 +77,7 @@
                             <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
                             <xh:a
                                 href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
-                                target="_blank">
-                                <xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
+                                target="_blank"><xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
                             </xh:a>
                         </xh:td>
                     </xh:tr>
@@ -122,8 +121,8 @@
         <xbl:implementation>
             <xf:model id="xbl-model">
                 <!-- Contains the data from which the itemset is populated -->
-                <xf:instance id="itemset"><dummy/></xf:instance>
-                <xf:instance id="submission-ran"><count>0</count></xf:instance>
+                <xf:instance id="itemset"><_/></xf:instance>
+                <xf:instance id="submission-ran"><_>0</_></xf:instance>
                 <!-- What do when doing a refresh -->
                 <xf:submission id="get-itemset" method="get" resource="{event('resource')}" replace="instance" serialization="none">
                     <xf:setvalue ev:event="xforms-submit-done" ref="instance('submission-ran')" value=". + 1"/>

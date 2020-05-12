@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.test
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
@@ -42,6 +42,8 @@ import scala.collection.mutable
 //
 // NOTE: Doesn't extend HttpClient because it has to return a `ProcessorService` and `CacheEvent`s.
 //
+// TODO: This should reuse/be merged with `InternalHttpClient`!
+//
 object TestHttpClient {
 
   sealed trait CacheEvent
@@ -60,7 +62,7 @@ object TestHttpClient {
     val Host             = "localhost"
     val ContextPath      = "/orbeon"
     var OrbeonTokenValue = SecureUtils.randomHexId
-    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() += (OrbeonTokenLower → OrbeonTokenValue)
+    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() += (OrbeonTokenLower -> OrbeonTokenValue)
     val sessions         = mutable.HashMap[String, Session]()
   }
 
@@ -93,7 +95,7 @@ object TestHttpClient {
     }
 
     val (response, sessionOpt) =
-      withPipelineContext { pipelineContext ⇒
+      withPipelineContext { pipelineContext =>
 
         val (externalContext, response) = {
 
@@ -141,7 +143,7 @@ object TestHttpClient {
                 if (create)
                   new SimpleSession(SecureUtils.randomHexId) |!>
                     XFormsStateManager.sessionCreated        |!>
-                    (newSession ⇒ session = Some(newSession))
+                    (newSession => session = Some(newSession))
                 else
                   null
               }
@@ -152,7 +154,7 @@ object TestHttpClient {
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,
             method                  = method,
-            headersMaybeCapitalized = headers + (OrbeonToken → List(ServerState.OrbeonTokenValue)),
+            headersMaybeCapitalized = headers + (OrbeonToken -> List(ServerState.OrbeonTokenValue)),
             content                 = content
           )
 

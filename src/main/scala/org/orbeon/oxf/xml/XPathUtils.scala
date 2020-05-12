@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
@@ -21,7 +21,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.oxf.xml.{dom4j ⇒ _}
+import org.orbeon.oxf.xml.{dom4j => _}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
@@ -33,13 +33,13 @@ import scala.collection.compat._
 object XPathUtils {
 
   private def itemToJavaUnwrap: PartialFunction[Item, AnyRef] = {
-    case v: AtomicValue                                                  ⇒ Value.convertToJava(v)
-    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
+    case v: AtomicValue                                                  => Value.convertToJava(v)
+    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] => n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
   private def itemToNodeUnwrap: PartialFunction[Item, dom.Node] = {
-    case v: AtomicValue                                                  ⇒ throw new IllegalArgumentException
-    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
+    case v: AtomicValue                                                  => throw new IllegalArgumentException
+    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] => n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
   private val EmptyVariables  = ju.Collections.emptyMap[String, ValueRepresentation]()
@@ -130,7 +130,7 @@ object XPathUtils {
     else if (resultWithJava.size == 1)
       resultWithJava.head
     else
-      resultWithJava collect { case v: dom.Node ⇒ v } asJava
+      resultWithJava collect { case v: dom.Node => v } asJava
   }
 
   // 1 external usage
@@ -160,8 +160,8 @@ object XPathUtils {
 
     if (resultWithJavaIt.hasNext) {
       resultWithJavaIt.next() match {
-        case v: dom.Node ⇒ v.getStringValue
-        case v           ⇒ v.toString // covers String, Boolean, and number values
+        case v: dom.Node => v.getStringValue
+        case v           => v.toString // covers String, Boolean, and number values
       }
     } else
       null
@@ -214,6 +214,6 @@ object XPathUtils {
           reporter            = null
         )
 
-    resultWithItems.asScala.iterator
+    resultWithItems.iterator
   }
 }

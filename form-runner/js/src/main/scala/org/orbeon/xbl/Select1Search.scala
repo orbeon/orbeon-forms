@@ -13,10 +13,11 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.facades.Select2
+import org.orbeon.facades.Select2.toJQuerySelect2
 import org.orbeon.jquery._
-import org.orbeon.xbl.Select2.toJQuerySelect2
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxEvent, ServerValueStore}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -38,9 +39,9 @@ private class Select1SearchCompanion extends XBLCompanion {
 
   override def init(): Unit =
     for {
-      jContainer        ← $(containerElem).headJQuery
-      jXFormsSelect     ← jContainer.find(".xforms-select1").headJQuery
-      (select, jSelect) ← jXFormsSelect.find("select").headElemJQuery
+      jContainer        <- $(containerElem).headJQuery
+      jXFormsSelect     <- jContainer.find(".xforms-select1").headJQuery
+      (select, jSelect) <- jXFormsSelect.find("select").headElemJQuery
       htmlSelect        = select.asInstanceOf[dom.html.Select]
     } locally {
 
@@ -64,47 +65,65 @@ private class Select1SearchCompanion extends XBLCompanion {
           }
         }
 
-        val options = new Select2.Options
-        options.placeholder =
-          new Select2.Option {
-            val id   = "0"
-            val text = elementWithData.attr(DataPlaceholder).get
-          }
-        options.ajax =
-          if (performsSearch)
-            Select2Ajax
-          else
-            null
-        options.allowClear = true
+        object options extends Select2.Options {
+          allowClear     = true
+          ajax           = if (performsSearch) Select2Ajax else null
+          width          = "100%" // For Select2 width to update as the viewport width changes
+          placeholder    =
+            new Select2.Option {
+              val id   = "0"
+              val text = elementWithData.attr(DataPlaceholder).get
+            }
+        }
+
         jSelect.select2(options)
-        if (performsSearch)
-          jSelect.on("change", onChange(htmlSelect) _)
+        jSelect.on("change", onChange _)
       }
 
       initOrUpdatePlaceholder()
       onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
     }
 
+  override def xformsFocus(): Unit =
+    containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
+
   // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: JQuery, attributeName: String, listener: () ⇒ Unit) {
-    val observer = new MutationObserver((_, _) ⇒ listener())
+  private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
+    val observer = new MutationObserver((_, _) => listener())
     observer.observe(element.get(0), MutationObserverInit(
       attributes = true,
       attributeFilter = js.Array(attributeName)
     ))
   }
 
-  private def onChange(htmlSelect: html.Select)(event: JQueryEventObject): Unit = {
-    val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
-    val label = selectedOption.text
-    val value = selectedOption.value
-    AjaxEvent.dispatchEvent(
+  private def onChange(event: JQueryEventObject): Unit = {
+    val htmlSelect = event.target.asInstanceOf[html.Select]
+    if (htmlSelect.selectedIndex == -1) {
+      // `selectedIndex` is -1 when the value was cleared
+      dispatchFrChange(
+        label = "",
+        value = ""
+      )
+    } else {
+      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+      dispatchFrChange(
+        label = selectedOption.text,
+        value = selectedOption.value
+      )
+    }
+  }
+
+  private def dispatchFrChange(
+    label : String,
+    value : String
+  ): Unit = {
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = "fr-change",
         targetId   = containerElem.id,
         properties = Map(
-          "fr-label" → label,
-          "fr-value" → value
+          "fr-label" -> label,
+          "fr-value" -> value
         )
       )
     )
@@ -137,67 +156,16 @@ private class Select1SearchCompanion extends XBLCompanion {
       val searchValue = params.data.term.getOrElse("")
       val searchPage  = params.data.page.getOrElse(1)
       select2SuccessCallbacks.enqueue(success)
-      AjaxEvent.dispatchEvent(
+      AjaxClient.fireEvent(
         AjaxEvent(
           eventName  = "fr-search",
           targetId   = containerElem.id,
           properties = Map(
-            "fr-search-value" → searchValue,
-            "fr-search-page"  → searchPage.toString
+            "fr-search-value" -> searchValue,
+            "fr-search-page"  -> searchPage.toString
           )
         )
       )
     }
-  }
-}
-
-private object Select2 {
-
-  implicit def toJQuerySelect2(jQuery: JQuery): JQuerySelect2 =
-    jQuery.asInstanceOf[JQuerySelect2]
-
-  @js.native
-  trait JQuerySelect2 extends JQuery {
-    def select2(options: Options): Unit = js.native
-  }
-
-  class Options extends js.Object {
-    var placeholder : Option  = _
-    var ajax        : Ajax    = _
-    var allowClear  : Boolean = false
-  }
-
-  trait Option extends js.Object {
-    val id   : String
-    val text : String
-  }
-
-  trait ParamsData extends js.Object {
-    val term: js.UndefOr[String]
-    val page: js.UndefOr[Int]
-  }
-
-  trait Params extends js.Object {
-    val data: ParamsData
-  }
-
-  trait Data extends js.Object {
-    val results    : js.Array[Option]
-    val pagination : Pagination
-  }
-
-  trait Pagination extends js.Object {
-    val more: Boolean
-  }
-
-  type Success = js.Function1[Data, Unit]
-
-  trait Ajax extends js.Object {
-    val delay: Int
-    def transport(
-      params  : Params,
-      success : Success,
-      failure : js.Function0[Unit]
-    ): Unit
   }
 }

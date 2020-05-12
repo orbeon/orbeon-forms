@@ -346,6 +346,7 @@
                 <status>Status</status>
                 <app>Application</app>
                 <form>Form</form>
+                <version>Version</version>
                 <title>Title</title>
                 <view>View</view>
                 <new>New</new>
@@ -820,6 +821,7 @@
                 <status>Status</status>
                 <app>Application</app>
                 <form>Formulaire</form>
+                <version>Version</version>
                 <title>Titre</title>
                 <view>Voir</view>
                 <new>Nouveau</new>
@@ -1280,6 +1282,7 @@
                 <status>Estado</status>
                 <app>Aplicación</app>
                 <form>Formulario</form>
+                <version todo="true">[Version]</version>
                 <title>Título</title>
                 <view>Ver</view>
                 <new>Nuevo</new>
@@ -1739,6 +1742,7 @@
                 <status todo="true">[Status]</status>
                 <app todo="true">[App]</app>
                 <form todo="true">[Form]</form>
+                <version todo="true">[Version]</version>
                 <title todo="true">[Title]</title>
                 <view todo="true">[View]</view>
                 <new todo="true">[New]</new>
@@ -2196,6 +2200,7 @@
                 <status todo="true">[Status]</status>
                 <app todo="true">[App]</app>
                 <form todo="true">[Form]</form>
+                <version todo="true">[Version]</version>
                 <title todo="true">[Title]</title>
                 <view todo="true">[View]</view>
                 <new todo="true">[New]</new>
@@ -2666,6 +2671,7 @@
                 <status>Stato</status>
                 <app>Applicazione</app>
                 <form>Modulo</form>
+                <version todo="true">[Version]</version>
                 <title>Titolo</title>
                 <view>Vizualizza</view>
                 <new>Nuovo</new>
@@ -3136,6 +3142,7 @@
                 <status>Status</status>
                 <app>Anwendung</app>
                 <form>Formular</form>
+                <version todo="true">[Version]</version>
                 <title>Titel</title>
                 <view>Ansicht</view>
                 <new>Neu</new>
@@ -3606,6 +3613,7 @@
                 <status>Tila</status>
                 <app>Sovellus</app>
                 <form>Lomake</form>
+                <version todo="true">[Version]</version>
                 <title>Otsikko</title>
                 <view>Näytä</view>
                 <new>Uusi</new>
@@ -4076,6 +4084,7 @@
                 <status>Status</status>
                 <app>Område</app>
                 <form>Formulär</form>
+                <version todo="true">[Version]</version>
                 <title>Titel</title>
                 <view>Visa</view>
                 <new>Skapa</new>
@@ -4545,6 +4554,7 @@
                 <status>Status</status>
                 <app>Applicatie</app>
                 <form>Form</form>
+                <version todo="true">[Version]</version>
                 <title>Titel</title>
                 <view>Weergave</view>
                 <new>Nieuw</new>
@@ -5014,6 +5024,7 @@
                 <status>Estado</status>
                 <app>Aplicação</app>
                 <form>Formulário</form>
+                <version todo="true">[Version]</version>
                 <title>Título</title>
                 <view>Ver</view>
                 <new>Novo</new>
@@ -5471,6 +5482,7 @@
                 <status>Status</status>
                 <app>App</app>
                 <form>Blanket</form>
+                <version todo="true">[Version]</version>
                 <title>Titel</title>
                 <view>Visning</view>
                 <new>Ny</new>
@@ -5940,6 +5952,7 @@
                 <status>Status</status>
                 <app>Aplikacja</app>
                 <form>Formularz</form>
+                <version todo="true">[Version]</version>
                 <title>Tytuł</title>
                 <view>Podgląd</view>
                 <new>Nowy</new>

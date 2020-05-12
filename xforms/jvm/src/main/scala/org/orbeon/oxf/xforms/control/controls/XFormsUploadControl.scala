@@ -75,39 +75,39 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   override def performTargetAction(event: XFormsEvent): Unit = {
     super.performTargetAction(event)
     event match {
-      case _: XXFormsUploadStartEvent ⇒
+      case _: XXFormsUploadStartEvent =>
         // Upload started
         containingDocument.startUpload(getUploadUniqueId)
-      case _: XXFormsUploadProgressEvent ⇒
+      case _: XXFormsUploadProgressEvent =>
         // NOP: upload progress information will be sent through the diff process
-      case _: XXFormsUploadCancelEvent ⇒
+      case _: XXFormsUploadCancelEvent =>
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
         UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
-      case doneEvent: XXFormsUploadDoneEvent ⇒
+      case doneEvent: XXFormsUploadDoneEvent =>
         // Upload done: process upload to this control
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
         UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
         visitWithAncestors()
-      case _: XXFormsUploadErrorEvent ⇒
+      case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)
         UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
-      case _ ⇒
+      case _ =>
     }
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     super.performDefaultAction(event)
     event match {
-      case _: XXFormsUploadErrorEvent ⇒
+      case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
         // It would be good to support i18n at the XForms engine level, but form authors can handle
         // xxforms-upload-error in a custom way if needed. This is what Form Runner does.
         containingDocument.addMessageToRun("There was an error during the upload.", "modal")
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -121,7 +121,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
   def getUploadUniqueId: String = getEffectiveId
 
-  // Called either upon Ajax xxforms-upload-done or upon client form POST (`replace="all"`)
+  // Called either upon Ajax `xxforms-upload-done` or upon client form POST (`replace="all"`)
   def handleUploadedFile(value: String, filename: String, mediatype: String, size: String): Unit =
     if (size != "0" || filename != "") {
       // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
@@ -145,13 +145,13 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
           val file = new File(new URI(PathUtils.splitQuery(url)._1))
           if (file.exists) {
             if (file.delete())
-              debug("deleted temporary file upon upload", List("path" → file.getCanonicalPath))
+              debug("deleted temporary file upon upload", List("path" -> file.getCanonicalPath))
             else
-              warn("could not delete temporary file upon upload", List("path" → file.getCanonicalPath))
+              warn("could not delete temporary file upon upload", List("path" -> file.getCanonicalPath))
           }
         } catch {
-          case NonFatal(_) ⇒
-            error("could not delete temporary file upon upload", List("path" → url))
+          case NonFatal(_) =>
+            error("could not delete temporary file upon upload", List("path" -> url))
         }
 
     // Clean values
@@ -211,7 +211,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       setFileSize(size)
 
     } catch {
-      case NonFatal(t) ⇒ throw new ValidationException(t, getLocationData)
+      case NonFatal(t) => throw new ValidationException(t, getLocationData)
     }
   }
 
@@ -223,10 +223,10 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XFormsUploadControl) ⇒
+      case Some(other: XFormsUploadControl) =>
         compareFileMetadata(other) &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
     }
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
@@ -269,13 +269,13 @@ object XFormsUploadControl {
   def hmacURL(url: String, filename: Option[String], mediatype: Option[String], size: Option[String]): String = {
 
     val candidates = List(
-      "filename"  → filename,
-      "mediatype" → mediatype,
-      "size"      → size
+      "filename"  -> filename,
+      "mediatype" -> mediatype,
+      "size"      -> size
     )
 
     val query = candidates collect {
-      case (name, Some(value)) ⇒
+      case (name, Some(value)) =>
         name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
     } mkString "&"
 
@@ -298,7 +298,7 @@ object XFormsUploadControl {
 
     val filteredQuery =
       query filterNot (_._1 == MacParamName) map {
-        case (name, value) ⇒
+        case (name, value) =>
           name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
       } mkString "&"
 
@@ -314,8 +314,8 @@ object XFormsUploadControl {
   // Check that the given URL as a correct MAC
   def verifyMAC(url: String): Boolean =
     getMAC(url) match {
-      case Some(mac) ⇒ hmac(removeMAC(url)) == mac
-      case None      ⇒ false
+      case Some(mac) => hmac(removeMAC(url)) == mac
+      case None      => false
     }
 
   /**
@@ -336,11 +336,11 @@ object XFormsUploadControl {
    */
   def handleSubmittedFiles(containingDocument: XFormsContainingDocument, filesElement: Element): Unit =
     for {
-      (name, value, filename, mediatype, size) ← iterateFileElement(filesElement)
+      (name, value, filename, mediatype, size) <- iterateFileElement(filesElement)
       // In case of `xf:repeat`, the name of the template will not match an existing control.
       // In addition, only set value on forControl control if specified.
-      control       ← containingDocument.findControlByEffectiveId(name)
-      uploadControl ← control.narrowTo[XFormsUploadControl]
+      control       <- containingDocument.findControlByEffectiveId(name)
+      uploadControl <- control.narrowTo[XFormsUploadControl]
     } locally {
       uploadControl.handleUploadedFile(value, filename, mediatype, size)
     }
@@ -351,11 +351,11 @@ object XFormsUploadControl {
 
   private def iterateFileElement(filesElement: Element) =
     for {
-      parameterElement ← Option(filesElement).toIterator flatMap Dom4j.elements
+      parameterElement <- Option(filesElement).toIterator flatMap Dom4j.elements
 
       // Extract all parameters
-      name      ← parameterElement.elementOpt("name")                     flatMap (_.getText.trimAllToOpt)
-      value     ← parameterElement.elementOpt("value")                    flatMap (_.getText.trimAllToOpt)
+      name      <- parameterElement.elementOpt("name")                     flatMap (_.getText.trimAllToOpt)
+      value     <- parameterElement.elementOpt("value")                    flatMap (_.getText.trimAllToOpt)
 
       // TODO: Ideally: `Option[Filename]`, `Option[ContentType]`, `Option[FileSize]`.
       filename  = parameterElement.elementOpt("filename")                 flatMap (_.getText.trimAllToOpt) getOrElse ""

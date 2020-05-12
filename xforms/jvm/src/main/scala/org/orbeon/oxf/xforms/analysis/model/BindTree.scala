@@ -19,12 +19,12 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.collection.compat._
 
-class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName ⇒ Boolean) {
+class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName => Boolean) {
 
-  bindTree ⇒
+  bindTree =>
 
   // All bind ids
   val bindIds = new m.LinkedHashSet[String]
@@ -57,7 +57,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     val preceding = model.variablesSeq.lastOption
 
     val staticBinds =
-      for (bindElement ← bindElements)
+      for (bindElement <- bindElements)
         yield new StaticBind(bindTree, bindElement, model, preceding)
 
     staticBinds.to(List)
@@ -98,8 +98,8 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     assert(! model.part.isTopLevel)
 
     bind.parent match {
-      case Some(parentBind: StaticBind) ⇒ parentBind.removeBind(bind)
-      case _ ⇒ throw new IllegalArgumentException // for now, cannot remove top-level binds
+      case Some(parentBind: StaticBind) => parentBind.removeBind(bind)
+      case _ => throw new IllegalArgumentException // for now, cannot remove top-level binds
     }
 
     // TODO: update has*
@@ -108,7 +108,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 
   // In-scope variable on binds include variables implicitly declared with bind/@name
   // Used by XPath analysis
-  lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(k, v) })
+  lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
 
   class BindAsVariable(val name: String, bind: StaticBind) extends VariableTrait {
     def variableAnalysis = bind.getBindingAnalysis
@@ -148,12 +148,12 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     // Output binds information
     if (topLevelBinds.nonEmpty) {
       helper.startElement("binds")
-      for (bind ← topLevelBinds)
+      for (bind <- topLevelBinds)
         bind.toXML(helper)
       helper.endElement()
     }
 
   def freeBindsTransientState(): Unit =
-    for (bind ← topLevelBinds)
+    for (bind <- topLevelBinds)
       bind.freeTransientState()
 }

@@ -36,7 +36,7 @@ class WizardTest
       val (processorService, Some(doc), _) =
         runFormRunner("tests", "wizard", "new", document = "", initialize = true)
 
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {
 
           val dataRootElem = instance(FormInstance).get.rootElement

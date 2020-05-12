@@ -20,11 +20,11 @@ object UI {
   def status : String = StatusStore.getStatus.name
   def stop() : Unit   = StatusStore.setStatus(Status.Stopping)
 
-  def getProviderToken   = Some(StatusStore.getStatus).collect{case Status.Indexing(p, _, _) ⇒ p               }.getOrElse("")
-  def getProviderCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) ⇒ c.current       }.getOrElse(0)
-  def getProviderTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) ⇒ c.total         }.getOrElse(0)
-  def getDocumentCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) ⇒ d.current }.getOrElse(0)
-  def getDocumentTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) ⇒ d.total   }.getOrElse(0)
+  def getProviderToken   = Some(StatusStore.getStatus).collect{case Status.Indexing(p, _, _) => p               }.getOrElse("")
+  def getProviderCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.current       }.getOrElse(0)
+  def getProviderTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, c, _) => c.total         }.getOrElse(0)
+  def getDocumentCurrent = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.current }.getOrElse(0)
+  def getDocumentTotal   = Some(StatusStore.getStatus).collect{case Status.Indexing(_, _, Some(d)) => d.total   }.getOrElse(0)
 
 }
 

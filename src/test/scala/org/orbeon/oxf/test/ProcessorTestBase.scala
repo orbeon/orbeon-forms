@@ -43,8 +43,8 @@ import scala.collection.compat._
 
 abstract class ProcessorTestBase(
   testsDocUrl      : String,
-  sessionCreated   : Session ⇒ Any = _ ⇒ (),
-  sessionDestroyed : Session ⇒ Any = _ ⇒ ()
+  sessionCreated   : Session => Any = _ => (),
+  sessionDestroyed : Session => Any = _ => ()
 )
   extends AnyFunSpec
      with ResourceManagerSupport
@@ -64,19 +64,19 @@ abstract class ProcessorTestBase(
   case class  ErrorTestResult(t: Throwable)                          extends TestResult
 
   // Run tests
-  findTestsToRun groupByKeepOrder (_.groupOpt) foreach { case (groupOpt, descriptors) ⇒
+  findTestsToRun groupByKeepOrder (_.groupOpt) foreach { case (groupOpt, descriptors) =>
     describe(groupOpt getOrElse "[No group description provided]") {
-      descriptors foreach { descriptor ⇒
+      descriptors foreach { descriptor =>
         it (s"must pass ${descriptor.descriptionOpt getOrElse "[No test description provided]"}") {
           runOneTest(descriptor) match {
-            case SuccessTestResult ⇒
-            case FailedTestResult(expected, actual) ⇒
+            case SuccessTestResult =>
+            case FailedTestResult(expected, actual) =>
               assert(
                 expected.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
                   actual.getRootElement.serializeToString(XMLWriter.PrettyFormat)
               )
               assert(false)
-            case ErrorTestResult(t) ⇒
+            case ErrorTestResult(t) =>
               throw Exceptions.getRootThrowable(t)
           }
         }
@@ -87,7 +87,7 @@ abstract class ProcessorTestBase(
   private def runOneTest(d: TestDescriptor) =
     try {
       // Create pipeline context
-      InitUtils.withPipelineContext { pipelineContext ⇒
+      InitUtils.withPipelineContext { pipelineContext =>
 
          PipelineSupport.setExternalContext(
            pipelineContext,
@@ -106,7 +106,7 @@ abstract class ProcessorTestBase(
 
           val resultsIt =
             for {
-              (doc, serializer) ← d.docsAndSerializers.iterator
+              (doc, serializer) <- d.docsAndSerializers.iterator
               actualDoc         = serializer.runGetDocument(pipelineContext)
             } yield {
               // NOTE: We could make the comparison more configurable, for example to not collapse white space
@@ -116,11 +116,11 @@ abstract class ProcessorTestBase(
                 FailedTestResult(doc, actualDoc)
             }
 
-          resultsIt collectFirst { case f: FailedTestResult ⇒ f } getOrElse SuccessTestResult
+          resultsIt collectFirst { case f: FailedTestResult => f } getOrElse SuccessTestResult
         }
       }
     } catch {
-      case NonFatal(t) ⇒ ErrorTestResult(t)
+      case NonFatal(t) => ErrorTestResult(t)
     }
 
   private def findTestsToRun: List[TestDescriptor] = {
@@ -155,12 +155,12 @@ abstract class ProcessorTestBase(
                 ]
       """
 
-    implicit val ctx = XPathContext(vars = Map("edition" → stringToStringValue(Version.Edition.toLowerCase)))
+    implicit val ctx = XPathContext(vars = Map("edition" -> stringToStringValue(Version.Edition.toLowerCase)))
 
     val testDescriptors =
       for {
-        testElem       ← XPathCache.evaluateKeepItems(expr, testsDoc) collect { case i: NodeInfo ⇒ i }
-        groupElem      ← testElem.parentOption
+        testElem       <- XPathCache.evaluateKeepItems(expr, testsDoc) collect { case i: NodeInfo => i }
+        groupElem      <- testElem.parentOption
 
         descriptionOpt = testElem.attValueNonBlankOpt("description")
         groupOpt       = if (groupElem.localname == "group") groupElem.attValueNonBlankOpt("description") else None
@@ -175,7 +175,7 @@ abstract class ProcessorTestBase(
         // Connect outputs
         val docsAndSerializers =
           for {
-            outputElem ← testElem child "output"
+            outputElem <- testElem child "output"
             name       = outputElem.attValueNonBlankOrThrow("name")
             unwrapped  = unsafeUnwrapElement(outputElem)
             doc        = createDocumentFromEmbeddedOrHref(unwrapped, outputElem.attValueNonBlankOpt("href").orNull)

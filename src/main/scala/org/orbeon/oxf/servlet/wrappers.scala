@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import java.io._
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.servlet.{ReadListener, ServletInputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
@@ -88,7 +88,7 @@ trait RequestPrependHeaders extends HttpServletRequestWrapper {
 
 trait RequestRemoveHeaders extends HttpServletRequestWrapper {
 
-  def headersToRemove: String ⇒ Boolean
+  def headersToRemove: String => Boolean
 
   override def getHeaderNames             : ju.Enumeration[String] = (super.getHeaderNames.asScala filterNot headersToRemove).asJavaEnumeration
 
@@ -122,10 +122,10 @@ private object ServletRequestWrapper {
 
     def extraQueryParametersIterator =
       for {
-        (name, values) ← extraQueryParameters.asScala.iterator
-        value          ← values
+        (name, values) <- extraQueryParameters.asScala.iterator
+        value          <- values
       } yield
-        name → value
+        name -> value
 
     recombineQuery(pathQuery, extraQueryParametersIterator.toList)
   }

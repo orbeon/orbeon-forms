@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 /**
  * `Branch` interface defines the common behaviour for Nodes which

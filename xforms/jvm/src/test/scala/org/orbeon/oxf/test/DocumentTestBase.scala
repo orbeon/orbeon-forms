@@ -24,7 +24,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
 
   // FIXME: change to avoid global document
   private var _document: XFormsContainingDocument = _
-  def document = _document
+  implicit def document: XFormsContainingDocument = _document
 
   def setupDocument(documentURL: String): XFormsContainingDocument =
     setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
@@ -66,8 +66,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     doc.afterUpdateResponse()
   }
 
-  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument ⇒ T): T =
-    InitUtils.withPipelineContext { pipelineContext ⇒
+  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument => T): T =
+    InitUtils.withPipelineContext { pipelineContext =>
       PipelineSupport.setExternalContext(
         pipelineContext,
         PipelineSupport.DefaultRequestUrl,

@@ -31,7 +31,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
   }
 
   describe("With `upload.max-size` property only") {
-    for (limit ← List(LimitedSize(0L), LimitedSize(1000L), UnlimitedSize))
+    for (limit <- List(LimitedSize(0L), LimitedSize(1000L), UnlimitedSize))
       it(s"limit = `$limit`") {
         assert(limit === TestUploadCheckerLogic(
           controlIdToMaxSize             = Map(),
@@ -45,32 +45,32 @@ class UploadCheckerLogicTest extends AnyFunSpec {
   describe("With `upload.max-size` property and limit per control") {
 
     val expectations = List(
-      LimitedSize(0L) → List(
-        "control1" → LimitedSize(1000L),
-        "control2" → LimitedSize(2000L),
-        "control3" → LimitedSize(0L)
+      LimitedSize(0L) -> List(
+        "control1" -> LimitedSize(1000L),
+        "control2" -> LimitedSize(2000L),
+        "control3" -> LimitedSize(0L)
 
       ),
-      LimitedSize(1000L) → List(
-        "control1" → LimitedSize(1000L),
-        "control2" → LimitedSize(2000L),
-        "control3" → LimitedSize(1000L)
+      LimitedSize(1000L) -> List(
+        "control1" -> LimitedSize(1000L),
+        "control2" -> LimitedSize(2000L),
+        "control3" -> LimitedSize(1000L)
 
       ),
-      UnlimitedSize → List(
-        "control1" → LimitedSize(1000L),
-        "control2" → LimitedSize(2000L),
-        "control3" → UnlimitedSize
+      UnlimitedSize -> List(
+        "control1" -> LimitedSize(1000L),
+        "control2" -> LimitedSize(2000L),
+        "control3" -> UnlimitedSize
       )
     )
 
     for {
-      (limit, controlAndExpected) ← expectations
-      (controlId, expectedLimit)  ← controlAndExpected
+      (limit, controlAndExpected) <- expectations
+      (controlId, expectedLimit)  <- controlAndExpected
     } locally {
       it(s"limit = `$limit`, controlId = `$controlId`") {
         assert(expectedLimit === TestUploadCheckerLogic(
-          controlIdToMaxSize             = Map("control1" → 1000L, "control2" → 2000L),
+          controlIdToMaxSize             = Map("control1" -> 1000L, "control2" -> 2000L),
           currentUploadSizeAggregate     = None,
           uploadMaxSizeAggregateProperty = UnlimitedSize,
           uploadMaxSizeProperty          = limit
@@ -83,44 +83,44 @@ class UploadCheckerLogicTest extends AnyFunSpec {
 
     val expectations = List(
       (1000L, LimitedSize(0L), List(
-          "control1" → LimitedSize(0L),
-          "control2" → LimitedSize(0L),
-          "control3" → LimitedSize(0L)
+          "control1" -> LimitedSize(0L),
+          "control2" -> LimitedSize(0L),
+          "control3" -> LimitedSize(0L)
         )
       ),
       (1000L, LimitedSize(1000L), List(
-          "control1" → LimitedSize(0L),
-          "control2" → LimitedSize(0L),
-          "control3" → LimitedSize(0L)
+          "control1" -> LimitedSize(0L),
+          "control2" -> LimitedSize(0L),
+          "control3" -> LimitedSize(0L)
         )
       ),
       (1000L, LimitedSize(2000L), List(
-          "control1" → LimitedSize(1000L),
-          "control2" → LimitedSize(1000L),
-          "control3" → LimitedSize(1000L)
+          "control1" -> LimitedSize(1000L),
+          "control2" -> LimitedSize(1000L),
+          "control3" -> LimitedSize(1000L)
         )
       ),
       (1000L, LimitedSize(4000L), List(
-          "control1" → LimitedSize(1000L),
-          "control2" → LimitedSize(2000L),
-          "control3" → LimitedSize(3000L)
+          "control1" -> LimitedSize(1000L),
+          "control2" -> LimitedSize(2000L),
+          "control3" -> LimitedSize(3000L)
         )
       ),
       (1000L, UnlimitedSize, List(
-          "control1" → LimitedSize(1000L),
-          "control2" → LimitedSize(2000L),
-          "control3" → LimitedSize(3000L)
+          "control1" -> LimitedSize(1000L),
+          "control2" -> LimitedSize(2000L),
+          "control3" -> LimitedSize(3000L)
         )
       )
     )
 
     for {
-      (currentAggregateSize, aggregateLimit, controlAndExpected) ← expectations
-      (controlId, expectedLimit)  ← controlAndExpected
+      (currentAggregateSize, aggregateLimit, controlAndExpected) <- expectations
+      (controlId, expectedLimit)  <- controlAndExpected
     } locally {
       it(s"currentAggregateSize = `$currentAggregateSize`, aggregateLimit = `$aggregateLimit`, controlId = `$controlId`") {
         assert(expectedLimit === TestUploadCheckerLogic(
-          controlIdToMaxSize             = Map("control1" → 1000L, "control2" → 2000L),
+          controlIdToMaxSize             = Map("control1" -> 1000L, "control2" -> 2000L),
           currentUploadSizeAggregate     = Some(currentAggregateSize),
           uploadMaxSizeAggregateProperty = aggregateLimit,
           uploadMaxSizeProperty          = LimitedSize(3000)
@@ -131,7 +131,7 @@ class UploadCheckerLogicTest extends AnyFunSpec {
     it("must throw if no current aggregate size can be provided") {
       assertThrows[IllegalArgumentException] {
         TestUploadCheckerLogic(
-          controlIdToMaxSize             = Map("control1" → 1000L, "control2" → 2000L),
+          controlIdToMaxSize             = Map("control1" -> 1000L, "control2" -> 2000L),
           currentUploadSizeAggregate     = None,
           uploadMaxSizeAggregateProperty = LimitedSize(10000),
           uploadMaxSizeProperty          = LimitedSize(3000)

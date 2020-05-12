@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
   // NOTE: Never match anything if there is no context path
-  val OrbeonResourceRegex = orbeonContextPathOpt map (path ⇒ s"$path(/.*)".r) getOrElse "$.".r
+  val OrbeonResourceRegex = orbeonContextPathOpt map (path => s"$path(/.*)".r) getOrElse "$.".r
 }
 
 // This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
@@ -50,11 +50,11 @@ class OrbeonXFormsFilter extends Filter {
 
   def doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain): Unit =
     settingsOpt foreach {
-      case settings @ FilterSettings(servletContext, orbeonContextPathOpt, defaultEncoding) ⇒
+      case settings @ FilterSettings(servletContext, orbeonContextPathOpt, defaultEncoding) =>
 
         val orbeonContext = (
           orbeonContextPathOpt
-          map { orbeonContextPath ⇒
+          map { orbeonContextPath =>
             servletContext.getContext(orbeonContextPath) ensuring (
               _ ne null,
               s"Can't find Orbeon Forms context called '$orbeonContextPath'. Check the " +
@@ -81,7 +81,7 @@ class OrbeonXFormsFilter extends Filter {
         )
 
         requestPath match {
-          case settings.OrbeonResourceRegex(subRequestPath) ⇒
+          case settings.OrbeonResourceRegex(subRequestPath) =>
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
 
             // Check that the session exists for any request to /xforms-server
@@ -93,7 +93,7 @@ class OrbeonXFormsFilter extends Filter {
               (_ ne null, "Session has expired. Unable to process incoming request.")
 
             getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse)
-          case _ ⇒
+          case _ =>
             // Forward the request to the Orbeon Forms renderer
             val requestWrapper  = new FilterRequestWrapper(httpRequest)
             val responseWrapper = new FilterResponseWrapper(httpResponse, defaultEncoding)
@@ -108,7 +108,7 @@ class OrbeonXFormsFilter extends Filter {
               responseWrapper.statusCode filterNot NetUtils.isSuccessCode
 
             failureCodeOpt match {
-              case None ⇒
+              case None =>
                 // Content can be a String or other content set as a request attribute which can be read by the
                 // scope generator
                 val content =
@@ -116,9 +116,9 @@ class OrbeonXFormsFilter extends Filter {
                   responseWrapper.content
 
                 val nonEmptyContent = content match {
-                  case Some(s: String) ⇒ s.nonBlank
-                  case Some(_)         ⇒ true
-                  case None            ⇒ false
+                  case Some(s: String) => s.nonAllBlank
+                  case Some(_)         => true
+                  case None            => false
                 }
 
                 // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just
@@ -163,7 +163,7 @@ class OrbeonXFormsFilter extends Filter {
                   // No content was produced, consider this equivalent to a "not found" status
                   httpResponse.setStatus(404)
                 }
-              case Some(failureCode) ⇒
+              case Some(failureCode) =>
                 // Forward status code
                 httpResponse.setStatus(failureCode)
             }
@@ -205,7 +205,7 @@ private class FilterRequestWrapper(httpServletRequest: HttpServletRequest)
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/1796
-  def headersToRemove = (name: String) ⇒ name.toLowerCase.startsWith("if-")
+  def headersToRemove = (name: String) => name.toLowerCase.startsWith("if-")
 }
 
 private class OptionalBodyFilterRequestWrapper(httpServletRequest: HttpServletRequest, forceEmptyBody: Boolean)

@@ -27,8 +27,8 @@ class XXFormsGetVariable extends XFormsFunction {
     val variableName       = stringArgument(1)(xpathContext)
 
     containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-      case model: XFormsModel ⇒ model.getVariable(variableName)
-      case _                  ⇒ EmptyIterator.getInstance
+      case model: XFormsModel => model.getVariable(variableName)
+      case _                  => EmptyIterator.getInstance
     }
   }
 }

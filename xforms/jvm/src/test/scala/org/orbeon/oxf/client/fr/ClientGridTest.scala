@@ -45,26 +45,26 @@ trait ClientGridTest extends AssertionsForJUnit with FormRunnerOps {
 
     def doMenuAction(iteration: Int, action: String) =
       for {
-        _ ← openMenu(iteration)
-        _ ← assert(isMenuOpen)
-        _ ← clickOnMenuAction(action)
-        _ ← assert(! isMenuOpen)
+        _ <- openMenu(iteration)
+        _ <- assert(isMenuOpen)
+        _ <- clickOnMenuAction(action)
+        _ <- assert(! isMenuOpen)
       }()
 
     for {
-      _ ← loadOrbeonPage("/unit-tests/issue-1431")
-      _ ← openMenu(1)
-      _ ← assert(isMenuOpen)
-      _ ← clickOutside()
-      _ ← assert(! isMenuOpen)
-      _ ← doMenuAction(1, "insert-below")
-      _ ← assert(cssSelector("#my-grid≡fr-tr⊙2").findElement.isDefined)
-      _ ← assert(firstInputValue === "R2-D2")
-      _ ← doMenuAction(2, "move-up")
-      _ ← assert(firstInputValue === "")
-      _ ← doMenuAction(1, "remove")
-      _ ← assert(firstInputValue === "R2-D2")
-      _ ← assert(cssSelector("#my-grid≡fr-tr⊙2").findElement.isEmpty)
+      _ <- loadOrbeonPage("/unit-tests/issue-1431")
+      _ <- openMenu(1)
+      _ <- assert(isMenuOpen)
+      _ <- clickOutside()
+      _ <- assert(! isMenuOpen)
+      _ <- doMenuAction(1, "insert-below")
+      _ <- assert(cssSelector("#my-grid≡fr-tr⊙2").findElement.isDefined)
+      _ <- assert(firstInputValue === "R2-D2")
+      _ <- doMenuAction(2, "move-up")
+      _ <- assert(firstInputValue === "")
+      _ <- doMenuAction(1, "remove")
+      _ <- assert(firstInputValue === "R2-D2")
+      _ <- assert(cssSelector("#my-grid≡fr-tr⊙2").findElement.isEmpty)
     }()
   }
 }

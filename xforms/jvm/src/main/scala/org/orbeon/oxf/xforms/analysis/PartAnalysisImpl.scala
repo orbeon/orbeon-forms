@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, XMLReceiverHelper}
 import org.orbeon.xforms.Constants
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 /**
  * Static analysis of a whole part, including:
@@ -58,7 +58,7 @@ class PartAnalysisImpl(
    with Logging
    with DebugXML {
 
-  partAnalysis ⇒
+  partAnalysis =>
 
   def getIndentedLogger: IndentedLogger = staticState.getIndentedLogger
 
@@ -110,7 +110,7 @@ class PartAnalysisImpl(
     preceding      : Option[ElementAnalysis],
     controlElement : Element,
     containerScope : Scope,
-    index          : ElementAnalysis ⇒ Unit
+    index          : ElementAnalysis => Unit
   ): Option[ElementAnalysis] = {
 
     assert(containerScope ne null)
@@ -140,9 +140,9 @@ class PartAnalysisImpl(
       throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
 
     elementAnalysisOpt foreach {
-      case componentControl: ComponentControl if ! componentControl.hasLazyBinding ⇒
+      case componentControl: ComponentControl if ! componentControl.hasLazyBinding =>
         componentControl.setConcreteBinding(controlElement)
-      case _ ⇒
+      case _ =>
     }
 
     // 3. Index new control
@@ -155,7 +155,7 @@ class PartAnalysisImpl(
   def analyzeSubtree(container: ChildrenBuilderTrait): Unit = {
 
     implicit val logger = getIndentedLogger
-    withDebug("performing static analysis of subtree", Seq("prefixed id" → container.prefixedId)) {
+    withDebug("performing static analysis of subtree", Seq("prefixed id" -> container.prefixedId)) {
 
       // Global lists of external LHHA and handlers
       val lhhas         = m.Buffer[LHHAAnalysis]()
@@ -167,14 +167,14 @@ class PartAnalysisImpl(
       container.build(build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
 
       // Attach LHHA
-      for (lhha ← lhhas)
+      for (lhha <- lhhas)
         lhha.attachToControl()
 
       // Register event handlers
       registerEventHandlers(eventHandlers)
 
       // Index new models
-      for (model ← models)
+      for (model <- models)
         indexModel(model)
 
       // Some controls need special processing
@@ -219,14 +219,14 @@ class PartAnalysisImpl(
       if (isTopLevel) {
         val globalsOptions =
           for {
-            global        ← xblBindings.allGlobals
-            globalElement ← global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
+            global        <- xblBindings.allGlobals
+            globalElement <- global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
-              case childrenBuilder: ChildrenBuilderTrait ⇒
+              case childrenBuilder: ChildrenBuilderTrait =>
                 childrenBuilder.build(buildGatherLHHAAndHandlers)
                 childrenBuilder
-              case other ⇒ other
+              case other => other
             }
 
         // Add globals to the root analysis
@@ -235,14 +235,14 @@ class PartAnalysisImpl(
         warn(s"There are ${xblBindings.allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 
       // Attach LHHA
-      for (lhha ← lhhas)
+      for (lhha <- lhhas)
         lhha.attachToControl()
 
       // Register event handlers
       registerEventHandlers(eventHandlers)
 
       // Index new models
-      for (model ← models)
+      for (model <- models)
         indexModel(model)
 
       // Some controls need special processing
@@ -258,7 +258,7 @@ class PartAnalysisImpl(
         analyzeControlsXPath()
       }
 
-      debugResults(Seq("controls" → controlAnalysisMap.size.toString))
+      debugResults(Seq("controls" -> controlAnalysisMap.size.toString))
     }
 
     // Log if needed

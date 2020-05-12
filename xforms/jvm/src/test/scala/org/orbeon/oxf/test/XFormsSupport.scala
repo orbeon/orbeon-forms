@@ -42,10 +42,10 @@ import scala.reflect.ClassTag
 
 trait XFormsSupport extends MockitoSugar {
 
-  self: DocumentTestBase ⇒
+  self: DocumentTestBase =>
 
-  def withTestExternalContext[T](body: ExternalContext ⇒ T): T =
-    InitUtils.withPipelineContext { pipelineContext ⇒
+  def withTestExternalContext[T](body: ExternalContext => T): T =
+    InitUtils.withPipelineContext { pipelineContext =>
       body(
         PipelineSupport.setExternalContext(
           pipelineContext,
@@ -56,19 +56,19 @@ trait XFormsSupport extends MockitoSugar {
       )
     }
 
-  def withActionAndDoc[T](url: String)(body: ⇒ T): T =
+  def withActionAndDoc[T](url: String)(body: => T): T =
     withActionAndDoc(setupDocument(url))(body)
 
-  def withActionAndDoc[T](doc: XFormsContainingDocument)(body: ⇒ T): T =
-    withScalaAction(mockActionInterpreter(doc)) { _ ⇒
+  def withActionAndDoc[T](doc: XFormsContainingDocument)(body: => T): T =
+    withScalaAction(mockActionInterpreter(doc)) { _ =>
       withContainingDocument(doc) {
         body
       }
     }
 
-  def withAction[T](body: ⇒ T): T = {
+  def withAction[T](body: => T): T = {
     document.withOutermostActionHandler {
-      withScalaAction(mockActionInterpreter(inScopeContainingDocument))(_ ⇒ body)
+      withScalaAction(mockActionInterpreter(inScopeContainingDocument))(_ => body)
     }
   }
 
@@ -128,11 +128,11 @@ trait XFormsSupport extends MockitoSugar {
     }
 
     getObject(controlEffectiveId) match {
-      case c: XFormsControl ⇒
+      case c: XFormsControl =>
         ControlsIterator(c, includeSelf = true) collectFirst {
-          case vc: XFormsValueControl if vc.allowExternalEvent(EventNames.XXFormsValue) ⇒  vc
+          case vc: XFormsValueControl if vc.allowExternalEvent(EventNames.XXFormsValue) =>  vc
         } foreach process
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -144,15 +144,15 @@ trait XFormsSupport extends MockitoSugar {
 
   def hasFocus(controlEffectiveId: String)   = document.getControls.getFocusedControl exists (_ eq getSingleNodeControl(controlEffectiveId))
 
-  def getItemset(controlEffectiveId: String) = {
+  def getItemset(controlEffectiveId: String): String = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
-    select1.getItemset.asJSON(null, select1.mustEncodeValues, null)
+    select1.getItemset.asJSON(None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
   }
 
   def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {
-    case c: XFormsSelect1Control   ⇒ Some(c.getItemset)
-    case c: XFormsComponentControl ⇒ ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control ⇒  c.getItemset }
-    case _                         ⇒ None
+    case c: XFormsSelect1Control   => Some(c.getItemset)
+    case c: XFormsComponentControl => ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control =>  c.getItemset }
+    case _                         => None
   }
 
   def resolveObject[T: ClassTag](
@@ -164,13 +164,13 @@ trait XFormsSupport extends MockitoSugar {
 
     val resolvedOpt =
       container.resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId) collect {
-        case result if indexes.nonEmpty ⇒
+        case result if indexes.nonEmpty =>
           document.getObjectByEffectiveId(Dispatch.resolveRepeatIndexes(container, result, container.prefixedId, indexes mkString " "))
-        case result ⇒
+        case result =>
           result
       }
 
-    resolvedOpt collect { case c: T ⇒ c }
+    resolvedOpt collect { case c: T => c }
   }
 
   def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]

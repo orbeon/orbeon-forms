@@ -43,12 +43,12 @@ class Classes extends ClassSupport with DependsOnContextItemIfSingleArgumentMiss
 protected trait ClassSupport extends DefaultFunctionSupport {
   protected def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] =
     itemArgumentOrContextOpt(i) match {
-      case Some(node: NodeInfo) if node.isElement ⇒
+      case Some(node: NodeInfo) if node.isElement =>
         val classCode = xpathContext.getNamePool.allocate("", "", "class")
         val value     = node.getAttributeValue(classCode)
 
         value.tokenizeToSet
-      case _ ⇒
+      case _ =>
         Set.empty
     }
 }

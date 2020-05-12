@@ -211,7 +211,7 @@ class GridDataMigrationTest
           Migration48(List(PathElem("section-23"), PathElem("grid-3")),                                  PathElem("my-custom-grid-3-iteration"))
         )
 
-      for (migrations ← List(Migration48JsonWithParens, Migration48Json))
+      for (migrations <- List(Migration48JsonWithParens, Migration48Json))
         assert(expected === MigrationOps48.decodeMigrationSetFromJson(migrations).migrations)
     }
 
@@ -238,7 +238,7 @@ class GridDataMigrationTest
       (MigrationOps20191, Migration20191Json)
     )
 
-    for ((ops, jsonString) ← expected)
+    for ((ops, jsonString) <- expected)
       it(s"must encode ${ops.version.entryName} migrations to the expected JSON") {
 
         val result =
@@ -681,10 +681,10 @@ class GridDataMigrationTest
 
     def testSetOfData(allData: List[(String, List[(DataFormatVersion, NodeInfo)])], migrateUp: Boolean): Unit =
       allData foreach {
-        case (desc, versionAndData @ (_, originData) :: _) ⇒
+        case (desc, versionAndData @ (_, originData) :: _) =>
 
           for {
-            ((srcVersion, srcData), (dstVersion, dstData)) ← versionAndData.sliding(2) map { case List(a, b) ⇒ a → b }
+            ((srcVersion, srcData), (dstVersion, dstData)) <- versionAndData.sliding(2) map { case List(a, b) => a -> b }
             mutableSrcData = MigrationSupport.copyDocumentKeepInstanceData(srcData.root).rootElement.asInstanceOf[NodeWrapper]
           } locally {
 
@@ -707,7 +707,7 @@ class GridDataMigrationTest
               )
             }
           }
-        case _ ⇒
+        case _ =>
           throw new IllegalArgumentException
       }
 
@@ -716,22 +716,22 @@ class GridDataMigrationTest
         (
           "",
           List(
-            DataFormatVersion.V400   → DataOrbeonForms40,
-            DataFormatVersion.V480   → DataOrbeonForms48,
-            DataFormatVersion.V20191 → DataOrbeonForms20191
+            DataFormatVersion.V400   -> DataOrbeonForms40,
+            DataFormatVersion.V480   -> DataOrbeonForms48,
+            DataFormatVersion.V20191 -> DataOrbeonForms20191
           )
         ),
         (
           " with empty iterations",
           List(
-            DataFormatVersion.V400   → DataOrbeonForms40EmptyIterations,
-            DataFormatVersion.V480   → DataOrbeonForms48EmptyIterations,
-            DataFormatVersion.V20191 → DataOrbeonForms20191EmptyIterations
+            DataFormatVersion.V400   -> DataOrbeonForms40EmptyIterations,
+            DataFormatVersion.V480   -> DataOrbeonForms48EmptyIterations,
+            DataFormatVersion.V20191 -> DataOrbeonForms20191EmptyIterations
           )
         )
       )
 
     testSetOfData(testData,                                                  migrateUp = true)
-    testSetOfData(testData map { case (desc, data) ⇒ (desc, data.reverse) }, migrateUp = false)
+    testSetOfData(testData map { case (desc, data) => (desc, data.reverse) }, migrateUp = false)
   }
 }

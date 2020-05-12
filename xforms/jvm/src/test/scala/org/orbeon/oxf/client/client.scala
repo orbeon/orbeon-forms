@@ -58,14 +58,14 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     // Try to close any modal alert
     try webDriver.switchTo.alert.accept()
     catch {
-      case _: NoAlertPresentException ⇒ // NOP
+      case _: NoAlertPresentException => // NOP
     }
 
   def waitForAjaxResponse() = eventually {
     assert(executeScript("return ! (ORBEON.xforms.server.AjaxServer.hasEventsToProcess()))").asInstanceOf[Boolean])
   }
 
-  def withAjaxAction[T](wait: Boolean = true)(body: ⇒ T) = {
+  def withAjaxAction[T](wait: Boolean = true)(body: => T) = {
     val result = body
     if (wait)
       waitForAjaxResponse()
@@ -87,10 +87,10 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   def patientlyClick(css: CssSelectorQuery): Unit = eventually { click on css.element }
   def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = eventually { css.element.underlying.sendKeys(keys) }
 
-  implicit class EventuallyMonad[A](operation: ⇒ A) {
-    def map[B](continuation: A ⇒ B): B                                        = continuation(eventually(operation))
-    def flatMap[B](continuation: A ⇒ EventuallyMonad[B]): EventuallyMonad[B]  = continuation(eventually(operation))
-    def foreach[B](continuation: A ⇒ Unit): Unit                              = continuation(eventually(operation))
+  implicit class EventuallyMonad[A](operation: => A) {
+    def map[B](continuation: A => B): B                                        = continuation(eventually(operation))
+    def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B]  = continuation(eventually(operation))
+    def foreach[B](continuation: A => Unit): Unit                              = continuation(eventually(operation))
   }
 
   // For a given id, return:
@@ -147,9 +147,9 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     def tabOut(wait: Boolean = true) = insertFieldText(Keys.TAB)
 
     def insertFieldText(keys: CharSequence): Unit = e match {
-      case control if classes("xforms-control") ⇒ // && isFocusable
+      case control if classes("xforms-control") => // && isFocusable
         nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
-      case _ ⇒
+      case _ =>
         throw new IllegalArgumentException("Element is not a focusable XForms control")
     }
 
@@ -225,16 +225,16 @@ trait FormBuilderOps extends FormRunnerOps {
     val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
     val SaveButton        = cssSelector(".fr-save-button button")
 
-    def onNewForm[T](block: ⇒ T): Unit = {
+    def onNewForm[T](block: => T): Unit = {
 
       for {
-        _ ← loadOrbeonPage("/fr/orbeon/builder/new")
-        _ ← elementByStaticId("fb-app-name-input").replaceFieldText("a")
-        _ ← elementByStaticId("fb-form-name-input").replaceFieldText("a")
-        _ ← click on NewContinueButton
-        _ ← waitForAjaxResponse() // other way to test that dialog is hidden?
-        _ ← block
-        _ ← click on SaveButton   // so that we can close the browser window
+        _ <- loadOrbeonPage("/fr/orbeon/builder/new")
+        _ <- elementByStaticId("fb-app-name-input").replaceFieldText("a")
+        _ <- elementByStaticId("fb-form-name-input").replaceFieldText("a")
+        _ <- click on NewContinueButton
+        _ <- waitForAjaxResponse() // other way to test that dialog is hidden?
+        _ <- block
+        _ <- click on SaveButton   // so that we can close the browser window
       }()
     }
 
@@ -268,13 +268,13 @@ trait FormBuilderOps extends FormRunnerOps {
       Option(
         executeScript(
           "return ORBEON.jQuery('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
-          new java.lang.Integer(row),
-          new java.lang.Integer(col)
+          java.lang.Integer.valueOf(row),
+          java.lang.Integer.valueOf(col)
         ).asInstanceOf[WebElement]
       )
 
     def moveOverCellInCurrentGrid(row: Int, col: Int) =
-      findCell(row, col) foreach { e ⇒
+      findCell(row, col) foreach { e =>
         executeScript("arguments[0].scrollIntoView(true);", e)
         moveToWebElement(e)
         assert(cssSelector("#fb-edit-details-trigger a").element.isDisplayed)
@@ -337,14 +337,14 @@ object OrbeonClientBase {
   @BeforeClass
   def createAndStartService(): Unit = {
     System.getProperty("oxf.test.driver") match {
-      case "chromedriver" ⇒
+      case "chromedriver" =>
         val service = ChromeDriverService.createDefaultService()
         service.start()
         serviceOpt = Some(service)
         driverOpt = Some(new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome()))
-      case "firefoxdriver" ⇒
+      case "firefoxdriver" =>
         driverOpt = Some(new FirefoxDriver())
-      case _ ⇒
+      case _ =>
         val capabilities = (
           DesiredCapabilities.firefox()
           |!> (_.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER")))

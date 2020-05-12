@@ -32,7 +32,7 @@ class RepeatedSectionsTest
 
   describe("Model instance body elements") {
     it("must enable repeat") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -69,7 +69,7 @@ class RepeatedSectionsTest
     }
 
     it("must rename section") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -108,7 +108,7 @@ class RepeatedSectionsTest
     }
 
     it("must support custom iteration element name") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -146,7 +146,7 @@ class RepeatedSectionsTest
     }
 
     it("must change min/max") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -163,7 +163,7 @@ class RepeatedSectionsTest
     }
 
     it("must change calculated min/max") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -180,7 +180,7 @@ class RepeatedSectionsTest
     }
 
     it("must change freeze") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -198,7 +198,7 @@ class RepeatedSectionsTest
     }
 
     it("must move section into it") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -236,7 +236,7 @@ class RepeatedSectionsTest
     }
 
     it("must disable repeat") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -281,7 +281,7 @@ class RepeatedSectionsTest
       unsafeUnwrapElement(findTemplateInstance(doc, name).get / * head)
 
     it("must enable repeat") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -310,7 +310,7 @@ class RepeatedSectionsTest
     }
 
     it("must switch grid to `fb:initial-iterations=\"first\"`") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -343,7 +343,7 @@ class RepeatedSectionsTest
     }
 
     it("must insert control within grid") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -386,7 +386,7 @@ class RepeatedSectionsTest
     }
 
     it("must switch grid back to no `fb:initial-iterations`") {
-      withActionAndFBDoc(Doc) { implicit ctx ⇒
+      withActionAndFBDoc(Doc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 

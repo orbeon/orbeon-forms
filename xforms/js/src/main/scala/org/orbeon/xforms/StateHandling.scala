@@ -16,8 +16,10 @@ package org.orbeon.xforms
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
+import enumeratum._
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
+import org.scalajs.dom.HashChangeEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -28,12 +30,16 @@ object StateHandling {
 
   import Private._
 
+  // Restore state after hash changes
+  def initializeHashChangeListener(): Unit =
+    dom.window.addEventListener("hashchange", (_: HashChangeEvent) => {
+      Private.rawState.foreach(Private.replaceState)
+    })
+
   case class ClientState(
     uuid     : String,
     sequence : Int
   )
-
-  import enumeratum._
 
   sealed abstract class StateResult extends EnumEntry
 
@@ -49,7 +55,7 @@ object StateHandling {
   def initializeState(formId: String, initialUuid: String): StateResult = {
 
     def setInitialState(uuid: String): Unit =
-      StateHandling.updateClientState(
+      updateClientState(
         formId,
         ClientState(
           uuid     = uuid,
@@ -57,8 +63,8 @@ object StateHandling {
         )
       )
 
-    StateHandling.findClientState(formId) match {
-      case None ⇒
+    findClientState(formId) match {
+      case None =>
 
         scribe.debug("no state found, setting initial state")
 
@@ -66,7 +72,7 @@ object StateHandling {
         setInitialState(uuid)
         StateResult.Uuid(uuid)
 
-      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload ⇒
+      case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload =>
 
         scribe.debug("state found upon reload, setting initial state")
 
@@ -74,14 +80,14 @@ object StateHandling {
         setInitialState(uuid)
         StateResult.Uuid(uuid)
 
-      case Some(_) if Properties.revisitHandling.get() == "reload" ⇒
+      case Some(_) if Properties.revisitHandling.get() == "reload" =>
 
         scribe.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
-        StateHandling.clearClientState(formId)
+        clearClientState(formId)
         StateResult.Reload
 
-      case Some(state) ⇒
+      case Some(state) =>
 
         scribe.debug("state found, assuming back/forward/navigate, requesting all events")
 
@@ -108,12 +114,12 @@ object StateHandling {
     findClientState(formId) getOrElse (throw new IllegalStateException(s"client state not found for form `$formId`"))
 
   def findClientState(formId: String): Option[ClientState] =
-    findRawState flatMap (_.get(formId)) flatMap { serialized ⇒
+    findRawState flatMap (_.get(formId)) flatMap { serialized =>
       decode[ClientState](serialized) match {
-        case Left(_)  ⇒
+        case Left(_)  =>
           scribe.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
-        case Right(state) ⇒
+        case Right(state) =>
           scribe.trace(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
@@ -127,24 +133,27 @@ object StateHandling {
     scribe.debug(s"updating client state for form `$formId` with value `$serialized`")
 
     dict(formId) = serialized
-
-    dom.window.history.replaceState(
-      statedata = dict,
-      title     = "",
-      url       = null
-    )
+    Private.replaceState(dict)
   }
 
   def clearClientState(formId: String): Unit =
-    findRawState foreach { state ⇒
+    findRawState foreach { state =>
+      state -= formId
+      Private.replaceState(state)
+    }
+
+  private object Private {
+
+    var rawState: Option[Dictionary[String]] = None
+
+    def replaceState(state: Dictionary[String]): Unit = {
+      Private.rawState = Some(state)
       dom.window.history.replaceState(
-        statedata = state -= formId,
+        statedata = state,
         title     = "",
         url       = null
       )
     }
-
-  private object Private {
 
     // Assume the state is a `js.Dictionary[String]` mapping form ids to serialized state
     def findRawState: Option[Dictionary[String]] =

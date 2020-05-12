@@ -38,25 +38,25 @@ object OrbeonLocationException {
 
   private def getLocationData(throwable: Throwable): List[LocationData] =
     throwable match {
-      case t: ValidationException ⇒
+      case t: ValidationException =>
         t.allLocationData
-      case te: TransformerException ⇒
+      case te: TransformerException =>
         te.getException match {
-          case null | NonFatal(_) ⇒ // unclear logic
+          case null | NonFatal(_) => // unclear logic
             Option(te.getLocator) map
-            { l ⇒ new LocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
-          case _ ⇒
+            { l => new LocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
+          case _ =>
             Nil
         }
-      case t: SAXParseException ⇒
+      case t: SAXParseException =>
         List(new LocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
-      case _ ⇒
+      case _ =>
         Nil
     }
 
   def wrapException(throwable: Throwable, locationData: LocationData): ValidationException =
     throwable match {
-      case t: ValidationException ⇒ Option(locationData) foreach t.addLocationData; t
-      case t                      ⇒ new ValidationException(t, locationData)
+      case t: ValidationException => Option(locationData) foreach t.addLocationData; t
+      case t                      => new ValidationException(t, locationData)
     }
 }

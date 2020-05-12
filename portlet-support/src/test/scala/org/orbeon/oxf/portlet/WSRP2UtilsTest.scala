@@ -24,19 +24,19 @@ class WSRP2UtilsTest extends AnyFunSpec {
   describe("The `decodeQueryStringPortlet()` function") {
 
     val expected = Seq(
-      """filename=data.html&orbeon.path=/fr/service/import-export/serve&uuid=""" →
-        Map("filename"    → Seq("data.html"),
-          "orbeon.path" → Seq("/fr/service/import-export/serve"),
-          "uuid"        → Seq("")),
-      """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=""" →
-        Map("p1" → Seq("v11", "v12", ""),
-          "p2" → Seq("v21", "", "v23"))
+      """filename=data.html&orbeon.path=/fr/service/import-export/serve&uuid=""" ->
+        Map("filename"    -> Seq("data.html"),
+          "orbeon.path" -> Seq("/fr/service/import-export/serve"),
+          "uuid"        -> Seq("")),
+      """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=""" ->
+        Map("p1" -> Seq("v11", "v12", ""),
+          "p2" -> Seq("v21", "", "v23"))
     )
 
     def decode(s: String) = NetUtils.decodeQueryStringPortlet(s).asScala.mapValues(_.toList)
 
     it ("must satisfy expectations") {
-      for ((query, extracted) ← expected) {
+      for ((query, extracted) <- expected) {
         // Test with both separators
         assert(extracted === decode(query))
         assert(extracted === decode(query.replaceAllLiterally("&", "&amp;")))
@@ -48,24 +48,24 @@ class WSRP2UtilsTest extends AnyFunSpec {
 
     val expected = Seq(
       // No magic, no p_p_resource_id
-      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=" →
+      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=" ->
         "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=",
       // No magic, but non-matching p_p_resource_id
-      "http://localhost:8080/my/path/p_p_resource_id?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&gotcha=p_p_resource_id" →
+      "http://localhost:8080/my/path/p_p_resource_id?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&gotcha=p_p_resource_id" ->
         "http://localhost:8080/my/path/p_p_resource_id?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&gotcha=p_p_resource_id",
       // p_p_resource_id with magic in the middle
-      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" ->
         "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js&p2=&p2=v23&p1=",
       // Extra p_p_resource_id without magic gets ignored
-      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" ->
         "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js&p2=&p2=v23&p1=&p_p_resource_id=other-resource-id",
       // Extra p_p_resource_id after gets ignored
-      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+      "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" ->
         "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=other-resource-id&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js"
     )
 
     it ("must satisfy expectations") {
-      for ((expected, initial) ← expected)
+      for ((expected, initial) <- expected)
         assert(expected === LiferayURL.moveMagicResourceId(initial))
     }
   }

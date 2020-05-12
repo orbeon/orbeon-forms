@@ -328,6 +328,12 @@
                     <item id="0">Control Value</item>
                     <item id="1">XPath Expression</item>
                     <item id="2">All Control Values</item>
+                    <item id="3">Link to the "edit" page</item>
+                    <item id="4">Link to the "view" page</item>
+                    <item id="5">Link to the "new" page</item>
+                    <item id="6">Link to the "summary" page</item>
+                    <item id="7">Link to the "home" page</item>
+                    <item id="8">Link to the PDF file</item>
                 </type>
             </parameters-editor>
         </components>
@@ -485,6 +491,10 @@
                 <item>
                     <label>Email sender</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label>Email reply-to</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Include as email attachment</label>
@@ -681,6 +691,9 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "address"</hint>
             </control-name>
+            <grid-columns>
+                <label>Number of grid columns</label>
+            </grid-columns>
             <options>
                 <label>Options</label>
                 <item>
@@ -1066,11 +1079,11 @@
             <event-condition>
                 <label>Condition</label>
                 <item>
-                    <label>Run always</label>
+                    <label>Run in all modes</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Run on creation only</label>
+                    <label>Run in "new" mode only</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -1576,6 +1589,12 @@
                     <item id="0">Valeur de contrôle</item>
                     <item id="1">Expression XPath</item>
                     <item id="2">Toutes les valeurs</item>
+                    <item id="3">Lien à la page d'édition</item>
+                    <item id="4">Lien à la page de visualisation</item>
+                    <item id="5">Lien à la page de création</item>
+                    <item id="6">Lien à la page de sommaire</item>
+                    <item id="7">Lien à la page d'accueil</item>
+                    <item id="8">Lien au fichier PDF</item>
                 </type>
             </parameters-editor>
         </components>
@@ -1733,6 +1752,10 @@
                 <item>
                     <label>Expéditeur email</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label>"Répondre à" email</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Inclure à l'email comme fichier joint</label>
@@ -1929,6 +1952,9 @@
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
                 <hint>Par ex.: "addresse"</hint>
             </control-name>
+            <grid-columns>
+                <label>Nombre de colonnes dans la grille</label>
+            </grid-columns>
             <options>
                 <label>Options</label>
                 <item>
@@ -2315,11 +2341,11 @@
             <event-condition>
                 <label>Condition d'exécution</label>
                 <item>
-                    <label>Toujours</label>
+                    <label>Tous les modes</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>Création seulement</label>
+                    <label>Mode "création" seulement</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -2807,6 +2833,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -2964,6 +2996,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -3161,6 +3197,9 @@
                 <alert>Navnet er galt eller allerede i bruk.</alert>
                 <hint>F.eks.: «adresse»</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -3574,11 +3613,11 @@
             <event-condition>
                 <label todo="true">[Condition]</label>
                 <item>
-                    <label todo="true">[Run always]</label>
+                    <label todo="true">[Run in all modes]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label todo="true">[Run on creation only]</label>
+                    <label todo="true">[Run in "new" mode only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -4066,6 +4105,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -4223,6 +4268,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -4419,6 +4468,9 @@
                 <alert>Название уже используется или некорректно</alert>
                 <hint>Например: "address"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -4832,11 +4884,11 @@
             <event-condition>
                 <label todo="true">[Condition]</label>
                 <item>
-                    <label todo="true">[Run always]</label>
+                    <label todo="true">[Run in all modes]</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label todo="true">[Run on creation only]</label>
+                    <label todo="true">[Run in "new" mode only]</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
@@ -5325,6 +5377,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -5482,6 +5540,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -5678,6 +5740,9 @@
                 <alert>Il nome é già in uso o non è valido</alert>
                 <hint>Ad esempio: "indirizzo"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opzioni</label>
                 <item>
@@ -6576,6 +6641,12 @@
                     <item id="0">Steuerelement-Wert</item>
                     <item id="1">XPath Ausdruck</item>
                     <item id="2">Werte aller Steuerelemente</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -6700,7 +6771,7 @@
                 <hint>z.B.: "Vorname"</hint>
             </control-name>
             <pdf-field-name>
-                <label todo="true">[Name of the PDF field]</label>
+                <label>Name des PDF-Felds</label>
             </pdf-field-name>
             <options>
                 <item>
@@ -6717,7 +6788,7 @@
                 </item>
             </options>
             <email-options>
-                <label todo="true">[Email Options]</label>
+                <label>E-Mail Optionen</label>
                 <item>
                     <label>E-Mail-Empfänger</label>
                     <value>fr-email-recipient</value>
@@ -6733,6 +6804,10 @@
                 <item>
                     <label>E-Mail Absender</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Als E-Mail Anhang einfügen</label>
@@ -6929,6 +7004,9 @@
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>z.B.: "Kontaktdaten"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Optionen</label>
                 <item>
@@ -7147,10 +7225,10 @@
                 <hint>Wählen Sie einen einzigartigen Namen für diesen Dienst</hint>
             </service-name>
             <service-performs-search>
-                <label todo="true">[Service performs search]</label>
+                <label>Service führt Suche aus</label>
             </service-performs-search>
             <service-supports-paging>
-                <label todo="true">[Service supports paging]</label>
+                <label>Service unterstützt Paging</label>
             </service-supports-paging>
             <resource>
                 <label>URL der Ressourcen</label>
@@ -7393,7 +7471,7 @@
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </item-value>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
             <save>
                 <label>Speichern</label>
@@ -7487,7 +7565,7 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
-            <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
+            <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
         </xbl-control-settings>
         <messages>
             <delete-section>Sind Sie sicher, dass Sie den aktuellen Abschnitt löschen wollen?</delete-section>
@@ -7830,6 +7908,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -7987,6 +8071,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -8183,6 +8271,9 @@
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
                 <hint>Esim.: "osoite"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Asetukset</label>
                 <item>
@@ -9081,6 +9172,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -9238,6 +9335,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Incluir como Adjuntos al Mail</label>
@@ -9434,6 +9535,9 @@
                 <alert>Nombre ya usado o incorrecto</alert>
                 <hint>Ej: "nombre"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opciones</label>
                 <item>
@@ -10333,6 +10437,12 @@
                     <item id="0">Control-waarde</item>
                     <item id="1">XPath expressie</item>
                     <item id="2">Alle control-waarden</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -10490,6 +10600,10 @@
                 <item>
                     <label>E-mail afzender</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Voeg toe als e-mailbijlage</label>
@@ -10686,6 +10800,9 @@
                 <alert>Naam is al in gebruik of ongeldig</alert>
                 <hint>Bijv.: "adres"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opties</label>
                 <item>
@@ -11564,6 +11681,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -11721,6 +11844,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -11917,6 +12044,9 @@
                 <alert>O Nome é incorrecto ou já existe</alert>
                 <hint>Ex.: "morada"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Opções</label>
                 <item>
@@ -12822,6 +12952,12 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[XPath Expression]</item>
                     <item id="2" todo="true">[All Control Values]</item>
+                    <item id="3" todo="true">[Link to the "edit" page]</item>
+                    <item id="4" todo="true">[Link to the "view" page]</item>
+                    <item id="5" todo="true">[Link to the "new" page]</item>
+                    <item id="6" todo="true">[Link to the "summary" page]</item>
+                    <item id="7" todo="true">[Link to the "home" page]</item>
+                    <item id="8" todo="true">[Link to the PDF file]</item>
                 </type>
             </parameters-editor>
         </components>
@@ -12979,6 +13115,10 @@
                 <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
+                </item>
+                <item>
+                    <label todo="true">[Email reply-to recipient]</label>
+                    <value>fr-email-reply-to</value>
                 </item>
                 <item>
                     <label>Lägg till som mejlbilaga</label>
@@ -13175,6 +13315,9 @@
                 <alert>Namnet är felaktigt eller redan definierat</alert>
                 <hint>Exempel: "adress"</hint>
             </control-name>
+            <grid-columns>
+                <label todo="true">[Number of grid columns]</label>
+            </grid-columns>
             <options>
                 <label>Val</label>
                 <item>

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom._
 import org.orbeon.oxf.fr.{AppForm, ResourcesPatcher}
-import org.orbeon.oxf.properties.{Properties, PropertyStore}
+import org.orbeon.oxf.properties.{Properties, PropertySet, PropertyStore}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CollectionUtils._
@@ -23,9 +23,11 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import org.orbeon.oxf.util.CoreUtils._
 
 // NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
 class ResourcesPatcherTest
@@ -119,10 +121,10 @@ class ResourcesPatcherTest
       // - allow "type" because it's used for the FB list of types
       val AllowedDuplicateNames = Set("item", "choices", "type")
 
-      for (url ← urls) {
+      for (url <- urls) {
 
         val doc =
-          useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+          useAndClose(URLFactory.createURL(url).openStream()) { is =>
             TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
           }
 
@@ -132,9 +134,9 @@ class ResourcesPatcherTest
         // Recursively compare element presence and order. All other nodes, including text and attribute nodes, are
         // ignored.
         def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
-          case (left: DocumentInfo, right: DocumentInfo) ⇒
+          case (left: DocumentInfo, right: DocumentInfo) =>
             compareElements(left.rootElement, right.rootElement, lang)
-          case (left: NodeInfo, right: NodeInfo) if left.isElement ⇒
+          case (left: NodeInfo, right: NodeInfo) if left.isElement =>
 
             def commonMessageSuffix = s" (url=$url and lang=$lang)"
 
@@ -162,17 +164,17 @@ class ResourcesPatcherTest
 
               leftChildren.size == rightChildren.size && {
                 (leftChildren zip rightChildren) forall {
-                  case (l, r) ⇒ compareElements(l, r, lang)
+                  case (l, r) => compareElements(l, r, lang)
                 }
               }
             })
-          case _ ⇒
+          case _ =>
             // Ignore all other nodes
             true
         }
 
         for {
-          resource ← doc / * / "resource" filterNot hasLang("en")
+          resource <- doc / * / "resource" filterNot hasLang("en")
           lang     = resource attValue "*:lang"
         } locally {
           assert(compareElements(englishResource, resource, lang))
@@ -249,7 +251,7 @@ class ResourcesPatcherTest
               <login>
                   <title>[Form Runner Login]</title>
                   <username>[Username]</username>
-                  <password>[Password]</password>
+                  <password>Mot de passe</password>
                   <login>[Login]</login>
               </login>
             </authentication>
@@ -258,7 +260,15 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-      ResourcesPatcher.transform(initial, AppForm("*", "*"))(Properties.instance.getPropertySet)
+      val props = new PropertySet |!>
+        (_.setProperty(
+          element     = null,
+          name        = "oxf.fr.resource.*.*.fr.authentication.login.password",
+          typ         = XS_STRING_QNAME,
+          stringValue = "Mot de passe"
+        ))
+
+      ResourcesPatcher.transform(initial, AppForm("*", "*"))(props)
 
       assertXMLDocumentsIgnoreNamespacesInScope(initial, expected)
     }

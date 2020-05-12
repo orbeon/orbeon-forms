@@ -32,7 +32,7 @@ trait SearchResult extends SearchRequest {
     // Produce XML result
     val documentsElem =
       <documents search-total={count.toString}>{
-        documents.map(doc ⇒
+        documents.map(doc =>
           <document
             created       ={DateTime.print(doc.metadata.created.getTime)}
             last-modified ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
@@ -41,7 +41,7 @@ trait SearchResult extends SearchRequest {
             operations    ={doc.operations.mkString(" ")}>{
 
             <details>{
-              request.columns.map { requestColumn ⇒
+              request.columns.map { requestColumn =>
                   val columnValue = doc.values
                     // For all the value for the current doc, get the ones for the current column
                     .filter(_.control == requestColumn.path)

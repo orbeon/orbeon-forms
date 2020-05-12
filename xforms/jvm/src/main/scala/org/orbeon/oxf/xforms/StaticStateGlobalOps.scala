@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLAssets}
 
 import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -35,25 +35,25 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     parts = parts filterNot (_ eq part)
 
   // Find in all parts
-  private def findInParts[T <: AnyRef](get: PartAnalysis ⇒ T) =
+  private def findInParts[T <: AnyRef](get: PartAnalysis => T) =
     parts map get find (_ ne null)
 
-  private def findInPartsOpt[T <: AnyRef](get: PartAnalysis ⇒ Option[T]) =
-    parts flatMap (part ⇒ get(part)) headOption
+  private def findInPartsOpt[T <: AnyRef](get: PartAnalysis => Option[T]) =
+    parts flatMap (part => get(part)) headOption
 
   // Exists in all parts
-  private def existsInParts(p: PartAnalysis ⇒ Boolean) =
+  private def existsInParts(p: PartAnalysis => Boolean) =
     parts exists p
 
   // Collect in all parts
-  private def collectInPartsJ[T](get: PartAnalysis ⇒ java.util.Collection[T]) =
-    parts flatMap (part ⇒ get(part).asScala)
+  private def collectInPartsJ[T](get: PartAnalysis => java.util.Collection[T]) =
+    parts flatMap (part => get(part).asScala)
 
-  private def collectInParts[T](get: PartAnalysis ⇒ Iterable[T]) =
-    parts flatMap (part ⇒ get(part))
+  private def collectInParts[T](get: PartAnalysis => Iterable[T]) =
+    parts flatMap (part => get(part))
 
-  private def collectInPartsReverse[T](get: PartAnalysis ⇒ Iterable[T]) =
-    parts.reverse flatMap (part ⇒ get(part))
+  private def collectInPartsReverse[T](get: PartAnalysis => Iterable[T]) =
+    parts.reverse flatMap (part => get(part))
 
   // Models
   def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))
@@ -107,7 +107,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is
     findControlAnalysis(startPrefixedId).toList flatMap
       (_.ancestorRepeatsAcrossParts) takeWhile
-        (a ⇒ ! endPrefixedId.contains(a.prefixedId)) map
+        (a => ! endPrefixedId.contains(a.prefixedId)) map
           (_.prefixedId)
 
   def getAncestorRepeats(prefixedId: String): List[RepeatControl] =
@@ -115,7 +115,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def getAncestorOrSelfRepeats(startPrefixedId: String): Seq[String] =
     (findControlAnalysis(startPrefixedId).toSeq collect
-      { case r: RepeatControl ⇒ r.prefixedId }) ++ getAncestorRepeatIds(startPrefixedId, None)
+      { case r: RepeatControl => r.prefixedId }) ++ getAncestorRepeatIds(startPrefixedId, None)
 
   /**
    * Find the closest common ancestor repeat given two prefixed ids. If the prefixed ids denote repeats, include them
@@ -130,7 +130,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     // Starting from the root, find the couples of repeats with identical ids
     val longestPrefix = getAncestorRepeatIds(prefixedId1).reverse zip
       getAncestorRepeatIds(prefixedId2).reverse takeWhile
-        { case (left, right) ⇒ left == right }
+        { case (left, right) => left == right }
 
     // Return the id of the last element found
     longestPrefix.lastOption map (_._1)

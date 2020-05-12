@@ -28,7 +28,7 @@ object Offset {
 
   def offset(el: JQuery, offset: Offset): Unit =
     el.offset(js.Dictionary(
-      "left" → offset.left,
-      "top"  → offset.top
+      "left" -> offset.left,
+      "top"  -> offset.top
     ))
 }

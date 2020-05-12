@@ -50,7 +50,7 @@ private[persistence] object SQL extends Logging {
     }
 
     // Mark lines that are end-of-statement
-    val linesWithMarkers = linesWithNext.map{case (line, next) ⇒ (line,
+    val linesWithMarkers = linesWithNext.map{case (line, next) => (line,
       // To be the end of a statement, we must end with a `;`
       line.endsWith(";") &&
       // But also we don't start with space, or we're at the end of the file, or the next line is empty
@@ -60,7 +60,7 @@ private[persistence] object SQL extends Logging {
     // Group lines in statements
     var allStatements    = ArrayBuffer[String]()
     var currentStatement = ArrayBuffer[String]()
-    linesWithMarkers.foreach { case (line, isLastLineOfStatement) ⇒
+    linesWithMarkers.foreach { case (line, isLastLineOfStatement) =>
       // Remove the `;` separator if this is the last line, except at the end of
       // a block (`END;`) where it is required by Oracle
       val partToKeep = if (isLastLineOfStatement && ! line.endsWith("END;"))
@@ -75,9 +75,9 @@ private[persistence] object SQL extends Logging {
   }
 
   def executeStatements(provider: Provider, statement: Statement, sql: Seq[String])(implicit logger: IndentedLogger): Unit = {
-    withDebug("running statements", List("provider" → provider.entryName)) {
-      sql foreach { s ⇒
-        withDebug("running", List("statement" → s)) {
+    withDebug("running statements", List("provider" -> provider.entryName)) {
+      sql foreach { s =>
+        withDebug("running", List("statement" -> s)) {
           statement.executeUpdate(s)
         }
       }

@@ -54,9 +54,9 @@ private object XXFormsNodesetChangedEvent {
 
   import XFormsEvent._
 
-  val Getters = Map[String, XXFormsNodesetChangedEvent ⇒ Option[Any]](
-    xxfName("new-positions")  → (_.newIterationsOpt),
-    xxfName("from-positions") → (_.oldIterationPositionsOpt),
-    xxfName("to-positions")   → (_.newIterationPositionsOpt)
+  val Getters = Map[String, XXFormsNodesetChangedEvent => Option[Any]](
+    xxfName("new-positions")  -> (_.newIterationsOpt),
+    xxfName("from-positions") -> (_.oldIterationPositionsOpt),
+    xxfName("to-positions")   -> (_.newIterationPositionsOpt)
   )
 }

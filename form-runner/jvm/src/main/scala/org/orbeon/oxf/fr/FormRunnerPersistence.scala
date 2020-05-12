@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import java.io.File
 import java.net.URI
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
@@ -132,13 +132,13 @@ object FormRunnerPersistence {
     // Build headers map
     val headers = (
       for {
-        propertyName   ← properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
-        lowerSuffix    ← propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
+        propertyName   <- properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
+        lowerSuffix    <- propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
         if ! StandardProviderProperties(lowerSuffix)
         headerName     = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
-        headerValue    ← properties.getObjectOpt(propertyName)
+        headerValue    <- properties.getObjectOpt(propertyName)
       } yield
-        headerName → headerValue.toString) toMap
+        headerName -> headerValue.toString) toMap
 
     val uri = Option(providerPropertyAsURL(provider, "uri")) getOrElse
       (throw new OXFException(s"no base URL specified for requested persistence provider `$provider` (check properties)"))
@@ -154,7 +154,7 @@ object FormRunnerPersistence {
     val headersXML =
       <headers>{
         for {
-          (name, value) ← headers
+          (name, value) <- headers
         } yield
           <header><name>{name.escapeXmlMinimal}</name><value>{value.escapeXmlMinimal}</value></header>
       }</headers>.toString
@@ -173,9 +173,9 @@ object FormRunnerPersistence {
       providerPropertyAsString(provider, DataFormatVersionName, PersistenceDefaultDataFormatVersion.entryName)
 
     DataFormatVersion.withNameOption(dataFormatVersionString) match {
-      case Some(dataFormatVersion) ⇒
+      case Some(dataFormatVersion) =>
         dataFormatVersion
-      case None ⇒
+      case None =>
         throw new IllegalArgumentException(
           s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property is set to `$dataFormatVersionString` but must be one of ${DataFormatVersion.values map (_.entryName) mkString ("`", "`, `", "`")}"
         )
@@ -220,15 +220,15 @@ trait FormRunnerPersistence {
     PathUtils.recombineQuery(
       FormMetadataBasePath :: app :: form :: Nil mkString "/",
       List(
-        "all-versions" → allVersions.toString,
-        "all-forms"    → allForms.toString
+        "all-versions" -> allVersions.toString,
+        "all-forms"    -> allForms.toString
       )
     )
 
   //@XPathFunction
   def createNewFromServiceUrlOrEmpty(app: String, form: String): String =
     properties.getStringOrURIAsStringOpt(NewFromServiceUriProperty :: app :: form :: Nil mkString ".") match {
-      case Some(serviceUrl) ⇒
+      case Some(serviceUrl) =>
 
         val requestedParams =
           properties.getString(NewFromServiceParamsProperty :: app :: form :: Nil mkString ".", "").splitTo[List]()
@@ -237,18 +237,18 @@ trait FormRunnerPersistence {
 
         val nameValueIt =
           for {
-            name   ← requestedParams.iterator
-            values ← docParams.get(name).iterator
-            value  ← values.iterator
+            name   <- requestedParams.iterator
+            values <- docParams.get(name).iterator
+            value  <- values.iterator
           } yield
-            name → value
+            name -> value
 
         PathUtils.recombineQuery(
           pathQuery = serviceUrl,
           params    = nameValueIt
         )
 
-      case None ⇒ null
+      case None => null
     }
 
   // Whether the given path is an attachment path (ignoring an optional query string)
@@ -297,7 +297,7 @@ trait FormRunnerPersistence {
     val url = new URI(rewrittenURLString)
 
     val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-      scheme           = UriScheme.withName(url.getScheme),
+      url              = url,
       hasCredentials   = false,
       customHeaders    = Map(),
       headersToForward = Connection.headersToForwardFromProperty,
@@ -321,7 +321,7 @@ trait FormRunnerPersistence {
     // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
     // required).
     //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-    ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+    ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
       // do process XInclude, so FB's model gets included
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, rewrittenURLString, true, false)
     } toOption
@@ -368,25 +368,25 @@ trait FormRunnerPersistence {
 
     val unsavedAttachmentHolders =
       documentIdOpt match {
-        case Some(documentId) if isNewOrEditMode(mode) ⇒
+        case Some(documentId) if isNewOrEditMode(mode) =>
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
           collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false)._1
-        case _ ⇒
+        case _ =>
           Nil
       }
 
     val filenames =
       for {
-        holder   ← unsavedAttachmentHolders
+        holder   <- unsavedAttachmentHolders
         filename = holder attValue "filename"
         if ! new File(URLFactory.createURL(splitQuery(holder.stringValue)._1).getFile).exists()
       } yield {
 
         setvalue(holder, "")
 
-        AttachmentAttributeNames foreach { attName ⇒
+        AttachmentAttributeNames foreach { attName =>
           setvalue(holder /@ attName, "")
         }
 
@@ -403,7 +403,7 @@ trait FormRunnerPersistence {
     forceAttachments : Boolean
   ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
     for {
-      holder        ← data descendant Node
+      holder        <- data descendant Node
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
@@ -430,7 +430,7 @@ trait FormRunnerPersistence {
 
   def putWithAttachments(
     data              : DocumentInfo,
-    migrate           : DocumentInfo ⇒ DocumentInfo,
+    migrate           : DocumentInfo => DocumentInfo,
     toBaseURI         : String,
     fromBasePath      : String,
     toBasePath        : String,
@@ -450,37 +450,37 @@ trait FormRunnerPersistence {
 
     def saveAllAttachments(): Unit = {
       val holdersAfterURLs = uploadHolders.zip(afterURLs)
-      holdersAfterURLs foreach { case (holder, resource) ⇒
+      holdersAfterURLs foreach { case (holder, resource) =>
         // Copy holder, so we're not blocked in case there are other background uploads
         val holderCopy = TransformerUtils.extractAsMutableDocument(holder).rootElement
         sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder" → Some(holderCopy),
-          "resource" → Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
-          "username" → username,
-          "password" → password,
-          "form-version" → formVersion
+          "holder" -> Some(holderCopy),
+          "resource" -> Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
+          "username" -> username,
+          "password" -> password,
+          "form-version" -> formVersion
         )
         )
       }
     }
 
     def updateAttachmentPaths() =
-      uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
+      uploadHolders zip afterURLs foreach { case (holder, resource) =>
         setvalue(holder, resource)
       }
 
     def rollbackAttachmentPaths() =
-      uploadHolders zip beforeURLs foreach { case (holder, resource) ⇒
+      uploadHolders zip beforeURLs foreach { case (holder, resource) =>
         setvalue(holder, resource)
       }
 
     def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
-        "holder"       → Some(migratedData.rootElement),
-        "resource"     → Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
-        "username"     → username,
-        "password"     → password,
-        "form-version" → formVersion)
+        "holder"       -> Some(migratedData.rootElement),
+        "resource"     -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
+        "username"     -> username,
+        "password"     -> password,
+        "form-version" -> formVersion)
       )
 
     // First process attachments
@@ -494,15 +494,15 @@ trait FormRunnerPersistence {
 
         // Save and try to retrieve returned version
         for {
-          done     ← saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
-          headers  ← done.headers
-          versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
-          version  ← versions.headOption
+          done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
+          headers  <- done.headers
+          versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
+          version  <- versions.headOption
         } yield
           version
 
       } catch {
-        case NonFatal(e) ⇒
+        case NonFatal(e) =>
           // In our persistence implementation, we do not remove attachments if saving the data fails.
           // However, some custom persistence implementations do. So we don't think we can assume that
           // attachments have been saved. So we rollback attachment paths in the data in this case.

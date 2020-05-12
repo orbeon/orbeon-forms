@@ -13,11 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
+
 
 trait FormRunnerEmail {
 
@@ -41,8 +47,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
-      case ControlBindPathHoldersResources(_, _, _, None,          _) ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None,          _) => Nil
     }
 
   // Given a form head, form body and instance data:
@@ -71,8 +77,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
-      case ControlBindPathHoldersResources(_, _, _, None         , _) ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
+      case ControlBindPathHoldersResources(_, _, _, None         , _) => Nil
     }
 
   //@XPathFunction
@@ -95,13 +101,41 @@ trait FormRunnerEmail {
       )
 
     for {
-      (expr, mapping) ← formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
-      trimmedExpr     ← expr.trimAllToOpt
+      (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
+      trimmedExpr     <- expr.trimAllToOpt
       name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
     } yield {
       // This appears necessary for non-ASCII characters to make it through.
       // Verified that this works with GMail.
       javax.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
+    }
+  }
+
+  //@XPathFunction
+  def buildLinkBackToFormRunner(linkType: String): String = {
+
+    val FormRunnerParams(app, form, version, documentOpt, _) = FormRunnerParams()
+
+    val baseUrlNoSlash =
+      formRunnerStandaloneBaseUrl(
+        Properties.instance.getPropertySet,
+        NetUtils.getExternalContext.getRequest
+      ).dropTrailingSlash
+
+    def build(mode: String, documentId: Option[String]) =
+      recombineQuery(
+        pathQuery = s"$baseUrlNoSlash/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}",
+        params    = List(FormVersionParam -> version.toString)
+      )
+
+    linkType match {
+      case "LinkToEditPageParam"    => build("edit",    documentOpt)
+      case "LinkToViewPageParam"    => build("view",    documentOpt)
+      case "LinkToNewPageParam"     => build("new",     None)
+      case "LinkToSummaryPageParam" => build("summary", None)
+      case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToPdfParam"         => build("pdf",     documentOpt)
+      case _ => throw new IllegalArgumentException(linkType)
     }
   }
 }

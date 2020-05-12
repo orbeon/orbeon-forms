@@ -45,7 +45,7 @@
       }
       value = Controls.getCurrentValue(control);
       changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, value, "xxforms-value");
-      return ORBEON.xforms.server.AjaxServer.fireEvents([changeEvent], false);
+      return ORBEON.xforms.server.AjaxServer.fireEvent(changeEvent);
     };
     if (YD.hasClass(document.body, "xforms-ios")) {
       initUnder = function(node) {
@@ -97,7 +97,7 @@
         if (isDateOrTimeInput) {
           value = Controls.getCurrentValue(event.control);
           changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, event.control.id, value, "xxforms-value");
-          return ORBEON.xforms.server.AjaxServer.fireEvents([changeEvent], false);
+          return ORBEON.xforms.server.AjaxServer.fireEvent(changeEvent);
         }
       });
       return Controls.valueChange.subscribe(function(event) {

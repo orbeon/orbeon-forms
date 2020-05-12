@@ -39,9 +39,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   import OrbeonProxyPortlet._
 
   private case class PortletSettings(
-    forwardHeaders     : Map[String, String], // lowercase name → original name
+    forwardHeaders     : Map[String, String], // lowercase name -> original name
     forwardParams      : Set[String],
-    forwardProperties  : Map[String, String], // lowercase name → original name
+    forwardProperties  : Map[String, String], // lowercase name -> original name
     keepParams         : Set[String],
     resourcesRegex     : String,
     httpClient         : HttpClient
@@ -82,9 +82,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     super.init(config)
     settingsOpt = Some(
       PortletSettings(
-        forwardHeaders     = config.getInitParameter("forward-headers").tokenizeToSet.iterator.map(name ⇒ name.toLowerCase → name).toMap,
+        forwardHeaders     = config.getInitParameter("forward-headers").tokenizeToSet.iterator.map(name => name.toLowerCase -> name).toMap,
         forwardParams      = config.getInitParameter("forward-parameters").tokenizeToSet,
-        forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.iterator.map(name ⇒ name.toLowerCase → name).toMap,
+        forwardProperties  = config.getInitParameter("forward-properties").tokenizeToSet.iterator.map(name => name.toLowerCase -> name).toMap,
         keepParams         = config.getInitParameter("keep-parameters").tokenizeToSet,
         resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
@@ -102,31 +102,31 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   // Try to find `getHttpServletRequest` only the first time this is accessed
   private lazy val getHttpServletRequest =
     try Some(LiferayAPI.getHttpServletRequest _)
-    catch { case _: NoClassDefFoundError | _: ClassNotFoundException ⇒ None }
+    catch { case _: NoClassDefFoundError | _: ClassNotFoundException => None }
 
   private lazy val getOriginalServletRequest =
     try Some(LiferayAPI.getOriginalServletRequest _)
-    catch { case _: NoClassDefFoundError | _: ClassNotFoundException ⇒ None }
+    catch { case _: NoClassDefFoundError | _: ClassNotFoundException => None }
 
   private def findServletRequest(request: PortletRequest): Option[HttpServletRequest] =
     for {
-      f1      ← getHttpServletRequest
-      httpReq ← Option(f1(request))
+      f1      <- getHttpServletRequest
+      httpReq <- Option(f1(request))
     } yield
       httpReq
 
   private def findOriginalServletRequest(request: PortletRequest): Option[HttpServletRequest] =
     for {
-      f1              ← getHttpServletRequest
-      httpReq         ← Option(f1(request))
-      f2              ← getOriginalServletRequest
-      originalHttpReq ← Option(f2(httpReq))
+      f1              <- getHttpServletRequest
+      httpReq         <- Option(f1(request))
+      f2              <- getOriginalServletRequest
+      originalHttpReq <- Option(f2(httpReq))
     } yield
       originalHttpReq
 
   // Portlet render
   override def doView(request: RenderRequest, response: RenderResponse): Unit =
-    settingsOpt foreach { settings ⇒
+    settingsOpt foreach { settings =>
       withRootException("view render", new PortletException(_)) {
 
         implicit val ctx = new ProxyPortletEmbeddingContextWithResponse(
@@ -147,22 +147,22 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   // Portlet action
   override def processAction(request: ActionRequest, response: ActionResponse): Unit =
-    settingsOpt foreach { _ ⇒
+    settingsOpt foreach { _ =>
       HttpMethod.withNameInsensitive(request.getMethod) match {
-        case HttpMethod.GET ⇒
+        case HttpMethod.GET =>
           // See https://github.com/orbeon/orbeon-forms/issues/3978
           // NOP
-        case _ ⇒
+        case _ =>
           request.getPortletMode match {
-            case PortletMode.VIEW ⇒ doViewAction(request, response)
-            case PortletMode.EDIT ⇒ doEditAction(request, response)
-            case _ ⇒ // NOP
+            case PortletMode.VIEW => doViewAction(request, response)
+            case PortletMode.EDIT => doEditAction(request, response)
+            case _ => // NOP
           }
       }
     }
 
   private def doViewAction(request: ActionRequest, response: ActionResponse): Unit =
-    settingsOpt foreach { settings ⇒
+    settingsOpt foreach { settings =>
       withRootException("view action", new PortletException(_)) {
         implicit val ctx = new PortletEmbeddingContext(
           getPortletContext,
@@ -180,7 +180,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   // Portlet resource
   override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
-    settingsOpt foreach { settings ⇒
+    settingsOpt foreach { settings =>
       withRootException("resource", new PortletException(_)) {
 
         // Use this context so that URLs in XML responses are rewritten with `keep-parameters` as well
@@ -193,7 +193,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         )
 
         APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePathRegex) match {
-          case Some(sanitizedResourcePath) ⇒
+          case Some(sanitizedResourcePath) =>
             val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
             val requestDetails =
@@ -207,7 +207,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             APISupport.proxyResource(requestDetails)
 
-          case None ⇒
+          case None =>
             // What were the Portlet API designers thinking?
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpServletResponse.SC_NOT_FOUND.toString)
         }
@@ -216,19 +216,19 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def preferenceFromPortalQuery(request: PortletRequest, pref: Pref): Option[String] =
     if (getBooleanPreference(request, EnableURLParameters))
-      portalQueryFromOriginalServletRequestIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value}
+      portalQueryFromOriginalServletRequestIt(request) collectFirst { case (pref.nameLabel.publicName, value) => value}
     else
       None
 
   private def preferenceFromPublicRenderParameter(request: PortletRequest, pref: Pref): Option[String] =
     if (getBooleanPreference(request, EnablePublicRenderParameters))
-      publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+      publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) => value }
     else
       None
 
   private def preferenceFromSessionParameter(request: PortletRequest, pref: Pref) = {
     if (getBooleanPreference(request, EnableSessionParameters))
-      sessionParameters(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+      sessionParameters(request) collectFirst { case (pref.nameLabel.publicName, value) => value }
     else
       None
   }
@@ -262,19 +262,19 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         if (getBooleanPreference(request, ReadOnly) && mode == FormRunnerMode.Edit.entryName) FormRunnerMode.View.entryName else mode
 
       pathParameterOpt getOrElse defaultPath match {
-        case path @ APISupport.XFormsServerSubmit ⇒
+        case path @ APISupport.XFormsServerSubmit =>
           path
         // Incoming path is Form Runner path without document id
-        case FormRunnerPathRegex(appName, formName, mode, _, query) ⇒
+        case FormRunnerPathRegex(appName, formName, mode, _, query) =>
           APISupport.formRunnerPath(appName, formName, filterMode(mode), None, Option(query))
         // Incoming path is Form Runner path with document id
-        case FormRunnerDocumentPathRegex(appName, formName, mode, documentId, _, query) ⇒
+        case FormRunnerDocumentPathRegex(appName, formName, mode, documentId, _, query) =>
           APISupport.formRunnerPath(appName, formName, filterMode(mode), Some(documentId), Option(query))
         // Incoming path is Form Runner Home page
-        case FormRunnerHomePathRegex(_, query) ⇒
+        case FormRunnerHomePathRegex(_, query) =>
           APISupport.formRunnerHomePath(Option(query))
         // Unsupported path
-        case otherPath ⇒
+        case otherPath =>
           throw new PortletException(s"Unsupported path: `$otherPath`")
       }
     }
@@ -292,30 +292,30 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   // doesn't appear to work for resource URLs.
   private def portalQueryFromOriginalServletRequestIt(request: PortletRequest): Iterator[(String, String)] =
     findOriginalServletRequest(request) match {
-      case Some(httpServletRequest) ⇒
+      case Some(httpServletRequest) =>
         for {
-          (key, values) ← httpServletRequest.getParameterMap.asScala.iterator
-          value ← values
+          (key, values) <- httpServletRequest.getParameterMap.asScala.iterator
+          value <- values
         } yield
-          key → value
-      case None ⇒
+          key -> value
+      case None =>
         Iterator.empty
     }
 
-  private def keepFromPortalQueryIt(request: PortletRequest, keep: String ⇒ Boolean): Iterator[(String, String)] =
+  private def keepFromPortalQueryIt(request: PortletRequest, keep: String => Boolean): Iterator[(String, String)] =
     for {
-      pair @ (key, _) ← portalQueryFromOriginalServletRequestIt(request)
+      pair @ (key, _) <- portalQueryFromOriginalServletRequestIt(request)
       if keep(key)
     } yield
       pair
 
   private def publicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] =
     for {
-      (key, values) ← request.getPublicParameterMap.asScala.iterator
-      firstValue    ← values.headOption
-      nonBlankValue ← firstValue.trimAllToOpt
+      (key, values) <- request.getPublicParameterMap.asScala.iterator
+      firstValue    <- values.headOption
+      nonBlankValue <- firstValue.trimAllToOpt
     } yield
-      key → nonBlankValue
+      key -> nonBlankValue
 
   private def sessionParameters(request: PortletRequest): Iterator[(String, String)] = {
 
@@ -323,10 +323,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       request.getPortletSession.getAttribute(name, PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
 
     Iterator(
-      DocumentId.nameLabel.publicName → fromSession("LIFERAY_SHARED_ORBEON_DOCUMENT_ID"),
-      AppName.nameLabel.publicName    → fromSession("LIFERAY_SHARED_ORBEON_APP"),
-      FormName.nameLabel.publicName   → fromSession("LIFERAY_SHARED_ORBEON_FORM"),
-      Page.nameLabel.publicName       → fromSession("LIFERAY_SHARED_ORBEON_PAGE")
+      DocumentId.nameLabel.publicName -> fromSession("LIFERAY_SHARED_ORBEON_DOCUMENT_ID"),
+      AppName.nameLabel.publicName    -> fromSession("LIFERAY_SHARED_ORBEON_APP"),
+      FormName.nameLabel.publicName   -> fromSession("LIFERAY_SHARED_ORBEON_FORM"),
+      Page.nameLabel.publicName       -> fromSession("LIFERAY_SHARED_ORBEON_PAGE")
     )
   }
 
@@ -348,10 +348,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     def portletRequestHeadersIt =
       for {
-        name   ← request.getPropertyNames.asScala
+        name   <- request.getPropertyNames.asScala
         values = request.getProperties(name).asScala.toList
       } yield
-        name → values
+        name -> values
 
     val portletReqHeaders = portletRequestHeadersIt.to(List)
 
@@ -395,7 +395,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def contentFromRequest(request: PortletRequest, namespace: String): Option[StreamedContent] =
     request match {
-      case clientDataRequest: ClientDataRequest if clientDataRequest.getMethod == "POST" ⇒
+      case clientDataRequest: ClientDataRequest if clientDataRequest.getMethod == "POST" =>
         Some(
           StreamedContent(
             clientDataRequest.getPortletInputStream,
@@ -404,7 +404,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             None
           )
         )
-      case _ ⇒
+      case _ =>
         None
     }
 }
@@ -415,10 +415,10 @@ private[portlet] object OrbeonProxyPortlet {
   val FormRunnerPathRegex         : Regex = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
   val FormRunnerDocumentPathRegex : Regex = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
 
-  def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
+  def withRootException[T](action: String, newException: Throwable => Exception)(body: => T)(implicit ctx: PortletContext): T =
     try body
     catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         ctx.log("Exception when running " + action + '\n' + OrbeonFormatter.format(t))
         throw newException(Exceptions.getRootThrowable(t))
     }

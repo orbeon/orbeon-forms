@@ -35,8 +35,8 @@ class FormBuilderUndoTest
   describe("Undo delete section, grid and control") {
 
     val containerDetails =
-      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
-        findNestedContainers(ctx.bodyElem) map  { container ⇒
+      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
+        findNestedContainers(ctx.bodyElem) map  { container =>
           (
             container.id,
             IsGrid(container),
@@ -46,9 +46,9 @@ class FormBuilderUndoTest
         } toList
       }
 
-    containerDetails foreach { case (containerId, isGrid, firstCellId, nestedControlId) ⇒
+    containerDetails foreach { case (containerId, isGrid, firstCellId, nestedControlId) =>
       it(s"Must be able to undo delete of ${if (isGrid) "grid" else "section"} `$containerId` and nested control `$nestedControlId`") {
-        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
 
@@ -114,9 +114,9 @@ class FormBuilderUndoTest
       }
     }
 
-    containerDetails filter (_._2) foreach { case (containerId, _, firstCellId, _) ⇒
+    containerDetails filter (_._2) foreach { case (containerId, _, firstCellId, _) =>
       it(s"Must be able to move cell walls, merge and split cells of grid `$containerId`") {
-        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
 

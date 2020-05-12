@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
@@ -47,8 +47,8 @@ object XBLTransformer {
       elem          : Element
     ): Boolean =
       elem.attributeValueOpt(XXBLUseIfAttrQName) match {
-        case Some(att) ⇒ boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
-        case None      ⇒ true
+        case Some(att) => boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
+        case None      => true
       }
   }
 
@@ -88,12 +88,12 @@ object XBLTransformer {
       namespaceElement : Element
     ): Unit =
       if ((attributeValue ne null) && (nodes ne null) && ! nodes.isEmpty) {
-        for (node ← nodes.asScala) {
+        for (node <- nodes.asScala) {
           node match {
-            case element: Element ⇒
+            case element: Element =>
               Dom4jUtils.copyMissingNamespaces(namespaceElement, element)
               element.addAttribute(attributeQName, attributeValue)
-            case _ ⇒
+            case _ =>
           }
         }
       }
@@ -103,14 +103,14 @@ object XBLTransformer {
       value : String
     ): Unit =
       if ((value ne null) && (nodes ne null) && ! nodes.isEmpty) {
-        for (node ← nodes.asScala) {
+        for (node <- nodes.asScala) {
           if (node.isInstanceOf[Element]) {
             node.setText(value)
           }
         }
       }
 
-    Dom4j.visitSubtree(shadowTreeDocument.getRootElement, currentElem ⇒ {
+    Dom4j.visitSubtree(shadowTreeDocument.getRootElement, currentElem => {
 
       val isXBLContent = currentElem.getQName == XBLContentQName
       var resultingNodes: ju.List[Node] = null
@@ -126,14 +126,14 @@ object XBLTransformer {
             // All bound node content must be copied over (except nested handlers if requested)
 
             val clonedContent = new ju.ArrayList[Node]
-            for (node ← Dom4j.content(boundElement)) {
+            for (node <- Dom4j.content(boundElement)) {
               node match {
-                case _: Namespace ⇒
+                case _: Namespace =>
                   // don't copy over namespace nodes
-                case elem: Element ⇒
+                case elem: Element =>
                   if (! mustFilterOut(elem))
                     clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
-                case node ⇒
+                case node =>
                   clonedContent.add(Dom4jUtils.createCopy(node))
               }
             }
@@ -161,7 +161,7 @@ object XBLTransformer {
             if (elements.nonEmpty) {
               // Clone all the resulting elements
               contentToInsert = new ju.ArrayList[Node](elements.size)
-              for (currentNodeInfo ← elements) {
+              for (currentNodeInfo <- elements) {
                 val currentElement = unsafeUnwrapElement(currentNodeInfo)
                 if (! mustFilterOut(currentElement))
                   contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
@@ -170,7 +170,7 @@ object XBLTransformer {
               // Clone all the element's children if any
               // See: http://www.w3.org/TR/xbl/#the-content
               contentToInsert = new ju.ArrayList[Node](currentElem.nodeCount)
-              for (currentElement ← Dom4j.elements(currentElem)) {
+              for (currentElement <- Dom4j.elements(currentElem)) {
                 if (! mustFilterOut(currentElement))
                   contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
               }
@@ -188,7 +188,7 @@ object XBLTransformer {
           currentElem.detach()
 
           resultingNodes = contentToInsert
-          if (scopeAttribute.nonBlank) {
+          if (scopeAttribute.nonAllBlank) {
             // If author specified scope attribute, use it
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
           } else {
@@ -220,7 +220,7 @@ object XBLTransformer {
 
         val xblAttrString = xblAttr.getValue
 
-        for (currentValue ← xblAttrString.splitTo[Iterator]()) {
+        for (currentValue <- xblAttrString.splitTo[Iterator]()) {
 
           val equalIndex = currentValue.indexOf('=')
           if (equalIndex == -1) {
@@ -252,13 +252,13 @@ object XBLTransformer {
             val (rightSideValue, namespaceElement) =
               if (! isRightSideXBLText) {
                 // Get attribute value
-                boundElement.attributeValue(rightSideQName) → boundElement
+                boundElement.attributeValue(rightSideQName) -> boundElement
               } else {
                 // Get text value
 
                 // "any text nodes (including CDATA nodes and whitespace text nodes) that are
                 // explicit children of the bound element must have their data concatenated"
-                boundElement.getText → null
+                boundElement.getText -> null
               }
 
             if (rightSideValue ne null) {
@@ -303,7 +303,7 @@ object XBLTransformer {
           null
         )
         if (! nodeInfos.isEmpty) {
-          for (nodeInfo ← nodeInfos.asScala) {
+          for (nodeInfo <- nodeInfos.asScala) {
             val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
             if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
               val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
@@ -315,7 +315,7 @@ object XBLTransformer {
 
       // Check for AVTs
       if (supportAVTs) {
-        for (att ← Dom4j.attributes(currentElem)) {
+        for (att <- Dom4j.attributes(currentElem)) {
           val attValue = att.getValue
           if (XFormsUtils.maybeAVT(attValue)) {
             val newValue = XPathCache.evaluateAsAvt(

@@ -14,13 +14,12 @@
 
     .fr-xforms-inspector {
         display: block; clear: both;                                                                // Be tolerant of different surroundings
-        border: 2px solid #aaa;
+        border: 1px solid #e3e3e3;
         padding: .5em 1em;
-        background: url("gradient.gif")  repeat-x scroll center top #F8F8F8;                        // Background with gradient
-        margin: 1em 1em;                                                                            // Add margin, on the sides especially for Form Runner
-        font-size: 12px;                                                                            // Use px size to be more predictable depending on where the Inspector is used*/
-        font-family: "Lucida Grande","Lucida Sans Unicode",Helvetica,Arial,Verdana,sans-serif;      // Orbeon font
-        color: #333;                                                                                // Orbeon color
+        background: white;
+        margin: auto;                                                                               // Center
+        max-width: 940px;
+        box-sizing: border-box;
     }
 
     .fr-xforms-inspector-title { font-size: 167%; padding: .5em 0 1em 0; }                           // Use larger font for title with padding
@@ -28,11 +27,13 @@
         color: #ccc;                                                                                // Grey out part of the UI that are disabled
         .xforms-label { color: #ccc }                                                               // Label is light gray when disabled
     }
-    .xforms-label { display: inline-block; width: 5em;                                              // Align labels
-                                font-weight: bold; color: #333 }                                    // Styling to distinguish labels
-    .fr-xforms-inspector-instance { padding-left: 2em }                                             // Space between model and instance
+    .xforms-label { display: block;                                                                 // Labels above controls, as in Form Runner
+                    font-weight: bold; color: #333; margin: 0 }                                     // Styling to distinguish labels
+    .fr-xforms-inspector-model-instance > * { display: inline-block; width: 300px }
+    .fr-xforms-inspector-instance { padding-left: 20px }                                            // Space between model and instance
+    .fr-xforms-inspector-xpath input { width: 545px }
     .fr-xforms-inspector-block { padding: .5em 0 }                                                  // Space before/after different sections of the form
-    .xforms-input input { width: 20em }                                                             // Wider input fields
     .fr-xforms-inspector-source { padding: 1em 0 0 0 }                                              // Space before the view area
     .fr-xforms-inspector-mode { background-color: #F8F8F8; padding: .5em 0 }                        // Better integrate formatting with editor
+    .xbl-fr-code-mirror { font-size: 12px }
 }

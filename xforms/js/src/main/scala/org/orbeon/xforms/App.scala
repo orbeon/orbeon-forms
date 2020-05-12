@@ -33,11 +33,11 @@ trait App {
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ ⇒ InitSupport.liferayF) onComplete {
-      case Success(_) ⇒
+    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ => InitSupport.liferayF) onComplete {
+      case Success(_) =>
         scribe.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()
-      case Failure(t) ⇒
+      case Failure(t) =>
         throw t
     }
   }
@@ -47,8 +47,6 @@ trait App {
     import scribe.format._
     import scribe.output.{LogOutput, TextOutput}
     import scribe.{Level, LogRecord}
-
-    import scala.scalajs.LinkingInfo
 
     // Custom log formatter to output something that is readable
     private object CustomPosition extends FormatBlock {
@@ -62,8 +60,8 @@ trait App {
         val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
 
         record.methodName match {
-          case Some(name) ⇒ new TextOutput(p"$className.$name")
-          case None       ⇒ new TextOutput(p"$className")
+          case Some(name) => new TextOutput(p"$className.$name")
+          case None       => new TextOutput(p"$className")
         }
       }
     }
@@ -78,7 +76,8 @@ trait App {
 
     def initialize(): Unit = {
 
-      val rootLevel = if (LinkingInfo.developmentMode) Level.Debug else Level.Error
+      // By default, set to `Error` instead of `Debug`, not to pollute the console when it isn't necessary
+      val rootLevel = Level.Error
 
       scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
         minimumLevel = Some(rootLevel),

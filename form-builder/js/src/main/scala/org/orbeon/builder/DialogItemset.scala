@@ -31,13 +31,13 @@ object DialogItemset {
     $(dom.window.document).onWithSelector(
       events   = "change.orbeon",
       selector = LabelInputSelector,
-      handler  = (event: JQueryEventObject) ⇒ {
+      handler  = (event: JQueryEventObject) => {
 
         val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
         val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
 
-        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
-          DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue ⇒
+        if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isAllBlank)) {
+          DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue =>
             DocumentAPI.setValue(valueXFormsInput, suggestedValue)
           }
         }

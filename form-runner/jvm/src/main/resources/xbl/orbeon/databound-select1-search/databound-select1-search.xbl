@@ -43,7 +43,7 @@
             fr|databound-select1[appearance ~= search]"
         xxf:external-events="fr-search fr-change"
         xxbl:container="span"
-        xxbl:mode="lhha binding value selection javascript-lifecycle">
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Search</display-name>
@@ -51,7 +51,7 @@
             <display-name lang="fi" todo="true">[With Search]</display-name>
             <display-name lang="fr">Avec recherche</display-name>
             <display-name lang="ru" todo="true">[With Search]</display-name>
-            <display-name lang="de" todo="true">[With Search]</display-name>
+            <display-name lang="de">Mit Suche</display-name>
             <display-name lang="it" todo="true">[With Search]</display-name>
             <display-name lang="nl" todo="true">[With Search]</display-name>
             <display-name lang="sv" todo="true">[With Search]</display-name>
@@ -114,8 +114,7 @@
                             <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
                             <xh:a
                                 href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
-                                target="_blank">
-                                <xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
+                                target="_blank"><xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
                             </xh:a>
                         </xh:td>
                     </xh:tr>
@@ -248,7 +247,7 @@
                         <xf:model>
 
                             <xf:instance id="orbeon-resources" xxf:readonly="true">
-                                <resources>
+                                <_>
                                     <resource xml:lang="en"><select>Please select:</select></resource>
                                     <resource xml:lang="fr"><select>Veuillez sélectionner:</select></resource>
                                     <resource xml:lang="es"><select>Seleccione por favor:</select></resource>
@@ -261,18 +260,18 @@
                                     <resource xml:lang="pt"><select>Por favor seleccione:</select></resource>
                                     <resource xml:lang="sv"><select>Välj:</select></resource>
                                     <resource xml:lang="da"><select>Vælg:</select></resource>
-                                </resources>
+                                </_>
                             </xf:instance>
 
                             <xf:instance id="local">
-                                <local>
+                                <_>
                                     <resource-attr><xsl:value-of select="@resource"/></resource-attr>
                                     <service-supports-paging><xsl:value-of select="@service-supports-paging"/></service-supports-paging>
                                     <is-last-page-ref><xsl:value-of select="@is-last-page"/></is-last-page-ref>
                                     <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
                                     <label-ref><xsl:value-of select="xf:itemset/xf:label/@ref"/></label-ref>
                                     <value-ref><xsl:value-of select="xf:itemset/xf:value/@ref"/></value-ref>
-                                </local>
+                                </_>
                             </xf:instance>
 
                             <xf:instance id="result-raw" ><result/></xf:instance>
@@ -303,7 +302,11 @@
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search = 'true'"/>
                         <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
-                        <xh:span
+                        <xf:var name="view"    value="fr:mode() = ('view', 'pdf')"/>
+
+                        <xf:group
+                            ref=".[not($view)]"
+                            xxf:element="span"
                             data-placeholder="{{xxf:r('select')}}"
                             data-service-performs-search="{$service-performs-search}">
 
@@ -333,9 +336,8 @@
                                     </fr:databound-select1>
                                 </xsl:otherwise>
                             </xsl:choose>
-
-                        </xh:span>
-
+                        </xf:group>
+                        <xf:input ref="$binding[$view]/@label"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

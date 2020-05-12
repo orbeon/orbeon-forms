@@ -32,7 +32,7 @@ class BindingIndexTest extends AnyFunSpec {
   }
 
   val FooURI     = "http://orbeon.org/oxf/xml/foo"
-  val Namespaces = NamespaceMapping(Map("foo" → FooURI))
+  val Namespaces = NamespaceMapping(Map("foo" -> FooURI))
 
   val AllSelectors =
     CSSSelectorParser.parseSelectors(
@@ -51,7 +51,7 @@ class BindingIndexTest extends AnyFunSpec {
     )
 
   val AllBindings =
-    AllSelectors map (s ⇒ TestBinding(List(s), Namespaces))
+    AllSelectors map (s => TestBinding(List(s), Namespaces))
 
   val (
       fooBarBinding                   ::
@@ -73,7 +73,7 @@ class BindingIndexTest extends AnyFunSpec {
     // We wrote the attribute bindings above from more specific to least specific, and the index prepends new
     // bindings as we index, so newer bindings are found first. To help with testing matching by attribute, we
     // index in reverse order, so that e.g. [appearance ~= baz] is found before [appearance *= gaga].
-    AllBindings.reverse foreach { binding ⇒
+    AllBindings.reverse foreach { binding =>
       currentIndex = BindingIndex.indexBinding(currentIndex, binding)
     }
 
@@ -83,7 +83,7 @@ class BindingIndexTest extends AnyFunSpec {
   def parseXMLElemWithNamespaces(xmlElem: String): Element = {
 
     val namespacesString =
-      Namespaces.mapping map { case (prefix, uri) ⇒ s"""xmlns:$prefix="$uri"""" } mkString " "
+      Namespaces.mapping map { case (prefix, uri) => s"""xmlns:$prefix="$uri"""" } mkString " "
 
     val encapsulated =
       s"""<root $namespacesString>$xmlElem</root>"""
@@ -94,7 +94,7 @@ class BindingIndexTest extends AnyFunSpec {
   def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {
 
     val elem = parseXMLElemWithNamespaces(xmlElem)
-    val atts = Dom4j.attributes(elem) map (a ⇒ a.getQName → a.getValue)
+    val atts = Dom4j.attributes(elem) map (a => a.getQName -> a.getValue)
 
     val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
 

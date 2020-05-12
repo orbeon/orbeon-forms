@@ -812,7 +812,7 @@
                             <xf:action if="$is-empty">
                                 <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
                                 <xf:rebuild/>
-                                <xf:recalculate xxf:defauls="true"/>
+                                <xf:recalculate xxf:defaults="true"/>
                             </xf:action>
                             <xf:action if="not($is-empty)">
                                 <xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"></xf:var>
@@ -820,7 +820,7 @@
                                     <xf:delete ref="instance()/*"/>
                                     <xf:insert context="instance()" origin="$simply-migrated/*"/>
                                     <xf:rebuild/>
-                                    <xf:recalculate xxf:defauls="true"/>
+                                    <xf:recalculate xxf:defaults="true"/>
                                 </xf:action>
                             </xf:action>
                         </xf:action>

@@ -172,4 +172,93 @@
         </output>
     </test>
 
+    <test description="Excel import shows extra number digits #4452" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="rows"/>
+
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>Excel file with extra digits.xlsx</url>
+                            <content-type>multipart/x-zip</content-type>
+                            <cache-control><use-local-cache>false</use-local-cache></cache-control>
+                            <mode>binary</mode>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="zip"/>
+                </p:processor>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="file"   href="#zip"/>
+                    <p:output name="rows"   ref="rows"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="rows">
+            <rows>
+                <row>
+                    <c r="A" type="string">date-1</c>
+                    <c r="B" type="string">currency-1</c>
+                    <c r="C" type="string">decimal-1</c>
+                    <c r="D" type="string">number-1</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.44</c>
+                    <c r="C" type="number">0.44</c>
+                    <c r="D" type="number">0.44</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.57</c>
+                    <c r="C" type="number">0.57</c>
+                    <c r="D" type="number">0.57</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.7</c>
+                    <c r="C" type="number">0.7</c>
+                    <c r="D" type="number">0.7</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.83</c>
+                    <c r="C" type="number">0.83</c>
+                    <c r="D" type="number">0.83</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.96</c>
+                    <c r="C" type="number">0.96</c>
+                    <c r="D" type="number">0.96</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">1.09</c>
+                    <c r="C" type="number">1.09</c>
+                    <c r="D" type="number">1.09</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.58</c>
+                    <c r="C" type="number">0.58</c>
+                    <c r="D" type="number">0.58</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.59</c>
+                    <c r="C" type="number">0.59</c>
+                    <c r="D" type="number">0.59</c>
+                </row>
+                <row>
+                    <c r="A" type="date">2017-06-11</c>
+                    <c r="B" type="number">0.58</c>
+                    <c r="C" type="number">0.58</c>
+                    <c r="D" type="number">0.58</c>
+                </row>
+            </rows>
+        </output>
+    </test>
 </group>

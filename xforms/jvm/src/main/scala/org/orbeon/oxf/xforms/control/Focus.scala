@@ -24,7 +24,7 @@ object Focus {
 
   // Focus on the given control and dispatch appropriate focus events
   def focusWithEvents(control: XFormsControl): Unit =
-    if (control.isFocusable && ! isHidden(control)) {
+    if (control.isDirectlyFocusable) {
 
       val doc = control.containingDocument
 
@@ -41,7 +41,7 @@ object Focus {
         val currentChain = containersAndSelf(control).reverse
 
         // Number of common ancestor containers, if any
-        val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) ⇒ previous eq current}
+        val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) => previous eq current}
 
         // Focus out of the previous control and grouping controls we are leaving
         // Events are dispatched from leaf to root
@@ -60,7 +60,7 @@ object Focus {
     doc              : XFormsContainingDocument
   ): Unit =
     repeatOpt match {
-      case Some(repeat) ⇒
+      case Some(repeat) =>
         // Update the focus based on a previously focused control for which focus out events up to a repeat have
         // already been dispatched when a repeat iteration has been removed
 
@@ -77,19 +77,19 @@ object Focus {
         def focus(control: XFormsControl): Unit =
           setFocusPartially(control, Some(repeat))
 
-        updateFocus(focusedBeforeOpt, _ ⇒ removeFocus(), focus)
-      case None ⇒
-        updateFocus(focusedBeforeOpt, focusedBefore ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents)
+        updateFocus(focusedBeforeOpt, _ => removeFocus(), focus)
+      case None =>
+        updateFocus(focusedBeforeOpt, focusedBefore => removeFocus(focusedBefore.containingDocument), focusWithEvents)
     }
 
   // Update focus based on a previously focused control
   private def updateFocus(
     focusedBeforeOpt : Option[XFormsControl],
-    onRemoveFocus    : XFormsControl ⇒ Any,
-    onFocus          : XFormsControl ⇒ Any
+    onRemoveFocus    : XFormsControl => Any,
+    onFocus          : XFormsControl => Any
   ): Unit =
     focusedBeforeOpt match {
-      case Some(focusedBefore) ⇒
+      case Some(focusedBefore) =>
         // There was a control with focus before
 
         // If there was a focused control and nobody has overwritten it with `setFocusedControl()` (NOTE:
@@ -112,23 +112,23 @@ object Focus {
           val newReferenceWithRepeats = XFormsRepeatControl.findControlFollowIndexes(focusedBefore)
 
           newReferenceWithRepeats match {
-            case None ⇒
+            case None =>
               // Cannot find a reference to the control anymore
               // Control might be a ghost that has been removed from the tree (iteration removed)
               onRemoveFocus(focusedBefore)
 
-            case Some(newReference) if ! (newReference.isFocusable && ! isHidden(newReference)) ⇒
+            case Some(newReference) if ! (newReference.isDirectlyFocusable) =>
               // New reference exists, but is not focusable
               onRemoveFocus(focusedBefore)
 
-            case Some(newReference) if newReference ne focusedBefore ⇒
+            case Some(newReference) if newReference ne focusedBefore =>
               // Control exists and is focusable, and is not the same as the original control
 
               // This covers the case where repeat indexes have been updated
               // Here we move the focus to the new control
               onFocus(newReference)
 
-            case _ ⇒
+            case _ =>
               // Control exists, is focusable, and is the same as before, so we do nothing!
           }
         } else {
@@ -139,7 +139,7 @@ object Focus {
           //
           // Either way events must have already been dispatched, so here we do nothing.
         }
-      case None ⇒
+      case None =>
         // There was no focus before. If there is focus now, the change must have been done via xforms-focus, which
         // means that events have already been dispatched. If there is no focus now, nothing has changed. So here we
         // do nothing.
@@ -148,8 +148,8 @@ object Focus {
   // Whether focus is currently within the given container
   def isFocusWithinContainer(container: XFormsContainerControl): Boolean =
     container.containingDocument.getControls.getFocusedControl match {
-      case Some(control) if new AncestorOrSelfIterator(control.parent) exists (_ eq container) ⇒ true
-      case _ ⇒ false
+      case Some(control) if new AncestorOrSelfIterator(control.parent) exists (_ eq container) => true
+      case _ => false
     }
 
   private def isNotBoundary(control: XFormsControl, boundary: Option[XFormsContainerControl]) =
@@ -164,7 +164,7 @@ object Focus {
       containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) foreach focusOut
 
     // Dispatch focus out events if needed
-    doc.getControls.getFocusedControl foreach { focused ⇒
+    doc.getControls.getFocusedControl foreach { focused =>
       doc.getControls.setFocusedControl(None)
       dispatchFocusOuts(focused)
     }
@@ -194,15 +194,15 @@ object Focus {
 
   // Whether the control is hidden within a non-visible case or dialog
   def isHidden(control: XFormsControl): Boolean = new AncestorOrSelfIterator(control.parent) exists {
-    case c: XFormsCaseControl     if ! c.isVisible ⇒ true
-    case c: XXFormsDialogControl  if ! c.isVisible ⇒ true
-    case _                                         ⇒ false
+    case c: XFormsCaseControl     if ! c.isVisible => true
+    case c: XXFormsDialogControl  if ! c.isVisible => true
+    case _                                         => false
   }
 
   // Return all the ancestor-or-self hidden cases
   def ancestorOrSelfHiddenCases(control: XFormsControl): Iterator[XFormsCaseControl] =
     new AncestorOrSelfIterator(control) collect {
-      case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
+      case switchCase: XFormsCaseControl if ! switchCase.isVisible => switchCase
     }
 
   // Dispatch DOMFocusOut and DOMFocusIn
@@ -215,7 +215,7 @@ object Focus {
   // Find all ancestor container controls of the given control from leaf to root
   private def containers(control: XFormsControl) =
     new AncestorOrSelfIterator(control.parent) collect
-      { case container: XFormsContainerControl ⇒ container } toList
+      { case container: XFormsContainerControl => container } toList
 
   // Ancestor controls and control from leaf to root excepting the root control
   private def containersAndSelf(control: XFormsControl) =

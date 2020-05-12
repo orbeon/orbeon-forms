@@ -13,9 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
@@ -63,6 +62,12 @@ abstract class XFormsBaseHandlerXHTML (
   protected def isDefaultIncremental                                                = false
   protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
 
+  def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
+    control match {
+      case c: XFormsSingleNodeControl => c.isReadonly && ! containingDocument.staticReadonly
+      case _ => false
+    }
+
   // Output MIP classes
   // TODO: Move this to to control itself, like writeMIPsAsAttributes
   final def handleMIPClasses(controlPrefixedId: String, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
@@ -83,7 +88,7 @@ abstract class XFormsBaseHandlerXHTML (
         appendWithSpace("xforms-visited")
 
       control match {
-        case singleNodeControl: XFormsSingleNodeControl ⇒
+        case singleNodeControl: XFormsSingleNodeControl =>
 
           addConstraintClasses(sb, singleNodeControl.alertLevel)
 
@@ -93,13 +98,13 @@ abstract class XFormsBaseHandlerXHTML (
           if (singleNodeControl.isRequired) {
             appendWithSpace("xforms-required")
             control match {
-              case valueControl: XFormsValueControl ⇒
+              case valueControl: XFormsValueControl =>
                 // NOTE: Test above excludes xf:group
                 if (valueControl.isEmptyValue)
                   appendWithSpace("xforms-empty")
                 else
                   appendWithSpace("xforms-filled")
-              case _ ⇒
+              case _ =>
             }
           }
 
@@ -110,7 +115,7 @@ abstract class XFormsBaseHandlerXHTML (
           singleNodeControl.getBuiltinOrCustomTypeCSSClassOpt foreach
             appendWithSpace
 
-        case _ ⇒
+        case _ =>
       }
     }
   }
@@ -120,10 +125,11 @@ abstract class XFormsBaseHandlerXHTML (
     controlName        : String,
     controlAttributes  : Attributes,
     control            : XFormsControl,
-    incrementalDefault : Boolean
+    incrementalDefault : Boolean,
+    staticLabel        : Option[LHHAAnalysis]
   ): jl.StringBuilder = {
 
-    implicit val sb = new jl.StringBuilder(50)
+    implicit val sb: jl.StringBuilder = new jl.StringBuilder(50)
 
     // User-defined classes go first
     appendControlUserClasses(controlAttributes, control)
@@ -149,7 +155,7 @@ abstract class XFormsBaseHandlerXHTML (
         appendWithSpace("xforms-incremental")
 
       // Class for mediatype
-      Option(controlAttributes.getValue("mediatype")) foreach { mediatypeValue ⇒
+      Option(controlAttributes.getValue("mediatype")) foreach { mediatypeValue =>
 
         // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
         val slashIndex = mediatypeValue.indexOf('/')
@@ -177,9 +183,12 @@ abstract class XFormsBaseHandlerXHTML (
 
     // Classes for appearances
     elementAnalysis match {
-      case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.encodeAndAppendAppearances(sb)
-      case _ ⇒
+      case appearanceTrait: AppearanceTrait => appearanceTrait.encodeAndAppendAppearances(sb)
+      case _ =>
     }
+
+    if (staticLabel exists (_.hasLocalLeftAppearance))
+      appendWithSpace("xxforms-label-appearance-left")
 
     sb
   }
@@ -191,7 +200,7 @@ abstract class XFormsBaseHandlerXHTML (
   ): Unit = {
     // @class
     val evaluatedClassValueOpt =
-      Option(controlAttributes.getValue("class")) flatMap { classValue ⇒
+      Option(controlAttributes.getValue("class")) flatMap { classValue =>
         if (!XFormsUtils.maybeAVT(classValue)) {
           // Definitely not an AVT
           Some(classValue)
@@ -234,30 +243,30 @@ abstract class XFormsBaseHandlerXHTML (
 
       val (labelHintHelpAlertValue, mustOutputHTMLFragment) =
         lhha match {
-          case LHHA.Label | LHHA.Hint if controlOrNull ne null ⇒
+          case LHHA.Label | LHHA.Hint if controlOrNull ne null =>
             (controlOrNull.lhhaProperty(lhha).value(), lhhaAnalysis.containsHTML)
-          case LHHA.Label | LHHA.Hint ⇒
+          case LHHA.Label | LHHA.Hint =>
             (null, lhhaAnalysis.containsHTML)
-          case LHHA.Help if controlOrNull ne null ⇒
+          case LHHA.Help if controlOrNull ne null =>
             // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
             // case because it is stored as escaped HTML within a <label> element.
             (controlOrNull.lhhaProperty(lhha).escapedValue(), false)
-          case LHHA.Help ⇒
+          case LHHA.Help =>
             (null, false)
-          case LHHA.Alert if controlOrNull ne null ⇒
+          case LHHA.Alert if controlOrNull ne null =>
             // Not known statically at this time because it currently depends on the number of active alerts
             (controlOrNull.lhhaProperty(lhha).value(), controlOrNull.isHTMLAlert)
-          case LHHA.Alert ⇒
+          case LHHA.Alert =>
             (null, false)
         }
 
       val elementName =
         requestedElementNameOpt getOrElse {
           lhha match {
-            case LHHA.Label ⇒ xformsHandlerContext.getLabelElementName
-            case LHHA.Help  ⇒ xformsHandlerContext.getHelpElementName
-            case LHHA.Hint  ⇒ xformsHandlerContext.getHintElementName
-            case LHHA.Alert ⇒ xformsHandlerContext.getAlertElementName
+            case LHHA.Label => xformsHandlerContext.getLabelElementName
+            case LHHA.Help  => xformsHandlerContext.getHelpElementName
+            case LHHA.Hint  => xformsHandlerContext.getHintElementName
+            case LHHA.Alert => xformsHandlerContext.getAlertElementName
           }
         }
 
@@ -279,11 +288,11 @@ abstract class XFormsBaseHandlerXHTML (
       // Mark alert as active if needed
       if (lhha == LHHA.Alert)
         controlOrNull match {
-          case singleNodeControl: XFormsSingleNodeControl ⇒
+          case singleNodeControl: XFormsSingleNodeControl =>
 
             val constraintLevelOpt = singleNodeControl.alertLevel
 
-            constraintLevelOpt foreach { _ ⇒
+            constraintLevelOpt foreach { _ =>
               appendWithSpace("xforms-active")
             }
 
@@ -291,7 +300,7 @@ abstract class XFormsBaseHandlerXHTML (
             if (isExternal)
               addConstraintClasses(classes, constraintLevelOpt)
 
-          case _ ⇒
+          case _ =>
         }
 
       // Handle visibility
@@ -336,13 +345,14 @@ abstract class XFormsBaseHandlerXHTML (
     attributes    : Attributes,
     prefixedId    : String,
     effectiveId   : String,
-    xformsControl : XFormsControl
+    xformsControl : XFormsControl,
+    staticLabel   : Option[LHHAAnalysis]
   ): AttributesImpl = {
 
     // Get classes
     // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
-    implicit val classes =
-      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
+    implicit val classes: jl.StringBuilder =
+      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental, staticLabel)
 
     // All MIP-related classes
     handleMIPClasses(prefixedId, xformsControl)
@@ -367,10 +377,10 @@ abstract class XFormsBaseHandlerXHTML (
 object XFormsBaseHandlerXHTML {
 
   val LHHACodes = Map[LHHA, String](
-    LHHA.Label → "l",
-    LHHA.Help  → "p",
-    LHHA.Hint  → "t",
-    LHHA.Alert → "a"
+    LHHA.Label -> "l",
+    LHHA.Help  -> "p",
+    LHHA.Hint  -> "t",
+    LHHA.Alert -> "a"
   )
 
   val ControlCode = "c"
@@ -383,7 +393,7 @@ object XFormsBaseHandlerXHTML {
   }
 
   def addConstraintClasses(sb: jl.StringBuilder, constraintLevelOpt: Option[ValidationLevel]): Unit =
-    constraintLevelOpt foreach { constraintLevel ⇒
+    constraintLevelOpt foreach { constraintLevel =>
       val levelName = constraintLevel.entryName
       if (sb.length > 0)
         sb.append(' ')
@@ -404,7 +414,7 @@ object XFormsBaseHandlerXHTML {
     addIds: Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
-    outputLabelText(handlerContext.getController.getOutput, labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)
+    outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.getController.getOutput)
     outputLabelForEnd(handlerContext, elementName)
   }
 
@@ -458,14 +468,14 @@ object XFormsBaseHandlerXHTML {
     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName)
   }
 
-  def outputLabelText(
-    xmlReceiver            : XMLReceiver,
+  def outputLabelTextIfNotEmpty(
     value                  : String,
     xhtmlPrefix            : String,
     mustOutputHTMLFragment : Boolean,
-    locationDataOpt        : Option[LocationData]
+    locationDataOpt        : Option[LocationData])(implicit
+    xmlReceiver            : XMLReceiver
   ): Unit =
-    if (StringUtils.isNotEmpty(value)) {
+    if ((value ne null) && value.nonEmpty) {
       if (mustOutputHTMLFragment)
         XFormsUtils.streamHTMLFragment(
           xmlReceiver,
@@ -477,9 +487,9 @@ object XFormsBaseHandlerXHTML {
         xmlReceiver.characters(value.toCharArray, 0, value.length)
   }
 
-  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit = {
-    // @disabled="disabled"
-    // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
+  def outputDisabledAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled")
-  }
+
+  def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
+    newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
 }

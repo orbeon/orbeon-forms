@@ -14,9 +14,11 @@
 package org.orbeon.oxf.fr.persistence.http
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.net.URI
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.permission.Operations
@@ -27,7 +29,7 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
-import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xml.Dom4j
@@ -77,7 +79,7 @@ private[persistence] object HttpCall {
         credentials = actualRequest.credentials,
         timeout     = actualRequest.timeout
       )
-    ) { closableHttpResponse ⇒
+    ) { closableHttpResponse =>
 
       val actualResponse = closableHttpResponse.httpResponse
       val actualHeaders  = actualResponse.headers
@@ -86,7 +88,7 @@ private[persistence] object HttpCall {
       assert(actualResponse.statusCode == expectedResponse.code)
 
       // Check operations
-      expectedResponse.operations.foreach { expectedOperations ⇒
+      expectedResponse.operations.foreach { expectedOperations =>
         val actualOperationsString = actualHeaders.get("orbeon-operations").map(_.head)
         val actualOperationsList   = actualOperationsString.to[List].flatMap(_.splitTo[List]())
         val actualOperations       = Operations.parse(actualOperationsList)
@@ -98,22 +100,22 @@ private[persistence] object HttpCall {
       assert(expectedResponse.formVersion == resultFormVersion)
 
       // Check body
-      expectedResponse.body.foreach { expectedBody ⇒
+      expectedResponse.body.foreach { expectedBody =>
         val actualBody =
-          useAndClose(actualResponse.content.inputStream) { inputStream ⇒
+          useAndClose(actualResponse.content.inputStream) { inputStream =>
             val outputStream = new ByteArrayOutputStream
             NetUtils.copyStream(inputStream, outputStream)
             outputStream.toByteArray
           }
         expectedBody match {
-          case HttpCall.XML(expectedDoc) ⇒
+          case HttpCall.XML(expectedDoc) =>
             val resultDoc  = Dom4jUtils.readDom4j(new ByteArrayInputStream(actualBody))
             if (! Dom4j.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
                 resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
                   expectedDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
               )
-          case HttpCall.Binary(expectedFile) ⇒
+          case HttpCall.Binary(expectedFile) =>
             assert(actualBody == expectedFile)
         }
       }
@@ -132,40 +134,40 @@ private[persistence] object HttpCall {
     externalContext : ExternalContext
   ): ClosableHttpResponse = {
 
-    val documentURL = PersistenceBase + path
+    val documentURL = PersistenceBase.appendSlash + path.dropStartingSlash
 
     val headersCapitalized = {
 
       import Version._
 
-      val timeoutHeader = timeout.map(t ⇒ Headers.Timeout → List(Headers.TimeoutValuePrefix + t.toString))
+      val timeoutHeader = timeout.map(t => Headers.Timeout -> List(Headers.TimeoutValuePrefix + t.toString))
       val versionHeader = version match {
-        case Unspecified             ⇒ None
-        case Next                    ⇒ Some(OrbeonFormDefinitionVersion → List("next"))
-        case Specific(version)       ⇒ Some(OrbeonFormDefinitionVersion → List(version.toString))
-        case ForDocument(documentId) ⇒ Some(OrbeonForDocumentId         → List(documentId))
+        case Unspecified             => None
+        case Next                    => Some(OrbeonFormDefinitionVersion -> List("next"))
+        case Specific(version)       => Some(OrbeonFormDefinitionVersion -> List(version.toString))
+        case ForDocument(documentId) => Some(OrbeonForDocumentId         -> List(documentId))
       }
-      val stageHeader   = stage.map(_.name).map(StageHeader.HeaderName → List(_))
+      val stageHeader   = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
       val headers = (timeoutHeader.toList ++ versionHeader.toList ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.Http,
+        url              = new URI(documentURL),
         hasCredentials   = false,
         customHeaders    = headers,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = _ ⇒ None
+        getHeader        = _ => None
       )
     }
 
     val contentType = body.map {
-      case XML   (_) ⇒ ContentTypes.XmlContentType
-      case Binary(_) ⇒ "application/octet-stream"
+      case XML   (_) => ContentTypes.XmlContentType
+      case Binary(_) => "application/octet-stream"
     }
 
     val messageBody = body map {
-      case XML   (doc ) ⇒ doc.getRootElement.serializeToString().getBytes
-      case Binary(file) ⇒ file
+      case XML   (doc ) => doc.getRootElement.serializeToString().getBytes
+      case Binary(file) => file
     }
 
     val content = messageBody map
@@ -231,14 +233,14 @@ private[persistence] object HttpCall {
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, GET, version, None, None, credentials)) { chr ⇒
+    useAndClose(request(url, GET, version, None, None, credentials)) { chr =>
 
       val httpResponse = chr.httpResponse
       val statusCode   = httpResponse.statusCode
       val headers      = httpResponse.headers
 
       val body =
-        useAndClose(httpResponse.content.inputStream) { inputStream ⇒
+        useAndClose(httpResponse.content.inputStream) { inputStream =>
           Try {
             val outputStream = new ByteArrayOutputStream
             NetUtils.copyStream(inputStream, outputStream)

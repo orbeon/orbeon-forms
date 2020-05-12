@@ -35,17 +35,17 @@ class FormBuilderPermissionsTest extends AnyFunSpec {
 
     val frRolesOpt = Some(frRoles)
 
-    val always = Map("app-always" → Set("form-always"))
+    val always = Map("app-always" -> Set("form-always"))
 
     it ("must always return app/form which matches all roles") {
       assert(formBuilderPermissions(frRolesOpt, Set("some", "other"))                         === always)
-      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role"))                    === always + ("foo" → Set("*")))
-      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role"))                          === always + ("bar" → Set("baz")))
-      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" → Set("*")) + ("bar" → Set("baz")))
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role"))                    === always + ("foo" -> Set("*")))
+      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role"))                          === always + ("bar" -> Set("baz")))
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" -> Set("*")) + ("bar" -> Set("baz")))
     }
 
     it ("must return `*` with role which matches all app/form names") {
-      val all = Map("*" → Set("*"))
+      val all = Map("*" -> Set("*"))
 
       assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role"))                        === all)
       assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "some", "other"))       === all)
@@ -54,15 +54,15 @@ class FormBuilderPermissionsTest extends AnyFunSpec {
     }
 
     it ("must combine roles with wildcard and specific app") {
-      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" → Set("*")))
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" -> Set("*")))
     }
 
     it ("must combine app/form names") {
-      assert(formBuilderPermissions(frRolesOpt, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" → Set("baz")) + ("bar" → Set("baz")))
+      assert(formBuilderPermissions(frRolesOpt, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" -> Set("baz")) + ("bar" -> Set("baz")))
     }
 
     it ("must combine form names with same app name") {
-      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" → Set("baz", "baz2")))
+      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" -> Set("baz", "baz2")))
     }
 
     it ("must return an empty result when empty roles are passed") {

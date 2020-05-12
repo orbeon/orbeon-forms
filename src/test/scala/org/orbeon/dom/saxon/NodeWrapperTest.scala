@@ -66,7 +66,7 @@ class NodeWrapperTest extends AnyFunSpec {
 
     val docWrapper = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
 
-    for (((node, expected), index) ← expected.zipWithIndex)
+    for (((node, expected), index) <- expected.zipWithIndex)
       it(s"for index $index") {
         assert(docWrapper.wrap(node).asInstanceOf[SiblingCountingNode].getSiblingPosition === expected)}
 

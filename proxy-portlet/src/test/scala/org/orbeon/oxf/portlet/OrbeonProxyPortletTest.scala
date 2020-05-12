@@ -104,14 +104,14 @@ class OrbeonProxyPortletTest extends AnyFunSpec {
   val FormRunnerResourcePath = DefaultFormRunnerResourcePath.r
 
   describe("Allowed paths") {
-    for (r ← distinctAllowedPaths)
+    for (r <- distinctAllowedPaths)
       it(s"must allow `$r`") {
         assert(sanitizeResourceId(r, FormRunnerResourcePath).isDefined)
       }
   }
 
   describe("Rejected paths") {
-    for (r ← distinctRejectedPaths)
+    for (r <- distinctRejectedPaths)
       it(s"must reject `$r`") {
         assert(sanitizeResourceId(r, FormRunnerResourcePath).isEmpty)
       }

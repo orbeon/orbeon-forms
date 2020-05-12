@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import java.net.URI
+
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms._
@@ -47,13 +50,13 @@ case class InstanceCaching(
   )
 
   def debugPairs = Seq(
-    "timeToLive"      → timeToLive.toString,
-    "handleXInclude"  → handleXInclude.toString,
-    "sourceURI"       → pathOrAbsoluteURI,
-    "requestBodyHash" → requestBodyHash.orNull
+    "timeToLive"      -> timeToLive.toString,
+    "handleXInclude"  -> handleXInclude.toString,
+    "sourceURI"       -> pathOrAbsoluteURI,
+    "requestBodyHash" -> requestBodyHash.orNull
   )
 
-  def writeAttributes(att: (String, String) ⇒ Unit): Unit = {
+  def writeAttributes(att: (String, String) => Unit): Unit = {
     att("cache", "true")
     if (timeToLive >= 0) att("ttl", timeToLive.toString)
     if (handleXInclude)  att("xinclude", "true")
@@ -74,7 +77,11 @@ object InstanceCaching {
     InstanceCaching(
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
-      pathOrAbsoluteURI = Connection.findInternalURL(sourceURI) getOrElse sourceURI, // adjust for internal path so replication works
+      pathOrAbsoluteURI = Connection.findInternalUrl(
+        normalizedUrl = new URI(sourceURI).normalize,
+        filter        = isInternalPath)(
+        ec            = NetUtils.getExternalContext
+      ) getOrElse sourceURI, // adjust for internal path so replication works
       requestBodyHash   = Option(requestBodyHashOrNull)
     )
 }
@@ -157,37 +164,37 @@ class XFormsInstance(
 
   def getLocationData =
     underlyingDocumentOpt match {
-      case Some(doc) ⇒ XFormsUtils.getNodeLocationData(doc.getRootElement)
-      case None      ⇒ new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
+      case Some(doc) => XFormsUtils.getNodeLocationData(doc.getRootElement)
+      case None      => new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
     }
 
   def parentEventObserver: XFormsEventTarget = model
 
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
-      case _: XXFormsInstanceInvalidate ⇒
+      case _: XXFormsInstanceInvalidate =>
         implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
         _instanceCaching match {
-          case Some(instanceCaching) ⇒
+          case Some(instanceCaching) =>
             XFormsServerSharedInstancesCache.remove(
               instanceCaching.pathOrAbsoluteURI,
               null,
               instanceCaching.handleXInclude
             )
-          case None ⇒
+          case None =>
             warn(
               "xxforms-instance-invalidate event dispatched to non-cached instance",
-              Seq("instance id" → getEffectiveId)
+              Seq("instance id" -> getEffectiveId)
             )
         }
-      case ev: XXFormsActionErrorEvent ⇒
+      case ev: XXFormsActionErrorEvent =>
         XFormsError.handleNonFatalActionError(this, ev.throwable)
-      case _ ⇒
+      case _ =>
     }
 
   def performTargetAction(event: XFormsEvent): Unit =
     event match {
-      case insertEvent: XFormsInsertEvent ⇒
+      case insertEvent: XFormsInsertEvent =>
         // New nodes were just inserted
 
         val insertedNodes = insertEvent.insertedNodes
@@ -197,29 +204,29 @@ class XFormsInstance(
         if (! insertEvent.isRootElementReplacement)
           updateIndexForInsert(insertedNodes)
 
-      case deleteEvent: XFormsDeleteEvent ⇒
+      case deleteEvent: XFormsDeleteEvent =>
         // New nodes were just deleted
         if (deleteEvent.deletedNodes.nonEmpty) {
           // Find affected repeats and update them
           updateIndexForDelete(deleteEvent.deletedNodes)
         }
-      case replaceEvent: XXFormsReplaceEvent ⇒
+      case replaceEvent: XXFormsReplaceEvent =>
         // A node was replaced
         // As of 2013-02-18, this happens for:
         // - a root element replacement
         // - an id attribute replacement
         updateIndexForReplace(replaceEvent.formerNode, replaceEvent.currentNode)
-      case valueChangeEvent: XXFormsValueChangedEvent ⇒
+      case valueChangeEvent: XXFormsValueChangedEvent =>
         updateIndexForValueChange(valueChangeEvent)
-      case _ ⇒
+      case _ =>
     }
 
   // Return the instance document as a dom4j Document
   // If the instance is readonly, this returns `None`. Callers should use root() whenever possible.
   def underlyingDocumentOpt: Option[Document] =
     _documentInfo match {
-      case virtualNode: VirtualNode ⇒ Some(virtualNode.getUnderlyingNode.asInstanceOf[Document])
-      case _                        ⇒ None
+      case virtualNode: VirtualNode => Some(virtualNode.getUnderlyingNode.asInstanceOf[Document])
+      case _                        => None
     }
 
   // For state serialization
@@ -239,9 +246,9 @@ class XFormsInstance(
   def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
     implicit val logger = indentedLogger
     debug(message, Seq(
-      "model effective id"    → parent.getEffectiveId,
-      "instance effective id" → getEffectiveId,
-      "instance"              → TransformerUtils.tinyTreeToString(rootElement)
+      "model effective id"    -> parent.getEffectiveId,
+      "instance effective id" -> getEffectiveId,
+      "instance"              -> TransformerUtils.tinyTreeToString(rootElement)
     ))
   }
 
@@ -305,8 +312,7 @@ class XFormsInstance(
           null,   // CHECK
           currentRoot.getDocumentRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
-          0,
-          true
+          0
         )
       )
     }
@@ -332,12 +338,12 @@ class XFormsInstance(
 // - handle schema xs:ID type as well
 trait XFormsInstanceIndex {
 
-  self: XFormsInstance ⇒
+  self: XFormsInstance =>
 
   import org.orbeon.scaxon.SimplePath._
   import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
-  import collection.{mutable ⇒ m}
+  import collection.{mutable => m}
 
   private var idIndex: m.Map[String, List[Element]] = _
 
@@ -365,9 +371,9 @@ trait XFormsInstanceIndex {
 
           // Query index
           idIndex.get(id) match {
-            case Some(list) if list.size > 1 ⇒ list.min(ElementOrdering) // get first in document order
-            case Some(list)                  ⇒ list.head                 // empty list not allowed in the map
-            case None                        ⇒ null
+            case Some(list) if list.size > 1 => list.min(ElementOrdering) // get first in document order
+            case Some(list)                  => list.head                 // empty list not allowed in the map
+            case None                        => null
           }
         }
       })
@@ -382,12 +388,12 @@ trait XFormsInstanceIndex {
 
   def updateIndexForInsert(nodes: Seq[NodeInfo]): Unit =
     if (idIndex ne null)
-      for (node ← nodes)
+      for (node <- nodes)
         combineMappings(mappingsInSubtree(node))
 
   def updateIndexForDelete(nodes: Seq[NodeInfo]): Unit =
     if (idIndex ne null)
-      for (node ← nodes; (id, element) ← mappingsInSubtree(node))
+      for (node <- nodes; (id, element) <- mappingsInSubtree(node))
         removeId(id, element)
 
   def updateIndexForReplace(formerNode: NodeInfo, currentNode: NodeInfo): Unit =
@@ -417,33 +423,33 @@ trait XFormsInstanceIndex {
       start descendantOrSelf * att "id"
 
   private def mappingsInSubtree(start: NodeInfo) =
-    idsInSubtree(start) map (id ⇒ id.getStringValue → unsafeUnwrapElement(id.parentUnsafe))
+    idsInSubtree(start) map (id => id.getStringValue -> unsafeUnwrapElement(id.parentUnsafe))
 
   private def removeId(id: String, parentElement: Element) = {
     idIndex.get(id) match {
-      case Some(list) if list.size > 1 ⇒
+      case Some(list) if list.size > 1 =>
         idIndex(id) = list filter (_ ne parentElement)
         assert(idIndex(id).nonEmpty)
-      case Some(list)                  ⇒ idIndex -= id // don't leave an empty list in the map
-      case None                        ⇒ // NOP
+      case Some(list)                  => idIndex -= id // don't leave an empty list in the map
+      case None                        => // NOP
     }
   }
 
   private def addId(id: String, element: Element): Unit =
     idIndex(id) = element :: (
       idIndex.get(id) match {
-        case Some(list) ⇒
+        case Some(list) =>
           // We should enable the assert below, but first we need to make sure we skip xforms-insert
           // processing for an attribute replacement, because xxforms-replace has already handled the updated
           // attribute. For now, filter so we don't get duplicates.
           //assert(! (list exists (_ eq element)))
           list filter (_ ne element)
-        case None       ⇒ Nil
+        case None       => Nil
       }
     )
 
   private def combineMappings(mappings: Seq[(String, Element)]) =
-    for ((id, element) ← mappings)
+    for ((id, element) <- mappings)
       addId(id, element)
 }
 
@@ -464,8 +470,8 @@ object XFormsInstance extends Logging {
     )
 
   def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean): DocumentInfo = doc match {
-    case Left(dom4jDocument) ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
-    case Right(documentInfo) ⇒ documentInfo
+    case Left(dom4jDocument) => wrapDocument(dom4jDocument, exposeXPathTypes)
+    case Right(documentInfo) => documentInfo
   }
 
   def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo =
@@ -498,8 +504,8 @@ object XFormsInstance extends Logging {
 
     val (caching, documentInfo) =
       instanceState.cachingOrContent match {
-        case Left(caching)  ⇒
-          debug("restoring instance from instance cache", Seq("id" → instanceState.effectiveId))
+        case Left(caching)  =>
+          debug("restoring instance from instance cache", Seq("id" -> instanceState.effectiveId))
 
           // NOTE: No XInclude supported to read instances with @src for now
           // TODO: must pass method and request body in case of POST/PUT
@@ -514,8 +520,8 @@ object XFormsInstance extends Logging {
             )
           )
 
-        case Right(content) ⇒
-          debug("using initialized instance from state", Seq("id" → instanceState.effectiveId))
+        case Right(content) =>
+          debug("using initialized instance from state", Seq("id" -> instanceState.effectiveId))
           (
             None,
             createDocumentInfo(

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayOutputStream
-import java.net.URLEncoder
+import java.net.{URI, URLEncoder}
 
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
@@ -53,7 +53,7 @@ object SerializationParameters {
 
     if (p.serialize) {
       requestedSerialization match {
-        case _ if (overriddenSerializedData ne null) && overriddenSerializedData != "" ⇒
+        case _ if (overriddenSerializedData ne null) && overriddenSerializedData != "" =>
           // Form author set data to serialize
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
@@ -68,7 +68,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }
-        case serialization @ "application/x-www-form-urlencoded" ⇒
+        case serialization @ "application/x-www-form-urlencoded" =>
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
               messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8),
@@ -82,7 +82,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }
-        case serialization @ ContentTypes.XmlContentType ⇒
+        case serialization @ ContentTypes.XmlContentType =>
           try {
             val identity = TransformerUtils.getIdentityTransformer
             TransformerUtils.applyOutputProperties(
@@ -109,7 +109,7 @@ object SerializationParameters {
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
           } catch {
-            case NonFatal(throwable) ⇒
+            case NonFatal(throwable) =>
               throw new XFormsSubmissionException(
                 submission  = submission,
                 message     = "xf:submission: exception while serializing instance to XML.",
@@ -117,7 +117,7 @@ object SerializationParameters {
                 throwable   = throwable
               )
           }
-        case serialization @ "application/json" ⇒
+        case serialization @ "application/json" =>
 
           val result = Converter.xmlToJsonString(
             root   = new DocumentWrapper(documentToSubmit, null, XPath.GlobalConfiguration),
@@ -130,14 +130,14 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
 
-        case serialization @ "multipart/related" ⇒
+        case serialization @ "multipart/related" =>
           // TODO
           throw new XFormsSubmissionException(
             submission  = submission,
             message     = s"xf:submission: submission serialization not yet implemented: $serialization",
             description = "serializing instance"
           )
-        case "multipart/form-data" ⇒
+        case "multipart/form-data" =>
           // Build multipart/form-data body
           val multipartFormData = XFormsSubmissionUtils.createMultipartFormData(documentToSubmit)
           val os = new ByteArrayOutputStream
@@ -149,7 +149,7 @@ object SerializationParameters {
             queryString            = null,
             actualRequestMediatype = actualRequestMediatype(multipartFormData.getContentType.getValue)
           )
-        case serialization @ "application/octet-stream" ⇒
+        case serialization @ "application/octet-stream" =>
           // Binary serialization
           val nodeType = InstanceData.getType(documentToSubmit.getRootElement)
           if (XMLConstants.XS_BASE64BINARY_QNAME == nodeType) {
@@ -164,22 +164,24 @@ object SerializationParameters {
             // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
 
             // NOTE: We support a relative path, in which case the path is resolved as a service URL
-            val resolvedURI =
-              XFormsUtils.resolveServiceURL(
-                submission.containingDocument,
-                submission.getSubmissionElement,
-                documentToSubmit.getRootElement.getStringValue,
-                URLRewriter.REWRITE_MODE_ABSOLUTE
+            val resolvedAbsoluteUrl =
+              new URI(
+                XFormsUtils.resolveServiceURL(
+                  submission.containingDocument,
+                  submission.getSubmissionElement,
+                  documentToSubmit.getRootElement.getStringValue,
+                  URLRewriter.REWRITE_MODE_ABSOLUTE
+                )
               )
 
             try {
               SerializationParameters(
-                messageBody            = SubmissionUtils.readByteArray(submission.getModel, resolvedURI),
+                messageBody            = SubmissionUtils.readByteArray(submission.getModel, resolvedAbsoluteUrl),
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
             } catch {
-              case NonFatal(throwable) ⇒
+              case NonFatal(throwable) =>
                 throw new XFormsSubmissionException(
                   submission  = submission,
                   message     = "xf:submission: binary serialization with anyURI type failed reading URL.",
@@ -188,7 +190,7 @@ object SerializationParameters {
                 )
             }
           }
-        case serialization @ (ContentTypes.HtmlContentType | ContentTypes.XhtmlContentType) ⇒
+        case serialization @ (ContentTypes.HtmlContentType | ContentTypes.XhtmlContentType) =>
           // HTML or XHTML serialization
           try {
             val identity = TransformerUtils.getIdentityTransformer
@@ -216,7 +218,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case NonFatal(throwable) ⇒
+            case NonFatal(throwable) =>
               throw new XFormsSubmissionException(
                 submission  = submission,
                 message     = "xf:submission: exception while serializing instance to HTML or XHTML.",
@@ -224,7 +226,7 @@ object SerializationParameters {
                 throwable   = throwable
               )
           }
-        case serialization if ContentTypes.isTextOrJSONContentType(serialization) ⇒
+        case serialization if ContentTypes.isTextOrJSONContentType(serialization) =>
           // Text serialization
           try {
             val identity = TransformerUtils.getIdentityTransformer
@@ -249,7 +251,7 @@ object SerializationParameters {
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } catch {
-            case NonFatal(throwable) ⇒
+            case NonFatal(throwable) =>
               throw new XFormsSubmissionException(
                 submission  = submission,
                 message     = "xf:submission: exception while serializing instance to text.",
@@ -257,7 +259,7 @@ object SerializationParameters {
                 throwable   = throwable
               )
           }
-        case serialization ⇒
+        case serialization =>
           throw new XFormsSubmissionException(
             submission  = submission,
             message     = s"xf:submission: invalid submission serialization requested: $serialization",

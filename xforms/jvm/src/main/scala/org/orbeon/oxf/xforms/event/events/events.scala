@@ -34,7 +34,7 @@ class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGe
   extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {
 
   def this(target: XFormsEventTarget, locationData: LocationData, reason: Reason) = {
-    this(target, Map("message" → Option(reason.message)))
+    this(target, Map("message" -> Option(reason.message)))
     _locationData = Option(locationData)
     _reason = Option(reason)
   }
@@ -50,8 +50,8 @@ class XXFormsXPathErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   extends XFormsEvent(XXFORMS_XPATH_ERROR, target, properties, bubbles = true, cancelable = true) {
 
   def this(target: XFormsEventTarget, message: String, throwable: Throwable) = {
-    // MAYBE: "throwable" → OrbeonFormatter.format(throwable)
-    this(target, Map("message" → Option(message)))
+    // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
+    this(target, Map("message" -> Option(message)))
     _throwable = Option(throwable)
   }
 
@@ -69,8 +69,8 @@ class XFormsLinkErrorEvent(target: XFormsEventTarget, properties: PropertyGetter
   with LinkEvent {
 
   def this(target: XFormsEventTarget, url: String, throwable: Throwable) = {
-    // MAYBE: "throwable" → OrbeonFormatter.format(throwable)
-    this(target, Map("resource-uri" → Option(url)))
+    // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
+    this(target, Map("resource-uri" -> Option(url)))
     _throwable = Option(throwable)
   }
 
@@ -83,8 +83,8 @@ class XFormsLinkExceptionEvent(target: XFormsEventTarget, properties: PropertyGe
   with LinkEvent {
 
   def this(target: XFormsEventTarget, url: String, throwable: Throwable) = {
-    // MAYBE: "throwable" → OrbeonFormatter.format(throwable)
-    this(target, Map("resource-uri" → Option(url)))
+    // MAYBE: "throwable" -> OrbeonFormatter.format(throwable)
+    this(target, Map("resource-uri" -> Option(url)))
     _throwable = Option(throwable)
   }
 
@@ -96,7 +96,7 @@ class XXFormsValueEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(EventNames.XXFormsValue, target, properties, bubbles = false, cancelable = false) {
 
   def this(target: XFormsEventTarget, value: String) =
-    this(target, Map("value" → Option(value)))
+    this(target, Map("value" -> Option(value)))
 
   def value = property[String]("value").get
 }
@@ -105,13 +105,13 @@ class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_LOAD, target, properties, bubbles = false, cancelable = false) {
 
   def this(target: XFormsEventTarget, resource: String) =
-    this(target, Map("resource" → Option(resource)))
+    this(target, Map("resource" -> Option(resource)))
 
   def resource = property[String]("resource").get
 }
 
 object XXFormsLoadEvent {
-  val StandardProperties = Map(XXFORMS_LOAD → Seq("resource"))
+  val StandardProperties = Map(XXFORMS_LOAD -> Seq("resource"))
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
@@ -145,7 +145,7 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
 
 object XXFormsUploadDoneEvent {
   val StandardProperties = Map(
-    EventNames.XXFormsUploadDone → Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    EventNames.XXFormsUploadDone -> Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
   )
 }
 
@@ -164,25 +164,25 @@ object XXFormsUploadErrorEvent {
   def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
     target.cast[XFormsUploadControl].to(List) flatMap
       FileMetadata.progress                   flatMap {
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) ⇒
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) =>
         List(
-          "error-type" → Some("size-error"),
-          "permitted"  → Some(permitted),
-          "actual"     → Some(actual)
+          "error-type" -> Some("size-error"),
+          "permitted"  -> Some(permitted),
+          "actual"     -> Some(actual)
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(permitted, actual)))) ⇒
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(permitted, actual)))) =>
         List(
-          "error-type" → Some("mediatype-error"),
-          "permitted"  → Some(permitted.to(List) map (_.toString)),
-          "actual"     → (actual map (_.toString))
+          "error-type" -> Some("mediatype-error"),
+          "permitted"  -> Some(permitted.to(List) map (_.toString)),
+          "actual"     -> (actual map (_.toString))
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(message)))) ⇒
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(message)))) =>
         List(
-          "error-type" → Some("file-scan-error"),
-          "message"    → Some(message)
+          "error-type" -> Some("file-scan-error"),
+          "message"    -> Some(message)
         )
-      case _ ⇒
-        List("error-type" → Some("upload-error"))
+      case _ =>
+        List("error-type" -> Some("upload-error"))
     }
 }
 
@@ -199,7 +199,7 @@ class XFormsModelConstructDoneEvent(target: XFormsEventTarget, properties: Prope
 class XFormsModelConstructEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_MODEL_CONSTRUCT, target, properties, bubbles = true, cancelable = false) {
   def this(target: XFormsEventTarget, rrr: Boolean) =
-    this(target, Map("rrr" → Option(rrr)))
+    this(target, Map("rrr" -> Option(rrr)))
 
   def rrr = propertyOrDefault[Boolean]("rrr", default = true)
 }

@@ -22,10 +22,10 @@ object freeTextFilterPart {
   def apply(request: Request): StatementPart =
     request.freeTextSearch match {
 
-      case None ⇒
+      case None =>
         NilPart
 
-      case Some(freeTextSearch) ⇒
+      case Some(freeTextSearch) =>
         StatementPart(
           sql =
             s"""|AND d.id = c.data_id

@@ -24,11 +24,11 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
 
-// Handler for <xh:head>
+// Handler for `<xh:head>`
 class XHTMLHeadHandler(
   uri            : String,
   localname      : String,
@@ -36,13 +36,15 @@ class XHTMLHeadHandler(
   localAtts      : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, true) {
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = true) {
+
+  import XHTMLHeadHandler._
 
   private var formattingPrefix: String = null
 
   override def start(): Unit = {
 
-    val xmlReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
 
     // Register control handlers on controller
     xformsHandlerContext.getController.registerHandler(
@@ -52,13 +54,12 @@ class XHTMLHeadHandler(
       XHTMLBodyHandler.ANY_MATCHER
     )
 
-    // Declare xmlns:f
+    // Declare `xmlns:f`
     formattingPrefix = xformsHandlerContext.findFormattingPrefixDeclare
 
     // Open head element
     xmlReceiver.startElement(uri, localname, qName, attributes)
 
-    implicit val helper = new XMLReceiverHelper(xmlReceiver)
     val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
 
     // Create prefix for combined resources if needed
@@ -68,17 +69,14 @@ class XHTMLHeadHandler(
     // Include static XForms CSS and JS
     val externalContext = xformsHandlerContext.getExternalContext
 
-    if (containingDocument.isServeInlineResources) {
-      helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "style", Array("type", "text/css", "media", "all"))
-
-      val content =
-        """html body form.xforms-initially-hidden, html body .xforms-form .xforms-initially-hidden {
-          |    display: none
-          |}"""
-
-      helper.text(content)
-      helper.endElement()
-    }
+    if (containingDocument.isServeInlineResources)
+      withElement("style", xhtmlPrefix, XHTML_NAMESPACE_URI, List("type" -> "text/css", "media" -> "all")) {
+        text(
+          """html body form.xforms-initially-hidden, html body .xforms-form .xforms-initially-hidden {
+              display: none
+          }"""
+        )
+      }
 
     val ops = containingDocument.getStaticOps
 
@@ -86,52 +84,40 @@ class XHTMLHeadHandler(
     val (scripts, styles)                 = ops.bindingResources
 
     // Stylesheets
-    val attributesImpl = new AttributesImpl
 
-    outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, styles, baselineStyles)
+    outputCSSResources(xhtmlPrefix, isMinimal, containingDocument.getStaticState.assets, styles, baselineStyles)
 
     // Scripts
     locally {
 
       // Linked JavaScript resources
-      outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)
+      outputJavaScriptResources(xhtmlPrefix, isMinimal, containingDocument.getStaticState.assets, scripts, baselineScripts)
 
       if (! containingDocument.isServeInlineResources) {
 
         // Static resources
         if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)
-          helper.element(
-            xhtmlPrefix,
-            XHTML_NAMESPACE_URI,
-            "script",
-            Array(
-              "type", "text/javascript",
-              "class", "xforms-standalone-resource",
-              "defer", "defer",
-              "src", XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js"
-            )
+          element(
+            localName = "script",
+            prefix    = xhtmlPrefix,
+            uri       = XHTML_NAMESPACE_URI,
+            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js") :: StandaloneScriptBaseAtts)
           )
 
         // Dynamic resources
-        helper.element(
-          xhtmlPrefix,
-          XHTML_NAMESPACE_URI,
-          "script",
-          Array(
-            "type", "text/javascript",
-            "class", "xforms-standalone-resource",
-            "defer", "defer",
-            "src", XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js"
-          )
+        element(
+          localName = "script",
+          prefix    = xhtmlPrefix,
+          uri       = XHTML_NAMESPACE_URI,
+          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js") :: StandaloneScriptBaseAtts)
         )
 
       } else {
 
-        def writeContent(content: String): Unit = {
-          helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-          helper.text(escapeJavaScriptInsideScript(content))
-          helper.endElement()
-        }
+        def writeContent(content: String): Unit =
+          withElement("script", xhtmlPrefix, XHTML_NAMESPACE_URI, List("type" -> "text/javascript")) {
+            text(escapeJavaScriptInsideScript(content))
+          }
 
         // Scripts known statically
         val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
@@ -171,86 +157,97 @@ class XHTMLHeadHandler(
     xmlReceiver.endElement(uri, localname, qName)
     xformsHandlerContext.findFormattingPrefixUndeclare(formattingPrefix)
   }
+}
 
-  // Output an element
-  private def outputElement(
-    xhtmlPrefix       : String,
-    attributesImpl    : AttributesImpl,
-    getElementDetails : (Option[String], Option[String]) ⇒ (String, Array[String]))(
-    resource          : Option[String],
-    cssClass          : Option[String],
-    content           : Option[String])(implicit
-    helper            : XMLReceiverHelper
-  ): Unit = {
+private object XHTMLHeadHandler {
 
-    val (elementName, attributes) = getElementDetails(resource, cssClass)
+  val ScriptBaseAtts =
+    List(
+      "type"  -> "text/javascript"
+    )
 
-    attributesImpl.clear()
-    XMLReceiverHelper.populateAttributes(attributesImpl, attributes)
-    helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, elementName, attributesImpl)
-    // Output content only if present
-    content foreach helper.text
-    helper.endElement()
-  }
+  val StandaloneScriptBaseAtts =
+    List(
+      "type"  -> "text/javascript",
+      "class" -> "xforms-standalone-resource",
+      "defer" -> "defer"
+    )
 
-  private def outputCSSResources(
+  val StyleBaseAtts =
+    List(
+      "type"  -> "text/css",
+      "media" -> "all"
+    )
+
+  val LinkBaseAtts =
+    List(
+      "rel"   -> "stylesheet",
+      "type"  -> "text/css",
+      "media" -> "all"
+    )
+
+  def valueOptToList(name: String, value: Option[String]): List[(String, String)] =
+    value.toList map (name -> _)
+
+  def outputJavaScriptResources(
     xhtmlPrefix       : String,
     minimal           : Boolean,
-    attributesImpl    : AttributesImpl,
     assets            : XFormsAssets,
     headElements      : List[HeadElement],
     baselineResources : List[String])(implicit
-    helper            : XMLReceiverHelper
+    receiver          : XMLReceiver
   ): Unit = {
 
-    // Function to output either a <link> or <style> element
-    def outputCSSElement =
-      outputElement(
-        xhtmlPrefix,
-        attributesImpl,
-        (resource, cssClass) ⇒ resource match {
-          case Some(resource) ⇒
-            ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
-          case None ⇒
-            ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
-        }
-      )(_, _, _)
+    def outputScriptElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit =
+      withElement(
+        localName = "script",
+        prefix    = xhtmlPrefix,
+        uri       = XHTML_NAMESPACE_URI,
+        atts      = ScriptBaseAtts ::: valueOptToList("src", resource) ::: valueOptToList("class", cssClass)
+      ) {
+        content foreach text
+      }
 
-    // Output all CSS
     XBLAssets.outputResources(
-      outputCSSElement,
-      assets.css,
-      headElements,
-      baselineResources,
-      minimal
+      outputElement = outputScriptElement,
+      builtin       = assets.js,
+      headElements  = headElements,
+      xblBaseline   = baselineResources,
+      minimal       = minimal
     )
   }
 
-  private def outputJavaScriptResources(
+  def outputCSSResources(
     xhtmlPrefix       : String,
     minimal           : Boolean,
-    attributesImpl    : AttributesImpl,
     assets            : XFormsAssets,
     headElements      : List[HeadElement],
     baselineResources : List[String])(implicit
-    helper            : XMLReceiverHelper
+    receiver          : XMLReceiver
   ): Unit = {
 
-    // Function to output a <script> element
-    def outputJSElement =
-      outputElement(
-        xhtmlPrefix,
-        attributesImpl,
-        (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
-      )(_, _, _)
+    def outputLinkOrStyleElement(resource: Option[String], cssClass: Option[String], content: Option[String]): Unit =
+      withElement(
+        localName = resource match {
+          case Some(_) => "link"
+          case None    => "style"
+        },
+        prefix    = xhtmlPrefix,
+        uri       = XHTML_NAMESPACE_URI,
+        atts      = (resource match {
+            case Some(resource) => ("href"  -> resource) :: LinkBaseAtts
+            case None           => StyleBaseAtts
+          }) ::: valueOptToList("class", cssClass)
+      ) {
+        content foreach text
+      }
 
-    // Output all JS
     XBLAssets.outputResources(
-      outputJSElement,
-      assets.js,
-      headElements,
-      baselineResources,
-      minimal
+      outputElement = outputLinkOrStyleElement,
+      builtin       = assets.css,
+      headElements  = headElements,
+      xblBaseline   = baselineResources,
+      minimal       = minimal
     )
   }
 }

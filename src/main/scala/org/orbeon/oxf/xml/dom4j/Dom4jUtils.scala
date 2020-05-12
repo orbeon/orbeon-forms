@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.dom4j
 
 import java.io.{InputStream, Reader, StringReader}
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
@@ -90,7 +90,7 @@ object Dom4jUtils {
 
   def makeSystemId(e: Element): String =
     Option(e.getData.asInstanceOf[LocationData]) flatMap
-      (d ⇒ Option(d.file))                       getOrElse
+      (d => Option(d.file))                       getOrElse
       DOMGenerator.DefaultContext
 
   /**
@@ -115,21 +115,21 @@ object Dom4jUtils {
           val children = elem.content
           var previousNode: Node = null
           var sb: jl.StringBuilder = null
-          for (currentNode ← children.iterator.asScala) {
+          for (currentNode <- children.iterator.asScala) {
             if (previousNode ne null) {
               previousNode match {
-                case previousNodeText: Text if currentNode.isInstanceOf[Text] ⇒
+                case previousNodeText: Text if currentNode.isInstanceOf[Text] =>
                   if (sb eq null)
                     sb = new jl.StringBuilder(previousNodeText.getText)
                   sb.append(currentNode.getText)
                   nodesToDetach.add(currentNode)
-                case _: Text ⇒
+                case _: Text =>
                   // Update node if needed
                   if (sb ne null)
                     previousNode.setText(sb.toString)
                   previousNode = currentNode
                   sb = null
-                case _ ⇒
+                case _ =>
                   previousNode = currentNode
                   sb = null
               }
@@ -145,7 +145,7 @@ object Dom4jUtils {
     )
 
     // Detach nodes only in the end so as to not confuse the acceptor above
-    for (currentNode ← nodesToDetach.asScala)
+    for (currentNode <- nodesToDetach.asScala)
       currentNode.detach()
 
     nodeToNormalize
@@ -229,7 +229,7 @@ object Dom4jUtils {
     var currentElem = elem
     while (currentElem ne null) {
       val currentNamespaces = currentElem.declaredNamespaces
-      for (namespace ← currentNamespaces.iterator.asScala) {
+      for (namespace <- currentNamespaces.iterator.asScala) {
         if (!namespaces.containsKey(namespace.prefix)) {
           namespaces.put(namespace.prefix, namespace.uri)
           // TODO: Intern namespace strings to save memory; should use NamePool later
@@ -356,8 +356,8 @@ object Dom4jUtils {
     * @return copy of Node
     */
   def createCopy(source: Node): Node = source match {
-    case elem: Element ⇒ elem.createCopy
-    case _             ⇒ source.deepCopy
+    case elem: Element => elem.createCopy
+    case _             => source.deepCopy
   }
 
   /**
@@ -403,7 +403,7 @@ object Dom4jUtils {
   def copyMissingNamespaces(sourceElem: Element, destinationElement: Element) {
     val parentNamespaceContext = getNamespaceContext(sourceElem)
     val rootElementNamespaceContext = getNamespaceContext(destinationElement)
-    for (prefix ← parentNamespaceContext.keySet.asScala) {
+    for (prefix <- parentNamespaceContext.keySet.asScala) {
       // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
       // namespace even if there are no namespace nodes
       if (rootElementNamespaceContext.get(prefix) eq null) {
@@ -424,7 +424,7 @@ object Dom4jUtils {
     val parentElement = newRoot.getParent
     val parentNamespaceContext = getNamespaceContext(parentElement)
     val rootElemNamespaceContext = getNamespaceContext(rootElement)
-    for (prefix ← parentNamespaceContext.keySet.asScala) {
+    for (prefix <- parentNamespaceContext.keySet.asScala) {
       if ((rootElemNamespaceContext.get(prefix) eq null) && ! prefixesToFilter.contains(prefix)) {
         val uri = parentNamespaceContext.get(prefix)
         rootElement.addNamespace(prefix, uri)
@@ -497,14 +497,14 @@ object Dom4jUtils {
         container.content
 
     // Iterate over the content
-    for (childNode ← content.asScala) {
+    for (childNode <- content.asScala) {
       childNode match {
-        case childElem: Element ⇒
+        case childElem: Element =>
           visitorListener.startElement(childElem)
           visitSubtree(childElem, visitorListener, mutable)
           visitorListener.endElement(childElem)
-        case text: Text ⇒ visitorListener.text(text)
-        case _ ⇒
+        case text: Text => visitorListener.text(text)
+        case _ =>
         // Ignore as we don't need other node types for now
       }
     }
@@ -517,7 +517,7 @@ object Dom4jUtils {
     sb.append(element.getQualifiedName)
 
     // Attributes if any
-    for (currentAtt ← element.attributeIterator.asScala) {
+    for (currentAtt <- element.attributeIterator.asScala) {
       sb.append(' ')
       sb.append(currentAtt.getQualifiedName)
       sb.append("=\"")
@@ -553,7 +553,7 @@ object Dom4jUtils {
     */
   def getSAXAttributes(element: Element): AttributesImpl = {
     val result = new AttributesImpl
-    for (att ← element.attributeIterator.asScala) {
+    for (att <- element.attributeIterator.asScala) {
       result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
     }
     result

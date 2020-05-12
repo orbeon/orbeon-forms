@@ -52,7 +52,7 @@ class XFormsLHHAHandler(
       staticLhha.lhhaType == LHHA.Hint && ! containingDocument.staticReadonlyHint && XFormsBaseHandler.isStaticReadonly(currentControlOpt.orNull)
 
     staticControlOpt match {
-      case Some(staticLhha: LHHAAnalysis) if staticLhha.isForRepeat ⇒
+      case Some(staticLhha: LHHAAnalysis) if staticLhha.isForRepeat =>
 
         // Case where the LHHA has a dynamic representation and is in a lower nesting of repeats.
         // NOTE: In this case, we don't output a `for` attribute. Instead, the repeated control will use
@@ -62,12 +62,12 @@ class XFormsLHHAHandler(
 
         if (! mustOmitStaticReadonlyHint(staticLhha, currentControlOpt)) {
           val containerAtts =
-            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl)
+            getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, currentControl, None)
 
           withElement("span", prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
             for {
-              currentLHHAControl ← currentControl.narrowTo[XFormsLHHAControl]
-              externalValue      ← currentLHHAControl.externalValueOpt
+              currentLHHAControl <- currentControl.narrowTo[XFormsLHHAControl]
+              externalValue      <- currentLHHAControl.externalValueOpt
               if externalValue.nonEmpty
             } locally {
               if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
@@ -79,36 +79,36 @@ class XFormsLHHAHandler(
           }
         }
 
-      case Some(staticLhha: LHHAAnalysis) if ! staticLhha.isForRepeat && ! staticLhha.isLocal ⇒
+      case Some(staticLhha: LHHAAnalysis) if ! staticLhha.isForRepeat && ! staticLhha.isLocal =>
 
         // Non-repeated case of an external label.
         // Here we have a `for` attribute.
 
         def resolveControlOpt(staticControl: ElementAnalysis) =
           Controls.resolveControlsById(containingDocument, lhhaEffectiveId, staticControl.staticId, followIndexes = true).headOption collect {
-            case control: XFormsControl ⇒ control
+            case control: XFormsControl => control
           }
 
         val effectiveTargetControlOpt =
           staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
-            case Some(Left(effectiveTargetControl)) ⇒ resolveControlOpt(effectiveTargetControl)
-            case Some(Right(_))                     ⇒ None
-            case None                               ⇒ resolveControlOpt(staticLhha.directTargetControl)
+            case Some(Left(effectiveTargetControl)) => resolveControlOpt(effectiveTargetControl)
+            case Some(Right(_))                     => None
+            case None                               => resolveControlOpt(staticLhha.directTargetControl)
           }
 
         if (! mustOmitStaticReadonlyHint(staticLhha, effectiveTargetControlOpt)) {
           val forEffectiveIdOpt =
             staticLhha.lhhaType == LHHA.Label option {
               staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
-                case Some(Left(effectiveTargetControl)) ⇒
+                case Some(Left(effectiveTargetControl)) =>
                   findTargetControlForEffectiveId(
                     xformsHandlerContext,
                     effectiveTargetControl,
                     XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
                   )
-                case Some(Right(targetPrefixedId)) ⇒
+                case Some(Right(targetPrefixedId)) =>
                   Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
-                case None ⇒
+                case None =>
                   findTargetControlForEffectiveId(
                     xformsHandlerContext,
                     staticLhha.directTargetControl,
@@ -128,7 +128,7 @@ class XFormsLHHAHandler(
           )
         }
 
-      case _ ⇒ // `None if staticLhha.isLocal && ! staticLhha.isForRepeat`
+      case _ => // `None if staticLhha.isLocal && ! staticLhha.isForRepeat`
         // Q: Can this happen? There should always be a static LHHA for the control, right?
     }
   }
@@ -152,8 +152,8 @@ object XFormsLHHAHandler {
     // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
     handlerContext.getController.findHandlerFromElem(targetControl.element, handlerContext) match {
-      case Some(handler: XFormsControlLifecyleHandler) ⇒ Option(handler.getForEffectiveId(targetControlEffectiveId))
-      case _                                           ⇒ None
+      case Some(handler: XFormsControlLifecyleHandler) => Option(handler.getForEffectiveId(targetControlEffectiveId))
+      case _                                           => None
     }
   }
 }

@@ -20,7 +20,7 @@ import collection.JavaConverters._
 
 trait ControlBindingSupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   // This control's binding context
   private[ControlBindingSupport] var _bindingContext: BindingContext = null
@@ -35,9 +35,9 @@ trait ControlBindingSupport {
   // Find the control's binding context
   final def contextForBinding: Option[Item] =
     for {
-      currentBinding ← Option(_bindingContext)
-      parentBinding  ← Option(currentBinding.parent)
-      singleItem     ← parentBinding.nodeset.asScala.lift(parentBinding.position - 1)
+      currentBinding <- Option(_bindingContext)
+      parentBinding  <- Option(currentBinding.parent)
+      singleItem     <- parentBinding.nodeset.asScala.lift(parentBinding.position - 1)
     } yield
       singleItem
 

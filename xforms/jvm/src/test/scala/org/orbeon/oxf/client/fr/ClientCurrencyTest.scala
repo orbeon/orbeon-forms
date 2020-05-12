@@ -26,15 +26,15 @@ trait ClientCurrencyTest extends AssertionsForJUnit with FormRunnerOps {
     val emailInput = cssSelector(".xforms-type-email input")
 
     for {
-      _ ← loadOrbeonPage("/fr/orbeon/controls/new")
-      _ ← clickOn(LinkTextQuery("Typed Controls"))
+      _ <- loadOrbeonPage("/fr/orbeon/controls/new")
+      _ <- clickOn(LinkTextQuery("Typed Controls"))
     }()
 
     def enterCheck(input: String, result: String) = for {
-      _ ← clickOn(currencyInput)
-      _ ← textField(currencyInput).value = input
-      _ ← clickOn(emailInput)
-      _ ← assert(textField(currencyInput).value === result)
+      _ <- clickOn(currencyInput)
+      _ <- textField(currencyInput).value = input
+      _ <- clickOn(emailInput)
+      _ <- assert(textField(currencyInput).value === result)
     }()
 
     enterCheck(".9", "0.90")

@@ -21,7 +21,7 @@ class XXFormsSetindexEvent(target: XFormsEventTarget, properties: PropertyGetter
   extends XFormsEvent(XXFORMS_SETINDEX, target, properties, bubbles = true, cancelable = false) {
 
   def this(target: XFormsEventTarget, index: Int) =
-    this(target, Map("index" → Option(index)))
+    this(target, Map("index" -> Option(index)))
 
   def index = property[Int]("index").get
 }

@@ -39,23 +39,23 @@ class XFormsActionAction extends XFormsAction {
 
     def hasClientRepresentation(observer: XFormsEventTarget) =
       observer match {
-        case _: XFormsVariableControl ⇒ false
-        case c: XFormsControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) ⇒ false
-        case _ ⇒ true
+        case _: XFormsVariableControl => false
+        case c: XFormsControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) => false
+        case _ => true
       }
 
     def firstClientRepresentation(observer: XFormsEventTarget) =
       observerAncestorsOrSelfIterator(observer) find hasClientRepresentation
 
     actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
-      case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) ⇒
+      case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) =>
         // Evaluate script parameters if any and schedule the script to run
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
             script              = script,
             targetEffectiveId   = actionContext.interpreter.event.targetObject.getEffectiveId,
             observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver) map (_.getEffectiveId) getOrElse "",
-            paramValues         = paramExpressions map { expr ⇒
+            paramValues         = paramExpressions map { expr =>
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(
                 actionElement,
@@ -66,7 +66,7 @@ class XFormsActionAction extends XFormsAction {
             }
           )
         )
-      case Some(StaticScript(_, XPathScriptType, _, ShareableScript(_, _, body, _))) ⇒
+      case Some(StaticScript(_, XPathScriptType, _, ShareableScript(_, _, body, _))) =>
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
           actionElement,
@@ -74,7 +74,7 @@ class XFormsActionAction extends XFormsAction {
           bindingContext.position,
           body
         )
-      case None ⇒
+      case None =>
         // Grouping XForms action which executes its children actions
 
         val contextStack = actionInterpreter.actionXPathContext
@@ -82,26 +82,26 @@ class XFormsActionAction extends XFormsAction {
 
         // Iterate over child actions
         var variablesCount = 0
-        for (childActionElement ← Dom4j.elements(actionElement)) {
+        for (childActionElement <- Dom4j.elements(actionElement)) {
 
           val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 
           partAnalysis.findControlAnalysis(childPrefixedId) match {
-            case Some(variable: VariableAnalysisTrait) ⇒
+            case Some(variable: VariableAnalysisTrait) =>
               // Scope variable
               contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
               variablesCount += 1
-            case Some(action: ActionTrait) ⇒
+            case Some(action: ActionTrait) =>
               // Run child action
               // NOTE: We execute children actions even if they happen to have `observer` or `target` attributes.
               actionInterpreter.runAction(action)
-            case _ ⇒
+            case _ =>
               throw new IllegalStateException
           }
         }
 
         // Unscope all variables
-        for (_ ← 1 to variablesCount)
+        for (_ <- 1 to variablesCount)
           contextStack.popBinding()
     }
   }

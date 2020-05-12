@@ -58,7 +58,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     val childElems = findUrlsInstanceRootElem.toList child *
 
     // Remove resource and temporary file if any
-    childElems map (_.stringValue) flatMap trimAllToOpt foreach { path ⇒
+    childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
       XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
     }
 
@@ -67,7 +67,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   }
 
   override def processError(t: Throwable) =
-    tryErrorMessage(Map(Some("resource") → "process-error"))
+    tryErrorMessage(Map(Some("resource") -> "process-error"))
 
   def writeSuspendedProcess(process: String) =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, process)
@@ -93,7 +93,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
       )
 
   def transactionRollback(): Unit =
-    inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent ⇒
+    inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent =>
 
       // Q: Should we also store `instanceCaching` and `readonly` into `RollbackContent`? As of now,
       // these won't change over time for `fr-form-instance` so we can safely read their latest version
@@ -124,7 +124,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     def stringPropertySet (name: String) = formRunnerProperty(name) flatMap trimAllToOpt isDefined
 
     buttonName match {
-      case "workflow-send" ⇒
+      case "workflow-send" =>
         val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
         val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
         val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
@@ -159,7 +159,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
         }
 
         Some(buffer mkString " ")
-      case _ ⇒
+      case _ =>
         None
     }
   }

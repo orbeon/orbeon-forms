@@ -14,9 +14,8 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState
 
@@ -28,7 +27,7 @@ trait VisitableTrait extends XFormsControl {
   // Previous values for refresh
   private[this] var _wasVisited = false
 
-  override def visited = _visited
+  override def visited: Boolean = _visited
 
   def visited_=(visited: Boolean): Unit =
     if (visited != _visited && ! (visited && isStaticReadonly)) {
@@ -53,16 +52,16 @@ trait VisitableTrait extends XFormsControl {
 
     // See https://github.com/orbeon/orbeon-forms/issues/3508
     new AncestorOrSelfIterator(this) foreach {
-      case v: XFormsValueComponentControl ⇒ v.visited = true
-      case _ ⇒
+      case v: XFormsValueComponentControl => v.visited = true
+      case _ =>
     }
   }
 
-  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean) = {
+  override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
     _visited = state match {
-      case Some(state) ⇒ state.visited
-      case None        ⇒ false
+      case Some(state) => state.visited
+      case None        => false
     }
   }
 
@@ -72,28 +71,28 @@ trait VisitableTrait extends XFormsControl {
     result
   }
 
-  override def commitCurrentUIState() = {
+  override def commitCurrentUIState(): Unit = {
     super.commitCurrentUIState()
     wasVisitedCommit()
   }
 
   override def performTargetAction(event: XFormsEvent): Unit = {
     event match {
-      case _: DOMFocusOutEvent ⇒
+      case _: DOMFocusOutEvent =>
         // Mark control visited upon `DOMFocusOut`. This applies to any control, including grouping controls. We
         // do this upon the event reaching the target, so that by the time a regular event listener makes use of the
         // visited property, it is up to date. This seems reasonable since `DOMFocusOut` indicates that the focus has
         // already left the control.
         // See https://github.com/orbeon/orbeon-forms/issues/3508 and https://github.com/orbeon/orbeon-forms/issues/3611
         visited = true
-      case _: XXFormsBlurEvent ⇒
+      case _: XXFormsBlurEvent =>
         // The client dispatches `xxforms-blur` when focus goes away from all XForms controls.
         if (containingDocument.getControls.getFocusedControl exists (_ eq this)) {
           // See https://github.com/orbeon/orbeon-forms/issues/3508 and https://github.com/orbeon/orbeon-forms/issues/3611
           visited = true
           Focus.removeFocus(containingDocument)
         }
-      case _ ⇒
+      case _ =>
     }
     super.performTargetAction(event)
   }
@@ -104,14 +103,14 @@ trait VisitableTrait extends XFormsControl {
     previousControlOpt    : Option[XFormsControl]
   ): Boolean =
     previousControlOpt match {
-      case Some(other: VisitableTrait) ⇒
+      case Some(other: VisitableTrait) =>
         visited == other.visited &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
-      case _ ⇒ false
+      case _ => false
     }
 
   // Dispatch change events (between the control becoming enabled and disabled)
-  override def dispatchChangeEvents() = {
+  override def dispatchChangeEvents(): Unit = {
     // Gather change first for consistency with XFormsSingleNodeControl
     val visitedChanged = wasVisitedCommit() != visited
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import collection.JavaConverters._
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List => JList, Map => JMap}
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
@@ -72,8 +72,8 @@ object XPathCache {
   }
 
   def isDynamicXPathError(t: Throwable): Boolean = t match {
-    case e: XPathException if ! e.isStaticError ⇒ true
-    case _ ⇒ false
+    case e: XPathException if ! e.isStaticError => true
+    case _ => false
   }
   // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
   // etc.), but NodeInfo wrappers are preserved.
@@ -160,11 +160,11 @@ object XPathCache {
       baseURI            = xpathContext.baseURI,
       locationData       = xpathContext.locationData,
       reporter           = null
-    ).asScala
+    )
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
-  // 4 external usages
-  def evaluateKeepItems(
+  // 2 external usages
+  def evaluateKeepItemsJava(
     contextItems       : JList[Item],
     contextPosition    : Int,
     xpathString        : String,
@@ -176,6 +176,38 @@ object XPathCache {
     locationData       : LocationData,
     reporter           : Reporter
   ): JList[Item] = {
+
+    val xpathExpression =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    withEvaluation(xpathString, xpathExpression, locationData, reporter) {
+      xpathExpression.evaluateKeepItemsJava(functionContext)
+    }
+  }
+
+  def evaluateKeepItems(
+    contextItems       : JList[Item],
+    contextPosition    : Int,
+    xpathString        : String,
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : JMap[String, ValueRepresentation],
+    functionLibrary    : FunctionLibrary,
+    functionContext    : FunctionContext,
+    baseURI            : String,
+    locationData       : LocationData,
+    reporter           : Reporter
+  ): List[Item] = {
 
     val xpathExpression =
       getXPathExpression(
@@ -324,7 +356,7 @@ object XPathCache {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ) = {
+  ): AnyRef = {
 
     val xpathExpression =
       getXPathExpression(
@@ -561,7 +593,7 @@ object XPathCache {
       if (variableNames.nonEmpty) {
         // There are some variables in scope. They must be part of the key
         // TODO: Put this in static state as this can be determined statically once and for all
-        for (variableName ← variableNames) {
+        for (variableName <- variableNames) {
           cacheKeyString.append('|')
           cacheKeyString.append(variableName)
         }
@@ -592,7 +624,7 @@ object XPathCache {
 
       pooledXPathExpression
     } catch {
-      case NonFatal(t) ⇒ throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)
+      case NonFatal(t) => throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)
     }
   }
 
@@ -671,17 +703,17 @@ object XPathCache {
 
       // Declare namespaces
       if (namespaceMapping ne null)
-        for ((prefix, uri) ← namespaceMapping.mapping)
+        for ((prefix, uri) <- namespaceMapping.mapping)
           independentContext.declareNamespace(prefix, uri)
 
       // Declare variables (we don't use the values here, just the names)
       val variables =
         if (variableNames ne null)
           for {
-            name ← variableNames
+            name <- variableNames
             variable = independentContext.declareVariable("", name)
           } yield
-            name → variable
+            name -> variable
         else
           Nil
 
@@ -695,7 +727,7 @@ object XPathCache {
     override def destroyObject(o: PooledXPathExpression): Unit = ()
   }
 
-  private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: ⇒ T): T =
+  private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: => T): T =
     try {
       if (reporter ne null) {
         val startTime = System.nanoTime
@@ -708,7 +740,7 @@ object XPathCache {
       } else
         body
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
     } finally
       xpathExpression.returnToPool()

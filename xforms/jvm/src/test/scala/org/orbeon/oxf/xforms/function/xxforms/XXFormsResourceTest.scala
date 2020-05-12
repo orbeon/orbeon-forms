@@ -40,12 +40,12 @@ class XXFormsResourceTest extends AnyFunSpec {
       </resources>
 
     val Expected = List(
-      "components.grid.insert-above" → "42",
-      "first-name.alert.0"           → "Default Alert",
-      "first-name.alert.1"           → "Invalid Length"
+      "components.grid.insert-above" -> "42",
+      "first-name.alert.0"           -> "Default Alert",
+      "first-name.alert.1"           -> "Invalid Length"
     )
 
-    for ((path, expected) ← Expected)
+    for ((path, expected) <- Expected)
       it(s"must find the node with path `$path`") {
 
         val result = XXFormsResource.pathFromTokens(resources.rootElement, XXFormsResource.splitResourceName(path))
@@ -58,12 +58,12 @@ class XXFormsResourceTest extends AnyFunSpec {
   describe("The `flattenResourceName()` function") {
 
      val Expected = List(
-      "components.grid.insert-above" → List("components", "grid", "insert-above"),
-      "first-name.alert.0"           → List("first-name", "alert"),
-      "first-name.alert.1"           → List("first-name", "alert")
+      "components.grid.insert-above" -> List("components", "grid", "insert-above"),
+      "first-name.alert.0"           -> List("first-name", "alert"),
+      "first-name.alert.1"           -> List("first-name", "alert")
     )
 
-    for ((path, expected) ← Expected)
+    for ((path, expected) <- Expected)
       it(s"must flatten path `$path`") {
         assert(expected === XXFormsResource.flattenResourceName(path))
       }
@@ -82,19 +82,19 @@ class XXFormsResourceTest extends AnyFunSpec {
     val Expected = List(
       (
         PublishTemplate,
-        List("form-version" → 42, "attachments" → 0)
-      ) → """Version 42 with no attachments.""",
+        List("form-version" -> 42, "attachments" -> 0)
+      ) -> """Version 42 with no attachments.""",
       (
         PublishTemplate,
-        List("form-version" → 42, "attachments" → 1)
-      ) → """Version 42 with 1 attachment.""",
+        List("form-version" -> 42, "attachments" -> 1)
+      ) -> """Version 42 with 1 attachment.""",
       (
         PublishTemplate,
-        List("form-version" → 42, "attachments" → 3)
-      ) → """Version 42 with 3 attachments."""
+        List("form-version" -> 42, "attachments" -> 3)
+      ) -> """Version 42 with 3 attachments."""
     )
 
-    for (((template, params), expected) ← Expected)
+    for (((template, params), expected) <- Expected)
       it(s"must replace template to `$expected`") {
         assert(
           expected === ProcessTemplate.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))

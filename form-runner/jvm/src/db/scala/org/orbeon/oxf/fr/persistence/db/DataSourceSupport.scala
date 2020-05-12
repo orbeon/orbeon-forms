@@ -27,7 +27,7 @@ object DataSourceSupport {
   // Run the given thunk in the context of the datasources specified by the given descriptors.
   // This sets a JNDI context, binds the datasources, runs the thunk, unbind the datasources, and
   // does some JNDI context cleanup.
-  def withDatasources[T](descriptors: immutable.Seq[DatasourceDescriptor])(thunk: ⇒ T): T = {
+  def withDatasources[T](descriptors: immutable.Seq[DatasourceDescriptor])(thunk: => T): T = {
     val originalProperties = setupInitialContextForJDBC()
     val basicDataSources = descriptors map bindDatasource
     val result = thunk
@@ -40,8 +40,8 @@ object DataSourceSupport {
 
   private def setupInitialContextForJDBC(): List[(String, Option[String])] = {
 
-    val originalProperties = List(Context.INITIAL_CONTEXT_FACTORY, Context.URL_PKG_PREFIXES) map { name ⇒
-      name → Option(System.getProperty(name))
+    val originalProperties = List(Context.INITIAL_CONTEXT_FACTORY, Context.URL_PKG_PREFIXES) map { name =>
+      name -> Option(System.getProperty(name))
     }
 
     System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory")
@@ -51,7 +51,7 @@ object DataSourceSupport {
       try {
         ic.createSubcontext(name)
       } catch {
-        case _: NameAlreadyBoundException ⇒ // ignore
+        case _: NameAlreadyBoundException => // ignore
       }
 
     new InitialContext                                         |!>
@@ -65,8 +65,8 @@ object DataSourceSupport {
 
   private def clearInitialContextForJDBC(originalProperties: List[(String, Option[String])]): Unit =
     originalProperties foreach {
-      case (name, Some(value)) ⇒ System.setProperty(name, value)
-      case (name, None)        ⇒ System.clearProperty(name)
+      case (name, Some(value)) => System.setProperty(name, value)
+      case (name, None)        => System.clearProperty(name)
     }
 
   class TestDataSource(dsd: DatasourceDescriptor) extends BasicDataSource {

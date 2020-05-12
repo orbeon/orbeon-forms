@@ -28,10 +28,10 @@ object Direction extends Enum[Direction] with CirceEnum[Direction] {
   case object Right extends Direction
 
   def mirror(direction: Direction): Direction = direction match {
-    case Up    ⇒ Down
-    case Down  ⇒ Up
-    case Left  ⇒ Right
-    case Right ⇒ Left
+    case Up    => Down
+    case Down  => Up
+    case Left  => Right
+    case Right => Left
   }
 }
 
@@ -46,8 +46,8 @@ object Orientation extends Enum[Orientation] with CirceEnum[Orientation] {
 
   def fromDirection(direction: Direction): Orientation = {
     direction match {
-      case Direction.Left | Direction.Right ⇒ Horizontal
-      case Direction.Up   | Direction.Down  ⇒ Vertical
+      case Direction.Left | Direction.Right => Horizontal
+      case Direction.Up   | Direction.Down  => Vertical
     }
   }
 }

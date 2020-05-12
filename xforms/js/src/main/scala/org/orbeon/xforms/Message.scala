@@ -20,8 +20,8 @@ import scala.collection.mutable
 import org.scalajs.dom.document
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.js.Dynamic.{newInstance ⇒ jsnew}
+import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.{newInstance => jsnew}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.xforms.action.Message")
@@ -53,7 +53,7 @@ object Message {
     yuiMessageDialogOpt.getOrElse {
 
       // Prevent SimpleDialog from registering itself on the form
-      val noop: js.Function = () ⇒ ()
+      val noop: js.Function = () => ()
       g.YAHOO.widget.SimpleDialog.prototype.registerForm = noop
 
       // Create one single instance of the YUI dialog used for xf:message

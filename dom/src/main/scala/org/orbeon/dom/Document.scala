@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.DocumentFactory.createElement
 import org.orbeon.dom.tree.AbstractBranch
@@ -61,10 +61,10 @@ class Document extends AbstractBranch {
   }
 
   private def contentRemoved(): Unit =
-    for (i ← 0 until internalContent.size) {
+    for (i <- 0 until internalContent.size) {
       internalContent.get(i) match {
-        case node: Node ⇒ childRemoved(node)
-        case _ ⇒
+        case node: Node => childRemoved(node)
+        case _ =>
       }
     }
 

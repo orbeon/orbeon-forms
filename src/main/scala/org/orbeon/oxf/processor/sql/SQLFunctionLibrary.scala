@@ -31,9 +31,9 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
 
   def instance = this
 
-  class SQLFunctionContext(val currentNode: dom.Node, val position: Int, val getColumn: (String, Int) ⇒ String) extends FunctionContext
+  class SQLFunctionContext(val currentNode: dom.Node, val position: Int, val getColumn: (String, Int) => String) extends FunctionContext
 
-  abstract class Function2Base[V1, V2, R] extends ((V1, V2) ⇒ R)
+  abstract class Function2Base[V1, V2, R] extends ((V1, V2) => R)
 
   private def functionContextOpt =
     XPath.functionContext flatMap CollectionUtils.collectByErasedType[SQLFunctionContext]
@@ -52,7 +52,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
       def wrap(node: dom.Node) =
         new DocumentWrapper(node.getDocument, null, XPath.GlobalConfiguration).wrap(node)
 
-      functionContextOpt flatMap (c ⇒ Option(c.currentNode)) map wrap orNull
+      functionContextOpt flatMap (c => Option(c.currentNode)) map wrap orNull
     }
   }
 
@@ -69,7 +69,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
       val colName = stringArgument(0)
       val level   = arguments.lift(1) flatMap evaluateAsLong filter (_ >= 1) getOrElse 1L
 
-      functionContextOpt flatMap (c ⇒ Option(c.getColumn) map (_.apply(colName, level.toInt)))
+      functionContextOpt flatMap (c => Option(c.getColumn) map (_.apply(colName, level.toInt)))
     }
   }
 

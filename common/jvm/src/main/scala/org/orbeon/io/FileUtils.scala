@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 object FileUtils {
 
   def isTemporaryFileUri(uri: URI): Boolean =
-    findFileUriPath(uri) exists { uriPath ⇒
+    findFileUriPath(uri) exists { uriPath =>
       val tmpPath = new File(System.getProperty("java.io.tmpdir")).toURI.normalize.getPath
       uriPath.startsWith(tmpPath)
     }

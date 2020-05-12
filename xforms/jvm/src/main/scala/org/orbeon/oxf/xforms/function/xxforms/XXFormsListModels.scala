@@ -22,7 +22,7 @@ import org.orbeon.xforms.XFormsId
 class XXFormsListModels extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     for {
-      model       ← getContainingDocument(xpathContext).allModels
+      model       <- getContainingDocument(xpathContext).allModels
       effectiveId = model.getEffectiveId
       absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
     } yield

@@ -47,18 +47,18 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     // The target might the control itself, or for grids with LHH in headers, an `xf:output` added to edit the LHH
     val controlName = FormRunner.controlNameFromId(
       EditorIdPrefixes find staticControlId.startsWith match {
-        case Some(prefix) ⇒ staticControlId.substring(prefix.size)
-        case None         ⇒ staticControlId
+        case Some(prefix) => staticControlId.substring(prefix.size)
+        case None         => staticControlId
       }
     )
 
     // The client might send this after the control is deleted and we don't want to crash
-    FormRunner.findControlByName(ctx.bodyElem, controlName) foreach { controlElem ⇒
+    FormRunner.findControlByName(ctx.bodyElem, controlName) foreach { controlElem =>
 
       val xcvElemOpt = ToolboxOps.controlOrContainerElemToXcv(controlElem)
 
       if (FormBuilder.setControlLabelHintHelpOrText(controlName, lhha, value, None, isHTML))
-        xcvElemOpt foreach { xcvElem ⇒
+        xcvElemOpt foreach { xcvElem =>
           Undo.pushUserUndoAction(
             ControlSettings(
               controlName,
@@ -72,7 +72,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def controlDelete(controlId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    resolveId(controlId) flatMap { controlElem ⇒
+    resolveId(controlId) flatMap { controlElem =>
       FormBuilder.deleteControlWithinCell(controlElem.parentUnsafe, updateTemplates = true)
     } foreach
       Undo.pushUserUndoAction
@@ -82,14 +82,14 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-control-details",
-      properties = Map("control-id" → Some(XFormsId.getStaticIdFromId(controlId)))
+      properties = Map("control-id" -> Some(XFormsId.getStaticIdFromId(controlId)))
     )
 
   def controlEditItems(controlId: String): Unit =
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-itemsets",
-      properties = Map("control-element" → resolveId(controlId)(FormBuilderDocContext()))
+      properties = Map("control-element" -> resolveId(controlId)(FormBuilderDocContext()))
     )
 
   def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {
@@ -107,8 +107,8 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
     val (_, undoAction) =
       AboveBelow.withName(aboveBelowString) match {
-        case AboveBelow.Above ⇒ FormBuilder.rowInsertAbove(FormBuilder.containerById(controlId), position - 1)
-        case AboveBelow.Below ⇒ FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
+        case AboveBelow.Above => FormBuilder.rowInsertAbove(FormBuilder.containerById(controlId), position - 1)
+        case AboveBelow.Below => FormBuilder.rowInsertBelow(FormBuilder.containerById(controlId), position - 1)
       }
 
     undoAction foreach Undo.pushUserUndoAction
@@ -154,7 +154,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-container-details",
-      properties = Map("container" → Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
+      properties = Map("container" -> Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
     )
 
   def sectionMove(sectionId: String, directionString: String): Unit = {
@@ -203,7 +203,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-ids",
-      properties = Map("container-id" → Some(containerId), "action" → Some("merge"))
+      properties = Map("container-id" -> Some(containerId), "action" -> Some("merge"))
     )
   }
 

@@ -110,7 +110,7 @@ class BindingDescriptorTest
   val FR  = "http://orbeon.org/oxf/xml/form-runner"
   val FB  = "http://orbeon.org/oxf/xml/form-builder"
 
-  val Bindings = ComponentsDocument.rootElement child (XBL → "xbl") child (XBL → "binding")
+  val Bindings = ComponentsDocument.rootElement child (XBL -> "xbl") child (XBL -> "binding")
 
   describe("New element name") {
 
@@ -124,36 +124,36 @@ class BindingDescriptorTest
     ): Unit =
       it(s"must pass with $oldControlName/$oldDatatype/$oldAppearance/$newDatatype/$newAppearance") {
         for {
-          oldT ← List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
-          newT ← List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
+          oldT <- List(oldDatatype, Model.getVariationTypeOrKeep(oldDatatype))
+          newT <- List(newDatatype, Model.getVariationTypeOrKeep(newDatatype))
         } locally {
           assert(expected === newElementName(oldControlName, oldT, oldAppearance.to(Set), newT, newAppearance, Bindings))
         }
       }
 
-    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "decimal", None                     )(Some((FR → "number"      , None)))
-    assertVaryTypes(FR → "number"       , XS → "string" , None                     , XS → "string" , None                     )(None)
-    assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "string" , None                     )(Some((XF → "input"       , None)))
-    assertVaryTypes(FR → "number"       , XS → "decimal", None                     , XS → "boolean", None                     )(Some((XF → "input"       , None)))
-    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "boolean", None                     )(None)
-    assertVaryTypes(XF → "input"        , XS → "boolean", None                     , XS → "boolean", None                     )(None)
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "decimal", None                     )(Some((FR -> "number"      , None)))
+    assertVaryTypes(FR -> "number"       , XS -> "string" , None                     , XS -> "string" , None                     )(None)
+    assertVaryTypes(FR -> "number"       , XS -> "decimal", None                     , XS -> "string" , None                     )(Some((XF -> "input"       , None)))
+    assertVaryTypes(FR -> "number"       , XS -> "decimal", None                     , XS -> "boolean", None                     )(Some((XF -> "input"       , None)))
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "boolean", None                     )(None)
+    assertVaryTypes(XF -> "input"        , XS -> "boolean", None                     , XS -> "boolean", None                     )(None)
 
-    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , None                     )(None)
-    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
-    assertVaryTypes(XF → "input"        , XS → "date"   , None                     , XS → "date"   , Some("dropdowns")        )(Some(FR → "dropdown-date", None))
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "date"   , None                     )(None)
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "date"   , Some("dropdowns")        )(Some(FR -> "dropdown-date", None))
+    assertVaryTypes(XF -> "input"        , XS -> "date"   , None                     , XS -> "date"   , Some("dropdowns")        )(Some(FR -> "dropdown-date", None))
 
-    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , None                     )(Some(XF → "input"        , None))
-    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "date"   , Some("fields")           )(Some(FR → "fields-date"  , None))
-    assertVaryTypes(FR → "dropdown-date", XS → "date"   , None                     , XS → "string" , Some("fields")           )(Some(XF → "input"        , Some("fields")))
+    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , None                     )(Some(XF -> "input"        , None))
+    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , Some("fields")           )(Some(FR -> "fields-date"  , None))
+    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "string" , Some("fields")           )(Some(XF -> "input"        , Some("fields")))
 
-    assertVaryTypes(XF → "select1"      , XS → "string" , Some("full")             , XS → "string" , Some("dropdown")         )(Some(XF → "select1"      , Some("dropdown")))
-    assertVaryTypes(XF → "select1"      , XS → "string" , Some("dropdown")         , XS → "string" , Some("full")             )(Some(XF → "select1"      , Some("full")))
+    assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("dropdown")         )(Some(XF -> "select1"      , Some("dropdown")))
+    assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("dropdown")         , XS -> "string" , Some("full")             )(Some(XF -> "select1"      , Some("full")))
 
-    assertVaryTypes(XF → "input"        , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "input"        , Some("character-counter")))
-    assertVaryTypes(XF → "textarea"     , XS → "string" , None                     , XS → "string" , Some("character-counter"))(Some(XF → "textarea"     , Some("character-counter")))
-    assertVaryTypes(XF → "textarea"     , XS → "string" , Some("character-counter"), XS → "string" , None                     )(Some(XF → "textarea"     , None))
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "string" , Some("character-counter"))(Some(XF -> "input"        , Some("character-counter")))
+    assertVaryTypes(XF -> "textarea"     , XS -> "string" , None                     , XS -> "string" , Some("character-counter"))(Some(XF -> "textarea"     , Some("character-counter")))
+    assertVaryTypes(XF -> "textarea"     , XS -> "string" , Some("character-counter"), XS -> "string" , None                     )(Some(XF -> "textarea"     , None))
 
-    assertVaryTypes(XF → "input"        , XS → "string" , Some("character-counter"), XS → "double" , Some("character-counter"))(None)
+    assertVaryTypes(XF -> "input"        , XS -> "string" , Some("character-counter"), XS -> "double" , Some("character-counter"))(None)
   }
 
   describe("Possible appearances with label") {
@@ -165,16 +165,16 @@ class BindingDescriptorTest
     ) =
       it(s"must pass with $elemName/$dataType") {
         for {
-          newT ← List(dataType, Model.getVariationTypeOrKeep(dataType))
+          newT <- List(dataType, Model.getVariationTypeOrKeep(dataType))
         } locally {
-          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t ⇒ t._1 → t._2)))
+          assert(expected === (possibleAppearancesWithLabel(elemName, newT, "en", Bindings) map (t => t._1 -> t._2)))
         }
       }
 
-    assertVaryTypes(XF → "input"   , XS → "string" )(Seq(None         → "Input Field"  , Some("character-counter") → "With Character Counter"))
-    assertVaryTypes(XF → "textarea", XS → "string" )(Seq(None         → "Text Area"    , Some("character-counter") → "With Character Counter"))
-    assertVaryTypes(XF → "input"   , XS → "decimal")(Seq(None         → "Number"))
-    assertVaryTypes(XF → "input"   , XS → "date"   )(Seq(None         → "Date"         , Some("dropdowns")         → "Dropdown Date"          , Some("fields") → "Fields Date"))
-    assertVaryTypes(XF → "select1" , XS → "string" )(Seq(Some("full") → "Radio Buttons", Some("dropdown")          → "Dropdown Menu"))
+    assertVaryTypes(XF -> "input"   , XS -> "string" )(Seq(None         -> "Input Field"  , Some("character-counter") -> "With Character Counter"))
+    assertVaryTypes(XF -> "textarea", XS -> "string" )(Seq(None         -> "Text Area"    , Some("character-counter") -> "With Character Counter"))
+    assertVaryTypes(XF -> "input"   , XS -> "decimal")(Seq(None         -> "Number"))
+    assertVaryTypes(XF -> "input"   , XS -> "date"   )(Seq(None         -> "Date"         , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
+    assertVaryTypes(XF -> "select1" , XS -> "string" )(Seq(Some("full") -> "Radio Buttons", Some("dropdown")          -> "Dropdown Menu"))
   }
 }

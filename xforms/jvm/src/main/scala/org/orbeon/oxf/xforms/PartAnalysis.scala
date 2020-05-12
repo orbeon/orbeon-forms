@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
 import org.orbeon.oxf.xforms.event.EventHandler
-import java.util.{List ⇒ JList}
+import java.util.{List => JList}
 
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.dom.Element
@@ -53,9 +53,9 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
   def dumpAnalysis()
 
   // The element in our parent that created the current part
-  def elementInParent =
-    parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing component separator
+  def elementInParent: Option[ElementAnalysis] =
+    parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // `.init` removes the trailing component separator
 
-  def repeatDepthAcrossParts =
+  def repeatDepthAcrossParts: Int =
     if (repeats.isEmpty) 0 else (repeats map (_.ancestorRepeatsAcrossParts.size)).max + 1
 }

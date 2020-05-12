@@ -30,10 +30,10 @@ class XXFormsAVTValue extends XFormsFunction {
     val attName = stringArgument(1)
     // TODO: handle also absolute id
     for {
-      forPrefixedId      ← sourceScope.prefixedIdForStaticIdOpt(forId)
-      attControlAnalysis ← Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
-      control            ← findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
-      attControl         ← CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
+      forPrefixedId      <- sourceScope.prefixedIdForStaticIdOpt(forId)
+      attControlAnalysis <- Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
+      control            <- findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
+      attControl         <- CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
     } yield
       attControl.getValue
   }

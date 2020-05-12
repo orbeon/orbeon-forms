@@ -36,19 +36,19 @@ class ActionsFormat20182Test
       val doc = docOpt.get
 
       it("must pass all service result checks") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
             for {
-              (expectedSizeOpt, i) ← List(Some(252), None, Some(270), None).zipWithIndex
+              (expectedSizeOpt, i) <- List(Some(252), None, Some(270), None).zipWithIndex
               control              = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
               value                = control.getValue
             } locally {
               expectedSizeOpt match {
-                case Some(expectedSize) ⇒
+                case Some(expectedSize) =>
                   assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
                   assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
-                case None ⇒
-                  assert(value.isBlank)
+                case None =>
+                  assert(value.isAllBlank)
               }
             }
           }
@@ -64,7 +64,7 @@ class ActionsFormat20182Test
       val doc = docOpt.get
 
       it("must pass all service result checks") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
             assert("First" == resolveObject[XFormsValueControl]("my-result-control").get.getValue)
           }
@@ -80,7 +80,7 @@ class ActionsFormat20182Test
       val doc = docOpt.get
 
       it("must pass all service result checks") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
             assert("21" == resolveObject[XFormsValueControl]("my-result-1-control").get.getValue)
             assert("22" == resolveObject[XFormsValueControl]("my-result-2-control").get.getValue)
@@ -97,7 +97,7 @@ class ActionsFormat20182Test
       val doc = docOpt.get
 
       it("must check the resulting iteration sizes") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
 
             def assertCount(controlName: String, size: Int): Unit = {

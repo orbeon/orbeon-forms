@@ -23,7 +23,7 @@ object Loggers {
   private val LoggersByCategory = new HashMap[String, IndentedLogger]
 
   // Return an indented logger for the given category
-  // FIXME: more than 1 thread access the returned indented logger, which is stateful → Use threadLocal?
+  // FIXME: more than 1 thread access the returned indented logger, which is stateful -> Use threadLocal?
   def getIndentedLogger(category: String): IndentedLogger = synchronized {
 
     def newLogger = {

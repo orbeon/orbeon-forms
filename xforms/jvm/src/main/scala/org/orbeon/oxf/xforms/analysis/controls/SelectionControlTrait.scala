@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.apache.commons.lang3.StringUtils
+import cats.syntax.option._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
@@ -24,30 +24,36 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.control.LHHAValue
-import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.SimplePath._
 
 trait SelectionControlTrait
 extends InputValueControl
    with SelectAppearanceTrait
    with ChildrenLHHAItemsetsAndActionsTrait {
 
-  if  (element.attributeValue("selection") == "open")
+  if (element.attributeValue("selection") == "open")
     throw new ValidationException("Open selection is currently not supported.", locationData)
+
+  private def newElemWrapper: NodeInfo = new DocumentWrapper(
+    element.getDocument,
+    null,
+    XPath.GlobalConfiguration
+  ).wrap(element)
 
   // Try to figure out if we have dynamic items. This attempts to cover all cases, including
   // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
   // don't check things like event handlers. Also check for AVTs.
-  val hasStaticItemset =
+  val hasStaticItemset: Boolean =
     ! XPathCache.evaluateSingle(
-      new DocumentWrapper(
-        element.getDocument,
-        null,
-        XPath.GlobalConfiguration
-      ).wrap(element),
-      """
+      contextItem = newElemWrapper,
+      xpathString =
+        """
         exists(
           (xf:choices | xf:item | xf:itemset)/
           descendant-or-self::*[
@@ -61,31 +67,63 @@ extends InputValueControl
           ]
         )
       """,
-      XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
-      null,
-      null,
-      null,
-      null,
-      locationData,
-      null
+      namespaceMapping   = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      variableToValueMap = null,
+      functionLibrary    = null,
+      functionContext    = null,
+      baseURI            = null,
+      locationData       = locationData,
+      reporter           = null
     ).asInstanceOf[Boolean]
 
-  val isNorefresh      = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
-  val mustEncodeValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map (_.toBoolean)
+  val useCopy: Boolean = {
+
+    val wrapper = newElemWrapper
+
+    val hasCopyElem  = wrapper descendant XFORMS_COPY_QNAME  nonEmpty
+    val hasValueElem = wrapper descendant XFORMS_VALUE_QNAME nonEmpty
+
+    // This limitation could be lifted in the future
+    if (hasValueElem && hasCopyElem)
+      throw new ValidationException(
+        s"an itemset cannot have both `xf:copy` and `xf:value` elements",
+        ElementAnalysis.createLocationData(element)
+      )
+
+    hasCopyElem
+  }
+
+  val excludeWhitespaceTextNodesForCopy: Boolean =
+    element.attributeValue(EXCLUDE_WHITESPACE_TEXT_NODES_QNAME) == "true"
+
+  val isNorefresh: Boolean =
+    element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
+
+  val mustEncodeValues: Option[Boolean] =
+    if (useCopy)
+      true.some
+    else
+      element.attributeValueOpt(ENCRYPT_ITEM_VALUES) map (_.toBoolean)
 
   private var itemsetAnalysis: Option[XPathAnalysis] = None
   private var _itemsetAnalyzed = false
-  def itemsetAnalyzed = _itemsetAnalyzed
+  def itemsetAnalyzed: Boolean = _itemsetAnalyzed
 
-  final def getItemsetAnalysis = { assert(_itemsetAnalyzed); itemsetAnalysis }
+  final def getItemsetAnalysis: Option[XPathAnalysis] = { assert(_itemsetAnalyzed); itemsetAnalysis }
 
-  override def analyzeXPath() = {
+  override def isAllowedBoundItem(item: om.Item): Boolean =
+    if (useCopy)
+      DataModel.isAllowedBoundItem(item)
+    else
+      super.isAllowedBoundItem(item)
+
+  override def analyzeXPath(): Unit = {
     super.analyzeXPath()
     itemsetAnalysis = computeItemsetAnalysis()
     _itemsetAnalyzed = true
   }
 
-  def computeItemsetAnalysis() = {
+  def computeItemsetAnalysis(): Option[XPathAnalysis] = {
 
     // TODO: operate on nested ElementAnalysis instead of Element
 
@@ -123,7 +161,7 @@ extends InputValueControl
 
         element.getQName match {
 
-          case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME ⇒
+          case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
 
             // Analyze container and add as a value dependency
             // We add this as dependency because the itemset must also be recomputed if any returned item of
@@ -143,14 +181,15 @@ extends InputValueControl
             combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
 
             processElement(LABEL_QNAME, required = true)
-            processElement(XFORMS_VALUE_QNAME, required = true)
+            processElement(XFORMS_VALUE_QNAME, required = false)
+            processElement(XFORMS_COPY_QNAME, required = false)
 
             if (isFull) {
               processElement(HELP_QNAME, required = false)
               processElement(HINT_QNAME, required = false)
             }
 
-          case XFORMS_CHOICES_QNAME ⇒
+          case XFORMS_CHOICES_QNAME =>
 
             // Analyze container and add as a value dependency (see above)
             itemElementAnalysis.analyzeXPath()
@@ -161,7 +200,7 @@ extends InputValueControl
             // Always push the container
             stack ::= itemElementAnalysis
 
-          case _ ⇒ // ignore
+          case _ => // ignore
         }
       }
 
@@ -169,7 +208,7 @@ extends InputValueControl
         if (element.getQName == XFORMS_CHOICES_QNAME)
           stack = stack.tail
 
-      def text(text: Text) = ()
+      def text(text: Text): Unit = ()
     })
 
     Some(combinedAnalysis)
@@ -179,28 +218,28 @@ extends InputValueControl
     super.toXMLContent(helper)
     if (_itemsetAnalyzed)
       getItemsetAnalysis match {
-        case Some(analysis) ⇒
+        case Some(analysis) =>
           helper.startElement("itemset")
           analysis.toXML(helper)
           helper.endElement()
-        case _ ⇒ // NOP
+        case _ => // NOP
       }
   }
 
-  override def freeTransientState() = {
+  override def freeTransientState(): Unit = {
     super.freeTransientState()
     if (_itemsetAnalyzed && getItemsetAnalysis.isDefined)
       getItemsetAnalysis.get.freeTransientState()
   }
 
   // Return the control's static itemset if any
-  lazy val staticItemset = hasStaticItemset option evaluateStaticItemset
+  lazy val staticItemset: Option[Itemset] = hasStaticItemset option evaluateStaticItemset
 
   private def evaluateStaticItemset = {
 
     // TODO: operate on nested ElementAnalysis instead of Element
 
-    val result = new Itemset(isMultiple)
+    val result = new Itemset(isMultiple, hasCopy = false)
 
     Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
 
@@ -209,74 +248,97 @@ extends InputValueControl
 
       def startElement(element: Element): Unit = {
 
-        def findNestedLHHValue(qName: QName, required: Boolean) = {
-          val nestedElementOpt = Option(element.element(qName))
+        def findLhhValue(qName: QName, required: Boolean): Option[LHHAValue] = {
 
-          if (required && nestedElementOpt.isEmpty)
-            throw new ValidationException(
-              s"${XFORMS_ITEM_QNAME.qualifiedName} must contain an ${qName.qualifiedName} element.",
-              ElementAnalysis.createLocationData(element)
-            )
+          element.elementOpt(qName) match {
+            case Some(lhhaElem) =>
 
-          nestedElementOpt flatMap { nestedElement ⇒
-            val containsHTML = Array[Boolean](false)
+              val containsHTML = Array[Boolean](false)
 
-            val valueOpt = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML).trimAllToOpt
+              val valueOpt =
+                XFormsUtils.getStaticChildElementValue(
+                  containerScope.fullPrefix,
+                  lhhaElem,
+                  isFull,
+                  containsHTML
+                ).trimAllToOpt
 
-            if (required)
-              Some(LHHAValue(valueOpt getOrElse "", containsHTML(0)))
-            else
-              valueOpt map (LHHAValue(_, containsHTML(0)))
+              if (required)
+                LHHAValue(valueOpt getOrElse "", containsHTML(0)).some
+              else
+                valueOpt map (LHHAValue(_, containsHTML(0)))
+
+            case None =>
+              if (required)
+                throw new ValidationException(
+                  "`xf:item` or `xf:itemset` must contain an `xf:label` element",
+                  ElementAnalysis.createLocationData(element)
+                )
+              else
+                None
           }
         }
 
         element.getQName match {
 
-          case XFORMS_ITEM_QNAME ⇒ // xf:item
+          case XFORMS_ITEM_QNAME => // xf:item
 
-            val label = findNestedLHHValue(LABEL_QNAME, required = true).get
-            val help  = findNestedLHHValue(HELP_QNAME,  required = false)
-            val hint  = findNestedLHHValue(HINT_QNAME,  required = false)
+            val labelOpt = findLhhValue(LABEL_QNAME, required = true)
+            val helpOpt  = findLhhValue(HELP_QNAME,  required = false)
+            val hintOpt  = findLhhValue(HINT_QNAME,  required = false)
 
-            val value = {
-              val valueElement = element.element(XFORMS_VALUE_QNAME)
-              if (valueElement eq null)
-                throw new ValidationException(
-                  "xf:item must contain an xf:value element.",
-                  ElementAnalysis.createLocationData(element)
+            val valueOpt = {
+
+              val rawValue =
+                element.elementOpt(XFORMS_VALUE_QNAME) map (
+                  XFormsUtils.getStaticChildElementValue(
+                    containerScope.fullPrefix,
+                    _,
+                    false,
+                    null
+                  )
+                ) getOrElse (
+                  throw new ValidationException(
+                    "xf:item must contain an xf:value element.",
+                    ElementAnalysis.createLocationData(element)
+                  )
                 )
 
-              StringUtils.defaultString(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null))
+              if (isMultiple)
+                rawValue.trimAllToOpt
+              else
+                rawValue.some
             }
 
-            currentContainer.addChildItem(
-              Item(
-                label      = label,
-                help       = help,
-                hint       = hint,
-                value      = value,
-                attributes = SelectionControlUtil.getAttributes(element)
-              )(
-                position   = position
+            valueOpt foreach { value =>
+              currentContainer.addChildItem(
+                Item.ValueNode(
+                  label      = labelOpt getOrElse LHHAValue.Empty,
+                  help       = helpOpt,
+                  hint       = hintOpt,
+                  value      = Left(value),
+                  attributes = SelectionControlUtil.getAttributes(element)
+                )(
+                  position   = position
+                )
               )
-            )
-            position += 1
+              position += 1
+            }
 
-          case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
+          case XFORMS_ITEMSET_QNAME => // xf:itemset
 
             throw new ValidationException(
               "xf:itemset must not appear in static itemset.",
               ElementAnalysis.createLocationData(element)
             )
 
-          case XFORMS_CHOICES_QNAME ⇒ // xf:choices
+          case XFORMS_CHOICES_QNAME => // xf:choices
 
-            findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
-              val newContainer = Item(
-                label      = label,
-                help       = None,
-                hint       = None,
-                value      = null,
+            val labelOpt = findLhhValue(LABEL_QNAME, required = false)
+
+            labelOpt foreach { _ =>
+              val newContainer = Item.ChoiceNode(
+                label      = labelOpt getOrElse LHHAValue.Empty,
                 attributes = SelectionControlUtil.getAttributes(element)
               )(
                 position   = position
@@ -286,19 +348,17 @@ extends InputValueControl
               currentContainer = newContainer
             }
 
-          case _ ⇒ // ignore
+          case _ => // ignore
         }
       }
 
       def endElement(element: Element): Unit =
         if (element.getQName == XFORMS_CHOICES_QNAME) {
-          // xf:choices
-          val labelElement = element.element(LABEL_QNAME)
-          if (labelElement ne null)
+          if (element.elementOpt(LABEL_QNAME).isDefined)
             currentContainer = currentContainer.parent
         }
 
-      def text(text: Text) = ()
+      def text(text: Text): Unit = ()
     })
     result
   }
@@ -309,13 +369,13 @@ object SelectionControlUtil {
   val AttributesToPropagate = List(CLASS_QNAME, STYLE_QNAME, XXFORMS_OPEN_QNAME)
   val TopLevelItemsetQNames = Set(XFORMS_ITEM_QNAME, XFORMS_ITEMSET_QNAME, XFORMS_CHOICES_QNAME)
 
-  def isTopLevelItemsetElement(e: Element) = TopLevelItemsetQNames(e.getQName)
+  def isTopLevelItemsetElement(e: Element): Boolean = TopLevelItemsetQNames(e.getQName)
 
-  def getAttributes(itemChoiceItemset: Element) =
+  def getAttributes(itemChoiceItemset: Element): List[(QName, String)] =
     for {
-      attributeName   ← AttributesToPropagate
+      attributeName   <- AttributesToPropagate
       attributeValue = itemChoiceItemset.attributeValue(attributeName)
       if attributeValue ne null
     } yield
-      attributeName → attributeValue
+      attributeName -> attributeValue
 }

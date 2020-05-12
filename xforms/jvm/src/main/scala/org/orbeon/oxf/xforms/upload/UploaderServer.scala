@@ -40,10 +40,11 @@ import org.orbeon.xforms.Constants
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 import scala.collection.compat._
+import shapeless.syntax.typeable._
 
 // Separate checking logic for sanity and testing
 trait UploadCheckerLogic {
@@ -62,13 +63,13 @@ trait UploadCheckerLogic {
         uploadMaxSizeProperty
 
     uploadMaxSizeAggregateProperty match {
-      case UnlimitedSize ⇒
+      case UnlimitedSize =>
         // Aggregate size is not a factor so just use what we got for the control
         maximumSizeForControlOrDefault
-      case LimitedSize(maximumAggregateSize) ⇒
+      case LimitedSize(maximumAggregateSize) =>
         // Aggregate size is a factor
         currentUploadSizeAggregate match {
-          case Some(currentAggregateSize) ⇒
+          case Some(currentAggregateSize) =>
 
             val remainingByAggregation = (maximumAggregateSize - currentAggregateSize) max 0L
 
@@ -76,11 +77,11 @@ trait UploadCheckerLogic {
               LimitedSize(0)
             } else {
               maximumSizeForControlOrDefault match {
-                case UnlimitedSize                   ⇒ LimitedSize(remainingByAggregation)
-                case LimitedSize(remainingByControl) ⇒ LimitedSize(remainingByControl min remainingByAggregation)
+                case UnlimitedSize                   => LimitedSize(remainingByAggregation)
+                case LimitedSize(remainingByControl) => LimitedSize(remainingByControl min remainingByAggregation)
               }
             }
-          case None ⇒
+          case None =>
             throw new IllegalArgumentException(s"missing `upload.max-size-aggregate-expression` property")
         }
     }
@@ -98,9 +99,9 @@ object AllowedMediatypes {
   def unapply(s: String): Option[AllowedMediatypes] = {
 
     val mediatypeRanges =
-      s.splitTo[List](" ,") flatMap { token ⇒
+      s.splitTo[List](" ,") flatMap { token =>
         token.trimAllToOpt
-      } flatMap { trimmed ⇒
+      } flatMap { trimmed =>
           MediatypeRange.unapply(trimmed)
       }
 
@@ -157,7 +158,7 @@ object UploaderServer {
 
   def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress] =
     session flatMap (_.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
-      case progress: UploadProgress ⇒ progress
+      case progress: UploadProgress => progress
     }
 
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress] =
@@ -207,8 +208,8 @@ object UploaderServer {
 
       val headersOpt =
         for {
-          headersSupport ← collectByErasedType[FileItemHeadersSupport](fileItem)
-          headers        ← Option(headersSupport.getHeaders)
+          headersSupport <- collectByErasedType[FileItemHeadersSupport](fileItem)
+          headers        <- Option(headersSupport.getHeaders)
         } yield
           headers
 
@@ -218,9 +219,9 @@ object UploaderServer {
         // This is `None` with Chrome and Firefox at least (2019-10-18: confirmed at least for Chrome)
         val untrustedPartContentLengthOpt =
           for {
-            headers             ← headersOpt
-            contentLengthString ← Option(headers.getHeader(Headers.ContentLength))
-            contentLengthLong   ← NumericUtils.parseLong(contentLengthString)
+            headers             <- headersOpt
+            contentLengthString <- Option(headers.getHeader(Headers.ContentLength))
+            contentLengthLong   <- NumericUtils.parseLong(contentLengthString)
           } yield
             contentLengthLong
 
@@ -241,7 +242,7 @@ object UploaderServer {
         // As of 2017-03-22: part `Content-Length` takes precedence if provided (but browsers don't set it).
         // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
         // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.
-        untrustedExpectedSizeOpt foreach { untrustedExpectedSize ⇒
+        untrustedExpectedSizeOpt foreach { untrustedExpectedSize =>
           checkSizeLimitExceeded(maxSize = maxUploadSizeForControl, currentSize = untrustedExpectedSize)
         }
 
@@ -250,42 +251,40 @@ object UploaderServer {
         // The assumption is that the content of the upload is typically much larger than
         // the overhead.
         (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
-          case (_,                   UnlimitedSize)         ⇒ outerLimiterInputStream.maxBytes = UnlimitedSize
-          case (UnlimitedSize, LimitedSize(control))        ⇒ throw new IllegalStateException
-          case (LimitedSize(current), LimitedSize(control)) ⇒ outerLimiterInputStream.maxBytes = LimitedSize(current + control)
+          case (_,                   UnlimitedSize)         => outerLimiterInputStream.maxBytes = UnlimitedSize
+          case (UnlimitedSize, LimitedSize(control))        => throw new IllegalStateException
+          case (LimitedSize(current), LimitedSize(control)) => outerLimiterInputStream.maxBytes = LimitedSize(current + control)
         }
       }
 
       // Handle mediatypes
       locally {
         allowedMediatypeRangesForControl match {
-          case AllowedMediatypes.AllowedAnyMediatype ⇒
-          case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) ⇒
+          case AllowedMediatypes.AllowedAnyMediatype =>
+          case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
 
-            val untrustedPartMediatypeOpt =
+            def findHeaderValue(name: String) =
               for {
-                headersSupport    ← collectByErasedType[FileItemHeadersSupport](fileItem)
-                headers           ← Option(headersSupport.getHeaders)
-                contentTypeString ← Option(headers.getHeader(Headers.ContentType))
-                mediatypeString   ← ContentTypes.getContentTypeMediaType(contentTypeString)
-                mediatype         ← Mediatype.unapply(mediatypeString)
+                support <- fileItem.cast[FileItemHeadersSupport]
+                headers <- Option(support.getHeaders)
+                value   <- Option(headers.getHeader(name))
               } yield
-                mediatype
+                value
 
-            untrustedPartMediatypeOpt match {
-              case None ⇒
+            Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
+              case None =>
                 throw DisallowedMediatypeException(allowedMediatypeRanges, None)
-              case Some(untrustedPartMediatype) ⇒
+              case Some(untrustedPartMediatype) =>
                 if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
                   throw DisallowedMediatypeException(allowedMediatypeRanges, Some(untrustedPartMediatype))
             }
         }
       }
 
-      fileScanProviderOpt foreach { fileScanProvider ⇒
+      fileScanProviderOpt foreach { fileScanProvider =>
         fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
-          case Success(fs) ⇒ Some(fs)
-          case Failure(t)  ⇒ throw FileScanException(t.getMessage)
+          case Success(fs) => Some(fs)
+          case Failure(t)  => throw FileScanException(t.getMessage)
         }
       }
 
@@ -297,7 +296,7 @@ object UploaderServer {
 
       progressOpt foreach (_.receivedSize += len)
 
-      fileScanOpt foreach { fileScan ⇒
+      fileScanOpt foreach { fileScan =>
         withFileScanCall(fileScan.bytesReceived(b, off, len))
       }
     }
@@ -306,9 +305,9 @@ object UploaderServer {
     def fileItemState(state: UploadState): Unit = {
 
       state match {
-        case UploadState.Completed(fileItem) ⇒ fileScanOpt foreach (fileScan ⇒ withFileScanCall(fileScan.complete(fileFromFileItemCreateIfNeeded(fileItem))))
-        case UploadState.Interrupted(_)      ⇒ runQuietly(fileScanOpt foreach (_.abort())) // TODO: maybe log?
-        case _ ⇒
+        case UploadState.Completed(fileItem) => fileScanOpt foreach (fileScan => withFileScanCall(fileScan.complete(fileFromFileItemCreateIfNeeded(fileItem))))
+        case UploadState.Interrupted(_)      => runQuietly(fileScanOpt foreach (_.abort())) // TODO: maybe log?
+        case _ =>
       }
 
       progressOpt foreach (_.state = state)
@@ -317,17 +316,17 @@ object UploaderServer {
     def interrupted(): Unit = {
       // - don't remove `UploadProgress` objects from the session
       // - instead mark all entries added so far as being in state `Interrupted` if not already the case
-      for (sessionKey ← sessionKeys)
+      for (sessionKey <- sessionKeys)
         runQuietly (
           getUploadProgress(sessionKey)
-          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) ⇒ p }
+          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
           foreach (_.state = UploadState.Interrupted(None))
         )
     }
 
     private def getUploadProgress(sessionKey: String): Option[UploadProgress] =
       session.getAttribute(sessionKey) collect {
-        case progress: UploadProgress ⇒ progress
+        case progress: UploadProgress => progress
       }
   }
 
@@ -341,15 +340,15 @@ object UploaderServer {
       UploadProgressSessionKey + uuid + "." + fieldName
 
     def checkSizeLimitExceeded(maxSize: MaximumSize, currentSize: Long) = maxSize match {
-      case UnlimitedSize        ⇒
-      case LimitedSize(maxSize) ⇒
+      case UnlimitedSize        =>
+      case LimitedSize(maxSize) =>
         if (currentSize > maxSize)
           Multipart.throwSizeLimitExceeded(maxSize, currentSize)
     }
 
     def convertFileItemHeaders(headers: FileItemHeaders) =
-      for (name ← headers.getHeaderNames.asScala.to(List))
-        yield name → headers.getHeaders(name).asScala.to(List)
+      for (name <- headers.getHeaderNames.asScala.to(List))
+        yield name -> headers.getHeaders(name).asScala.to(List)
 
     // The file will expire with the request
     // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first
@@ -359,26 +358,26 @@ object UploaderServer {
     def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
       new java.io.File(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE))
 
-    def withFileScanCall(block: ⇒ FileScanStatus): FileScanStatus =
+    def withFileScanCall(block: => FileScanStatus): FileScanStatus =
       Try(block) match {
-        case Failure(t)                     ⇒ throw FileScanException(t.getMessage)
-        case Success(FileScanStatus.Reject) ⇒ throw FileScanException("File scan rejected uploaded content")
-        case Success(FileScanStatus.Error)  ⇒ throw FileScanException("File scan returned an error")
-        case Success(FileScanStatus.Accept) ⇒ FileScanStatus.Accept
+        case Failure(t)                     => throw FileScanException(t.getMessage)
+        case Success(FileScanStatus.Reject) => throw FileScanException("File scan rejected uploaded content")
+        case Success(FileScanStatus.Error)  => throw FileScanException("File scan returned an error")
+        case Success(FileScanStatus.Accept) => FileScanStatus.Accept
       }
 
     lazy val fileScanProviderOpt: Option[FileScanProvider] =
       try {
         Version.instance.requirePEFeature("File scan API")
 
-        Option(ServiceLoader.load(classOf[FileScanProvider])) flatMap { serviceLoader ⇒
-          serviceLoader.iterator.asScala.nextOption() |!> { provider ⇒
+        Option(ServiceLoader.load(classOf[FileScanProvider])) flatMap { serviceLoader =>
+          serviceLoader.iterator.asScala.nextOption() |!> { provider =>
             Logger.info(s"Initializing file scan provider `${provider.getClass.getName}`")
             provider.init()
           }
         }
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           Logger.error(s"Failed to obtain file scan provider:\n${OrbeonFormatter.format(t)}")
           None
       }

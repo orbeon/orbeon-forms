@@ -25,16 +25,16 @@ trait SchemaOps {
 
   def findSchemaNamespace(inDoc: NodeInfo) =
     for {
-      schema          ← findSchema(inDoc)
-      targetNamespace ← schema attValueOpt "targetNamespace"
+      schema          <- findSchema(inDoc)
+      targetNamespace <- schema attValueOpt "targetNamespace"
     } yield
       targetNamespace
 
   def findSchemaPrefix(inDoc: NodeInfo) =
     for {
-      schema          ← findSchema(inDoc)
-      targetNamespace ← findSchemaNamespace(inDoc)
-      prefix          ← schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
+      schema          <- findSchema(inDoc)
+      targetNamespace <- findSchemaNamespace(inDoc)
+      prefix          <- schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
     } yield
       prefix
 }

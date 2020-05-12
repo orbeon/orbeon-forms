@@ -63,7 +63,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    * Test form versioning for form definitions.
    */
   @Test def formDefinitionVersionTest(): Unit =
-    Connect.withOrbeonTables("form definition") { (_, provider) ⇒
+    Connect.withOrbeonTables("form definition") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -118,7 +118,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    * Test form versioning for form data
    */
   @Test def formDataVersionStageTest(): Unit = {
-    Connect.withOrbeonTables("form data version") { (_, provider) ⇒
+    Connect.withOrbeonTables("form data version") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -155,7 +155,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    * Get form definition corresponding to a document
    */
   @Test def formForDataTest(): Unit = {
-    Connect.withOrbeonTables("form data") { (_, provider) ⇒
+    Connect.withOrbeonTables("form data") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -202,7 +202,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def permissionsTest(): Unit = {
 
-    Connect.withOrbeonTables("permissions") { (connection, provider) ⇒
+    Connect.withOrbeonTables("permissions") { (connection, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -269,7 +269,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   @Test def organizationPermissions(): Unit =
-    Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) ⇒
+    Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -308,11 +308,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   // Try uploading files of 1 KB, 1 MB
   @Test def attachmentsTest(): Unit = {
-    Connect.withOrbeonTables("attachments") { (_, provider) ⇒
+    Connect.withOrbeonTables("attachments") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
-      for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
+      for ((size, position) <- Seq(1024, 1024*1024).zipWithIndex) {
         val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
         val url = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
         HttpAssert.put(url, Specific(1), bytes, 201)
@@ -323,14 +323,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   // Try uploading files of 1 KB, 1 MB
   @Test def largeXMLDocumentsTest(): Unit = {
-    Connect.withOrbeonTables("large XML documents") { (_, provider) ⇒
+    Connect.withOrbeonTables("large XML documents") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
-      for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
+      for ((size, position) <- Seq(1024, 1024*1024).zipWithIndex) {
 
         val charArray = new Array[Char](size)
-        for (i ← 0 until size)
+        for (i <- 0 until size)
           charArray(i) = Random.nextPrintableChar()
 
         val text    = Text(new String(charArray))
@@ -346,7 +346,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   @Test def draftsTest(): Unit = {
-    Connect.withOrbeonTables("drafts") { (_, provider) ⇒
+    Connect.withOrbeonTables("drafts") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -363,7 +363,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   }
 
   @Test def extractMetadata(): Unit =
-    Connect.withOrbeonTables("extract metadata") { (_, provider) ⇒
+    Connect.withOrbeonTables("extract metadata") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 
@@ -395,8 +395,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val doc = Dom4jUtils.readDom4j(new ByteArrayInputStream(bytes))
 
         for {
-          formElem             ← Dom4j.elements(doc.getRootElement, "form")
-          lastModifiedTimeElem ← Dom4j.elements(formElem, "last-modified-time")
+          formElem             <- Dom4j.elements(doc.getRootElement, "form")
+          lastModifiedTimeElem <- Dom4j.elements(formElem, "last-modified-time")
         } locally {
           lastModifiedTimeElem.detach()
         }

@@ -50,7 +50,7 @@ class XXFormsDynamicHandler(
     xformsHandlerContext.pushComponentContext(prefixedId)
 
     containingDocument.getControlByEffectiveId(effectiveId) match {
-      case control: XXFormsDynamicControl ⇒
+      case control: XXFormsDynamicControl =>
         // Output new scripts upon update if any
         // NOTE: Not implemented as of 2016-01-18.
         if (! containingDocument.isInitializing && control.newScripts.nonEmpty && containingDocument.isServeInlineResources) {
@@ -58,25 +58,25 @@ class XXFormsDynamicHandler(
           helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
           // NOTE: As of 2018-05-03, this is still not functional, so there is no impact
           // for https://github.com/orbeon/orbeon-forms/issues/3565
-          ScriptBuilder.writeScripts(control.newScripts, s ⇒ helper.text(ScriptBuilder.escapeJavaScriptInsideScript(s)))
+          ScriptBuilder.writeScripts(control.newScripts, s => helper.text(ScriptBuilder.escapeJavaScriptInsideScript(s)))
           helper.endElement()
           control.clearNewScripts()
         }
         // Output new markup
-        control.nested foreach { nested ⇒
+        control.nested foreach { nested =>
           xformsHandlerContext.pushPartAnalysis(nested.partAnalysis)
           processShadowTree(controller, nested.template)
 
           // Add part globals for top-level part only (see comments in PartAnalysisImpl)
           if (nested.partAnalysis.isTopLevel)
-            nested.partAnalysis.getGlobals foreach { global ⇒
+            nested.partAnalysis.getGlobals foreach { global =>
               XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController, global.templateTree)
             }
 
           xformsHandlerContext.popPartAnalysis()
         }
 
-      case _ ⇒
+      case _ =>
     }
   }
 

@@ -126,7 +126,7 @@
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
+    <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="0"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
@@ -183,8 +183,6 @@
 
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year.*.*"         value="()"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year.*.*"           value="()"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
         year-from-date(current-date())
@@ -265,7 +263,6 @@
             { "full": "/ops/javascript/underscore/underscore.js",                            "min": true  },
 
             { "full": "/ops/javascript/xforms.js",                                           "min": true  },
-            { "full": "/ops/javascript/orbeon/util/StringOps.js",                            "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },

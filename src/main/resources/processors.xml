@@ -485,7 +485,7 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:resources-aggregator">
+    <processor name="oxf:assets-aggregator">
         <class name="org.orbeon.oxf.xforms.processor.AssetsAggregator"/>
     </processor>
 

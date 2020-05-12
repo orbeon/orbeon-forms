@@ -110,8 +110,8 @@ object SubmissionParameters {
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
 
     val serialize = serializationOpt match {
-      case Some(serialization) ⇒ serialization != "none"
-      case None                ⇒ ! (staticSubmission.serializeOpt contains false.toString) // backward compatibility
+      case Some(serialization) => serialization != "none"
+      case None                => ! (staticSubmission.serializeOpt contains false.toString) // backward compatibility
     }
 
     val resolvedValidateStringOpt = staticSubmission.avtValidateOpt flatMap booleanAvtOpt

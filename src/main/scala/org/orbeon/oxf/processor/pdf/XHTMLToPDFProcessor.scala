@@ -49,8 +49,8 @@ private object XHTMLToPDFProcessor {
     val props = Properties.instance.getPropertySet
 
     for {
-      propName  ← props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
-      path      ← props.getNonBlankString(propName)
+      propName  <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
+      path      <- props.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } locally {
       try {
@@ -59,14 +59,14 @@ private object XHTMLToPDFProcessor {
 
         val absolutePath =
           pathOrResource match {
-            case "path"     ⇒ path
-            case "resource" ⇒ ResourceManagerWrapper.instance.getRealPath(path)
-            case _          ⇒ throw new IllegalStateException
+            case "path"     => path
+            case "resource" => ResourceManagerWrapper.instance.getRealPath(path)
+            case _          => throw new IllegalStateException
           }
 
         renderer.getFontResolver.addFont(absolutePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
       } catch {
-        case NonFatal(e) ⇒
+        case NonFatal(e) =>
           logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
       }
     }
@@ -91,7 +91,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     implicit val externalContext = NetUtils.getExternalContext
 
     val domDocument = readInputAsDOM(pipelineContext, input)
-    val requestOpt  = Option(externalContext) flatMap (ctx ⇒ Option(ctx.getRequest))
+    val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val renderer    = new ITextRenderer(DefaultDotsPerPoint, DefaultDotsPerPixel)
 
     try {
@@ -154,28 +154,31 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
           val url = new URI(resolvedURI)
           val headers =
             Connection.buildConnectionHeadersCapitalizedIfNeeded(
-              scheme           = UriScheme.withName(url.getScheme),
+              url              = url,
               hasCredentials   = false,
-              customHeaders    = Map(Headers.OrbeonClient → List("servlet")),
+              customHeaders    = Map(Headers.OrbeonClient -> List("servlet")),
               headersToForward = Connection.headersToForwardFromProperty,
               cookiesToForward = Connection.cookiesToForwardFromProperty,
-              getHeader        = name ⇒ requestOpt flatMap (r ⇒ Connection.getHeaderFromRequest(r)(name))
+              getHeader        = name => requestOpt flatMap (r => Connection.getHeaderFromRequest(r)(name))
             )
 
           val cxr =
             Connection(
-              method      = HttpMethod.GET,
-              url         = url,
-              credentials = None,
-              content     = None,
-              headers     = headers,
-              loadState   = true,
-              logBody     = false)(
-              logger      = indentedLogger
-            ).connect(true)
+              method          = HttpMethod.GET,
+              url             = url,
+              credentials     = None,
+              content         = None,
+              headers         = headers,
+              loadState       = true,
+              logBody         = false)(
+              logger          = indentedLogger,
+              externalContext = externalContext
+            ).connect(
+              saveState = true
+            )
 
           ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {
-            pipelineContext.addContextListener((_: Boolean) ⇒ cxr.close())
+            pipelineContext.addContextListener((_: Boolean) => cxr.close())
           } get
         }
 
@@ -204,7 +207,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
       renderer.layout()
 
-      IOUtils.useAndClose(outputStream) { os ⇒
+      IOUtils.useAndClose(outputStream) { os =>
         // Page count might be zero!
         // Q: Log if no pages?
         val hasPages = Option(renderer.getRootBox.getLayer.getPages) exists (_.size > 0)

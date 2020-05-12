@@ -16,32 +16,34 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.oxf.xforms.itemset
+import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.om
 
-import scala.collection.{mutable, Set ⇒ CSet}
 import scala.collection.compat._
+import scala.collection.{mutable, Set => CSet}
 
-/**
- * Represents an xf:select control.
- *
- * xf:select represents items as a list of space-separated tokens.
- */
+import org.orbeon.scaxon.SimplePath._
+
 class XFormsSelectControl(
   container : XBLContainer,
   parent    : XFormsControl,
   element   : Element,
   id        : String
-) extends XFormsSelect1Control(
+) extends XFormsSelect1Control( // TODO: bad inheritance; use shared trait if needed
   container,
   parent,
   element,
   id
 ) {
+
+  selfControl =>
 
   import XFormsSelectControl._
 
@@ -51,36 +53,40 @@ class XFormsSelectControl(
    * - Itemset values which are in the list of tokens are merged with the bound control's value.
    * - Itemset values which are not in the list of tokens are removed from the bound control's value.
    */
-  override def translateExternalValue(externalValue: String): Option[String] = {
+  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
-    val existingValues = valueAsLinkedSet(getValue)
-    val itemsetValues  = mutable.LinkedHashSet(getItemset.allItemsIterator map (_.value) toList: _*)
+    def filterItemsReturnValues(f: itemset.Item.ValueNode => Boolean): List[Item.Value[om.Item]] =
+      (getItemset.allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
 
-    val incomingValuesFiltered = {
+    val dataItemValues =
+      getCurrentItemValueFromData(boundItem) match {
+        case Left(dataValue) =>
+          valueAsLinkedSet(dataValue).toList map Left.apply
+        case Right(allDataItems) =>
+          allDataItems map (dataItem => Right(List(dataItem)))
+      }
+
+    val itemsetItemValues = filterItemsReturnValues(_ => true)
+
+    val incomingItemValues = {
       val newUIValues = valueAsSet(externalValue)
-
-      val matches: Item ⇒ Boolean =
-        if (mustEncodeValues)
-          item ⇒ newUIValues(item.position.toString)
-        else
-          item ⇒ newUIValues(item.value)
-
-      mutable.LinkedHashSet(getItemset.allItemsIterator filter matches map (_.value) toList: _*)
+      filterItemsReturnValues(item => newUIValues(item.externalValue(mustEncodeValues)))
     }
 
     val (newlySelectedValues, newlyDeselectedValues, _) =
-      updateSelection(existingValues, itemsetValues, incomingValuesFiltered)
+      updateSelection(dataItemValues, itemsetItemValues, incomingItemValues, staticControl.excludeWhitespaceTextNodesForCopy)
 
     // 2016-01-29: Switching order of event dispatch as `xf:select1` does it this way and XForms 1.1 says: "Newly
     // selected items receive the event xforms-select immediately after all newly deselected items receive the
     // event xforms-deselect."
-    for (value ← newlyDeselectedValues)
-      Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
+    for (value <- newlyDeselectedValues)
+      Dispatch.dispatchEvent(new XFormsDeselectEvent(selfControl, value))
 
-    for (value ← newlySelectedValues)
-      Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
+    for (value <- newlySelectedValues)
+      Dispatch.dispatchEvent(new XFormsSelectEvent(selfControl, value))
 
     // Value is updated via `xforms-select`/`xforms-deselect` events
+    // Q: Could/should this be the case for other controls as well?
     None
   }
 
@@ -112,66 +118,61 @@ class XFormsSelectControl(
     setExternalValue(updatedValue)
   }
 
-  override def findSelectedItems: List[Item] = {
-
-    // If the control is relevant, its internal value and itemset must be defined
-    val internalValue = getValue   ensuring (_ ne null)
-    val itemset       = getItemset ensuring (_ ne null)
-
-    if (internalValue == "") {
-        // Nothing is selected
+  override def findSelectedItems: List[Item.ValueNode] =
+    boundItemOpt match {
+      case Some(boundItem) =>
+        getItemset.iterateSelectedItems(getCurrentItemValueFromData(boundItem), _ => true, staticControl.excludeWhitespaceTextNodesForCopy).to(List)
+      case None =>
         Nil
-      } else {
-        // Values in the itemset
-        val instanceValues = valueAsSet(internalValue)
-
-        // All itemset external values for which the value exists in the instance
-        val intersection =
-          for {
-            item ← itemset.allItemsIterator
-            if instanceValues(item.value)
-          } yield
-            item
-
-        intersection.to(List)
-      }
-  }
+    }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
-      case deselect: XFormsDeselectEvent ⇒
+      case deselect: XFormsDeselectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
-            DataModel.setValueIfChangedHandleErrors(
-              containingDocument = containingDocument,
-              eventTarget        = this,
-              locationData       = getLocationData,
-              nodeInfo           = boundNode,
-              valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) - deselect.itemValue) mkString " ",
-              source             = "deselect",
-              isCalculate        = false
-            )
-          case None ⇒
-            // Q: Can this happen?
+          case Some(boundNode) =>
+            deselect.itemValue match {
+              case Left(v)  =>
+                DataModel.setValueIfChangedHandleErrors(
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) - v) mkString " ",
+                  source       = "deselect",
+                  isCalculate  = false
+                )
+              case r @ Right(_) =>
+                XFormsAPI.delete(
+                  ref = ItemsetSupport.findMultipleItemValues(getCurrentItemValueFromData(boundNode), r)
+                )
+            }
+          case None =>
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case select: XFormsSelectEvent ⇒
+      case select: XFormsSelectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
-            DataModel.setValueIfChangedHandleErrors(
-              containingDocument = containingDocument,
-              eventTarget        = this,
-              locationData       = getLocationData,
-              nodeInfo           = boundNode,
-              valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) + select.itemValue) mkString " ",
-              source             = "select",
-              isCalculate        = false
-            )
-          case None ⇒
-            // Q: Can this happen?
+          case Some(boundNode) =>
+            select.itemValue match {
+              case Left(v)  =>
+                DataModel.setValueIfChangedHandleErrors(
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) + v) mkString " ",
+                  source       = "select",
+                  isCalculate  = false
+                )
+              case Right(v) =>
+                XFormsAPI.insert(
+                  origin = v,
+                  into   = List(boundNode),
+                  after  = boundNode child *
+                )
+            }
+          case None =>
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case _ ⇒
+      case _ =>
     }
     // Make sure not to call the method of XFormsSelect1Control
     // We should *not* use inheritance this way here!
@@ -182,26 +183,31 @@ class XFormsSelectControl(
 object XFormsSelectControl {
 
   def updateSelection(
-    existingValues         : CSet[String],
-    itemsetValues          : CSet[String],
-    incomingValuesFiltered : CSet[String]
-  ) = {
+    dataValues                 : List[Item.Value[om.NodeInfo]],
+    itemsetValues              : List[Item.Value[om.Item]],
+    incomingValues             : List[Item.Value[om.Item]],
+    excludeWhitespaceTextNodes : Boolean
+  ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
-    val newlySelectedValues   = incomingValuesFiltered -- existingValues
-    val newlyDeselectedValues = itemsetValues -- incomingValuesFiltered intersect existingValues
+    def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
+      values exists (ItemsetSupport.compareSingleItemValues(_, value, _ => true, excludeWhitespaceTextNodes))
 
-    val newInstanceValue = existingValues ++ newlySelectedValues -- newlyDeselectedValues
+    val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
+    val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)
+
+    // Used for tests only
+    val newInstanceValue = (dataValues ::: newlySelectedValues) filterNot belongsTo(newlyDeselectedValues)
 
     (newlySelectedValues, newlyDeselectedValues, newInstanceValue)
   }
 
-  private def valueAsLinkedSet(s: String) = s.trimAllToOpt match {
-    case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
-    case None ⇒ Set[String]()
+  private def valueAsLinkedSet(s: String): CSet[String] = s.trimAllToOpt match {
+    case Some(list) => (list split """\s+""").to(mutable.LinkedHashSet)
+    case None       => Set.empty
   }
 
-  private def valueAsSet(s: String) = s.trimAllToOpt match {
-    case Some(list) ⇒ list split """\s+""" toSet
-    case None ⇒ Set[String]()
+  private def valueAsSet(s: String): Set[String] = s.trimAllToOpt match {
+    case Some(list) => (list split """\s+""").to(Set)
+    case None       => Set.empty
   }
 }

@@ -13,77 +13,64 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import collection.JavaConverters._
+import org.orbeon.saxon.om
 
 trait ItemContainer {
 
-  var level: Int = 0
-  def isTopLevel = level == 0
+  protected var _parent: ItemContainer = null
+  def parent: ItemContainer = _parent
 
-  var parent: ItemContainer = null
+  private var _childrenReversed: List[ItemNode] = Nil
 
-  private var _children: List[Item] = Nil
-
-  def addChildItem(childItem: Item): Unit = {
-    childItem.level = level
-    childItem.parent = this
-
-    _children ::= childItem
+  def addChildItem(childItem: ItemNode): Unit = {
+    childItem._parent = this
+    _childrenReversed ::= childItem
   }
 
-  def hasChildren = _children.nonEmpty
-  def children = _children.reverse
-  def lastChild = _children.head
-
-  def pruneNonRelevantChildren(): Unit = {
-    // Prune children first
-    _children foreach (_.pruneNonRelevantChildren())
-    // Keep only children which have children or which have a value
-    _children = _children filter (child ⇒ child.hasChildren || (child.value ne null))
-  }
+  def hasChildren: Boolean = _childrenReversed.nonEmpty
+  def children: List[ItemNode] = _childrenReversed.reverse
+  def lastChild: ItemNode = _childrenReversed.head
 
   // Visit the entire itemset
-  def visit[T](o: T, listener: ItemsetListener[T]): Unit = {
+  def visit[T](listener: ItemsetListener): Unit =
     if (hasChildren) {
-      listener.startLevel(o, selfItem) // Item is used only by menu, not ideal!
+      listener.startLevel(selfItem) // Item is used only by menu, not ideal!
       var first = true
-      for (item ← children) {
-        listener.startItem(o, item, first)
-        item.visit(o, listener)
-        listener.endItem(o, item)
+      for (item <- children) {
+        listener.startItem(item, first)
+        item.visit(listener)
+        listener.endItem(item)
         first = false
       }
-      listener.endLevel(o)
+      listener.endLevel()
     }
-  }
 
   // Depth-first Iterator over all the items of this and children
-  def allItemsIterator: Iterator[Item] = {
-    def selfIterator = new Iterator[Item] {
-      var current = selfItem
-      def hasNext = current ne null
-      def next() = {
-        val result = current
-        current = null
-        result
-      }
+  def allItemsIterator: Iterator[ItemNode] =
+    selfIterator ++ (children.iterator flatMap (_.allItemsIterator))
+
+  // Same as `allItemsIterator` but in reverse order
+  def allItemsReverseIterator: Iterator[ItemNode] =
+    (_childrenReversed.iterator flatMap (_.allItemsReverseIterator)) ++ selfIterator
+
+  def allItemsWithValueIterator(reverse: Boolean): Iterator[(Item.ValueNode, Item.Value[om.Item])] =
+    (if (reverse) allItemsReverseIterator else allItemsIterator) collect {
+      case l: Item.ValueNode => l -> l.value
     }
 
-    def childrenIterator = children.iterator flatMap (_.allItemsIterator)
-
-    selfIterator ++ childrenIterator
+  override def equals(other: Any): Boolean = other match {
+    case c: ItemContainer => _childrenReversed == c._childrenReversed
+    case _                => false
   }
 
-  def jAllItemsIterator = allItemsIterator.asJava
+  private def selfIterator: Iterator[ItemNode] =
+    this match {
+      case item: ItemNode => Iterator.single(item)
+      case _              => Iterator.empty
+    }
 
-  // Implement deep equals
-  override def equals(other: Any) = other match {
-    case other: ItemContainer ⇒ _children == other._children
-    case _                    ⇒ false
-  }
-
-  private def selfItem = this match {
-    case item: Item ⇒ item
-    case _          ⇒ null
+  private def selfItem: ItemNode = this match {
+    case item: ItemNode => item
+    case _              => null
   }
 }

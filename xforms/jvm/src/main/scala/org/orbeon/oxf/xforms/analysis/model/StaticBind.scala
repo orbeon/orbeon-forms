@@ -14,7 +14,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
-import org.orbeon.oxf.{util ⇒ u}
+import org.orbeon.oxf.{util => u}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.List
@@ -35,16 +35,16 @@ class StaticBind(
   bindTree.model.scope
 ) {
 
-  staticBind ⇒
+  staticBind =>
 
   def parentBind: Option[StaticBind] = parent match {
-    case parentBind: StaticBind ⇒ Some(parentBind)
-    case _                      ⇒ None
+    case parentBind: StaticBind => Some(parentBind)
+    case _                      => None
   }
 
   val ancestorBinds: List[StaticBind] = parentBind match {
-    case Some(parent) ⇒ parent :: parent.ancestorBinds
-    case None         ⇒ Nil
+    case Some(parent) => parent :: parent.ancestorBinds
+    case None         => Nil
   }
 
   val ancestorOrSelfBinds: List[StaticBind] = staticBind :: ancestorBinds
@@ -100,15 +100,15 @@ class StaticBind(
         val usedVariables = staticContext.referencedVariables
 
         // Check whether all variables used by the expression are actually in scope, throw otherwise
-        usedVariables find (name ⇒ ! allBindVariablesInScope.contains(name.getLocalName)) foreach { name ⇒
+        usedVariables find (name => ! allBindVariablesInScope.contains(name.getLocalName)) foreach { name =>
           throw new ValidationException("Undeclared variable in XPath expression: $" + name.getClarkName, staticBind.locationData)
         }
       }
 
       // Analyze and remember if figured out
       staticBind.analyzeXPath(getChildrenContext, allBindVariablesInScope, compiledExpression) match {
-        case valueAnalysis if valueAnalysis.figuredOutDependencies ⇒ this.analysis = valueAnalysis
-        case _ ⇒ // NOP
+        case valueAnalysis if valueAnalysis.figuredOutDependencies => this.analysis = valueAnalysis
+        case _ => // NOP
       }
     }
   }
@@ -144,33 +144,33 @@ class StaticBind(
 
   // Globally remember binds ids
   bindTree.bindIds += staticId
-  bindTree.bindsById += staticId → staticBind
+  bindTree.bindsById += staticId -> staticBind
 
   // Remember variables mappings
   val nameOpt = Option(element.attributeValue(NAME_QNAME))
-  nameOpt foreach { name ⇒
-    bindTree.bindsByName += name → staticBind
+  nameOpt foreach { name =>
+    bindTree.bindsByName += name -> staticBind
   }
 
   // Type MIP is special as it is not an XPath expression
   val typeMIPOpt: Option[TypeMIP] = {
 
     def fromAttribute =
-      for (value ← Option(element.attributeValue(TYPE_QNAME)))
+      for (value <- Option(element.attributeValue(TYPE_QNAME)))
       yield new TypeMIP(staticId, value)
 
     // For a while we supported <xf:validation>
     def fromNestedElementsLegacy =
       for {
-        e           ← Dom4j.elements(element, XFORMS_VALIDATION_QNAME)
-        value       ← Option(e.attributeValue(TYPE_QNAME))
+        e           <- Dom4j.elements(element, XFORMS_VALIDATION_QNAME)
+        value       <- Option(e.attributeValue(TYPE_QNAME))
       } yield
         new TypeMIP(getElementId(e), value)
 
     def fromNestedElement =
       for {
-        e           ← Dom4j.elements(element, XFORMS_TYPE_QNAME) // <xf:type>
-        value       ← e.getText.trimAllToOpt                     // text literal (doesn't support @value)
+        e           <- Dom4j.elements(element, XFORMS_TYPE_QNAME) // <xf:type>
+        value       <- e.getText.trimAllToOpt                     // text literal (doesn't support @value)
       } yield
         new TypeMIP(getElementId(e), value)
 
@@ -193,44 +193,44 @@ class StaticBind(
   val mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
 
     def fromAttribute(name: QName) =
-      for (value ← Option(element.attributeValue(name)).toList)
+      for (value <- Option(element.attributeValue(name)).toList)
       yield (staticId, value, ErrorLevel)
 
     // For a while we supported <xf:validation>
     def fromNestedElementLegacy(name: QName) =
       for {
-        e     ← Dom4j.elements(element, XFORMS_VALIDATION_QNAME).toList
-        value ← Option(e.attributeValue(name))
+        e     <- Dom4j.elements(element, XFORMS_VALIDATION_QNAME).toList
+        value <- Option(e.attributeValue(name))
       } yield
         (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
 
     def fromNestedElement(name: QName) =
       for {
-        e     ← Dom4j.elements(element, name).toList
-        value ← Option(e.attributeValue(VALUE_QNAME))
+        e     <- Dom4j.elements(element, name).toList
+        value <- Option(e.attributeValue(VALUE_QNAME))
       } yield
         (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
 
     for {
-      mip              ← QNameToXPathMIP.values
+      mip              <- QNameToXPathMIP.values
       idValuesAndLevel = fromNestedElement(mip.eName) ::: fromNestedElementLegacy(mip.aName) ::: fromAttribute(mip.aName)
       if idValuesAndLevel.nonEmpty
       mips             = idValuesAndLevel flatMap {
-        case (id, value, level) ⇒
+        case (id, value, level) =>
           // Ignore level for non-constraint MIPs as it's not supported yet
           val overriddenLevel = if (mip.name == Constraint.name) level else ErrorLevel
           XPathMIP.createOrNone(id, mip.name, overriddenLevel, value)
       }
     } yield
-      mip.name → mips
+      mip.name -> mips
   }
 
   // Custom XPath MIPs
-  val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String → List[XPathMIP] and not String → XPathMIP?
+  val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?
 
     def attributeCustomMIP =
       for {
-        att           ← Dom4j.attributes(element).iterator
+        att           <- Dom4j.attributes(element).iterator
         if bindTree.isCustomMIP(att.getQName)
         value         = att.getValue
         customMIPName = buildInternalCustomMIPName(att.getQName)
@@ -241,21 +241,21 @@ class StaticBind(
     // function can be used to retrieve them once that is fixed.
     // def elementCustomMIPs =
     //     for {
-    //         elem          ← Dom4j.elements(element).toList
+    //         elem          <- Dom4j.elements(element).toList
     //         if bindTree.isCustomMIP(elem.getQName)
-    //         value         ← Option(elem.attributeValue(VALUE_QNAME))
+    //         value         <- Option(elem.attributeValue(VALUE_QNAME))
     //         customMIPName = buildCustomMIPName(elem.getQualifiedName)
     //     } yield
     //         (getElementId(elem), customMIPName, value)
 
     for {
-      (name, idNameValue) ← attributeCustomMIP.to(List) groupBy (_._2)
+      (name, idNameValue) <- attributeCustomMIP.to(List) groupBy (_._2)
       mips                = idNameValue flatMap {
-        case (id, _, value) ⇒
+        case (id, _, value) =>
           XPathMIP.createOrNone(id, name, ErrorLevel, value)
       }
     } yield
-      name → mips
+      name -> mips
   }
 
   // All XPath MIPs
@@ -265,23 +265,23 @@ class StaticBind(
   val constraintsByLevel: Map[ValidationLevel, List[XPathMIP]] = {
     val levelWithMIP =
       for {
-        mips ← allMIPNameToXPathMIP.get(Constraint.name).toList
-        mip  ← mips
+        mips <- allMIPNameToXPathMIP.get(Constraint.name).toList
+        mip  <- mips
       } yield
         mip
 
     levelWithMIP groupBy (_.level)
   }
 
-  val hasCalculateComputedMIPs = mipNameToXPathMIP exists { case (_, mips) ⇒ mips exists (_.isCalculateComputedMIP)}
-  val hasValidateMIPs          = typeMIPOpt.nonEmpty || (mipNameToXPathMIP exists { case (_, mips) ⇒ mips exists (_.isValidateMIP) })
+  val hasCalculateComputedMIPs = mipNameToXPathMIP exists { case (_, mips) => mips exists (_.isCalculateComputedMIP)}
+  val hasValidateMIPs          = typeMIPOpt.nonEmpty || (mipNameToXPathMIP exists { case (_, mips) => mips exists (_.isValidateMIP) })
   val hasCustomMIPs            = customMIPNameToXPathMIP.nonEmpty
   val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
 
   def iterateNestedIds: Iterator[String] =
     for {
-      elem ← Dom4j.elements(element).iterator
-      id   ← Option(XFormsUtils.getElementId(elem))
+      elem <- Dom4j.elements(element).iterator
+      id   <- Option(XFormsUtils.getElementId(elem))
     } yield
       id
 
@@ -310,7 +310,7 @@ class StaticBind(
   def removeBind(bind: StaticBind): Unit = {
     bindTree.bindIds -= bind.staticId
     bindTree.bindsById -= bind.staticId
-    bind.nameOpt foreach { name ⇒
+    bind.nameOpt foreach { name =>
       bindTree.bindsByName -= name
     }
 
@@ -328,8 +328,8 @@ class StaticBind(
 
   // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
   override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt orElse nonPreserveWhitespaceMIPOpt match {
-    case Some(_) if hasBinding ⇒ Some(analyzeXPath(getChildrenContext, "string(.)"))
-    case _                     ⇒ None
+    case Some(_) if hasBinding => Some(analyzeXPath(getChildrenContext, "string(.)"))
+    case _                     => None
   }
 
   // Return true if analysis succeeded
@@ -341,9 +341,9 @@ class StaticBind(
     // If successful, gather derived information
     val refSucceeded =
       ref match {
-        case Some(_) ⇒
+        case Some(_) =>
           getBindingAnalysis match {
-            case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies ⇒
+            case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
               // There is a binding and analysis succeeded
 
               // Remember dependent instances
@@ -358,12 +358,12 @@ class StaticBind(
 
               true
 
-            case _ ⇒
+            case _ =>
               // Analysis failed
               false
           }
 
-        case None ⇒
+        case None =>
           // No binding, consider a success
           true
       }
@@ -378,10 +378,10 @@ class StaticBind(
   def analyzeMIPs(): Unit = {
     // Analyze local MIPs if there is a @ref
     ref match {
-      case Some(_) ⇒
-        for (mips ← allMIPNameToXPathMIP.values; mip ← mips)
+      case Some(_) =>
+        for (mips <- allMIPNameToXPathMIP.values; mip <- mips)
           mip.analyzeXPath()
-      case None ⇒
+      case None =>
     }
 
     // Analyze children
@@ -392,17 +392,17 @@ class StaticBind(
 
     super.freeTransientState()
 
-    for (mips ← allMIPNameToXPathMIP.values; mip ← mips)
+    for (mips <- allMIPNameToXPathMIP.values; mip <- mips)
       mip.analysis.freeTransientState()
 
-    for (child ← _children)
+    for (child <- _children)
       child.freeTransientState()
   }
 
   override def toXMLAttributes = Seq(
-    "id"      → staticId,
-    "context" → context.orNull,
-    "ref"     → ref.orNull
+    "id"      -> staticId,
+    "context" -> context.orNull,
+    "ref"     -> ref.orNull
   )
 
   override def toXMLContent(helper: XMLReceiverHelper): Unit = {
@@ -411,14 +411,14 @@ class StaticBind(
     // @ref analysis is handled by superclass
 
     // MIP analysis
-    for ((_, mips) ← allMIPNameToXPathMIP.to(List).sortBy(_._1); mip ← mips) {
+    for ((_, mips) <- allMIPNameToXPathMIP.to(List).sortBy(_._1); mip <- mips) {
       helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
       mip.analysis.toXML(helper)
       helper.endElement()
     }
 
     // Children binds
-    for (child ← _children)
+    for (child <- _children)
       child.toXML(helper)
   }
 }

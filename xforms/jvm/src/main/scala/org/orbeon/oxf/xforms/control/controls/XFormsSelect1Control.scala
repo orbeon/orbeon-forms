@@ -13,30 +13,30 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.mutable
 import scala.util.control.NonFatal
 
-/**
- * Represents an xf:select1 control.
- */
 class XFormsSelect1Control(
   container : XBLContainer,
   parent    : XFormsControl,
@@ -50,13 +50,15 @@ class XFormsSelect1Control(
 ) with XFormsValueControl
   with FocusableTrait {
 
+  selfControl =>
+
   override type Control <: SelectionControl
 
   // This is a var just for getBackCopy
-  private[XFormsSelect1Control] var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
+  private[XFormsSelect1Control] var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(selfControl)
 
-  def mustEncodeValues = XFormsSelect1Control.mustEncodeValues(containingDocument, staticControl)
-  def isFullAppearance = staticControl.isFull
+  def mustEncodeValues: Boolean = XFormsSelect1Control.mustEncodeValues(containingDocument, staticControl)
+  def isFullAppearance: Boolean = staticControl.isFull
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
@@ -70,7 +72,7 @@ class XFormsSelect1Control(
   def getGroupName: String =
     extensionAttributeValue(XXFORMS_GROUP_QNAME) getOrElse getEffectiveId
 
-  override def hasJavaScriptInitialization =
+  override def hasJavaScriptInitialization: Boolean =
     staticControl.appearances contains XFORMS_COMPACT_APPEARANCE_QNAME
 
   override def markDirtyImpl(): Unit = {
@@ -89,7 +91,7 @@ class XFormsSelect1Control(
         // Items are not automatically refreshed and stored globally
         // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
         containingDocument.getControls.getConstantItems(getPrefixedId) getOrElse {
-          val newItemset = XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this)
+          val newItemset = ItemsetSupport.evaluateItemset(selfControl)
           containingDocument.getControls.setConstantItems(getPrefixedId, newItemset)
           newItemset
         }
@@ -97,15 +99,18 @@ class XFormsSelect1Control(
         // Items are stored in the control
         itemsetProperty.value()
     } catch {
-      case NonFatal(t) ⇒
-        throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
+      case NonFatal(t) =>
+        throw OrbeonLocationException.wrapException(
+          t,
+          new ExtendedLocationData(getLocationData, "evaluating itemset", element)
+        )
     }
 
   override def evaluateExternalValue(): Unit = {
 
     // If the control is relevant, its internal value and itemset must be defined
-    val internalValue = getValue   ensuring (_ ne null)
-    val itemset       = getItemset ensuring (_ ne null)
+    getValue   ensuring (_ ne null)
+    getItemset ensuring (_ ne null)
 
     setExternalValue(
       if (! isStaticReadonly)
@@ -115,81 +120,161 @@ class XFormsSelect1Control(
     )
   }
 
-  def findSelectedItems: List[Item] = findSelectedItem.toList
+  // Q: In theory, multiple items could have the same value and therefore be selected, right?
+  def findSelectedItems: List[Item.ValueNode] =
+    findSelectedItem.toList
 
-  def findSelectedItem: Option[Item] = {
+  def findSelectedItem: Option[Item.ValueNode] =
+    boundItemOpt map getCurrentItemValueFromData flatMap { current =>
+      getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
+        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(
+          dataValue                  = current,
+          itemValue                  = itemValue,
+          compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+          excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
+        ) => item
+      }
+    }
 
-    val internalValue = getValue   ensuring (_ ne null)
-    val itemset       = getItemset ensuring (_ ne null)
-
-    itemset.allItemsIterator find (_.value == internalValue)
+  // The current value depends on whether we follow `xf:copy` or `xf:value` semantics
+  def getCurrentItemValueFromData(boundItem: om.Item): Item.Value[om.NodeInfo] = {
+    if (staticControl.useCopy)
+      Right(
+        boundItem match {
+          case node: om.NodeInfo => (node child Node).toList
+          case _ => Nil
+        }
+      )
+    else
+      Left(getValue)
   }
 
-  override def translateExternalValue(externalValue: String): Option[String] = {
+  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
-    val existingValue = getValue
+    val (selectEvents, deselectEvents) =
+      gatherEventsForExternalValue(getItemset, getCurrentItemValueFromData(boundItem), externalValue)
 
-    // Find what got selected/deselected
-    val (selectEvents, deselectEvents) = gatherEvents(externalValue, existingValue)
-
-    for (currentEvent ← deselectEvents)
+    for (currentEvent <- deselectEvents)
       Dispatch.dispatchEvent(currentEvent)
 
-    for (currentEvent ← selectEvents)
+    for (currentEvent <- selectEvents)
       Dispatch.dispatchEvent(currentEvent)
 
+    // Value is updated via `xforms-select`/`xforms-deselect` events
+    // Q: Could/should this be the case for other controls as well?
     None
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
-      case select: XFormsSelectEvent ⇒
+      case deselect: XFormsDeselectEvent =>
         boundNodeOpt match {
-          case Some(boundNode) ⇒
-            DataModel.setValueIfChangedHandleErrors(
-              containingDocument = containingDocument,
-              eventTarget        = this,
-              locationData       = getLocationData,
-              nodeInfo           = boundNode,
-              valueToSet         = select.itemValue,
-              source             = "select",
-              isCalculate        = false
-            )
-          case None ⇒
-            // Q: Can this happen?
+          case Some(boundNode) =>
+            deselect.itemValue match {
+              case Left(_)  =>
+                DataModel.setValueIfChangedHandleErrors(
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = "",
+                  source       = "select",
+                  isCalculate  = false
+                )
+              case Right(v) =>
+
+                // If the deselected value contains attributes, remove all of those from the bound node
+                val (atts, other) = ItemsetSupport.partitionAttributes(v)
+
+                if (atts.nonEmpty)
+                  XFormsAPI.delete(
+                    ref = atts flatMap (att => boundNode att (att.namespaceURI, att.localname))
+                  )
+
+                // If the deselected value contains a node that is not an attribute, then clear the element
+                // content. We could clear the element content no matter what but this enables the use case
+                // of selecting attributes independently from the element's content.
+                if (other.nonEmpty)
+                  XFormsAPI.delete(
+                    ref = boundNode child Node
+                  )
+            }
+          case None =>
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
         }
-      case _ ⇒
+      case select: XFormsSelectEvent =>
+        boundNodeOpt match {
+          case Some(boundNode) =>
+            select.itemValue match {
+              case Left(v)  =>
+                DataModel.setValueIfChangedHandleErrors(
+                  eventTarget  = selfControl,
+                  locationData = getLocationData,
+                  nodeInfo     = boundNode,
+                  valueToSet   = v,
+                  source       = "select",
+                  isCalculate  = false
+                )
+              case Right(v) =>
+                XFormsAPI.delete(
+                  ref = boundNode child Node
+                )
+                XFormsAPI.insert(
+                  origin = v,
+                  into   = List(boundNode)
+                )
+            }
+          case None =>
+            throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+        }
+      case _ =>
     }
     super.performDefaultAction(event)
   }
 
   // For XFormsSelectControl
   // We should *not* use inheritance this way here!
-  protected def valueControlPerformDefaultAction(event: XFormsEvent): Unit = {
+  protected def valueControlPerformDefaultAction(event: XFormsEvent): Unit =
     super.performDefaultAction(event)
-  }
 
-  private def gatherEvents(newExternalValue: String, existingValue: String): (List[XFormsSelectEvent], List[XFormsDeselectEvent]) = {
+  private def gatherEventsForExternalValue(
+    itemset          : Itemset,
+    dataValue        : Item.Value[om.NodeInfo],
+    newExternalValue : String
+  ): (List[XFormsSelectEvent], List[XFormsDeselectEvent]) =
+    itemset.allItemsWithValueIterator(reverse = true).foldLeft((Nil: List[XFormsSelectEvent], Nil: List[XFormsDeselectEvent])) {
+      case (result @ (selected, deselected), (item, itemValue)) =>
 
-    val selectEvents   = mutable.ListBuffer[XFormsSelectEvent]()
-    val deselectEvents = mutable.ListBuffer[XFormsDeselectEvent]()
+        val itemWasSelected =
+          ItemsetSupport.compareSingleItemValues(
+            dataValue                  = dataValue,
+            itemValue                  = itemValue,
+            compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+            excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
+          )
 
-    for (currentItem ← getItemset.allItemsIterator) {
-      val currentItemValue = currentItem.value
+        val itemIsSelected =
+          item.externalValue(mustEncodeValues) == newExternalValue
 
-      val itemWasSelected = existingValue == currentItemValue
-      val itemIsSelected  = currentItem.externalValue(mustEncodeValues) == newExternalValue
+        val getsSelected   = ! itemWasSelected &&   itemIsSelected
+        val getsDeselected =   itemWasSelected && ! itemIsSelected
 
-      // Handle xforms-select / xforms-deselect
-      if (! itemWasSelected && itemIsSelected)
-        selectEvents += new XFormsSelectEvent(this, currentItemValue)
-      else if (itemWasSelected && ! itemIsSelected)
-        deselectEvents += new XFormsDeselectEvent(this, currentItemValue)
+        val newSelected =
+          if (getsSelected)
+            new XFormsSelectEvent(selfControl, itemValue) :: selected
+          else
+            selected
+
+        val newDeselected =
+          if (getsDeselected)
+            new XFormsDeselectEvent(selfControl, itemValue) :: deselected
+          else
+            deselected
+
+        if (getsSelected || getsDeselected)
+          (newSelected, newDeselected)
+        else
+          result // optimization
     }
-
-    (selectEvents.toList, deselectEvents.toList)
-  }
 
   override def getBackCopy: AnyRef = {
     val cloned = super.getBackCopy.asInstanceOf[XFormsSelect1Control]
@@ -203,18 +288,18 @@ class XFormsSelect1Control(
     previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other: XFormsSelect1Control) ⇒
+      case Some(other: XFormsSelect1Control) =>
         ! mustSendItemsetUpdate(other) &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-      case _ ⇒ false
+      case _ => false
     }
 
-  private def mustSendItemsetUpdate(otherSelect1Control: XFormsSelect1Control): Boolean = {
+  private def mustSendItemsetUpdate(otherSelect1Control: XFormsSelect1Control): Boolean =
     if (staticControl.hasStaticItemset) {
       // There is no need to send an update:
       //
       // 1. Items are static...
-      // 2. ...and they have been output statically in the HTML page, directly or in repeat template
+      // 2. ...and they have been output statically in the HTML page
       false
     } else if (isStaticReadonly) {
       // There is no need to send an update for static readonly controls
@@ -226,7 +311,7 @@ class XFormsSelect1Control(
         // Here we decide to send an update only if we become relevant, as the client will know that the
         // new state of the control is non-relevant and can handle the itemset on the client as it wants.
         isRelevant
-      } else if (! XFormsSingleNodeControl.isRelevant(this)) {
+      } else if (! XFormsSingleNodeControl.isRelevant(selfControl)) {
         // We were and are non-relevant, no update
         false
       } else {
@@ -234,24 +319,24 @@ class XFormsSelect1Control(
         otherSelect1Control.getItemset != getItemset
       }
     }
-  }
 
   final override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
   ): Unit = {
 
     val hasNestedContent =
       mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)
 
-    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+    val outputNestedContent = (ch: XMLReceiverHelper) => {
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array[String]())
 
       val itemset = getItemset
       if (itemset ne null) {
-        val result = itemset.asJSON(null, mustEncodeValues, getLocationData)
+
+        val result = itemset.asJSON(None, mustEncodeValues, staticControl.excludeWhitespaceTextNodesForCopy, getLocationData)
         if (result.nonEmpty)
           ch.text(result)
       }
@@ -268,34 +353,34 @@ class XFormsSelect1Control(
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/3383
-  override def findAriaByControlEffectiveId =
+  override def findAriaByControlEffectiveId: Option[String] =
     super.findAriaByControlEffectiveId
 
   // Don't accept focus if we have the internal appearance
-  override def focusableControls =
-    if (! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME))
-      super.focusableControls
-    else
-      Iterator.empty
+  override def isDirectlyFocusable: Boolean =
+    ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.isDirectlyFocusable
 
-  override def supportAjaxUpdates =
+  override def supportAjaxUpdates: Boolean =
     ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)
 }
 
 object XFormsSelect1Control {
 
+  def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
+    boundNodeOpt exists (_.getAttributeValue(att.getFingerprint) == att.getStringValue)
+
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
-  // lookup by id takes place and the control must have a static itemset or otherwise null is returned.
-  def getInitialItemset(control: XFormsSelect1Control, staticControl: SelectionControlTrait): Itemset =
+  // lookup by id takes place and the control must have a static itemset or otherwise `None` is returned.
+  def getInitialItemset(control: XFormsSelect1Control, staticControl: SelectionControlTrait): Option[Itemset] =
     if ((control ne null) && control.isRelevant) {
       // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
-      control.getItemset
+      control.getItemset.some
     } else {
       // Control is not there or is not relevant, so use static itemsets
       // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-      staticControl.staticItemset.orNull
+      staticControl.staticItemset
     }
 
-  def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait) =
+  def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait): Boolean =
     control.mustEncodeValues getOrElse containingDocument.encodeItemValues
 }

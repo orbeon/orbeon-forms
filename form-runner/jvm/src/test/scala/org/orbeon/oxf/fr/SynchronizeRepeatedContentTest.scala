@@ -34,7 +34,7 @@ class SynchronizeRepeatedContentTest
     val doc = docOpt.get
 
     it("must pass all synchronization checks") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {
 
           val masterGridGrid     = resolveObject[XFormsControl]("master-grid-grid").get
@@ -55,11 +55,11 @@ class SynchronizeRepeatedContentTest
 
           assertBothValues(index = 1, BobValue)
 
-          dispatch(name = "fr-insert-below", effectiveId = masterGridGrid.effectiveId, properties = Map("row" → Some("1")))
+          dispatch(name = "fr-insert-below", effectiveId = masterGridGrid.effectiveId, properties = Map("row" -> Some("1")))
           doc.synchronizeAndRefresh()
           assertBothValues(index = 1, BobValue)
 
-          dispatch(name = "fr-insert-above", effectiveId = masterGridGrid.effectiveId, properties = Map("row" → Some("1")))
+          dispatch(name = "fr-insert-above", effectiveId = masterGridGrid.effectiveId, properties = Map("row" -> Some("1")))
           doc.synchronizeAndRefresh()
           assertBothValues(index = 2, BobValue)
 
@@ -68,19 +68,19 @@ class SynchronizeRepeatedContentTest
           assertBothValues(index = 2, BobValue)
           assertBothValues(index = 3, AliceValue)
 
-          dispatch(name = "fr-remove", masterGridGrid.effectiveId, properties = Map("row" → Some("1")))
+          dispatch(name = "fr-remove", masterGridGrid.effectiveId, properties = Map("row" -> Some("1")))
           doc.synchronizeAndRefresh()
 
           assertBothValues(index = 1, BobValue)
           assertBothValues(index = 2, AliceValue)
 
-          dispatch(name = "fr-move-down", effectiveId = masterGridGrid.effectiveId, properties = Map("row" → Some("1")))
+          dispatch(name = "fr-move-down", effectiveId = masterGridGrid.effectiveId, properties = Map("row" -> Some("1")))
           doc.synchronizeAndRefresh()
 
           assertBothValues(index = 2, BobValue)
           assertBothValues(index = 1, AliceValue)
 
-          dispatch(name = "fr-move-up", effectiveId = masterGridGrid.effectiveId, properties = Map("row" → Some("2")))
+          dispatch(name = "fr-move-up", effectiveId = masterGridGrid.effectiveId, properties = Map("row" -> Some("2")))
           doc.synchronizeAndRefresh()
 
           assertBothValues(index = 1, BobValue)

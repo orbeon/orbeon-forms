@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.NamespaceMapping
-
-import org.orbeon.oxf.util.CoreUtils._
-
+import org.orbeon.saxon.om
 
 object XFormsContextStackSupport {
 
@@ -32,7 +31,7 @@ object XFormsContextStackSupport {
     sourceEffectiveId              : String,
     scope                          : Scope,
     handleNonFatal                 : Boolean
-  )(body: ⇒ T)(implicit xformsContextStack: XFormsContextStack): T = {
+  )(body: => T)(implicit xformsContextStack: XFormsContextStack): T = {
     xformsContextStack.pushBinding(
       ref.orNull,
       context.orNull,
@@ -45,11 +44,22 @@ object XFormsContextStackSupport {
       scope,
       handleNonFatal
     )
-    body |!> (_ ⇒ xformsContextStack.popBinding())
+    body |!> (_ => xformsContextStack.popBinding())
   }
 
-  def withIteration[T](currentPosition: Int)(body: ⇒ T)(implicit xformsContextStack: XFormsContextStack): T = {
-    xformsContextStack.pushIteration(currentPosition)
-    body |!> (_ ⇒ xformsContextStack.popBinding())
+  def withBinding[T](
+    bindingElement    : Element,
+    sourceEffectiveId : String,
+    scope             : Scope
+  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
+    contextStack.pushBinding(bindingElement, sourceEffectiveId, scope)
+    body(contextStack.getCurrentBindingContext) |!>
+      (_ => contextStack.popBinding())
+  }
+
+  def withIteration[T](currentPosition: Int)(body: om.Item => T)(implicit contextStack: XFormsContextStack): T = {
+    contextStack.pushIteration(currentPosition)
+    body(contextStack.getCurrentBindingContext.contextItem) |!>
+      (_ => contextStack.popBinding())
   }
 }

@@ -38,21 +38,21 @@ abstract class XBLCompanionWithState extends XBLCompanion {
 
   final override def xformsUpdateValue(newValue: String): Unit =
     decode(newValue) match {
-      case Success(newState) ⇒
+      case Success(newState) =>
 
         val previousStateOpt = stateOpt
         stateOpt = Some(newState)
 
         scribe.debug(s"previousStateOpt = `$previousStateOpt`, newState = `$newState`")
         xformsUpdateState(previousStateOpt, newState)
-      case Failure(t) ⇒
+      case Failure(t) =>
         scribe.debug(s"error decoding value: ${t.getMessage}")
     }
 
-  final def updateStateAndSendValueToServerIfNeeded(newState: State, valueFromState: State ⇒ String): Boolean = {
+  final def updateStateAndSendValueToServerIfNeeded(newState: State, valueFromState: State => String): Boolean = {
 
     val mustUpdateStateAndSendValue =
-      ! (stateOpt exists (state ⇒ valueFromState(state) == valueFromState(newState)))
+      ! (stateOpt exists (state => valueFromState(state) == valueFromState(newState)))
 
     scribe.debug(s"mustSendValue = `$mustUpdateStateAndSendValue`, stateOpt = `$stateOpt`, newState = `$newState`")
 

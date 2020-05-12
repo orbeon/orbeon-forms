@@ -69,8 +69,8 @@ class VersionTest
     )
 
     for {
-      (version, expected) ← Expectations
-      suffix              ← Suffixes
+      (version, expected) <- Expectations
+      suffix              <- Suffixes
       versionWithSuffix   = version + suffix
     } locally {
       it(s"must pass for `$versionWithSuffix") {
@@ -91,16 +91,16 @@ class VersionTest
     val BuildTimeStamp = "201301281947"
 
     val Expectations = List(
-      s"$BuildTimeStamp"               → TimeStamp,
-      s"4.1.0.$BuildTimeStamp"         → TimeStamp,
-      s"4.1.0.$BuildTimeStamp.42"      → TimeStamp,
-      s"prefix.$BuildTimeStamp.suffix" → TimeStamp,
-      s"prefix${BuildTimeStamp}suffix" → TimeStamp,
-      s"${BuildTimeStamp}8"            → None,
-      s"20130128"                      → None
+      s"$BuildTimeStamp"               -> TimeStamp,
+      s"4.1.0.$BuildTimeStamp"         -> TimeStamp,
+      s"4.1.0.$BuildTimeStamp.42"      -> TimeStamp,
+      s"prefix.$BuildTimeStamp.suffix" -> TimeStamp,
+      s"prefix${BuildTimeStamp}suffix" -> TimeStamp,
+      s"${BuildTimeStamp}8"            -> None,
+      s"20130128"                      -> None
     )
 
-    for ((in, expected) ← Expectations)
+    for ((in, expected) <- Expectations)
       it(s"must pass for `$in`") {
         assert(expected === PEVersion.dateFromVersionNumber(in))
       }
@@ -126,16 +126,16 @@ class VersionTest
     case class Booleans(badVersion: Boolean, expired: Boolean, buildAfterSubscriptionEnd: Boolean)
 
     val Expectations = List(
-      (Some("4.0"), None, None)         → Booleans(badVersion = true,  expired = false, buildAfterSubscriptionEnd = false),
-      (None, parse("3000-01-01"), None) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
-      (None, parse("1000-01-01"), None) → Booleans(badVersion = false, expired = true,  buildAfterSubscriptionEnd = false),
-      (None, None, parse("3000-01-01")) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
-      (None, None, parse("2013-01-28")) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
-      (None, None, parse("2013-01-27")) → Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = true)
+      (Some("4.0"), None, None)         -> Booleans(badVersion = true,  expired = false, buildAfterSubscriptionEnd = false),
+      (None, parse("3000-01-01"), None) -> Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
+      (None, parse("1000-01-01"), None) -> Booleans(badVersion = false, expired = true,  buildAfterSubscriptionEnd = false),
+      (None, None, parse("3000-01-01")) -> Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
+      (None, None, parse("2013-01-28")) -> Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = false),
+      (None, None, parse("2013-01-27")) -> Booleans(badVersion = false, expired = false, buildAfterSubscriptionEnd = true)
     )
 
     for {
-      (in, expected) ← Expectations
+      (in, expected) <- Expectations
       license        = (create _).tupled(in)
     } locally {
       it(s"must pass for `$in`") {
@@ -215,7 +215,7 @@ class VersionTest
     )
 
     for {
-      (description, license, expectedClass) ← Expectations
+      (description, license, expectedClass) <- Expectations
     } locally {
       it(description) {
 
@@ -223,7 +223,7 @@ class VersionTest
           tryLicenseInfo(license).get
         }
 
-        val thrownCauses = Iterator.iterateFrom(thrown, (e: Throwable) ⇒ Option(e.getCause)).toList
+        val thrownCauses = Iterator.iterateFrom(thrown, (e: Throwable) => Option(e.getCause)).toList
 
         assert(thrownCauses.map(_.getClass).contains(expectedClass))
       }

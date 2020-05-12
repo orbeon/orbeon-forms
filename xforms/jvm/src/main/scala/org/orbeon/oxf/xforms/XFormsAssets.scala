@@ -34,8 +34,8 @@ object AssetPath {
 
   def minFromFull(full: String): String =
     findExtension(full) match {
-      case Some(ext) ⇒ full.substring(0, full.length - ext.length - 1) + ".min." + ext
-      case None      ⇒ throw new IllegalArgumentException
+      case Some(ext) => full.substring(0, full.length - ext.length - 1) + ".min." + ext
+      case None      => throw new IllegalArgumentException
     }
 }
 
@@ -55,9 +55,9 @@ object XFormsAssets {
       val existingItems  = if (isCss) assets.css else assets.js
 
       (! existingItems.exists(_.full == path)) option (existingItems :+ AssetPath(path, None)) match {
-        case Some(newItems) if isCss ⇒ assets.copy(css = newItems)
-        case Some(newItems)          ⇒ assets.copy(js = newItems)
-        case None                    ⇒ assets
+        case Some(newItems) if isCss => assets.copy(css = newItems)
+        case Some(newItems)          => assets.copy(js = newItems)
+        case None                    => assets
       }
     }
 
@@ -81,31 +81,31 @@ object XFormsAssets {
   def fromJSONProperty: XFormsAssets =
     Properties.instance.getPropertySet
       .getPropertyOrThrow(AssetsBaselineProperty)
-      .associatedValue(v ⇒ fromJsonString(v.value.toString))
+      .associatedValue(v => fromJsonString(v.value.toString))
 
   private def fromJson(json: JsValue): XFormsAssets = {
 
     def collectFullMin(key: String, fields: Map[String, JsValue]): Vector[AssetPath] =
       fields.get(key) match {
-        case Some(JsArray(values)) ⇒
-          values collect { case JsObject(fields) ⇒
-            val full   = fields.get("full") collect { case JsString(v)  ⇒ v } getOrElse (throw new IllegalArgumentException)
-            val hasMin = fields.get("min")  collect { case JsBoolean(v) ⇒ v } getOrElse false
+        case Some(JsArray(values)) =>
+          values collect { case JsObject(fields) =>
+            val full   = fields.get("full") collect { case JsString(v)  => v } getOrElse (throw new IllegalArgumentException)
+            val hasMin = fields.get("min")  collect { case JsBoolean(v) => v } getOrElse false
 
             AssetPath(full, hasMin)
           }
-        case _ ⇒ throw new IllegalArgumentException
+        case _ => throw new IllegalArgumentException
       }
 
     json match {
-      case JsObject(fields) ⇒
+      case JsObject(fields) =>
 
         val css = collectFullMin("css", fields)
         val js  = collectFullMin("js",  fields)
 
         XFormsAssets(css.to(List), js.to(List))
 
-      case _ ⇒ throw new IllegalArgumentException
+      case _ => throw new IllegalArgumentException
     }
   }
 }

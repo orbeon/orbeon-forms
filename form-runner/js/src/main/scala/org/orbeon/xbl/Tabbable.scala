@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
 import org.orbeon.xbl.DndRepeat._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
@@ -20,6 +21,7 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
@@ -47,7 +49,7 @@ object Tabbable {
 
       override def init(): Unit = {
 
-        if ($(containerElem).is(".fr-tabbable-dnd")) {
+        if (containerElem.classList.contains("fr-tabbable-dnd")) {
 
           val firstRepeatContainer = $(containerElem).find(NavTabsSelector)(0)
 
@@ -75,7 +77,7 @@ object Tabbable {
               }
             )
 
-          newDrake.onDrag((el: Element, source: Element) ⇒ {
+          newDrake.onDrag((el: Element, source: Element) => {
 
             val jEl = $(el)
 
@@ -87,13 +89,13 @@ object Tabbable {
             )
           })
 
-          newDrake.onDragend((el: Element) ⇒ {
+          newDrake.onDragend((el: Element) => {
             dragState = None
           })
 
           // This is almost identical in `DndRepeat`. Should remove code duplication.
-          newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
-            dragState foreach { dragState ⇒
+          newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) => {
+            dragState foreach { dragState =>
 
               val jEl = $(el)
 
@@ -106,29 +108,25 @@ object Tabbable {
 
               if (dndStart != dndEnd) {
 
-                lazy val moveBack: js.Function = () ⇒ {
-                  $(beforeEl).after(el)
-                  // TODO: Fix this if we switch to `jquery-facade`
-                  AjaxClient.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
-                }
-
                 // Restore order once we get an Ajax response back
                 // NOTE: You might think that we should wait for the specific response to the Ajax request corresponding to
                 // the event below. However, we should move the element back to its original location before *any*
                 // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
                 // doing this is probably the right thing to do.
-                AjaxClient.ajaxResponseReceived.add(moveBack)
+                AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("tabbable") foreach { _ =>
+                  $(beforeEl).after(el)
+                }
 
                 // Thinking this should instead block input, but only after a while show a modal screen.
-                // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
+                // XFormsUI.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(companion.container).id)
 
-                AjaxEvent.dispatchEvent(
+                AjaxClient.fireEvent(
                   AjaxEvent(
                     eventName  = EventNames.XXFormsDnD,
                     targetId   = repeatId,
                     properties = Map(
-                      "dnd-start" → (dndStart + 1),
-                      "dnd-end"   → (dndEnd + 1)
+                      "dnd-start" -> (dndStart + 1),
+                      "dnd-end"   -> (dndEnd + 1)
                     )
                   )
                 )
@@ -144,7 +142,7 @@ object Tabbable {
         // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
         // support dynamically repeated tabs.
         $(containerElem).on("click.tabbable.data-api", "[data-toggle = 'tabbable']", {
-          (bound: html.Element, e: JQueryEventObject) ⇒ {
+          (bound: html.Element, e: JQueryEventObject) => {
 
             e.preventDefault()  // don"t allow anchor navigation
             e.stopPropagation() // prevent ancestor tab handlers from running

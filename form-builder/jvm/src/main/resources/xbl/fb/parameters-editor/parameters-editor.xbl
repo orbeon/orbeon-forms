@@ -58,30 +58,24 @@
                     ref="fr:param/fr:controlName"
                     required="true()"/>
 
-                <!-- NOTE: This could be generated automatically. -->
-                <xf:instance id="expression-param-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
-                    <fr:param type="ExpressionParam">
-                        <fr:name/>
-                        <fr:expr/>
-                    </fr:param>
+                <xf:instance id="values-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <_>
+                        <!-- Make sure there are no whitespace next nodes inbetween as we don't handle that yet. -->
+                        <fr:param type="ExpressionParam"       ><fr:name/><fr:expr/></fr:param>
+                        <fr:param type="ControlValueParam"     ><fr:name/><fr:controlName/></fr:param>
+                        <fr:param type="AllControlValuesParam" ><fr:name/></fr:param>
+                        <fr:param type="LinkToEditPageParam"   ><fr:name/></fr:param>
+                        <fr:param type="LinkToViewPageParam"   ><fr:name/></fr:param>
+                        <fr:param type="LinkToNewPageParam"    ><fr:name/></fr:param>
+                        <fr:param type="LinkToSummaryPageParam"><fr:name/></fr:param>
+                        <fr:param type="LinkToHomePageParam"   ><fr:name/></fr:param>
+                        <fr:param type="LinkToPdfParam"        ><fr:name/></fr:param>
+                    </_>
                 </xf:instance>
 
-                <!-- NOTE: This could be generated automatically. -->
-                <xf:instance id="control-value-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
-                    <fr:param type="ControlValueParam">
-                        <fr:name/>
-                        <fr:controlName/>
-                    </fr:param>
-                </xf:instance>
-
-                <!-- NOTE: This could be generated automatically. -->
-                <xf:instance id="all-control-values-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
-                    <fr:param type="AllControlValuesParam">
-                        <fr:name/>
-                    </fr:param>
-                </xf:instance>
-
-                <xf:var name="template" value="instance('control-value-template')"/>
+                <xf:var
+                    name="readonly-template"
+                    value="instance('values-template')/*[@type = 'ControlValueParam']"/>
 
                 <!-- List of controls computed once, as this is an expensive operation for large forms -->
                 <xf:instance id="controls-label-value-itemset">
@@ -122,7 +116,7 @@
                             if (exists($params)) then
                                 $params
                             else
-                                $template">
+                                $readonly-template">
 
                     <xf:var name="current-param"    value="."/>
                     <xf:var name="param-count"      value="count($i/fr:param)"/>
@@ -140,41 +134,51 @@
                             <xf:alert ref="$resources/components/parameters-editor/name/alert"/>
                         </xf:input>
 
-                        <xf:select1 ref="$current-param/@type" class="fb-param-type">
+                        <xf:select1 ref="$current-param" class="fb-param-type" xxf:exclude-whitespace-text-nodes="true">
                             <xf:label>Type</xf:label>
-
-                            <xf:item>
-                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 0]"/>
-                                <xf:value>ControlValueParam</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 1]"/>
-                                <xf:value>ExpressionParam</xf:value>
-                            </xf:item>
-                            <xf:itemset ref=".[xxf:component-param-value('all-control-values') = 'true']">
-                                <xf:label ref="$resources/components/parameters-editor/type/item[@id = 2]"/>
-                                <xf:value>AllControlValuesParam</xf:value>
-                            </xf:itemset>
-
-                            <xf:action event="xforms-select">
-                                <xf:var name="name" value="../fr:name"/>
-                                <xf:delete ref="../*"/>
-                                <xf:insert
-                                    context=".."
-                                    origin="
-                                        (
-                                            if (event('xxf:item-value') = 'ExpressionParam') then
-                                                instance('expression-param-template')
-                                            else if (event('xxf:item-value') = 'ControlValueParam') then
-                                                instance('control-value-template')
-                                            else if (event('xxf:item-value') = 'AllControlValuesParam') then
-                                                instance('all-control-values-template')
+                            <xf:itemset ref="$resources/components/parameters-editor/type/item">
+                                <xf:label ref="."/>
+                                <xf:copy
+                                    ref="
+                                        let $type :=
+                                            if (@id = 0) then
+                                                'ControlValueParam'
+                                            else if (@id = 1) then
+                                                'ExpressionParam'
+                                            else if (@id = 2 and xxf:component-param-value('all-control-values') = 'true') then
+                                                'AllControlValuesParam'
+                                            else if (@id = (3 to 8) and xxf:component-param-value('form-runner-links') = 'true') then
+                                                if (@id = 3) then
+                                                    'LinkToEditPageParam'
+                                                else if (@id = 4) then
+                                                    'LinkToViewPageParam'
+                                                else if (@id = 5) then
+                                                    'LinkToNewPageParam'
+                                                else if (@id = 6) then
+                                                    'LinkToSummaryPageParam'
+                                                else if (@id = 7) then
+                                                    'LinkToHomePageParam'
+                                                else if (@id = 8) then
+                                                    'LinkToPdfParam'
+                                                else
+                                                    error()
                                             else
-                                                error()
-                                        )/*
-                                "/>
-                                <xf:setvalue ref="../fr:name" value="$name"/>
-                            </xf:action>
+                                                (),
+                                            $template := instance('values-template')/fr:param[@type = $type]
+                                        return
+                                            if (exists($type)) then
+                                                 (
+                                                    $template/@type,
+                                                    if ($type = $current-param/@type) then
+                                                        $current-param/*             (: keep the currently-selected value as is :)
+                                                    else (
+                                                        $current-param/fr:name,      (: always keep the parameter name          :)
+                                                        $template/(* except fr:name) (: but use the other elements if any       :)
+                                                    )
+                                                )
+                                            else
+                                                ()"/>
+                            </xf:itemset>
                         </xf:select1>
 
                         <xf:switch caseref="$current-param/@type" class="fb-param-details">
@@ -216,7 +220,7 @@
                                         context="$i"
                                         ref="$current-param[parent::* is $i]"
                                         position="after"
-                                        origin="$template"/>
+                                        origin="$readonly-template"/>
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
@@ -225,7 +229,6 @@
 
                 </fr:dnd-repeat>
             </xf:group>
-
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

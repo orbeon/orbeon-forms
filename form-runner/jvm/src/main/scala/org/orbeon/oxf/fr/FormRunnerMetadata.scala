@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CollectionUtils._
@@ -24,7 +25,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
-import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, LHHAValue}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
@@ -37,8 +38,8 @@ import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.xml.Elem
 import scala.collection.compat._
+import scala.xml.Elem
 
 object FormRunnerMetadata {
 
@@ -49,7 +50,7 @@ object FormRunnerMetadata {
     repeated     : Boolean,
     iterations   : List[Int],
     datatype     : Option[String],
-    lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[Item]))],
+    lhhaAndItems : List[(Lang, (List[(LHHA, String)], List[ItemNode]))],
     value        : Option[ControlValue],
     forHashes    : List[String]
   )
@@ -94,16 +95,16 @@ object FormRunnerMetadata {
 
       val valueOpt =
         value flatMap {
-          case SingleControlValue  (_, formattedValue)  ⇒
+          case SingleControlValue  (_, formattedValue)  =>
             formattedValue
-          case MultipleControlValue(_, formattedValues) ⇒
+          case MultipleControlValue(_, formattedValues) =>
             formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
         }
 
       def combineLabelAndValue(label: String, value: Option[String]): Option[String] = {
 
         val normalizedLabel =
-          label.trimAllToOpt map { l ⇒
+          label.trimAllToOpt map { l =>
             if (l.endsWith(":")) l.init else l
           }
 
@@ -117,8 +118,8 @@ object FormRunnerMetadata {
 
       val r =
         typ match {
-          case "section" ⇒ labelOpt
-          case _         ⇒ labelOpt flatMap (combineLabelAndValue(_, valueOpt))
+          case "section" => labelOpt
+          case _         => labelOpt flatMap (combineLabelAndValue(_, valueOpt))
         }
 
         r map (_ + (if (Debug) s" [$name/$typ]" else ""))
@@ -128,9 +129,9 @@ object FormRunnerMetadata {
 
     def processNext(controlDetails: List[ControlDetails], level: Int): Unit =
       controlDetails match {
-        case Nil ⇒
+        case Nil =>
 
-        case ControlDetails(_, "grid", gridLevel, _, _, _, _, _, _) :: rest ⇒
+        case ControlDetails(_, "grid", gridLevel, _, _, _, _, _, _) :: rest =>
 
           val nextLevel = gridLevel + 1
 
@@ -139,25 +140,25 @@ object FormRunnerMetadata {
           val grouped = rest.takeWhile(f).groupBy(_.iterations.headOption)
 
           grouped.toList.sortBy(_._1) foreach {
-            case (Some(iteration), content) ⇒
+            case (Some(iteration), content) =>
               sb ++= "<li>"
               sb ++= iterationString(iteration)
               sb ++= "<ul>"
               processNext(content, nextLevel)
               sb ++= "</ul>"
               sb ++= "</li>"
-            case _ ⇒ // ignore
+            case _ => // ignore
           }
 
           processNext(rest.dropWhile(f), level)
 
-        case ControlDetails(name, typ @ "section", sectionLevel, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest ⇒
+        case ControlDetails(name, typ @ "section", sectionLevel, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest =>
 
           val nextLevel    = sectionLevel + 1
           val headingLevel = nextLevel + 1 // so we start at `<h2>` for top-level sections
 
           // TODO: use current/requested lang
-          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line ⇒
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line =>
             sb ++= s"<h$headingLevel>"
             sb ++= line
             sb ++= s"</h$headingLevel>"
@@ -170,17 +171,17 @@ object FormRunnerMetadata {
           sb ++= "</ul>"
           processNext(rest.dropWhile(f), level)
 
-        case ControlDetails(name, typ, _, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest if ! ControlsToIgnore(typ) ⇒
+        case ControlDetails(name, typ, _, _, _, _, (lang, (lhhas, _)) :: _, value, _) :: rest if ! ControlsToIgnore(typ) =>
 
           // TODO: use current/requested lang
-          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line ⇒
+          createLine(name, typ, lhhas.toMap.get(LHHA.Label), value, isFirst = false) foreach { line =>
             sb ++= "<li>"
             sb ++= line
             sb ++= "</li>"
           }
           processNext(rest, level)
 
-        case _ :: rest  ⇒
+        case _ :: rest  =>
 
           processNext(rest, level)
       }
@@ -216,9 +217,9 @@ object FormRunnerMetadata {
     }
 
     def iterateResources(resourcesInstance: XFormsInstance): Iterator[(String, NodeInfo)] =
-      for (resource ← resourcesInstance.rootElement / Resource iterator)
+      for (resource <- resourcesInstance.rootElement / Resource iterator)
       yield
-        resource.attValue("*:lang") → resource
+        resource.attValue("*:lang") -> resource
 
     def resourcesForControl(staticControl: StaticLHHASupport, lang: String, resourcesRoot: NodeInfo, controlName: String) = {
 
@@ -226,20 +227,20 @@ object FormRunnerMetadata {
 
       val lhhas =
         for {
-          lhha     ← LHHA.values.to(List)
+          lhha     <- LHHA.values.to(List)
           if staticControl.hasLHHA(lhha)
           lhhaName = lhha.entryName
-          holder   ← enclosingHolder child lhhaName
+          holder   <- enclosingHolder child lhhaName
         } yield
           <dummy>{holder.stringValue}</dummy>.copy(label = lhhaName)
 
       val items =
         (enclosingHolder child Names.Item nonEmpty) list
           <items>{
-            for (item ← enclosingHolder child Names.Item)
+            for (item <- enclosingHolder child Names.Item)
             yield
               <item>{
-                for (el ← item child *)
+                for (el <- item child *)
                 yield
                   <dummy>{el.stringValue}</dummy>.copy(label = el.localname)
               }</item>
@@ -256,40 +257,40 @@ object FormRunnerMetadata {
       controls.values flatMap (_.narrowTo[XFormsSingleNodeControl]) filter isBoundToFormDataInScope
 
     val sortedControls =
-      selectedControls.to(List).sortBy(c ⇒ ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
+      selectedControls.to(List).sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {
-        control           ← sortedControls
-        staticControl     ← control.staticControl.cast[StaticLHHASupport]
-        resourcesInstance ← resourcesInstance(control)
+        control           <- sortedControls
+        staticControl     <- control.staticControl.cast[StaticLHHASupport]
+        resourcesInstance <- resourcesInstance(control)
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
-        controlName       ← FormRunner.controlNameFromIdOpt(control.getId)
-        boundNode         ← control.boundNodeOpt
+        controlName       <- FormRunner.controlNameFromIdOpt(control.getId)
+        boundNode         <- control.boundNodeOpt
         dataHash          = SubmissionUtils.dataNodeHash(boundNode)
       } yield
-        dataHash →
+        dataHash ->
           <control
             name={controlName}
             type={staticControl.localName}
             datatype={control.getTypeLocalNameOpt.orNull}>{
-            for ((lang, resourcesRoot) ← iterateResources(resourcesInstance))
+            for ((lang, resourcesRoot) <- iterateResources(resourcesInstance))
             yield
               <resources lang={lang}>{resourcesForControl(staticControl, lang, resourcesRoot, controlName)}</resources>
           }{
-            for (valueControl ← control.narrowTo[XFormsValueControl].toList)
+            for (valueControl <- control.narrowTo[XFormsValueControl].toList)
             yield
               <value>{valueControl.getValue}</value>
           }</control>
 
-    import scala.{xml ⇒ sxml}
+    import scala.{xml => sxml}
 
     def addAttribute(elem: Elem, name: String, value: String) =
       elem % sxml.Attribute(None, name, sxml.Text(value), sxml.Null)
 
     val groupedMetadata =
-      controlMetadata groupByKeepOrder (x ⇒ x._2) map
-      { case (elem, hashes) ⇒ addAttribute(elem, "for", hashes map (_._1) mkString " ")}
+      controlMetadata groupByKeepOrder (x => x._2) map
+      { case (elem, hashes) => addAttribute(elem, "for", hashes map (_._1) mkString " ")}
 
     <metadata>{groupedMetadata}</metadata>
   }
@@ -306,13 +307,13 @@ object FormRunnerMetadata {
       instanceInScope(control, FormResources)
 
     def isBoundToFormDataInScope(control: XFormsControl): Boolean = control match {
-      case c: XFormsSingleNodeControl ⇒
+      case c: XFormsSingleNodeControl =>
 
         val boundNode = c.boundNodeOpt
         val data      = instanceInScope(c, FormInstance)
 
         (boundNode map (_.getDocumentRoot)) == (data map (_.root))
-      case _ ⇒
+      case _ =>
         false
     }
 
@@ -323,40 +324,40 @@ object FormRunnerMetadata {
 
     def isRepeatedGridComponent(control: XFormsControl): Boolean =
       control match {
-        case c: XFormsComponentControl if c.localName == "grid" && isRepeat(c) ⇒ true
-        case _                                                                 ⇒ false
+        case c: XFormsComponentControl if c.localName == "grid" && isRepeat(c) => true
+        case _                                                                 => false
       }
 
     def iterateResources(resourcesInstance: XFormsInstance): Iterator[(Lang, NodeInfo)] =
-      for (resource ← resourcesInstance.rootElement / Resource iterator)
+      for (resource <- resourcesInstance.rootElement / Resource iterator)
       yield
-        Lang(resource.attValue("*:lang")) → resource
+        Lang(resource.attValue("*:lang")) -> resource
 
     def resourcesForControl(
       staticControl : StaticLHHASupport,
       lang          : Lang,
       resourcesRoot : NodeInfo,
       controlName   : String
-    ): (List[(LHHA, String)], List[Item]) = {
+    ): (List[(LHHA, String)], List[ItemNode]) = {
 
       val enclosingHolder = resourcesRoot descendant controlName take 1
 
       val lhhas =
         for {
-          lhha   ← LHHA.values.to(List)
+          lhha   <- LHHA.values.to(List)
           if staticControl.hasLHHA(lhha)
-          holder ← enclosingHolder child lhha.entryName
+          holder <- enclosingHolder child lhha.entryName
         } yield
-          lhha → holder.stringValue
+          lhha -> holder.stringValue
 
       val items =
-        for ((item, position) ← enclosingHolder child Names.Item zipWithIndex)
+        for ((item, position) <- enclosingHolder child Names.Item zipWithIndex)
         yield
-          itemset.Item(
+          itemset.Item.ValueNode(
             label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false), // TODO isHTML
             help       = item elemValueOpt LHHA.Help.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
             hint       = item elemValueOpt LHHA.Hint.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
-            value      = item elemValue Names.Value,
+            value      = Left(item elemValueOpt Names.Value getOrElse ""),
             attributes = Nil
           )(position)
 
@@ -369,17 +370,17 @@ object FormRunnerMetadata {
       controls.values  filter
         (_.isRelevant) filterNot
         isExcluded     filter
-        (c ⇒ isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
+        (c => isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
 
     val sortedControls =
-      selectedControls.to(List).sortBy(c ⇒ ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
+      selectedControls.to(List).sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {
-        control       ← sortedControls
+        control       <- sortedControls
         staticControl = control.staticControl
         if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
-        controlName   ← FormRunner.controlNameFromIdOpt(control.getId)
+        controlName   <- FormRunner.controlNameFromIdOpt(control.getId)
       } yield {
 
         val singleNodeControlOpt = control.narrowTo[XFormsSingleNodeControl]
@@ -388,57 +389,60 @@ object FormRunnerMetadata {
         val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNodeOpt)
         val dataHashOpt          = boundNodeOpt map SubmissionUtils.dataNodeHash
 
-        dataHashOpt → {
+        dataHashOpt -> {
 
           val lhhaAndItemsIt =
             for {
-              resourcesInstance     ← resourcesInstanceOpt.iterator
-              lhhaStaticControl     ← staticControl.cast[StaticLHHASupport].iterator
-              (lang, resourcesRoot) ← iterateResources(resourcesInstance)
+              resourcesInstance     <- resourcesInstanceOpt.iterator
+              lhhaStaticControl     <- staticControl.cast[StaticLHHASupport].iterator
+              (lang, resourcesRoot) <- iterateResources(resourcesInstance)
             } yield
-              lang → resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
+              lang -> resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
 
           val lhhaAndItemsList = lhhaAndItemsIt.to(List)
 
           val valueOpt =
             Option(control) collect {
-              case c: XFormsSelectControl  ⇒
+              case c: XFormsSelectControl  =>
 
                 val selectedLabels = c.findSelectedItems map (_.label.label) // TODO: HTML
 
                 MultipleControlValue(c.getValue, selectedLabels) // TODO
 
-              case c: XFormsSelect1Control ⇒
+              case c: XFormsSelect1Control =>
 
                 val selectedLabel = c.findSelectedItem map (_.label.label) // TODO: HTML
 
                 SingleControlValue(c.getValue, selectedLabel) // TODO
 
-              case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection ⇒
+              case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection =>
 
                 val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
 
                 selectionControlOpt match {
-                  case Some(selectControl: XFormsSelectControl) ⇒
+                  case Some(selectControl: XFormsSelectControl) =>
                     val selectedLabels = selectControl.findSelectedItems map (_.label.label)  // TODO: HTML
                     MultipleControlValue(selectControl.getValue, selectedLabels) // TODO
-                  case Some(select1Control) ⇒
+                  case Some(select1Control) =>
 
                     // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
                     val itemOpt =
                       if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
-                        select1Control.findSelectedItem filter (_.value.nonBlank)
+                        select1Control.findSelectedItem filter (_.value match {
+                          case Left(v) if v.nonAllBlank => true
+                          case _                        => false
+                        })
                       else
                         select1Control.findSelectedItem
 
                     // TODO: HTML
-                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse Some("") // use a blank string so we get `N/A` in the end
+                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse "".some // use a blank string so we get `N/A` in the end
                     SingleControlValue(select1Control.getValue, selectedLabelOpt)
-                  case None ⇒
+                  case None =>
                     throw new IllegalStateException
                 }
 
-              case c: XFormsOutputControl ⇒
+              case c: XFormsOutputControl =>
 
                 // Special case: if there is a "Calculated Value" control, but which has a blank value in the
                 // instance and no initial/calculated expressions, then consider that this control doesn't have
@@ -454,11 +458,11 @@ object FormRunnerMetadata {
 
                 SingleControlValue(c.getValue, formattedValue)
 
-              case c: XFormsValueControl if Set("image-attachment", "attachment")(staticControl.localName) ⇒
+              case c: XFormsValueControl if Set("image-attachment", "attachment")(staticControl.localName) =>
 
                 SingleControlValue(c.getValue, c.boundNodeOpt flatMap (_.attValueOpt("filename")))
 
-              case c: XFormsValueControl ⇒
+              case c: XFormsValueControl =>
 
                 SingleControlValue(c.getValue, c.getFormattedValue orElse Option(c.getValue))
             }
@@ -466,8 +470,8 @@ object FormRunnerMetadata {
           // Include sections and repeated grids only
           def ancestorLevelContainers(control: XFormsControl): Iterator[XFormsComponentControl] =
             new AncestorOrSelfIterator(control.parent) collect {
-              case c: XFormsComponentControl if isSection(c)             ⇒ c
-              case c: XFormsComponentControl if isGrid(c) && isRepeat(c) ⇒ c
+              case c: XFormsComponentControl if isSection(c)             => c
+              case c: XFormsComponentControl if isGrid(c) && isRepeat(c) => c
             }
 
           val repeatDepth = control.staticControl.ancestorRepeatsAcrossParts.size
@@ -488,7 +492,7 @@ object FormRunnerMetadata {
         }
       }
 
-    controlMetadata groupByKeepOrder (x ⇒ x._2) map { case (elem, hashes) ⇒
+    controlMetadata groupByKeepOrder (x => x._2) map { case (elem, hashes) =>
       elem.copy(forHashes = hashes flatMap (_._1))
     }
   }

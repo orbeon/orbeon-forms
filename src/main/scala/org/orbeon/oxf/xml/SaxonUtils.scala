@@ -20,13 +20,17 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
+import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
+import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
+
 
 object SaxonUtils {
 
@@ -46,19 +50,19 @@ object SaxonUtils {
 
   def fixStringValue[V <: Item](item: V): V =
     item match {
-      case v: StringValue ⇒ new StringValueWithEquals(v.getStringValueCS).asInstanceOf[V] // we know it's ok...
-      case v              ⇒ v
+      case v: StringValue => new StringValueWithEquals(v.getStringValueCS).asInstanceOf[V] // we know it's ok...
+      case v              => v
     }
 
   // Convert a Java object to a Saxon Item using the Saxon API
-  val anyToItem: Any ⇒ Item = new StandardObjectConverter(new SaxonXQDataFactory {
-    def getConfiguration = util.XPath.GlobalConfiguration
+  val anyToItem: Any => Item = new StandardObjectConverter(new SaxonXQDataFactory {
+    def getConfiguration: Configuration = util.XPath.GlobalConfiguration
   }).convertToItem(_: Any)
 
   // Convert a Java object to a Saxon Item but keep unchanged if already an Item
-  val anyToItemIfNeeded: Any ⇒ Item = {
-    case i: Item ⇒ i
-    case a       ⇒ anyToItem(a)
+  val anyToItemIfNeeded: Any => Item = {
+    case i: Item => i
+    case a       => anyToItem(a)
   }
 
   // Effective boolean value of the iterator
@@ -100,7 +104,7 @@ object SaxonUtils {
       } else
         sb.append('_')
 
-      for (i ← 1 until name.length) {
+      for (i <- 1 until name.length) {
         val ch = name.charAt(i)
         sb.append(if (name10Checker.isNCNameChar(ch)) ch else '_')
       }
@@ -111,14 +115,14 @@ object SaxonUtils {
   def compareValueRepresentations(valueRepr1: ValueRepresentation, valueRepr2: ValueRepresentation): Boolean =
     (valueRepr1, valueRepr2) match {
       // Ideally we wouldn't support null here (XFormsVariableControl passes null)
-      case (null,             null)            ⇒ true
-      case (null,             _)               ⇒ false
-      case (_,                null)            ⇒ false
-      case (v1: Value, v2: Value)              ⇒ compareValues(v1, v2)
-      case (v1: NodeInfo, v2: NodeInfo)        ⇒ v1 == v2
+      case (null,             null)            => true
+      case (null,             _)               => false
+      case (_,                null)            => false
+      case (v1: Value, v2: Value)              => compareValues(v1, v2)
+      case (v1: NodeInfo, v2: NodeInfo)        => v1 == v2
       // 2014-08-18: Checked Saxon class hierarchy
       // Saxon type hierarchy is closed (ValueRepresentation = NodeInfo | Value)
-      case _                                   ⇒ throw new IllegalStateException
+      case _                                   => throw new IllegalStateException
     }
 
   def compareValues(value1: Value, value2: Value): Boolean = {
@@ -136,22 +140,22 @@ object SaxonUtils {
   def compareItems(item1: Item, item2: Item): Boolean =
     (item1, item2) match {
       // We probably shouldn't support null at all here!
-      case (null,             null)            ⇒ true
-      case (null,             _)               ⇒ false
-      case (_,                null)            ⇒ false
+      case (null,             null)            => true
+      case (null,             _)               => false
+      case (_,                null)            => false
       // StringValue.equals() throws (Saxon equality requires a collation)
-      case (v1: StringValue,  v2: StringValue) ⇒ v1.codepointEquals(v2)
-      case (v1: StringValue,  v2 )             ⇒ false
-      case (v1,               v2: StringValue) ⇒ false
+      case (v1: StringValue,  v2: StringValue) => v1.codepointEquals(v2)
+      case (v1: StringValue,  v2 )             => false
+      case (v1,               v2: StringValue) => false
       // AtomicValue.equals() may throw (Saxon changes the standard equals() contract)
-      case (v1: AtomicValue,  v2: AtomicValue) ⇒ v1 == v2
-      case (v1,               v2: AtomicValue) ⇒ false
-      case (v1: AtomicValue,  v2)              ⇒ false
+      case (v1: AtomicValue,  v2: AtomicValue) => v1 == v2
+      case (v1,               v2: AtomicValue) => false
+      case (v1: AtomicValue,  v2)              => false
       // NodeInfo
-      case (v1: NodeInfo,     v2: NodeInfo)    ⇒ v1 == v2
+      case (v1: NodeInfo,     v2: NodeInfo)    => v1 == v2
       // 2014-08-18: Checked Saxon class hierarchy
       // Saxon type hierarchy is closed (Item = NodeInfo | AtomicValue)
-      case _                                   ⇒ throw new IllegalStateException
+      case _                                   => throw new IllegalStateException
     }
 
   def buildNodePath(node: NodeInfo): List[String] = {
@@ -160,8 +164,8 @@ object SaxonUtils {
 
       val nodeTestForSameNode =
         node.getFingerprint match {
-          case -1 ⇒ NodeKindTest.makeNodeKindTest(node.getNodeKind)
-          case _  ⇒ new NameTest(node)
+          case -1 => NodeKindTest.makeNodeKindTest(node.getNodeKind)
+          case _  => new NameTest(node)
         }
 
       val precedingAxis =
@@ -185,9 +189,9 @@ object SaxonUtils {
       if (node ne null) {
         val parent = node.getParent
         node.getNodeKind match {
-          case Type.DOCUMENT ⇒
+          case Type.DOCUMENT =>
             Nil
-          case Type.ELEMENT ⇒
+          case Type.ELEMENT =>
             if (parent eq null) {
               List(buildNameTest(node))
             } else {
@@ -198,21 +202,21 @@ object SaxonUtils {
                 (buildNameTest(node) + '[' + findNodePosition(node) + ']') :: pre
               }
             }
-          case Type.ATTRIBUTE ⇒
+          case Type.ATTRIBUTE =>
             ("@" + buildNameTest(node)) :: buildOne(parent)
-          case Type.TEXT ⇒
+          case Type.TEXT =>
             ("text()[" + findNodePosition(node) + ']') :: buildOne(parent)
-          case Type.COMMENT ⇒
+          case Type.COMMENT =>
             "comment()[" + findNodePosition(node) + ']' :: buildOne(parent)
-          case Type.PROCESSING_INSTRUCTION ⇒
+          case Type.PROCESSING_INSTRUCTION =>
             ("processing-instruction()[" + findNodePosition(node) + ']') :: buildOne(parent)
-          case Type.NAMESPACE ⇒
+          case Type.NAMESPACE =>
             var test = node.getLocalPart
             if (test.isEmpty) {
               test = "*[not(local-name()]"
             }
             ("namespace::" + test) :: buildOne(parent)
-          case _ ⇒
+          case _ =>
             throw new IllegalArgumentException
         }
       } else {
@@ -225,14 +229,14 @@ object SaxonUtils {
 
   def convertJavaObjectToSaxonObject(o: Any): ValueRepresentation =
     o match {
-      case v: ValueRepresentation ⇒ v
-      case v: String              ⇒ new StringValue(v)
-      case v: java.lang.Boolean   ⇒ BooleanValue.get(v)
-      case v: java.lang.Integer   ⇒ new Int64Value(v.toLong)
-      case v: java.lang.Float     ⇒ new FloatValue(v)
-      case v: java.lang.Double    ⇒ new DoubleValue(v)
-      case v: URI                 ⇒ new AnyURIValue(v.toString)
-      case _                      ⇒ throw new OXFException(s"Invalid variable type: ${o.getClass}")
+      case v: ValueRepresentation => v
+      case v: String              => new StringValue(v)
+      case v: java.lang.Boolean   => BooleanValue.get(v)
+      case v: java.lang.Integer   => new Int64Value(v.toLong)
+      case v: java.lang.Float     => new FloatValue(v)
+      case v: java.lang.Double    => new DoubleValue(v)
+      case v: URI                 => new AnyURIValue(v.toString)
+      case _                      => throw new OXFException(s"Invalid variable type: ${o.getClass}")
     }
 
   // Return `true` iif `potentialAncestor` is an ancestor of `potentialDescendant`
@@ -248,5 +252,31 @@ object SaxonUtils {
       parent = parent.getParent
     }
     false
+  }
+
+  def deepCompare(
+    config                     : Configuration,
+    it1                        : Iterator[om.Item],
+    it2                        : Iterator[om.Item],
+    excludeWhitespaceTextNodes : Boolean
+  ): Boolean = {
+
+    // Do our own filtering of top-level items as Saxon's `DeepEqual` doesn't
+    def filterWhitespaceNodes(item: om.Item) = item match {
+      case n: om.NodeInfo => ! Whitespace.isWhite(n.getStringValueCS)
+      case _ => true
+    }
+
+    DeepEqual.deepEquals(
+      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it1 filter filterWhitespaceNodes else it1),
+      Implicits.asSequenceIterator(if (excludeWhitespaceTextNodes) it2 filter filterWhitespaceNodes else it2),
+      new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
+      config,
+      DeepEqual.INCLUDE_PREFIXES                  |
+        DeepEqual.INCLUDE_COMMENTS                |
+        DeepEqual.COMPARE_STRING_VALUES           |
+        DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS |
+        (if (excludeWhitespaceTextNodes) DeepEqual.EXCLUDE_WHITESPACE_TEXT_NODES else 0)
+    )
   }
 }

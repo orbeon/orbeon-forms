@@ -28,4 +28,5 @@ object UriScheme extends Enum[UriScheme] {
   case object Data   extends UriScheme
   case object Mailto extends UriScheme
   case object Oxf    extends UriScheme
+  case object Echo   extends UriScheme
 }

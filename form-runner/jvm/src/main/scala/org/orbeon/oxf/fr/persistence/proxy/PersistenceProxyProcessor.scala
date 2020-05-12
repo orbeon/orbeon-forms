@@ -87,13 +87,13 @@ private object PersistenceProxyProcessor {
   def proxyRequest(request: Request, response: Response): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
-      case FormPath(path, app, form, _)                ⇒ proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
-      case DataPath(path, app, form, _, _, filename)   ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, Some(filename), path)
-      case DataCollectionPath(path, app, form)         ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
-      case SearchPath(path, app, form)                 ⇒ proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
-      case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
-      case ReindexPath                                 ⇒ proxyReindex(request, response)
-      case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
+      case FormPath(path, app, form, _)                => proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
+      case DataPath(path, app, form, _, _, filename)   => proxyRequest               (request, response, app, form, FormOrData.Data, Some(filename), path)
+      case DataCollectionPath(path, app, form)         => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
+      case SearchPath(path, app, form)                 => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
+      case PublishedFormsMetadataPath(path, app, form) => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
+      case ReindexPath                                 => proxyReindex(request, response)
+      case _                                           => throw new OXFException(s"Unsupported path: $incomingPath")
     }
   }
 
@@ -114,14 +114,14 @@ private object PersistenceProxyProcessor {
     val requestContent = Connection.requiresRequestBody(request.getMethod) option {
 
       val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case Some(bodyURL) ⇒ NetUtils.uriToInputStream(bodyURL)
-        case None          ⇒ request.getInputStream
+        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
+        case None          => request.getInputStream
       }
 
       implicit val logger = new IndentedLogger(ProcessorImpl.logger)
       val (bodyInputStream, bodyContentLength) =
         FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
-          .getOrElse(requestInputStream → request.contentLengthOpt)
+          .getOrElse(requestInputStream -> request.contentLengthOpt)
 
       StreamedContent(
         bodyInputStream,
@@ -147,9 +147,9 @@ private object PersistenceProxyProcessor {
           val nonrelevantParamValue      = request.getFirstParamAsString(NonRelevantName)
           val requestedRelevanceHandling = nonrelevantParamValue.flatMap(RelevanceHandling.withNameLowercaseOnlyOption)
           requestedRelevanceHandling match {
-            case Some(Keep)      | None ⇒ None
-            case Some(Remove)           ⇒ Some(parsePruneAndSerializeXmlData _)
-            case Some(r @ Empty)        ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
+            case Some(Keep)      | None => None
+            case Some(Remove)           => Some(parsePruneAndSerializeXmlData _)
+            case Some(r @ Empty)        => throw new UnsupportedOperationException(s"${r.entryName}")
           }
         }
 
@@ -190,14 +190,14 @@ private object PersistenceProxyProcessor {
     val receiver = TransformerUtils.getIdentityTransformerHandler
     receiver.setResult(new StreamResult(os))
 
-    useAndClose(is) { is ⇒
-      useAndClose(os) { _ ⇒
+    useAndClose(is) { is =>
+      useAndClose(os) { _ =>
         XMLParsing.inputStreamToSAX(
           is,
           null,
           new ElementFilterXMLReceiver(
             xmlReceiver = receiver,
-            filter      = (_, _, _, atts) ⇒
+            filter      = (_, _, _, atts) =>
               atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
           ),
           XMLParsing.ParserConfiguration.PLAIN,
@@ -213,9 +213,9 @@ private object PersistenceProxyProcessor {
     serviceURI     : String,
     headers        : Map[String, String],
     response       : Response,
-    transforms     : List[(InputStream, OutputStream) ⇒ Unit]
+    transforms     : List[(InputStream, OutputStream) => Unit]
   ): Unit =
-    useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr ⇒
+    useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
       // Proxy status code
       response.setStatus(cxr.statusCode)
       // Proxy incoming headers
@@ -226,12 +226,12 @@ private object PersistenceProxyProcessor {
       def applyTransforms(
         startInputStream : InputStream,
         endOutputStream  : OutputStream,
-        transforms       : List[(InputStream, OutputStream) ⇒ Unit]
+        transforms       : List[(InputStream, OutputStream) => Unit]
       ): Unit = {
         transforms match {
-          case Nil                             ⇒ copyStream(startInputStream, endOutputStream)
-          case List(transform)                 ⇒ transform(startInputStream, endOutputStream)
-          case headTransform :: tailTransforms ⇒
+          case Nil                             => copyStream(startInputStream, endOutputStream)
+          case List(transform)                 => transform(startInputStream, endOutputStream)
+          case headTransform :: tailTransforms =>
             val intermediateOutputStream = new ByteArrayOutputStream
             headTransform(startInputStream, intermediateOutputStream)
             val intermediateInputStream = new ByteArrayInputStream(intermediateOutputStream.toByteArray)
@@ -261,8 +261,8 @@ private object PersistenceProxyProcessor {
       new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
 
     val persistenceHeaders =
-      for ((name, value) ← headers)
-      yield capitalizeCommonOrSplitHeader(name) → List(value)
+      for ((name, value) <- headers)
+      yield capitalizeCommonOrSplitHeader(name) -> List(value)
 
     // Forwards all incoming headers, with exceptions like connection headers and, importantly, cookie headers
     val proxiedHeaders =
@@ -272,7 +272,7 @@ private object PersistenceProxyProcessor {
 
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.withName(outgoingURL.getScheme),
+        url              = outgoingURL,
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,
         headersToForward = Set(),                                   // handled by proxyAndCapitalizeHeaders()
@@ -312,10 +312,10 @@ private object PersistenceProxyProcessor {
 
     val providers = {
       (app, form) match {
-        case (Some(appName), Some(formName)) ⇒
+        case (Some(appName), Some(formName)) =>
           // Get the specific provider for this app/form
           findProvider(appName, formName, FormOrData.Form).toList
-        case _ ⇒
+        case _ =>
           // Get providers independently from app/form
           // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
           getProviders(usableFor = FormOrData.Form)
@@ -326,14 +326,14 @@ private object PersistenceProxyProcessor {
 
     val allFormElements =
       for {
-        provider           ← providers
+        provider           <- providers
         (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
       } yield {
         // Read all the forms for the current service
         val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
         val cxr        = proxyEstablishConnection(request, None, serviceURI, headers)
 
-        ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+        ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
           val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
           forms descendant "forms" descendant "form"
         }
@@ -356,11 +356,11 @@ private object PersistenceProxyProcessor {
   ): Unit = {
     val dataProviders = getProviders(usableFor = FormOrData.Data)
     val dataProvidersWithIndexSupport =
-      dataProviders.filter { provider ⇒
+      dataProviders.filter { provider =>
         FormRunner.providerPropertyAsBoolean(provider, "reindex", default = false)
       }
     Backend.reindexingProviders(
-      dataProvidersWithIndexSupport, p ⇒ {
+      dataProvidersWithIndexSupport, p => {
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
         proxyRequest(request, None, serviceURI, headers, response, Nil)
@@ -383,7 +383,7 @@ private object PersistenceProxyProcessor {
   def getProviders(usableFor: FormOrData): List[String] = {
     val propertySet = Properties.instance.getPropertySet
     propertySet.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
-      .filter (propName ⇒ propName.endsWith(".*") ||
+      .filter (propName => propName.endsWith(".*") ||
                           propName.endsWith(s".${usableFor.entryName}"))
       .flatMap(propertySet.getNonBlankString)
       .distinct

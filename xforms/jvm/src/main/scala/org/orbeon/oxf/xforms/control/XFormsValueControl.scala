@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
-import org.orbeon.saxon.om.ValueRepresentation
+import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -129,7 +129,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       throw new OXFException("operation not allowed")
 
   // Subclasses can override this to translate the incoming external value
-  def translateExternalValue(externalValue: String): Option[String] = Option(externalValue)
+  def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = Option(externalValue)
 
   // Set the external value into the instance
   final def doStoreExternalValue(externalValue: String): Unit = {
@@ -137,19 +137,18 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // about this? See: https://github.com/orbeon/orbeon-forms/issues/13
 
     boundNodeOpt match {
-      case None ⇒
+      case None =>
         // This should not happen
         throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
-      case Some(boundNode) ⇒
-        translateExternalValue(externalValue) foreach { translatedValue ⇒
+      case Some(boundNode) =>
+        translateExternalValue(boundNode, externalValue) foreach { translatedValue =>
           DataModel.setValueIfChangedHandleErrors(
-            containingDocument = containingDocument,
-            eventTarget        = this,
-            locationData       = getLocationData,
-            nodeInfo           = boundNode,
-            valueToSet         = translatedValue,
-            source             = "client",
-            isCalculate        = false
+            eventTarget  = this,
+            locationData = getLocationData,
+            nodeInfo     = boundNode,
+            valueToSet   = translatedValue,
+            source       = "client",
+            isCalculate  = false
           )
         }
     }
@@ -204,9 +203,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       )
 
     for {
-      typeName ← getBuiltinTypeNameOpt
-      format   ← containingDocument.getTypeOutputFormat(typeName)
-      value    ← evaluateFormat(format)
+      typeName <- getBuiltinTypeNameOpt
+      format   <- containingDocument.getTypeOutputFormat(typeName)
+      value    <- evaluateFormat(format)
     } yield
       value
   }
@@ -270,10 +269,10 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   ): Boolean =
     handleExternalValue && (
       previousControl match {
-        case Some(other: XFormsValueControl) ⇒
+        case Some(other: XFormsValueControl) =>
           previousExternalValue == other.externalValueOpt &&
           super.compareExternalUseExternalValue(previousExternalValue, previousControl)
-        case _ ⇒ false
+        case _ => false
       }
     )
 
@@ -303,7 +302,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
     previousControl : Option[XFormsValueControl],
-    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
   ): Unit = {
 
@@ -313,7 +312,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     val hasNestedContent =
       content.isDefined || hasNestedValueContent
 
-    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+    val outputNestedContent = (ch: XMLReceiverHelper) => {
 
       content foreach (_(ch))
 
@@ -342,16 +341,16 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   ): Unit =
     if (previousControl.isEmpty && ! isStaticReadonly) {
       for {
-        (lhha, attName)          ← ControlAjaxSupport.LhhaWithAriaAttName
-        value                    ← ControlAjaxSupport.findAriaBy(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
-        ariaByControlEffectiveId ← findAriaByControlEffectiveId
+        (lhha, attName)          <- ControlAjaxSupport.LhhaWithAriaAttName
+        value                    <- ControlAjaxSupport.findAriaBy(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
+        ariaByControlEffectiveId <- findAriaByControlEffectiveId
       } locally {
         ControlAjaxSupport.outputAttributeElement(
           previousControl,
           this,
           ariaByControlEffectiveId,
           attName,
-          _ ⇒ value
+          _ => value
         )(ch, containingDocument)
       }
     }
@@ -375,16 +374,16 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case xxformsValue: XXFormsValueEvent ⇒ storeExternalValue(xxformsValue.value)
-    case _ ⇒ super.performDefaultAction(event)
+    case xxformsValue: XXFormsValueEvent => storeExternalValue(xxformsValue.value)
+    case _ => super.performDefaultAction(event)
   }
 
-  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit =
+  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: => Unit): Unit =
     super.toXML(helper, attributes) {
       helper.text(getExternalValue())
     }
 
-  override def writeMIPs(write: (String, String) ⇒ Unit): Unit = {
+  override def writeMIPs(write: (String, String) => Unit): Unit = {
     super.writeMIPs(write)
 
     if (isRequired)
@@ -403,7 +402,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
       val control2IsEmptyValue = control2.isEmptyValue
 
-      if (control1Opt.isEmpty || control1Opt.exists(control1 ⇒ ! control1.isRequired || control1.isEmptyValue != control2IsEmptyValue)) {
+      if (control1Opt.isEmpty || control1Opt.exists(control1 => ! control1.isRequired || control1.isEmptyValue != control2IsEmptyValue)) {
         attributesImpl.addAttribute("", "empty", "empty", XMLReceiverHelper.CDATA, control2IsEmptyValue.toString)
         added = true
       }
@@ -418,11 +417,11 @@ object XFormsValueControl {
   val FormatNamespaceMapping =
     NamespaceMapping(
       Map(
-        XSD_PREFIX           → XSD_URI,
-        XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
-        XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
-        XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
-        XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
-        EXFORMS_PREFIX       → EXFORMS_NAMESPACE_URI
+        XSD_PREFIX           -> XSD_URI,
+        XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
+        XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,
+        XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
+        XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
+        EXFORMS_PREFIX       -> EXFORMS_NAMESPACE_URI
       ).asJava)
 }

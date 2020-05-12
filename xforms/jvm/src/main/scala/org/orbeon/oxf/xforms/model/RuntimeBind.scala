@@ -19,7 +19,7 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 class RuntimeBind(
   val model           : XFormsModel,
@@ -39,12 +39,12 @@ class RuntimeBind(
     // NOTE: This should probably go into XFormsContextStack
     val bindingContext = contextStack.getCurrentBindingContext
 
-    import java.{util ⇒ ju}
+    import java.{util => ju}
 
     // @ref can be missing and defaults to the context item
     val items: ju.List[Item] =
       if (bindingContext.newBind)
-        // Case where a @ref attribute is present → a current nodeset is therefore available
+        // Case where a @ref attribute is present -> a current nodeset is therefore available
         bindingContext.nodeset
       else {
         // Case where of missing @ref attribute (it is optional in XForms 1.1 and defaults to the context item)
@@ -61,7 +61,7 @@ class RuntimeBind(
     // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
     // the Single Node Binding or Node Set Binding"
     if (isSingleNodeContext)
-      binds.singleNodeContextBinds += staticBind.staticId → this
+      binds.singleNodeContextBinds += staticBind.staticId -> this
 
     val itemsAsScala = items.asScala
     val itemsSize    = itemsAsScala.size
@@ -78,7 +78,7 @@ class RuntimeBind(
 
           // Iterate over nodeset and produce child iterations
           var currentPosition = 1
-          for (item ← itemsAsScala) {
+          for (item <- itemsAsScala) {
             contextStack.pushIteration(currentPosition)
 
             // Create iteration and remember it
@@ -93,13 +93,13 @@ class RuntimeBind(
 
             result += currentBindIteration
 
-            // Create mapping context item → iteration
+            // Create mapping context item -> iteration
             // NOTE: There might already be a mapping.
             // NOTE: Indexing nodes is probably not efficient with Dom4j, as nodes don't implement hashCode!
             // 2017-10-19:We have our own DOM, can we improve on this?
             if (! childrenBindsHaveSingleNodeContext) {
               val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)
-              binds.iterationsForContextItem += item → (currentBindIteration :: existingIterations)
+              binds.iterationsForContextItem += item -> (currentBindIteration :: existingIterations)
             }
 
             contextStack.popBinding
@@ -110,7 +110,7 @@ class RuntimeBind(
           // No children binds, but we have MIPs, so create holders too
           val result = new m.ArrayBuffer[BindNode](itemsSize)
           var currentPosition = 1
-          for (item ← itemsAsScala) {
+          for (item <- itemsAsScala) {
             result += new BindNode(this, currentPosition, item)
             currentPosition += 1
           }
@@ -125,16 +125,16 @@ class RuntimeBind(
     (items, bindNodes)
   }
 
-  def applyBinds(fn: BindNode ⇒ Unit): Unit =
+  def applyBinds(fn: BindNode => Unit): Unit =
     if (bindNodes.nonEmpty)
-      for (bindNode ← bindNodes) {
+      for (bindNode <- bindNodes) {
         // Handle current node
         fn(bindNode)
 
         // Handle children binds if any
         bindNode match {
-          case iteration: BindIteration ⇒ iteration.applyBinds(fn)
-          case _ ⇒
+          case iteration: BindIteration => iteration.applyBinds(fn)
+          case _ =>
         }
       }
 

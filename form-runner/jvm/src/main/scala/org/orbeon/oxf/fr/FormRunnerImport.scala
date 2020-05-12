@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.joda.time.format.ISODateTimeFormat
-import org.orbeon.oxf.fr.excel.ExcelDateUtils
+import org.orbeon.oxf.fr.excel.{ExcelDateUtils, NumberToTextConverter}
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.StringUtils._
 
@@ -37,7 +37,7 @@ object FormRunnerImport {
   def convertDateTime(value: String, formatTypeString: String, use1904windowing: Boolean): String = {
 
     val dateOpt =
-      Try(value.toDouble).toOption flatMap { double ⇒
+      Try(value.toDouble).toOption flatMap { double =>
         ExcelDateUtils.getJavaDate(
           date             = double,
           use1904windowing = use1904windowing,
@@ -51,10 +51,10 @@ object FormRunnerImport {
 
     def formatter =
       formatType match {
-        case FormatType.DateTime ⇒ DateTimeFormatter
-        case FormatType.Date     ⇒ DateFormatter
-        case FormatType.Time     ⇒ TimeFormatter
-        case FormatType.Other    ⇒ throw new IllegalArgumentException(formatTypeString)
+        case FormatType.DateTime => DateTimeFormatter
+        case FormatType.Date     => DateFormatter
+        case FormatType.Time     => TimeFormatter
+        case FormatType.Other    => throw new IllegalArgumentException(formatTypeString)
       }
 
     def removeTrailingZIfPresent(s: String) =
@@ -62,8 +62,8 @@ object FormRunnerImport {
 
     def removeTrailingMillisIfPresent(s: String) =
       formatType match {
-        case FormatType.DateTime | FormatType.Time ⇒ s.trimSuffixIfPresent(".000")
-        case _ ⇒ s
+        case FormatType.DateTime | FormatType.Time => s.trimSuffixIfPresent(".000")
+        case _ => s
       }
 
     dateOpt                         map
@@ -72,4 +72,8 @@ object FormRunnerImport {
       removeTrailingZIfPresent      map
       removeTrailingMillisIfPresent orNull
   }
+
+  // https://github.com/orbeon/orbeon-forms/issues/4452
+  def convertNumber(value: String): String =
+    Try(NumberToTextConverter.toText(value.toDouble)).toOption.getOrElse(value)
 }

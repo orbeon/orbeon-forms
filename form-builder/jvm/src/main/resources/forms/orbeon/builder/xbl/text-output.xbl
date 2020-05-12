@@ -25,6 +25,15 @@
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
             <display-name lang="sv">Beräknat värde</display-name>
             <display-name lang="pt" todo="true">Saída de Texto</display-name>
+            <appearance-display-name lang="en">Use default</appearance-display-name>
+            <appearance-display-name lang="es" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="fr">Défaut</appearance-display-name>
+            <appearance-display-name lang="ru" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="de" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="it" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="nl" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="sv" todo="true">[Use default]</appearance-display-name>
+            <appearance-display-name lang="pt" todo="true">[Use default]</appearance-display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
             </icon>
@@ -52,6 +61,15 @@
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
             <display-name lang="sv" todo="true">Beräknat värde</display-name>
             <display-name lang="pt" todo="true">Saída de Texto</display-name>
+            <appearance-display-name lang="en">With border</appearance-display-name>
+            <appearance-display-name lang="es" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="fr">Avec bord</appearance-display-name>
+            <appearance-display-name lang="ru" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="de" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="it" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="nl" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="sv" todo="true">[With border]</appearance-display-name>
+            <appearance-display-name lang="pt" todo="true">[With border]</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>
@@ -80,6 +98,15 @@
             <display-name lang="nl" todo="true">Calculated Value Without Border</display-name>
             <display-name lang="sv" todo="true">Calculated Value Without Border</display-name>
             <display-name lang="pt" todo="true">Calculated Value Without Border</display-name>
+            <appearance-display-name lang="en">Without border</appearance-display-name>
+            <appearance-display-name lang="es" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="fr">Sans bord</appearance-display-name>
+            <appearance-display-name lang="ru" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="de" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="it" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="nl" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="sv" todo="true">[Without border]</appearance-display-name>
+            <appearance-display-name lang="pt" todo="true">[Without border]</appearance-display-name>
             <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calculator</icon-class>

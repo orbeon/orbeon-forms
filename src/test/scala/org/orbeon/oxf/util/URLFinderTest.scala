@@ -13,43 +13,46 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
+
 import scala.collection.compat._
 
-class URLFinderTest extends AssertionsForJUnit {
+
+class URLFinderTest extends AnyFunSpecLike {
 
   import URLFinder._
 
-  @Test def testFindURLs(): Unit = {
+  describe("The `findURLs` function") {
 
     val expected = List(
-      """www.google.com"""                                           → List("""www.google.com"""),
-      """http://www.google.com"""                                    → List("""http://www.google.com"""),
-      """https://www.google.com"""                                   → List("""https://www.google.com"""),
-      """http://www.google.com,"""                                   → List("""http://www.google.com"""),
-      """http://www.google.com."""                                   → List("""http://www.google.com"""),
-      """http://www.google.com:"""                                   → List("""http://www.google.com"""),
-      """this (http://www.google.com) works"""                       → List("""http://www.google.com"""),
-      """this http://userid:password@example.com:8080/, works"""     → List("""http://userid:password@example.com:8080/"""),
-      """this http://223.255.255.254, works"""                       → List("""http://223.255.255.254"""),
-      """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" → List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
-      """naked google.com URL and another (http://twitter.com/)"""   → List("""google.com""", """http://twitter.com/"""),
-      """trailing / works too for google.com/."""                    → List("""google.com/"""),
-      """this info@orbeon.com works"""                               → List("""info@orbeon.com"""),
-      """this info@orbeon.com@ works"""                              → Nil,
-      """this (info@orbeon.com) works"""                             → List("""info@orbeon.com"""),
-      """this (info@orbeon.com, ada.lovelace@london.uk) works"""     → List("""info@orbeon.com""", """ada.lovelace@london.uk"""),
-      """this (INFO@ORBEON.COM) works"""                             → List("""INFO@ORBEON.COM"""),
-      """this info@orbeon.com/ works"""                              → List("""info@orbeon.com"""),
-      """this mailto:info@orbeon.com works"""                        → List("""info@orbeon.com""")
+      """www.google.com"""                                           -> List("""www.google.com"""),
+      """http://www.google.com"""                                    -> List("""http://www.google.com"""),
+      """https://www.google.com"""                                   -> List("""https://www.google.com"""),
+      """http://www.google.com,"""                                   -> List("""http://www.google.com"""),
+      """http://www.google.com."""                                   -> List("""http://www.google.com"""),
+      """http://www.google.com:"""                                   -> List("""http://www.google.com"""),
+      """this (http://www.google.com) works"""                       -> List("""http://www.google.com"""),
+      """this http://userid:password@example.com:8080/, works"""     -> List("""http://userid:password@example.com:8080/"""),
+      """this http://223.255.255.254, works"""                       -> List("""http://223.255.255.254"""),
+      """this http://foo.bar/?q=Test%20URL-encoded%20stuff, works""" -> List("""http://foo.bar/?q=Test%20URL-encoded%20stuff"""),
+      """naked google.com URL and another (http://twitter.com/)"""   -> List("""google.com""", """http://twitter.com/"""),
+      """trailing / works too for google.com/."""                    -> List("""google.com/"""),
+      """this info@orbeon.com works"""                               -> List("""info@orbeon.com"""),
+      """this info@orbeon.com@ works"""                              -> Nil,
+      """this (info@orbeon.com) works"""                             -> List("""info@orbeon.com"""),
+      """this (info@orbeon.com, ada.lovelace@london.uk) works"""     -> List("""info@orbeon.com""", """ada.lovelace@london.uk"""),
+      """this (INFO@ORBEON.COM) works"""                             -> List("""INFO@ORBEON.COM"""),
+      """this info@orbeon.com/ works"""                              -> List("""info@orbeon.com"""),
+      """this mailto:info@orbeon.com works"""                        -> List("""info@orbeon.com""")
     )
 
-    for ((in, out) ← expected)
-      assert(out === findURLs(in).to(List))
+    it("must find all the URLs") {
+      for ((in, out) <- expected)
+        assert(out == findURLs(in).to(List))
+    }
   }
 
-  @Test def testReplaceURLs(): Unit = {
+  describe("The `replaceURLs` function ") {
 
     val input =
       """- Music is an art (https://en.wikipedia.org/wiki/Art).
@@ -75,23 +78,27 @@ class URLFinderTest extends AssertionsForJUnit {
         |- <a href="http://d1api.com/">d1api.com/</a>&quot;,k
         |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
-    assert(expected === replaceURLs(input, replaceWithHyperlink))
+    it("must replace all the URLs") {
+      assert(expected == replaceURLs(input, replaceWithHyperlink))
+    }
   }
 
-  @Test def testEmail(): Unit = {
+  describe("The `isEmail` function ") {
 
     val expected = List(
-      """www.google.com"""         → false,
-      """info@orbeon.com"""        → true,
-      """info@orbeon.com@"""       → false,
-      """(info@orbeon.com)"""      → false,
-      """ada.lovelace@london.uk""" → true,
-      """INFO@ORBEON.COM"""        → true,
-      """info@orbeon.com/"""       → false,
-      """mailto:info@orbeon.com""" → false
+      """www.google.com"""         -> false,
+      """info@orbeon.com"""        -> true,
+      """info@orbeon.com@"""       -> false,
+      """(info@orbeon.com)"""      -> false,
+      """ada.lovelace@london.uk""" -> true,
+      """INFO@ORBEON.COM"""        -> true,
+      """info@orbeon.com/"""       -> false,
+      """mailto:info@orbeon.com""" -> false
     )
 
-    for ((in, out) ← expected)
-      assert(out === isEmail(in))
+    it("must pass all") {
+      for ((in, out) <- expected)
+        assert(out == isEmail(in))
+    }
   }
 }

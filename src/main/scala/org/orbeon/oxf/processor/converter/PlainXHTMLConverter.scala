@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.converter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI ⇒ HtmlURI}
+import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => HtmlURI}
 import org.orbeon.oxf.xml.{PlainHTMLOrXHTMLReceiver, XMLReceiver}
 
 // Perform the following transformation on the input document:
@@ -37,7 +37,7 @@ class PlainXHTMLConverter extends Converter(HtmlURI)
 
 abstract class Converter(targetURI: String) extends ProcessorImpl {
 
-  self ⇒
+  self =>
 
   addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
@@ -46,8 +46,8 @@ abstract class Converter(targetURI: String) extends ProcessorImpl {
     addOutput(outputName, new CacheableTransformerOutputImpl(self, outputName) {
       def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
         readInputAsSAX(
-          pipelineContext, 
-          ProcessorImpl.INPUT_DATA, 
+          pipelineContext,
+          ProcessorImpl.INPUT_DATA,
           new PlainHTMLOrXHTMLReceiver(targetURI, xmlReceiver)
         )
     })

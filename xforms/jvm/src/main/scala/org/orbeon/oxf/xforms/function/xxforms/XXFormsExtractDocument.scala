@@ -35,11 +35,11 @@ class XXFormsExtractDocument extends XFormsFunction {
 
     val rootElement =
       item match {
-        case virtualNode: VirtualNode ⇒
+        case virtualNode: VirtualNode =>
           virtualNode.getUnderlyingNode.asInstanceOf[Element]
-        case nodeInfo: NodeInfo ⇒
+        case nodeInfo: NodeInfo =>
           TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
-        case _ ⇒ return null
+        case _ => return null
       }
 
     Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false, removeInstanceData = true)

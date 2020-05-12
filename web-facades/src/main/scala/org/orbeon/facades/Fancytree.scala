@@ -11,7 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.xbl
+package org.orbeon.facades
 
 import org.scalajs.jquery.JQueryPromise
 
@@ -63,7 +63,7 @@ object FancytreeJsonNode {
     result.title = label
     result.key   = value
 
-    childrenOrUndef foreach { children ⇒
+    childrenOrUndef foreach { children =>
       result.folder   = true
       result.children = children
     }
@@ -71,7 +71,7 @@ object FancytreeJsonNode {
     if (open)
       result.expanded = true
 
-    classesOrUndef foreach { classes ⇒
+    classesOrUndef foreach { classes =>
       result.extraClasses = classes
     }
 

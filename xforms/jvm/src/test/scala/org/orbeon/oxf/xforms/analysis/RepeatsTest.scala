@@ -80,22 +80,22 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
     assert(document.getStaticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
 
     val repeatAncestors = Map(
-      "department" → Seq(),
-      "employee"   → Seq("repeat-department"),
-      "office"     → Seq("repeat-department"),
-      "building"   → Seq()
+      "department" -> Seq(),
+      "employee"   -> Seq("repeat-department"),
+      "office"     -> Seq("repeat-department"),
+      "building"   -> Seq()
     )
 
     // Test ancestors of repeat controls
     for {
-      (name, ancestors) ← repeatAncestors
+      (name, ancestors) <- repeatAncestors
       id = "repeat-" + name
     } yield
       assert(document.getStaticOps.getAncestorRepeatIds(id) === ancestors)
 
     // Test ancestors of other controls and actions
     for {
-      id ← Seq("my-output", "action1", "action2")
+      id <- Seq("my-output", "action1", "action2")
     } yield
       assert(document.getStaticOps.getAncestorRepeatIds(id) === Seq("repeat-employee", "repeat-department"))
 

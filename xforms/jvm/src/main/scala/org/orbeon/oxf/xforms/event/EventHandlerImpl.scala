@@ -14,20 +14,21 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.{Logging, Modifier}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, Modifier}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.xforms.{EventNames, XFormsId}
 
 import scala.util.control.NonFatal
+
 
 /**
  * XForms (or just plain XML Events) event handler implementation.
@@ -50,19 +51,18 @@ class EventHandlerImpl(
 ) with EventHandler
   with Logging {
 
-  self: ActionTrait ⇒
+  self: ActionTrait =>
 
   import EventHandlerImpl._
 
-  // NOTE: We check attributes in the ev:* or no namespace. We don't need to handle attributes in the xbl:* namespace.
-  private def att(name: QName)               : String         = element.attributeValue(name)
-  private def attOption(name: QName)         : Option[String] = element.attributeValueOpt(name)
-  // TODO: no null
-  private def att(name1: QName, name2: QName)          =  attOption(name1) orElse attOption(name2) orNull
+  // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
+  private def att   (name: QName)               : String         = element.attributeValue(name)
+  private def attOpt(name: QName)               : Option[String] = element.attributeValueOpt(name)
+  private def attOpt(name1: QName, name2: QName): Option[String] = attOpt(name1) orElse attOpt(name2)
 
   // These are only relevant when listening to keyboard events
-  val keyText      : Option[String] = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
+  val keyText      : Option[String] = attOpt(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOpt(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
 
   val eventNames: Set[String] = {
 
@@ -74,8 +74,8 @@ class EventHandlerImpl(
     // as modifiers require `keydown` in browsers.
     if (keyModifiers.nonEmpty)
       names map {
-        case EventNames.KeyPress ⇒ EventNames.KeyDown
-        case other               ⇒ other
+        case EventNames.KeyPress => EventNames.KeyDown
+        case other               => other
       }
     else
       names
@@ -88,23 +88,35 @@ class EventHandlerImpl(
     else
       (eventNames, false)
 
-   // Q: is this going to be eliminated as a field?
-  private val phaseAtt = att(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME)
+  val (
+    isCapturePhaseOnly: Boolean,
+    isTargetPhase     : Boolean,
+    isBubblingPhase   : Boolean
+  ) = {
+    val phaseAsSet = attOpt(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME).toSet
 
-  val isCapturePhaseOnly     = phaseAtt == "capture"
-  val isTargetPhase          = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
-  val isBubblingPhase        = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
-  // "true" means "continue", "false" means "stop"
-  val isPropagate            = att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) != "stop"
-  // "true" means "perform", "false" means "cancel"
-  val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
+    val capture  = phaseAsSet("capture")
+    val target   = phaseAsSet.isEmpty || phaseAsSet.exists(TargetPhaseTestSet)
+    val bubbling = phaseAsSet.isEmpty || phaseAsSet.exists(BubblingPhaseTestSet)
 
-  val isPhantom       = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
-  val isIfNonRelevant = attOption(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
+    (capture, target, bubbling)
+  }
 
-  assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
+  val propagate: Propagate =
+    if (attOpt(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) contains "stop")
+      Propagate.Stop
+    else
+      Propagate.Continue
 
-  val isXBLHandler = element.getQName == XBL_HANDLER_QNAME
+  val isPerformDefaultAction: Perform =
+    if (attOpt(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) contains "cancel")
+      Perform.Cancel
+    else
+      Perform.Perform
+
+  val isPhantom             : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
+  val isIfNonRelevant       : Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
+  val isXBLHandler          : Boolean = element.getQName == XBL_HANDLER_QNAME
 
   // Observers and targets
 
@@ -113,8 +125,8 @@ class EventHandlerImpl(
   private var _targetPrefixedIds: Set[String] = _
 
   // Question: should we just point to the ElementAnalysis instead of using ids?
-  def observersPrefixedIds = _observersPrefixedIds
-  def targetPrefixedIds = _targetPrefixedIds
+  def observersPrefixedIds: Set[String] = _observersPrefixedIds
+  def targetPrefixedIds: Set[String] = _targetPrefixedIds
 
   // Analyze the handler
   def analyzeEventHandler(): Unit = {
@@ -124,16 +136,16 @@ class EventHandlerImpl(
     assert(_targetPrefixedIds eq null)
 
     // Logging
-    implicit val logger = staticStateContext.partAnalysis.getIndentedLogger
+    implicit val logger: IndentedLogger = staticStateContext.partAnalysis.getIndentedLogger
 
     def unknownTargetId(id: String) = {
-      warn("unknown id", Seq("id" → id))
+      warn("unknown id", Seq("id" -> id))
       Set.empty[String]
     }
 
     def ignoringHandler(attName: String) = {
       warn(attName + " attribute present but does not refer to at least one valid id, ignoring event handler",
-         Seq("element" → Dom4jUtils.elementToDebugString(element)))
+         Seq("element" -> Dom4jUtils.elementToDebugString(element)))
       Set.empty[String]
     }
 
@@ -141,7 +153,7 @@ class EventHandlerImpl(
     type TokenResolver = PartialFunction[String, Set[String]]
 
     val staticIdResolver: TokenResolver = {
-      case id ⇒
+      case id =>
         val prefixedId = scope.prefixedIdForStaticId(id)
         if (prefixedId ne null)
           Set(prefixedId)
@@ -153,10 +165,10 @@ class EventHandlerImpl(
 
     // Resolve a token starting with a hash (#)
     val observerHashResolver: TokenResolver = {
-      case ObserverIsPrecedingSibling ⇒
+      case ObserverIsPrecedingSibling =>
         preceding match {
-          case Some(p) ⇒ Set(p.prefixedId)
-          case None    ⇒ unknownTargetId(ObserverIsPrecedingSibling)
+          case Some(p) => Set(p.prefixedId)
+          case None    => unknownTargetId(ObserverIsPrecedingSibling)
         }
     }
 
@@ -175,11 +187,11 @@ class EventHandlerImpl(
           observersPrefixedIdsAndHashes
         else
           parent collect {
-            case iteration: RepeatIterationControl ⇒
+            case iteration: RepeatIterationControl =>
               // Case where the handler doesn't have an explicit observer and is within a repeat
               // iteration. As of 2012-05-18, the handler observes the enclosing repeat container.
               Set(iteration.parent.get.prefixedId)
-            case parent: ElementAnalysis ⇒
+            case parent: ElementAnalysis =>
               // Case where the handler doesn't have an explicit observer. It observes its parent.
               Set(parent.prefixedId)
           } getOrElse Set.empty[String]
@@ -189,7 +201,7 @@ class EventHandlerImpl(
 
     // Resolve a token starting with a hash (#)
     val targetHashResolver: TokenResolver = {
-      case TargetIsObserver ⇒ observersPrefixedIds
+      case TargetIsObserver => observersPrefixedIds
     }
 
     // Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
@@ -229,7 +241,7 @@ class EventHandlerImpl(
       eventObserver match {
 
         // Observer is the XBL component itself but from the "inside"
-        case componentControl: XFormsComponentControl if isXBLHandler ⇒
+        case componentControl: XFormsComponentControl if isXBLHandler =>
 
           if (componentControl.canRunEventHandlers(event)) {
 
@@ -243,25 +255,25 @@ class EventHandlerImpl(
             (xblContainer, handlerEffectiveId, stack)
           } else {
             debug("ignoring event dispatched to non-relevant component control", List(
-              "name"       → event.name,
-              "control id" → componentControl.effectiveId)
+              "name"       -> event.name,
+              "control id" -> componentControl.effectiveId)
             )
             return
           }
 
         // Regular observer
-        case _ ⇒
+        case _ =>
 
           // Resolve the concrete handler
-          EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
-            case Some(concreteHandler) ⇒
+          EventHandlerImpl.resolveHandler(containingDocument, self, eventObserver, event.targetObject) match {
+            case Some(concreteHandler) =>
 
               val handlerContainer   = concreteHandler.container
               val handlerEffectiveId = concreteHandler.getEffectiveId
               val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
               (handlerContainer, handlerEffectiveId, stack)
-            case None ⇒
+            case None =>
               return
           }
       }
@@ -289,7 +301,7 @@ class EventHandlerImpl(
           _.runAction(self)
         }
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           // Something bad happened while running the action: dispatch error event to the root of the current scope
           // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
           // target. We thought about dispatching to the root control of the current scope, BUT in case the action
@@ -300,15 +312,15 @@ class EventHandlerImpl(
       }
     } else {
       debug("skipping non-relevant handler", List(
-        "event"        → event.name,
-        "observer"     → event.targetObject.getEffectiveId,
-        "handler name" → localName,
-        "handler id"   → handlerEffectiveId
+        "event"        -> event.name,
+        "observer"     -> event.targetObject.getEffectiveId,
+        "handler name" -> localName,
+        "handler id"   -> handlerEffectiveId
       ))
     }
   }
 
-  final def isMatchByName(eventName: String) =
+  final def isMatchByName(eventName: String): Boolean =
     isAllEvents || eventNames(eventName)
 
   // Match if no target id is specified, or if any specified target matches
@@ -316,24 +328,23 @@ class EventHandlerImpl(
     targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
 
   // Match both name and target
-  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String) =
+  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean =
     isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 }
 
 object EventHandlerImpl extends Logging {
 
   // Special observer id indicating that the observer is the preceding sibling control
-  val ObserverIsPrecedingSibling = "#preceding-sibling"
+  private val ObserverIsPrecedingSibling = "#preceding-sibling"
 
   // Special target id indicating that the target is the observer
-  val TargetIsObserver = "#observer"
+  private val TargetIsObserver = "#observer"
 
-  // Whether the element is an event handler (a known action element with @*:event)
-  def isEventHandler(element: Element) =
-    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
+  private val TargetPhaseTestSet   = Set("target", "default")
+  private val BubblingPhaseTestSet = Set("bubbling", "default")
 
   // Given a static handler, and concrete observer and target, try to find the concrete handler
-  def resolveHandler(
+  private def resolveHandler(
     containingDocument : XFormsContainingDocument,
     handler            : EventHandlerImpl,
     eventObserver      : XFormsEventTarget,
@@ -344,21 +355,40 @@ object EventHandlerImpl extends Logging {
       if (targetObject.scope == handler.scope) {
         // The scopes match so we can resolve the id relative to the target
         targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
-      } else if (handler.isPhantom) {
-        // Special case of a phantom handler
-        // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
+      } else if (handler.isPhantom && ! handler.isWithinRepeat) {
+        // Optimize for non-repeated phantom handler
         containingDocument.findObjectByEffectiveId(handler.prefixedId)
+      } else if (handler.isPhantom) {
+        // Repeated phantom handler
+
+        val zeroOrOneControl =
+          for {
+            controls           <- Option(containingDocument.getControls).toList
+            effectiveControlId <-
+              Controls.resolveControlsEffectiveIds(
+                containingDocument.getStaticOps,
+                controls.getCurrentControlTree,
+                targetObject.getEffectiveId,
+                handler.staticId,
+                followIndexes = true // so this will return 0 or 1 element
+              )
+            control            <- controls.findObjectByEffectiveId(effectiveControlId)
+          } yield
+            control
+
+        zeroOrOneControl.headOption
+
       } else {
         // See https://github.com/orbeon/orbeon-forms/issues/243
         warn(
           "skipping event in different scope (see issue #243)",
           List(
-            "target id"             → targetObject.getEffectiveId,
-            "handler id"            → handler.prefixedId,
-            "observer id"           → eventObserver.getEffectiveId,
-            "target scope"          → targetObject.scope.scopeId,
-            "handler scope"         → handler.scope.scopeId,
-            "observer scope"        → eventObserver.scope.scopeId
+            "target id"             -> targetObject.getEffectiveId,
+            "handler id"            -> handler.prefixedId,
+            "observer id"           -> eventObserver.getEffectiveId,
+            "target scope"          -> targetObject.scope.scopeId,
+            "handler scope"         -> handler.scope.scopeId,
+            "observer scope"        -> eventObserver.scope.scopeId
           ))(
           containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
         )
@@ -368,9 +398,13 @@ object EventHandlerImpl extends Logging {
     resolvedObject map (_.asInstanceOf[XFormsEventHandler])
   }
 
+  // Whether the element is an event handler (a known action element with @*:event)
+  def isEventHandler(element: Element): Boolean =
+    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
+
   def parseKeyModifiers(value: Option[String]): Set[Modifier] =
     value match {
-      case Some(attValue) ⇒ Modifier.parseStringToSet(attValue)
-      case None           ⇒ Set.empty[Modifier]
+      case Some(attValue) => Modifier.parseStringToSet(attValue)
+      case None           => Set.empty[Modifier]
     }
 }

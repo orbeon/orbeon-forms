@@ -43,7 +43,7 @@ class ClipboardTest
   describe("Clipboard cut and paste") {
 
     it("Simple cut/paste must remove and restore the control, bind, holders, and resources") {
-      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -76,13 +76,13 @@ class ClipboardTest
     }
 
     val containerIds =
-      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
         findNestedContainers(ctx.bodyElem).to(List) map (_.id)
       }
 
-    containerIds foreach { containerId ⇒
+    containerIds foreach { containerId =>
       it(s"Must be able to cut and paste container `$containerId`") {
-        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
 
@@ -151,7 +151,7 @@ class ClipboardTest
       val RepeatedControl2 = "control-121"
       val SingleControl    = "control-21"
 
-      withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -213,7 +213,7 @@ class ClipboardTest
       val NestedGridId         = "grid-1-grid"
       val NestedRepeatedGridId = "grid12-grid"
 
-      withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 

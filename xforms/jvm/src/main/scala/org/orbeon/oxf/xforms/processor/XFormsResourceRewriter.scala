@@ -43,7 +43,7 @@ object XFormsResourceRewriter extends Logging {
     isMinimal    : Boolean)(implicit
     logger       : IndentedLogger
   ): Unit =
-    useAndClose(os) { _ ⇒
+    useAndClose(os) { _ =>
       if (isCSS)
         generateCSS(assetPaths, namespaceOpt, os, isMinimal)
       else
@@ -53,8 +53,8 @@ object XFormsResourceRewriter extends Logging {
     }
 
   private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Any] = {
-    case NonFatal(_) ⇒
-      error("could not read asset to aggregate", List("asset" → path))
+    case NonFatal(_) =>
+      error("could not read asset to aggregate", List("asset" -> path))
   }
 
   private def generateCSS(
@@ -86,11 +86,11 @@ object XFormsResourceRewriter extends Logging {
     // Use iterators so that we don't open all input streams at once
     def inputStreamIterator =
       for {
-        asset ← assetPaths.iterator
+        asset <- assetPaths.iterator
         path  = asset.assetPath(isMinimal)
-        is    ← tryInputStream(path).iterator
+        is    <- tryInputStream(path).iterator
       } yield
-        path → is
+        path -> is
 
     def tryReadCSS(path: String, is: InputStream) =
       Try {
@@ -102,21 +102,21 @@ object XFormsResourceRewriter extends Logging {
 
     val readCSSIterator =
       for {
-        (path, is)  ← inputStreamIterator
-        originalCSS ← tryReadCSS(path, is).iterator
+        (path, is)  <- inputStreamIterator
+        originalCSS <- tryReadCSS(path, is).iterator
       } yield
-        path → originalCSS
+        path -> originalCSS
 
     val outputWriter = new OutputStreamWriter(os, CharsetNames.Utf8)
 
     // Output Orbeon Forms version if allowed
-    Version.versionStringIfAllowed foreach { version ⇒
+    Version.versionStringIfAllowed foreach { version =>
       outputWriter.write(s"/* This file was produced by $version */\n")
     }
 
     // Write and rewrite all resources one after the other
     readCSSIterator foreach {
-      case (path, originalCSS) ⇒
+      case (path, originalCSS) =>
         if (! isMinimal)
           outputWriter.write("/* Original CSS path: " + path + " */\n")
 
@@ -141,8 +141,8 @@ object XFormsResourceRewriter extends Logging {
 
     // Match and rewrite an id within a selector
     def rewriteSelector(s: String) = namespaceOpt match {
-      case Some(namespace) ⇒ MatchId.replaceAllIn(s, e ⇒ Matcher.quoteReplacement("#" + namespace + e.group(1)))
-      case None            ⇒ s
+      case Some(namespace) => MatchId.replaceAllIn(s, e => Matcher.quoteReplacement("#" + namespace + e.group(1)))
+      case None            => s
     }
 
     // Rewrite an individual URL
@@ -152,18 +152,18 @@ object XFormsResourceRewriter extends Logging {
         val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
         "url(" + rewrittenURI + ")"
       } recover {
-        case NonFatal(_) ⇒
-          warn("found invalid URI in CSS file", Seq("uri" → url))
+        case NonFatal(_) =>
+          warn("found invalid URI in CSS file", Seq("uri" -> url))
           "url(" + url + ")"
       }
 
     // Match and rewrite a URL within a block
     def rewriteBlock(s: String) =
-      MatchURL.replaceAllIn(s, e ⇒ Matcher.quoteReplacement(tryRewriteURL(e.group(2)).get))
+      MatchURL.replaceAllIn(s, e => Matcher.quoteReplacement(tryRewriteURL(e.group(2)).get))
 
     // Find approximately pairs of selectors/blocks and rewrite each part
     // Ids are rewritten only if the namespace is not empty
-    MatchSelectorAndBlock.replaceAllIn(css, e ⇒ Matcher.quoteReplacement(rewriteSelector(e.group(1)) + rewriteBlock(e.group(2))))
+    MatchSelectorAndBlock.replaceAllIn(css, e => Matcher.quoteReplacement(rewriteSelector(e.group(1)) + rewriteBlock(e.group(2))))
   }
 
   private def generateJS(
@@ -176,7 +176,7 @@ object XFormsResourceRewriter extends Logging {
     val outputWriter = new OutputStreamWriter(os, CharsetNames.Utf8)
 
     // Output Orbeon Forms version if allowed
-    Version.versionStringIfAllowed foreach { version ⇒
+    Version.versionStringIfAllowed foreach { version =>
       outputWriter.write(s"// This file was produced by $version\n")
       outputWriter.flush()
     }
@@ -188,7 +188,7 @@ object XFormsResourceRewriter extends Logging {
 
     // Use iterators so that we don't open all input streams at once
     def inputStreamIterator =
-      assetPaths.iterator flatMap (r ⇒ tryInputStream(r.assetPath(isMinimal)).iterator)
+      assetPaths.iterator flatMap (r => tryInputStream(r.assetPath(isMinimal)).iterator)
 
     // Write all resources one after the other
 
@@ -211,7 +211,7 @@ object XFormsResourceRewriter extends Logging {
 
     outputWriter.flush()
 
-    inputStreamIterator foreach { is ⇒
+    inputStreamIterator foreach { is =>
       useAndClose(is)(NetUtils.copyStream(_, os))
       os.write('\n')
     }

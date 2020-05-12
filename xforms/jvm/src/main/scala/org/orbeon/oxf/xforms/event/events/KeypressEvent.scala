@@ -55,11 +55,11 @@ object KeyboardEvent {
   private def filter(properties: PropertyGetter): PropertyGetter = new PropertyGetter {
     def isDefinedAt(name: String) = properties.isDefinedAt(name)
     def apply(name: String) = name match {
-      case KeyModifiersPropertyName ⇒ properties(name) collect { case value: String if isNotBlank(value) ⇒ value.trimAllToEmpty }
-      case KeyTextPropertyName      ⇒ properties(name) collect { case value: String if isNotEmpty(value) ⇒ value } // allow for e.g. " "
-      case _                        ⇒ properties(name)
+      case KeyModifiersPropertyName => properties(name) collect { case value: String if isNotBlank(value) => value.trimAllToEmpty }
+      case KeyTextPropertyName      => properties(name) collect { case value: String if isNotEmpty(value) => value } // allow for e.g. " "
+      case _                        => properties(name)
     }
   }
 
-  val StandardProperties: Map[String, List[String]] = KeyboardEvents map (_ → Properties) toMap
+  val StandardProperties: Map[String, List[String]] = KeyboardEvents map (_ -> Properties) toMap
 }

@@ -29,11 +29,11 @@ trait SingleNodeTrait extends ElementAnalysis {
   def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)
 
   val explicitValidation: Boolean = Option(element.attributeValue(XXFORMS_VALIDATION_MODE_QNAME)) match {
-    case Some("explicit") ⇒ true
-    case Some(_)          ⇒ false
-    case None             ⇒
+    case Some("explicit") => true
+    case Some(_)          => false
+    case None             =>
       ElementAnalysis.ancestorIterator(this) collectFirst
-        { case c: SingleNodeTrait ⇒ c.explicitValidation } getOrElse
+        { case c: SingleNodeTrait => c.explicitValidation } getOrElse
         false
   }
 }

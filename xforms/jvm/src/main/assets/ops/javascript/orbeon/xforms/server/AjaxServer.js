@@ -37,7 +37,7 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID, ignoreErrors) {
+    AjaxServer.handleResponseDom = function(responseXML, formID, ignoreErrors) {
 
         try {
             var responseRoot = responseXML.documentElement;
@@ -224,22 +224,7 @@
                                 });
 
                                 // Set content of select element
-                                if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-
-                                    // TODO: Check if this is still the case with IE11, the only version Orbeon Forms supports
-                                    // as of Orbeon Forms 2018.2.
-
-                                    // IE does not support setting the content of a select with innerHTML
-                                    // So we have to generate the whole select, and use outerHTML
-                                    YAHOO.util.Event.removeListener(select, "change");
-                                    var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
-                                    select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
-                                    // Get again control, as it has been re-created
-                                    documentElement.getElementsByTagName("select")[0];
-                                } else {
-                                    // Version for compliant browsers
-                                    select.innerHTML = sb.join("");
-                                }
+                                select.innerHTML = sb.join("");
 
                             } else {
 
@@ -1195,7 +1180,7 @@
                                     var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
                                     showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
                                     var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
-                                    discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
+                                    discardable = ! YAHOO.lang.isNull(discardable) && discardable == "true";
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
                                     if (delay == null) {
                                         // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of
@@ -1437,7 +1422,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                ORBEON.xforms.Page.getForm(formID).loadingIndicator.show();
+                ORBEON.xforms.Page.loadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
         } catch (e) {

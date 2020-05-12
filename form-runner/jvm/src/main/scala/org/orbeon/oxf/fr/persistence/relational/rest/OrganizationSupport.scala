@@ -42,16 +42,16 @@ object OrganizationSupport {
       val sql = {
 
         // Generate lists for each level of the organization
-        def perLevel(f: Int ⇒ List[String]): List[String] =
+        def perLevel(f: Int => List[String]): List[String] =
           organization
             .levels
             .zipWithIndex
-            .flatMap { case (_, pos) ⇒ f(pos + 1) }
+            .flatMap { case (_, pos) => f(pos + 1) }
 
-        val sqlFrom  = perLevel{pos ⇒
+        val sqlFrom  = perLevel{pos =>
           List(s"orbeon_organization o$pos")
         }.mkString(", ")
-        val sqlWhere = perLevel{pos ⇒
+        val sqlWhere = perLevel{pos =>
           // Join organization tables on id
           (pos > 1).list(s"o$pos.id = o${pos -1}.id") ++
           // Depth must match
@@ -63,12 +63,12 @@ object OrganizationSupport {
         s"SELECT o1.id FROM $sqlFrom WHERE $sqlWhere"
       }
 
-      useAndClose(connection.prepareStatement(sql)) { statement ⇒
-        organization.levels.zipWithIndex.foreach { case (name, pos) ⇒
+      useAndClose(connection.prepareStatement(sql)) { statement =>
+        organization.levels.zipWithIndex.foreach { case (name, pos) =>
             statement.setInt   (pos*2 + 1, organization.levels.length)
             statement.setString(pos*2 + 2, name)
         }
-        useAndClose(statement.executeQuery()) { resultSet ⇒
+        useAndClose(statement.executeQuery()) { resultSet =>
           val foundExistingOrganization = resultSet.next()
           foundExistingOrganization.option(resultSet.getInt("id"))
         }
@@ -80,17 +80,17 @@ object OrganizationSupport {
       existingOrganization.getOrElse(
         Provider
           .seqNextVal(connection, provider)
-          .kestrel { orgId ⇒
+          .kestrel { orgId =>
             organization
               .levels
               .zipWithIndex
-              .foreach { case (name, pos) ⇒
+              .foreach { case (name, pos) =>
                 val Sql =
                   """INSERT
                     |  INTO orbeon_organization (id, depth, pos, name)
                     |  VALUES                   (? , ?    , ?  , ?)
                     |  """.stripMargin
-                useAndClose(connection.prepareStatement(Sql)) { statement ⇒
+                useAndClose(connection.prepareStatement(Sql)) { statement =>
                   statement.setInt   (1, orgId)
                   statement.setInt   (2, organization.levels.length)
                   statement.setInt   (3, pos + 1)
@@ -112,16 +112,16 @@ object OrganizationSupport {
         |ORDER BY pos
         |""".stripMargin
 
-    useAndClose(connection.prepareStatement(Sql)) { statement ⇒
+    useAndClose(connection.prepareStatement(Sql)) { statement =>
       statement.setInt(1, id.underlying)
-      useAndClose(statement.executeQuery()) { resultSet ⇒
+      useAndClose(statement.executeQuery()) { resultSet =>
         val levels = Iterator.iterateWhile(
           resultSet.next(),
           resultSet.getString("name")
         ).toList
         levels match {
-          case Nil ⇒ None
-          case _   ⇒ Some(Organization(levels))
+          case Nil => None
+          case _   => Some(Organization(levels))
         }
       }
     }
@@ -137,7 +137,7 @@ object OrganizationSupport {
       None
     } else {
       val organizationOpt = OrganizationSupport.read(connection, OrganizationId(id))
-      organizationOpt.map(id → _)
+      organizationOpt.map(id -> _)
     }
   }
 

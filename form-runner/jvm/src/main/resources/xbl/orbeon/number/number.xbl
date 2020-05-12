@@ -128,7 +128,7 @@
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <prefix/>
                             <suffix/>
                             <decimal-separator/>
@@ -137,7 +137,7 @@
                             <round-when-formatting/>
                             <round-when-storing/>
                             <field-width/>
-                        </local>
+                        </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
@@ -149,7 +149,7 @@
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
-                        <resources>
+                        <_>
                             <resource xml:lang="en">
                                 <prefix>Prefix</prefix>
                                 <suffix>Suffix</suffix>
@@ -204,7 +204,7 @@
                                     <item id="5">Point (.)</item>
                                 </grouping-separators>
                             </resource>
-                        </resources>
+                        </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-number-grid">

@@ -52,15 +52,15 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     val requestTime = System.currentTimeMillis
 
     requestPath match {
-      case DynamicResourceRegex(_) ⇒
+      case DynamicResourceRegex(_) =>
         serveDynamicResource(requestPath)
-      case FormDynamicResourcesRegex(uuid) ⇒
+      case FormDynamicResourcesRegex(uuid) =>
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
         val fromCurrentStateOpt =
           // NOTE: Use the same timeout as upload for now. If the timeout expires, this throws an exception.
-          withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document ⇒
+          withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document =>
             document.initialClientScript
           }
 
@@ -80,36 +80,36 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
         )
 
-        useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer ⇒
-          fromCurrentStateOpt orElse fromInitialStateOpt foreach { content ⇒
+        useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+          fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
             writer.write(content)
           }
         }
 
-      case FormStaticResourcesRegex(staticStateDigest) ⇒
+      case FormStaticResourcesRegex(staticStateDigest) =>
 
         // Security consideration: Unlike in the dynamic case, where knowledge of the transient UUID is required, here we don't require
         // particular access rights to request the static state functions. This shouldn't be a problem, as what is returned is, in effect,
         // just a list of customer scripts which are either part of Form Runner, or part of XBL components. There is no form-specific
         // data returned. So this should be no different than having access to the combined JavaScript resource, for example.
 
-        XFormsStaticStateCache.findDocument(staticStateDigest) foreach { case (state, validity) ⇒
+        XFormsStaticStateCache.findDocument(staticStateDigest) foreach { case (state, validity) =>
 
           // NOTE: The validity is the time the static state was put in cache. We could do better by finding the last modified time
           // of the form definition, but that information is harder to obtain right now.
           response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
-          useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer ⇒
+          useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
             ScriptBuilder.writeScripts(
               state.topLevelPart.uniqueJsScripts,
               writer.write
             )
           }
         }
-      case ResourceRegex(hash, ext) ⇒
+      case ResourceRegex(hash, ext) =>
         serveCSSOrJavaScript(requestTime, hash, ext)
-      case _ ⇒
+      case _ =>
         response.setStatus(StatusCode.NotFound)
     }
   }
@@ -119,7 +119,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     val response = externalContext.getResponse
 
     findDynamicResource(requestPath) match {
-      case Some(resource) ⇒
+      case Some(resource) =>
 
         val digestFromPath = filename(requestPath)
 
@@ -147,9 +147,9 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         def addExtensionIfNeeded(filename: String) =
           findExtension(filename) match {
-            case Some(_) ⇒
+            case Some(_) =>
               filename
-            case None    ⇒
+            case None    =>
               Mediatypes.findExtensionForMediatype(resource.mediaType) map
               (filename + "." +)                                       getOrElse
               filename
@@ -178,16 +178,16 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
 
-          useAndClose(cxr.content.inputStream) { is ⇒
-            useAndClose(response.getOutputStream) { os ⇒
+          useAndClose(cxr.content.inputStream) { is =>
+            useAndClose(response.getOutputStream) { os =>
               copyStream(is, os)
             }
           }
         } catch {
-          case NonFatal(t) ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(t)))
+          case NonFatal(t) => warn("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
         }
 
-      case None ⇒
+      case None =>
         response.setStatus(StatusCode.NotFound)
     }
   }
@@ -202,7 +202,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
       if (cacheElement ne null) {
         // Mapping found
         val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
-        resourcesStrings map (r ⇒ AssetPath(r, hasMin = false))
+        resourcesStrings map (r => AssetPath(r, hasMin = false))
       } else {
         // Not found, either because the hash is invalid, or because the cache lost the mapping
         response.setStatus(StatusCode.NotFound)
@@ -241,7 +241,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
     }
 
-    debug("caching not requested, serving directly", Seq("request path" → externalContext.getRequest.getRequestPath))
+    debug("caching not requested, serving directly", Seq("request path" -> externalContext.getRequest.getRequestPath))
     XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
   }
 }
@@ -273,7 +273,7 @@ object XFormsAssetServer {
     lastModified     : Long,
     customHeaders    : Map[String, List[String]],
     headersToForward : Set[String],
-    getHeader        : String ⇒ Option[List[String]])(implicit
+    getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String = {
 
@@ -285,7 +285,7 @@ object XFormsAssetServer {
 
     // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
     // an absolute URI.
-    val serviceURI = new URI(
+    val serviceAbsoluteUrl = new URI(
       URLRewriterUtils.rewriteServiceURL(
         NetUtils.getExternalContext.getRequest,
         uri,
@@ -295,7 +295,7 @@ object XFormsAssetServer {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        scheme           = UriScheme.withName(serviceURI.getScheme),
+        url              = serviceAbsoluteUrl,
         hasCredentials   = false,
         customHeaders    = customHeaders,
         headersToForward = headersToForward,
@@ -306,7 +306,7 @@ object XFormsAssetServer {
       )
 
     val resource =
-      DynamicResource(serviceURI, filename, contentType, lastModified, outgoingHeaders)
+      DynamicResource(serviceAbsoluteUrl, filename, contentType, lastModified, outgoingHeaders)
 
     // Store mapping into session
     session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
@@ -317,7 +317,7 @@ object XFormsAssetServer {
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(uri: String, contentType: String) =
-    proxyURI(uri, None, Option(contentType), -1, Map(), Set(), _ ⇒ None)(null)
+    proxyURI(uri, None, Option(contentType), -1, Map(), Set(), _ => None)(null)
 
   // Try to remove a dynamic resource
   //
@@ -331,11 +331,11 @@ object XFormsAssetServer {
 
     implicit val externalContext = NetUtils.getExternalContext
 
-    findDynamicResource(requestPath) foreach { resource ⇒
-      externalContext.getRequest.sessionOpt foreach { session ⇒
+    findDynamicResource(requestPath) foreach { resource =>
+      externalContext.getRequest.sessionOpt foreach { session =>
 
         if (removeFile)
-          Try(new File(resource.uri)) foreach { file ⇒
+          Try(new File(resource.uri)) foreach { file =>
             file.delete()
           }
 
@@ -348,7 +348,7 @@ object XFormsAssetServer {
     requestPath     : String)(implicit
     externalContext : ExternalContext
   ): Option[DynamicResource] =
-    externalContext.getRequest.sessionOpt flatMap { session ⇒
+    externalContext.getRequest.sessionOpt flatMap { session =>
       val digestFromPath = filename(requestPath)
       val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 
@@ -400,7 +400,7 @@ object XFormsAssetServer {
       val incompleteMediatype = mediatypeOpt exists (_.endsWith("/*"))
 
       val contentType =
-        contentTypeOpt filterNot (_ ⇒ incompleteMediatype) getOrElse "application/octet-stream"
+        contentTypeOpt filterNot (_ => incompleteMediatype) getOrElse "application/octet-stream"
 
       DynamicResource(
         digest       = digest,

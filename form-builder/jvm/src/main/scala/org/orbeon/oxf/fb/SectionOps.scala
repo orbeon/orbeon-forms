@@ -22,11 +22,11 @@ import org.orbeon.scaxon.SimplePath._
 
 trait SectionOps extends ContainerOps {
 
-  self: GridOps ⇒ // funky dependency, to resolve at some point
+  self: GridOps => // funky dependency, to resolve at some point
 
   def deleteSectionByIdIfPossible(sectionId: String)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     findContainerById(sectionId) flatMap
-      (_ ⇒ deleteContainerById(canDeleteContainer, sectionId))
+      (_ => deleteContainerById(canDeleteContainer, sectionId))
 
   def moveSection(container: NodeInfo, direction: Direction)(implicit ctx: FormBuilderDocContext): Some[UndoAction] = {
 
@@ -34,10 +34,10 @@ trait SectionOps extends ContainerOps {
     val position  = FormBuilder.containerPosition(sectionId)
 
     direction match {
-      case Direction.Up    ⇒ moveSectionUp(container)
-      case Direction.Down  ⇒ moveSectionDown(container)
-      case Direction.Left  ⇒ moveSectionLeft(container)
-      case Direction.Right ⇒ moveSectionRight(container)
+      case Direction.Up    => moveSectionUp(container)
+      case Direction.Down  => moveSectionDown(container)
+      case Direction.Left  => moveSectionLeft(container)
+      case Direction.Right => moveSectionRight(container)
     }
 
     Some(MoveContainer(sectionId, direction, position))

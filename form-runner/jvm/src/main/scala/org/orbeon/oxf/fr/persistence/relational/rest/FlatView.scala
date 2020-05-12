@@ -34,8 +34,8 @@ private object FlatView {
   val MetadataPairs           =
     List("document_id", "created", "last_modified_time", "last_modified_by")
         .map(_.toUpperCase)
-        .map(col ⇒ Col(s"d.$col", s"METADATA_$col"))
-  val PrefixedMetadataColumns = MetadataPairs.map{case Col(_, colName) ⇒ colName}
+        .map(col => Col(s"d.$col", s"METADATA_$col"))
+  val PrefixedMetadataColumns = MetadataPairs.map{case Col(_, colName) => colName}
   val MaxNameLength           = 30
   val TablePrefix             = "ORBEON_F_"
 
@@ -61,7 +61,7 @@ private object FlatView {
               | WHERE table_name = ?
               |""".stripMargin
 
-        useAndClose(connection.prepareStatement(sqlQuery)) { ps ⇒
+        useAndClose(connection.prepareStatement(sqlQuery)) { ps =>
           // On PostgreSQL, the name is stored in lower case in `information_schema.views`
           ps.setString(1, if (req.provider == PostgreSQL) viewName.toLowerCase else viewName)
           useAndClose(ps.executeQuery())(_.next())
@@ -73,10 +73,10 @@ private object FlatView {
 
     // Compute columns in the view
     val cols = {
-      val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) ⇒
+      val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) =>
         val extractFunction = req.provider match {
-          case PostgreSQL ⇒ s"(xpath('/*/$path/text()', d.xml))[1]::text"
-          case _          ⇒ throw new UnsupportedOperationException
+          case PostgreSQL => s"(xpath('/*/$path/text()', d.xml))[1]::text"
+          case _          => throw new UnsupportedOperationException
         }
         Col(extractFunction, col)
       }
@@ -88,7 +88,7 @@ private object FlatView {
     locally {
       val query =
         s"""|CREATE VIEW $viewName AS
-            |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
+            |SELECT  ${cols map { case Col(col, name) => col + " " + name} mkString ", "}
             |  FROM  orbeon_form_data d,
             |        (
             |            SELECT   max(last_modified_time) last_modified_time,
@@ -137,25 +137,25 @@ private object FlatView {
       }
 
       node match {
-        case _ if isRepeat(node) ⇒
+        case _ if isRepeat(node) =>
           // Don't go into repeats, as we don't them yet for flat views
           Nil
-        case _ if IsSection(node) ⇒
+        case _ if IsSection(node) =>
           val sectionNames = outerSectionNames :+ controlNameFromId(node.id)
           collectFromChildren(sectionNames)
-        case _ if IsGrid(node) ⇒
+        case _ if IsGrid(node) =>
           collectFromChildren(outerSectionNames)
-        case _ if isSectionTemplateContent(node) ⇒
+        case _ if isSectionTemplateContent(node) =>
           xblMappings.get(node.uriQualifiedName) match {
-            case None ⇒
+            case None =>
               Nil
-            case Some(xblBindingNode) ⇒
+            case Some(xblBindingNode) =>
               val xblTemplate = xblBindingNode.rootElement.child(XBLTemplateTest).head
               collectFromNode(outerSectionNames, xblTemplate)
           }
-        case _ if isControl(node) ⇒
+        case _ if isControl(node) =>
           List(outerSectionNames :+ controlNameFromId(node.id))
-        case _ ⇒
+        case _ =>
           collectFromChildren(outerSectionNames)
       }
     }
@@ -169,12 +169,12 @@ private object FlatView {
     val seen = mutable.HashSet[String](PrefixedMetadataColumns: _*)
 
     for {
-      path: List[String]  ← paths
+      path: List[String]  <- paths
       sqlPath            = path map xmlToSQLId
       col                = joinParts(sqlPath, MaxNameLength)
       uniqueCol          = resolveDuplicate(col, MaxNameLength)(seen)
     } yield
-      path.mkString("/") → uniqueCol
+      path.mkString("/") -> uniqueCol
   }
 
   def resolveDuplicate(value: String, maxLength: Int)(seen: mutable.HashSet[String]): String = {

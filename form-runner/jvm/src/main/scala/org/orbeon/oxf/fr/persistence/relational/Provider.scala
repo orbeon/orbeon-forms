@@ -36,38 +36,38 @@ object Provider extends Enum[Provider] {
 
   def xmlCol(provider: Provider, tableName: String) =
     provider match {
-      case PostgreSQL ⇒ s"$tableName.xml as xml"
-      case _          ⇒ s"$tableName.xml xml"
+      case PostgreSQL => s"$tableName.xml as xml"
+      case _          => s"$tableName.xml xml"
     }
 
   def xmlContains(provider: Provider): String =
     provider match {
-      case MySQL      ⇒ "xml like ?"
-      case PostgreSQL ⇒ "xml::text ilike ?"
+      case MySQL      => "xml like ?"
+      case PostgreSQL => "xml::text ilike ?"
     }
 
   def xmlContainsParam(provider: Provider, param: String): String =
     provider match {
-      case MySQL | PostgreSQL ⇒ s"%$param%"
-      case _                  ⇒ param
+      case MySQL | PostgreSQL => s"%$param%"
+      case _                  => param
     }
 
   def textContains(provider: Provider, colName: String): String =
     provider match {
-      case MySQL ⇒
+      case MySQL =>
         // LIKE is case insensitive on MySQL and SQL Server
         s"$colName LIKE ?"
-      case PostgreSQL ⇒
+      case PostgreSQL =>
         // PostgreSQL has ILIKE as a case insensitive version of LIKE
         s"$colName ILIKE ?"
     }
 
   def readXmlColumn(provider: Provider, resultSet: ResultSet): DocumentInfo = {
     provider match {
-      case PostgreSQL ⇒
+      case PostgreSQL =>
         val xmlString = resultSet.getString("xml")
         TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, false)
-      case _ ⇒
+      case _ =>
         val dataClob = resultSet.getClob("xml")
         val source = new StreamSource(dataClob.getCharacterStream)
         TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
@@ -76,16 +76,16 @@ object Provider extends Enum[Provider] {
 
   def seqNextVal(connection: Connection, provider: Provider): Int = {
     val nextValSql = provider match {
-      case _ ⇒
+      case _ =>
         val insertSql = provider match {
-          case MySQL ⇒ "INSERT INTO orbeon_seq VALUES ()"
-          case _     ⇒ "INSERT INTO orbeon_seq DEFAULT VALUES"
+          case MySQL => "INSERT INTO orbeon_seq VALUES ()"
+          case _     => "INSERT INTO orbeon_seq DEFAULT VALUES"
         }
         useAndClose(connection.prepareStatement(insertSql))(_.executeUpdate())
         "SELECT max(val) FROM orbeon_seq"
     }
-    useAndClose(connection.prepareStatement(nextValSql)){ statement ⇒
-      useAndClose(statement.executeQuery()) { resultSet ⇒
+    useAndClose(connection.prepareStatement(nextValSql)){ statement =>
+      useAndClose(statement.executeQuery()) { resultSet =>
         resultSet.next()
         resultSet.getInt(1)
       }
@@ -96,12 +96,12 @@ object Provider extends Enum[Provider] {
     connection : Connection,
     provider   : Provider,
     tableName  : String,
-    thunk      : () ⇒ Unit
+    thunk      : () => Unit
   ): Unit = {
     val lockSQL = provider match {
-      case MySQL      ⇒ s"LOCK TABLES $tableName WRITE"
-      case PostgreSQL ⇒ s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
-      case _          ⇒ throw new UnsupportedOperationException
+      case MySQL      => s"LOCK TABLES $tableName WRITE"
+      case PostgreSQL => s"LOCK TABLE $tableName IN EXCLUSIVE MODE"
+      case _          => throw new UnsupportedOperationException
     }
     // See https://github.com/orbeon/orbeon-forms/issues/3866
     useAndClose(connection.createStatement())(_.execute(lockSQL))
@@ -109,10 +109,10 @@ object Provider extends Enum[Provider] {
       thunk()
     } finally {
       val unlockSQLOpt = provider match {
-        case MySQL ⇒ Some(s"UNLOCK TABLES")
-        case _     ⇒ None
+        case MySQL => Some(s"UNLOCK TABLES")
+        case _     => None
       }
-      unlockSQLOpt.foreach(unlockSQL ⇒
+      unlockSQLOpt.foreach(unlockSQL =>
         // See https://github.com/orbeon/orbeon-forms/issues/3866
         useAndClose(connection.createStatement())(_.execute(unlockSQL)))
     }
@@ -120,16 +120,16 @@ object Provider extends Enum[Provider] {
 
   def secondsTo(provider: Provider, date: String): String =
     provider match {
-      case MySQL      ⇒ s"TIMESTAMPDIFF(second, CURRENT_TIMESTAMP, $date)"
-      case PostgreSQL ⇒ s"EXTRACT(EPOCH FROM ($date - CURRENT_TIMESTAMP))"
-      case _          ⇒ throw new UnsupportedOperationException
+      case MySQL      => s"TIMESTAMPDIFF(second, CURRENT_TIMESTAMP, $date)"
+      case PostgreSQL => s"EXTRACT(EPOCH FROM ($date - CURRENT_TIMESTAMP))"
+      case _          => throw new UnsupportedOperationException
     }
 
   def dateIn(provider: Provider): String =
     provider match {
-      case MySQL        ⇒ "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
-      case PostgreSQL   ⇒ "CURRENT_TIMESTAMP + (interval '1' second * ?)"
-      case _            ⇒ throw new UnsupportedOperationException
+      case MySQL        => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? second)"
+      case PostgreSQL   => "CURRENT_TIMESTAMP + (interval '1' second * ?)"
+      case _            => throw new UnsupportedOperationException
     }
 
   case class RowNumSQL(
@@ -149,8 +149,8 @@ object Provider extends Enum[Provider] {
       (provider == MySQL).option {
         val mySQLVersion = {
           val sql = "SHOW VARIABLES LIKE \"version\""
-          useAndClose(connection.prepareStatement(sql)) { ps ⇒
-            useAndClose(ps.executeQuery()) { rs ⇒
+          useAndClose(connection.prepareStatement(sql)) { ps =>
+            useAndClose(ps.executeQuery()) { rs =>
               rs.next()
               rs.getString("value")
             }
@@ -160,13 +160,13 @@ object Provider extends Enum[Provider] {
       }
 
     mySQLMajorVersion match {
-      case Some(v) if v < 8 ⇒
+      case Some(v) if v < 8 =>
         RowNumSQL(
           table   = Some("(select @rownum := 0) r"),
           col     = "@rownum := @rownum + 1 row_num",
           orderBy = s"ORDER BY $tableAlias.last_modified_time DESC"
         )
-      case _ ⇒
+      case _ =>
         RowNumSQL(
           table   = None,
           col     = s"row_number() over (order by $tableAlias.last_modified_time desc) row_num",

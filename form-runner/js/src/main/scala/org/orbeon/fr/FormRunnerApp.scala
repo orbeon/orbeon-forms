@@ -29,9 +29,11 @@ object FormRunnerApp extends App {
     xbl.TreeSelect1
     xbl.WPaint
     xbl.HrefButton
+    xbl.LaddaButton
     xbl.Select1Search
     xbl.AutosizeTextarea
     xbl.TinyMCE
+    xbl.Attachment
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI

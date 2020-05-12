@@ -29,7 +29,7 @@ import scala.collection.compat._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.|
 import scala.util.Try
 
@@ -68,7 +68,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   def updateWindow(window: OrbeonWindow, controlId: String, newValue: String | Double | Boolean): Future[Unit] = {
     window.documentAPI.setValue(controlId, newValue)
-    window.ajaxServer.ajaxResponseReceivedForTests().toFuture
+    window.ajaxServer.allEventsProcessedP().toFuture
   }
 
   def updateWindowsAndAssert(windows: List[OrbeonWindow], line: Int): Future[Unit] = async {
@@ -108,7 +108,7 @@ class OrbeonClientTest extends AsyncFunSpec {
       checkImageRunning
     )
 
-  def withRunContainer[T](image: String, params: String, checkImageRunning: Boolean)(block: ⇒ Future[T]): Future[T] = async {
+  def withRunContainer[T](image: String, params: String, checkImageRunning: Boolean)(block: => Future[T]): Future[T] = async {
     await(runContainer(image, params, checkImageRunning))
     val result = await(block)
     await(removeContainerByImage(image))
@@ -122,7 +122,7 @@ class OrbeonClientTest extends AsyncFunSpec {
     urlToLoad     : String,
     sessionCookie : Option[String] = None
   ): Future[SimpleHttpResponse] = {
-    HttpRequest(urlToLoad).withHeaders(sessionCookie.toList map ("Cookie" → _): _*).send() filter (_.statusCode == 200)
+    HttpRequest(urlToLoad).withHeaders(sessionCookie.toList map ("Cookie" -> _): _*).send() filter (_.statusCode == 200)
   }
 
   def loadDocumentViaJSDOM(
@@ -132,7 +132,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
     val myCookieJar = new CookieJar
 
-    sessionCookie foreach { cookie ⇒
+    sessionCookie foreach { cookie =>
       myCookieJar.setCookieSync(cookie, OrbeonHAProxyUrl)
     }
 
@@ -151,8 +151,8 @@ class OrbeonClientTest extends AsyncFunSpec {
     }
 
     for {
-      jsdom ← JSDOM.fromURL(urlToLoad, options).toFuture
-      _     ← InitSupport.atLeastDomInteractiveF(jsdom.window.document)
+      jsdom <- JSDOM.fromURL(urlToLoad, options).toFuture
+      _     <- InitSupport.atLeastDomInteractiveF(jsdom.window.document)
       if jsdom.window.document.querySelector(".orbeon") ne null // this will throw if not satisfied
     } yield
       jsdom.window
@@ -162,7 +162,7 @@ class OrbeonClientTest extends AsyncFunSpec {
   def waitForServerCookie(serverPrefix: String): Future[Try[String]] =
     eventuallyAsTry(interval = 5.seconds, timeout = CookieTimeout) {
 
-      simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res ⇒
+      simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res =>
 
         // https://github.com/hmil/RosHTTP/issues/68
         val setCookieHeaders =

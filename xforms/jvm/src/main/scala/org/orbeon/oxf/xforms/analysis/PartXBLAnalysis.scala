@@ -25,7 +25,7 @@ import scala.collection.compat._
 
 trait PartXBLAnalysis extends TransientState {
 
-  self: PartAnalysisImpl ⇒
+  self: PartAnalysisImpl =>
 
   val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
 
@@ -37,7 +37,7 @@ trait PartXBLAnalysis extends TransientState {
     val prefix = startScope.fullPrefix
     metadata.idGenerator.add(Constants.DocumentId) // top-level is not added to the id generator until now
     for {
-      staticId   ← metadata.idGenerator.ids
+      staticId   <- metadata.idGenerator.ids
       prefixedId = prefix + staticId
     } locally {
       mapScopeIds(staticId, prefixedId, startScope, ignoreIfPresent = false)
@@ -50,7 +50,7 @@ trait PartXBLAnalysis extends TransientState {
     println("scopes:")
     println(
       prefixedIdToXBLScopeMap.to(List).map{
-        case (id, scope) ⇒ s"$id → ${scope.scopeId}"
+        case (id, scope) => s"$id -> ${scope.scopeId}"
       }.sorted.mkString("\n")
     )
   }
@@ -61,7 +61,7 @@ trait PartXBLAnalysis extends TransientState {
   private def registerScope(scope: Scope) = {
     assert(! scopesById.contains(scope.scopeId))
 
-    scopesById += scope.scopeId → scope
+    scopesById += scope.scopeId -> scope
     scope
   }
 
@@ -73,27 +73,27 @@ trait PartXBLAnalysis extends TransientState {
       if (! ignoreIfPresent)
         throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
     } else {
-      scope += staticId → prefixedId
-      prefixedIdToXBLScopeMap += prefixedId → scope
+      scope += staticId -> prefixedId
+      prefixedIdToXBLScopeMap += prefixedId -> scope
     }
 
   // Deindex the given control's XBL-related information
   def unmapScopeIds(control: ElementAnalysis): Unit = {
     control match {
-      case component: ComponentControl ⇒
-        component.bindingOpt foreach { binding ⇒
+      case component: ComponentControl =>
+        component.bindingOpt foreach { binding =>
           xblBindings.removeBinding(component.prefixedId)
           deregisterScope(binding.innerScope)
         }
-      case attribute: AttributeControl ⇒
+      case attribute: AttributeControl =>
         control.scope -= attribute.forStaticId
         prefixedIdToXBLScopeMap -= attribute.forPrefixedId
-      case bind: StaticBind ⇒
-        bind.iterateNestedIds foreach { mipId ⇒
+      case bind: StaticBind =>
+        bind.iterateNestedIds foreach { mipId =>
           control.scope -= mipId
           prefixedIdToXBLScopeMap -= XFormsId.getRelatedEffectiveId(control.prefixedId, mipId)
         }
-      case _ ⇒
+      case _ =>
     }
     control.scope -= control.staticId
     prefixedIdToXBLScopeMap -= control.prefixedId

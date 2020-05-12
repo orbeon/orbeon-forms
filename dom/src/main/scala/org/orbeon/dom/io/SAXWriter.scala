@@ -1,6 +1,6 @@
 package org.orbeon.dom.io
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io.SAXWriter._
@@ -51,13 +51,13 @@ class SAXWriter extends XMLReader {
 
   def write(node: Node): Unit =
     node match {
-      case n: Element               ⇒ writeElement(n)
-      case n: Text                  ⇒ writeText(n.getText)
-      case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
-      case n: Comment               ⇒ writeComment(n)
-      case n: Document              ⇒ writeDocument(n)
-      case n: Namespace             ⇒ // NOP
-      case n                        ⇒ throw new SAXException(s"Invalid node type: $n")
+      case n: Element               => writeElement(n)
+      case n: Text                  => writeText(n.getText)
+      case n: ProcessingInstruction => writeProcessingInstruction(n)
+      case n: Comment               => writeComment(n)
+      case n: Document              => writeDocument(n)
+      case n: Namespace             => // NOP
+      case n                        => throw new SAXException(s"Invalid node type: $n")
     }
 
   private def writeDocument(document: Document): Unit =
@@ -98,25 +98,25 @@ class SAXWriter extends XMLReader {
 
   def setFeature(name: String, value: Boolean): Unit =
     name match {
-      case FeatureNamespacePrefixes if value ⇒
+      case FeatureNamespacePrefixes if value =>
         throw new SAXNotSupportedException("Namespace prefixes feature is never supported")
-      case FeatureNamespaces if ! value ⇒
+      case FeatureNamespaces if ! value =>
         throw new SAXNotSupportedException("Namespace feature is always supported")
-      case FeatureNamespaces ⇒
-      case _ ⇒
+      case FeatureNamespaces =>
+      case _ =>
         features.put(name, value)
     }
 
   def setProperty(name: String, value: AnyRef): Unit =
     LexicalHandlerNames find (_ == name) match {
-      case Some(handlerName) ⇒ setLexicalHandler(value.asInstanceOf[LexicalHandler])
-      case None              ⇒ properties.put(name, value)
+      case Some(handlerName) => setLexicalHandler(value.asInstanceOf[LexicalHandler])
+      case None              => properties.put(name, value)
     }
 
   def getProperty(name: String): AnyRef =
     LexicalHandlerNames find (_ == name) match {
-      case Some(handlerName) ⇒ getLexicalHandler
-      case None              ⇒ properties.get(name)
+      case Some(handlerName) => getLexicalHandler
+      case None              => properties.get(name)
     }
 
   def parse(systemId: String): Unit =
@@ -124,20 +124,20 @@ class SAXWriter extends XMLReader {
 
   def parse(input: InputSource): Unit =
     input match {
-      case documentInput: DocumentInputSource ⇒ writeDocument(documentInput.getDocument)
-      case _                                  ⇒ throw new SAXNotSupportedException("This XMLReader can only accept a DocumentInputSource")
+      case documentInput: DocumentInputSource => writeDocument(documentInput.getDocument)
+      case _                                  => throw new SAXNotSupportedException("This XMLReader can only accept a DocumentInputSource")
     }
 
   private def writeContent(branch: Branch, namespaceStack: NamespaceStack): Unit = {
     val iter = branch.nodeIterator
     while (iter.hasNext) {
       iter.next() match {
-        case element : Element               ⇒ writeElement(element, namespaceStack)
-        case text    : Text                  ⇒ writeText(text.getText)
-        case comment : Comment               ⇒ writeComment(comment)
-        case pi      : ProcessingInstruction ⇒ writeProcessingInstruction(pi)
-        case _       : Namespace             ⇒ // ignore
-        case _                               ⇒ throw new IllegalStateException
+        case element : Element               => writeElement(element, namespaceStack)
+        case text    : Text                  => writeText(text.getText)
+        case comment : Comment               => writeComment(comment)
+        case pi      : ProcessingInstruction => writeProcessingInstruction(pi)
+        case _       : Namespace             => // ignore
+        case _                               => throw new IllegalStateException
       }
     }
   }
@@ -169,7 +169,7 @@ class SAXWriter extends XMLReader {
     }
     val declaredNamespaces = element.declaredNamespaces
     val size = declaredNamespaces.size
-    // `for (i ← 0 until size)` is inefficient and shows in the profiler
+    // `for (i <- 0 until size)` is inefficient and shows in the profiler
     var i = 0
     while (i < size) {
       val namespace = declaredNamespaces.get(i)

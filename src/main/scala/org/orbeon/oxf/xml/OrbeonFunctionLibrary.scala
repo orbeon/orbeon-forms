@@ -33,14 +33,14 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
     private var _currentURI: Option[String] = None
     def currentURI = _currentURI
 
-    def apply(uri: String)(block: ⇒ Any): Unit = {
+    def apply(uri: String)(block: => Any): Unit = {
       _currentURI = Some(uri)
       block
       _currentURI = None
     }
 
-    def apply(uris: Seq[String])(block: ⇒ Any): Unit = {
-      uris foreach  { uri ⇒
+    def apply(uris: Seq[String])(block: => Any): Unit = {
+      uris foreach  { uri =>
         _currentURI = Some(uri)
         block
         _currentURI = None
@@ -83,12 +83,12 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
       e.resultIfEmpty       = new Array[Value](max)
 
       // Add arguments
-      args.zipWithIndex foreach { case (a, i) ⇒
+      args.zipWithIndex foreach { case (a, i) =>
         arg(e, i, a.itemType, a.arity, a.resultIfEmpty)
       }
 
       // Remember function
-      functions += functionName → e
+      functions += functionName -> e
     }
   }
 
@@ -97,25 +97,25 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
 
   def getEntry(uri: String, name: String, arity: Int) =
     functions.get(FunctionName(uri, name)) filter
-      (e ⇒ arity == -1 || arity >= e.minArguments && arity <= e.maxArguments)
+      (e => arity == -1 || arity >= e.minArguments && arity <= e.maxArguments)
 
   def isAvailable(functionName: StructuredQName, arity: Int) =
     getEntry(functionName.getNamespaceURI, functionName.getLocalName, arity) isDefined
 
   def bind(functionName: StructuredQName, staticArgs: Array[Expression], env: StaticContext) =
     getEntry(functionName.getNamespaceURI, functionName.getLocalName, staticArgs.length) match {
-      case Some(entry) ⇒
+      case Some(entry) =>
         val functionClass = entry.implementationClass
         val f =
-          try functionClass.newInstance.asInstanceOf[SystemFunction]
+          try functionClass.getConstructor().newInstance().asInstanceOf[SystemFunction]
           catch {
-            case NonFatal(t) ⇒ throw new OXFException("Failed to load function: " + t.getMessage, t)
+            case NonFatal(t) => throw new OXFException("Failed to load function: " + t.getMessage, t)
           }
         f setDetails entry
         f setFunctionName functionName
         f setArguments staticArgs
         f
-      case None ⇒
+      case None =>
         null
     }
 

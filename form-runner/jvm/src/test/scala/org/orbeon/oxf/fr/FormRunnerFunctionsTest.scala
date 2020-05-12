@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.{Document ⇒ JDocument}
+import org.orbeon.dom.{Document => JDocument}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -35,13 +35,13 @@ class FormRunnerFunctionsTest
   describe("Persistence headers") {
 
     val Expected = List(
-      FormOrData.Form →
+      FormOrData.Form ->
         """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/Mexico_City</value></header><header><name>Orbeon-City-Name</name><value>Mexico City</value></header><header><name>Orbeon-Population</name><value>8851080</value></header></headers>""",
-      FormOrData.Data →
+      FormOrData.Data ->
         """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>"""
     )
 
-    for ((formOrData, expected) ← Expected)
+    for ((formOrData, expected) <- Expected)
       it(s"must get headers for ${formOrData.entryName}") {
         val headersAsXml = getPersistenceHeadersAsXML("cities", "form1", formOrData)
         assert(TransformerUtils.tinyTreeToString(headersAsXml) === expected)
@@ -54,42 +54,42 @@ class FormRunnerFunctionsTest
     val Form = "order"
 
     it("`oxf.fr.default-language` not set so `en` is the default") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         assert("en" === getDefaultLang(getAppForm(App, Form)))
       }
     }
 
     it("`oxf.fr.available-languages` not set so all languages are allowed") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         assert(isAllowedLang(getAppForm(App, Form))("en"))
         assert(isAllowedLang(getAppForm(App, Form))("foo"))
       }
     }
 
     describe("Requested language") {
-      for (v ← List(null, "   "))
+      for (v <- List(null, "   "))
         it (s"must default to `en` for `$v` requested language") {
-          withTestExternalContext { _ ⇒
+          withTestExternalContext { _ =>
             assert(Some("en") === findRequestedLang(getAppForm(App, Form), v))
           }
         }
 
-      for (v ← List("es", "en"))
+      for (v <- List("es", "en"))
         it(s"must find requested language for `$v`") {
-          withTestExternalContext { _ ⇒
+          withTestExternalContext { _ =>
             assert(Some(v) === findRequestedLang(getAppForm(App, Form), v))
           }
         }
 
       it("must find language in session if present and not requested") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
           assert(Some("fr") === findRequestedLang(getAppForm(App, Form), null))
         }
       }
 
       it("must use requested language even if a language is present in session") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
           assert(Some("it") === findRequestedLang(getAppForm(App, Form), "it"))
         }
       }
@@ -99,19 +99,19 @@ class FormRunnerFunctionsTest
 
       describe("Selection") {
         it(s"default language is put first`") {
-            withTestExternalContext { _ ⇒
+            withTestExternalContext { _ =>
               assert(List("en", "fr", "it") === getFormLangSelection(App, Form, List("fr", "it", "en").asJava))
             }
         }
 
         it(s"other languages order is preserved") {
-            withTestExternalContext { _ ⇒
+            withTestExternalContext { _ =>
               assert(List("fr", "it", "es") === getFormLangSelection(App, Form, List("fr", "it", "es").asJava))
             }
         }
 
         it(s"no language available") {
-            withTestExternalContext { _ ⇒
+            withTestExternalContext { _ =>
               assert(Nil                    === getFormLangSelection(App, Form, Nil.asJava))
             }
         }
@@ -125,9 +125,9 @@ class FormRunnerFunctionsTest
           (null , "fr", Nil)
         )
 
-        for ((expected, requested, available) ← Expected)
+        for ((expected, requested, available) <- Expected)
           it(s"must select language for `$requested` and available `$available`") {
-            withTestExternalContext { _ ⇒
+            withTestExternalContext { _ =>
               assert(expected === selectFormLang(App, Form, requested, available.asJava))
             }
           }
@@ -140,9 +140,9 @@ class FormRunnerFunctionsTest
           ("fr" , "zh", List("fr", "it", "es"))
         )
 
-        for ((expected, requested, available) ← Expected)
+        for ((expected, requested, available) <- Expected)
           it(s"must select language for `$requested` and available `$available`") {
-            withTestExternalContext { _ ⇒
+            withTestExternalContext { _ =>
               assert(expected === selectFormRunnerLang(App, Form, requested,available.asJava))
             }
           }
@@ -156,8 +156,8 @@ class FormRunnerFunctionsTest
     val Form = "order"
 
     it("must select the correct language") {
-      withTestExternalContext { _ ⇒
-        for (lang ← List("zh-Hans", "zh-Hant"))
+      withTestExternalContext { _ =>
+        for (lang <- List("zh-Hans", "zh-Hant"))
           assert(lang === selectFormRunnerLang(App, Form, lang, List("en", "zh-Hans", "zh-Hant", "es").asJava))
 
         assert("en" === selectFormRunnerLang(App, Form, "en_US", List("en", "zh-Hans", "zh-Hant", "es").asJava))
@@ -228,7 +228,7 @@ class FormRunnerFunctionsTest
       </xh:html>
 
     it("must order the controls in document order") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(source)) {
 
           val doc = inScopeContainingDocument
@@ -241,7 +241,7 @@ class FormRunnerFunctionsTest
 
           val effectiveAbsoluteIds =
             doc.getControls.getCurrentControlTree.effectiveIdsToControls map
-            { case (id, _) ⇒ XFormsId.effectiveIdToAbsoluteId(id) } toList
+            { case (id, _) => XFormsId.effectiveIdToAbsoluteId(id) } toList
 
           assert(effectiveAbsoluteIds.sortBy(ErrorSummary.controlSearchIndexes)(ErrorSummary.IntIteratorOrdering) === effectiveAbsoluteIds)
         }

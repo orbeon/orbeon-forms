@@ -18,7 +18,7 @@ import org.orbeon.io.IOUtils._
 
 object Statement {
 
-  type Setter = (PreparedStatement, Int) ⇒ Unit
+  type Setter = (PreparedStatement, Int) => Unit
 
   case class StatementPart(
     sql    : String,
@@ -29,21 +29,21 @@ object Statement {
 
   def buildQuery(parts: List[StatementPart]): String =
     parts
-      .map { case StatementPart(partSQL, _) ⇒ partSQL }
+      .map { case StatementPart(partSQL, _) => partSQL }
       .mkString("\n")
 
   def executeQuery[T](
     connection : Connection,
     sql        : String,
     parts      : List[StatementPart])(
-    block      : ResultSet ⇒ T
+    block      : ResultSet => T
   ): T = {
-    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+    useAndClose(connection.prepareStatement(sql)) { ps =>
       val index = Iterator.from(1)
       parts
         .map(_.setters)
-        .foreach(setters ⇒
-          setters.foreach(setter ⇒
+        .foreach(setters =>
+          setters.foreach(setter =>
             setter(ps, index.next())))
       useAndClose(ps.executeQuery())(block)
     }

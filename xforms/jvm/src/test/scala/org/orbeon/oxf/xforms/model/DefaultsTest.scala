@@ -173,7 +173,7 @@ class DefaultsTest extends DocumentTestBase with XFormsSupport with AssertionsFo
 
       // Replace `oldvalue` with `newvalue` but do not recompute defaults
       withAction {
-        sendThrowOnError("replace-element-submission", Map("defaults" → Some("false")))
+        sendThrowOnError("replace-element-submission", Map("defaults" -> Some("false")))
       }
 
       assert(instance.rootElement / "oldvalue" isEmpty)
@@ -182,14 +182,14 @@ class DefaultsTest extends DocumentTestBase with XFormsSupport with AssertionsFo
 
       // Replace `oldvalue` with `newvalue` and recompute defaults
       withAction {
-        sendThrowOnError("replace-element-submission", Map("defaults" → Some("true")))
+        sendThrowOnError("replace-element-submission", Map("defaults" -> Some("true")))
       }
 
       assert("2" === (instance.rootElement / "newvalue" stringValue))
 
       // Replace entire instance and do not recompute defaults
       withAction {
-        sendThrowOnError("replace-entire-instance-submission", Map("defaults" → Some("false")))
+        sendThrowOnError("replace-entire-instance-submission", Map("defaults" -> Some("false")))
       }
 
       assert("" === (instance.rootElement / "some" stringValue))
@@ -197,7 +197,7 @@ class DefaultsTest extends DocumentTestBase with XFormsSupport with AssertionsFo
 
       // Replace entire instance and recompute defaults
       withAction {
-        sendThrowOnError("replace-entire-instance-submission", Map("defaults" → Some("true")))
+        sendThrowOnError("replace-entire-instance-submission", Map("defaults" -> Some("true")))
       }
 
       assert("2" === (instance.rootElement / "some" stringValue))

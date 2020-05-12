@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -79,13 +79,13 @@ class XFormsRepeatHandler(
       // Place interceptor on output
       val savedOutput = xformsHandlerContext.getController.getOutput
 
-      var outputDelimiter: (String, String) ⇒ Unit = null // initialized further below
+      var outputDelimiter: (String, String) => Unit = null // initialized further below
 
       val outputInterceptor =
         new OutputInterceptor(
           savedOutput,
           spanQName,
-          _ ⇒ {
+          _ => {
             if (isMustGenerateBeginEndDelimiters) {
 
               val firstDelimiterClasses = "xforms-repeat-begin-end" + (if (userClasses.nonEmpty) " " + userClasses else "")
@@ -120,7 +120,7 @@ class XFormsRepeatHandler(
           xformsHandlerContext.getController.repeatBody()
           outputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
         } catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             throw OrbeonLocationException.wrapException(
               t,
               new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element)
@@ -136,7 +136,7 @@ class XFormsRepeatHandler(
       val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
       implicit val addedClasses = new jl.StringBuilder(200)
-      for (i ← 1 to repeatControl.getSize) {
+      for (i <- 1 to repeatControl.getSize) {
         // Delimiter: before repeat entries, except the first one which is output by `generateFirstDelimiter()`
         if (i > 1)
           outputDelimiter("xforms-repeat-delimiter", null)
@@ -171,18 +171,18 @@ class XFormsRepeatHandler(
       // If there are no repeat iterations, we need to output the start/end delimiters
 
       def outputBeginEndDelimiters(localName: String, prefix: String, uri: String): Unit =
-        for (infix ← List("begin", "end"))
+        for (infix <- List("begin", "end"))
           element(
             localName = localName,
             prefix    = prefix,
             uri       = uri,
-            atts      = List("id" → s"repeat-$infix-$namespacedId", "class" → "xforms-repeat-begin-end"))(
+            atts      = List("id" -> s"repeat-$infix-$namespacedId", "class" -> "xforms-repeat-begin-end"))(
             receiver  = xformsHandlerContext.getController.getOutput
           )
 
       xformsHandlerContext.getController.findFirstHandlerOrElem match {
 
-        case Some(Left(handler: XFormsControlLifecyleHandler)) ⇒
+        case Some(Left(handler: XFormsControlLifecyleHandler)) =>
 
           outputBeginEndDelimiters(
             localName = handler.getContainingElementName,
@@ -190,7 +190,7 @@ class XFormsRepeatHandler(
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
 
-        case Some(Left(handler: XHTMLElementHandler)) ⇒
+        case Some(Left(handler: XHTMLElementHandler)) =>
 
           outputBeginEndDelimiters(
             localName = handler.localname,
@@ -198,7 +198,7 @@ class XFormsRepeatHandler(
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
 
-        case Some(Right(structuredQName)) ⇒ // no handler for the element (shouldn't happen as we have `XHTMLElementHandler`)
+        case Some(Right(structuredQName)) => // no handler for the element (shouldn't happen as we have `XHTMLElementHandler`)
 
           outputBeginEndDelimiters(
             localName = structuredQName.getLocalName,
@@ -206,7 +206,7 @@ class XFormsRepeatHandler(
             uri       = structuredQName.getNamespaceURI
           )
 
-        case Some(Left(_)) | None  ⇒ // handler is not one we support or no element was output
+        case Some(Left(_)) | None  => // handler is not one we support or no element was output
 
           outputBeginEndDelimiters(
             localName = "span",

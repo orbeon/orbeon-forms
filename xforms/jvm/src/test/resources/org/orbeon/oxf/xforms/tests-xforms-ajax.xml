@@ -498,6 +498,7 @@
                                             <error>error7</error>
                                             <error>error8</error>
                                             <error>error9</error>
+                                            <error>error10</error>
                                         </instance>
                                     </xf:instance>
                                     <xf:bind ref=".[@show = 'true']">
@@ -529,12 +530,18 @@
                                     <xf:var name="var2" value="xs:date(error[6])"/>                                     <!-- XPath error on variable value -->
                                     <xf:input ref=".[xs:date(error[7]) = current-date()]"/>                             <!-- XPath error on control binding -->
                                     <xf:output value="xs:date(error[8])"/>                                              <!-- XPath error on control value -->
-                                    <xf:select ref="select">
+                                    <xf:select1 ref="select">
                                         <xf:itemset ref=".[1]">
                                             <xf:label value="xs:date(../error[9])"/>                                    <!-- XPath error on itemset label -->
                                             <xf:value/>
                                         </xf:itemset>
-                                    </xf:select>
+                                    </xf:select1>
+                                    <xf:select1 ref="select">
+                                        <xf:itemset ref=".[1]">
+                                            <xf:label>My item</xf:label>
+                                            <xf:copy ref="xs:date(../error[10])"/>
+                                        </xf:itemset>
+                                    </xf:select1>
                                 </xf:group>
                             </xh:body>
                         </xh:html>
@@ -596,6 +603,7 @@
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error7" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error8" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error9" (Non-numeric year component)</xxf:error>
+                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error10" (Non-numeric year component)</xxf:error>
             </xxf:errors>
         </output>
     </test>

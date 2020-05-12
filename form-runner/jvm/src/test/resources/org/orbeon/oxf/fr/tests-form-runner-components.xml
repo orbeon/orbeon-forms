@@ -140,7 +140,6 @@
                 <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/StringOps.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>
@@ -653,16 +652,16 @@
                                 </error-summary>
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
-                                <errors>
+                                <_>
                                     <error id="|first-name-control|" position="116" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
                                     <error id="|note-control⊙1|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
                                     <error id="|note-control⊙2|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
                                     <error id="|note-control⊙3|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
                                     <error id="|last-name-control|" position="124" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
-                                </errors>
+                                </_>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">
-                                <state>
+                                <_>
                                     <!-- Whether to be visible or not -->
                                     <show>true</show>
                                     <!-- Filter on section for which to show errors -->
@@ -679,7 +678,7 @@
                                     <!-- Number of items (errors/warnings/infos) to show -->
                                     <default-page-size>20</default-page-size>
                                     <current-page-size>20</current-page-size>
-                                </state>
+                                </_>
                             </instance>
                         </instances>
                         <controls>

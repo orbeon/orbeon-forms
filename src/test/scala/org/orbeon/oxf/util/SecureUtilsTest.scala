@@ -13,77 +13,104 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
 import java.security.SecureRandom
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatestplus.junit.AssertionsForJUnit
+
+import org.orbeon.oxf.test.ResourceManagerSupport
+import org.scalatest.funspec.AnyFunSpecLike
 
 // NOTE: hmac is tested via XFormsUploadControlTest
-class SecureUtilsTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class SecureUtilsTest
+  extends ResourceManagerSupport
+     with AnyFunSpecLike {
 
-  private val sizes = Seq(0, 1, 10, 16, 100, 128, 256, 1000, 1024, 10000, 16384, 100000)
+  private val Sizes = List(0, 1, 10, 16, 100, 128, 256, 1000, 1024, 10000, 16384, 100000)
 
-  @Test def encryptDecrypt(): Unit = {
+  describe("Encrypt and decrypt") {
 
     def asserts(size: Int) = {
 
       val bytes = randomBytes(size)
 
       // Decrypted value is the same as the original
-      assert(bytes.toList === SecureUtils.decrypt(SecureUtils.encrypt(bytes)).toList)
+      assert(bytes.toList == SecureUtils.decrypt(SecureUtils.encrypt(bytes)).toList)
 
       // Encrypting the same value twice doesn't yield the same result
       assert(SecureUtils.encrypt(bytes) != SecureUtils.encrypt(bytes))
 
       // Unless we provide an IV
       val iv = randomBytes(16)
-      assert(SecureUtils.encryptIV(bytes, Some(iv)) === SecureUtils.encryptIV(bytes, Some(iv)))
+      assert(SecureUtils.encryptIV(bytes, Some(iv)) == SecureUtils.encryptIV(bytes, Some(iv)))
     }
 
     // Try multiple data sizes
-    for (size ← sizes)
-      asserts(size)
+    it("must pass serially") {
+      for (size <- Sizes)
+        asserts(size)
+    }
 
-    // Try in parallel
-    for (size ← sizes.par)
-      asserts(size)
+    it("must pass in parallel") {
+      for (size <- Sizes.par)
+        asserts(size)
+    }
   }
 
-  @Test def toHex(): Unit = {
+  describe("Convert to hexadecimal") {
     val bytes = randomBytes(100)
-    assert(bytes.map("%02X" format _).mkString.toLowerCase === SecureUtils.byteArrayToHex(bytes))
+    it("must convert") {
+      assert(bytes.map("%02X" format _).mkString.toLowerCase == SecureUtils.byteArrayToHex(bytes))
+    }
   }
 
-  @Test def digest(): Unit = {
+  describe("Digest") {
 
-    val algorithms = Seq("SHA1", "MD5")
-    val encodings  = Seq("hex", "base64")
+    val Algorithms = List("SHA1", "MD5")
+    val Encodings  = List("hex", "base64")
 
     def asserts(algorithm: String, encoding: String, size: Int) = {
+
       val bytes = randomBytes(size)
 
       // Same digest
-      assert(SecureUtils.digestBytes(bytes, algorithm, encoding) === SecureUtils.digestBytes(bytes, algorithm, encoding))
+      assert(SecureUtils.digestBytes(bytes, algorithm, encoding) == SecureUtils.digestBytes(bytes, algorithm, encoding))
 
       // Digest different if data changes
       assert(SecureUtils.digestBytes(bytes :+ 42.asInstanceOf[Byte], algorithm, encoding) != SecureUtils.digestBytes(bytes, algorithm, encoding))
     }
 
     // Try multiple algorithms, encodings, and data sizes
-    for (algorithm ← algorithms; encoding ← encodings; size ← sizes)
-      asserts(algorithm, encoding, size)
+    for {
+      algorithm <- Algorithms
+      encoding  <- Encodings
+    } locally {
+      it(s"must pass for $algorithm/$encoding") {
+        for (size <- Sizes)
+          asserts(algorithm, encoding, size)
+      }
+    }
 
-    // Try in parallel
-    for (algorithm ← algorithms.par; encoding ← encodings; size ← sizes)
-      asserts(algorithm, encoding, size)
+    it(s"must pass in parallel for all") {
+      for {
+        algorithm <- Algorithms.par
+        encoding  <- Encodings
+        size      <- Sizes
+      } locally {
+        asserts(algorithm, encoding, size)
+      }
+    }
 
     // Check that for a given algorithm/encoding, the digest has the same size for any size of input data
-    def assertSameSize(algorithm: String, encoding: String) =
-      sizes map randomBytes map (SecureUtils.digestBytes(_, algorithm, encoding)) map (_.size) sliding 2 foreach
-        { case Seq(s1, s2) ⇒ assert(s1 === s2) }
+    def assertSameSize(algorithm: String, encoding: String): Unit =
+      Sizes map randomBytes map (SecureUtils.digestBytes(_, algorithm, encoding)) map (_.size) sliding 2 foreach
+        { case Seq(s1, s2) => assert(s1 == s2) }
 
-    for (algorithm ← algorithms; encoding ← encodings)
-      assertSameSize(algorithm, encoding)
+    it(s"must have the same size in parallel for all") {
+      for {
+        algorithm <- Algorithms.par
+        encoding  <- Encodings
+      } locally {
+        assertSameSize(algorithm, encoding)
+      }
+    }
   }
 
   private def randomBytes(n: Int) = {

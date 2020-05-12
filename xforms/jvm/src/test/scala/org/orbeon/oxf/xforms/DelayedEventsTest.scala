@@ -26,7 +26,7 @@ class DelayedEventsTest
   describe("Delayed events") {
 
     it ("recursive delayed events") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val doc = this setupDocument
           <xh:html
@@ -77,7 +77,7 @@ class DelayedEventsTest
     }
 
     it("deferred focus") {
-        withTestExternalContext { _ ⇒
+        withTestExternalContext { _ =>
 
         val doc = this setupDocument
           <xh:html

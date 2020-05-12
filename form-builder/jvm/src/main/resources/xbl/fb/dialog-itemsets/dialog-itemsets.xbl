@@ -132,31 +132,7 @@
                 <xf:label ref="$resources/dialog-itemsets/label"/>
                 <xh:div class="fb-dialog-body fb-hide-alert">
 
-                    <xf:var
-                        name="available-languages"
-                        value="frf:allLangs(fbf:resourcesRoot())"/>
-
-                    <!-- Don't display language selector if there is only one language -->
-                    <!-- FIXME: This logic is duplicated in view.xsl -->
-                    <xf:group
-                        ref="
-                            .[
-                                count($available-languages) gt 1 and
-                                xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
-                            ]">
-                        <div class="navbar">
-                            <div class="navbar-inner">
-                                <xh:div class="fr-language-choice">
-                                    <xf:select1 ref="$i/lang" appearance="bootstrap">
-                                        <xf:itemset ref="$available-languages">
-                                            <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                                            <xf:value ref="context()"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                </xh:div>
-                            </div>
-                        </div>
-                    </xf:group>
+                    <fb:language-choice ref="$i/lang"/>
 
                     <!-- Only allow HTML for full appearance -->
                     <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox">

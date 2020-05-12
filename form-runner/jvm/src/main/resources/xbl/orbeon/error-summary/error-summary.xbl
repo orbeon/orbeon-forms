@@ -78,17 +78,17 @@
 
                 <!-- Instance containing the current errors, indexed by absolute id -->
                 <xf:instance id="fr-errors-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
-                    <errors xmlns=""/>
+                    <_ xmlns=""/>
                 </xf:instance>
 
                 <!-- Instance containing the visible errors (for non-incremental mode) -->
                 <xf:instance id="fr-snapshot-instance" xxf:exclude-result-prefixes="#all">
-                    <errors xmlns=""/>
+                    <_ xmlns=""/>
                 </xf:instance>
 
                 <!-- State instance -->
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all" xxf:expose-xpath-types="true">
-                    <state xmlns="">
+                    <_ xmlns="">
                         <!-- Whether to be visible or not -->
                         <show>true</show>
                         <!-- Filter on section for which to show errors -->
@@ -105,7 +105,7 @@
                         <!-- Number of items (errors/warnings/infos) to show -->
                         <default-page-size>20</default-page-size>
                         <current-page-size>20</current-page-size>
-                    </state>
+                    </_>
                 </xf:instance>
 
                 <xf:bind ref="instance('fr-state-instance')">

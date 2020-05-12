@@ -26,9 +26,9 @@ class LocalDate extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(context: XPathContext): StringValue = {
     val value =
       stringArgumentOpt(0)(context) match {
-        case Some("test") ⇒
+        case Some("test") =>
           new DateValue("2004-12-31-07:00")
-        case _ ⇒
+        case _ =>
           val now = new GregorianCalendar
           new DateValue(now, now.get(Calendar.ZONE_OFFSET) / 1000 / 60)
       }

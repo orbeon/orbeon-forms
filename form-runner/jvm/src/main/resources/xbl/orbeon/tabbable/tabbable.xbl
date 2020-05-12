@@ -23,8 +23,7 @@
          xmlns:p="http://www.orbeon.com/oxf/pipeline"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!--<xbl:script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"/>-->
-    <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
+    <xbl:script src="/ops/dragula/dragula.min.js"/>
 
     <xbl:binding
         id="fr-tabbable"
@@ -32,8 +31,7 @@
         xxbl:mode="binding javascript-lifecycle">
 
         <xbl:resources>
-             <!--<xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>-->
-             <xbl:style src="/xbl/orbeon/tabbable/dragula/dragula.min.css"/>
+             <xbl:style src="/ops/dragula/dragula.min.css"/>
              <xbl:style src="/xbl/orbeon/tabbable/tabbable.css"/>
         </xbl:resources>
 
@@ -49,7 +47,7 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><add>Add One</add></resource>
                         <resource xml:lang="fr"><add>Ajouter</add></resource>
                         <resource xml:lang="es"><add>Agregar Uno</add></resource>
@@ -61,7 +59,7 @@
                         <resource xml:lang="nl"><add>[Add One]</add></resource>
                         <resource xml:lang="pt"><add>[Add One]</add></resource>
                         <resource xml:lang="sv"><add>[Add One]</add></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>
@@ -83,6 +81,7 @@
                                 <xsl:variable name="pos"               select="position()"/>
                                 <xsl:variable name="repeat"            select="exists($tab/(@bind | @ref))"/>
                                 <xsl:variable name="label"             select="$tab/(fr:label | xf:label)[1]"/>
+                                <xsl:variable name="reorder"           select="$repeat and not($tab/@reorder = 'false')"/>
 
                                 <xf:group appearance="xxf:internal">
 
@@ -102,7 +101,7 @@
                                                     'active'[$pos = 1],
                                                 '{''xforms-hidden''[not($visible)]}'[$tab/@visible],
                                                 'xforms-dnd-item',
-                                                'xforms-dnd-moves'[$repeat]
+                                                'xforms-dnd-moves'[$reorder]
                                             }">
                                             <!-- Transform *:label into xf:output -->
                                             <xh:a data-toggle="tabbable">
@@ -123,7 +122,9 @@
                                                         </xf:output>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
-                                                <xh:i class="fa fa-fw fa-bars fr-tabbable-grab"/>
+                                                <xsl:if test="$reorder">
+                                                    <xh:i class="fa fa-fw fa-bars fr-tabbable-grab"/>
+                                                </xsl:if>
                                             </xh:a>
                                         </xh:li>
                                     </xsl:variable>

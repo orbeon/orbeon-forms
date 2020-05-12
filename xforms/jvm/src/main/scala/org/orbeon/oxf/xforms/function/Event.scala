@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xml.RuntimeDependentFunction
@@ -35,8 +35,8 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     implicit val ctx = xpathContext
 
     Option(getContainingDocument) flatMap (_.currentEventOpt) match {
-      case Some(event) ⇒ getEventAttribute(event, stringArgument(0))
-      case None        ⇒ EmptyIterator.getInstance
+      case Some(event) => getEventAttribute(event, stringArgument(0))
+      case None        => EmptyIterator.getInstance
     }
   }
 

@@ -22,7 +22,7 @@ class XXFormsDialogOpenEvent(target: XFormsEventTarget, properties: PropertyGett
     extends XFormsEvent(XXFORMS_DIALOG_OPEN, target, properties, bubbles = true, cancelable = false) {
 
   def this(properties: PropertyGetter, target: XFormsEventTarget, neighbor: String, constrainToViewport: Boolean) =
-    this(target, properties orElse Map("neighbor" → Option(neighbor), "constrain-to-viewport" → Option(constrainToViewport)))
+    this(target, properties orElse Map("neighbor" -> Option(neighbor), "constrain-to-viewport" -> Option(constrainToViewport)))
 
   def neighbor            = property[String]("neighbor")
   def constrainToViewport = property[Boolean]("constrain-to-viewport") getOrElse false

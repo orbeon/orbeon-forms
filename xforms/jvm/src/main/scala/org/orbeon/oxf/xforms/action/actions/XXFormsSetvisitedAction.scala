@@ -33,18 +33,18 @@ class XXFormsSetvisitedAction extends XFormsAction {
     //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)
   }
 
-  private def applyToVisitable(control: XFormsControl, visit: VisitableTrait ⇒ Any, recurse: Boolean): Unit =
+  private def applyToVisitable(control: XFormsControl, visit: VisitableTrait => Any, recurse: Boolean): Unit =
     if (control.isRelevant && ! control.isStaticReadonly)
       control match {
-        case containerControl: XFormsContainerControl ⇒
+        case containerControl: XFormsContainerControl =>
           visit(containerControl)
 
           if (recurse)
-            for (control ← containerControl.children)
+            for (control <- containerControl.children)
               applyToVisitable(control, visit, recurse)
 
-        case control: VisitableTrait ⇒
+        case control: VisitableTrait =>
           visit(control)
-        case _ ⇒
+        case _ =>
       }
 }

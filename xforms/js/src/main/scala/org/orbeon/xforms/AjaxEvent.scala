@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import cats.syntax.option._
 import io.circe.generic.auto._
 import org.orbeon.xforms.EventNames._
-import org.orbeon.xforms.facade.{AjaxServer, Controls}
+import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -56,13 +56,13 @@ object AjaxEvent {
   ): AjaxEvent =
     new AjaxEvent(
       js.Dictionary[js.Any](
-        "eventName"    → eventName,
-        "targetId"     → targetId,
-        "form"         → form.orUndefined,
-        "properties"   → properties.toJSDictionary,
-        "ignoreErrors" → ignoreErrors,
-        "showProgress" → showProgress,
-        "incremental"  → incremental
+        "eventName"    -> eventName,
+        "targetId"     -> targetId,
+        "form"         -> form.orUndefined,
+        "properties"   -> properties.toJSDictionary,
+        "ignoreErrors" -> ignoreErrors,
+        "showProgress" -> showProgress,
+        "incremental"  -> incremental
       )
     )
 
@@ -73,16 +73,12 @@ object AjaxEvent {
   ): AjaxEvent =
     new AjaxEvent(
       js.Dictionary[js.Any](
-        "form"      → form,
-        "eventName" → eventName
+        "form"      -> form,
+        "eventName" -> eventName
       )
     )
 
-  def dispatchEvent(event: AjaxEvent): Unit =
-    AjaxClient.fireEvents(
-      events      = js.Array(event),
-      incremental = event.incremental
-    )
+  private val EventsWithoutTargetId = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
 }
 
 @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
@@ -105,12 +101,12 @@ class AjaxEvent(args: js.Any*) extends js.Object {
 
   import scala.reflect.ClassTag
 
-  private def checkT[T: ClassTag](v: Any): Option[T] = v match { case t: T ⇒ Some(t); case _ ⇒ None }
+  private def checkT[T: ClassTag](v: Any): Option[T] = v match { case t: T => Some(t); case _ => None }
 
   private def checkArgOpt[T: ClassTag](name: String): Option[T] =
     argsDict.get(name).flatMap(checkT[T](_))
 
-  private def checkArg[T: ClassTag](name: String, default: ⇒ T): T =
+  private def checkArg[T: ClassTag](name: String, default: => T): T =
     checkArgOpt[T](name).getOrElse(default)
 
   val eventName: String =
@@ -125,26 +121,26 @@ class AjaxEvent(args: js.Any*) extends js.Object {
     val targetIdOpt = checkArgOpt[String]("targetId")
 
     (formOpt, targetIdOpt) match {
-      case (Some(form), None) if eventName == XXFormsAllEventsRequired || eventName == XXFormsServerEvents ⇒
-        form → None
-      case (Some(_), None) ⇒
+      case (Some(form), None) if EventsWithoutTargetId(eventName) =>
+        form -> None
+      case (Some(_), None) =>
         throw new IllegalArgumentException("targetId")
-      case (None, Some(targetId)) ⇒
-        Option(dom.document.getElementById(targetId)) flatMap (e ⇒ Controls.getForm(e).toOption) match {
-          case Some(form) ⇒
-            form → targetId.some // here we could check that the namespaces match!
-          case None ⇒
-            Support.getFirstForm → targetId.some
+      case (None, Some(targetId)) =>
+        Option(dom.document.getElementById(targetId)) flatMap (e => Controls.getForm(e).toOption) match {
+          case Some(form) =>
+            form -> targetId.some // here we could check that the namespaces match!
+          case None =>
+            Support.getFirstForm -> targetId.some
         }
-      case (Some(form), Some(targetId)) ⇒
-        form → Support.adjustIdNamespace(form, targetId)._2.some
+      case (Some(form), Some(targetId)) =>
+        form -> Support.adjustIdNamespace(form, targetId)._2.some
     }
   }
 
   var properties: js.Dictionary[js.Any] = {
     // Use `js.Object` as `ClassTag` doesn't support `js.Dictionary`
     val dict = checkArg[js.Object]("properties", new js.Object).asInstanceOf[js.Dictionary[js.Any]]
-    dict ++= checkArgOpt[String]("value") map (v ⇒ "value" → (v: js.Any)) // `value` is now a property
+    dict ++= checkArgOpt[String]("value") map (v => "value" -> (v: js.Any)) // `value` is now a property
     dict
   }
 
@@ -155,5 +151,5 @@ class AjaxEvent(args: js.Any*) extends js.Object {
   scribe.debug(toString)
 
   override def toString =
-    s"AjaxServerEvent(eventName = `$eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv ⇒ s"${kv._1} => ${kv._2}") mkString "/"}`)"
+    s"AjaxServerEvent(eventName = `$eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv => s"${kv._1} => ${kv._2}") mkString "/"}`)"
 }

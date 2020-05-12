@@ -21,8 +21,8 @@ object ControlOps {
   // Get the control name based on the control, bind, grid, section or template id
   def controlNameFromIdOpt(controlOrBindId: String): Option[String] =
     XFormsId.getStaticIdFromId(controlOrBindId) match {
-      case ControlName(name, _) ⇒ Some(name)
-      case _                    ⇒ None
+      case ControlName(name, _) => Some(name)
+      case _                    => None
     }
 
   private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB

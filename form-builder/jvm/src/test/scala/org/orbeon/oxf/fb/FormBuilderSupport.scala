@@ -25,20 +25,20 @@ import org.orbeon.scaxon.NodeConversions
 
 trait FormBuilderSupport extends XFormsSupport {
 
-  self: DocumentTestBase ⇒
+  self: DocumentTestBase =>
 
   val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
 
   // Run the body in the action context of a form which simulates the main Form Builder model
-  def withActionAndFBDoc[T](url: String)(body: FormBuilderDocContext ⇒ T): T =
-    withTestExternalContext { _ ⇒
+  def withActionAndFBDoc[T](url: String)(body: FormBuilderDocContext => T): T =
+    withTestExternalContext { _ =>
       withActionAndFBDoc(formBuilderContainingDocument(url))(body)
     }
 
   private def formBuilderContainingDocument(url: String) =
     setupDocument(formBuilderDoc(url))
 
-  private def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: FormBuilderDocContext ⇒ T): T =
+  private def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: FormBuilderDocContext => T): T =
     withActionAndDoc(doc) {
       body(
         doc.models

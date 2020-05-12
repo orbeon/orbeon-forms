@@ -27,5 +27,5 @@ class JsonStringToXml extends FunctionSupport with DependsOnContextItemIfSingleA
 
 class XmlToJsonString extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    itemArgumentOrContextOpt(0)(xpathContext)  map (i ⇒ Converter.xmlToJsonString(i.asInstanceOf[NodeInfo], strict = false))
+    itemArgumentOrContextOpt(0)(xpathContext)  map (i => Converter.xmlToJsonString(i.asInstanceOf[NodeInfo], strict = false))
 }

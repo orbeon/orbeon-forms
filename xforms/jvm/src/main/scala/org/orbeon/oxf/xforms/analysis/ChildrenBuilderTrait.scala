@@ -20,7 +20,7 @@ import scala.collection.compat._
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
 
-  type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) ⇒ Option[ElementAnalysis]
+  type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => Option[ElementAnalysis]
 
   def findRelevantChildrenElements: Seq[(Element, Scope)] = findAllChildrenElements
 
@@ -29,7 +29,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
   // This element's children (valid after build() has been called)
   private var _children = Seq[ElementAnalysis]()
-  final def children = _children
+  final def children: Seq[ElementAnalysis] = _children
 
   // NOTE: Should probably make it so that controls add themselves to their container upon creation
   final def addChildren(children: IterableOnce[ElementAnalysis]): Unit =
@@ -42,7 +42,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
   final def descendants: Seq[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: ChildrenBuilderTrait ⇒ child }
+      _children collect { case child: ChildrenBuilderTrait => child }
 
     _children ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
   }
@@ -52,7 +52,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
   def indexedElements: Seq[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: ChildrenBuilderTrait ⇒ child }
+      _children collect { case child: ChildrenBuilderTrait => child }
 
     _children ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
   }
@@ -67,15 +67,15 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
       // Build and collect the children
       val childrenOptions =
-        for ((childElement, childContainerScope) ← findRelevantChildrenElements)
+        for ((childElement, childContainerScope) <- findRelevantChildrenElements)
           yield builder(this, preceding, childElement, childContainerScope) collect {
             // The element has children
-            case newControl: ChildrenBuilderTrait ⇒
+            case newControl: ChildrenBuilderTrait =>
               newControl.build(builder)
               preceding = Some(newControl)
               newControl
             // The element does not have children
-            case newControl ⇒
+            case newControl =>
               preceding = Some(newControl)
               newControl
           }

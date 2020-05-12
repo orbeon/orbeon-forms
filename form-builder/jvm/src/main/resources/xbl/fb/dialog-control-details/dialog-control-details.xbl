@@ -199,7 +199,7 @@
                     value="xxf:create-document()"/>
                 <xf:insert
                     context="$control-document"
-                    origin="fbf:findControlByNameOrEmpty($i/control-name)"/>
+                    origin="fbf:findControlByNameOrEmpty($i/original-control-name)"/>
 
                 <!-- If the form author changed the appearance, change it on the control before we get the XBL binding -->
                 <xf:var
@@ -1203,7 +1203,7 @@
                                     </fr:tinymce>
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
-                                    <fb:parameters-editor ref="." resources-ref="$resources">
+                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
                                         <xf:label ref="$resources/dialog-control-details/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>

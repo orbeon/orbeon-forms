@@ -36,12 +36,12 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.{xml ⇒ sx}
+import scala.{xml => sx}
 import scala.collection.compat._
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
-  self: GridOps ⇒ // funky dependency, to resolve at some point
+  self: GridOps => // funky dependency, to resolve at some point
 
   private val OldAlertRefMatcher = """\$form-resources/([^/]+)/(\w+)(?:\[(\d+)\])?""".r
   private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.(\w+)(?:\.(\d+))?'\)""".r
@@ -52,7 +52,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     RequiredValidation.fromForm(controlName)    ::
     DatatypeValidation.fromForm(controlName)    ::
     ConstraintValidation.fromForm(controlName)  map
-    (v ⇒ elemToNodeInfo(v.toXML(currentLang)))
+    (v => elemToNodeInfo(v.toXML(currentLang)))
 
   def writeAlertsAndValidationsAsXML(
     controlName      : String,
@@ -74,10 +74,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // Extract from XML
     val allValidations = {
       val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).toIterator
-      validationElemsSeq map (v ⇒ v → (v attValue "type")) flatMap {
-        case (e, Required.name) ⇒ RequiredValidation.fromXML(e, idsIterator)
-        case (e, "datatype")    ⇒ DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)
-        case (e, _)             ⇒ ConstraintValidation.fromXML(e, idsIterator)
+      validationElemsSeq map (v => v -> (v attValue "type")) flatMap {
+        case (e, Required.name) => RequiredValidation.fromXML(e, idsIterator)
+        case (e, "datatype")    => DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)
+        case (e, _)             => ConstraintValidation.fromXML(e, idsIterator)
       }
     }
 
@@ -85,8 +85,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // We expect only one "required" validation
     allValidations collectFirst {
-      case v: RequiredValidation ⇒ v
-    } foreach { v ⇒
+      case v: RequiredValidation => v
+    } foreach { v =>
       writeValidations(
         controlName,
         Required,
@@ -96,8 +96,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // We expect only one "datatype" validation
     allValidations collect {
-      case v: DatatypeValidation ⇒ v
-    } foreach { v ⇒
+      case v: DatatypeValidation => v
+    } foreach { v =>
 
       v.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt)
 
@@ -112,7 +112,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     writeValidations(
       controlName,
       Constraint,
-      allValidations collect { case v: ConstraintValidation ⇒ v }
+      allValidations collect { case v: ConstraintValidation => v }
     )
 
     writeAlerts(
@@ -139,25 +139,25 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val (_, mipElemQName) = mipToFBMIPQNames(mip)
 
     validations match {
-      case Nil ⇒
+      case Nil =>
         delete(existingAttributeValidations ++ existingElementValidations)
-      case List(Validation(_, ErrorLevel, value, None)) ⇒
+      case List(Validation(_, ErrorLevel, value, None)) =>
 
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
         // NOTE: We could optimize further by taking this branch if there is no type or required validation.
         writeAndNormalizeMip(controlName, mip, value)
         delete(existingElementValidations)
-      case _ ⇒
+      case _ =>
         val nestedValidations =
-          validations flatMap { case Validation(idOpt, level, value, _) ⇒
+          validations flatMap { case Validation(idOpt, level, value, _) =>
 
             value.trimAllToOpt match {
-              case Some(nonEmptyValue) ⇒
+              case Some(nonEmptyValue) =>
 
                 val prefix = mipElemQName.namespace.uri match {
-                  case XMLNames.FB ⇒ XMLNames.FBPrefix // also covers the case of `xxf:default` (Form Builder names here)
-                  case XF          ⇒ "xf" // case of `xf:type`, `xf:required`
+                  case XMLNames.FB => XMLNames.FBPrefix // also covers the case of `xxf:default` (Form Builder names here)
+                  case XF          => "xf" // case of `xf:type`, `xf:required`
                 }
 
                 val dummyMIPElem =
@@ -169,7 +169,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
                 List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.localName): NodeInfo)
-              case None ⇒
+              case None =>
                 Nil
             }
           }
@@ -192,7 +192,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val alertsForValidations =
         validations collect
-          { case Validation(_, _, _, Some(alert)) ⇒ alert }
+          { case Validation(_, _, _, Some(alert)) => alert }
 
       val nonGlobalDefaultAlert =
         ! defaultAlert.global list defaultAlert
@@ -204,20 +204,20 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       def messagesForAllLangs(a: AlertDetails) = {
         val messagesMap = a.messages.toMap
-        allLangs(resourcesRoot) map { lang ⇒ lang → messagesMap.getOrElse(lang, "") }
+        allLangs(resourcesRoot) map { lang => lang -> messagesMap.getOrElse(lang, "") }
       }
 
       val messagesByLang = (
         alertsWithResources
         flatMap messagesForAllLangs
         groupBy (_._1)
-        map     { case (lang, values) ⇒ lang → (values map (_._2)) }
+        map     { case (lang, values) => lang -> (values map (_._2)) }
       )
 
       // Make sure we have a default for all languages if there are no alerts or if some languages are missing
       // from the alerts. We do want to update all languages on write, including removing unneeded <alert>
       // elements.
-      val defaultMessages = allLangs(resourcesRoot) map (_ → Nil)
+      val defaultMessages = allLangs(resourcesRoot) map (_ -> Nil)
 
       defaultMessages.toMap ++ messagesByLang toList
     }
@@ -235,9 +235,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Insert validation attribute as needed
     newAlertElements zip alertsWithResources foreach {
-      case (e, AlertDetails(Some(forValidationId), _, _)) ⇒
+      case (e, AlertDetails(Some(forValidationId), _, _)) =>
         insert(into = e, origin = NodeInfoFactory.attributeInfo(VALIDATION_QNAME, forValidationId))
-      case _ ⇒ // no attributes to insert if this is not an alert linked to a validation
+      case _ => // no attributes to insert if this is not an alert linked to a validation
     }
 
     // Write global default alert if needed
@@ -290,7 +290,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): RequiredValidation =
       findMIPs(controlName, Required).headOption map {
-        case (idOpt, _, value, alertOpt) ⇒
+        case (idOpt, _, value, alertOpt) =>
           RequiredValidation(idOpt, xpathOptToEither(Some(value)), alertOpt)
       } getOrElse
         DefaultRequireValidation
@@ -312,16 +312,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     private def xpathOptToEither(opt: Option[String]): Either[Boolean, String] =
       opt match {
-        case Some("true()")         ⇒ Left(true)
-        case Some("false()") | None ⇒ Left(false)    // normalize missing MIP to false()
-        case Some(xpath)            ⇒ Right(xpath)
+        case Some("true()")         => Left(true)
+        case Some("false()") | None => Left(false)    // normalize missing MIP to false()
+        case Some(xpath)            => Right(xpath)
       }
 
     private def eitherToXPath(required: Either[Boolean, String]) =
       required match {
-        case Left(true)   ⇒ "true()"
-        case Left(false)  ⇒ "false()"
-        case Right(xpath) ⇒ xpath
+        case Left(true)   => "true()"
+        case Left(false)  => "false()"
+        case Right(xpath) => xpath
       }
   }
 
@@ -344,10 +344,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ): Unit = {
       val newDatatype = datatypeQName
       for {
-        controlElem    ← findControlByName(ctx.formDefinitionRootElem, controlName)
+        controlElem    <- findControlByName(ctx.formDefinitionRootElem, controlName)
         oldDatatype    = DatatypeValidation.fromForm(controlName).datatypeQName
         oldAppearances = controlElem attTokens APPEARANCE_QNAME
-        (newElemName, newAppearanceAttOpt) ← BindingDescriptor.newElementName(
+        (newElemName, newAppearanceAttOpt) <- BindingDescriptor.newElementName(
           controlElem.uriQualifiedName,
           oldDatatype,
           oldAppearances,
@@ -366,13 +366,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem = {
 
       val builtinTypeString = datatype match {
-        case Left((name, _)) ⇒ name.localName
-        case _               ⇒ ""
+        case Left((name, _)) => name.localName
+        case _               => ""
       }
 
       val builtinTypeRequired = datatype match {
-        case Left((_, required)) ⇒ required.toString
-        case _                   ⇒ ""
+        case Left((_, required)) => required.toString
+        case _                   => ""
       }
 
       <validation type="datatype" id={idOpt.orNull} level={level.entryName} default-alert={alert.isEmpty.toString}>
@@ -387,7 +387,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
   object DatatypeValidation {
 
     private val DefaultDataTypeValidation =
-      DatatypeValidation(None, Left(XMLConstants.XS_STRING_QNAME → false), None)
+      DatatypeValidation(None, Left(XMLConstants.XS_STRING_QNAME -> false), None)
 
     // Create from a control name
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): DatatypeValidation = {
@@ -401,13 +401,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val isBuiltinType = Set(XF, XS)(qName.namespace.uri)
 
         if (isBuiltinType)
-          Left(qName → (qName.namespace.uri == XS))
+          Left(qName -> (qName.namespace.uri == XS))
         else
           Right(qName)
       }
 
       findMIPs(controlName, Type).headOption map {
-        case (idOpt, _, value, alertOpt) ⇒
+        case (idOpt, _, value, alertOpt) =>
           DatatypeValidation(idOpt, builtinOrSchemaType(value), alertOpt)
       } getOrElse
         DefaultDataTypeValidation
@@ -442,7 +442,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
 
-          QName(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
+          QName(builtinTypeString, Namespace(prefix, nsURI)) -> builtinTypeRequired
         }
 
         def schemaTypeQName: QName = {
@@ -452,7 +452,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           // Schema type OTOH comes with a prefix if needed
           val localname = parseQName(schemaType)._2
           val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
-            { case (prefix, uri) ⇒ Namespace(prefix, uri) } getOrElse
+            { case (prefix, uri) => Namespace(prefix, uri) } getOrElse
             Namespace.EmptyNamespace
           QName(localname, namespace)
         }
@@ -508,7 +508,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def fromForm(controlName: String)(implicit ctx: FormBuilderDocContext): List[ConstraintValidation] =
       findMIPs(controlName, Constraint) map {
-        case (idOpt, level, value, alertOpt) ⇒
+        case (idOpt, level, value, alertOpt) =>
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
 
@@ -518,13 +518,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
-        case "formula"                                    ⇒ normalizedAttOpt("expression")
-        case vn @ UploadMediatypesValidation.PropertyName ⇒ Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')") // quote
-        case vn @ ExcludedDatesValidation.PropertyName    ⇒ Some(s"xxf:$vn((${normalizedAttOpt("argument") getOrElse ""}))") // parens
-        case vn                                           ⇒ Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")   // as is
+        case "formula"                                    => normalizedAttOpt("expression")
+        case vn @ UploadMediatypesValidation.PropertyName => Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')") // quote
+        case vn @ ExcludedDatesValidation.PropertyName    => Some(s"xxf:$vn((${normalizedAttOpt("argument") getOrElse ""}))") // parens
+        case vn                                           => Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")   // as is
       }
 
-      constraintExpressionOpt map { expr ⇒
+      constraintExpressionOpt map { expr =>
 
         val level           = Validation.levelFromXML(validationElem)
         val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
@@ -552,7 +552,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       // languages so we can write them back.
       <alert message={messages.toMap getOrElse (forLang, "")} global={global.toString}>{
         messages collect {
-          case (lang, message) if lang != forLang ⇒
+          case (lang, message) if lang != forLang =>
             <message lang={lang} value={message}/>
         }
       }</alert>
@@ -571,19 +571,19 @@ trait AlertsAndConstraintsOps extends ControlOps {
       Option(index) map (_.toInt - 1)
 
     refAtt match {
-      case OldAlertRefMatcher(_, `resourceName`, index) ⇒ Some(normalizeIndex(index))
-      case NewAlertRefMatcher(_, `resourceName`, index) ⇒ Some(normalizeIndex(index))
-      case _                                            ⇒ None
+      case OldAlertRefMatcher(_, `resourceName`, index) => Some(normalizeIndex(index))
+      case NewAlertRefMatcher(_, `resourceName`, index) => Some(normalizeIndex(index))
+      case _                                            => None
     }
   }
 
   // Same as `findZeroBasedIndexFromAlertRef` but handle case of a blank value which returns `Some(None)`.
   def findZeroBasedIndexFromAlertRefHandleBlankRef(refAtt: String, resourceName: String): Option[Option[Int]] =
-    findZeroBasedIndexFromAlertRef(refAtt, resourceName) orElse (refAtt.isBlank option None)
+    findZeroBasedIndexFromAlertRef(refAtt, resourceName) orElse (refAtt.isAllBlank option None)
 
   // NOTE: The index is 0-based.
   def buildResourcePointer(controlName: String, lhhaName: String, indexOpt: Option[Int]) =
-    s"$$form-resources/$controlName/$lhhaName${indexOpt map (i ⇒ s"[${i + 1}]") getOrElse ""}"
+    s"$$form-resources/$controlName/$lhhaName${indexOpt map (i => s"[${i + 1}]") getOrElse ""}"
 
   object AlertDetails {
 
@@ -607,14 +607,14 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val refAttOpt     = attValueOrNone(REF_QNAME)
 
         val alertIndexOpt = refAttOpt match {
-          case Some(refAtt) ⇒ findZeroBasedIndexFromAlertRef(refAtt, LHHA.Alert.entryName).flatten orElse Some(0)
-          case None         ⇒ throw new IllegalArgumentException(s"missing `${REF_QNAME.qualifiedName}` attribute")
+          case Some(refAtt) => findZeroBasedIndexFromAlertRef(refAtt, LHHA.Alert.entryName).flatten orElse Some(0)
+          case None         => throw new IllegalArgumentException(s"missing `${REF_QNAME.qualifiedName}` attribute")
         }
 
         // Try to find an existing resource for the given index if present, otherwise assume a blank value for
         // the language
         val alertsByLang = alertResourcesForAllLangs.to(List) map {
-          case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
+          case (lang, alerts) => lang -> (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
         }
 
         val forValidations = gatherAlertValidations(validationAtt)
@@ -636,7 +636,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val messageAtt = alertElem attValue "message"
 
       val messagesElems = (alertElem child "message" toList) map {
-        message ⇒ (message attValue "lang", message attValue "value")
+        message => (message attValue "lang", message attValue "value")
       }
 
       val isGlobal = (alertElem attValue "global") == "true"
@@ -699,5 +699,5 @@ trait AlertsAndConstraintsOps extends ControlOps {
   private def mipElems(bind: NodeInfo, mip: MIP) = bind /  mipToFBMIPQNames(mip)._2
 
   private def alertOrPlaceholder(alert: Option[AlertDetails], forLang: String)(implicit ctx: FormBuilderDocContext) =
-    alert orElse Some(AlertDetails(None, List(currentLang → ""), global = false)) map (_.toXML(forLang)) get
+    alert orElse Some(AlertDetails(None, List(currentLang -> ""), global = false)) map (_.toXML(forLang)) get
 }

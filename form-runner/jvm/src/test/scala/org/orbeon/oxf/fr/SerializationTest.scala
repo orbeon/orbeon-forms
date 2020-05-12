@@ -47,7 +47,7 @@ class SerializationTest
           </xh:body>
         </xh:html>
 
-      withXFormsDocument(xhtml) { doc ⇒
+      withXFormsDocument(xhtml) { doc =>
 
         assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
 
@@ -106,7 +106,7 @@ class SerializationTest
           </xh:body>
         </xh:html>
 
-      withXFormsDocument(xhtml) { doc ⇒
+      withXFormsDocument(xhtml) { doc =>
 
         assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
 
@@ -118,7 +118,7 @@ class SerializationTest
 
         val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
 
-        for (id ← List("my-foo", "my-bar", "my-number"))
+        for (id <- List("my-foo", "my-bar", "my-number"))
           assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)
       }
     }

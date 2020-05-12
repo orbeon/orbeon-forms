@@ -34,7 +34,7 @@ import scala.collection.compat._
 
 trait ContainerOps extends ControlOps {
 
-  self: GridOps ⇒ // funky dependency, to resolve at some point
+  self: GridOps => // funky dependency, to resolve at some point
 
   def containerById(containerId: String)(implicit ctx: FormBuilderDocContext): NodeInfo =
     findContainerById(containerId).get
@@ -77,7 +77,7 @@ trait ContainerOps extends ControlOps {
 
   // Delete the entire container and contained controls
   def deleteContainerById(
-    canDelete   : NodeInfo ⇒ Boolean,
+    canDelete   : NodeInfo => Boolean,
     containerId : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[UndoAction] = {
@@ -103,13 +103,10 @@ trait ContainerOps extends ControlOps {
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
-      // NOTE: Deleting is tricky because NodeInfo is mutation-averse as it keeps a node's index, among others
-      // (no longer the case with #3630!).
-      // So deleting a node under a given NodeInfo can cause the position of following siblings to be out of date
-      // and cause errors. So we delete from back to front. But a safer solution should be found.
+      // So we delete from back to front, but it's probably no longer needed (#3630).
 
       // Go depth-first so we delete containers after all their content has been deleted
-      // NOTE: Use toList to make sure we are not lazy, otherwise items might be deleted as we go!
+      // NOTE: Use `toList` to make sure we are not lazy, otherwise items might be deleted as we go!
       val children = childrenContainers(container).reverse.toList flatMap recurse
 
       val gridContent =
@@ -138,7 +135,7 @@ trait ContainerOps extends ControlOps {
   def moveContainer(
     containerElem  : NodeInfo,
     otherContainer : NodeInfo,
-    move           : (NodeInfo, NodeInfo) ⇒ NodeInfo)(implicit
+    move           : (NodeInfo, NodeInfo) => NodeInfo)(implicit
     ctx            : FormBuilderDocContext
   ): Unit = {
 
@@ -153,19 +150,19 @@ trait ContainerOps extends ControlOps {
 
     // Try to move holders and binds based on name of other element
     (nameOption, otherNameOption) match {
-      case (Some(name), Some(otherName)) ⇒
+      case (Some(name), Some(otherName)) =>
 
         // Move data holder only
         for {
-          holder      ← findDataHolders(name)
-          otherHolder ← findDataHolders(otherName)
+          holder      <- findDataHolders(name)
+          otherHolder <- findDataHolders(otherName)
         } yield
           move(holder, otherHolder)
 
         // Move bind
         for {
-          bind      ← findBindByName(doc, name)
-          otherBind ← findBindByName(doc, otherName)
+          bind      <- findBindByName(doc, name)
+          otherBind <- findBindByName(doc, otherName)
         } yield
           move(bind, otherBind)
 
@@ -174,9 +171,9 @@ trait ContainerOps extends ControlOps {
         def firstControl(s: Seq[NodeInfo]) =
           s find (getControlNameOpt(_).isDefined)
 
-        def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo): Unit =
+        def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) => NodeInfo): Unit =
           findResourceHolders(name) foreach {
-            holder ⇒
+            holder =>
               findSiblingsWithName(holder, siblingName).headOption foreach
                   (moveOp(holder, _))
           }
@@ -184,15 +181,15 @@ trait ContainerOps extends ControlOps {
         val movedContainer = findInViewTryIndex(doc, containerElem.id).get // must get new reference
 
         (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
-          case (Some(preceding), _) ⇒ tryToMoveHolders(getControlName(preceding), moveElementAfter)
-          case (_, Some(following)) ⇒ tryToMoveHolders(getControlName(following), moveElementBefore)
-          case _ ⇒
+          case (Some(preceding), _) => tryToMoveHolders(getControlName(preceding), moveElementAfter)
+          case (_, Some(following)) => tryToMoveHolders(getControlName(following), moveElementBefore)
+          case _ =>
         }
 
         // Moving sections can impact templates
         updateTemplates(None)
 
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -207,14 +204,14 @@ trait ContainerOps extends ControlOps {
 
   def canContainerMove(container: NodeInfo, direction: Direction): Boolean =
     direction match {
-      case Direction.Up    ⇒ container precedingSibling * exists IsContainer
-      case Direction.Right ⇒ firstPrecedingContainerToMoveInto(container).nonEmpty
-      case Direction.Down  ⇒ container followingSibling * exists IsContainer
-      case Direction.Left  ⇒ canDeleteContainer(container) && findAncestorContainersLeafToRoot(container).lengthCompare(if (IsSection(container)) 2 else 3) >= 0
+      case Direction.Up    => container precedingSibling * exists IsContainer
+      case Direction.Right => firstPrecedingContainerToMoveInto(container).nonEmpty
+      case Direction.Down  => container followingSibling * exists IsContainer
+      case Direction.Left  => canDeleteContainer(container) && findAncestorContainersLeafToRoot(container).lengthCompare(if (IsSection(container)) 2 else 3) >= 0
     }
 
-  val ContainerDirectionCheck: List[(Direction, NodeInfo ⇒ Boolean)] = Direction.values.to(List) map { d ⇒
-    d → (canContainerMove(_, d))
+  val ContainerDirectionCheck: List[(Direction, NodeInfo => Boolean)] = Direction.values.to(List) map { d =>
+    d -> (canContainerMove(_, d))
   }
 
   def isCustomIterationName(controlName: String, iterationName: String): Boolean =
@@ -237,7 +234,7 @@ trait ContainerOps extends ControlOps {
     // TODO: Remove once `ctx` is used everywhere
     val inDoc = ctx.formDefinitionRootElem
 
-    findControlByName(inDoc, controlName) foreach { control ⇒
+    findControlByName(inDoc, controlName) foreach { control =>
 
       val wasRepeat = isRepeat(control)
       val oldInitialIterationsAttribute = getInitialIterationsAttribute(control)
@@ -271,7 +268,7 @@ trait ContainerOps extends ControlOps {
         delete(oldNestedBinds)
 
         // Insert nested iteration bind
-        findControlByName(inDoc, controlName) foreach { control ⇒
+        findControlByName(inDoc, controlName) foreach { control =>
           ensureBinds(findContainerNamesForModel(control) :+ controlName :+ iterationName)
         }
 
@@ -281,7 +278,7 @@ trait ContainerOps extends ControlOps {
 
         // Insert nested iteration data holders
         // NOTE: There can be multiple existing data holders due to enclosing repeats
-        findDataHolders(controlName) foreach { holder ⇒
+        findDataHolders(controlName) foreach { holder =>
           val nestedHolders = holder / *
           delete(nestedHolders)
           insert(into = holder, origin = elementInfo(iterationName, nestedHolders))
@@ -307,7 +304,7 @@ trait ContainerOps extends ControlOps {
         insert(into = controlBind, origin = oldNestedBinds)
 
         // Move data holders up and keep only the first iteration
-        findDataHolders(controlName) foreach { holder ⇒
+        findDataHolders(controlName) foreach { holder =>
           val nestedHolders = holder / * take 1 child *
           delete(holder / *)
           insert(into = holder, origin = nestedHolders)
@@ -337,8 +334,8 @@ trait ContainerOps extends ControlOps {
 
   def renameTemplate(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      root     ← findTemplateRoot(oldName)
-      instance ← root.parentOption
+      root     <- findTemplateRoot(oldName)
+      instance <- root.parentOption
     } locally {
       ensureAttribute(instance, "id", templateId(newName))
     }
@@ -355,12 +352,12 @@ trait ContainerOps extends ControlOps {
     val templateInstanceId = templateId(controlName)
     val modelElement = getModelElem(ctx.formDefinitionRootElem)
     modelElement / XFInstanceTest find (_.hasIdValue(templateInstanceId)) match {
-      case Some(templateInstance) ⇒
+      case Some(templateInstance) =>
         // clear existing template instance content
         delete(templateInstance / *)
         insert(into = templateInstance , origin = content)
 
-      case None ⇒
+      case None =>
         // Insert template instance if not present
         val template: NodeInfo =
           <xf:instance
@@ -395,7 +392,7 @@ trait ContainerOps extends ControlOps {
     val inDoc       = startBindElem.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
-    val allControlsByName = getAllControlsWithIds(inDoc) map (c ⇒ controlNameFromId(c.id) → c) toMap
+    val allControlsByName = getAllControlsWithIds(inDoc) map (c => controlNameFromId(c.id) -> c) toMap
 
     def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
 
@@ -405,17 +402,17 @@ trait ContainerOps extends ControlOps {
       // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470
       def fromNonStandardRef =
         bind attValueOpt "ref" match {
-          case Some(AttributeRe(att)) ⇒ Some(Some(NodeInfoFactory.attributeInfo(att)))
-          case Some(".")              ⇒ Some(None)
-          case _                      ⇒ None
+          case Some(AttributeRe(att)) => Some(Some(NodeInfoFactory.attributeInfo(att)))
+          case Some(".")              => Some(None)
+          case _                      => None
         }
 
       def fromBinding =
         for {
-          controlElem ← controlElemOpt
+          controlElem <- controlElemOpt
           appearances = controlElem attTokens APPEARANCE_QNAME
-          descriptor  ← findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
-          binding     ← descriptor.binding
+          descriptor  <- findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
+          binding     <- descriptor.binding
         } yield {
           Some(FormBuilder.newDataHolder(controlName, binding))
         }
@@ -425,7 +422,7 @@ trait ContainerOps extends ControlOps {
 
       val elementTemplateOpt = fromNonStandardRef orElse fromBinding orElse fromPlainControlName flatten
 
-      elementTemplateOpt foreach { elementTemplate ⇒
+      elementTemplateOpt foreach { elementTemplate =>
 
         val iterationCount = {
 
@@ -438,14 +435,14 @@ trait ContainerOps extends ControlOps {
             ! topLevel && isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
 
           controlElemOpt match {
-            case Some(controlElem) if useInitialIterations(controlElem) ⇒
+            case Some(controlElem) if useInitialIterations(controlElem) =>
 
               val firstDataHolder   = findDataHolders(controlName) take 1
               val iterationsHolders = firstDataHolder / *
 
               iterationsHolders.size
 
-            case _ ⇒
+            case _ =>
               1
           }
         }
@@ -463,7 +460,7 @@ trait ContainerOps extends ControlOps {
           //   ...
           // </repeated-section-2-iteration>
           val nested         = bind / "*:bind" flatMap (holderForBind(_, topLevel = false))
-          val repeatedNested = (1 to iterationCount) flatMap (_ ⇒ nested)
+          val repeatedNested = (1 to iterationCount) flatMap (_ => nested)
 
           insert(into = elementTemplate, origin = repeatedNested)
         }
@@ -479,11 +476,11 @@ trait ContainerOps extends ControlOps {
 
   def updateTemplates(ancestorContainerNames: Option[Set[String]])(implicit ctx: FormBuilderDocContext): Unit =
     for {
-      templateInstance ← templateInstanceElements(ctx.formDefinitionRootElem)
+      templateInstance <- templateInstanceElements(ctx.formDefinitionRootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
-      iterationName    ← findRepeatIterationName(ctx.formDefinitionRootElem, repeatName)
-      template         ← createTemplateContentFromBindName(iterationName, ctx.componentBindings)
+      iterationName    <- findRepeatIterationName(ctx.formDefinitionRootElem, repeatName)
+      template         <- createTemplateContentFromBindName(iterationName, ctx.componentBindings)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)
     }

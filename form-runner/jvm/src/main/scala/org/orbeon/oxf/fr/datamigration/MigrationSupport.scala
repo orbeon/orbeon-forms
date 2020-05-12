@@ -29,7 +29,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 
 object MigrationSupport {
 
@@ -37,7 +37,7 @@ object MigrationSupport {
 
   val FormBuilderAppName = AppForm("orbeon", "builder")
 
-  // `val migrationsFromForm: (ops: MigrationOps) ⇒ ops.M ` = ops ⇒ ...`
+  // `val migrationsFromForm: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromForm(
     outerDocument        : DocumentInfo,
     availableXBLBindings : Option[DocumentInfo],
@@ -47,20 +47,20 @@ object MigrationSupport {
       ops.buildMigrationSet(outerDocument, availableXBLBindings, legacyGridsOnly)
   }
 
-  // `val migrationsFromMetadata: (ops: MigrationOps) ⇒ ops.M ` = ops ⇒ ...`
+  // `val migrationsFromMetadata: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromMetadata(
     metadataOpt : Option[DocumentInfo]
   ) extends MigrationGetter {
     def find(ops: MigrationOps): Option[ops.M] =
-      metadataOpt flatMap (metadata ⇒ findMigrationForVersion(metadata.rootElement, ops.version)) match {
+      metadataOpt flatMap (metadata => findMigrationForVersion(metadata.rootElement, ops.version)) match {
         // Using `map` fails because Scala 2.12 cannot represent the dependent function type!
-        case Some(jsonString) ⇒ Some(ops.decodeMigrationSetFromJson(jsonString))
-        case None             ⇒ None
+        case Some(jsonString) => Some(ops.decodeMigrationSetFromJson(jsonString))
+        case None             => None
       }
   }
 
   def findAllGrids(doc: DocumentInfo, repeat: Boolean): Seq[NodeInfo] =
-    getFormRunnerBodyElem(doc) descendant * filter IsGrid filter (g ⇒ isRepeat(g) ^ ! repeat)
+    getFormRunnerBodyElem(doc) descendant * filter IsGrid filter (g => isRepeat(g) ^ ! repeat)
 
   def findLegacyRepeatedGrids(doc: DocumentInfo): Seq[NodeInfo] =
     findAllGrids(doc, repeat = true) filter isLegacyRepeat
@@ -77,19 +77,19 @@ object MigrationSupport {
   def buildGridMigrations[M](
     outerDocument         : DocumentInfo,
     availableXBLBindings  : Option[DocumentInfo],
-    migrationsForBinding  : (DocumentInfo, Boolean) ⇒ Seq[M],
-    updateWithBindingPath : (M, List[PathElem]) ⇒ M
+    migrationsForBinding  : (DocumentInfo, Boolean) => Seq[M],
+    updateWithBindingPath : (M, List[PathElem]) => M
   ): Seq[M] = {
 
     // Process section templates only if bindings are provided
     val (sectionsWithTemplates, xblBindingsByURIQualifiedName) =
       availableXBLBindings match {
-        case Some(bindingsDocument) ⇒
+        case Some(bindingsDocument) =>
           (
             findSectionsWithTemplates(getFormRunnerBodyElem(outerDocument)),
             sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
           )
-        case None ⇒
+        case None =>
           (
             Nil,
             Map.empty[URIQualifiedName, DocumentInfo]
@@ -118,11 +118,11 @@ object MigrationSupport {
     legacyGridsOnly      : Boolean
   ): List[(MigrationVersion, String)] =
     for {
-      ops        ← AllMigrationOps
-      m          ← ops.buildMigrationSet(outerDocument, availableXBLBindings, legacyGridsOnly).toList
+      ops        <- AllMigrationOps
+      m          <- ops.buildMigrationSet(outerDocument, availableXBLBindings, legacyGridsOnly).toList
       jsonString = ops.encodeMigrationsToJson(m)
     } yield
-      m.version → jsonString
+      m.version -> jsonString
 
   def isMigrateUp(
     srcVersion : DataFormatVersion,
@@ -143,7 +143,7 @@ object MigrationSupport {
       else
         DataFormatVersion.values.reverse dropWhile (_ != srcVersion) takeWhile (_ != dstVersion)
 
-    (migrateUp, migrationOpsVersions flatMap (v ⇒ AllMigrationOps find (_.version == v)))
+    (migrateUp, migrationOpsVersions flatMap (v => AllMigrationOps find (_.version == v)))
   }
 
   // Migrate data in place from one version to the other
@@ -155,7 +155,7 @@ object MigrationSupport {
     dataRootElem     : NodeWrapper,
     srcVersion       : DataFormatVersion,
     dstVersion       : DataFormatVersion,
-    findMigrationSet : MigrationGetter // `(ops: MigrationOps) ⇒ ops.M `
+    findMigrationSet : MigrationGetter // `(ops: MigrationOps) => ops.M `
   ): MigrationResult =
     if (srcVersion == dstVersion) {
       MigrationResult.None
@@ -164,13 +164,13 @@ object MigrationSupport {
       val (migrateUp, migrationOpsToApply) = findMigrationOps(srcVersion, dstVersion)
 
       migrationOpsToApply.foldLeft(MigrationResult.None: MigrationResult) {
-        case (migrationResultSoFar, ops) ⇒
+        case (migrationResultSoFar, ops) =>
 
           val migrate =
             if (migrateUp)
-              ops.migrateDataTo(dataRootElem, _)
+              ops.migrateDataUp(dataRootElem, _)
             else
-              ops.migrateDataFrom(dataRootElem, _)
+              ops.migrateDataDown(dataRootElem, _)
 
           val newResultOpt = findMigrationSet.find(ops) map migrate
 
@@ -189,8 +189,8 @@ object MigrationSupport {
     pruneMetadata : Boolean
   ): Option[DocumentWrapper] =
     appForm match {
-      case FormBuilderAppName ⇒ None
-      case _ ⇒
+      case FormBuilderAppName => None
+      case _ =>
         val mutableData = copyDocumentKeepInstanceData(data)
 
         val result =
@@ -211,12 +211,12 @@ object MigrationSupport {
   def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =
     new DocumentWrapper(
       data match {
-        case virtualNode: VirtualNode ⇒
+        case virtualNode: VirtualNode =>
           virtualNode.getUnderlyingNode match {
-            case doc: Document ⇒ Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
-            case _             ⇒ throw new IllegalStateException
+            case doc: Document => Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
+            case _             => throw new IllegalStateException
           }
-        case _ ⇒
+        case _ =>
           TransformerUtils.tinyTreeToDom4j(data)
       },
       null,
@@ -237,7 +237,7 @@ object MigrationSupport {
     // Prune except `fr:relevant` attributes, as we need them to handle extra relevance information. Those will
     // be kept/removed later as needed by the submission code.
     // https://github.com/orbeon/orbeon-forms/issues/3568
-    val frAttributes = allElements /@ @* filter (a ⇒ a.namespaceURI == XMLNames.FR && a.localname != "relevant") toList
+    val frAttributes = allElements /@ @* filter (a => a.namespaceURI == XMLNames.FR && a.localname != "relevant") toList
 
     frAttributes.foreach (delete(_, doDispatch = false))
 

@@ -47,8 +47,8 @@ class PortletSessionImpl(portletSession: PortletSession)
 
   def addListener(sessionListener: ExternalContext.SessionListener): Unit =
     portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
-      case listeners: SessionListeners ⇒ listeners.addListener(sessionListener)
-      case _ ⇒
+      case listeners: SessionListeners => listeners.addListener(sessionListener)
+      case _ =>
         throw new IllegalStateException(
           "`SessionListeners` object not found in session. `OrbeonSessionListener` might be missing from web.xml."
         )
@@ -56,7 +56,7 @@ class PortletSessionImpl(portletSession: PortletSession)
 
   def removeListener(sessionListener: ExternalContext.SessionListener): Unit =
     portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
-      case listeners: SessionListeners ⇒ listeners.removeListener(sessionListener)
-      case _ ⇒
+      case listeners: SessionListeners => listeners.removeListener(sessionListener)
+      case _ =>
     }
 }

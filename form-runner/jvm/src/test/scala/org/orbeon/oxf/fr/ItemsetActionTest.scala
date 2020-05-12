@@ -33,14 +33,14 @@ class ItemsetActionTest
     val doc = docOpt.get
 
     it("must pass setting dependent and non-dependent itemsets and internationalization") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {
 
           def resolveCityAndZipControls(indexes: List[Int]) = {
             val cityControl = resolveObject[XFormsComponentControl]("city-control", indexes = indexes).get
             val zipControl  = resolveObject[XFormsComponentControl]("zip-control", cityControl.effectiveId, indexes).get
 
-            cityControl → zipControl
+            cityControl -> zipControl
           }
 
           def assertEmptyRowValues(indexes: List[Int]) = {
@@ -56,9 +56,9 @@ class ItemsetActionTest
             val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
 
             def assertOne(control: XFormsComponentControl, itemValueOpt: Option[String]) = itemValueOpt match {
-              case Some(itemValue) ⇒
-                assert(getItemsetSearchNested(control).get.allItemsIterator exists (_.value == itemValue))
-              case None ⇒
+              case Some(itemValue) =>
+                assert(getItemsetSearchNested(control).get.allItemsWithValueIterator(reverse = false) exists (_._2 == Left(itemValue)))
+              case None =>
                 assert(1 === getItemsetSearchNested(control).get.allItemsIterator.size) // because fr:dropdown has a blank item
             }
 
@@ -105,11 +105,11 @@ class ItemsetActionTest
               assert(uniqueIdsInUse == uniqueMetadataItemsetIds)
             }
 
-            def withAssertNewCountsAndWindowsAndOrphans[T](counts: List[(String, Int)])(thunk: ⇒ T): T = {
-              val before = counts map { case (name, _) ⇒ countAttributes(name) }
+            def withAssertNewCountsAndWindowsAndOrphans[T](counts: List[(String, Int)])(thunk: => T): T = {
+              val before = counts map { case (name, _) => countAttributes(name) }
               val result = thunk
-              val after  = counts map { case (name, _) ⇒ countAttributes(name) }
-              counts.zip(before.zip(after)) foreach { case ((_, expected), (before, after)) ⇒
+              val after  = counts map { case (name, _) => countAttributes(name) }
+              counts.zip(before.zip(after)) foreach { case ((_, expected), (before, after)) =>
                 val newCount = after - before
                 assert(expected === newCount)
               }
@@ -130,14 +130,14 @@ class ItemsetActionTest
             assertRowItemsetsContain(List(sectionIndex, 1), None, None)
 
             // Switch to CA
-            withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → 1, "itemsetmap" → 1)) {
+            withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" -> 1, "itemsetmap" -> 1)) {
               setControlValueWithEventSearchNested(stateControl.getEffectiveId, stateValue)
               assert(stateValue === getControlValue(stateControl.effectiveId))
             }
 
             // Set values and add iterations
-            withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → (expected.size * 2), "itemsetmap" → 0)) {
-              for ((indexes @ List(sectionIndex, gridIndex), city, zip) ← expected) {
+            withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" -> (expected.size * 2), "itemsetmap" -> 0)) {
+              for ((indexes @ List(sectionIndex, gridIndex), city, zip) <- expected) {
 
                 assertEmptyRowValues(indexes)
                 assertItemsetsChange(indexes, city, zip)
@@ -154,7 +154,7 @@ class ItemsetActionTest
               }
             }
 
-            for ((indexes, city, zip) ← expected) {
+            for ((indexes, city, zip) <- expected) {
               assertRowValues(indexes, city, zip)
             }
 
@@ -163,7 +163,7 @@ class ItemsetActionTest
             assert("AK" === getControlValue(stateControl.effectiveId))
 
             // Check that all values are cleared on all iterations, and that the city itemsets are updated
-            for ((indexes @ List(sectionIndex, gridIndex), _, _) ← expected ) {
+            for ((indexes @ List(sectionIndex, gridIndex), _, _) <- expected ) {
               assertEmptyRowValues(indexes)
               assertRowItemsetsContain(indexes, Some("Anchorage"), None)
             }
@@ -201,7 +201,7 @@ class ItemsetActionTest
 
           // Itemset internationalization
           def assertStateItemsetsContain(label: String) =
-            for (sectionIndex ← 1 to 2) {
+            for (sectionIndex <- 1 to 2) {
               val stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(sectionIndex)).get
               assert(getItemsetSearchNested(stateControl).get.allItemsIterator exists (_.label.label == label))
             }
@@ -215,7 +215,7 @@ class ItemsetActionTest
           assertStateItemsetsContain("Californie")
 
           // Remove 2nd iteration
-          withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → -8, "itemsetmap" → -1)) {
+          withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" -> -8, "itemsetmap" -> -1)) {
             performSectionAction(
               resolveObject[XFormsControl]("states-section-control").get,
               "fr-remove"

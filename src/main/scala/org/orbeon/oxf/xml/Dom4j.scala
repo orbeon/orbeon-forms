@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xml
 
-import java.util.{List ⇒ JList}
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.util.{List => JList}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils
@@ -65,19 +65,19 @@ object Dom4j {
     compareElementsIgnoreNamespacesInScopeCollapse(left.getRootElement, right.getRootElement)
 
   def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element): Boolean = {
-    val normalizeText = (c: String) ⇒ Whitespace.collapseWhitespace(c).toString
+    val normalizeText = (c: String) => Whitespace.collapseWhitespace(c).toString
     compareTwoNodes(normalizeTextNodes(createCopy(left)), normalizeTextNodes(createCopy(right)))(normalizeText)
   }
 
   // Only keep the nodes we care about
   private def filterOut(l: Seq[Node]) = l collect {
-    case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) ⇒ n
-    case t: Text if t.getText.nonBlank ⇒ t
+    case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
+    case t: Text if t.getText.nonAllBlank => t
   }
 
-  private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String ⇒ String) =
+  private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String => String) =
     left.lengthCompare(right.size) == 0 && (left.zip(right) forall
-      { case (n1, n2) ⇒ compareTwoNodes(n1, n2)(normalizeText) })
+      { case (n1, n2) => compareTwoNodes(n1, n2)(normalizeText) })
 
   private implicit def dom4jListToNodeSeq(l: JList[_]): Seq[Node] = l.asInstanceOf[JList[Node]].asScala
 
@@ -87,24 +87,24 @@ object Dom4j {
       x.getQName.uriQualifiedName compare y.getQName.uriQualifiedName
   }
 
-  private def compareTwoNodes(left: Node, right: Node)(normalizeText: String ⇒ String): Boolean =
+  private def compareTwoNodes(left: Node, right: Node)(normalizeText: String => String): Boolean =
     (left, right) match {
-      case (d1: Document, d2: Document) ⇒
+      case (d1: Document, d2: Document) =>
         compareTwoNodeSeqs(filterOut(d1.content), filterOut(d2.content))(normalizeText)
-      case (e1: Element, e2: Element) ⇒
+      case (e1: Element, e2: Element) =>
         e1.getQName == e2.getQName &&
           compareTwoNodeSeqs(e1.attributes.asScala.sorted, e2.attributes.asScala.sorted)(normalizeText) && // sort attributes
           compareTwoNodeSeqs(filterOut(e1.content), filterOut(e2.content))(normalizeText)
-      case (a1: Attribute, a2: Attribute) ⇒
+      case (a1: Attribute, a2: Attribute) =>
         a1.getQName == a2.getQName &&
           a1.getValue == a2.getValue
-      case (c1: Comment, c2: Comment) ⇒
+      case (c1: Comment, c2: Comment) =>
         c1.getText == c2.getText
-      case (t1: Text, t2: Text) ⇒
+      case (t1: Text, t2: Text) =>
         normalizeText(t1.getText) == normalizeText(t2.getText)
-      case (p1: ProcessingInstruction, p2: ProcessingInstruction) ⇒
+      case (p1: ProcessingInstruction, p2: ProcessingInstruction) =>
         p1.getTarget == p2.getTarget && compareProcessingInstruction(p1, p2)
-      case _ ⇒
+      case _ =>
         false
     }
 
@@ -204,13 +204,13 @@ object Dom4j {
     insertIfNeeded(root, path.iterator)
   }
 
-  def visitSubtree(container: Element, process: Element ⇒ Boolean): Unit = {
-    for (childNode ← new java.util.ArrayList(container.content).asScala) {
+  def visitSubtree(container: Element, process: Element => Boolean): Unit = {
+    for (childNode <- new java.util.ArrayList(container.content).asScala) {
       childNode match {
-        case e: Element ⇒
+        case e: Element =>
           if (process(e))
             visitSubtree(e, process)
-        case _ ⇒
+        case _ =>
       }
     }
   }

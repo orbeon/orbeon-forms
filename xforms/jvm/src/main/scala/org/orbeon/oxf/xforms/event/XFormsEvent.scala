@@ -35,7 +35,10 @@ import scala.collection.JavaConverters._
  *   - passing to the constructor
  * - the reason we use `lazyProperties` is that we had trouble passing a `PropertyGetter` with a reference to this to the
  *   constructor!
- * - all property values are Java values or `Seq` of Java values
+ * - all property values are:
+ *   - Java values (including `NodeInfo`)
+ *   - `Seq` of Java values
+ *   - `Either` of the above (2020-02-27)
  * - for Java/Scala consumers, use `property[T]``
  * - for XPath consumers, use `getAttribute``
  * - `PropertyGetter` is used instead of a plain `Map` because:
@@ -85,7 +88,7 @@ abstract class XFormsEvent(
   // - the property is not supported
   // - it is supported but no value is available for it
   final def property[T](name: String): Option[T] =
-    allProperties.applyOrElse(name, { name: String ⇒ warnUnsupportedIfNeeded(name); None }) map (_.asInstanceOf[T])
+    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map (_.asInstanceOf[T])
 
   // Return a property of the given type or the default value
   // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
@@ -94,7 +97,7 @@ abstract class XFormsEvent(
   // - the property is not supported
   // - it is supported but no value is available for it
   final def propertyOrDefault[T](name: String, default: T): T =
-    allProperties.applyOrElse(name, (_: String) ⇒ None) map (_.asInstanceOf[T]) getOrElse default
+    allProperties.applyOrElse(name, (_: String) => None) map (_.asInstanceOf[T]) getOrElse default
 
   // Get an attribute as an XPath SequenceIterator
   final def getAttribute(name: String): SequenceIterator = {
@@ -104,14 +107,17 @@ abstract class XFormsEvent(
     // "If the event context information does not contain the property indicated by the string argument, then an
     // empty node-set is returned."
 
-    allProperties.applyOrElse(name, { name: String ⇒ warnUnsupportedIfNeeded(name); None }) map {
-      case s: Seq[_] ⇒ listIterator(s map SaxonUtils.anyToItemIfNeeded)
-      case other     ⇒ itemIterator(SaxonUtils.anyToItemIfNeeded(other))
-    } getOrElse emptyIterator
+    def handleOneLevel(any: Any): SequenceIterator = any match {
+      case s: Seq[_]       => listIterator(s map SaxonUtils.anyToItemIfNeeded)
+      case e: Either[_, _] => e.fold(handleOneLevel, handleOneLevel)
+      case other           => itemIterator(SaxonUtils.anyToItemIfNeeded(other))
+    }
+
+    allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
   }
 
   private def warnDeprecatedIfNeeded(name: String) =
-    newPropertyName(name) foreach { newName ⇒
+    newPropertyName(name) foreach { newName =>
       indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
     }
 
@@ -143,7 +149,7 @@ object XFormsEvent {
   val EmptyGetter: PropertyGetter = Map()
 
   // Can we benefit from Scala 2.10's applyOrElse here?
-  def getters[E <: XFormsEvent](e: E, m: Map[String, E ⇒ Option[Any]]): PropertyGetter = new PropertyGetter {
+  def getters[E <: XFormsEvent](e: E, m: Map[String, E => Option[Any]]): PropertyGetter = new PropertyGetter {
     def isDefinedAt(name: String) = m.isDefinedAt(name)
     def apply(name: String)       = m(name)(e)
   }
@@ -157,27 +163,27 @@ object XFormsEvent {
   def xxfName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
 
   private val Deprecated = Map(
-    "target"         → "xxf:targetid",
-    "event"          → "xxf:type",
-    "repeat-indexes" → "xxf:repeat-indexes"
+    "target"         -> "xxf:targetid",
+    "event"          -> "xxf:type",
+    "repeat-indexes" -> "xxf:repeat-indexes"
   )
 
-  private val Getters = Map[String, XFormsEvent ⇒ Option[Any]](
-    "target"                       → (e ⇒ Option(e.targetObject.getId)),
-    xxfName("target")              → (e ⇒ Option(e.targetObject.getId)),
-    xxfName("targetid")            → (e ⇒ Option(e.targetObject.getId)),
-    xxfName("absolute-targetid")   → (e ⇒ Option(XFormsId.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
-    "event"                        → (e ⇒ Option(e.name)),
-    xxfName("type")                → (e ⇒ Option(e.name)),
-    xxfName("bubbles")             → (e ⇒ Option(e.bubbles)),
-    xxfName("cancelable")          → (e ⇒ Option(e.cancelable)),
-    xxfName("phase")               → (e ⇒ Option(e.currentPhase.name)),
-    xxfName("observerid")          → (e ⇒ Option(e.currentObserver.getId)),
-    xxfName("absolute-observerid") → (e ⇒ Option(XFormsId.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
-    "repeat-indexes"               → repeatIndexes,
-    xxfName("repeat-indexes")      → repeatIndexes,
-    xxfName("repeat-ancestors")    → repeatAncestors,
-    xxfName("target-prefixes")     → targetPrefixes
+  private val Getters = Map[String, XFormsEvent => Option[Any]](
+    "target"                       -> (e => Option(e.targetObject.getId)),
+    xxfName("target")              -> (e => Option(e.targetObject.getId)),
+    xxfName("targetid")            -> (e => Option(e.targetObject.getId)),
+    xxfName("absolute-targetid")   -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
+    "event"                        -> (e => Option(e.name)),
+    xxfName("type")                -> (e => Option(e.name)),
+    xxfName("bubbles")             -> (e => Option(e.bubbles)),
+    xxfName("cancelable")          -> (e => Option(e.cancelable)),
+    xxfName("phase")               -> (e => Option(e.currentPhase.name)),
+    xxfName("observerid")          -> (e => Option(e.currentObserver.getId)),
+    xxfName("absolute-observerid") -> (e => Option(XFormsId.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
+    "repeat-indexes"               -> repeatIndexes,
+    xxfName("repeat-indexes")      -> repeatIndexes,
+    xxfName("repeat-ancestors")    -> repeatAncestors,
+    xxfName("target-prefixes")     -> targetPrefixes
   )
 
   // NOTE: should ideally be Option[Seq[Int]]. At this time XForms callers assume Option[Seq[String]].

@@ -17,7 +17,7 @@ import org.xml.sax.Attributes
 import org.orbeon.scaxon.SAXEvents._
 
 // Receiver which produces a subtree rooted at the first element matching the predicate provided.
-class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] ⇒ Boolean)
+class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] => Boolean)
     extends ForwardingXMLReceiver(receiver) {
 
   super.setForward(false)
@@ -40,7 +40,7 @@ class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] ⇒ Bool
         matchLevel = level
         super.setForward(true)
         super.startDocument()
-        for ((prefix, uri) ← namespaceContext.current.mappings)
+        for ((prefix, uri) <- namespaceContext.current.mappings)
           super.startPrefixMapping(prefix, uri)
       }
     }
@@ -57,7 +57,7 @@ class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] ⇒ Bool
       if (matchLevel == level) {
         matchLevel = -1
 
-        for ((prefix, _) ← namespaceContext.current.mappings)
+        for ((prefix, _) <- namespaceContext.current.mappings)
           super.endPrefixMapping(prefix)
 
         super.endDocument()

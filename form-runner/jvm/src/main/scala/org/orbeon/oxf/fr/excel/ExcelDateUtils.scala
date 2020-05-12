@@ -16,11 +16,12 @@
 ==================================================================== */
 package org.orbeon.oxf.fr.excel
 
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.CoreUtils._
+
 
 // ORBEON: Moved subset of original Apache POI class to Scala and made lots of changes, including:
 //
@@ -108,9 +109,9 @@ object ExcelDateUtils {
           val nc = formatString.charAt(i + 1)
           if (c == '\\')
             nc match {
-              case  '-' | ',' | '.' | ' ' | '\\' ⇒
+              case  '-' | ',' | '.' | ' ' | '\\' =>
                 append = false // skip  '\'
-              case _ ⇒
+              case _ =>
             }
           else if (c == ';' && nc == '@') {
             i += 1
@@ -128,7 +129,7 @@ object ExcelDateUtils {
     }
 
     def removePatternSequences(s: String): String =
-      RemovePatterns.foldLeft(s)((v, p) ⇒ p.matcher(v).replaceAll(""))
+      RemovePatterns.foldLeft(s)((v, p) => p.matcher(v).replaceAll(""))
 
     def removeSecondFormat(s: String): String = {
       // You're allowed something like `dd/mm/yy;[red]dd/mm/yy` which would place dates before 1900/1904 in red.
@@ -141,9 +142,9 @@ object ExcelDateUtils {
     }
 
     findInternalFormat(formatIndex) match {
-      case Some((formatType, _)) ⇒ formatType
-      case None if formatString.isEmpty ⇒ FormatType.Other
-      case None ⇒
+      case Some((formatType, _)) => formatType
+      case None if formatString.isEmpty => FormatType.Other
+      case None =>
 
         val firstPass = removeSimpleSequences(formatString)
 
@@ -250,53 +251,53 @@ object ExcelDateUtils {
     val BuiltinFormats: Map[Int, (FormatType, String)] = {
 
       val first =
-        0 → List(
-          FormatType.Other    → "General",
-          FormatType.Other    → "0",
-          FormatType.Other    → "0.00",
-          FormatType.Other    → "#,##0",
-          FormatType.Other    → "#,##0.00",
-          FormatType.Other    → "\"$\"#,##0_);(\"$\"#,##0)",
-          FormatType.Other    → "\"$\"#,##0_);[Red](\"$\"#,##0)",
-          FormatType.Other    → "\"$\"#,##0.00_);(\"$\"#,##0.00)",
-          FormatType.Other    → "\"$\"#,##0.00_);[Red](\"$\"#,##0.00)",
-          FormatType.Other    → "0%",
-          FormatType.Other    → "0.00%",
-          FormatType.Other    → "0.00E+00",
-          FormatType.Other    → "# ?/?",
-          FormatType.Other    → "# ??/??",
-          FormatType.Date     → "m/d/yy",
-          FormatType.Date     → "d-mmm-yy",
-          FormatType.Date     → "d-mmm",
-          FormatType.Date     → "mmm-yy",
-          FormatType.Time     → "h:mm AM/PM",
-          FormatType.Time     → "h:mm:ss AM/PM",
-          FormatType.Time     → "h:mm",
-          FormatType.Time     → "h:mm:ss",
-          FormatType.DateTime → "m/d/yy h:mm"
+        0 -> List(
+          FormatType.Other    -> "General",
+          FormatType.Other    -> "0",
+          FormatType.Other    -> "0.00",
+          FormatType.Other    -> "#,##0",
+          FormatType.Other    -> "#,##0.00",
+          FormatType.Other    -> "\"$\"#,##0_);(\"$\"#,##0)",
+          FormatType.Other    -> "\"$\"#,##0_);[Red](\"$\"#,##0)",
+          FormatType.Other    -> "\"$\"#,##0.00_);(\"$\"#,##0.00)",
+          FormatType.Other    -> "\"$\"#,##0.00_);[Red](\"$\"#,##0.00)",
+          FormatType.Other    -> "0%",
+          FormatType.Other    -> "0.00%",
+          FormatType.Other    -> "0.00E+00",
+          FormatType.Other    -> "# ?/?",
+          FormatType.Other    -> "# ??/??",
+          FormatType.Date     -> "m/d/yy",
+          FormatType.Date     -> "d-mmm-yy",
+          FormatType.Date     -> "d-mmm",
+          FormatType.Date     -> "mmm-yy",
+          FormatType.Time     -> "h:mm AM/PM",
+          FormatType.Time     -> "h:mm:ss AM/PM",
+          FormatType.Time     -> "h:mm",
+          FormatType.Time     -> "h:mm:ss",
+          FormatType.DateTime -> "m/d/yy h:mm"
         )
 
         val second =
-          0x25 → List(
-            FormatType.Other  → "#,##0_);(#,##0)",
-            FormatType.Other  → "#,##0_);[Red](#,##0)",
-            FormatType.Other  → "#,##0.00_);(#,##0.00)",
-            FormatType.Other  → "#,##0.00_);[Red](#,##0.00)",
-            FormatType.Other  → "_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)",
-            FormatType.Other  → "_(\"$\"* #,##0_);_(\"$\"* (#,##0);_(\"$\"* \"-\"_);_(@_)",
-            FormatType.Other  → "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)",
-            FormatType.Other  → "_(\"$\"* #,##0.00_);_(\"$\"* (#,##0.00);_(\"$\"* \"-\"??_);_(@_)",
-            FormatType.Time   → "mm:ss",
-            FormatType.Time   → "[h]:mm:ss",
-            FormatType.Time   → "mm:ss.0",
-            FormatType.Other  → "##0.0E+0",
-            FormatType.Other  → "@"
+          0x25 -> List(
+            FormatType.Other  -> "#,##0_);(#,##0)",
+            FormatType.Other  -> "#,##0_);[Red](#,##0)",
+            FormatType.Other  -> "#,##0.00_);(#,##0.00)",
+            FormatType.Other  -> "#,##0.00_);[Red](#,##0.00)",
+            FormatType.Other  -> "_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)",
+            FormatType.Other  -> "_(\"$\"* #,##0_);_(\"$\"* (#,##0);_(\"$\"* \"-\"_);_(@_)",
+            FormatType.Other  -> "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)",
+            FormatType.Other  -> "_(\"$\"* #,##0.00_);_(\"$\"* (#,##0.00);_(\"$\"* \"-\"??_);_(@_)",
+            FormatType.Time   -> "mm:ss",
+            FormatType.Time   -> "[h]:mm:ss",
+            FormatType.Time   -> "mm:ss.0",
+            FormatType.Other  -> "##0.0E+0",
+            FormatType.Other  -> "@"
           )
 
       val all =
         for {
-          (offset, items) ← List(first, second)
-          (typeFormat, i) ← items.zipWithIndex
+          (offset, items) <- List(first, second)
+          (typeFormat, i) <- items.zipWithIndex
         } yield
           (offset + i, typeFormat)
 

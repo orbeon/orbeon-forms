@@ -41,7 +41,7 @@ class ExtendedLocationData private (
       Option(locationData) map (_.line) getOrElse -1,
       Option(locationData) map (_.col) getOrElse -1,
       description,
-      (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
+      (if (element.isDefined) List("element" -> (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
     )
 
   // For Java callers: with LocationData, description, element and parameters
@@ -72,12 +72,12 @@ class ExtendedLocationData private (
   def getDescription               = description.orNull
   def getElementString             = getElementDebugString
   def getElementDebugString        = elementString.orNull
-  def getParameters: Array[String] = params.iterator.flatMap(p ⇒ Array(p._1, p._2)).to(Array)
+  def getParameters: Array[String] = params.iterator.flatMap(p => Array(p._1, p._2)).to(Array)
 
   override def toString = {
 
     def parametersString =
-      params collect { case (k, v) if v ne null ⇒ s"$k='$v'" } mkString ", "
+      params collect { case (k, v) if v ne null => s"$k='$v'" } mkString ", "
 
     super.toString + (
       if (description.isDefined || params.nonEmpty)
@@ -90,7 +90,7 @@ class ExtendedLocationData private (
 
 object ExtendedLocationData {
   def arrayToPairs(a: Seq[String]) = Option(a ensuring (_.size % 2 == 0)) match {
-    case Some(a) ⇒ a.grouped(2).toList collect { case Seq(k, v) ⇒ k → v }
-    case None    ⇒ Nil
+    case Some(a) => a.grouped(2).toList collect { case Seq(k, v) => k -> v }
+    case None    => Nil
   }
 }

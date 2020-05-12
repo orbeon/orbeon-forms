@@ -21,7 +21,7 @@ import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.{Cell, FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -36,6 +36,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+
 import scala.collection.compat._
 
 object FormBuilderXPathApi {
@@ -47,7 +48,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlName)) foreach { controlElem ⇒
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlName)) foreach { controlElem =>
       assert(FormRunner.isRepeat(controlElem))
       updateTemplatesCheckContainers(FormRunner.findAncestorRepeatNames(controlElem).to(Set))
     }
@@ -72,7 +73,7 @@ object FormBuilderXPathApi {
   def renameControlIfNeeded(oldName: String, newName: String, addToUndoStack: Boolean): Unit = {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.renameControlIfNeeded(oldName, newName) filter
-      (_ ⇒ addToUndoStack) foreach
+      (_ => addToUndoStack) foreach
       Undo.pushUserUndoAction
   }
 
@@ -84,8 +85,8 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip      ← Model.AllComputedMipsByName.get(mipName)
-        bindElem ← FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+        mip      <- Model.AllComputedMipsByName.get(mipName)
+        bindElem <- FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
       } yield
         FormBuilder.readDenormalizedCalculatedMip(bindElem, mip)
 
@@ -99,7 +100,7 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip ← Model.AllComputedMipsByName.get(mipName)
+        mip <- Model.AllComputedMipsByName.get(mipName)
       } yield
         FormBuilder.writeAndNormalizeMip(controlName, mip, mipValue)
 
@@ -260,18 +261,18 @@ object FormBuilderXPathApi {
     // Find data holders for all section templates
     val holdersWithRoots =
       for {
-        sectionNode   ← FormRunner.findSectionsWithTemplates(ctx.bodyElem)
-        controlName   ← FormRunner.getControlNameOpt(sectionNode).toList
-        holder        ← FormBuilder.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
-        componentNode ← FormRunner.findComponentNodeForSection(sectionNode)
-        xblNode       ← FormRunner.findXblXblForSectionTemplateNamespace(ctx.bodyElem, componentNode.namespaceURI)
-        bindingNode   ← FormRunner.findXblBindingForLocalname(xblNode, componentNode.localname)
-        instance      ← FormRunner.findXblInstance(bindingNode, fr.Names.FormTemplate)
-        instanceRoot  ← instance / * headOption
+        sectionNode   <- FormRunner.findSectionsWithTemplates(ctx.bodyElem)
+        controlName   <- FormRunner.getControlNameOpt(sectionNode).toList
+        holder        <- FormBuilder.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
+        componentNode <- FormRunner.findComponentNodeForSection(sectionNode)
+        xblNode       <- FormRunner.findXblXblForSectionTemplateNamespace(ctx.bodyElem, componentNode.namespaceURI)
+        bindingNode   <- FormRunner.findXblBindingForLocalname(xblNode, componentNode.localname)
+        instance      <- FormRunner.findXblInstance(bindingNode, fr.Names.FormTemplate)
+        instanceRoot  <- instance / * headOption
       } yield
-        holder → instanceRoot
+        holder -> instanceRoot
 
-    holdersWithRoots foreach { case (holder, instanceRoot) ⇒
+    holdersWithRoots foreach { case (holder, instanceRoot) =>
       delete(holder / *)
       insert(into = holder, origin = instanceRoot / *)
     }
@@ -291,10 +292,10 @@ object FormBuilderXPathApi {
 
     val allHelpElementsWithControlNames =
       ctx.bodyElem descendant lhhaTest map
-      (lhhaElem ⇒ lhhaElem → lhhaElem.attValue("ref")) collect
-      { case (lhhaElem, HelpRefMatcher(controlName)) ⇒ lhhaElem → controlName }
+      (lhhaElem => lhhaElem -> lhhaElem.attValue("ref")) collect
+      { case (lhhaElem, HelpRefMatcher(controlName)) => lhhaElem -> controlName }
 
-    allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) ⇒
+    allHelpElementsWithControlNames flatMap { case (lhhaElement, controlName) =>
 
       val (doDelete, holders) =
         holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(controlName, List(lhhaElement), lhha.entryName)
@@ -344,8 +345,8 @@ object FormBuilderXPathApi {
     val allContainersWithSettings = getAllContainerControlsWithIds(ctx.formDefinitionRootElem) filter FormRunner.hasContainerSettings
 
     previousOrNext match {
-      case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ FormRunner.getControlName(n) != controlName) lastOption
-      case "next"     ⇒ allContainersWithSettings dropWhile (n ⇒ FormRunner.getControlName(n) != controlName) drop 1 headOption
+      case "previous" => allContainersWithSettings takeWhile (n => FormRunner.getControlName(n) != controlName) lastOption
+      case "next"     => allContainersWithSettings dropWhile (n => FormRunner.getControlName(n) != controlName) drop 1 headOption
     }
   }
 
@@ -372,7 +373,7 @@ object FormBuilderXPathApi {
 
     AlertDetails.fromForm(controlName)(FormBuilderDocContext())             find
       (_.default)                                                           getOrElse
-      AlertDetails(None, List(FormBuilder.currentLang → ""), global = true) toXML
+      AlertDetails(None, List(FormBuilder.currentLang -> ""), global = true) toXML
       FormBuilder.currentLang
   }
 
@@ -398,14 +399,14 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) flatMap { control ⇒
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) flatMap { control =>
 
       val currentCell = control parent CellTest
 
       val cells =
         previousOrNext match {
-          case "previous" ⇒ currentCell preceding CellTest
-          case "next"     ⇒ currentCell following CellTest
+          case "previous" => currentCell preceding CellTest
+          case "next"     => currentCell following CellTest
         }
 
       val cellWithChild = cells find (_.hasChildElement)
@@ -441,9 +442,9 @@ object FormBuilderXPathApi {
   def isValidListOfMediatypeRanges(s: String): Boolean = {
 
     val mediatypeRanges =
-      s.splitTo[List](" ,") flatMap { token ⇒
+      s.splitTo[List](" ,") flatMap { token =>
         token.trimAllToOpt
-      } map { trimmed ⇒
+      } map { trimmed =>
           MediatypeRange.unapply(trimmed).isDefined
       }
 
@@ -474,7 +475,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findControlBoundNodeByName(controlName: String): Option[NodeInfo] = (
     findConcreteControlByName(controlName)(FormBuilderDocContext())
-    collect { case c: XFormsSingleNodeControl ⇒ c }
+    collect { case c: XFormsSingleNodeControl => c }
     flatMap (_.boundNodeOpt)
   )
 
@@ -492,8 +493,8 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getControlsLabelValueItemset: Seq[NodeInfo] = {
-    val resourceMap = currentResources.child(*).map(r ⇒ r.localname → r).toMap
-    getAllControlsWithIds.map { control ⇒
+    val resourceMap = currentResources.child(*).map(r => r.localname -> r).toMap
+    getAllControlsWithIds.map { control =>
       val controlId    = control.attValue("id")
       val controlName  = FormRunner.controlNameFromId(controlId)
       val controlLabel = resourceMap(controlName).firstChildOpt("label").map(_.getStringValue).getOrElse("")
@@ -529,7 +530,7 @@ object FormBuilderXPathApi {
     val container = containerById(gridId)
 
     val directionClasses =
-      ContainerDirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction.entryName }
+      ContainerDirectionCheck collect { case (direction, check) if check(container) => "fb-can-move-" + direction.entryName }
 
     "fr-editable"                                          ::
       directionClasses                                     :::
@@ -542,7 +543,7 @@ object FormBuilderXPathApi {
   def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
 
     val directionClasses =
-      ContainerDirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction.entryName }
+      ContainerDirectionCheck collect { case (direction, check) if check(container) => "fb-can-move-" + direction.entryName }
 
     val deleteClasses =
       canDeleteContainer(container) list "fb-can-delete"
@@ -565,8 +566,8 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def buildFormBuilderControlEffectiveIdOrEmpty(staticId: String): String =
-    FormBuilder.buildFormBuilderControlEffectiveId(staticId)(FormBuilderDocContext()).orNull
+  def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String): String =
+    FormBuilder.buildFormBuilderControlNamespacedIdOrEmpty(staticId)(FormBuilderDocContext())
 
   //@XPathFunction
   def findControlByNameOrEmpty(controlName: String): NodeInfo = {
@@ -576,7 +577,7 @@ object FormBuilderXPathApi {
 
   private def renamingDetailsToXPath(renamingDetails: Option[Seq[(String, String, Boolean)]]): SequenceIterator =
     renamingDetails.toList.flatten map {
-      case (oldId, newId, isAutomaticId) ⇒
+      case (oldId, newId, isAutomaticId) =>
         ArrayFunctions.createValue(
           Vector(
             SaxonUtils.fixStringValue(oldId),
@@ -592,7 +593,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) map { controlElem ⇒
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) map { controlElem =>
 
       val containerNames =
         FormRunner.findContainerNamesForModel(
@@ -655,8 +656,8 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     for {
-      control ← FormRunner.findControlByName(ctx.formDefinitionRootElem, oldName)
-      xcv     ← ToolboxOps.controlOrContainerElemToXcv(control)
+      control <- FormRunner.findControlByName(ctx.formDefinitionRootElem, oldName)
+      xcv     <- ToolboxOps.controlOrContainerElemToXcv(control)
     } locally {
       Undo.pushUserUndoAction(ControlSettings(oldName, newName, xcv))
     }
@@ -666,8 +667,8 @@ object FormBuilderXPathApi {
   def undoAction(): Unit = {
     implicit val ctx = FormBuilderDocContext()
     for {
-      undoAction ← Undo.popUndoAction()
-      redoAction ← processUndoRedoAction(undoAction)
+      undoAction <- Undo.popUndoAction()
+      redoAction <- processUndoRedoAction(undoAction)
     } locally {
       Undo.pushAction(UndoOrRedo.Redo, redoAction, undoAction.name)
     }
@@ -677,16 +678,24 @@ object FormBuilderXPathApi {
   def redoAction(): Unit = {
     implicit val ctx = FormBuilderDocContext()
     for {
-      redoAction ← Undo.popRedoAction()
-      undoAction ← processUndoRedoAction(redoAction)
+      redoAction <- Undo.popRedoAction()
+      undoAction <- processUndoRedoAction(redoAction)
     } locally {
       Undo.pushAction(UndoOrRedo.Undo, undoAction, undoAction.name)
     }
   }
 
+  //@XPathFunction
+  def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit =
+    FormBuilder.migrateGridColumns(gridElem, from, to) // foreach Undo.pushUserUndoAction
+
+  //@XPathFunction
+  def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean =
+    FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
+
   private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
     undoAction match {
-      case DeleteContainer(position, xcvElem) ⇒
+      case DeleteContainer(position, xcvElem) =>
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           "",
@@ -694,16 +703,16 @@ object FormBuilderXPathApi {
           Some(position),
           Set.empty
         )
-      case DeleteControl(position, xcvElem) ⇒
+      case DeleteControl(position, xcvElem) =>
         ToolboxOps.pasteSingleControlFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
           Some(position)
         )
-      case DeleteRow(gridId, xcvElem, rowPos) ⇒
+      case DeleteRow(gridId, xcvElem, rowPos) =>
 
         val containerPosition = FormBuilder.containerPosition(gridId)
 
-        FormBuilder.deleteContainerById(_ ⇒ true, gridId)
+        FormBuilder.deleteContainerById(_ => true, gridId)
 
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
@@ -714,45 +723,45 @@ object FormBuilderXPathApi {
         )
 
         Some(UndeleteRow(gridId, rowPos))
-      case UndeleteRow(gridId, rowPos) ⇒
+      case UndeleteRow(gridId, rowPos) =>
         FormBuilder.rowDelete(gridId, rowPos)
-      case InsertRow(gridId, rowPos, AboveBelow.Above) ⇒
+      case InsertRow(gridId, rowPos, AboveBelow.Above) =>
         FormBuilder.rowDelete(gridId, rowPos)
-      case InsertRow(gridId, rowPos, AboveBelow.Below) ⇒
+      case InsertRow(gridId, rowPos, AboveBelow.Below) =>
         FormBuilder.rowDelete(gridId, rowPos + 1)
-      case Rename(oldName, newName) ⇒
+      case Rename(oldName, newName) =>
         FormBuilder.renameControlIfNeeded(newName, oldName)
-      case InsertControl(controlId) ⇒
+      case InsertControl(controlId) =>
         FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)) map
           (_.parentUnsafe) flatMap
           (FormBuilder.deleteControlWithinCell(_))
-      case InsertSection(sectionId) ⇒
+      case InsertSection(sectionId) =>
         FormBuilder.deleteSectionByIdIfPossible(sectionId)
-      case InsertGrid(gridId) ⇒
+      case InsertGrid(gridId) =>
         FormBuilder.deleteGridByIdIfPossible(gridId)
-      case MoveControl(insert, delete) ⇒
+      case MoveControl(insert, delete) =>
         for {
-          newUndoDeleteAction ← processUndoRedoAction(delete)
-          newUndoInsertAction ← processUndoRedoAction(insert)
+          newUndoDeleteAction <- processUndoRedoAction(delete)
+          newUndoInsertAction <- processUndoRedoAction(insert)
         } yield
           MoveControl(newUndoDeleteAction, newUndoInsertAction)
-      case MoveContainer(sectionId, direction, position) ⇒
+      case MoveContainer(sectionId, direction, position) =>
 
         val container = FormBuilder.containerById(sectionId)
 
         direction match {
-          case Direction.Up    ⇒ FormBuilder.moveSection(container, Direction.Down)
-          case Direction.Down  ⇒ FormBuilder.moveSection(container, Direction.Up)
-          case Direction.Left  ⇒ FormBuilder.moveSection(container, Direction.Right)
-          case Direction.Right ⇒ FormBuilder.moveSection(container, Direction.Left)
+          case Direction.Up    => FormBuilder.moveSection(container, Direction.Down)
+          case Direction.Down  => FormBuilder.moveSection(container, Direction.Up)
+          case Direction.Left  => FormBuilder.moveSection(container, Direction.Right)
+          case Direction.Right => FormBuilder.moveSection(container, Direction.Left)
         }
-      case InsertSectionTemplate(sectionId) ⇒
+      case InsertSectionTemplate(sectionId) =>
         FormBuilder.deleteSectionByIdIfPossible(sectionId)
-      case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) ⇒
+      case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) =>
 
         val containerPosition = FormBuilder.containerPosition(sectionId)
 
-        FormBuilder.deleteContainerById(_ ⇒ true, sectionId)
+        FormBuilder.deleteContainerById(_ => true, sectionId)
 
         ToolboxOps.pasteSectionGridFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
@@ -763,12 +772,12 @@ object FormBuilderXPathApi {
         )
 
         Some(UnmergeSectionTemplate(sectionId, prefix, suffix))
-      case UnmergeSectionTemplate(sectionId, prefix, suffix) ⇒
+      case UnmergeSectionTemplate(sectionId, prefix, suffix) =>
         ToolboxOps.containerMerge(sectionId, prefix, suffix)
-      case ControlSettings(oldName, newName, xcvElem) ⇒
+      case ControlSettings(oldName, newName, xcvElem) =>
         for {
-          controlElem ← FormRunner.findControlByName(ctx.formDefinitionRootElem, newName)
-          newXcvElem  ← ToolboxOps.controlOrContainerElemToXcv(controlElem)
+          controlElem <- FormRunner.findControlByName(ctx.formDefinitionRootElem, newName)
+          newXcvElem  <- ToolboxOps.controlOrContainerElemToXcv(controlElem)
         } yield {
 
           if (FormRunner.IsContainer(controlElem)) {
@@ -778,7 +787,7 @@ object FormBuilderXPathApi {
 
             val containerPosition = FormBuilder.containerPosition(containerId)
 
-            FormBuilder.deleteContainerById(_ ⇒ true, containerId)
+            FormBuilder.deleteContainerById(_ => true, containerId)
 
             ToolboxOps.pasteSectionGridFromXcv(
               TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
@@ -802,11 +811,13 @@ object FormBuilderXPathApi {
 
           ControlSettings(newName, oldName, newXcvElem)
         }
-      case MoveWall(cellId, startSide, target) ⇒
+      case MoveWall(cellId, startSide, target) =>
         FormBuilder.moveWall(FormBuilderRpcApiImpl.resolveId(cellId).get, startSide, target)
-      case SplitCell(cellId, direction) ⇒
+      case SplitCell(cellId, direction) =>
         FormBuilder.merge(FormBuilderRpcApiImpl.resolveId(cellId).get, direction)
-      case MergeCell(cellId, direction, size) ⇒
+      case MergeCell(cellId, direction, size) =>
         FormBuilder.split(FormBuilderRpcApiImpl.resolveId(cellId).get, direction, Some(size))
+      case MigrateGridColumns(gridId, from, to) =>
+        FormBuilder.migrateGridColumns(FormBuilderRpcApiImpl.resolveId(gridId).get, to, from)
     }
 }

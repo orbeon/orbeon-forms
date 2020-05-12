@@ -32,7 +32,7 @@ object DocumentAPI {
   // Q: Can we type `eventObject`?
   @JSExport
   def dispatchEvent(eventObject: js.Dictionary[js.Any]): Unit =
-    AjaxEvent.dispatchEvent(new AjaxEvent(eventObject))
+    AjaxClient.fireEvent(new AjaxEvent(eventObject))
 
   // Dispatch an event
   // We do NOT document this as of 2015-10 for JavaScript callers. This should be
@@ -56,13 +56,13 @@ object DocumentAPI {
 
     val eventObject  = js.Dictionary.empty[js.Any]
 
-    eventObject += "eventName" → eventName
-    eventObject += "targetId"  → targetId
+    eventObject += "eventName" -> eventName
+    eventObject += "targetId"  -> targetId
 
-    formElem     foreach (v ⇒ eventObject += "form"         → v)
-    incremental  foreach (v ⇒ eventObject += "incremental"  → v)
-    ignoreErrors foreach (v ⇒ eventObject += "ignoreErrors" → v)
-    properties   foreach (v ⇒ eventObject += "properties"   → v)
+    formElem     foreach (v => eventObject += "form"         -> v)
+    incremental  foreach (v => eventObject += "incremental"  -> v)
+    ignoreErrors foreach (v => eventObject += "ignoreErrors" -> v)
+    properties   foreach (v => eventObject += "properties"   -> v)
 
     dispatchEvent(eventObject)
   }
@@ -88,7 +88,7 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     require(
-      ! $(control).is(".xforms-output, .xforms-upload"),
+      ! (control.classList.contains("xforms-output") || control.classList.contains("xforms-upload")),
       s"Cannot set the value of an output or upload control for id `${control.id}`"
     )
 
@@ -96,11 +96,11 @@ object DocumentAPI {
     Controls.setCurrentValue(control, newStringValue)
 
     // And also fire server event
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = EventNames.XXFormsValue,
         targetId   = control.id,
-        properties = Map("value" → newStringValue)
+        properties = Map("value" -> newStringValue)
       )
     )
   }
@@ -114,7 +114,7 @@ object DocumentAPI {
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
     Controls.setFocus(control.id)
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName = EventNames.XFormsFocus,
         targetId  = control.id
@@ -131,16 +131,16 @@ object DocumentAPI {
 
       val (resolvedControlId, resolvedControlOpt) =
         (controlIdOrElem: Any) match {
-          case givenControlId: String ⇒
-            givenControlId → Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
-          case givenElement: html.Element ⇒
-            givenElement.id → Some(givenElement)
+          case givenControlId: String =>
+            givenControlId -> Option(dom.document.getElementById(Support.adjustIdNamespace(formElem, givenControlId)._2))
+          case givenElement: html.Element =>
+            givenElement.id -> Some(givenElement)
         }
 
       resolvedControlOpt match {
-        case Some(resolvedControl: html.Element) ⇒
+        case Some(resolvedControl: html.Element) =>
           resolvedControl
-        case _ ⇒
+        case _ =>
           throw new IllegalArgumentException(s"Cannot find control for id `$resolvedControlId`")
       }
     }

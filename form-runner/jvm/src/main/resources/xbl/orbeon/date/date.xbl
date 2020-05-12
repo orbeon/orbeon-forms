@@ -84,9 +84,9 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
-                        <local>
+                        <_>
                             <field-width/>
-                        </local>
+                        </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-date-grid">
@@ -136,12 +136,12 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <resources>
+                    <_>
                         <resource xml:lang="en"><format>MDY</format></resource>
                         <resource xml:lang="fr"><format>MJA</format></resource>
                         <resource xml:lang="de"><format>MTJ</format></resource>
                         <resource xml:lang="pl"><format>YMD</format></resource>
-                    </resources>
+                    </_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.http
 
 import java.io.IOException
-import java.net.{CookieStore ⇒ _, _}
+import java.net.{CookieStore => _, _}
 import java.security.KeyStore
 
 import javax.net.ssl.SSLContext
@@ -35,7 +35,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
-import org.apache.http.{ProtocolException ⇒ _, _}
+import org.apache.http.{ProtocolException => _, _}
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
@@ -72,7 +72,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     routePlanner foreach
       httpClient.setRoutePlanner
 
-    credentials foreach { actualCredentials ⇒
+    credentials foreach { actualCredentials =>
 
       // Make authentication preemptive when needed. Interceptor is added first, as the Authentication header
       // is added by HttpClient's RequestTargetAuthentication which is itself an interceptor, so our
@@ -88,9 +88,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       credentialsProvider.setCredentials(
         new AuthScope(uri.getHost, uri.getPort),
         actualCredentials match {
-          case Credentials(username, passwordOpt, _, None) ⇒
+          case Credentials(username, passwordOpt, _, None) =>
             new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
-          case Credentials(username, passwordOpt, _, Some(domain)) ⇒
+          case Credentials(username, passwordOpt, _, Some(domain)) =>
             new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
         }
       )
@@ -100,23 +100,23 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
     val requestMethod =
       method match {
-        case GET     ⇒ new HttpGet(uri)
-        case POST    ⇒ new HttpPost(uri)
-        case HEAD    ⇒ new HttpHead(uri)
-        case OPTIONS ⇒ new HttpOptions(uri)
-        case PUT     ⇒ new HttpPut(uri)
-        case DELETE  ⇒ new HttpDelete(uri)
-        case TRACE   ⇒ new HttpTrace(uri)
-        case LOCK    ⇒ new HttpLock(uri)
-        case UNLOCK  ⇒ new HttpUnlock(uri)
+        case GET     => new HttpGet(uri)
+        case POST    => new HttpPost(uri)
+        case HEAD    => new HttpHead(uri)
+        case OPTIONS => new HttpOptions(uri)
+        case PUT     => new HttpPut(uri)
+        case DELETE  => new HttpDelete(uri)
+        case TRACE   => new HttpTrace(uri)
+        case LOCK    => new HttpLock(uri)
+        case UNLOCK  => new HttpUnlock(uri)
       }
 
     val skipAuthorizationHeader = credentials.isDefined
 
     // Set all headers
     for {
-      (name, values) ← headers
-      value          ← values
+      (name, values) <- headers
+      value          <- values
       // Skip over Authorization header if user authentication specified
       if ! (skipAuthorizationHeader && name.toLowerCase == "authorization")
     } locally {
@@ -124,7 +124,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     }
 
     requestMethod match {
-      case request: HttpEntityEnclosingRequest ⇒
+      case request: HttpEntityEnclosingRequest =>
 
         def contentTypeFromContent =
           content flatMap (_.contentType)
@@ -156,7 +156,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
         request.setEntity(inputStreamEntity)
 
-      case _ ⇒
+      case _ =>
     }
 
     val response = httpClient.execute(requestMethod, httpContext)
@@ -170,8 +170,8 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       // querying the map properly with regard to case.
       lazy val headers =
         combineValues[String, String, List](
-          for (header ← response.getAllHeaders)
-          yield Headers.capitalizeCommonOrSplitHeader(header.getName) → header.getValue
+          for (header <- response.getAllHeaders)
+          yield Headers.capitalizeCommonOrSplitHeader(header.getName) -> header.getValue
         ) toMap
 
       lazy val lastModified =
@@ -206,7 +206,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       idleConnectionsDelay : Option[FiniteDuration] // for example 30.seconds
     ) extends Thread("Orbeon HTTP connection monitor") {
 
-      thread ⇒
+      thread =>
 
       private var _mustShutdown = false
 
@@ -235,7 +235,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
               (manager.closeIdleConnections(_, java.util.concurrent.TimeUnit.MILLISECONDS))
           }
         } catch {
-          case _: InterruptedException ⇒
+          case _: InterruptedException =>
         }
 
         Logger.info(s"stopping ${thread.getName} thread")
@@ -257,9 +257,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
     // It seems that credentials and state are not thread-safe, so create every time
     def newProxyAuthState = proxyCredentials map {
-      case c: NTCredentials               ⇒ new AuthState |!> (_.update(new NTLMScheme(JCIFSEngine), c))
-      case c: UsernamePasswordCredentials ⇒ new AuthState |!> (_.update(new BasicScheme, c))
-      case _                              ⇒ throw new IllegalStateException
+      case c: NTCredentials               => new AuthState |!> (_.update(new NTLMScheme(JCIFSEngine), c))
+      case c: UsernamePasswordCredentials => new AuthState |!> (_.update(new BasicScheme, c))
+      case _                              => throw new IllegalStateException
     }
 
     // The single ConnectionManager
@@ -268,27 +268,27 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       // Create SSL context, based on a custom key store if specified
       val trustStore =
         (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
-          case (Some(keyStoreURI), Some(keyStorePassword)) ⇒
+          case (Some(keyStoreURI), Some(keyStorePassword)) =>
 
             val keyStoreType =
               settings.sslKeystoreType getOrElse KeyStore.getDefaultType
 
             val keyStore =
-              useAndClose(new URL(keyStoreURI).openStream) { is ⇒ // URL is typically local (file:, etc.)
+              useAndClose(new URL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
                 KeyStore.getInstance(keyStoreType) |!>
                   (_.load(is, keyStorePassword.toCharArray))
               }
 
-            Some(keyStore → keyStorePassword)
-          case _ ⇒
+            Some(keyStore -> keyStorePassword)
+          case _ =>
             None
         }
 
       // Create SSL hostname verifier
       val hostnameVerifier = settings.sslHostnameVerifier match {
-        case "browser-compatible" ⇒ SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
-        case "allow-all"          ⇒ SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
-        case _                    ⇒ SSLSocketFactory.STRICT_HOSTNAME_VERIFIER
+        case "browser-compatible" => SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
+        case "allow-all"          => SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+        case _                    => SSLSocketFactory.STRICT_HOSTNAME_VERIFIER
       }
 
       // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
@@ -296,7 +296,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
       val sslSocketFactory = trustStore match {
-        case Some(trustStore) ⇒
+        case Some(trustStore) =>
           // Calling full constructor
           new SSLSocketFactory(
             SSLSocketFactory.TLS,
@@ -307,7 +307,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
             null,
             hostnameVerifier
           )
-        case None ⇒
+        case None =>
           // See http://docs.oracle.com/javase/7/docs/technotes/guides/security/jsse/JSSERefGuide.html#CustomizingStores
           // "This default SSLContext is initialized with a default KeyManager and a TrustManager. If a
           // keystore is specified by the javax.net.ssl.keyStore system property and an appropriate
@@ -330,45 +330,45 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     val (proxyHost, proxyExclude, proxyCredentials) = {
       // Set proxy if defined in properties
       (settings.proxyHost, settings.proxyPort) match {
-        case (Some(proxyHost), Some(proxyPort)) ⇒
+        case (Some(proxyHost), Some(proxyPort)) =>
           val _httpProxy = new HttpHost(proxyHost, proxyPort, if (settings.proxySSL) "https" else "http")
           val _proxyExclude = settings.proxyExclude
 
           // Proxy authentication
           val _proxyCredentials =
             (settings.proxyUsername, settings.proxyPassword) match {
-              case (Some(proxyUsername), Some(proxyPassword)) ⇒
+              case (Some(proxyUsername), Some(proxyPassword)) =>
                 Some(
                   (settings.proxyNTLMHost, settings.proxyNTLMDomain) match {
-                    case (Some(ntlmHost), Some(ntlmDomain)) ⇒
+                    case (Some(ntlmHost), Some(ntlmDomain)) =>
                       new NTCredentials(proxyUsername, proxyPassword, ntlmHost, ntlmDomain)
-                    case _ ⇒
+                    case _ =>
                       new UsernamePasswordCredentials(proxyUsername, proxyPassword)
                   }
                 )
-              case _ ⇒ None
+              case _ => None
             }
 
           (Some(_httpProxy), _proxyExclude, _proxyCredentials)
-        case _ ⇒
+        case _ =>
           (None, None, None)
       }
     }
 
-    val routePlanner = proxyHost map { proxyHost ⇒
+    val routePlanner = proxyHost map { proxyHost =>
       new HttpRoutePlanner {
         def determineRoute(target: HttpHost, request: HttpRequest, context: HttpContext) =
           proxyExclude match {
-            case Some(proxyExclude) if (target ne null) && target.getHostName.matches(proxyExclude) ⇒
+            case Some(proxyExclude) if (target ne null) && target.getHostName.matches(proxyExclude) =>
               new HttpRoute(target, null, "https".equalsIgnoreCase(target.getSchemeName))
-            case _ ⇒
+            case _ =>
               new HttpRoute(target, null, proxyHost, "https".equalsIgnoreCase(target.getSchemeName))
           }
       }
     }
 
     val idleConnectionMonitorThread: Option[IdleConnectionMonitorThread] =
-      settings.expiredConnectionsPollingDelay map { expiredConnectionsPollingDelay ⇒
+      settings.expiredConnectionsPollingDelay map { expiredConnectionsPollingDelay =>
         new IdleConnectionMonitorThread(
           manager              = connectionManager,
           pollingDelay         = expiredConnectionsPollingDelay,
@@ -415,7 +415,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
           try
             new Type2Message(Base64.decode(challenge))
           catch {
-            case ex: IOException ⇒
+            case ex: IOException =>
               throw new NTLMEngineException("Invalid Type2 message", ex)
           }
 

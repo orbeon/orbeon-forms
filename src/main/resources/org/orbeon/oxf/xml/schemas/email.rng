@@ -8,7 +8,7 @@
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
@@ -49,6 +49,11 @@
             <element name="from">
                 <ref name="address"/>
             </element>
+            <zeroOrMore>
+                <element name="reply-to">
+                    <ref name="address"/>
+                </element>
+            </zeroOrMore>
             <oneOrMore>
                 <choice>
                     <element name="to">

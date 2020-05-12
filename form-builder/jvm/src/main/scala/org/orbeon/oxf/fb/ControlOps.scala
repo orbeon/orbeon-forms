@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Whitespace, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -33,12 +34,10 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -53,12 +52,12 @@ import scala.collection.compat._
  */
 trait ControlOps extends SchemaOps with ResourcesOps {
 
-  self: GridOps ⇒ // funky dependency, to resolve at some point
+  self: GridOps => // funky dependency, to resolve at some point
 
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
-  private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
+  private val RewrittenMIPs = MIPsToRewrite map (mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
 
-  private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v ⇒ v.localName → v) toMap
+  private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v => v.localName -> v) toMap
 
   private val PossibleResourcePointerNames: Set[String] =
     (LHHA.values map (_.entryName)).to(Set) ++
@@ -107,8 +106,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // with a name (there might not be one).
     val boundControls =
       precedingSiblingOrSelfContainers(gridElem, includeSelf) flatMap {
-        case grid if ! grid.hasAtt(BIND_QNAME) ⇒ grid descendant CellTest child * filter hasName lastOption
-        case boundSectionOrGrid                ⇒ Some(boundSectionOrGrid)
+        case grid if ! grid.hasAtt(BIND_QNAME) => grid descendant CellTest child * filter hasName lastOption
+        case boundSectionOrGrid                => Some(boundSectionOrGrid)
       }
 
     // Take the first result
@@ -120,9 +119,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Insert bind container if needed
     val topLevelBind = ctx.topLevelBindElem match {
-      case Some(bind) ⇒
+      case Some(bind) =>
         bind
-      case None ⇒
+      case None =>
         insert(
           into   = ctx.modelElem,
           after  = ctx.dataInstanceElem,
@@ -135,8 +134,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       if (names.hasNext) {
         val bindName = names.next()
         val bind = containerElem / XFBindTest filter (isBindForName(_, bindName)) match {
-          case Seq(bind: NodeInfo, _*) ⇒ bind
-          case _ ⇒
+          case Seq(bind: NodeInfo, _*) => bind
+          case _ =>
 
             val newBind: Seq[NodeInfo] =
               <xf:bind
@@ -182,7 +181,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     updateTemplates : Boolean = false)(implicit
     ctx             : FormBuilderDocContext
   ): Option[UndoAction] =
-    cellElem firstChildOpt * flatMap { controlElem ⇒
+    cellElem firstChildOpt * flatMap { controlElem =>
 
       val undo =
         ToolboxOps.controlOrContainerElemToXcv(controlElem) map
@@ -200,7 +199,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def controlElementsToDelete(controlElem: NodeInfo)(implicit ctx: FormBuilderDocContext): List[NodeInfo] = {
 
     // Holders, bind, templates, resources if the control has a name
-    val holders = getControlNameOpt(controlElem).toList flatMap { controlName ⇒
+    val holders = getControlNameOpt(controlElem).toList flatMap { controlName =>
 
       val buffer = mutable.ListBuffer[NodeInfo]()
 
@@ -230,7 +229,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       renameControl (oldName, newName)
       renameTemplate(oldName, newName)
 
-      findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl ⇒
+      findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl =>
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to(Set))
       }
 
@@ -286,18 +285,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       ensureAttribute(controlElement, BIND_QNAME.localName, bindId(newName))
 
     // Make the control point to its template if @template (or legacy @origin) is present
-    for (attName ← List("template", "origin"))
+    for (attName <- List("template", "origin"))
       setvalue(controlElement /@ attName, makeInstanceExpression(templateId(newName)))
 
     // Set `xf:label`, `xf:hint`, `xf:help` and `xf:alert` `@ref` if present.
     // NOTE: Just after an insert, for example of `fr:explanation`, we have `<fr:text ref=""/>`, so we must handle
     // the case where the `ref` is blank.
     for {
-      childElem        ← controlElement child *
+      childElem        <- controlElement child *
       childName        = childElem.localname
       if PossibleResourcePointerNames(childName)
-      ref              ← childElem.att("ref").headOption
-      explicitIndexOpt ← FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue, childName)
+      ref              <- childElem.att("ref").headOption
+      explicitIndexOpt <- FormBuilder.findZeroBasedIndexFromAlertRefHandleBlankRef(ref.stringValue, childName)
     } locally {
       setvalue(List(ref), FormBuilder.buildResourcePointer(newName, childName, explicitIndexOpt))
     }
@@ -320,26 +319,26 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     findBindByName(ctx.formDefinitionRootElem, oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
-  private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
+  private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
 
-    @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() ⇒ NodeInfo, Option[String])]): Seq[NodeInfo] =
+    @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() => NodeInfo, Option[String])]): Seq[NodeInfo] =
       if (names.hasNext) {
         val (getHolder, precedingHolderName) = names.next()
         val holder = getHolder() // not ideal: this might create a NodeInfo just to check the name of the holder
 
         val children =
           for {
-            parent ← parents
+            parent <- parents
           } yield
             parent / * filter (_.name == holder.name) match {
-              case Seq() ⇒
+              case Seq() =>
                 // No holder exists so insert one
                 insert(
                   into   = parent,
                   after  = parent / * filter (_.name == precedingHolderName.getOrElse("")),
                   origin = holder
                 )
-              case existing ⇒
+              case existing =>
                 // At least one holder exists (can be more than one for repeats)
                 existing
             }
@@ -361,7 +360,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Unit = {
 
     // Create one holder per existing language
-    val resourceHolders = (allResources(ctx.resourcesRootElem) attValue XMLLangQName) map (_ → List(resourceHolder))
+    val resourceHolders = (allResources(ctx.resourcesRootElem) attValue XMLLangQName) map (_ -> List(resourceHolder))
     insertHolders(controlElement, List(dataHolder), resourceHolders, precedingControlName)
   }
 
@@ -378,7 +377,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val containers =
       ensureContainers(
         ctx.dataRootElem,
-        findContainerNamesForModel(controlElement) map (name ⇒ (() ⇒ elementInfo(name), None))
+        findContainerNamesForModel(controlElement) map (name => (() => elementInfo(name), None))
       )
 
     // Then we create the holders within the containers
@@ -389,7 +388,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val holdersIt =
       dataHolders.iterator ++ Iterator.continually(dataHolders.head)
 
-    containers foreach { container ⇒
+    containers foreach { container =>
       insert(
         into   = container,
         after  = container / * filter (_.name == precedingControlName.getOrElse("")),
@@ -400,7 +399,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Insert resources placeholders for all languages
     if (resourceHolders.nonEmpty) {
       val resourceHoldersMap = resourceHolders.toMap
-      allResources(ctx.resourcesRootElem) foreach { resource ⇒
+      allResources(ctx.resourcesRootElem) foreach { resource =>
         val lang    = resource attValue XMLLangQName
         val holders = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
         insert(
@@ -423,23 +422,23 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private def normalizeMipValue(
     mip          : MIP,
     mipValue     : String,
-    hasCalculate : ⇒ Boolean,
-    isTypeString : String ⇒ Boolean
+    hasCalculate : => Boolean,
+    isTypeString : String => Boolean
   ): Option[String] =
-    mipValue.trimAllToOpt flatMap { trimmed ⇒
+    mipValue.trimAllToOpt flatMap { trimmed =>
 
      // See also https://github.com/orbeon/orbeon-forms/issues/3950
 
       val isDefault =
         mip match {
-          case Model.Relevant   ⇒ trimmed == TrueExpr
-          case Model.Readonly   ⇒ trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
-          case Model.Required   ⇒ trimmed == FalseExpr
-          case Model.Constraint ⇒ trimmed.isEmpty
-          case Model.Calculate  ⇒ trimmed.isEmpty
-          case Model.Default    ⇒ trimmed.isEmpty
-          case Model.Type       ⇒ isTypeString(trimmed)
-          case Model.Whitespace ⇒ trimmed == Whitespace.Policy.Preserve.entryName
+          case Model.Relevant   => trimmed == TrueExpr
+          case Model.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
+          case Model.Required   => trimmed == FalseExpr
+          case Model.Constraint => trimmed.isEmpty
+          case Model.Calculate  => trimmed.isEmpty
+          case Model.Default    => trimmed.isEmpty
+          case Model.Type       => isTypeString(trimmed)
+          case Model.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
         }
 
       ! isDefault option trimmed
@@ -450,13 +449,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private def denormalizeMipValue(
     mip          : ComputedMIP,
     mipValue     : Option[String],
-    hasCalculate : ⇒ Boolean,
-    isTypeString : String ⇒ Boolean
+    hasCalculate : => Boolean,
+    isTypeString : String => Boolean
   ): String = {
 
     // Start by normalizing
     val normalizedValueOpt =
-      mipValue flatMap (_.trimAllToOpt) flatMap { rawMipValue ⇒
+      mipValue flatMap (_.trimAllToOpt) flatMap { rawMipValue =>
         normalizeMipValue(
           mip,
           rawMipValue,
@@ -466,16 +465,16 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       }
 
       normalizedValueOpt match {
-        case Some(value) ⇒
+        case Some(value) =>
           value
-        case None ⇒
+        case None =>
           mip match {
-            case Model.Relevant   ⇒ TrueExpr
-            case Model.Readonly   ⇒ if (hasCalculate) TrueExpr else FalseExpr
-            case Model.Required   ⇒ FalseExpr
-            case Model.Calculate  ⇒ ""
-            case Model.Default    ⇒ ""
-            case Model.Whitespace ⇒ Whitespace.Policy.Preserve.entryName
+            case Model.Relevant   => TrueExpr
+            case Model.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
+            case Model.Required   => FalseExpr
+            case Model.Calculate  => ""
+            case Model.Default    => ""
+            case Model.Whitespace => Whitespace.Policy.Preserve.entryName
           }
       }
     }
@@ -501,7 +500,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     mipValue    : String)(implicit
     ctx         : FormBuilderDocContext
   ): Unit = {
-    findControlByName(ctx.formDefinitionRootElem, controlName) foreach { control ⇒
+    findControlByName(ctx.formDefinitionRootElem, controlName) foreach { control =>
 
       // Get or create the bind element
       val bindElem = ensureBinds(findContainerNamesForModel(control) :+ controlName)
@@ -528,7 +527,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val (prefix, _) = parseQName(qNameValue)
 
     def existingNSMapping =
-      bind.namespaceMappings.toMap.get(prefix) map (prefix →)
+      bind.namespaceMappings.toMap.get(prefix) map (prefix ->)
 
     def newNSMapping = {
       // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
@@ -540,9 +539,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         else
           None
 
-      newURI map { uri ⇒
+      newURI map { uri =>
         insert(into = ctx.topLevelBindElem.toList, origin = namespaceInfo(prefix, uri))
-        prefix → uri
+        prefix -> uri
       }
     }
 
@@ -567,8 +566,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Return `(attQName, elemQName)`
   def mipToFBMIPQNames(mip: Model.MIP): (QName, QName) =
     RewrittenMIPs.get(mip) match {
-      case Some(qn) ⇒ qn        → qn
-      case None     ⇒ mip.aName → mip.eName
+      case Some(qn) => qn        -> qn
+      case None     => mip.aName -> mip.eName
     }
 
   def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
@@ -577,7 +576,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
     getFormRunnerBodyElem(inDoc) descendant * filter
-      (e ⇒ isIdForControl(e.id))
+      (e => isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
   def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -588,9 +587,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val model = getFormModel
     val part = model.staticModel.part
     for {
-      controlId ← findControlIdByName(ctx.formDefinitionRootElem, controlName)
+      controlId <- findControlIdByName(ctx.formDefinitionRootElem, controlName)
       prefixedId = part.startScope.prefixedIdForStaticId(controlId)
-      control ← Option(part.getControlAnalysis(prefixedId))
+      control <- Option(part.getControlAnalysis(prefixedId))
     } yield
       control
   }
@@ -599,8 +598,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
     val model = getFormModel
     for {
-      controlId ← findControlIdByName(ctx.formDefinitionRootElem, controlName)
-      control   ← model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
+      controlId <- findControlIdByName(ctx.formDefinitionRootElem, controlName)
+      control   <- model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
     } yield
       control
   }
@@ -643,16 +642,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val someNode = params.headOption orElse existingParams.headOption get
         val config   = someNode.getConfiguration
 
-        ! DeepEqual.deepEquals(
-          params.iterator,
-          existingParams.iterator,
-          new GenericAtomicComparer(CodepointCollator.getInstance, config.getConversionContext),
-          config,
-          DeepEqual.INCLUDE_PREFIXES |
-            DeepEqual.INCLUDE_COMMENTS |
-            DeepEqual.COMPARE_STRING_VALUES |
-            DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS
-        )
+        ! SaxonUtils.deepCompare(config, params.iterator, existingParams.iterator, excludeWhitespaceTextNodes = false)
       }
     }
 
@@ -688,7 +678,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     hasHTMLMediatype(findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset" child "label")
 
   def setHTMLMediatype(lhhaElems: Seq[NodeInfo], isHTML: Boolean): Unit =
-    lhhaElems foreach { lhhaElem ⇒
+    lhhaElems foreach { lhhaElem =>
       if (isHTML)
         insert(into = lhhaElem, origin = attributeInfo("mediatype", "text/html"))
       else
@@ -744,7 +734,13 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       Nil
   }
 
-  // Build an effective id for a given static id or return null (the empty sequence)
+  // Build an namespaced id for a given static id or return null (the empty sequence)
+  def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String = {
+    val effectiveId  = buildFormBuilderControlEffectiveId(staticId)
+    val namespacedId = effectiveId.map(XFormsUtils.namespaceId(XFormsAPI.inScopeContainingDocument, _))
+    namespacedId.orNull
+  }
+
   def buildFormBuilderControlAbsoluteIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String =
     buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
@@ -756,12 +752,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     val addHints = FormBuilder.hasItemHintEditor(controlName)
 
-    for ((lang, holder) ← FormRunner.findResourceHoldersWithLang(controlName, resourcesRoot)) {
+    for ((lang, holder) <- FormRunner.findResourceHoldersWithLang(controlName, resourcesRoot)) {
 
       delete(holder / "item")
 
       val newItemElems =
-        for (item ← items / "item")
+        for (item <- items / "item")
         yield {
           <item>
             <label>{item / "label" filter (_.attValue("lang") == lang) stringValue}</label>
@@ -796,7 +792,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val containerIds = ancestorContainers map (_.id)
     val repeatDepth  = ancestorContainers count isRepeat
 
-    def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_INDEX_SEPARATOR_STRING
+    def suffix = 1 to repeatDepth map (_ => 1) mkString REPEAT_INDEX_SEPARATOR_STRING
     val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
 
     prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
@@ -814,7 +810,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
     // Replace formulas in binds
-    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach { att ⇒
+    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach { att =>
 
       val xpathString = att.stringValue
 
@@ -849,11 +845,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       updateNode(newName)
 
     // `fr:listener/@controls`
-    ctx.modelElem child FRListenerTest att ControlsTest foreach { att ⇒
+    ctx.modelElem child FRListenerTest att ControlsTest foreach { att =>
 
       val newTokens = att.stringValue.splitTo[List]() map {
-        case `oldName` ⇒ newName
-        case other     ⇒ other
+        case `oldName` => newName
+        case other     => other
       }
 
       updateNode(newTokens mkString " ")(att)
@@ -862,7 +858,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Update legacy actions
     val legacyActions = findLegacyActions
 
-    findControlIdByName(ctx.bodyElem, oldName) foreach { oldControlId ⇒
+    findControlIdByName(ctx.bodyElem, oldName) foreach { oldControlId =>
 
       val newControlId = newName + oldControlId.substringAfter(oldName)
 

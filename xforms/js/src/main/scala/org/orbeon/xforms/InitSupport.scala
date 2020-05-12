@@ -28,12 +28,12 @@ import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
@@ -56,13 +56,13 @@ object InitSupport {
 
     val initializations =
       decode[rpc.Initializations](initializationsString) match {
-        case Left(e)  ⇒ throw e
-        case Right(i) ⇒ i
+        case Left(e)  => throw e
+        case Right(i) => i
       }
 
     scribe.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
-    pageContainsFormsMarkupF foreach { _ ⇒
+    pageContainsFormsMarkupF foreach { _ =>
 
       scribe.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
@@ -92,7 +92,7 @@ object InitSupport {
       }
     } else {
 
-      lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) ⇒ {
+      lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) => {
         scribe.debug(s"$DOMContentLoaded handler called")
         doc.removeEventListener(DOMContentLoaded, contentLoaded)
         promise.success(())
@@ -107,8 +107,8 @@ object InitSupport {
   def liferayF: Future[Unit] = {
     scribe.debug("checking for Liferay object")
     dom.window.Liferay.toOption match {
-      case None          ⇒ Future.successful(())
-      case Some(liferay) ⇒ liferay.allPortletsReadyF
+      case None          => Future.unit
+      case Some(liferay) => liferay.allPortletsReadyF
     }
   }
 
@@ -122,19 +122,19 @@ object InitSupport {
 
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
-        jBody.addClass(Constants.XFormsIosClass)
+      jBody.addClass(Constants.XFormsIosClass)
 
     if (Bowser.mobile.contains(true))
-        jBody.addClass(Constants.XFormsMobileClass)
+      jBody.addClass(Constants.XFormsMobileClass)
   }
 
   @JSExport
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
-      case Left(_)  ⇒
+      case Left(_)  =>
         // TODO: error
         None
-      case Right(controls) ⇒
+      case Right(controls) =>
         initializeJavaScriptControls(controls)
     }
 
@@ -162,26 +162,22 @@ object InitSupport {
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
 
-      // The error panel shouldn't depend on much and is useful early on
-      val errorPanel = ErrorPanel.initializeErrorPanel(formElem) getOrElse
-        (throw new IllegalStateException(s"missing error panel element for form `$formId`"))
-
       // Q: Do this later?
       $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
       val uuid =
         StateHandling.initializeState(formId, initializations.uuid) match {
-          case StateResult.Uuid(uuid) ⇒
+          case StateResult.Uuid(uuid) =>
             uuid
-          case StateResult.Restore(uuid) ⇒
-            AjaxEvent.dispatchEvent(
+          case StateResult.Restore(uuid) =>
+            AjaxClient.fireEvent(
               AjaxEvent(
                 eventName = EventNames.XXFormsAllEventsRequired,
                 form      = formElem
               )
             )
             uuid
-          case StateResult.Reload ⇒
+          case StateResult.Reload =>
             dom.window.location.reload(flag = true)
             return
         }
@@ -209,7 +205,6 @@ object InitSupport {
           xformsServerPath              = initializations.xformsServerPath,
           xformsServerUploadPath        = initializations.xformsServerUploadPath,
           calendarImagePath             = initializations.calendarImagePath,
-          errorPanel                    = errorPanel,
           repeatTreeChildToParent       = repeatTreeChildToParent,
           repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
           repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes),
@@ -250,7 +245,7 @@ object InitSupport {
       val hasOtherScripts = ! js.isUndefined(g.xformsPageLoadedServer)
 
       // Run user scripts
-      initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) ⇒
+      initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
         ServerAPI.callUserScript(formId, functionName, targetId, observerId, paramsValues map (_.asInstanceOf[js.Any]): _*)
       }
 
@@ -272,7 +267,7 @@ object InitSupport {
           if (heartBeatCheckDelay > 0) {
             scribe.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
             js.timers.setInterval(heartBeatCheckDelay) {
-              Events.sendHeartBeatIfNeeded(heartBeatDelay)
+              AjaxClient.sendHeartBeatIfNeeded(heartBeatDelay)
             }
           }
         }
@@ -297,34 +292,34 @@ object InitSupport {
       pageContainsFormsMarkupPromise.future
 
     def allFormElems: Seq[html.Form] =
-      dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form ⇒ f }
+      dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
 
     def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =
       formElem.elements.iterator                          collectFirst
-        { case e: html.Input if fieldName == e.name ⇒ e } getOrElse
+        { case e: html.Input if fieldName == e.name => e } getOrElse
         (throw new IllegalStateException(s"missing hidden field for form `$fieldName`"))
 
     def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {
-        repeatIndexes ← repeatIndexesString.splitTo[List](",")
+        repeatIndexes <- repeatIndexesString.splitTo[List](",")
         repeatInfos   = repeatIndexes.splitTo[List]() // must be of the form "a b"
       } yield
-        repeatInfos.head → repeatInfos.last
+        repeatInfos.head -> repeatInfos.last
 
     def parseRepeatTree(repeatTreeString: String): List[(String, String)] =
       for {
-       repeatTree  ← repeatTreeString.splitTo[List](",")
+       repeatTree  <- repeatTreeString.splitTo[List](",")
        repeatInfos = repeatTree.splitTo[List]() // must be of the form "a b"
        if repeatInfos.size > 1
      } yield
-       repeatInfos.head → repeatInfos.last
+       repeatInfos.head -> repeatInfos.last
 
     def createParentToChildrenMap(childToParentMap: Map[String, String]): collection.Map[String, js.Array[String]] = {
 
       val parentToChildren = m.Map[String, js.Array[String]]()
 
-      childToParentMap foreach { case (child, parent) ⇒
-        Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p ⇒
+      childToParentMap foreach { case (child, parent) =>
+        Iterator.iterateOpt(parent)(childToParentMap.get) foreach { p =>
           parentToChildren.getOrElseUpdate(p, js.Array[String]()).push(child)
         }
       }
@@ -344,24 +339,24 @@ object InitSupport {
       parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
 
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
-      controls foreach { case rpc.Control(id, valueOpt) ⇒
-        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control ⇒
-          val jControl = $(control)
+      controls foreach { case rpc.Control(id, valueOpt) =>
+        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
+          val classList = control.classList
           if (XBL.isComponent(control)) {
             // Custom XBL component initialization
             for {
-              _     ← Option(XBL.instanceForControl(control))
-              value ← valueOpt
+              _     <- Option(XBL.instanceForControl(control))
+              value <- valueOpt
             } locally {
               Controls.setCurrentValue(control, value)
             }
-          } else if (jControl.is(".xforms-dialog.xforms-dialog-visible-true")) {
+          } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
               // Initialized visible dialogs
               Init._dialog(control)
-          } else if (jControl.is(".xforms-select1-appearance-compact, .xforms-select-appearance-compact")) {
+          } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
               // Legacy JavaScript initialization
               Init._compactSelect(control)
-          } else if (jControl.is(".xforms-range")) {
+          } else if (classList.contains("xforms-range")) {
               // Legacy JavaScript initialization
               Init._range(control)
           }
@@ -369,7 +364,7 @@ object InitSupport {
       }
 
     def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
-      listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) ⇒
+      listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
         // NOTE: 2019-01-07: We don't handle dialogs yet.
         //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
@@ -386,13 +381,13 @@ object InitSupport {
         val modifierString =
           modifierStrings mkString " "
 
-        val callback: js.Function = (e: dom.KeyboardEvent, combo: String) ⇒ {
+        val callback: js.Function = (e: dom.KeyboardEvent, combo: String) => {
 
           val properties =
-            Map(KeyTextPropertyName → (keyText: js.Any)) ++
-              (modifiers map (_ ⇒ KeyModifiersPropertyName → (modifierString: js.Any)))
+            Map(KeyTextPropertyName -> (keyText: js.Any)) ++
+              (modifiers map (_ => KeyModifiersPropertyName -> (modifierString: js.Any)))
 
-          AjaxEvent.dispatchEvent(
+          AjaxClient.fireEvent(
             AjaxEvent(
               eventName   = e.`type`,
               targetId    = observer,
@@ -408,13 +403,13 @@ object InitSupport {
 
         // It is unlikely that supporting multiple event names is very useful, but you can imagine
         // in theory supporting both `keydown` and `keyup` for example.
-        eventNames foreach { eventName ⇒
+        eventNames foreach { eventName =>
           mousetrap.bind(keys, callback, eventName)
         }
       }
 
     def dispatchInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
-      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, encodedEvent) ⇒
+      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, encodedEvent) =>
         AjaxClient.createDelayedServerEvent(
           encodedEvent = encodedEvent,
           delay        = delay.toDouble,

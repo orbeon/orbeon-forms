@@ -11,13 +11,13 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.xbl
+package org.orbeon.facades
 
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.Dynamic.{global => g}
 
 // Simple facade for Dragula. See https://github.com/bevacqua/dragula.
 object Dragula {
@@ -51,8 +51,8 @@ trait Drake extends js.Any {
 
 object Drake {
   implicit class DrakeOps(private val drake: Drake) extends AnyVal {
-    def onDrag   (callback: (Element, Element)                   ⇒ Any): Unit = drake.on("drag",    callback)
-    def onDragend(callback: (Element)                            ⇒ Any): Unit = drake.on("dragend", callback)
-    def onDrop   (callback: (Element, Element, Element, Element) ⇒ Any): Unit = drake.on("drop",    callback)
+    def onDrag   (callback: (Element, Element)                   => Any): Unit = drake.on("drag",    callback)
+    def onDragend(callback: (Element)                            => Any): Unit = drake.on("dragend", callback)
+    def onDrop   (callback: (Element, Element, Element, Element) => Any): Unit = drake.on("drop",    callback)
   }
 }

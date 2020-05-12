@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 /**
  * `Element` interface defines an XML element. An element can have

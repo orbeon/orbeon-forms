@@ -36,14 +36,14 @@ class ItemsetTest
 
   describe("Read and write control items") {
     it("must read and write itemsets") {
-      withActionAndFBDoc(ItemsetsDoc) { implicit ctx ⇒
+      withActionAndFBDoc(ItemsetsDoc) { implicit ctx =>
 
         def assertControl(controlName: String, expectedItems: Seq[Elem]): Unit = {
 
           val actualItems =
             FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToDom4j
 
-          for ((expected, actual) ← expectedItems.zipAll(actualItems, null, null))
+          for ((expected, actual) <- expectedItems.zipAll(actualItems, null, null))
             assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
         }
 
@@ -92,11 +92,11 @@ class ItemsetTest
           )
 
           val controlNameExpected = List(
-            "dropdown" → expectedDropdownItems,
-            "radios"   → expectedRadioItems
+            "dropdown" -> expectedDropdownItems,
+            "radios"   -> expectedRadioItems
           )
 
-          for ((controlName, expected) ← controlNameExpected)
+          for ((controlName, expected) <- controlNameExpected)
             assertControl(controlName, expected)
         }
 
@@ -147,13 +147,13 @@ class ItemsetTest
             </items>
 
           val controlNameExpected = List(
-            "dropdown" → newDropdownItems,
-            "radios"   → newRadioItems
+            "dropdown" -> newDropdownItems,
+            "radios"   -> newRadioItems
           )
 
-          for ((controlName, expected) ← controlNameExpected) {
+          for ((controlName, expected) <- controlNameExpected) {
             FormBuilder.setControlItems(controlName, expected)
-            assertControl(controlName, expected \ "item" collect { case e: scala.xml.Elem ⇒ e })
+            assertControl(controlName, expected \ "item" collect { case e: scala.xml.Elem => e })
           }
         }
       }
@@ -166,14 +166,14 @@ class ItemsetTest
       val itemTemplates = {
         val fbResourcesURL = "oxf:/forms/orbeon/builder/form/resources.xml"
         val fbResources = TransformerUtils.urlToTinyTree(fbResourcesURL).rootElement.child("resource")
-        fbResources.map { resource ⇒
+        fbResources.map { resource =>
           val lang = resource.attValue("lang")
           val items = resource.child("template").child("items").child(*)
-          lang → items
+          lang -> items
         }.toMap
       }
 
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -192,7 +192,7 @@ class ItemsetTest
           // Extract from the resource the part just about this control
           val controlName = FormRunner.controlNameFromId(addedControl.id)
           <resources>{
-            FormBuilder.resourcesRoot.child(*) map (resourceForLang ⇒
+            FormBuilder.resourcesRoot.child(*) map (resourceForLang =>
               <resource lang={resourceForLang.attValue("lang")}>{
                 resourceForLang.child(controlName).child(*).map(nodeInfoToElem)
               }</resource>
@@ -203,7 +203,7 @@ class ItemsetTest
         def assertNewControlResources(expected: Seq[(String, Seq[NodeInfo])]): Unit = {
           val expectedResources =
             <resources>{
-              expected map { case (lang, items) ⇒
+              expected map { case (lang, items) =>
                 <resource lang={lang}>
                   <label/>
                   <hint/>
@@ -217,15 +217,15 @@ class ItemsetTest
 
         // Editing a form in English; English placeholders are added
         XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
-        assertNewControlResources(Seq("en" → itemTemplates("en")))
+        assertNewControlResources(Seq("en" -> itemTemplates("en")))
 
         // Switch language to Japanese; since we don't have FB resources, English is used
         XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "jp")
-        assertNewControlResources(Seq("jp" → itemTemplates("en")))
+        assertNewControlResources(Seq("jp" -> itemTemplates("en")))
 
         // Switch language to French; French placeholders are added
         XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "fr")
-        assertNewControlResources(Seq("fr" → itemTemplates("fr")))
+        assertNewControlResources(Seq("fr" -> itemTemplates("fr")))
 
         // Add English, in addition to French
         XFormsAPI.insert(
@@ -233,7 +233,7 @@ class ItemsetTest
          origin = FormBuilder.currentResources
         )
         XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
-        assertNewControlResources(Seq("fr" → itemTemplates("fr"), "en" → itemTemplates("en")))
+        assertNewControlResources(Seq("fr" -> itemTemplates("fr"), "en" -> itemTemplates("en")))
       }
     }
   }

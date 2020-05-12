@@ -22,10 +22,10 @@ trait RequestStats {
   def afterInitialResponse()
   def afterUpdateResponse()
   def addXPathStat(expr: String, time: Long)
-  def withXPath[T](expr: ⇒ String)(body: ⇒ T): T
+  def withXPath[T](expr: => String)(body: => T): T
 
   // For Java callers
-  def getReporter: (String, Long) ⇒ Unit = addXPathStat
+  def getReporter: (String, Long) => Unit = addXPathStat
 }
 
 class RequestStatsImpl extends RequestStats {
@@ -52,7 +52,7 @@ class RequestStatsImpl extends RequestStats {
   def addXPathStat(expr: String, time: Long) =
     xpathStats.getOrElseUpdate(expr, new XPathStats(expr)).addStat(time)
 
-  private def topXPath(n: Int, f: XPathStats ⇒ Long) =
+  private def topXPath(n: Int, f: XPathStats => Long) =
     xpathStats.values.toSeq sortBy f takeRight n reverse
 
   private def distinctXPath = xpathStats.size
@@ -65,14 +65,14 @@ class RequestStatsImpl extends RequestStats {
     println(" distinct XPath: " + distinctXPath)
     println(" total time in XPath: " + (xpathStats.values map (_.totalTime) sum))
     println(" top XPath by mean time: ")
-    for ((topXPath, i) ← topXPath(10, _.meanTime).zipWithIndex)
+    for ((topXPath, i) <- topXPath(10, _.meanTime).zipWithIndex)
       println("  " + (i + 1) + ": " + topXPath.toString)
     println(" top XPath by total time: ")
-    for ((topXPath, i) ← topXPath(10, _.totalTime).zipWithIndex)
+    for ((topXPath, i) <- topXPath(10, _.totalTime).zipWithIndex)
       println("  " + (i + 1) + ": " + topXPath.toString)
   }
 
-  def withXPath[T](expr: ⇒ String)(body: ⇒ T): T = {
+  def withXPath[T](expr: => String)(body: => T): T = {
     val startTime = System.nanoTime
 
     val result = body
@@ -89,7 +89,7 @@ object NOPRequestStats extends RequestStats {
   def afterInitialResponse() = ()
   def afterUpdateResponse() = ()
   def addXPathStat(expr: String, time: Long) = ()
-  def withXPath[T](expr: ⇒ String)(body: ⇒ T) = body
+  def withXPath[T](expr: => String)(body: => T) = body
 }
 
 object RequestStatsImpl {

@@ -24,7 +24,7 @@ class XXFormsReplaceEvent(target: XFormsEventTarget, properties: PropertyGetter)
   with InstanceEvent {
 
   def this(target: XFormsEventTarget, formerNode: NodeInfo, currentNode: NodeInfo) = {
-    this(target, Map("former-node" → Option(formerNode), "current-node" → Option(currentNode)))
+    this(target, Map("former-node" -> Option(formerNode), "current-node" -> Option(currentNode)))
   }
 
   def formerNode  = property[NodeInfo]("former-node").get

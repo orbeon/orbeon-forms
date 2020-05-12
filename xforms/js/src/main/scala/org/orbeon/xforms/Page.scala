@@ -23,9 +23,14 @@ object Page {
 
   import Private._
 
+  @JSExport
+  // Make the `lazy val` accessible to JavaScript through a function
+  // We can remove the `()` once we got rid of the call in `AjaxServer.js`
+  def loadingIndicator(): LoadingIndicator = Private.loadingIndicator
+
   def registerForm(namespacedFormId: String, form: Form): Unit = {
-    formsByNamespacedFormId += namespacedFormId → form
-    formsByUuid             += form.uuid        → form
+    formsByNamespacedFormId += namespacedFormId -> form
+    formsByUuid             += form.uuid        -> form
   }
 
   def unregisterForm(form: Form): Unit = {
@@ -71,37 +76,38 @@ object Page {
   @JSExport
   def getUploadControl(container: html.Element): Upload = {
 
-    def getControlConstructor(container: html.Element): () ⇒ Upload =
+    def getControlConstructor(container: html.Element): () => Upload =
       controlConstructors find (_.predicate(container)) match {
-        case Some(result) ⇒ result.controlConstructor
-        case None         ⇒ throw new IllegalArgumentException(s"Can't find a relevant control for container: `${container.id}`")
+        case Some(result) => result.controlConstructor
+        case None         => throw new IllegalArgumentException(s"Can't find a relevant control for container: `${container.id}`")
       }
 
     def createAndRegisterNewControl() = {
       val newControl = getControlConstructor(container)()
-      idToControl += container.id → newControl
+      idToControl += container.id -> newControl
       newControl.init(container)
       newControl
     }
 
     idToControl.get(container.id) match {
-      case None                                            ⇒ createAndRegisterNewControl()
-      case Some(control) if control.container ne container ⇒ createAndRegisterNewControl()
-      case Some(control)                                   ⇒ control
+      case None                                            => createAndRegisterNewControl()
+      case Some(control) if control.container ne container => createAndRegisterNewControl()
+      case Some(control)                                   => control
     }
   }
 
   // NOTE: This mechanism is deprecated by XBL and only used for the native `Upload` as of 2019-05-13.
-  def registerControlConstructor(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean): Unit =
+  def registerControlConstructor(controlConstructor: () => Upload, predicate: html.Element => Boolean): Unit =
     controlConstructors ::= ConstructorPredicate(controlConstructor, predicate)
 
   private object Private {
 
-    case class ConstructorPredicate(controlConstructor: () ⇒ Upload, predicate: html.Element ⇒ Boolean)
+    case class ConstructorPredicate(controlConstructor: () => Upload, predicate: html.Element => Boolean)
 
-    var formsByNamespacedFormId = Map[String, Form]()
-    var formsByUuid             = Map[String, Form]()
-    var controlConstructors     = List[ConstructorPredicate]()
-    var idToControl             = Map[String, Upload]()
+    lazy val loadingIndicator        = new LoadingIndicator
+    var      formsByNamespacedFormId = Map[String, Form]()
+    var      formsByUuid             = Map[String, Form]()
+    var      controlConstructors     = List[ConstructorPredicate]()
+    var      idToControl             = Map[String, Upload]()
   }
 }

@@ -50,7 +50,7 @@ trait XFormsContainerControl extends VisitableTrait {
     super.updateEffectiveId()
 
     if (hasChildren)
-      for (currentControl ← _children)
+      for (currentControl <- _children)
         currentControl.updateEffectiveId()
   }
 
@@ -61,7 +61,7 @@ trait XFormsContainerControl extends VisitableTrait {
     // Clone children if any
     if (hasChildren) {
       cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
-      for (currentChildControl ← _children) {
+      for (currentChildControl <- _children) {
         val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
         currentChildClone.parent = null // cloned control doesn't need a parent
         cloned._children += currentChildClone
@@ -73,7 +73,7 @@ trait XFormsContainerControl extends VisitableTrait {
 
   override def iterationRemoved(): Unit = {
     if (hasChildren)
-      for (currentControl ← _children)
+      for (currentControl <- _children)
         currentControl.iterationRemoved()
   }
 
@@ -84,7 +84,7 @@ trait XFormsContainerControl extends VisitableTrait {
     else
       Iterator.empty
 
-  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
+  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: => Unit): Unit = {
     super.toXML(helper, attributes) {
       children foreach (_.toXML(helper, List.empty)(()))
     }

@@ -125,6 +125,7 @@
             <xf:bind ref="instance('fr-form-instance')">
                 <xf:bind
                     ref="version"
+                    id="version-bind"
                     relevant="
                         $versioning-supported-on-data-side and
                         $latest-version gt 0               and
@@ -137,14 +138,14 @@
                         ref="existing-comment"
                         readonly="true()"/>
                 </xf:bind>
-                <xf:bind ref="upload">
+                <xf:bind ref="upload" id="upload-bind">
                     <xf:bind ref="file" required="true()"/>
                 </xf:bind>
-                <xf:bind ref="validate">
+                <xf:bind ref="validate" id="validate-bind">
                     <xf:bind ref="validating" constraint="$validation-completed"/>
                     <xf:bind ref="stats/*"    type="xs:integer" readonly="true()"/>
                 </xf:bind>
-                <xf:bind ref="import">
+                <xf:bind ref="import" id="import-bind">
                     <xf:bind id="fr-keep-existing-records-bind" ref="keep-existing-records"/>
                     <xf:bind id="fr-import-invalid-data-bind"   ref="import-invalid-data"/>
 
@@ -542,7 +543,7 @@
     <xh:body>
         <fr:view>
             <fr:body>
-                <fr:section id="upload-version-section" ref="instance('fr-form-instance')/version">
+                <fr:section id="version-section" bind="version-bind">
                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
 
                     <fr:grid>
@@ -626,7 +627,7 @@
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="upload-section" ref="instance('fr-form-instance')/upload">
+                <fr:section id="upload-section" bind="upload-bind">
                     <xf:label ref="xxf:r('import.upload.label', '|fr-fr-resources|')"/>
 
                     <fr:grid>
@@ -691,7 +692,7 @@
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="validate-section" ref="instance('fr-form-instance')/validate">
+                <fr:section id="validate-section" bind="validate-bind">
                     <xf:label ref="xxf:r('import.validation.label', '|fr-fr-resources|')"/>
 
                     <xf:var name="validating" value="validating = 'started'"/>
@@ -855,7 +856,7 @@
                     </xf:group>
 
                 </fr:section>
-                <fr:section id="import-section" ref="instance('fr-form-instance')/import">
+                <fr:section id="import-section" bind="import-bind">
                     <xf:label ref="xxf:r('import.import.label', '|fr-fr-resources|')"/>
 
                     <fr:grid>

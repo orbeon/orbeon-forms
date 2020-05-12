@@ -22,5 +22,5 @@ trait ChildrenLHHAAndActionsTrait extends ChildrenBuilderTrait {
   // For leaf controls, keep nested LHHA and actions
   override def findRelevantChildrenElements =
     findAllChildrenElements collect
-      { case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || XFormsActions.isAction(e.getQName) ⇒ (e, s) }
+      { case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || XFormsActions.isAction(e.getQName) => (e, s) }
 }

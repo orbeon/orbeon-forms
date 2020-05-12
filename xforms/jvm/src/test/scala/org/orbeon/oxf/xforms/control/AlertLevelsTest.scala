@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
-import org.orbeon.dom.{Document ⇒ JDocument}
+import org.orbeon.dom.{Document => JDocument}
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.submission.{RelevanceHandling, XFormsModelSubmissionBase}

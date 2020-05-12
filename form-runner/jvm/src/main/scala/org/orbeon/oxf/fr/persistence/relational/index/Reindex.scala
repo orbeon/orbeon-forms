@@ -56,21 +56,21 @@ trait Reindex extends FormDefinition {
     // If a document id was provided, produce WHERE clause, and set parameter
     val (whereConditions, paramSetter) =
       whatToReindex match {
-        case AllData ⇒ (
+        case AllData => (
           Nil,
-          (ps: PreparedStatement) ⇒ Unit
+          (ps: PreparedStatement) => Unit
         )
-        case DataForDocumentId(id) ⇒ (
+        case DataForDocumentId(id) => (
           List("document_id = ?"),
-          (ps: PreparedStatement) ⇒ ps.setString(1, id)
+          (ps: PreparedStatement) => ps.setString(1, id)
         )
-        case DataForForm(app, form, version) ⇒ (
+        case DataForForm(app, form, version) => (
           List(
             "app = ?",
             "form = ?",
             "form_version = ?"
           ),
-          (ps: PreparedStatement) ⇒ {
+          (ps: PreparedStatement) => {
             ps.setString(1, app)
             ps.setString(2, form)
             ps.setInt   (3, version)
@@ -82,18 +82,17 @@ trait Reindex extends FormDefinition {
     locally {
 
       val deleteWhereClause = whereConditions match {
-        case Nil ⇒ ""
-        case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
+        case Nil => ""
+        case _   => "WHERE " + whereConditions.mkString(" AND ")
       }
       val orderByClause = provider match {
-        case Provider.MySQL ⇒ " ORDER BY data_id"
-        case _              ⇒ ""
+        case Provider.MySQL => " ORDER BY data_id"
+        case _              => ""
       }
-
-      val deleteFromValueIndexSql = "DELETE FROM orbeon_i_control_text " + (
+      val deleteFromValueIndexWhereSql =
         whatToReindex match {
-          case AllData ⇒ ""
-          case _ ⇒
+          case AllData => ""
+          case _ =>
             s"""|WHERE data_id IN (
                 |   SELECT data_id
                 |     FROM orbeon_i_current
@@ -101,17 +100,31 @@ trait Reindex extends FormDefinition {
                 | )
                 |""".stripMargin
         }
-      )
+
+      val countFromValueIndexSql  = "SELECT count(*) FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+      val deleteFromValueIndexSql = "DELETE          FROM orbeon_i_control_text " + deleteFromValueIndexWhereSql
+
+      // Check if there is anything to delete from the value index
+      val countFromValueIndex =
+        useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps ⇒
+          paramSetter(ps)
+          useAndClose(ps.executeQuery()) { rs ⇒
+            rs.next()
+            rs.getInt(1)
+          }
+        }
 
       val deleteFromCurrentIndex =
         s"""|DELETE FROM orbeon_i_current
             |$deleteWhereClause
             |""".stripMargin
 
-      Iterator(
-        deleteFromValueIndexSql,
-        deleteFromCurrentIndex
-      ).foreach { deleteSql ⇒
+      val deleteSql = List(
+        if (countFromValueIndex > 0) Some(deleteFromValueIndexSql) else None,
+        Some(deleteFromCurrentIndex)
+      ).flatten
+
+      deleteSql.foreach { deleteSql =>
         useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps ⇒
           paramSetter(ps)
           ps.executeUpdate()
@@ -146,9 +159,9 @@ trait Reindex extends FormDefinition {
       s"""|SELECT count(*)
           |$currentFromWhere
           |""".stripMargin
-    useAndClose(connection.prepareStatement(countSql)) { ps ⇒
+    useAndClose(connection.prepareStatement(countSql)) { ps =>
       paramSetter(ps)
-      useAndClose(ps.executeQuery()) { rs ⇒
+      useAndClose(ps.executeQuery()) { rs =>
         rs.next()
         val count = rs.getInt(1)
         Backend.setProviderDocumentTotal(count)
@@ -175,9 +188,9 @@ trait Reindex extends FormDefinition {
          |ORDER BY app, form
          |""".stripMargin
 
-    useAndClose(connection.prepareStatement(currentDataSql)) { ps ⇒
+    useAndClose(connection.prepareStatement(currentDataSql)) { ps =>
       paramSetter(ps)
-      useAndClose(ps.executeQuery()) { currentData ⇒
+      useAndClose(ps.executeQuery()) { currentData =>
 
         // Info on indexed controls for a given app/form
         case class FormIndexedControls(
@@ -197,16 +210,16 @@ trait Reindex extends FormDefinition {
 
           // Get indexed controls for current app/form
           val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
-            case Some(FormIndexedControls(`app`, `form`, indexedControls)) ⇒
+            case Some(FormIndexedControls(`app`, `form`, indexedControls)) =>
               // Use indexed controls from previous iteration
               indexedControls
-            case _ ⇒
+            case _ =>
               // Compute indexed controls reading the form definition
               FormRunner.readPublishedForm(app, form)(RelationalUtils.Logger) match {
-                case None ⇒
+                case None =>
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                   Seq.empty
-                case Some(formDefinition) ⇒
+                case Some(formDefinition) =>
                   findIndexedControls(
                     formDefinition,
                     FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
@@ -234,7 +247,7 @@ trait Reindex extends FormDefinition {
               |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin
 
-          useAndClose(connection.prepareStatement(insertIntoCurrentSql)) { ps ⇒
+          useAndClose(connection.prepareStatement(insertIntoCurrentSql)) { ps =>
             ps.setInt      (position.next(), currentData.getInt("id"))
             ps.setTimestamp(position.next(), currentData.getTimestamp("created"))
             ps.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
@@ -242,8 +255,8 @@ trait Reindex extends FormDefinition {
             ps.setString   (position.next(), currentData.getString("username"))
             ps.setString   (position.next(), currentData.getString("groupname"))
             RelationalUtils.getIntOpt(currentData, "organization_id") match {
-              case Some(id) ⇒ ps.setInt(position.next(), id)
-              case None     ⇒ ps.setNull(position.next(), java.sql.Types.INTEGER)
+              case Some(id) => ps.setInt(position.next(), id)
+              case None     => ps.setNull(position.next(), java.sql.Types.INTEGER)
             }
             ps.setString   (position.next(), app)
             ps.setString   (position.next(), form)
@@ -263,10 +276,10 @@ trait Reindex extends FormDefinition {
           }
 
           // Extract and insert value for each indexed control
-          for (control ← indexedControls) {
+          for (control <- indexedControls) {
 
             val nodes = scaxon.XPath.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
-            for ((node, pos) ← nodes.zipWithIndex) {
+            for ((node, pos) <- nodes.zipWithIndex) {
               val nodeValue = truncateValue(provider, node.getStringValue)
               // For indexing, we are not interested in empty values
               if (!nodeValue.isEmpty) {
@@ -279,7 +292,7 @@ trait Reindex extends FormDefinition {
                     |            val)
                     |    VALUES (? , ? , ? , ? )
                   """.stripMargin
-                useAndClose(connection.prepareStatement(insertIntoControlTextSql)) { ps ⇒
+                useAndClose(connection.prepareStatement(insertIntoControlTextSql)) { ps =>
                   ps.setInt   (position.next(), currentData.getInt("id"))
                   ps.setInt   (position.next(), pos + 1)
                   ps.setString(position.next(), control.xpath)
@@ -312,19 +325,19 @@ trait Reindex extends FormDefinition {
   private def truncateValue(provider: Provider, value: String): String = {
     // Limit, if any, based on the provider
     val limit: Option[Int] = provider match {
-      case MySQL ⇒ Option(math.floor((math.pow(2, 16) - 1) / 4).toInt)
-      case _     ⇒ None
+      case MySQL => Option(math.floor((math.pow(2, 16) - 1) / 4).toInt)
+      case _     => None
     }
     limit match {
-      case Some(l) if l < value.length ⇒ value.substring(0, l)
-      case _                           ⇒ value
+      case Some(l) if l < value.length => value.substring(0, l)
+      case _                           => value
     }
   }
 
   // Prefixes used in Form Builder; prefixes in other documents, for now, are not supported
   private val FbNamespaceMapping = NamespaceMapping(Map(
-    "xh" → XMLConstants.XHTML_NAMESPACE_URI,
-    "xf" → XFormsConstants.XFORMS_NAMESPACE_URI
+    "xh" -> XMLConstants.XHTML_NAMESPACE_URI,
+    "xf" -> XFormsConstants.XFORMS_NAMESPACE_URI
   ).asJava)
 
 }

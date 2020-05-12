@@ -41,12 +41,12 @@ class EmailTest
     val data =
       TransformerUtils.extractAsMutableDocument(instance child * head)
 
-    def valuesForSearch(search: ⇒ Seq[ControlBindPathHoldersResources]) = {
+    def valuesForSearch(search: => Seq[ControlBindPathHoldersResources]) = {
 
       val searchResult = search
 
       val distinctPaths =
-        searchResult map { case ControlBindPathHoldersResources(_, _, path, _, _) ⇒ path map (_.value) mkString "/" } distinct
+        searchResult map { case ControlBindPathHoldersResources(_, _, path, _, _) => path map (_.value) mkString "/" } distinct
 
       val values =
         searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to(List)
@@ -63,7 +63,7 @@ class EmailTest
         ("fr-attachment fr-email-attachment", List("attachment-14.bin")                     , List("section-1/control-14"))
       )
 
-      for ((classNames, expectedValues, expectedPath) ← expectedForClassName)
+      for ((classNames, expectedValues, expectedPath) <- expectedForClassName)
         it(s"must pass with $classNames") {
 
           val (actualValues, actualPaths) = valuesForSearch {
@@ -88,7 +88,7 @@ class EmailTest
         ("fr-attachment fr-email-attachment", List("attachment-11.bin")                                          , List("section-3/control-11"))
       )
 
-      for ((classNames, expectedValues, expectedPath) ← expectedForClassName)
+      for ((classNames, expectedValues, expectedPath) <- expectedForClassName)
         it(s"must pass with $classNames") {
 
           val (actualValues, actualPaths) = valuesForSearch {

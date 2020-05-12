@@ -43,7 +43,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     def fromChildElements = {
 
       val firstChildXMLLang = Dom4j.elements(element) collectFirst {
-        case e if e.attribute(XML_LANG_QNAME) ne null ⇒ e.attributeValue(XML_LANG_QNAME)
+        case e if e.attribute(XML_LANG_QNAME) ne null => e.attributeValue(XML_LANG_QNAME)
       }
 
       firstChildXMLLang flatMap extractXMLLang
@@ -61,7 +61,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
   // might place them there.
   override def findRelevantChildrenElements =
     findAllChildrenElements filterNot
-      { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)(e.getQName) }
+      { case (e, _) => Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)(e.getQName) }
 
   override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
   override val externalEvents              = externalEventsDef

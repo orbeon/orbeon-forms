@@ -30,7 +30,7 @@ object DatasourceDescriptor {
   def apply(provider: Provider): DatasourceDescriptor = {
 
     provider match {
-      case MySQL ⇒
+      case MySQL =>
         DatasourceDescriptor(
           name      = provider.entryName,
           driver    = "com.mysql.cj.jdbc.Driver",
@@ -39,7 +39,7 @@ object DatasourceDescriptor {
           password  = "password",
           switchDB  = "USE orbeon"
         )
-      case PostgreSQL ⇒
+      case PostgreSQL =>
         DatasourceDescriptor(
           name      = provider.entryName,
           driver    = "org.postgresql.Driver",

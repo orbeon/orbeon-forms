@@ -78,13 +78,13 @@ class OrbeonSessionListener extends HttpSessionListener {
           httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
 
         for {
-          listeners ← Option(listeners).iterator
-          listener  ← listeners.iterateRemoveAndClose()
+          listeners <- Option(listeners).iterator
+          listener  <- listeners.iterateRemoveAndClose()
         } locally {
           try {
             listener.sessionDestroyed(new ServletSessionImpl(httpSession))
           } catch {
-            case NonFatal(t) ⇒
+            case NonFatal(t) =>
               // Catch so we can continue running the remaining listeners
               logger.error("Throwable caught when calling listener", t)
           }

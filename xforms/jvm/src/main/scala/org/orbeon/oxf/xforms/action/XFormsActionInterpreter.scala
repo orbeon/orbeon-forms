@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
@@ -101,20 +101,20 @@ class XFormsActionInterpreter(
 
         // NOTE: At this point, the context has already been set to the current action element.
         iterateIterationAttribute match {
-          case Some(_) ⇒
+          case Some(_) =>
             // Gotta iterate
 
             // It's not 100% clear how `@context` and `@iterate` should interact here. Right now `@iterate` overrides `@context`,
             // i.e. `@context` is evaluated first, and `@iterate` sets a new context for each iteration.
             val currentNodeset = actionXPathContext.getCurrentBindingContext.nodeset.asScala
-            for ((overriddenContextNodeInfo, zeroBasedIndex) ← currentNodeset.iterator.zipWithIndex)
-              withIteration(zeroBasedIndex + 1) {
+            for ((overriddenContextNodeInfo, zeroBasedIndex) <- currentNodeset.iterator.zipWithIndex)
+              withIteration(zeroBasedIndex + 1) { _ =>
                 runSingle(
                   hasOverriddenContext = true,
                   contextItem          = overriddenContextNodeInfo
                 )
               }
-          case None ⇒
+          case None =>
             // Do a single iteration run (but this may repeat over the `@while` condition!)
             runSingle(
               hasOverriddenContext = actionXPathContext.getCurrentBindingContext.hasOverriddenContext,
@@ -123,7 +123,7 @@ class XFormsActionInterpreter(
         }
       }
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(
           t,
           new ExtendedLocationData(
@@ -153,7 +153,7 @@ class XFormsActionInterpreter(
       while (true) {
 
         def conditionOrBreak(conditionOpt: Option[String], name: String): Unit =
-          conditionOpt foreach { condition ⇒
+          conditionOpt foreach { condition =>
             if (! evaluateCondition(actionAnalysis.element, actionQName.qualifiedName, condition, name, contextItem))
               break()
           }
@@ -164,8 +164,8 @@ class XFormsActionInterpreter(
         // We are executing the action
         withDebug(
           "executing",
-          ("action name" → actionQName.qualifiedName) ::
-          (whileIterationAttribute.nonEmpty list ("while iteration" → whileIteration.toString))
+          ("action name" -> actionQName.qualifiedName) ::
+          (whileIterationAttribute.nonEmpty list ("while iteration" -> whileIteration.toString))
         ) {
           // Push binding excluding excluding `@context` and `@model`
           // NOTE: If we repeat, re-evaluate the action binding.
@@ -217,7 +217,7 @@ class XFormsActionInterpreter(
 
     // Don't evaluate the condition if the context has gone missing
     if (contextNodeset.size == 0) { //  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
-      debug("not executing", List("action name" → actionName, "condition type" → conditionType, "reason" → "missing context"))
+      debug("not executing", List("action name" -> actionName, "condition type" -> conditionType, "reason" -> "missing context"))
       return false
     }
     val conditionResult =
@@ -228,15 +228,15 @@ class XFormsActionInterpreter(
         xpathExpression = XPath.makeBooleanExpression(conditionAttribute)
       )
 
-    if (! conditionResult.get(0).asInstanceOf[BooleanValue].effectiveBooleanValue) {
+    if (! conditionResult.head.asInstanceOf[BooleanValue].effectiveBooleanValue) {
       // Don't execute action
       debug(
         "not executing",
         List(
-          "action name"    → actionName,
-          "condition type" → conditionType,
-          "reason"         → "condition evaluated to `false`",
-          "condition"      → conditionAttribute
+          "action name"    -> actionName,
+          "condition type" -> conditionType,
+          "reason"         -> "condition evaluated to `false`",
+          "condition"      -> conditionAttribute
         )
       )
       false
@@ -277,8 +277,28 @@ class XFormsActionInterpreter(
     nodeset         : ju.List[Item],
     position        : Int,
     xpathExpression : String
-  ): ju.List[Item] =
+  ): List[Item] =
     XPathCache.evaluateKeepItems(
+      contextItems       = nodeset,
+      contextPosition    = position,
+      xpathString        = xpathExpression,
+      namespaceMapping   = getNamespaceMappings(actionElement),
+      variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
+      functionLibrary    = containingDocument.getFunctionLibrary,
+      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+      baseURI            = null,
+      locationData       = actionElement.getData.asInstanceOf[LocationData],
+      reporter           = containingDocument.getRequestStats.getReporter
+    )
+
+  // TODO: Pass `DynamicActionContext`.
+  def evaluateKeepItemsJava(
+    actionElement   : Element,
+    nodeset         : ju.List[Item],
+    position        : Int,
+    xpathExpression : String
+  ): ju.List[Item] =
+    XPathCache.evaluateKeepItemsJava(
       contextItems       = nodeset,
       contextPosition    = position,
       xpathString        = xpathExpression,
@@ -340,12 +360,12 @@ class XFormsActionInterpreter(
 
   // Find an effective object based on either the xxf:repeat-indexes attribute, or on the current repeat indexes.
   def resolveObject(actionElement: Element, targetStaticOrAbsoluteId: String): XFormsObject = {
-    container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject ⇒
+    container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject =>
       resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
-        case None ⇒
+        case None =>
           // Most common case
           resolvedObject
-        case Some(repeatIndexes) ⇒
+        case Some(repeatIndexes) =>
           containingDocument.getControlByEffectiveId(
             Dispatch.resolveRepeatIndexes(container, resolvedObject, getActionPrefixedId(actionElement), repeatIndexes)
           )

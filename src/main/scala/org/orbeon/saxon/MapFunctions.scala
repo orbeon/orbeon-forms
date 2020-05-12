@@ -51,7 +51,7 @@ class MapEntry extends ReturnMapFunction {
     val value = itemsArgument(1)
 
     createValue(
-      Map(key → new SequenceExtent(value)),
+      Map(key -> new SequenceExtent(value)),
       config
     )
   }
@@ -91,9 +91,9 @@ class MapGet extends MapFunction {
     val key = SaxonUtils.fixStringValue(itemArgument(1).asInstanceOf[AtomicValue]) // enforced by signature
 
     map.getOrElse(key, EmptySequence.getInstance) match {
-      case v: Value    ⇒ v.iterate()
-      case v: NodeInfo ⇒ SingletonIterator.makeIterator(v)
-      case _           ⇒ throw new IllegalStateException
+      case v: Value    => v.iterate()
+      case v: NodeInfo => SingletonIterator.makeIterator(v)
+      case _           => throw new IllegalStateException
     }
   }
 }
@@ -112,7 +112,7 @@ object MapFunctions {
     val mapType = saxonTypeForMap(config)
 
     asScalaIterator(it) collect {
-      case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == mapType ⇒
+      case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == mapType =>
         v.getObject.asInstanceOf[UnderlyingType]
     }
   }

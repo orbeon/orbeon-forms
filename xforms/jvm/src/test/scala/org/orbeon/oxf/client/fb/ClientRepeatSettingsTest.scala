@@ -43,33 +43,33 @@ trait ClientRepeatSettingsTest extends AssertionsForJUnit with FormBuilderOps wi
 
     def saveAndCheck(min: Int, max: Int) =
       for {
-        _ ← openGridDetails()
-        _ ← clickOn(cssSelector(SwitchToRepeatedContentTab))
-        _ ← clickOn(XForms.fullItemSelector(MinRepeatSelect1Id, min))
-        _ ← clickOn(XForms.fullItemSelector(MaxRepeatSelect1Id, max))
+        _ <- openGridDetails()
+        _ <- clickOn(cssSelector(SwitchToRepeatedContentTab))
+        _ <- clickOn(XForms.fullItemSelector(MinRepeatSelect1Id, min))
+        _ <- clickOn(XForms.fullItemSelector(MaxRepeatSelect1Id, max))
         minValue = min.toString
         maxValue = ((min + 1) max 1).toString
         checkMinField = min >= 2
         checkMaxField = max >= 1
-        _ ← if (checkMinField) MinInputSelector.element.replaceFieldText(minValue)
-        _ ← if (checkMaxField) MaxInputSelector.element.replaceFieldText(maxValue)
-        _ ← closeGridDetails()
-        _ ← openGridDetails()
-        _ ← assert(radioButton(XForms.fullItemSelector(MinRepeatSelect1Id, min)).isSelected)
-        _ ← assert(radioButton(XForms.fullItemSelector(MaxRepeatSelect1Id, max)).isSelected)
-        _ ← if (checkMinField) assert(minValue === MinInputSelector.element.fieldText)
-        _ ← if (checkMaxField) assert(maxValue === MaxInputSelector.element.fieldText)
-        _ ← closeGridDetails()
+        _ <- if (checkMinField) MinInputSelector.element.replaceFieldText(minValue)
+        _ <- if (checkMaxField) MaxInputSelector.element.replaceFieldText(maxValue)
+        _ <- closeGridDetails()
+        _ <- openGridDetails()
+        _ <- assert(radioButton(XForms.fullItemSelector(MinRepeatSelect1Id, min)).isSelected)
+        _ <- assert(radioButton(XForms.fullItemSelector(MaxRepeatSelect1Id, max)).isSelected)
+        _ <- if (checkMinField) assert(minValue === MinInputSelector.element.fieldText)
+        _ <- if (checkMaxField) assert(maxValue === MaxInputSelector.element.fieldText)
+        _ <- closeGridDetails()
       }()
 
     Builder.onNewForm {
       for {
-        _ ← Builder.insertNewRepeatedGrid()
+        _ <- Builder.insertNewRepeatedGrid()
       }()
 
       for {
-        min ← 0 to 2
-        max ← 0 to 1
+        min <- 0 to 2
+        max <- 0 to 1
       } locally {
         saveAndCheck(min, max)
       }

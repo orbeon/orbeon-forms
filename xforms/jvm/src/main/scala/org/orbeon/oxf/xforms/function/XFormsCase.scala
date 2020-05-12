@@ -25,9 +25,9 @@ import org.orbeon.scaxon.Implicits._
 class XFormsCase extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     for {
-      control      ← relevantControl(0)(xpathContext)
-      switch       ← collectByErasedType[XFormsSwitchControl](control)
-      selectedCase ← switch.selectedCaseIfRelevantOpt
+      control      <- relevantControl(0)(xpathContext)
+      switch       <- collectByErasedType[XFormsSwitchControl](control)
+      selectedCase <- switch.selectedCaseIfRelevantOpt
     } yield
       selectedCase.getId
 }

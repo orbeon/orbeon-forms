@@ -33,7 +33,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
 import scala.collection.JavaConverters._
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 object XFormsExtractor {
   val LastIdQName = QName("last-id")
@@ -160,18 +160,18 @@ class XFormsExtractor(
     xmlReceiverOpt foreach (_.startDocument())
 
   private def outputFirstElementIfNeeded(): Unit =
-    xmlReceiverOpt foreach { implicit xmlReceiver ⇒
+    xmlReceiverOpt foreach { implicit xmlReceiver =>
       if (mustOutputFirstElement && ! outputSingleTemplate) {
 
-        openElement(localName = "static-state", atts = List("is-html" → isHTMLDocument.toString))
-        openElement(localName = "root",         atts = List("id"      → Constants.DocumentId))
+        openElement(localName = "static-state", atts = List("is-html" -> isHTMLDocument.toString))
+        openElement(localName = "root",         atts = List("id"      -> Constants.DocumentId))
 
         mustOutputFirstElement = false
       }
     }
 
   override def endDocument(): Unit =
-    xmlReceiverOpt foreach { implicit xmlReceiver ⇒
+    xmlReceiverOpt foreach { implicit xmlReceiver =>
 
       if (! outputSingleTemplate) {
 
@@ -183,7 +183,7 @@ class XFormsExtractor(
           // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
           element(
             localName = XFormsExtractor.LastIdQName.localName,
-            atts      = List("id" → metadata.idGenerator.nextSequenceNumber.toString)
+            atts      = List("id" -> metadata.idGenerator.nextSequenceNumber.toString)
           )
 
           // TODO: It's not good to serialize this right here, since we have a live SAXStore anyway used to create the
@@ -192,7 +192,7 @@ class XFormsExtractor(
 
           // Remember the template (and marks if any) if there are top-level marks
           if (metadata.hasTopLevelMarks)
-            templateUnderConstructionOpt foreach { templateUnderConstruction ⇒
+            templateUnderConstructionOpt foreach { templateUnderConstruction =>
               withElement(localName = "template") {
                 // NOTE: At this point, the template has just received endDocument(), so is no longer under under
                 // construction and can be serialized safely.
@@ -230,41 +230,41 @@ class XFormsExtractor(
       // xbl:base
       val newBase =
         Option(attributes.getValue(XML_URI, "base")) match {
-          case Some(xmlBaseAttribute) ⇒
+          case Some(xmlBaseAttribute) =>
             try {
               parentElementDetails.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize // normalize to remove "..", etc.
             } catch {
-              case e: URISyntaxException ⇒
+              case e: URISyntaxException =>
                 throw new ValidationException(
                   s"Error creating URI from: `$parentElementDetails` and `$xmlBaseAttribute`.",
                   e,
                   LocationData.createIfPresent(locator)
                 )
             }
-          case None ⇒
+          case None =>
             parentElementDetails.xmlBase
         }
 
       // xml:lang
       val (newLangOpt, newLangAvtIdOpt) =
         Option(attributes.getValue(XML_URI, "lang")) match {
-          case some @ Some(xmlLangAttribute) ⇒
-            some → (
+          case some @ Some(xmlLangAttribute) =>
+            some -> (
               if (XFormsUtils.maybeAVT(xmlLangAttribute))
                 Option(staticId)
               else
                 parentElementDetails.xmlLangAvtIdOpt
             )
-          case None ⇒
-            parentElementDetails.xmlLangOpt →
+          case None =>
+            parentElementDetails.xmlLangOpt ->
               parentElementDetails.xmlLangAvtIdOpt
         }
 
       // xxbl:scope
       val newScope =
         Option(attributes.getValue(XXBL_SCOPE_QNAME.namespace.uri, XXBL_SCOPE_QNAME.localName)) match {
-          case Some(xblScopeAttribute) ⇒ XXBLScope.withName(xblScopeAttribute)
-          case None                    ⇒ parentElementDetails.scope
+          case Some(xblScopeAttribute) => XXBLScope.withName(xblScopeAttribute)
+          case None                    => parentElementDetails.scope
         }
 
       elementStack ::=
@@ -309,14 +309,14 @@ class XFormsExtractor(
       outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
 
       // Add xml:lang on element if found
-      elementStack.head.xmlLangOpt foreach { xmlLang ⇒
+      elementStack.head.xmlLangOpt foreach { xmlLang =>
         val newXMLLang =
           elementStack.head.xmlLangAvtIdOpt match {
-            case Some(xmlLangAvtId) if XFormsUtils.maybeAVT(xmlLang) ⇒
+            case Some(xmlLangAvtId) if XFormsUtils.maybeAVT(xmlLang) =>
               // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
               // xml:lang containing the id of the control that evaluates the runtime value.
               "#" + xmlLangAvtId
-            case _ ⇒
+            case _ =>
               // No AVT
               xmlLang
           }
@@ -400,7 +400,7 @@ class XFormsExtractor(
   }
 
   override def characters(ch: Array[Char], start: Int, length: Int): Unit =
-    xmlReceiverOpt foreach { xmlReceiver ⇒
+    xmlReceiverOpt foreach { xmlReceiver =>
       if (inPreserve) {
         xmlReceiver.characters(ch, start, length)
       } else if (! inForeign) {
@@ -412,13 +412,13 @@ class XFormsExtractor(
     }
 
   override def comment(ch: Array[Char], start: Int, length: Int) =
-    xmlReceiverOpt foreach { xmlReceiver ⇒
+    xmlReceiverOpt foreach { xmlReceiver =>
       if (inPreserve)
         xmlReceiver.comment(ch, start, length)
     }
 
   override def processingInstruction(target: String, data: String) =
-    xmlReceiverOpt foreach { xmlReceiver ⇒
+    xmlReceiverOpt foreach { xmlReceiver =>
       if (inPreserve)
         xmlReceiver.processingInstruction(target, data)
     }
@@ -439,16 +439,16 @@ trait ExtractorOutput extends XMLReceiver {
   override def endPrefixMapping(s: String): Unit = ()
 
   def startStaticStateElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
-    xmlReceiverOpt foreach { xmlReceiver ⇒
+    xmlReceiverOpt foreach { xmlReceiver =>
       outputNamespaceContextStack ::= inputNamespaceContext.current
       iterateChangedMappings foreach (xmlReceiver.startPrefixMapping _).tupled
       xmlReceiver.startElement(uri, localname, qName, attributes)
     }
 
   def endStaticStateElement(uri: String, localname: String, qName: String): Unit =
-    xmlReceiverOpt foreach { xmlReceiver ⇒
+    xmlReceiverOpt foreach { xmlReceiver =>
       xmlReceiver.endElement(uri, localname, qName)
-      iterateChangedMappings foreach { case (prefix, _) ⇒ xmlReceiver.endPrefixMapping(prefix) }
+      iterateChangedMappings foreach { case (prefix, _) => xmlReceiver.endPrefixMapping(prefix) }
       outputNamespaceContextStack = outputNamespaceContextStack.tail
     }
 
@@ -463,12 +463,12 @@ trait ExtractorOutput extends XMLReceiver {
       Iterator.empty
     } else {
       for {
-        newMapping @ (newPrefix, newURI) ← newMappings.iterator
+        newMapping @ (newPrefix, newURI) <- newMappings.iterator
         if (
           oldMappings.get(newPrefix) match {
-            case None                             ⇒ true  // new mapping
-            case Some(oldURI) if oldURI != newURI ⇒ true  // changed mapping, including to/from undeclaration with ""
-            case _                                ⇒ false // unchanged mapping
+            case None                             => true  // new mapping
+            case Some(oldURI) if oldURI != newURI => true  // changed mapping, including to/from undeclaration with ""
+            case _                                => false // unchanged mapping
           }
         )
       } yield
@@ -491,23 +491,23 @@ trait ExtractorProperties {
   private val unparsedInlineProperties = m.HashMap[String, String]()
 
   protected def outputNonDefaultProperties(): Unit =
-    xmlReceiverOpt foreach { implicit xmlReceiver ⇒
+    xmlReceiverOpt foreach { implicit xmlReceiver =>
 
       val propertySet = Properties.instance.getPropertySet
 
       val propertiesToKeep = {
         for {
-          (name, prop) ← SUPPORTED_DOCUMENT_PROPERTIES.asScala
+          (name, prop) <- SUPPORTED_DOCUMENT_PROPERTIES.asScala
           defaultValue = prop.defaultValue
           globalValue  = propertySet.getObject(XFORMS_PROPERTY_PREFIX + name, defaultValue)
         } yield
           unparsedInlineProperties.get(name) match {
-            case Some(localValue) ⇒ localValue  != defaultValue.toString option (name, localValue          , true)
-            case None             ⇒ globalValue != defaultValue          option (name, globalValue.toString, false)
+            case Some(localValue) => localValue  != defaultValue.toString option (name, localValue          , true)
+            case None             => globalValue != defaultValue          option (name, globalValue.toString, false)
           }
       } flatten
 
-      for ((name, value, inline) ← propertiesToKeep) {
+      for ((name, value, inline) <- propertiesToKeep) {
         val newAttributes = new AttributesImpl
         newAttributes.addAttribute("", "name",   "name",   XMLReceiverHelper.CDATA, name)
         newAttributes.addAttribute("", "value",  "value",  XMLReceiverHelper.CDATA, value)
@@ -518,7 +518,7 @@ trait ExtractorProperties {
 
   protected def addInlinePropertiesIfAny(attributes: Attributes): Unit =
     for {
-      i ← 0 until attributes.getLength
+      i <- 0 until attributes.getLength
       if attributes.getURI(i) == XXFORMS_NAMESPACE_URI
     } locally {
       unparsedInlineProperties.getOrElseUpdate(attributes.getLocalName(i), attributes.getValue(i))

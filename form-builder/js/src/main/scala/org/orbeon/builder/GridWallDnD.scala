@@ -16,10 +16,10 @@ package org.orbeon.builder
 import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
+import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
-import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
@@ -59,12 +59,12 @@ object GridWallDnD {
     locally {
       Position.currentContainerChanged(
         containerCache = BlockCache.cellCache,
-        wasCurrent     = (_   : Block) ⇒ {
+        wasCurrent     = (_   : Block) => {
           currentCellOpt = None
           if (! DndShadow.isDragging)
             DndWall.hideAll()
         },
-        becomesCurrent = (cell: Block) ⇒ {
+        becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
           if (! DndShadow.isDragging)
             DndSides.show(cell)
@@ -74,19 +74,21 @@ object GridWallDnD {
 
     object DndSides {
        def show(cell: Block): Unit = {
-         val gridModel = Cell.analyze12ColumnGridAndFillHoles(cell.underlying.parentElement, simplify = false)
-         val walls     = Cell.movableWalls(cell.underlying)
-         walls.foreach { case (direction, wallPosition) ⇒
+
+         val gridModel = Cell.analyze12ColumnGridAndFillHoles(HtmlElementCellOps.gridForCell(cell.underlying), simplify = false)
+
+         val walls     = Cell.movableWalls(gridModel, cell.underlying)
+         walls.foreach { case (direction, wallPosition) =>
            val wallOrientation = DndWall.wallOrientation(direction)
            val index = direction match {
-             case Direction.Left  ⇒ cell.x          - 1
-             case Direction.Right ⇒ cell.x + cell.w - 1
-             case Direction.Up    ⇒ cell.y          - 1
-             case Direction.Down  ⇒ cell.y + cell.h - 1
+             case Direction.Left  => cell.x          - 1
+             case Direction.Right => cell.x + cell.w - 1
+             case Direction.Up    => cell.y          - 1
+             case Direction.Down  => cell.y + cell.h - 1
            }
            val side = wallPosition match {
-             case WallPosition.Side   ⇒ Some(direction)
-             case WallPosition.Middle ⇒ None
+             case WallPosition.Side   => Some(direction)
+             case WallPosition.Middle => None
            }
            DndWall.show(gridModel, index, wallOrientation, side)
          }
@@ -101,16 +103,16 @@ object GridWallDnD {
       private var mouseOnWall                = false
 
       def show[Underlying](
-        gridMode    : GridModel[Underlying],
+        gridModel   : GridModel[Underlying],
         index       : Int,
         orientation : Orientation,
         side        : Option[Direction]
       ): Unit = {
-        currentCellOpt.foreach { currentCell ⇒
+        currentCellOpt.foreach { currentCell =>
           val orientationClass =
             orientation match {
-              case Orientation.Vertical   ⇒ WallVerticalClass
-              case Orientation.Horizontal ⇒ WallHorizontalClass
+              case Orientation.Vertical   => WallVerticalClass
+              case Orientation.Horizontal => WallHorizontalClass
             }
           val frGridBody       = currentCell.el.parents(BlockCache.GridBodySelector).first()
           val frGrid           = frGridBody.parent
@@ -122,20 +124,20 @@ object GridWallDnD {
           val sideSlide = {
             val wallThickness =
               orientation match {
-                case Orientation.Vertical   ⇒ dndContainer.width()
-                case Orientation.Horizontal ⇒ dndContainer.height()
+                case Orientation.Vertical   => dndContainer.width()
+                case Orientation.Horizontal => dndContainer.height()
               }
             side match {
-              case Some(Direction.Left  | Direction.Up  ) ⇒ 0
-              case Some(Direction.Right | Direction.Down) ⇒ wallThickness
-              case None                                   ⇒ wallThickness / 2
+              case Some(Direction.Left  | Direction.Up  ) => 0
+              case Some(Direction.Right | Direction.Down) => wallThickness
+              case None                                   => wallThickness / 2
             }
           }
 
           def trackOffset(orientation: Orientation) = {
             val gridSlide = orientation match {
-              case Orientation.Horizontal ⇒ Offset(frGridBody).top
-              case Orientation.Vertical   ⇒ Offset(frGridBody).left
+              case Orientation.Horizontal => Offset(frGridBody).top
+              case Orientation.Vertical   => Offset(frGridBody).left
             }
             val tracksSlide = Position.tracksWidth(frGridBody, orientation).take(index).sum
             val gapSlide = {
@@ -147,27 +149,27 @@ object GridWallDnD {
 
           Offset.offset(dndContainer, Offset(
             left = orientation match {
-              case Orientation.Vertical ⇒
+              case Orientation.Vertical =>
                 trackOffset(orientation)
-              case Orientation.Horizontal ⇒
+              case Orientation.Horizontal =>
                 currentCell.left
             },
             top  = orientation match {
-              case Orientation.Vertical ⇒
+              case Orientation.Vertical =>
                 currentCell.top - Position.scrollTop()
-              case Orientation.Horizontal ⇒
+              case Orientation.Horizontal =>
                 trackOffset(orientation)
             }
           ))
           orientation match {
-            case Orientation.Vertical   ⇒ dndContainer.height(currentCell.height)
-            case Orientation.Horizontal ⇒ dndContainer.width (currentCell.width)
+            case Orientation.Vertical   => dndContainer.height(currentCell.height)
+            case Orientation.Horizontal => dndContainer.width (currentCell.width)
           }
-          dndContainer.on("mouseenter", () ⇒ {
+          dndContainer.on("mouseenter", () => {
             mouseOnWall = true
             ControlEditor.mask()
           })
-          dndContainer.on("mouseleave", () ⇒ {
+          dndContainer.on("mouseleave", () => {
             mouseOnWall = false
             if (! DndShadow.isDragging)
               ControlEditor.unmask()
@@ -184,16 +186,16 @@ object GridWallDnD {
 
       def wallOrientation(direction: Direction): Orientation =
         direction match {
-          case Direction.Left | Direction.Right ⇒ Orientation.Vertical
-          case Direction.Up   | Direction.Down  ⇒ Orientation.Horizontal
+          case Direction.Left | Direction.Right => Orientation.Vertical
+          case Direction.Up   | Direction.Down  => Orientation.Horizontal
         }
 
-      def markClosestAsDropTarget(pointerPosition: Double, position: JQuery ⇒ Double): Unit = {
+      def markClosestAsDropTarget(pointerPosition: Double, position: JQuery => Double): Unit = {
 
         val closestContainer: Option[JQuery] = {
           def distance(container: JQuery) = Math.abs(position(container) - pointerPosition)
           case class BestContainer(container: JQuery, distance: Double)
-          walls.foldLeft(None: Option[BestContainer]) { (bestSoFarOpt, container) ⇒
+          walls.foldLeft(None: Option[BestContainer]) { (bestSoFarOpt, container) =>
             val currentDistance = distance(container)
             val keepBestSoFar = bestSoFarOpt.exists(_.distance <= currentDistance)
             if (keepBestSoFar) bestSoFarOpt else Some(BestContainer(container, currentDistance))
@@ -246,19 +248,19 @@ object GridWallDnD {
       }
 
       Position.onUnderPointerChange {
-        dndShadowOpt.foreach { dndShadow ⇒
-          startCellOpt.foreach { case StartCell(_, startSide, _) ⇒
+        dndShadowOpt.foreach { dndShadow =>
+          startCellOpt.foreach { case StartCell(_, startSide, _) =>
             DndWall.wallOrientation(startSide) match {
-              case Orientation.Vertical ⇒
+              case Orientation.Vertical =>
                 val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
                 val newShadowOffset = Offset(dndShadow).copy(left = newLeft)
                 Offset.offset(dndShadow, newShadowOffset)
-                DndWall.markClosestAsDropTarget(newLeft, (container: JQuery) ⇒ Offset(container).left)
-              case Orientation.Horizontal ⇒
+                DndWall.markClosestAsDropTarget(newLeft, (container: JQuery) => Offset(container).left)
+              case Orientation.Horizontal =>
                 val newTop = Position.pointerPos.top - (dndShadow.height() / 2)
                 val newShadowOffset = Offset(dndShadow).copy(top = newTop)
                 Offset.offset(dndShadow, newShadowOffset)
-                DndWall.markClosestAsDropTarget(newTop, (container: JQuery) ⇒ Offset(container).top)
+                DndWall.markClosestAsDropTarget(newTop, (container: JQuery) => Offset(container).top)
             }
           }
         }
@@ -281,29 +283,29 @@ object GridWallDnD {
         }
       )
 
-      drake.onDrag { (_, source) ⇒
-        currentCellOpt.foreach { currentCell ⇒
+      drake.onDrag { (_, source) =>
+        currentCellOpt.foreach { currentCell =>
           val startSide = {
             val wallIndex = source.getAttribute("data-index").toInt
             val isVertical = $(source).hasClass(WallVerticalClass)
             if (isVertical) if (wallIndex == currentCell.x - 1) Direction.Left else Direction.Right
             else            if (wallIndex == currentCell.y - 1) Direction.Up   else Direction.Down
           }
-          Cell.cellWallPossibleDropTargets(currentCell.underlying, startSide).foreach { possibleTargets ⇒
+          Cell.cellWallPossibleDropTargets(currentCell.underlying, startSide).foreach { possibleTargets =>
             startCellOpt = Some(StartCell(currentCell, startSide, possibleTargets.statusQuo))
             DndShadow.show(source)
             DndWall.hideAll()
             ControlEditor.mask()
-            val gridModel = Cell.analyze12ColumnGridAndFillHoles(currentCell.underlying.parentElement, simplify = false)
+            val gridModel = Cell.analyze12ColumnGridAndFillHoles(HtmlElementCellOps.gridForCell(currentCell.underlying), simplify = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
             possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
           }
         }
       }
 
-      drake.onDragend { el ⇒
-        DndWall.getDropTarget.foreach { dropTarget ⇒
-          startCellOpt foreach { case StartCell(block, startSide, startIndex) ⇒
+      drake.onDragend { el =>
+        DndWall.getDropTarget.foreach { dropTarget =>
+          startCellOpt foreach { case StartCell(block, startSide, startIndex) =>
             val targetIndex  = dropTarget.attr("data-index").get.toInt
             if (targetIndex != startIndex) {
               val cellId       = block.el.attr("id").get

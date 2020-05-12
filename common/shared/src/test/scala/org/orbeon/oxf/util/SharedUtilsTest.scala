@@ -79,7 +79,7 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `decodeSimpleQuery()` function") {
 
     val query    = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&=v3&p3&"""
-    val expected = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "", "p3" → "")
+    val expected = Seq("p1" -> "v11", "p2" -> "v21", "p1" -> "v12", "p2" -> "", "p2" -> "v23", "p1" -> "", "p3" -> "")
 
     it(s"must parse `$query`") {
       assert(expected === decodeSimpleQuery(query))
@@ -97,7 +97,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
   describe("The `combineValues()` function") {
 
-    val parameters = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
+    val parameters = Seq("p1" -> "v11", "p2" -> "v21", "p1" -> "v12", "p2" -> "", "p2" -> "v23", "p1" -> "")
     val expectedAsList   = Seq(("p1", List("v11", "v12", "")), ("p2", List("v21", "", "v23")))
     val expectedAsVector = Seq(("p1", Vector("v11", "v12", "")), ("p2", Vector("v21", "", "v23")))
     val expectedAsSet    = Seq(("p1", Set("v11", "v12", "")), ("p2", Set("v21", "", "v23")))
@@ -105,7 +105,7 @@ class SharedUtilsTest extends AnyFunSpec {
     assert(expectedAsList   === combineValues[String, String, List](parameters))
     assert(expectedAsVector === combineValues[String, String, Vector](parameters))
     assert(expectedAsSet    === combineValues[String, String, Set](parameters))
-    assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to(List)}))
+    assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) => k -> v.to(List)}))
   }
 
   describe("The `trimAllToOpt` function") {
@@ -154,7 +154,7 @@ class SharedUtilsTest extends AnyFunSpec {
       ("repeated token",              " GET  POST  PUT GET", Seq("GET", "POST", "PUT", "GET"))
     )
 
-    for ((desc, in, out) ← expected) {
+    for ((desc, in, out) <- expected) {
       it(s"must pass $desc") {
         assert(out === in.splitTo[List]())
         assert(out === in.splitTo[Array]().to(List))
@@ -178,7 +178,7 @@ class SharedUtilsTest extends AnyFunSpec {
       ("space on left/token on right", " =b", Seq(" ", "b"))
     )
 
-    for ((desc, in, out) ← expected) {
+    for ((desc, in, out) <- expected) {
       it(s"must pass $desc") {
         assert(out === in.splitTo[List]("="))
       }
@@ -188,24 +188,24 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `truncateWithEllipsis()` function") {
 
     val expected = Seq(
-      ("abcdef",        3,  0) → "abc…",
-      ("abcdef",        3, 10) → "abcdef",
-      ("abcdef",       10,  0) → "abcdef",
-      ("abcd ",         3,  1) → "abcd…",
-      ("abcde ",        3,  1) → "abc…",
-      ("abc d",         3,  1) → "abc…",
-      ("abc d e f",     3,  3) → "abc d…",
-      ("abc d e f",     3,  4) → "abc d e…",
-      ("abc d e f",     3,  5) → "abc d e…",
-      ("abc de fg hi",  3,  3) → "abc de…",
-      ("abc de fg hi",  3,  4) → "abc de…",
-      ("abc de fg hi",  3,  5) → "abc de…",
-      ("abc de fg hi",  3,  6) → "abc de fg…"
+      ("abcdef",        3,  0) -> "abc…",
+      ("abcdef",        3, 10) -> "abcdef",
+      ("abcdef",       10,  0) -> "abcdef",
+      ("abcd ",         3,  1) -> "abcd…",
+      ("abcde ",        3,  1) -> "abc…",
+      ("abc d",         3,  1) -> "abc…",
+      ("abc d e f",     3,  3) -> "abc d…",
+      ("abc d e f",     3,  4) -> "abc d e…",
+      ("abc d e f",     3,  5) -> "abc d e…",
+      ("abc de fg hi",  3,  3) -> "abc de…",
+      ("abc de fg hi",  3,  4) -> "abc de…",
+      ("abc de fg hi",  3,  5) -> "abc de…",
+      ("abc de fg hi",  3,  6) -> "abc de fg…"
     )
 
     val truncateWithEllipsisTupled = (truncateWithEllipsis _).tupled
 
-    for ((in, out) ← expected)
+    for ((in, out) <- expected)
       assert(out === truncateWithEllipsisTupled(in))
   }
 
@@ -224,17 +224,19 @@ class SharedUtilsTest extends AnyFunSpec {
     val funnyCharsString = allToTrim + rareChineseChar1 + allToTrim + rareChineseChar2 + allToTrim
 
     val expected = Seq(
-      ""               → "",
-      (null: String)   → "",
-      "  "             → "",
-      "\t"             → "",
-      "  a b c  "      → "a b c",
-      allToTrim        → "",
-      funnyCharsString → (rareChineseChar1 + allToTrim + rareChineseChar2)
+      ""               -> "",
+      (null: String)   -> "",
+      "  "             -> "",
+      "\t"             -> "",
+      "  a b c  "      -> "a b c",
+      allToTrim        -> "",
+      funnyCharsString -> (rareChineseChar1 + allToTrim + rareChineseChar2)
     )
 
-    for ((in, out) ← expected)
-      assert(out === in.trimAllToEmpty)
+    it("must pass all") {
+      for ((in, out) <- expected)
+        assert(out === in.trimAllToEmpty)
+    }
   }
 
   describe("The `substringAfter` function") {
@@ -248,7 +250,7 @@ class SharedUtilsTest extends AnyFunSpec {
       ("",       "abc", "")
     )
 
-    for ((s, search, expected) ← expected)
+    for ((s, search, expected) <- expected)
       it(s"must pass with `$s`/`$search`") {
         assert(expected === s.substringAfter(search))
       }
@@ -258,21 +260,21 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `escapeXMLMinimal` and `unescapeXMLMinimal` functions") {
 
     val expected = Seq(
-      """<a href="https://example.org/">a &amp; b and "c"</a>""" →
+      """<a href="https://example.org/">a &amp; b and "c"</a>""" ->
         """&lt;a href="https://example.org/"&gt;a &amp;amp; b and "c"&lt;/a&gt;"""
     )
 
-    for ((left, right) ← expected)
+    for ((left, right) <- expected)
       it(s"must escape with `$left`") {
         assert(right === left.escapeXmlMinimal)
       }
 
-    for ((left, right) ← expected)
+    for ((left, right) <- expected)
       it(s"must unescape with `$left`") {
         assert(left === right.unescapeXmlMinimal)
       }
 
-    for ((left, _) ← expected)
+    for ((left, _) <- expected)
       it(s"must roundtrip with `$left`") {
         assert(left === left.escapeXmlMinimal.unescapeXmlMinimal)
       }
@@ -281,11 +283,11 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `escapeXMLForAttribute` function") {
 
     val expected = Seq(
-      """<a href="https://example.org/">a &amp; b and "c"</a>""" →
+      """<a href="https://example.org/">a &amp; b and "c"</a>""" ->
         """&lt;a href=&quot;https://example.org/&quot;&gt;a &amp;amp; b and &quot;c&quot;&lt;/a&gt;"""
     )
 
-    for ((left, right) ← expected)
+    for ((left, right) <- expected)
       it(s"must escape with `$left`") {
         assert(right === left.escapeXmlForAttribute)
       }
@@ -294,10 +296,10 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `normalizeSerializedHTML` function") {
 
     val expected = Seq(
-      "\rtext with\r\na new line\r" → "text with\na new line"
+      "\rtext with\r\na new line\r" -> "text with\na new line"
     )
 
-    for ((left, right) ← expected)
+    for ((left, right) <- expected)
       it(s"must escape with `$left`") {
         assert(right === left.normalizeSerializedHtml)
       }

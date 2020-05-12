@@ -37,11 +37,11 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
     if (nextConnectShow) {
       if (shownCounter == 0) {
         // Show the indicator after a delay
-        js.timers.setTimeout(Properties.delayBeforeDisplayLoading.get()) {
-          shownCounter += 1
-          if (shownCounter == 1)
-            show()
-        }
+        val delay = Properties.delayBeforeDisplayLoading.get()
+        if (delay > 0)
+          js.timers.setTimeout(delay)(showIfNotAlreadyVisible _)
+        else
+          showIfNotAlreadyVisible()
       } else {
         // Indicator already shown, just increment counter
         shownCounter += 1
@@ -61,6 +61,12 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
   // NOTE: Called externally from `AjaxClient`.
   def setNextConnectShow(nextConnectShow: Boolean): Unit =
     this.nextConnectShow = nextConnectShow
+
+  private def showIfNotAlreadyVisible(): Unit = {
+    shownCounter += 1
+    if (shownCounter == 1)
+      show()
+  }
 
   // Actually shows the loading indicator (no delay or counter)
   def show(): Unit =

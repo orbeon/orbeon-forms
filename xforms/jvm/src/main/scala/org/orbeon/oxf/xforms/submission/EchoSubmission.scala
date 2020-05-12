@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayInputStream
+import java.net.URI
 
-import org.orbeon.io.UriScheme
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
 
@@ -30,9 +30,8 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ): Boolean = {
+  ): Boolean =
     p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:")
-  }
 
   def connect(
     p : SubmissionParameters,
@@ -56,8 +55,17 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
 
+    // Just a scheme is not a valid URI, so add a scheme-specific part if needed
+    val url =
+      new URI(
+        p2.actionOrResource match {
+          case "echo:" | "test:" => "echo:/"
+          case other             => other
+        }
+      )
+
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-      scheme           = UriScheme.Http,
+      url              = url,
       method           = p.httpMethod,
       hasCredentials   = p2.credentialsOpt.isDefined,
       mediatype        = sp.actualRequestMediatype,

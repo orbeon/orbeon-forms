@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.{immutable ⇒ i}
+import scala.collection.{immutable => i}
 import scala.util.{Failure, Success}
 import scala.collection.compat._
 
@@ -63,7 +63,7 @@ object MigrationOps20191 extends MigrationOps {
 
     def migrationsForBinding(doc: DocumentInfo, topLevel: Boolean): Seq[Migration20191] =
       for {
-        gridElem           ← if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
+        gridElem           <- if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
         gridName           = getControlName(gridElem)
         afterElem          = precedingSiblingOrSelfContainers(gridElem, includeSelf = false).headOption
         containerNames     = findContainerNamesForModel(gridElem, includeSelf = false, includeIterationElements = true)
@@ -101,25 +101,26 @@ object MigrationOps20191 extends MigrationOps {
     parser.decode[MigrationSet20191](jsonString).fold(Failure.apply, Success.apply) getOrElse
       (throw new IllegalArgumentException(s"illegal format `$jsonString`"))
 
-  def migrateDataFrom(
+  def migrateDataDown(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {
 
     var result: MigrationResult = MigrationResult.None
 
-    migrationSet.migrations foreach { case Migration20191(containerPath, newGridElem, _, content, _) ⇒
+    migrationSet.migrations foreach { case Migration20191(containerPath, newGridElem, _, content, _) =>
 
-      applyPath(dataRootElem, containerPath ::: newGridElem :: Nil) foreach { gridElem ⇒
+      applyPath(dataRootElem, containerPath ::: newGridElem :: Nil) foreach { gridElem =>
 
         result = MigrationResult.Some
 
-        val gridContent = content flatMap (p ⇒ gridElem child p.value)
+        val gridContent = content flatMap (p => gridElem child p.value)
 
         insert(
-          after      = gridElem,
-          origin     = gridContent,
-          doDispatch = false
+          after                             = gridElem,
+          origin                            = gridContent,
+          doDispatch                        = false,
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4519
         )
 
         delete(
@@ -132,20 +133,20 @@ object MigrationOps20191 extends MigrationOps {
     result
   }
 
-  def migrateDataTo(
+  def migrateDataUp(
     dataRootElem : NodeWrapper,
     migrationSet : MigrationSet20191
   ): MigrationResult = {
 
     var result: MigrationResult = MigrationResult.None
 
-    migrationSet.migrations foreach { case Migration20191(containerPath, newGridElem, afterElem, content, _) ⇒
+    migrationSet.migrations foreach { case Migration20191(containerPath, newGridElem, afterElem, content, _) =>
 
-      applyPath(dataRootElem, containerPath) foreach { containerElem ⇒
+      applyPath(dataRootElem, containerPath) foreach { containerElem =>
 
         result = MigrationResult.Some
 
-        val gridContent = content flatMap (p ⇒ containerElem child p.value)
+        val gridContent = content flatMap (p => containerElem child p.value)
 
         insert(
           into       = containerElem,
@@ -172,7 +173,7 @@ object MigrationOps20191 extends MigrationOps {
     val topLevelMigrations = migrationSet.migrations filter (_.topLevel)
 
     topLevelMigrations foreach {
-      case Migration20191(containerPath, newGridElem, afterElem, content, _) ⇒
+      case Migration20191(containerPath, newGridElem, afterElem, content, _) =>
 
         val containerName = containerPath.last.value // `.last` as is never empty (`NEL`) when at top-level
         val gridName      = newGridElem.value
@@ -181,10 +182,10 @@ object MigrationOps20191 extends MigrationOps {
 
         val containerBindElem = findBindByName(outerDocument, containerName).toList
 
-        val existingBindContent = content flatMap (p ⇒ findBindByName(outerDocument, p.value))
+        val existingBindContent = content flatMap (p => findBindByName(outerDocument, p.value))
 
         val afterBindElem =
-          afterElem flatMap (p ⇒ findBindByName(outerDocument, p.value)) filter (_.parentOption contains containerBindElem)
+          afterElem flatMap (p => findBindByName(outerDocument, p.value)) filter (_.parentOption contains containerBindElem)
 
         insert(
           into  = containerBindElem,
@@ -206,7 +207,7 @@ object MigrationOps20191 extends MigrationOps {
         )
 
         // 2. Controls
-        FormRunner.findControlByName(outerDocument, gridName) foreach { gridElem ⇒
+        FormRunner.findControlByName(outerDocument, gridName) foreach { gridElem =>
           ensureAttribute(gridElem, BIND_QNAME, FormRunner.bindId(FormRunner.controlNameFromId(gridElem.id)))
         }
     }
@@ -225,13 +226,13 @@ object MigrationOps20191 extends MigrationOps {
     migrationSet : MigrationSet20191,
     path         : List[PathElem]
   ): Option[List[PathElem]] =
-    (migrationSet.migrations exists (m ⇒ path.startsWith(m.containerPath ::: m.newGridElem :: Nil))) option {
+    (migrationSet.migrations exists (m => path.startsWith(m.containerPath ::: m.newGridElem :: Nil))) option {
       path.dropRight(2) ::: path.last :: Nil
     }
 
   private object Private {
 
     def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): Seq[NodeInfo] =
-      path.foldLeft(Seq(mutableData)) { case (e, p) ⇒ e child p.value }
+      path.foldLeft(Seq(mutableData)) { case (e, p) => e child p.value }
   }
 }

@@ -54,28 +54,28 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     // Register simple string functions
     for {
-      ((name, _), index) ← StringGettersByName.zipWithIndex
+      ((name, _), index) <- StringGettersByName.zipWithIndex
     } locally {
       Fun(name, classOf[StringFunction], index, 0, STRING, ALLOWS_ZERO_OR_ONE)
     }
 
     // Register simple boolean functions
     for {
-      ((name, _), index) ← BooleanGettersByName.zipWithIndex
+      ((name, _), index) <- BooleanGettersByName.zipWithIndex
     } locally {
       Fun(name, classOf[BooleanFunction], index, 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
     }
 
     // Register simple int functions
     for {
-      ((name, _), index) ← IntGettersByName.zipWithIndex
+      ((name, _), index) <- IntGettersByName.zipWithIndex
     } locally {
       Fun(name, classOf[IntFunction], index, 0, INTEGER, ALLOWS_ZERO_OR_ONE)
     }
 
     // Register simple dateTime functions
     for {
-      ((name, _), index) ← DateTimeGettersByName.zipWithIndex
+      ((name, _), index) <- DateTimeGettersByName.zipWithIndex
     } locally {
       Fun(name, classOf[DateTimeFunction], index, 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
     }
@@ -127,73 +127,73 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName = List(
-    "mode"                        → (() ⇒ FormRunnerParams().mode),
-    "app-name"                    → (() ⇒ FormRunnerParams().app),
-    "form-name"                   → (() ⇒ FormRunnerParams().form),
-    "document-id"                 → (() ⇒ FormRunnerParams().document.orNull),
-    "form-title"                  → (() ⇒ FormRunner.formTitleFromMetadata.orNull),
-    "lang"                        → (() ⇒ FormRunner.currentLang),
-    "username"                    → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
-    "user-group"                  → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
-    "relevant-form-values-string" → (() ⇒ FormRunnerMetadata.findAllControlsWithValues(html = false)),
-    "wizard-current-page-name"    → (() ⇒ Wizard.wizardCurrentPageNameOpt.orNull)
+    "mode"                        -> (() => FormRunnerParams().mode),
+    "app-name"                    -> (() => FormRunnerParams().app),
+    "form-name"                   -> (() => FormRunnerParams().form),
+    "document-id"                 -> (() => FormRunnerParams().document.orNull),
+    "form-title"                  -> (() => FormRunner.formTitleFromMetadata.orNull),
+    "lang"                        -> (() => FormRunner.currentLang),
+    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
+    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
+    "relevant-form-values-string" -> (() => FormRunnerMetadata.findAllControlsWithValues(html = false)),
+    "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt.orNull)
   )
 
   val BooleanGettersByName = List(
-    "is-pe"                       → (() ⇒ Version.isPE),
-    "is-design-time"              → (() ⇒ FormRunner.isDesignTime(FormRunnerParams())),
-    "is-readonly-mode"            → (() ⇒ FormRunner.isReadonlyMode(FormRunnerParams())),
-    "is-noscript"                 → (() ⇒ false),
-    "is-form-data-valid"          → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
-    "is-form-data-saved"          → (() ⇒ FormRunner.isFormDataSaved),
-    "is-wizard-toc-shown"         → (() ⇒ Wizard.isWizardTocShown),
-    "is-wizard-body-shown"        → (() ⇒ Wizard.isWizardBodyShown),
-    "is-wizard-first-page"        → (() ⇒ Wizard.isWizardFirstPage),
-    "is-wizard-last-page"         → (() ⇒ Wizard.isWizardLastPage),
-    "can-create"                  → (() ⇒ FormRunner.canCreate),
-    "can-read"                    → (() ⇒ FormRunner.canRead),
-    "can-update"                  → (() ⇒ FormRunner.canUpdate),
-    "can-delete"                  → (() ⇒ FormRunner.canDelete),
-    "owns-lease-or-none-required" → (() ⇒ FormRunner.userOwnsLeaseOrNoneRequired)
+    "is-pe"                       -> (() => Version.isPE),
+    "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
+    "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
+    "is-noscript"                 -> (() => false),
+    "is-form-data-valid"          -> (() => countValidationsByLevel(ErrorLevel) == 0),
+    "is-form-data-saved"          -> (() => FormRunner.isFormDataSaved),
+    "is-wizard-toc-shown"         -> (() => Wizard.isWizardTocShown),
+    "is-wizard-body-shown"        -> (() => Wizard.isWizardBodyShown),
+    "is-wizard-first-page"        -> (() => Wizard.isWizardFirstPage),
+    "is-wizard-last-page"         -> (() => Wizard.isWizardLastPage),
+    "can-create"                  -> (() => FormRunner.canCreate),
+    "can-read"                    -> (() => FormRunner.canRead),
+    "can-update"                  -> (() => FormRunner.canUpdate),
+    "can-delete"                  -> (() => FormRunner.canDelete),
+    "owns-lease-or-none-required" -> (() => FormRunner.userOwnsLeaseOrNoneRequired)
   )
 
   val IntGettersByName = List(
-    "form-version"                → (() ⇒ FormRunnerParams().formVersion)
+    "form-version"                -> (() => FormRunnerParams().formVersion)
   )
 
   val DateTimeGettersByName = List(
-    "created-dateTime"            → (() ⇒ FormRunner.documentCreatedDate),
-    "modified-dateTime"           → (() ⇒ FormRunner.documentModifiedDate),
-    "created-date"                → (() ⇒ FormRunner.documentCreatedDate), // only keep until 2017.1 or 2017.2 for backward compatibility
-    "modified-date"               → (() ⇒ FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
+    "created-dateTime"            -> (() => FormRunner.documentCreatedDate),
+    "modified-dateTime"           -> (() => FormRunner.documentModifiedDate),
+    "created-date"                -> (() => FormRunner.documentCreatedDate), // only keep until 2017.1 or 2017.2 for backward compatibility
+    "modified-date"               -> (() => FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
   )
 
   private val IndexedStringFunctions = (
     for {
-      ((_, fun), index) ← StringGettersByName.zipWithIndex
+      ((_, fun), index) <- StringGettersByName.zipWithIndex
     } yield
-      index → fun
+      index -> fun
   ).toMap
 
   private val IndexedBooleanFunctions = (
     for {
-      ((_, fun), index) ← BooleanGettersByName.zipWithIndex
+      ((_, fun), index) <- BooleanGettersByName.zipWithIndex
     } yield
-      index → fun
+      index -> fun
   ).toMap
 
   private val IndexedIntFunctions = (
     for {
-      ((_, fun), index) ← IntGettersByName.zipWithIndex
+      ((_, fun), index) <- IntGettersByName.zipWithIndex
     } yield
-      index → fun
+      index -> fun
   ).toMap
 
   private val IndexedDateTimeFunctions = (
     for {
-      ((_, fun), index) ← DateTimeGettersByName.zipWithIndex
+      ((_, fun), index) <- DateTimeGettersByName.zipWithIndex
     } yield
-      index → fun
+      index -> fun
   ).toMap
 
   class StringFunction extends FunctionSupport with RuntimeDependentFunction {
@@ -292,12 +292,12 @@ private object FormRunnerFunctions {
           Iterator.empty
 
       val allItems =
-        resolvedItems map { item ⇒
+        resolvedItems map { item =>
           try {
             // `TypedNodeWrapper.getTypedValue` *should* return a single value or throw
             Option(item.getTypedValue.next()) getOrElse EmptySequence.getInstance
           } catch {
-            case _: TypedValueException ⇒ EmptySequence.getInstance
+            case _: TypedValueException => EmptySequence.getInstance
           }
         }
 
@@ -321,7 +321,7 @@ private object FormRunnerFunctions {
 
       import XXFormsComponentParam._
 
-      findSourceComponent(XFormsFunction.context) flatMap { sourceComponent ⇒
+      findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
 
         val staticControl   = sourceComponent.staticControl
         val concreteBinding = staticControl.bindingOrThrow
@@ -340,8 +340,8 @@ private object FormRunnerFunctions {
           )
 
         fromAttributes orElse fromMetadataAndProperties map {
-            case paramValue: StringValue ⇒ stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
-            case paramValue              ⇒ paramValue
+            case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
+            case paramValue              => paramValue
           }
 
       } orNull
@@ -351,7 +351,7 @@ private object FormRunnerFunctions {
   class FRListPdfTemplates extends FunctionSupport with RuntimeDependentFunction {
 
     override def iterate(context: XPathContext): SequenceIterator =
-      FormRunnerRenderedFormat.listPdfTemplates map { template ⇒
+      FormRunnerRenderedFormat.listPdfTemplates map { template =>
         MapFunctions.createValue(
           Map[AtomicValue, ValueRepresentation](
             (SaxonUtils.fixStringValue("path"), template.path),
@@ -367,18 +367,18 @@ private object FormRunnerFunctions {
 
       val metadataVersionOpt =
         for {
-          sourceControl      ← XFormsFunction.context.container.associatedControlOpt
+          sourceControl      <- XFormsFunction.context.container.associatedControlOpt
           part               = sourceControl.staticControl.part
-          metadata           ← FRComponentParam.findConstantMetadataRootElem(part)
-          createdWithVersion ← metadata elemValueOpt Names.CreatedWithVersion
+          metadata           <- FRComponentParam.findConstantMetadataRootElem(part)
+          createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
         } yield
           createdWithVersion
 
       metadataVersionOpt match {
-        case None ⇒
+        case None =>
           // If no version info the metadata, or no metadata, do as if the form was created with an old version
           false
-        case Some(metadataVersion) ⇒
+        case Some(metadataVersion) =>
           val paramVersion = stringArgument(0)(context)
           Version.compare(metadataVersion, paramVersion).exists(_ >= 0)
       }
@@ -397,9 +397,9 @@ object FRComponentParam {
     val instancePrefixedId = part.startScope.prefixedIdForStaticId(Names.MetadataInstance)
 
     for {
-      elementAnalysis ← part.findControlAnalysis(instancePrefixedId)
-      instance        ← elementAnalysis.narrowTo[model.Instance]
-      constantContent ← instance.constantContent
+      elementAnalysis <- part.findControlAnalysis(instancePrefixedId)
+      instance        <- elementAnalysis.narrowTo[model.Instance]
+      constantContent <- instance.constantContent
     } yield
       constantContent.rootElement
   }
@@ -416,10 +416,10 @@ object FRComponentParam {
   //
   def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: NodeInfo): Option[String] =
     for {
-      directName    ← directNameOpt
-      xblElem       ← rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
-      componentElem ← xblElem.firstChildOpt(directName)
-      paramValue    ← componentElem.attValueOpt(paramName)
+      directName    <- directNameOpt
+      xblElem       <- rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
+      componentElem <- xblElem.firstChildOpt(directName)
+      paramValue    <- componentElem.attValueOpt(paramName)
     } yield
       paramValue
 
@@ -427,8 +427,8 @@ object FRComponentParam {
   // This also allows support of the edited form in Form Builder.
   def appFormFromMetadata(constantMetadataRootElem: NodeInfo): Option[AppForm] =
     for {
-      appName                  ← constantMetadataRootElem elemValueOpt Names.AppName
-      formName                 ← constantMetadataRootElem elemValueOpt Names.FormName
+      appName                  <- constantMetadataRootElem elemValueOpt Names.AppName
+      formName                 <- constantMetadataRootElem elemValueOpt Names.FormName
     } yield
       AppForm(appName, formName)
 
@@ -449,7 +449,7 @@ object FRComponentParam {
     def fromPropertiesWithSuffix: Option[AtomicValue] =
       iterateMetadataInParts flatMap
         appFormFromMetadata  flatMap
-        (appForm ⇒ XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt)) nextOption()
+        (appForm => XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt)) nextOption()
 
     def fromPropertiesWithoutSuffix: Option[AtomicValue] =
       XXFormsComponentParam.fromProperties(paramName, Nil, directNameOpt)

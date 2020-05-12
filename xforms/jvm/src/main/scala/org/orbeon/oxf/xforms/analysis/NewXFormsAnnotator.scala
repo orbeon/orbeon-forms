@@ -44,22 +44,22 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
 
   private val goBackHandler: StateFunction = {
     // EndElement taking us back to the previous state
-    case Event(ev @ EndElement(_), parentOption @ Some(parent)) if parent.level == depth ⇒
+    case Event(ev @ EndElement(_), parentOption @ Some(parent)) if parent.level == depth =>
       forward(out, ev)
       goto(parent.previousState) using parentOption
   }
 
   private val defaultHandler: StateFunction = goBackHandler orElse {
     // StartElement keeping us in the same state
-    case Event(ev @ StartElement(_, _), parentOption) ⇒
+    case Event(ev @ StartElement(_, _), parentOption) =>
       forward(out, ev)
       stay() using newElementDetail(ev, parentOption)
     // EndElement keeping us in the same state
-    case Event(ev @ EndElement(_), parentOption) ⇒
+    case Event(ev @ EndElement(_), parentOption) =>
       forward(out, ev)
       stay() using parentOption
     // Any other event
-    case Event(ev, _) ⇒
+    case Event(ev, _) =>
       forward(out, ev)
       stay()
   }
@@ -68,14 +68,14 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
   startWith(RootState, None)
 
   when(RootState) {
-    case Event(ev @ StartElement(HtmlHead, _), parentOption) ⇒
+    case Event(ev @ StartElement(HtmlHead, _), parentOption) =>
       forward(out, ev)
       goto(HeadState) using newElementDetail(ev, parentOption)
   }
   when(RootState)(defaultHandler)
 
   when(HeadState) {
-    case Event(ev @ StartElement(HtmlTitle, _), parentOption) ⇒
+    case Event(ev @ StartElement(HtmlTitle, _), parentOption) =>
       forward(out, ev)
 //            // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
 //            val newAtts = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex)
@@ -86,7 +86,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
   when(HeadState)(defaultHandler)
 
   when(TitleState) {
-    case Event(ev @ StartElement(XFormsOutput, atts), parentOption) ⇒
+    case Event(ev @ StartElement(XFormsOutput, atts), parentOption) =>
 //            val newAtts = XMLUtils.addOrReplaceAttribute(atts, "", "", "for", htmlTitleElementId)
 //            startPrefixMapping(true, "xxforms", XXFORMS_NAMESPACE_URI)
 //            startElement(true, XXFORMS_NAMESPACE_URI, "text", "xxf:text", newAtts)

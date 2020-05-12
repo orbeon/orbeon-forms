@@ -24,7 +24,7 @@ import scala.collection.compat._
 
 trait ControlLHHASupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   // Label, help, hint and alert (evaluated lazily)
   // 2013-06-19: We support multiple alerts, but only one client-facing alert value at this point.
@@ -35,7 +35,7 @@ trait ControlLHHASupport {
   def lhhaContainer = container
 
   def markLHHADirty(): Unit =
-    for (currentLHHA ← lhhaArray)
+    for (currentLHHA <- lhhaArray)
       if (currentLHHA ne null)
         currentLHHA.handleMarkDirty()
 
@@ -49,14 +49,14 @@ trait ControlLHHASupport {
   }
 
   def evaluateNonRelevantLHHA(): Unit =
-    for (i ← lhhaArray.indices)
+    for (i <- lhhaArray.indices)
       lhhaArray(i) = null
 
   // Copy LHHA if not null
   def updateLHHACopy(copy: XFormsControl): Unit = {
     copy.lhhaArray = new Array[LHHAProperty](LHHA.size)
     for {
-      i ← lhhaArray.indices
+      i <- lhhaArray.indices
       currentLHHA = lhhaArray(i)
       if currentLHHA ne null
     } yield {
@@ -78,11 +78,11 @@ trait ControlLHHASupport {
       val property =
         if (part.hasLHHA(prefixedId, lhha) && self.staticControl.isInstanceOf[StaticLHHASupport])
           self match {
-            case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert ⇒
+            case singleNodeControl: XFormsSingleNodeControl if lhha == LHHA.Alert =>
               new MutableAlertProperty(singleNodeControl, lhha, htmlLhhaSupport(lhha))
-            case control: XFormsControl if lhha != LHHA.Alert ⇒
+            case control: XFormsControl if lhha != LHHA.Alert =>
               new MutableLHHProperty(control, lhha, htmlLhhaSupport(lhha))
-            case _ ⇒
+            case _ =>
               NullLHHA
           }
         else
@@ -97,7 +97,7 @@ trait ControlLHHASupport {
   def ajaxLhhaSupport: Seq[LHHA] = LHHA.values
 
   def compareLHHA(other: XFormsControl) =
-    ajaxLhhaSupport forall (lhha ⇒ lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
+    ajaxLhhaSupport forall (lhha => lhhaProperty(lhha).value() == other.lhhaProperty(lhha).value())
 
   // Convenience accessors
   final def getLabel        = lhhaProperty(LHHA.Label).value()
@@ -165,13 +165,13 @@ object LHHASupport {
 
       // Alerts that specify neither a validations nor a level
       def alertsMatchingAny =
-        nonEmptyOption(staticAlerts filter (a ⇒ a.forValidations.isEmpty && a.forLevels.isEmpty))
+        nonEmptyOption(staticAlerts filter (a => a.forValidations.isEmpty && a.forLevels.isEmpty))
 
       // For that given level, identify all matching alerts if any, whether they match by validations or by level.
       // Alerts that specify neither a validation nor a level are considered a default, that is they are not added
       // if other alerts have already been matched.
       // Alerts are returned in document order
-      control.alertLevel flatMap { level ⇒
+      control.alertLevel flatMap { level =>
 
         val alerts =
           alertsMatchingValidations  orElse
@@ -180,7 +180,7 @@ object LHHASupport {
           Nil
 
         val matchingAlertIds = alerts map (_.staticId) toSet
-        val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
+        val matchingAlerts   = staticAlerts filter (a => matchingAlertIds(a.staticId))
 
         matchingAlerts.nonEmpty option (level, matchingAlerts)
       }

@@ -19,6 +19,7 @@ import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+
 import scala.collection.compat._
 
 // This contains grid/cell operations acting on `NodeInfo`, which is on the source of the form definition
@@ -37,6 +38,12 @@ object NodeInfoCell {
     def parent         (u: NodeInfo)              : NodeInfo       = u.parentUnsafe
     def hasChildElement(u: NodeInfo)              : Boolean        = u.hasChildElement
 
+    def cellsForGrid   (u: NodeInfo)              : List[NodeInfo] = (u / CellTest).to(List)
+    def gridForCell    (u: NodeInfo)              : NodeInfo       = parent(u)
+
+    def maxGridWidth(u: NodeInfo): Int =
+      if (u.attValueOpt("columns") contains "24") 24 else 12
+
     def x(u: NodeInfo): Option[Int] = attValueOpt(u, "x") map (_.toInt)
     def y(u: NodeInfo): Option[Int] = attValueOpt(u, "y") map (_.toInt)
     def w(u: NodeInfo): Option[Int] = attValueOpt(u, "w") map (_.toInt)
@@ -49,10 +56,6 @@ object NodeInfoCell {
     def updateH(u: NodeInfo, h: Int): Unit = XFormsAPI.toggleAttribute(u, "h", h.toString, h > 1)
     def updateW(u: NodeInfo, w: Int): Unit = XFormsAPI.ensureAttribute(u, "w", w.toString)
   }
-
-  // Get the x/y position of a td given Cell information
-  def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): Option[(Int, Int)] =
-    cells.iterator.flatten find (_.td == td) map (c ⇒ c.x → c.y)
 
   // This function is used to migrate grids from the older `<xh:tr>`/`<xh:td>` format to the new `<fr:c>` format.
   //
@@ -70,10 +73,10 @@ object NodeInfoCell {
         1
 
     ArrayFunctions.createValue(
-      allRowCells.cells.to(Vector) map { row ⇒
+      allRowCells.cells.to(Vector) map { row =>
         new SequenceExtent(
             row collect {
-              case Cell(u, None, x, y, h, w) ⇒
+              case Cell(u, None, x, y, h, w) =>
                 MapFunctions.createValue(
                   Map[AtomicValue, ValueRepresentation](
                     (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
@@ -97,10 +100,10 @@ object NodeInfoCell {
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row =>
         new SequenceExtent(
           row collect {
-            case Cell(u, None, x, y, h, w) ⇒
+            case Cell(u, None, x, y, h, w) =>
               MapFunctions.createValue(
                 Map[AtomicValue, ValueRepresentation](
                   (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
@@ -119,15 +122,15 @@ object NodeInfoCell {
   /* How I would like to write the function above with conversions for less boilerplate:
 
   def testAnalyze12ColumnGridAndFillHoles(grid: NodeInfo): Item =
-    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row ⇒
+    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row =>
       row collect {
-        case Cell(uOpt, x, y, h, w, false) ⇒
+        case Cell(uOpt, x, y, h, w, false) =>
           Map(
-            "c" → uOpt getOrElse EmptySequence.getInstance,
-            "x" → x,
-            "y" → y,
-            "w" → w,
-            "h" → h
+            "c" -> uOpt getOrElse EmptySequence.getInstance,
+            "x" -> x,
+            "y" -> y,
+            "w" -> w,
+            "h" -> h
           ) asXPath // or `toXPath`?
       } asXPathSeq  // or `toXPathSeq`?
     } asXPathArray  // or `toXPathArray`?

@@ -47,26 +47,26 @@ abstract class XFormsUIEvent(
 private object XFormsUIEvent {
 
   val Deprecated = Map(
-    "target-ref" → "xxf:binding",
-    "alert"      → "xxf:alert",
-    "label"      → "xxf:label",
-    "hint"       → "xxf:hint",
-    "help"       → "xxf:help"
+    "target-ref" -> "xxf:binding",
+    "alert"      -> "xxf:alert",
+    "label"      -> "xxf:label",
+    "hint"       -> "xxf:hint",
+    "help"       -> "xxf:help"
   )
 
-  val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](
-    "target-ref"                → binding,
-    xxfName("binding")          → binding,
-    xxfName("control-position") → controlPosition,
-    "label"                     → label,
-    xxfName("label")            → label,
-    "help"                      → help,
-    xxfName("help")             → help,
-    "hint"                      → hint,
-    xxfName("hint")             → hint,
-    "alert"                     → alert,
-    xxfName("alert")            → alert,
-    xxfName("level")            → level
+  val Getters = Map[String, XFormsUIEvent => Option[Any]](
+    "target-ref"                -> binding,
+    xxfName("binding")          -> binding,
+    xxfName("control-position") -> controlPosition,
+    "label"                     -> label,
+    xxfName("label")            -> label,
+    "help"                      -> help,
+    xxfName("help")             -> help,
+    "hint"                      -> hint,
+    xxfName("hint")             -> hint,
+    "alert"                     -> alert,
+    xxfName("alert")            -> alert,
+    xxfName("level")            -> level
   )
 
   def binding(e: XFormsUIEvent) = Option(e.targetControl.bindingEvenIfNonRelevant)
@@ -80,7 +80,7 @@ private object XFormsUIEvent {
   def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
 
   def level(e: XFormsUIEvent): Option[String] = e.targetControl match {
-    case c: XFormsSingleNodeControl ⇒ c.alertLevel map (_.entryName)
-    case c                          ⇒ None
+    case c: XFormsSingleNodeControl => c.alertLevel map (_.entryName)
+    case c                          => None
   }
 }

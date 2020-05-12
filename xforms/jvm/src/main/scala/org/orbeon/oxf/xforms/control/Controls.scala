@@ -132,7 +132,7 @@ object Controls {
     // TODO LATER: controls must take ElementAnalysis, not Element
 
     // NOTE: If we are unable to create a control (case of Model at least), this has no effect
-    XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map { control ⇒
+    XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map { control =>
 
         // Index the new control
         // NOTE: We used to do this after evaluating the binding. In general it shouldn't hurt to do it here.
@@ -157,15 +157,15 @@ object Controls {
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
   def buildChildren(
     control   : XFormsControl,
-    children  : ⇒ Iterable[ElementAnalysis],
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl],
+    children  : => Iterable[ElementAnalysis],
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
     idSuffix  : Seq[Int]
   ): Unit = {
     // Start with the context within the current control
     var newBindingContext = control.bindingContextForChildOrEmpty
     // Build each child
-    children foreach { childElement ⇒
-      buildTree(control.container, newBindingContext, childElement, idSuffix) foreach { newChildControl ⇒
+    children foreach { childElement =>
+      buildTree(control.container, newBindingContext, childElement, idSuffix) foreach { newChildControl =>
         // Update the context based on the just created control
         newBindingContext = newChildControl.bindingContextForFollowing
       }
@@ -197,8 +197,8 @@ object Controls {
     val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
 
     for {
-      controls           ← Option(containingDocument.getControls).toList
-      effectiveControlId ←
+      controls           <- Option(containingDocument.getControls).toList
+      effectiveControlId <-
         resolveControlsEffectiveIds(
           containingDocument.getStaticOps,
           controls.getCurrentControlTree,
@@ -206,7 +206,7 @@ object Controls {
           targetPrefixedId,
           followIndexes
         )
-      control            ← controls.findObjectByEffectiveId(effectiveControlId)
+      control            <- controls.findObjectByEffectiveId(effectiveControlId)
     } yield
       control
   }
@@ -247,24 +247,24 @@ object Controls {
 
     def searchNextRepeatLevel(indexes: List[Int], nextRepeatPrefixedIds: List[String]): List[List[Int]] =
       nextRepeatPrefixedIds match {
-        case Nil ⇒
+        case Nil =>
           List(indexes)
-        case repeatPrefixedId :: remainingPrefixedIds ⇒
+        case repeatPrefixedId :: remainingPrefixedIds =>
           tree.findRepeatControl(repeatPrefixedId + buildSuffix(indexes)) match {
-            case None ⇒
+            case None =>
               Nil // control might not exist (but why?)
-            case Some(repeatControl) if followIndexes ⇒
+            case Some(repeatControl) if followIndexes =>
               searchNextRepeatLevel(repeatControl.getIndex :: indexes, remainingPrefixedIds)
-            case Some(repeatControl) ⇒
-              1 to repeatControl.getSize flatMap (i ⇒ searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
-            case _ ⇒
+            case Some(repeatControl) =>
+              1 to repeatControl.getSize flatMap (i => searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
+            case _ =>
               throw new IllegalStateException
           }
       }
 
     val allIndexes = searchNextRepeatLevel(commonIndexesLeafToRoot, remainingRepeatPrefixedIdsLeafToRoot.reverse)
 
-    allIndexes map (indexes ⇒ targetPrefixedId + buildSuffix(indexes))
+    allIndexes map (indexes => targetPrefixedId + buildSuffix(indexes))
   }
 
   def buildSuffix(iterations: List[Int]): String =
@@ -278,7 +278,7 @@ object Controls {
     sourceEffectiveId : String,
     targetPrefixedId  : String
   ): (Option[String], List[Int], List[String]) = {
-    // Check preconditions
+
     require(sourceEffectiveId ne null, "Source effective id is required.")
 
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
@@ -288,8 +288,8 @@ object Controls {
 
     val commonIndexes =
       for {
-        ancestorRepeatPrefixedId ← ancestorRepeatPrefixedIdOpt.to(List)
-        index                    ← sourceParts.take(ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size + 1).reverse
+        ancestorRepeatPrefixedId <- ancestorRepeatPrefixedIdOpt.to(List)
+        index                    <- sourceParts.take(ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size + 1).reverse
       } yield
         index
 
@@ -391,7 +391,7 @@ object Controls {
           )
 
         control match {
-          case repeatControl: XFormsRepeatControl ⇒
+          case repeatControl: XFormsRepeatControl =>
 
             // Update iterations
             val oldRepeatSeq = control.bindingContext.nodeset.asScala
@@ -416,7 +416,7 @@ object Controls {
             // controls and dispatches events
             this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
 
-          case _ ⇒
+          case _ =>
 
             // Simply set the new binding
             evaluateBindingAndValues()
@@ -435,10 +435,10 @@ object Controls {
         relevanceChangeLevel = level // entering level of containing
 
       control.bindingContextForChildOpt match {
-        case Some(bindingContextForChild) ⇒
+        case Some(bindingContextForChild) =>
           bindingContext = bindingContextForChild
           true
-        case None ⇒
+        case None =>
           bindingContext = null // should not be used
           false
       }
@@ -490,9 +490,9 @@ object Controls {
   ) extends Iterator[XFormsControl] {
 
     private val children = start match {
-      case c: XFormsSwitchControl if followVisible ⇒ c.selectedCaseIfRelevantOpt.iterator
-      case c: XFormsContainerControl               ⇒ c.children.iterator
-      case _                                       ⇒ Iterator.empty
+      case c: XFormsSwitchControl if followVisible => c.selectedCaseIfRelevantOpt.iterator
+      case c: XFormsContainerControl               => c.children.iterator
+      case _                                       => Iterator.empty
     }
 
     private var descendants: Iterator[XFormsControl] = Iterator.empty
@@ -534,7 +534,7 @@ object Controls {
   }
 
   // Evaluate the body with InstancesControls in scope
-  def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: ⇒ T): T =
+  def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: => T): T =
     instancesControlsToRestore.withValue((instancesControls, topLevel))(body)
 
   // Evaluate the body with InstancesControls in scope (Java callers)
@@ -557,7 +557,7 @@ object Controls {
   // 2018-01-04: 2 uses left.
   def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
     control match {
-      case containerControl: XFormsContainerControl ⇒
+      case containerControl: XFormsContainerControl =>
         // Container itself
         if (includeCurrent)
           if (! listener.startVisitControl(containerControl))
@@ -569,7 +569,7 @@ object Controls {
         // Container itself
         if (includeCurrent)
           listener.endVisitControl(containerControl)
-      case control ⇒
+      case control =>
         if (includeCurrent) {
           listener.startVisitControl(control)
           listener.endVisitControl(control)
@@ -577,12 +577,12 @@ object Controls {
     }
 
   private def visitSiblings(listener: XFormsControlVisitorListener, children: Seq[XFormsControl]): Unit =
-    for (currentControl ← children) {
+    for (currentControl <- children) {
       if (listener.startVisitControl(currentControl)) {
         currentControl match {
-          case container: XFormsContainerControl ⇒
+          case container: XFormsContainerControl =>
             visitSiblings(listener, container.children)
-          case nonContainer ⇒
+          case nonContainer =>
             // NOTE: Unfortunately we handle children actions of non container controls a bit differently
             val childrenActions = nonContainer.childrenActions
             if (childrenActions.nonEmpty)

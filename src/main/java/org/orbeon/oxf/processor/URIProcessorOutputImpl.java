@@ -388,16 +388,17 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 final IndentedLogger indentedLogger = new IndentedLogger(logger);
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
                     Connection.jBuildConnectionHeadersCapitalizedIfNeeded(
-                        submissionURL.getScheme(),
+                        submissionURL,
                         credentials != null,
                         null,
                         Connection.jHeadersToForward(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
-                        indentedLogger
+                        indentedLogger,
+                        externalContext
                     );
 
                 final ConnectionResult connectionResult
-                    = Connection.jApply(HttpMethod.GET$.MODULE$, submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    = Connection.jApply(HttpMethod.GET$.MODULE$, submissionURL, credentials, null, headers, true, false, indentedLogger, externalContext).connect(true);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode() != 200)

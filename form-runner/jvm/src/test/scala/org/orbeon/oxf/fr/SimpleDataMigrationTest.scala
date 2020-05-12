@@ -177,7 +177,7 @@ class SimpleDataMigrationTest
         form       = "data-migration",
         mode       = "new",
         document   = "",
-        query      = List(FormRunnerPersistence.DataFormatVersionName → DataFormatVersion.Edge.entryName),
+        query      = List(FormRunnerPersistence.DataFormatVersionName -> DataFormatVersion.Edge.entryName),
         initialize = true,
         content    = Some(contentToPost)
       )
@@ -185,7 +185,7 @@ class SimpleDataMigrationTest
     val doc = docOpt.get
 
     it("must pass migration of elements in main form and section templates") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {
           assertXMLDocumentsIgnoreNamespacesInScope(
             left  = ExpectedFormData.root,

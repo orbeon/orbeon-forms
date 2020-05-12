@@ -23,7 +23,7 @@ import org.orbeon.oxf.common.ValidationException
  */
 trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
-  variableSelf ⇒
+  variableSelf =>
 
   import VariableAnalysis._
 
@@ -37,15 +37,15 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
   // Lazy because accessing scopeModel
   private lazy val nestedAnalysis =
-    valueOrSequenceElement(variableSelf.element) map { valueElement ⇒
+    valueOrSequenceElement(variableSelf.element) map { valueElement =>
       new SimpleElementAnalysis(staticStateContext, valueElement, Some(variableSelf), None, getChildElementScope(valueElement)) {
 
-        nestedSelf ⇒
+        nestedSelf =>
 
         override protected def computeValueAnalysis =
           valueOrSelectAttribute(nestedSelf.element) match {
-            case Some(value) ⇒ Some(analyzeXPath(nestedSelf.getChildrenContext, value))
-            case None        ⇒ Some(StringAnalysis()) // TODO: store constant value?
+            case Some(value) => Some(analyzeXPath(nestedSelf.getChildrenContext, value))
+            case None        => Some(StringAnalysis()) // TODO: store constant value?
           }
 
         // If in same scope as xf:var, in-scope variables are the same as xxf:var because we don't
@@ -60,17 +60,17 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
             getRootVariables ++ nestedSelf.treeInScopeVariables
 
         override protected def getRootVariables = variableSelf match {
-          case _: ViewTrait ⇒ nestedSelf.model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map() }
-          case _            ⇒ Map()
+          case _: ViewTrait => nestedSelf.model match { case Some(model) => model.variablesMap; case None => Map() }
+          case _            => Map()
         }
       }
     }
 
   // Scope of xf:var OR nested xxf:value if present
   lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) = nestedAnalysis match {
-    case Some(nestedAnalysis) ⇒
+    case Some(nestedAnalysis) =>
       (true, nestedAnalysis.scope, nestedAnalysis.namespaceMapping, nestedAnalysis.staticId)
-    case None ⇒
+    case None =>
       (false, scope, namespaceMapping, staticId)
   }
 
@@ -78,15 +78,15 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
   override def computeValueAnalysis =
     nestedAnalysis match {
-      case Some(nestedAnalysis) ⇒
+      case Some(nestedAnalysis) =>
         // Value is provided by nested xxf:value/@value
         nestedAnalysis.analyzeXPath()
         nestedAnalysis.getValueAnalysis
-      case None ⇒
+      case None =>
         // No nested xxf:value element
         valueOrSelectAttribute(element) match {
-          case Some(value) ⇒ Some(analyzeXPath(getChildrenContext, value))
-          case _           ⇒ Some(StringAnalysis()) // TODO: store constant value?
+          case Some(value) => Some(analyzeXPath(getChildrenContext, value))
+          case _           => Some(StringAnalysis()) // TODO: store constant value?
         }
     }
 }

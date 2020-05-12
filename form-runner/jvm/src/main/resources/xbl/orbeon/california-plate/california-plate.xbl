@@ -60,7 +60,7 @@
             <xf:model id="model">
                 <!-- Local instance with space for 7 characters -->
                 <xf:instance id="plate">
-                    <plate xmlns=""><c/><c/><c/><c/><c/><c/><c/></plate>
+                    <_ xmlns=""><c/><c/><c/><c/><c/><c/><c/></_>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>

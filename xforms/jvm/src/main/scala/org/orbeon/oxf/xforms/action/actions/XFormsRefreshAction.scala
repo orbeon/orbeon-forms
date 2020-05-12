@@ -31,9 +31,9 @@ class XFormsRefreshAction extends XFormsAction {
     val modelOpt = context.interpreter.actionXPathContext.getCurrentBindingContext.modelOpt
 
     modelOpt match {
-      case Some(model) ⇒
+      case Some(model) =>
         XFormsRefreshAction.refresh(model)
-      case None ⇒
+      case None =>
         val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
         throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
     }

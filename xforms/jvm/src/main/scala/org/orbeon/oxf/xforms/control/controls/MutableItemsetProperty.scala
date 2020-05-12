@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
-import org.orbeon.oxf.xforms.itemset.{XFormsItemUtils, Itemset}
+import org.orbeon.oxf.xforms.itemset.{ItemsetSupport, Itemset}
 
 class MutableItemsetProperty(private val control: XFormsSelect1Control) extends MutableControlProperty[Itemset] {
   protected def isRelevant        = control.isRelevant
@@ -22,5 +22,5 @@ class MutableItemsetProperty(private val control: XFormsSelect1Control) extends 
   protected def requireUpdate     = control.containingDocument.getXPathDependencies.requireItemsetUpdate(control.staticControl, control.effectiveId)
   protected def notifyCompute()   = control.containingDocument.getXPathDependencies.notifyComputeItemset()
   protected def notifyOptimized() = control.containingDocument.getXPathDependencies.notifyOptimizeItemset()
-  protected def evaluateValue()   = XFormsItemUtils.evaluateItemset(control)
+  protected def evaluateValue()   = ItemsetSupport.evaluateItemset(control)
 }

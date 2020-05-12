@@ -28,6 +28,7 @@ object XFormsApp extends App {
 
   def onPageContainsFormsMarkup(): Unit = {
     setupGlobalClassesIfNeeded()
+    StateHandling.initializeHashChangeListener()
     InitSupport.pageContainsFormsMarkup()
   }
 }

@@ -24,7 +24,7 @@ class XFormsAttribute extends XFormsFunction {
 
     // Attribute QName and value
     val qName = argument.lift(0) map (getQNameFromExpression(_)(xpathContext)) get
-    val value = argument.lift(1) flatMap (e ⇒ Option(e.evaluateItem(xpathContext))) map (_.getStringValue) getOrElse ""
+    val value = argument.lift(1) flatMap (e => Option(e.evaluateItem(xpathContext))) map (_.getStringValue) getOrElse ""
 
     // Create and wrap the attribute
     attributeInfo(qName, value)

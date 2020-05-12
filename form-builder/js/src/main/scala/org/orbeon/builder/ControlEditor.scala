@@ -30,10 +30,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object ControlEditor {
 
   private val SplitMergeCssClassDirectionOps = List(
-    "fb-x-merge" → Direction.Right → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].mergeRight(cellId).call()),
-    "fb-x-split" → Direction.Left  → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].splitX    (cellId).call()),
-    "fb-y-merge" → Direction.Down  → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].mergeDown (cellId).call()),
-    "fb-y-split" → Direction.Up    → ((cellId: String) ⇒ RpcClient[FormBuilderRpcApi].splitY    (cellId).call())
+    "fb-x-merge" -> Direction.Right -> ((cellId: String) => RpcClient[FormBuilderRpcApi].mergeRight(cellId).call()),
+    "fb-x-split" -> Direction.Left  -> ((cellId: String) => RpcClient[FormBuilderRpcApi].splitX    (cellId).call()),
+    "fb-y-merge" -> Direction.Down  -> ((cellId: String) => RpcClient[FormBuilderRpcApi].mergeDown (cellId).call()),
+    "fb-y-split" -> Direction.Up    -> ((cellId: String) => RpcClient[FormBuilderRpcApi].splitY    (cellId).call())
   )
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
@@ -46,11 +46,11 @@ object ControlEditor {
   // Show/hide editor
   Position.currentContainerChanged(
     containerCache = BlockCache.cellCache,
-    wasCurrent     = _ ⇒ {
+    wasCurrent     = _ => {
       currentCellOpt = None
       hideEditors()
     },
-    becomesCurrent = (cell: Block) ⇒ {
+    becomesCurrent = (cell: Block) => {
       currentCellOpt = Some(cell)
       if (! masked)
         showEditors(cell)
@@ -84,7 +84,7 @@ object ControlEditor {
       (cellContent.length > 0).option($(cellContent(0)))
     }
 
-    controlElOpt.foreach { controlEl ⇒
+    controlElOpt.foreach { controlEl =>
       // Control editor is only show when the cell isn't empty
       controlEl.append(controlEditorRight)
       positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
@@ -100,7 +100,7 @@ object ControlEditor {
       val cellEl = cell.el.get(0).asInstanceOf[html.Element]
       Cell.canChangeSize(cellEl)
     }
-    for (((cssClass, direction), _) ← SplitMergeCssClassDirectionOps) {
+    for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
       val disableIcon = ! allowedDirections.contains(direction)
       val icon = controlEditorLeft.find(s".$cssClass")
       icon.toggleClass("disabled", disableIcon)
@@ -115,28 +115,28 @@ object ControlEditor {
   }
 
   // Control actions
-  ControlActionNames.foreach { actionName ⇒
+  ControlActionNames.foreach { actionName =>
     val actionEl = controlEditorRight.find(s".fb-control-$actionName")
-    actionEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
-      currentCellOpt.foreach { currentCell ⇒
+    actionEl.on("click.orbeon.builder.control-editor", () => asUnit {
+      currentCellOpt.foreach { currentCell =>
 
         val controlId = currentCell.el.children().attr("id").get
 
         actionName match {
-          case "delete"       ⇒ RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
-          case "edit-details" ⇒ RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
-          case "edit-items"   ⇒ RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
+          case "delete"       => RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
+          case "edit-details" => RpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
+          case "edit-items"   => RpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
         }
       }
     })
   }
 
   // Expand/shrink actions
-  for (((cssClass, _), ops) ← SplitMergeCssClassDirectionOps) {
+  for (((cssClass, _), ops) <- SplitMergeCssClassDirectionOps) {
     val iconEl = controlEditorLeft.find(s".$cssClass")
-    iconEl.on("click.orbeon.builder.control-editor", () ⇒ asUnit {
+    iconEl.on("click.orbeon.builder.control-editor", () => asUnit {
       if (! iconEl.is(".disabled"))
-        currentCellOpt.foreach { currentCell ⇒
+        currentCellOpt.foreach { currentCell =>
           val cellId = currentCell.el.attr("id").get
           ops(cellId)
         }

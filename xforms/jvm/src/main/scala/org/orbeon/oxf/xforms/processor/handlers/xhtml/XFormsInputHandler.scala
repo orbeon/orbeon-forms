@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
-
 
 /**
  * Handle xf:input.
@@ -56,33 +56,36 @@ class XFormsInputHandler(
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
 
-  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
+  private def controlHas(predicate: XFormsInputControl => Boolean) =
     predicate(currentControl.asInstanceOf[XFormsInputControl])
 
-  private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
-  private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
-  private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
+  private def isDateTime    = controlHas(c => c.getBuiltinTypeName == "dateTime")
+  private def isDateMinimal = controlHas(c => c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
+  private def isBoolean     = controlHas(c => c.getBuiltinTypeName == "boolean")
 
   override protected def handleControlStart(): Unit = {
+
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+
     val inputControl = currentControl.asInstanceOf[XFormsInputControl]
-    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
     val isRelevantControl = ! isNonRelevant(inputControl)
+
     if (isBoolean) {
       // Produce a boolean output
 
       val isMultiple = true
-      val itemset = new Itemset(isMultiple)
+      val itemset = new Itemset(isMultiple, hasCopy = false)
       // NOTE: We have decided that it did not make much sense to encode the value for boolean. This also poses
       // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
       // the encrypted value of "true". So we do not encrypt values.
       // NOTE: Put null label so that it is not output at all
       // encode = false,
       itemset.addChildItem(
-        Item(
-          label      = null,
+        Item.ValueNode(
+          label      = LHHAValue.Empty,
           help       = None,
           hint       = None,
-          value      = "true",
+          value      = Left("true"),
           attributes = Nil
         )(
           position   = 0
@@ -92,16 +95,14 @@ class XFormsInputHandler(
       // TODO: Do not delegate but just share `outputContent` implementation.
       new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext)
         .outputContent(
-          uri,
-          localname,
-          attributes,
-          getEffectiveId,
-          inputControl,
-          itemset,
-          isMultiple,
-          true,
-          true,
-          xformsHandlerContext
+          attributes           = attributes,
+          effectiveId          = getEffectiveId,
+          control              = inputControl,
+          itemsetOpt           = itemset.some,
+          isMultiple           = isMultiple,
+          isFull               = true,
+          isBooleanInput       = true,
+          xformsHandlerContext = xformsHandlerContext
         )
     } else {
 
@@ -141,8 +142,8 @@ class XFormsInputHandler(
             // Q: Not sure why we duplicate the appearances here. As of 2011-10-27, removing this
             // makes the minimal date picker fail on the client. We should be able to remove this.
             elementAnalysis match {
-              case a: AppearanceTrait ⇒ a.encodeAndAppendAppearances(inputClasses)
-              case _ ⇒
+              case a: AppearanceTrait => a.encodeAndAppendAppearances(inputClasses)
+              case _ =>
             }
           } else {
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
@@ -152,7 +153,7 @@ class XFormsInputHandler(
           inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
 
           // Add attribute even if the control is not concrete
-          placeHolderInfo foreach { placeHolderInfo ⇒
+          placeHolderInfo foreach { placeHolderInfo =>
             if (placeHolderInfo.value ne null) // unclear whether this can ever be null
               reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
           }
@@ -169,8 +170,8 @@ class XFormsInputHandler(
             xmlReceiver.startElement(XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
             xmlReceiver.endElement(XHTML_NAMESPACE_URI, "img", imgQName)
           } else {
-            if (isHTMLDisabled(inputControl))
-              outputDisabledAttribute(reusableAttributes)
+            if (isXFormsReadonlyButNotStaticReadonly(inputControl))
+              outputReadonlyAttribute(reusableAttributes)
 
             handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
 
@@ -204,8 +205,8 @@ class XFormsInputHandler(
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
           }
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
-          if (isHTMLDisabled(inputControl))
-            outputDisabledAttribute(reusableAttributes)
+          if (isXFormsReadonlyButNotStaticReadonly(inputControl))
+            outputReadonlyAttribute(reusableAttributes)
 
           // TODO: set @size and @maxlength
 
@@ -216,9 +217,9 @@ class XFormsInputHandler(
       } else {
         // Output static read-only value
         if (isRelevantControl) {
-          val atts = List("class" → "xforms-field")
+          val atts = List("class" -> "xforms-field")
           withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts) {
-            inputControl.getFormattedValue foreach { value ⇒
+            inputControl.getFormattedValue foreach { value =>
               xmlReceiver.characters(value.toCharArray, 0, value.length)
             }
           }
@@ -238,14 +239,14 @@ class XFormsInputHandler(
     isDateTime option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-2")) orNull
 
   override def getForEffectiveId(effectiveId: String): String =
-    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, "0") getOrElse getFirstInputEffectiveId(getEffectiveId)
+    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveId(getEffectiveId)
 
   protected override def handleLabel(): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
       super.handleLabel()
 
   protected override def handleHint(): Unit =
-    if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
+    if (placeHolderInfo forall (_.isLabelPlaceholder))
       super.handleHint()
 }
 

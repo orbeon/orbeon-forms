@@ -32,14 +32,14 @@ object FormRunnerActionsSupport {
 
   def paramsToAppend(processParams: ProcessParams, paramNames: List[String]): List[(String, String)] =
     paramNames collect {
-      case name @ "process"             ⇒ name → processParams.runningProcessId
-      case name @ "app"                 ⇒ name → processParams.app
-      case name @ "form"                ⇒ name → processParams.form
-      case name @ FormVersionParam      ⇒ name → processParams.formVersion.toString
-      case name @ "document"            ⇒ name → processParams.document
-      case name @ "valid"               ⇒ name → processParams.valid.toString
-      case name @ "language"            ⇒ name → processParams.language
-      case name @ DataFormatVersionName ⇒ name → processParams.dataFormatVersion
+      case name @ "process"             => name -> processParams.runningProcessId
+      case name @ "app"                 => name -> processParams.app
+      case name @ "form"                => name -> processParams.form
+      case name @ FormVersionParam      => name -> processParams.formVersion.toString
+      case name @ "document"            => name -> processParams.document
+      case name @ "valid"               => name -> processParams.valid.toString
+      case name @ "language"            => name -> processParams.language
+      case name @ DataFormatVersionName => name -> processParams.dataFormatVersion
     }
 
   def updateUriWithParams(processParams: ProcessParams, uri: String, requestedParamNames: List[String]): String = {

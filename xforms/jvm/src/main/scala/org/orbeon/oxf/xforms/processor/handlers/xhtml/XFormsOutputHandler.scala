@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandl
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
-import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -58,7 +58,7 @@ class XFormsOutputDefaultHandler(
 
   override protected def handleControlStart(): Unit = {
 
-    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
 
@@ -213,7 +213,7 @@ class XFormsOutputDownloadHandler(
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
 
     // For f:url-type="resource"
-    withFormattingPrefix { formattingPrefix ⇒
+    withFormattingPrefix { formattingPrefix =>
 
       def anchorAttributes = {
 
@@ -251,14 +251,14 @@ class XFormsOutputDownloadHandler(
       val aAttributes = anchorAttributes
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes)
 
-      withElement("a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
+      withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
         val labelValue             = currentControl.getLabel
         val mustOutputHTMLFragment = currentControl.isHTMLLabel
-        XFormsBaseHandlerXHTML.outputLabelText(xmlReceiver, labelValue, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
+        XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, Option(currentControl.getLocationData))
       }
     }
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveId(effectiveId: String) = null
+  override def getForEffectiveId(effectiveId: String): String = null
 }

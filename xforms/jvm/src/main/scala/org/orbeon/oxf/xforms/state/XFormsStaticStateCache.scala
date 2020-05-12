@@ -33,8 +33,8 @@ object XFormsStaticStateCache {
     findDocument(digest) map (_._1) orNull
 
   def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
-    cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) ⇒
-      o.asInstanceOf[XFormsStaticState] → ProcessorImpl.findLastModified(validity)
+    cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) =>
+      o.asInstanceOf[XFormsStaticState] -> ProcessorImpl.findLastModified(validity)
     }
 
   private object Private {

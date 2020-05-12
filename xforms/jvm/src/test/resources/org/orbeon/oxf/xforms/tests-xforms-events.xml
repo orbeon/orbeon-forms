@@ -2513,11 +2513,11 @@
                             <!-- Toggling validity must produce 2 events -->
                             <xf:setvalue ref="instance('instance-1')">invalid</xf:setvalue>
                             <xf:setvalue ref="instance('instance-2')">valid</xf:setvalue>
-                            <xf:revalidate/>
+                            <xf:recalculate/>
 
                             <!-- This must not produce any new event as validity hasn't changed -->
                             <xf:setvalue ref="instance('instance-1')">foo</xf:setvalue>
-                            <xf:revalidate/>
+                            <xf:recalculate/>
                         </xf:action>
                     </xf:model>
                 </xh:head>
@@ -2540,10 +2540,8 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <xxforms-invalid targetid="instance-2"/>
-                                    <xforms-revalidate targetid="model"/>
                                     <xxforms-invalid targetid="instance-1"/>
                                     <xxforms-valid targetid="instance-2"/>
-                                    <xforms-revalidate targetid="model"/>
                                 </events>
                             </instance>
                         </instances>

@@ -14,14 +14,14 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
-import java.util.{Collections ⇒ JCollections}
+import java.util.{Collections => JCollections}
 import ControlLocalSupport._
 import org.orbeon.oxf.xforms.state.ControlState
 import collection.JavaConverters._
 
 trait ControlLocalSupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   // Scala 2.11: Simply `private` worked with 2.10. Unclear whether this is a feature or a bug.
   private[control] var initialLocal: XFormsControlLocal = null

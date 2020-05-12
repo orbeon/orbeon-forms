@@ -23,10 +23,11 @@ import org.orbeon.xforms.EventNames
 import scala.collection.mutable
 import scala.collection.compat._
 
+
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
 
-  self: PartAnalysisImpl ⇒
+  self: PartAnalysisImpl =>
 
   import PartEventHandlerAnalysis._
 
@@ -38,15 +39,15 @@ trait PartEventHandlerAnalysis {
   private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
   def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
   private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
-  def uniqueJsScripts = _uniqueJsScripts
+  def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
 
   // Register new event handlers
   def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
 
     val tuples =
       for {
-        handler ← eventHandlers
-        observerPrefixedId ← {
+        handler <- eventHandlers
+        observerPrefixedId <- {
           handler.analyzeEventHandler()
           handler.observersPrefixedIds
         }
@@ -54,13 +55,13 @@ trait PartEventHandlerAnalysis {
         (observerPrefixedId, handler)
 
     // Group event handlers by observer
-    val newHandlers = tuples groupBy (_._1) map { case (k, v) ⇒ k → (v map (_._2) toList) }
+    val newHandlers = tuples groupBy (_._1) map { case (k, v) => k -> (v map (_._2) toList) }
 
     // Accumulate new handlers into existing map by combining values for a given observer
     _handlersForObserver = newHandlers.foldLeft(_handlersForObserver) {
-      case (existingMap, (observerId, newHandlers)) ⇒
+      case (existingMap, (observerId, newHandlers)) =>
         val existingHandlers = existingMap.getOrElse(observerId, Nil)
-        existingMap + (observerId → (existingHandlers ::: newHandlers))
+        existingMap + (observerId -> (existingHandlers ::: newHandlers))
     }
 
     // Gather all event names (NOTE: #all is also included if present)
@@ -88,7 +89,7 @@ trait PartEventHandlerAnalysis {
         throw new NotImplementedError(s"""`runat="server"` is not supported""")
 
       val params =
-        Dom4j.elements(elem, XFORMS_PARAM_QNAME) map (p ⇒ p.attributeValue("name") → p.attributeValue("value"))
+        Dom4j.elements(elem, XFORMS_PARAM_QNAME) map (p => p.attributeValue("name") -> p.attributeValue("value"))
 
       val body =
         if (params.nonEmpty)
@@ -123,7 +124,7 @@ trait PartEventHandlerAnalysis {
     _scriptsByPrefixedId ++=
       jsScripts.iterator ++
       xpathScriptsIt     map
-      (script ⇒ script.prefixedId → script)
+      (script => script.prefixedId -> script)
 
     // Keep only one script body for a given digest
     _uniqueJsScripts ++= jsScripts.keepDistinctBy(_.shared.digest) map (_.shared)
@@ -142,12 +143,12 @@ trait PartEventHandlerAnalysis {
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
   }
 
-  def getEventHandlers(observerPrefixedId: String) =
+  def getEventHandlers(observerPrefixedId: String): List[EventHandler] =
     _handlersForObserver.getOrElse(observerPrefixedId, Nil)
 
-  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
+  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean =
     _handlersForObserver.get(observerPrefixedId) exists
-      (handlers ⇒ handlers exists (_.isMatchByName(eventName)))
+      (handlers => handlers exists (_.isMatchByName(eventName)))
 
   def keyboardHandlers: List[EventHandler] = _keyboardHandlers
 

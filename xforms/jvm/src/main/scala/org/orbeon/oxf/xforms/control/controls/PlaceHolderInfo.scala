@@ -33,7 +33,7 @@ object PlaceHolderInfo {
   ): Option[PlaceHolderInfo] = {
 
     staticControl match {
-      case lhhaSupport: StaticLHHASupport ⇒
+      case lhhaSupport: StaticLHHASupport =>
 
         val isLabelPlaceholder = lhhaSupport.hasLHHAPlaceholder(LHHA.Label)
         val isHintPlaceholder  = ! isLabelPlaceholder && lhhaSupport.hasLHHAPlaceholder(LHHA.Hint)
@@ -52,7 +52,7 @@ object PlaceHolderInfo {
 
           PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
         }
-      case _ ⇒
+      case _ =>
         None
     }
   }

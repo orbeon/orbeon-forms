@@ -19,7 +19,7 @@ import org.orbeon.oxf.processor.impl.{DigestState, DigestTransformerOutputImpl}
 import org.orbeon.oxf.xml.{DigestContentHandler, XMLReceiver}
 
 // This processor provides digest-based caching based on any content
-class DigestedProcessor(content: XMLReceiver ⇒ Unit) extends ProcessorImpl {
+class DigestedProcessor(content: XMLReceiver => Unit) extends ProcessorImpl {
 
   override def createOutput(name: String) =
     new DigestTransformerOutputImpl(DigestedProcessor.this, name) {

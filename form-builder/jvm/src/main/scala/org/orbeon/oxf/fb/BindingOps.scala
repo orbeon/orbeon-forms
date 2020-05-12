@@ -43,7 +43,7 @@ trait BindingOps {
     val lang        = FormRunner.currentLang
 
     for {
-      controlElem                  ← findControlByName(ctx.formDefinitionRootElem, controlName).toList
+      controlElem                  <- findControlByName(ctx.formDefinitionRootElem, controlName).toList
       originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
       (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
           elemName    = controlElem.uriQualifiedName,
@@ -52,7 +52,7 @@ trait BindingOps {
           descriptors = descriptors
         )
       newDatatype                  = Model.qNameForBuiltinTypeName(builtinDatatype, required = false)
-      appearanceElem               ← possibleAppearancesWithLabelAsXML(
+      appearanceElem               <- possibleAppearancesWithLabelAsXML(
           elemName                = virtualName,
           builtinType             = newDatatype,
           // Upon initial load, we want to select as current the original appearance. Later, we want to try
@@ -77,13 +77,13 @@ trait BindingOps {
   ): Array[NodeInfo] = {
 
     def appearanceMatches(appearanceOpt: Option[String]) = appearanceOpt match {
-      case Some(appearance) ⇒ appearancesForSelection contains appearance
-      case None             ⇒ appearancesForSelection.isEmpty
+      case Some(appearance) => appearancesForSelection contains appearance
+      case None             => appearancesForSelection.isEmpty
     }
 
     val appearancesXML =
       for {
-        (valueOpt, label, iconPathOpt, iconClasses) ← possibleAppearancesWithLabel(
+        (valueOpt, label, iconPathOpt, iconClasses) <- possibleAppearancesWithLabel(
             elemName,
             builtinType,
             lang,
@@ -94,7 +94,7 @@ trait BindingOps {
           <label>{label}</label>
           <value>{valueOpt.getOrElse("")}</value>
           {
-            iconPathOpt.toList map { iconPath ⇒
+            iconPathOpt.toList map { iconPath =>
               <icon-path>{iconPath}</icon-path>
             }
           }
@@ -120,10 +120,10 @@ trait BindingOps {
       bindingOpt.to(List) flatMap bindingMetadata headOption
 
     possibleAppearancesWithBindings(elemName, datatype, bindings) map {
-      case (appearanceOpt, bindingOpt, _) ⇒
+      case (appearanceOpt, bindingOpt, _) =>
         (appearanceOpt, metadataOpt(bindingOpt))
     } collect {
-      case (appearanceOpt, Some(metadata)) ⇒
+      case (appearanceOpt, Some(metadata)) =>
 
         def findMetadata(elems: Seq[NodeInfo]) = {
 
@@ -134,13 +134,14 @@ trait BindingOps {
         }
 
         // See also toolbox.xml which duplicates some of this logic
-        val displayNameOpt = findMetadata(metadata / FBDisplayNameTest)
-        val iconClasses    = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
-        val iconPathOpt    = findMetadata(metadata / FBIconTest / FBSmallIconTest)
+        val displayNameOpt           = findMetadata(metadata / FBDisplayNameTest)
+        val iconClasses              = findMetadata(metadata / FBIconTest / FBIconClassTest) getOrElse "fa fa-fw fa-puzzle-piece"
+        val iconPathOpt              = findMetadata(metadata / FBIconTest / FBSmallIconTest)
+        val appearanceDisplayNameOpt = findMetadata(metadata / FBAppearanceDisplayNameTest)
 
-        (appearanceOpt, displayNameOpt, iconPathOpt, iconClasses)
+        (appearanceOpt, appearanceDisplayNameOpt orElse displayNameOpt, iconPathOpt, iconClasses)
     } collect {
-      case (appearanceOpt, Some(displayName), iconPathOpt, iconClasses) ⇒
+      case (appearanceOpt, Some(displayName), iconPathOpt, iconClasses) =>
         (appearanceOpt, displayName, iconPathOpt, iconClasses)
     }
   }
@@ -173,14 +174,14 @@ trait BindingOps {
     val allAttributes = {
 
       val typeFromDatatype =
-        for (elem ← datatypeMetadataOpt.to(List))
+        for (elem <- datatypeMetadataOpt.to(List))
         yield
           (elem, QName("type"), elem.stringValue)
 
       val bindAttributes = {
         for {
-          elem ← bindMetadataOpt.to(List)
-          att  ← elem /@ @*
+          elem <- bindMetadataOpt.to(List)
+          att  <- elem /@ @*
         } yield
           (elem, QName(att.getLocalPart, att.getPrefix, att.getURI), att.stringValue)
       }
@@ -189,14 +190,14 @@ trait BindingOps {
     }
 
     allAttributes collect {
-      case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
+      case (_, qname, value) if BindTemplateAttributesToNamespace(qname) =>
         // Some attributes must be prefixed before being inserted into the edited form
-        QName(qname.localName, "fb", XMLNames.FB) → value
-      case (elem, qname, value) if !(qname.localName == "type" && elem.resolveQName(value).localName == "string") ⇒
+        QName(qname.localName, "fb", XMLNames.FB) -> value
+      case (elem, qname, value) if !(qname.localName == "type" && elem.resolveQName(value).localName == "string") =>
         // Exclude `type="*:string"`
-        qname → value
+        qname -> value
     } map {
-      case (qname, value) ⇒
+      case (qname, value) =>
         attributeInfo(qname, value)
     }
   }
@@ -209,8 +210,8 @@ trait BindingOps {
     val descriptors = getAllRelevantDescriptors(bindings)
 
     for {
-      descriptor      ← findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
-      binding         ← descriptor.binding
+      descriptor      <- findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+      binding         <- descriptor.binding
     } yield
       binding
   }
@@ -220,8 +221,8 @@ trait BindingOps {
 
     val editorAttributeValueOpt =
       for {
-        binding         ← bindingForControlElement(controlElem, bindings)
-        editorAttribute ← (bindingMetadata(binding) / FBEditorsTest /@ editor).headOption
+        binding         <- bindingForControlElement(controlElem, bindings)
+        editorAttribute <- (bindingMetadata(binding) / FBEditorsTest /@ editor).headOption
       } yield
         editorAttribute.stringValue
 

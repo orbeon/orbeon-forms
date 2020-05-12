@@ -19,6 +19,9 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
 import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.NodeInfoFactory.attributeInfo
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -50,7 +53,7 @@ class GridOpsTest
 
   describe("Row insertion below") {
     it("must insert as expected") {
-      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RowspansDoc) { implicit ctx =>
 
         val gridElem =
           ctx.bodyElem descendant NodeInfoCell.GridTest head
@@ -59,7 +62,7 @@ class GridOpsTest
         var mapping = createAndAssertInitialGrid(gridElem)
 
         // Insert one row below each existing row
-        for (rowPos ← List(0, 2, 4)) {
+        for (rowPos <- List(0, 2, 4)) {
           rowInsertBelow(gridElem, rowPos)
           val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
           mapping = newMapping
@@ -82,7 +85,7 @@ class GridOpsTest
 
   describe("Row insertion above") {
     it("must insert as expected") {
-      withActionAndFBDoc(RowspansDoc) { implicit ctx ⇒
+      withActionAndFBDoc(RowspansDoc) { implicit ctx =>
 
         val gridElem =
           ctx.bodyElem descendant NodeInfoCell.GridTest head
@@ -91,7 +94,7 @@ class GridOpsTest
         var mapping = createAndAssertInitialGrid(gridElem)
 
         // Insert one row above each existing row
-        for (rowPos ← List(0, 2, 4)) {
+        for (rowPos <- List(0, 2, 4)) {
           rowInsertAbove(gridElem, rowPos)
           val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
           mapping = newMapping
@@ -129,7 +132,7 @@ class GridOpsTest
 
   describe("Preceding name for control") {
     it("must insert all elements in the right places") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val controls =
           sectionWithGridAndControls descendant NodeInfoCell.CellTest child * filter (_.idOpt.nonEmpty)
@@ -142,7 +145,7 @@ class GridOpsTest
 
   describe("Preceding name for grid") {
     it("must insert all elements in the right places") {
-      withTestExternalContext { _ ⇒
+      withTestExternalContext { _ =>
 
         val section = sectionWithGridAndControls
 
@@ -158,15 +161,15 @@ class GridOpsTest
 
   describe("Delete") {
 
-    def assertSelectedCellAfterDelete(beforeAfter: List[(String, String)])(delete: NodeInfo ⇒ Any): Unit = {
+    def assertSelectedCellAfterDelete(beforeAfter: List[(String, String)])(delete: NodeInfo => Any): Unit = {
 
       // For before/after cell ids: create a doc, call the delete function, and assert the resulting selected cell
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
-        withActionAndFBDoc(SectionsGridsDoc) { implicit ctx ⇒
+        withActionAndFBDoc(SectionsGridsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
 
-          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell ⇒
+          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell =>
             selectCell(beforeCell)
             delete(beforeCell)
           }
@@ -177,20 +180,20 @@ class GridOpsTest
         }
 
       // Test all
-      for ((beforeTdId, afterTdId) ← beforeAfter)
+      for ((beforeTdId, afterTdId) <- beforeAfter)
         deleteAndCheckSelectedCell(beforeTdId, afterTdId)
     }
 
     it("must select the right cell after deleting a row") {
 
       val beforeAfter = List(
-        "1111" → "1121", // first cell
-        "2222" → "2231", // middle cell
-        "3333" → "3323", // last cell
-        "2111" → "2121"  // first cell of grid/section
+        "1111" -> "1121", // first cell
+        "2222" -> "2231", // middle cell
+        "3333" -> "3323", // last cell
+        "2111" -> "2121"  // first cell of grid/section
       )
 
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         implicit val ctx = FormBuilderDocContext()
         rowDelete(getContainingGrid(cell).id, (NodeInfoCellOps.y(cell) getOrElse 1) - 1)
       }
@@ -199,13 +202,13 @@ class GridOpsTest
     it("must select the right cell after deleting a grid") {
 
       val beforeAfter = List(
-        "1111" → "1211", // first cell
-        "2222" → "2311", // middle cell
-        "3333" → "3233", // last cell
-        "2111" → "2211"  // first cell of grid/section
+        "1111" -> "1211", // first cell
+        "2222" -> "2311", // middle cell
+        "3333" -> "3233", // last cell
+        "2111" -> "2211"  // first cell of grid/section
       )
 
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         deleteContainer(getContainingGrid(cell))
       }
     }
@@ -213,12 +216,12 @@ class GridOpsTest
     it("must select the right cell after deleting a section") {
 
       val beforeAfter = List(
-        "1111" → "2111", // first cell
-        "2222" → "3111", // middle cell
-        "3333" → "2333", // last cell
-        "2111" → "3111"  // first cell of grid/section
+        "1111" -> "2111", // first cell
+        "2222" -> "3111", // middle cell
+        "3333" -> "2333", // last cell
+        "2111" -> "3111"  // first cell of grid/section
       )
-      assertSelectedCellAfterDelete(beforeAfter) { cell ⇒
+      assertSelectedCellAfterDelete(beforeAfter) { cell =>
         deleteContainer(findAncestorContainersLeafToRoot(getContainingGrid(cell)).head)
       }
     }
@@ -226,7 +229,7 @@ class GridOpsTest
 
   describe("Last grid in section") {
     it("must allow inserting a new grid") {
-      withActionAndFBDoc(TemplateDoc) { implicit ctx ⇒
+      withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
         val doc = ctx.formDefinitionRootElem
 
@@ -236,7 +239,7 @@ class GridOpsTest
         assert(canInsertControl(doc) === true)
 
         // Remove everything (assume top-level section with a single grid inside)
-        childrenContainers(ctx.bodyElem).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
+        childrenContainers(ctx.bodyElem).toList foreach  { section => // evaluate with toList otherwise the lazy iterator can fail
           assert(isLastGridInSection(childrenGrids(section).head) === true)
           deleteContainer(section)
         }
@@ -246,6 +249,56 @@ class GridOpsTest
         assert(canInsertGrid(doc)    === false)
         assert(canInsertControl(doc) === false)
       }
+    }
+  }
+
+  describe("#4134: 24-column conversion") {
+
+    val grid12: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="6"/><fr:c x="7" y="1" w="6"/>
+      </fr:grid>
+
+    val grid24Even: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        columns="24"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="12"/><fr:c x="13" y="1" w="12"/>
+      </fr:grid>
+
+    val grid24Odd: NodeInfo =
+      <fr:grid
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        columns="24"
+        id="my-grid-grid" bind="my-grid-bind">
+        <fr:c x="1" y="1" w="13"/><fr:c x="14" y="1" w="11"/>
+      </fr:grid>
+
+    import org.orbeon.scaxon.Implicits._
+
+    it("must convert from 12 to 24 columns") {
+      val result = TransformerUtils.extractAsMutableDocument(grid12).rootElement
+      FormBuilder.migrateGridColumns(result, from = 12, to = 24)
+      XFormsAPI.insert(into = result, origin = attributeInfo("columns", "24") )
+      assertXMLElementsIgnoreNamespacesInScope(grid24Even, result)
+    }
+
+    it("must convert from 24 to 12 columns") {
+      val result = TransformerUtils.extractAsMutableDocument(grid24Even).rootElement
+      FormBuilder.migrateGridColumns(result, from = 24, to = 12)
+      XFormsAPI.delete(result /@ "columns")
+      assertXMLElementsIgnoreNamespacesInScope(grid12, result)
+    }
+
+    it("must report success to convert from 24 to 12 columns if cells are evenly aligned") {
+      assert(FormBuilder.findGridColumnMigrationType(grid24Even, from = 24, to = 12).contains(FormBuilder.To12ColumnMigrationType))
+    }
+
+    it("must report failure to convert from 24 to 12 columns if cells are oddly aligned") {
+      assert(FormBuilder.findGridColumnMigrationType(grid24Odd, from = 24 ,to = 12).isEmpty)
     }
   }
 }

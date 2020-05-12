@@ -25,13 +25,13 @@ package object jquery {
 
   implicit class JqueryOps(private val j: JQuery) extends AnyVal {
 
-    @inline private def asJsAny(body: ⇒ Any): js.Any = { body; () }
+    @inline private def asJsAny(body: => Any): js.Any = { body; () }
 
-    def onWithSelector(events: String, selector: String, handler: JQueryEventObject ⇒ _): Unit =
+    def onWithSelector(events: String, selector: String, handler: JQueryEventObject => _): Unit =
       j.on(
         events   = events,
         selector = selector,
-        handler  = ((e: JQueryEventObject) ⇒ asJsAny(handler(e))): js.Function1[JQueryEventObject, js.Any]
+        handler  = ((e: JQueryEventObject) => asJsAny(handler(e))): js.Function1[JQueryEventObject, js.Any]
       )
 
     def headElem      : Option[html.Element]           = j.length > 0 option j(0)
@@ -43,6 +43,6 @@ package object jquery {
 
     // Expose jQuery's `$(function)` as a `Future`
     def readyF(implicit executor: ExecutionContext): Future[Unit] =
-      j.when(j.asInstanceOf[js.Dynamic].ready).asInstanceOf[js.Thenable[js.Any]].toFuture map (_ ⇒ ())
+      j.when(j.asInstanceOf[js.Dynamic].ready).asInstanceOf[js.Thenable[js.Any]].toFuture map (_ => ())
   }
 }

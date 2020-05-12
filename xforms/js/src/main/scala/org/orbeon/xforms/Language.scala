@@ -20,7 +20,7 @@ import org.scalajs.dom.raw.{MutationObserver, MutationRecord}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 @JSExportTopLevel("ORBEON.xforms.Language")
 object Language {
@@ -37,10 +37,10 @@ object Language {
       .getOrElse("en")
   }
 
-  def onLangChange(listenerId: String, listener: String ⇒ Unit): Unit =
-    langElement.foreach { elem ⇒
+  def onLangChange(listenerId: String, listener: String => Unit): Unit =
+    langElement.foreach { elem =>
       val callback =
-        (_: js.Array[MutationRecord], _: MutationObserver) ⇒ listener(getLang())
+        (_: js.Array[MutationRecord], _: MutationObserver) => listener(getLang())
       val mutationObserver = new MutationObserver(callback)
       mutationObserver.observe(
         target  = elem,
@@ -53,7 +53,7 @@ object Language {
     }
 
   def offLangChange(listenerId: String): Unit = {
-    langListeners.get(listenerId).foreach { mutationObserver ⇒
+    langListeners.get(listenerId).foreach { mutationObserver =>
       mutationObserver.disconnect()
       langListeners.remove(listenerId)
     }
@@ -65,13 +65,13 @@ object Language {
 
     def langElement: Option[dom.Element] = {
 
-      val langElements: Iterator[() ⇒ Option[Element]] = Iterator(
-        () ⇒ Option(dom.document.documentElement),
-        () ⇒ Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]"))
+      val langElements: Iterator[() => Option[Element]] = Iterator(
+        () => Option(dom.document.documentElement),
+        () => Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]"))
       )
       langElements
         .map(_.apply)
-        .collectFirst { case Some(element) if element.hasAttribute(HtmlLangAttr) ⇒ element }
+        .collectFirst { case Some(element) if element.hasAttribute(HtmlLangAttr) => element }
     }
   }
 }

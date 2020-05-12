@@ -62,7 +62,7 @@ object Orbeon {
 
     // 1. Initialize the Resource Manager
     val properties = context.initParameters filter
-      { case (name, value) ⇒ name.startsWith("oxf.resources.")} updated
+      { case (name, value) => name.startsWith("oxf.resources.")} updated
         (WebAppResourceManagerImpl.WEB_APP_CONTEXT_KEY, context)
 
     logger.info(s"Initializing Resource Manager with: ${ResourceManagerWrapper.propertiesAsJson(properties)}")
@@ -100,7 +100,7 @@ object Orbeon {
       val json = Properties.instance.getPropertySet.allPropertiesAsJson
       Properties.logger.debug(s"All properties read: $json")
     } catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         logger.error(OrbeonFormatter.format(t))
     }
 

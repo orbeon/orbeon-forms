@@ -27,7 +27,6 @@
         .xforms-repeat-begin-end,
         .xforms-group-begin-end,
         .xforms-case-begin-end,
-        .xforms-case-deselected-subsequent,
         .xforms-hidden,
         .xforms-disabled,
         .xforms-case-deselected,
@@ -454,6 +453,15 @@
             display: inline-flex;
 
             > .add-on {
+
+                // Putting the `min-width` on the `.add-on` prevents its width from expanding beyond a certain point, so
+                // instead put the `min-width` on a child element; also see issue #4415
+                min-width: auto;
+                .xforms-output-output {
+                    min-width: 28px;
+                    display: inline-block;
+                }
+
                 .xforms-output-output {
                     white-space: nowrap;
                 }

@@ -30,7 +30,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.io.IOUtils._
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
 
 case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends FileUploadException
@@ -92,7 +92,7 @@ object Multipart {
 
     // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
     parseMultipartRequest(uploadContext, None, maxSize, headerEncoding, RequestGenerator.getMaxMemorySizeProperty) match {
-      case (nameValues, None) ⇒
+      case (nameValues, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListener {
@@ -100,7 +100,7 @@ object Multipart {
         })
 
         combineValues[String, AnyRef, Array](nameValues).toMap
-      case (nameValues, Some(t)) ⇒
+      case (nameValues, Some(t)) =>
         quietlyDeleteFileItems(nameValues)
         throw t
     }
@@ -137,18 +137,18 @@ object Multipart {
     servletFileUpload.setFileSizeMax(adjustedMaxSize)
 
     // Parse the request and add file information
-    useAndClose(uploadContext.getInputStream) { _ ⇒
+    useAndClose(uploadContext.getInputStream) { _ =>
       // This contains all completed values up to the point of failure if any
       val result = m.ListBuffer[(String, AnyRef)]()
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
         val itemIterator = asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
-        for (fis ← itemIterator)
+        for (fis <- itemIterator)
           result += processSingleStreamItem(servletFileUpload, fis, lifecycleOpt)
 
         (result.toList, None)
       } catch {
-        case NonFatal(t) ⇒
+        case NonFatal(t) =>
           lifecycleOpt foreach (_.interrupted())
           // Return all completed values up to the point of failure alongside the `Throwable`
           (result.toList, Some(t))
@@ -166,8 +166,8 @@ object Multipart {
   // Delete all items which are of type `FileItem`
   def quietlyDeleteFileItems(nameValues: List[(String, AnyRef)]): Unit = (
     nameValues
-    collect { case (_, fileItem: FileItem) ⇒ fileItem }
-    foreach (fileItem ⇒ runQuietly(fileItem.delete()))
+    collect { case (_, fileItem: FileItem) => fileItem }
+    foreach (fileItem => runQuietly(fileItem.delete()))
   )
 
   private object Private {
@@ -193,7 +193,7 @@ object Multipart {
         // by the limiter on the incoming outer input stream.
         val value = Streams.asString(fis.openStream, StandardParameterEncoding)
         lifecycleOpt foreach (_.fieldReceived(fieldName, value))
-        fieldName → value
+        fieldName -> value
       } else {
 
         try {
@@ -203,8 +203,8 @@ object Multipart {
 
             // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
             for {
-              fisHeaders     ← Option(fis.getHeaders) // `getHeaders` can be null
-              headersSupport ← collectByErasedType[FileItemHeadersSupport](fileItem)
+              fisHeaders     <- Option(fis.getHeaders) // `getHeaders` can be null
+              headersSupport <- collectByErasedType[FileItemHeadersSupport](fileItem)
             } locally {
               headersSupport.setHeaders(fisHeaders)
             }
@@ -240,22 +240,22 @@ object Multipart {
             )
           } catch {
             // Clean-up FileItem right away in case of failure
-            case NonFatal(t) ⇒
+            case NonFatal(t) =>
               runQuietly(fileItem.delete())
               throw t
           }
 
           lifecycleOpt foreach (_.fileItemState(UploadState.Completed(fileItem))) // can throw `FileScanException`
-          fieldName → fileItem
+          fieldName -> fileItem
         } catch {
-          case NonFatal(t) ⇒
+          case NonFatal(t) =>
             lifecycleOpt foreach (_.fileItemState(
               UploadState.Interrupted(
                Option(Exceptions.getRootThrowable(t))
                collect {
-                 case root: SizeLimitExceededException                ⇒ Reason.SizeReason(root.getPermittedSize, root.getActualSize)
-                 case DisallowedMediatypeException(permitted, actual) ⇒ Reason.MediatypeReason(permitted, actual)
-                 case FileScanException(message)                      ⇒ Reason.FileScanReason(message)
+                 case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
+                 case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
+                 case FileScanException(message)                      => Reason.FileScanReason(message)
                }
               )
             ))

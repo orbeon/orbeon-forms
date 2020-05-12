@@ -45,8 +45,8 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
     setProperty(propertyName, toMipValue(constraintOpt))
 
     valueOpt match {
-      case Some(itemValue) ⇒ evaluate(itemValue, constraintOpt)
-      case None            ⇒ true
+      case Some(itemValue) => evaluate(itemValue, constraintOpt)
+      case None            => true
     }
   }
 
@@ -62,7 +62,7 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
       attachmentPoint.setAtomized()
 
     val result = new PathMapNodeSet
-    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child ⇒
+    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child =>
       result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
     }
 
@@ -84,12 +84,12 @@ trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
     constraintOpt map (_ map (_.getStringValueCS) mkString " ")
 
   def argumentOpt(implicit xpathContext: XPathContext): Option[Seq[DateValue]] =
-    itemsArgumentOpt(0) map { itemsIt ⇒
+    itemsArgumentOpt(0) map { itemsIt =>
 
       val datesIt =
         Implicits.asScalaIterator(itemsIt) flatMap {
-          case v: DateValue  ⇒ Some(v)
-          case _             ⇒ None
+          case v: DateValue  => Some(v)
+          case _             => None
         }
 
       datesIt.toList
@@ -101,8 +101,8 @@ class MaxLengthValidation extends LongValidationFunction {
   val propertyName = "max-length"
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-    case Some(constraint) ⇒ org.orbeon.saxon.value.StringValue.getStringLength(value) <= constraint
-    case None             ⇒ true
+    case Some(constraint) => org.orbeon.saxon.value.StringValue.getStringLength(value) <= constraint
+    case None             => true
   }
 }
 
@@ -111,8 +111,8 @@ class MinLengthValidation extends LongValidationFunction {
   val propertyName = "min-length"
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-    case Some(constraint) ⇒ org.orbeon.saxon.value.StringValue.getStringLength(value) >= constraint
-    case None             ⇒ true
+    case Some(constraint) => org.orbeon.saxon.value.StringValue.getStringLength(value) >= constraint
+    case None             => true
   }
 }
 
@@ -151,8 +151,8 @@ class PositiveValidation extends LongValidationFunction {
 object NumericValidation {
 
   def trySignum(value: String): Option[Int] = tryParseAsLongOrBigDecimal(value) map {
-    case Left(long)        ⇒ long.signum
-    case Right(bigDecimal) ⇒ bigDecimal.signum
+    case Left(long)        => long.signum
+    case Right(bigDecimal) => bigDecimal.signum
   }
 
   // Don't use `Long.parseLong` or similar as they throw exceptions, and we can have invalid data in many cases.
@@ -164,19 +164,19 @@ object NumericValidation {
   //   - NOTE: Since Saxon 9.2, Saxon does throw instead! Handle this when upgrading to Saxon >= 9.2.
   def tryParseAsLongOrBigDecimal(value: String): Option[Either[Long, BigDecimal]] =
     IntegerValue.stringToInteger(value) match {
-      case v: Int64Value        ⇒ Some(Left(v.longValue))
-      case v: BigIntegerValue   ⇒ Some(Right(v.asDecimal))
-      case _: ValidationFailure ⇒
+      case v: Int64Value        => Some(Left(v.longValue))
+      case v: BigIntegerValue   => Some(Right(v.asDecimal))
+      case _: ValidationFailure =>
         DecimalValue.makeDecimalValue(value, true) match {
-          case v: DecimalValue      ⇒ Some(Right(v.getDecimalValue))
-          case _: ValidationFailure ⇒ None
+          case v: DecimalValue      => Some(Right(v.getDecimalValue))
+          case _: ValidationFailure => None
         }
     }
 
   def tryParseAsLong(value: String): Option[Long] =
     IntegerValue.stringToInteger(value) match {
-      case v: Int64Value        ⇒ Some(v.longValue)
-      case _                    ⇒ None
+      case v: Int64Value        => Some(v.longValue)
+      case _                    => None
     }
 }
 
@@ -191,7 +191,7 @@ class MaxFractionDigitsValidation extends LongValidationFunction {
     var digitsAfterDecimalSeparator = 0
     var trailingZeros               = 0
 
-    for (c ← value) {
+    for (c <- value) {
       if (beforeDecimalSeparator) {
         if (c == '.')
           beforeDecimalSeparator = false
@@ -210,8 +210,8 @@ class MaxFractionDigitsValidation extends LongValidationFunction {
   }
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-    case Some(constraint) ⇒ countDigitsAfterDecimalSeparator(value) <= constraint
-    case None             ⇒ true
+    case Some(constraint) => countDigitsAfterDecimalSeparator(value) <= constraint
+    case None             => true
   }
 }
 
@@ -224,8 +224,8 @@ class UploadMaxSizeValidation extends LongValidationFunction {
   val propertyName = UploadMaxSizeValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
-    case Some(constraint) ⇒ true // for now, don't actually validate, see #2956
-    case None             ⇒ true
+    case Some(constraint) => true // for now, don't actually validate, see #2956
+    case None             => true
   }
 
 }
@@ -239,8 +239,8 @@ class UploadMediatypesValidation extends StringValidationFunction {
   val propertyName = UploadMediatypesValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[String]) = constraintOpt match {
-    case Some(constraint) ⇒ true // for now, don't actually validate, see #3015
-    case None             ⇒ true
+    case Some(constraint) => true // for now, don't actually validate, see #3015
+    case None             => true
   }
 
 }
@@ -258,7 +258,7 @@ class ExcludedDatesValidation extends DateSeqValidationFunction {
   val propertyName = ExcludedDatesValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Seq[DateValue]]): Boolean =
-    DateUtils.tryParseISODate(value, DateUtils.TimeZone.UTC) exists { dateInstant ⇒
+    DateUtils.tryParseISODate(value, DateUtils.TimeZone.UTC) exists { dateInstant =>
        // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
       ! (constraintOpt.iterator.flatten exists (_.getCalendar.getTimeInMillis == dateInstant))
     }

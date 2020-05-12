@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 // Mix in this trait to prevent the control from trying to handle LHHA
 trait NoLHHATrait extends ControlLHHASupport {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   override def markLHHADirty()                     = ()
   override def forceDirtyAlert()                   = ()

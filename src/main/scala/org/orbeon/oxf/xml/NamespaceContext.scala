@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import scala.collection.JavaConverters._
 
@@ -48,20 +48,20 @@ class NamespaceContext {
 
     // Get all prefixes in scope ("" is not considered a prefix)
     def prefixes: List[String] =
-      mappings.collect { case (prefix, uri) if prefix != "" && uri != "" ⇒ prefix } toList
+      mappings.collect { case (prefix, uri) if prefix != "" && uri != "" => prefix } toList
 
     // Get all prefixes in scope, include returning "" for the default namespace if present
     def prefixesWithDefault: List[String] =
-      mappingsWithDefault map { case (prefix, _) ⇒ prefix } toList
+      mappingsWithDefault map { case (prefix, _) => prefix } toList
 
     // Get all mappings, including the default namespace if present
     def mappingsWithDefault: Iterable[(String, String)] =
-      mappings filterNot { case (_, uri) ⇒ uri == "" }
+      mappings filterNot { case (_, uri) => uri == "" }
 
     // Get all prefixes for the given URI ("" is not considered a prefix)
     // NOTE: This is not efficient if the map is large as we iterate through all map values.
     def prefixesForURI(uri: String): List[String] =
-      mappings.collect { case (prefix, `uri`) if prefix != "" && uri != "" ⇒ prefix } toList
+      mappings.collect { case (prefix, `uri`) if prefix != "" && uri != "" => prefix } toList
 
     // Get one prefix for the given URI ("" is not considered a prefix)
     // NOTE: This is not efficient if the map is large as we iterate through all map values.
@@ -70,10 +70,10 @@ class NamespaceContext {
   }
 
   // Start with the standard "xml" prefix
-  private var _current = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
+  private var _current = Context(None, Map("xml" -> "http://www.w3.org/XML/1998/namespace"))
   def current: Context = _current
 
-  // TODO: We create a copy of the map because we don't want the mapping from "" → default ns.
+  // TODO: We create a copy of the map because we don't want the mapping from "" -> default ns.
   // This is used only by `XFormsAnnotator` but needs to be fixed. Also, what about undeclarations?
   def currentMapping: Map[String, String] = _current.mappings - ""
 
@@ -96,7 +96,7 @@ class NamespaceContext {
   // Add the mapping
   def startPrefixMapping(prefix: String, uri: String): Unit =
     if (isLegalPrefix(prefix))
-      _pending += prefix → uri
+      _pending += prefix -> uri
 
   // For compatibility with NamespaceSupport/NamespaceSupport2
   def getURI(prefix: String): String = current.uriForPrefix(prefix).orNull

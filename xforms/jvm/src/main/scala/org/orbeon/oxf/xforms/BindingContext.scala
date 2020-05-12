@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
@@ -44,7 +44,7 @@ case class BindingContext(
   scope                     : Scope
 ) {
 
-  self ⇒
+  self =>
 
   require(scope ne null)
   require(nodeset ne null)
@@ -98,7 +98,7 @@ case class BindingContext(
     ! nodeset.isEmpty option nodeset.get(position - 1)
 
   def singleNodeOpt: Option[NodeInfo] =
-    singleItemOpt collect { case node: NodeInfo ⇒ node }
+    singleItemOpt collect { case node: NodeInfo => node }
 
   def getSingleItem: Item =
     singleItemOpt.orNull
@@ -111,9 +111,9 @@ case class BindingContext(
 
     // Scope view variables in the same scope only
     for {
-      bindingContext ← new AncestorIterator(includeSelf = true)
+      bindingContext <- new AncestorIterator(includeSelf = true)
       if bindingContext.scope == scope
-      VariableNameValue(name, value) ← bindingContext.variable
+      VariableNameValue(name, value) <- bindingContext.variable
     } locally {
       // The binding defines a variable and there is not already a variable with that name
       // NOTE: Put condition here to make sure we take previous variables into account
@@ -123,8 +123,8 @@ case class BindingContext(
 
     // Scope model variables at the bottom if needed
     if (scopeModelVariables)
-      modelOpt foreach { model ⇒
-        for ((name, value) ← model.getTopLevelVariables.asScala)
+      modelOpt foreach { model =>
+        for ((name, value) <- model.getTopLevelVariables.asScala)
           if (! tempVariablesMap.containsKey(name))
             tempVariablesMap.put(name, value)
       }
@@ -162,7 +162,7 @@ case class BindingContext(
   private def scopeModelVariables(model: XFormsModel): Unit = {
 
     val variableInfos =
-    for (variable ← model.getStaticModel.variablesSeq)
+    for (variable <- model.getStaticModel.variablesSeq)
       yield scopeVariable(variable, model.getEffectiveId, true)
 
     val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
@@ -175,7 +175,7 @@ case class BindingContext(
 
   // NOTE: This is as of 2018-05-15 used only to determine the submission instance based on a submission node.
   def instance: Option[XFormsInstance] =
-    singleNodeOpt flatMap { node ⇒
+    singleNodeOpt flatMap { node =>
       modelOpt flatMap (_.containingDocument.instanceForNodeOpt(node))
     }
 
@@ -191,7 +191,7 @@ case class BindingContext(
     // Handle case where we are within a repeat iteration, as well as case where we are directly within the repeat
     // container object
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if binding.isRepeatIterationBindingContext || binding.isRepeatBindingContext ⇒
+      case binding if binding.isRepeatIterationBindingContext || binding.isRepeatBindingContext =>
         binding.parent.elementId
     } getOrElse {
       throw new ValidationException("Enclosing xf:repeat not found.", locationData)
@@ -200,7 +200,7 @@ case class BindingContext(
   // Get the current repeat sequence for the given repeat id
   def repeatItems(repeatId: String): ju.List[Item] =
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if repeatId == binding.elementId && (binding.controlElement ne null) && binding.controlElement.getName == "repeat" ⇒
+      case binding if repeatId == binding.elementId && (binding.controlElement ne null) && binding.controlElement.getName == "repeat" =>
         binding.nodeset
     } getOrElse {
       throw new ValidationException(s"No enclosing xf:repeat found for id $repeatId", locationData)
@@ -221,7 +221,7 @@ case class BindingContext(
       binding.isRepeatIterationBindingContext && binding.parent.elementId == contextId
 
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if matchesContainer(binding) || matchesRepeat(binding) ⇒ binding.getSingleItem
+      case binding if matchesContainer(binding) || matchesRepeat(binding) => binding.getSingleItem
     } getOrElse {
       throw new ValidationException(s"No enclosing container XForms control found for id $contextId", locationData)
     }
@@ -233,12 +233,12 @@ case class BindingContext(
       binding.isRepeatIterationBindingContext && (repeatId.isEmpty || binding.parent.elementId == repeatId.get)
 
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if matches(binding) ⇒ binding
+      case binding if matches(binding) => binding
     } getOrElse {
       val message =
         repeatId match {
-          case Some(id) ⇒ s"No enclosing xf:repeat found for repeat id $id"
-          case None     ⇒  "No enclosing xf:repeat found"
+          case Some(id) => s"No enclosing xf:repeat found for repeat id $id"
+          case None     =>  "No enclosing xf:repeat found"
         }
 
       throw new ValidationException(message, locationData)
@@ -247,33 +247,33 @@ case class BindingContext(
 
   def currentBindingContextForModel(modelOpt: Option[XFormsModel]): Option[BindingContext]  =
     modelOpt match {
-      case Some(model) ⇒ new AncestorIterator(includeSelf = true) find (_.modelOpt exists (_ eq model))
-      case None        ⇒ None
+      case Some(model) => new AncestorIterator(includeSelf = true) find (_.modelOpt exists (_ eq model))
+      case None        => None
     }
 
   // Get the current binding for the given model.
   def currentNodeset(modelOpt: Option[XFormsModel]): ju.List[Item] =
     modelOpt match {
-      case Some(model) ⇒
+      case Some(model) =>
         currentBindingContextForModel(modelOpt) match {
-          case Some(bindingContext) ⇒
+          case Some(bindingContext) =>
             bindingContext.nodeset
-          case None ⇒
+          case None =>
             model.defaultInstanceOpt match {
-              case Some(defaultInstance) ⇒
+              case Some(defaultInstance) =>
                 ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[Item])
-              case None ⇒
+              case None =>
                 ju.Collections.emptyList[Item]
             }
         }
-      case None ⇒
+      case None =>
         ju.Collections.emptyList[Item]
   }
 
   class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {
     private var _next = if (includeSelf) self else parent
-    def hasNext = _next ne null
-    def next() = {
+    def hasNext: Boolean = _next ne null
+    def next(): BindingContext = {
       val result = _next
       _next = _next.parent
       result
@@ -286,7 +286,20 @@ case class VariableNameValue(name: String, value: ValueRepresentation)
 
 object BindingContext {
   // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context
-  // should simply be None.
-  def empty(bindingElement: Element, scope: Scope) =
-    BindingContext(null, None, null, Seq.empty[Item].asJava, 0, null, newBind = false, bindingElement, null, hasOverriddenContext = false, null, scope)
+  // should simply be `None`.
+  def empty(bindingElement: Element, scope: Scope): BindingContext =
+    BindingContext(
+      parent               = null,
+      modelOpt             = None,
+      bind                 = null,
+      nodeset              = Nil.asJava,
+      position             = 0,
+      elementId            = null,
+      newBind              = false,
+      controlElement       = bindingElement,
+      _locationData        = null,
+      hasOverriddenContext = false,
+      contextItem          = null,
+      scope                = scope
+    )
 }

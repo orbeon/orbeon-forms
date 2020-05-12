@@ -30,11 +30,11 @@ object ValidationLevel extends Enum[ValidationLevel] {
   case object WarningLevel extends ValidationLevel("warning")
   case object InfoLevel    extends ValidationLevel("info")
 
-  val LevelsByPriority = values.to(List)
-  val LevelByName      = LevelsByPriority map (l ⇒ l.entryName → l) toMap
+  val LevelsByPriority: List[ValidationLevel]        = values.to(List)
+  val LevelByName     : Map[String, ValidationLevel] = LevelsByPriority map (l => l.entryName -> l) toMap
 
   implicit object ValidationLevelOrdering extends Ordering[ValidationLevel] {
-    override def compare(x: ValidationLevel, y: ValidationLevel) =
+    override def compare(x: ValidationLevel, y: ValidationLevel): Int =
       if (x == y) 0
       else if (y == ErrorLevel || y == WarningLevel && x == InfoLevel) -1
       else 1

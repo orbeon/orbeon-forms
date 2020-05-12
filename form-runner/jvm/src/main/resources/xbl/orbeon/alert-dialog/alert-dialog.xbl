@@ -49,14 +49,14 @@
         <xbl:implementation>
             <xf:model>
                 <xf:instance>
-                    <alert>
+                    <_>
                         <message/>
                         <context/>
                         <positive/>
                         <negative/>
                         <neutral/>
                         <open-count/>
-                    </alert>
+                    </_>
                 </xf:instance>
                 <xf:bind ref="open-count" type="xs:integer" xxf:default="0"/>
             </xf:model>

@@ -80,7 +80,7 @@ object StringUtils {
           var start = 0
           var doMatch = false
 
-          val test: Char ⇒ Boolean =
+          val test: Char => Boolean =
             if (sep eq null)
               Character.isWhitespace
             else if (sep.length == 1) {
@@ -123,8 +123,9 @@ object StringUtils {
     private def isZeroWidthChar(c: Int) =
       c == '\u200b' || c == '\u200c' || c == '\u200d' || c == '\ufeff'
 
-    def isBlank  = trimAllToEmpty.isEmpty
-    def nonBlank = trimAllToEmpty.nonEmpty
+    // https://github.com/orbeon/orbeon-forms/issues/4490
+    def isAllBlank  = trimAllToEmpty.isEmpty
+    def nonAllBlank = trimAllToEmpty.nonEmpty
 
     def trimAllToEmpty = trimControlAndAllWhitespaceToEmptyCP
 
@@ -139,13 +140,13 @@ object StringUtils {
     }
 
     def trimControlAndAllWhitespaceToEmptyCP =
-      trimToEmptyCP(c ⇒ Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
+      trimToEmptyCP(c => Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
 
     // Trim the string according to a matching function
     // This checks for Unicode code points, unlike String.trim() or StringUtils.trim(). When matching on spaces
     // and control characters, this is not strictly necessary since they are in the BMP and cannot collide with
     // surrogates. But in the general case it is more correct to test on code points.
-    def trimToEmptyCP(matches: Int ⇒ Boolean) =
+    def trimToEmptyCP(matches: Int => Boolean) =
       if ((s eq null) || s.isEmpty) {
         ""
       } else {
@@ -154,13 +155,13 @@ object StringUtils {
 
         var prefix = 0
 
-        it takeWhile matches foreach { c ⇒
+        it takeWhile matches foreach { c =>
           prefix += Character.charCount(c)
         }
 
         var suffix = 0
 
-        it foreach { c ⇒
+        it foreach { c =>
           if (matches(c))
             suffix += Character.charCount(c)
           else
@@ -177,7 +178,7 @@ object StringUtils {
 
     // NOTE: Special the case where the string is blank for performance
     def toIntOpt: Option[Int] =
-      if (isBlank) None else Try(s.toInt).toOption
+      if (isAllBlank) None else Try(s.toInt).toOption
 
     // Like the XPath `translate` function
     def translate(mapString: String, transString: String): String = {
@@ -208,6 +209,11 @@ object StringUtils {
         s.substring(index + search.length)
       else
         ""
+    }
+
+    def substringAfterOpt(search: String): Option[String] = {
+      val index = s.indexOf(search)
+      index >= 0 option s.substring(index + search.length)
     }
 
     def trimSuffixIfPresent(suffix: String): String =

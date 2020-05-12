@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.util.{Map ⇒ JMap}
+import java.util.{Map => JMap}
 
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
@@ -58,8 +58,8 @@ object Metadata {
     TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))
 
     // Restore marks if there is a template
-    template foreach { template ⇒
-      for (mark ← template.saxStore.getMarks.asScala)
+    template foreach { template =>
+      for (mark <- template.saxStore.getMarks.asScala)
         metadata.putMark(mark)
     }
 
@@ -72,11 +72,11 @@ trait Marks {
 
   private val marks = new mutable.HashMap[String, SAXStore#Mark]
 
-  def putMark(mark: SAXStore#Mark): Unit                  = marks += mark.id → mark
+  def putMark(mark: SAXStore#Mark): Unit                  = marks += mark.id -> mark
   def getMark(prefixedId: String) : Option[SAXStore#Mark] = marks.get(prefixedId)
 
   def hasTopLevelMarks: Boolean =
-    marks exists { case (prefixedId, _) ⇒ XFormsId.isTopLevelId(prefixedId) }
+    marks exists { case (prefixedId, _) => XFormsId.isTopLevelId(prefixedId) }
 }
 
 // Handling of namespaces
@@ -85,7 +85,7 @@ trait NamespaceMappings {
   private val mappingsForPrefixedIds = new mutable.HashMap[String, NamespaceMapping]
 
   def addNamespaceMapping(prefixedId: String, mapping: Map[String, String]): Unit =
-    mappingsForPrefixedIds += prefixedId → NamespaceMapping(mapping)
+    mappingsForPrefixedIds += prefixedId -> NamespaceMapping(mapping)
 
   def removeNamespaceMapping(prefixedId: String): Unit =
     mappingsForPrefixedIds -= prefixedId

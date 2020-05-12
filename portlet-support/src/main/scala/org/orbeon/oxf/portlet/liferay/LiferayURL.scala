@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import javax.portlet._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
@@ -33,19 +33,19 @@ object LiferayURL {
   def moveMagicResourceId(encodedURL: String): String =
     if (encodedURL.contains(URLBaseMagic) && encodedURL.contains(ResourceIdParameter)) {
       splitQuery(encodedURL) match {
-        case (path, Some(query)) ⇒
+        case (path, Some(query)) =>
           val parameters = decodeSimpleQuery(query)
           parameters collectFirst {
-            case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId
+            case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) => resourceId
           } match {
-            case Some(resourceId) ⇒
+            case Some(resourceId) =>
               val updated =
-                (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
+                (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter -> resourceId)
               appendQueryString(path, encodeSimpleQuery(updated))
-            case None ⇒
+            case None =>
               encodedURL
           }
-        case _ ⇒ encodedURL
+        case _ => encodedURL
       }
     } else
       encodedURL
@@ -67,8 +67,8 @@ object LiferayURL {
       windowState          : Option[String],
       navigationParameters : ju.Map[String, Array[String]]
     ) = {
-      portletMode foreach (v ⇒ url.setPortletMode(new PortletMode(v)))
-      windowState foreach (v ⇒ url.setWindowState(new WindowState(v)))
+      portletMode foreach (v => url.setPortletMode(new PortletMode(v)))
+      windowState foreach (v => url.setWindowState(new WindowState(v)))
       url.setParameters(navigationParameters)
       url.toString
     }

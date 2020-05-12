@@ -60,52 +60,52 @@ object XFormsControlFactory {
     CoreControls + XXFORMS_VARIABLE_QNAME + XXFORMS_VAR_QNAME +
     XFORMS_VARIABLE_QNAME + XFORMS_VAR_QNAME + EXFORMS_VARIABLE_QNAME
 
-  private type ControlFactory = (XBLContainer, XFormsControl, Element, String) ⇒ XFormsControl
+  private type ControlFactory = (XBLContainer, XFormsControl, Element, String) => XFormsControl
 
   private val variableFactory: ControlFactory = new XFormsVariableControl(_, _, _, _)
 
   private val ControlFactory = Map[QName, ControlFactory](
     // Root control
-    QName("root")                 → (new XXFormsRootControl(_, _, _, _)),
-    XBL_TEMPLATE_QNAME            → (new XXFormsComponentRootControl(_, _, _, _)),
+    QName("root")                 -> (new XXFormsRootControl(_, _, _, _)),
+    XBL_TEMPLATE_QNAME            -> (new XXFormsComponentRootControl(_, _, _, _)),
     // Built-in standard controls
-    XFORMS_CASE_QNAME             → (new XFormsCaseControl(_, _, _, _)),
-    XFORMS_GROUP_QNAME            → (new XFormsGroupControl(_, _, _, _)),
-    XFORMS_INPUT_QNAME            → (new XFormsInputControl(_, _, _, _)),
-    XFORMS_OUTPUT_QNAME           → (new XFormsOutputControl(_, _, _, _)),
-    XFORMS_RANGE_QNAME            → (new XFormsRangeControl(_, _, _, _)),
-    XFORMS_REPEAT_QNAME           → (new XFormsRepeatControl(_, _, _, _)),
-    XFORMS_REPEAT_ITERATION_QNAME → (new XFormsRepeatIterationControl(_, _, _, _)),
-    XFORMS_SECRET_QNAME           → (new XFormsSecretControl(_, _, _, _)),
-    XFORMS_SELECT1_QNAME          → (new XFormsSelect1Control(_, _, _, _)),
-    XFORMS_SELECT_QNAME           → (new XFormsSelectControl(_, _, _, _)),
-    XFORMS_SUBMIT_QNAME           → (new XFormsSubmitControl(_, _, _, _)),
-    XFORMS_SWITCH_QNAME           → (new XFormsSwitchControl(_, _, _, _)),
-    XFORMS_TEXTAREA_QNAME         → (new XFormsTextareaControl(_, _, _, _)),
-    XFORMS_TRIGGER_QNAME          → (new XFormsTriggerControl(_, _, _, _)),
-    XFORMS_UPLOAD_QNAME           → (new XFormsUploadControl(_, _, _, _)),
+    XFORMS_CASE_QNAME             -> (new XFormsCaseControl(_, _, _, _)),
+    XFORMS_GROUP_QNAME            -> (new XFormsGroupControl(_, _, _, _)),
+    XFORMS_INPUT_QNAME            -> (new XFormsInputControl(_, _, _, _)),
+    XFORMS_OUTPUT_QNAME           -> (new XFormsOutputControl(_, _, _, _)),
+    XFORMS_RANGE_QNAME            -> (new XFormsRangeControl(_, _, _, _)),
+    XFORMS_REPEAT_QNAME           -> (new XFormsRepeatControl(_, _, _, _)),
+    XFORMS_REPEAT_ITERATION_QNAME -> (new XFormsRepeatIterationControl(_, _, _, _)),
+    XFORMS_SECRET_QNAME           -> (new XFormsSecretControl(_, _, _, _)),
+    XFORMS_SELECT1_QNAME          -> (new XFormsSelect1Control(_, _, _, _)),
+    XFORMS_SELECT_QNAME           -> (new XFormsSelectControl(_, _, _, _)),
+    XFORMS_SUBMIT_QNAME           -> (new XFormsSubmitControl(_, _, _, _)),
+    XFORMS_SWITCH_QNAME           -> (new XFormsSwitchControl(_, _, _, _)),
+    XFORMS_TEXTAREA_QNAME         -> (new XFormsTextareaControl(_, _, _, _)),
+    XFORMS_TRIGGER_QNAME          -> (new XFormsTriggerControl(_, _, _, _)),
+    XFORMS_UPLOAD_QNAME           -> (new XFormsUploadControl(_, _, _, _)),
     // Built-in extension controls
-    XXFORMS_DIALOG_QNAME          → (new XXFormsDialogControl(_, _, _, _)),
-    XXFORMS_ATTRIBUTE_QNAME       → (new XXFormsAttributeControl(_, _, _, _)),
-    XXFORMS_TEXT_QNAME            → (new XXFormsTextControl(_, _, _, _)),
-    XXFORMS_DYNAMIC_QNAME         → (new XXFormsDynamicControl(_, _, _, _)),
-    XXFORMS_VARIABLE_QNAME        → variableFactory,
-    XXFORMS_VAR_QNAME             → variableFactory,
-    XFORMS_VARIABLE_QNAME         → variableFactory,
-    XFORMS_VAR_QNAME              → variableFactory,
-    EXFORMS_VARIABLE_QNAME        → variableFactory
+    XXFORMS_DIALOG_QNAME          -> (new XXFormsDialogControl(_, _, _, _)),
+    XXFORMS_ATTRIBUTE_QNAME       -> (new XXFormsAttributeControl(_, _, _, _)),
+    XXFORMS_TEXT_QNAME            -> (new XXFormsTextControl(_, _, _, _)),
+    XXFORMS_DYNAMIC_QNAME         -> (new XXFormsDynamicControl(_, _, _, _)),
+    XXFORMS_VARIABLE_QNAME        -> variableFactory,
+    XXFORMS_VAR_QNAME             -> variableFactory,
+    XFORMS_VARIABLE_QNAME         -> variableFactory,
+    XFORMS_VAR_QNAME              -> variableFactory,
+    EXFORMS_VARIABLE_QNAME        -> variableFactory
   )
 
   private val ActionFactory: PartialFunction[QName, ControlFactory] =
-    { case qName if XFormsActions.isAction(qName) ⇒ new XFormsActionControl(_, _, _, _) }
+    { case qName if XFormsActions.isAction(qName) => new XFormsActionControl(_, _, _, _) }
 
   private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
-    (false, false) → (new XFormsComponentControl     (_, _, _, _)                         ),
-    (false, true)  → (new XFormsComponentControl     (_, _, _, _) with FocusableTrait),
-    (true,  false) → (new XFormsValueComponentControl(_, _, _, _)                    ),
-    (true,  true)  → (new XFormsValueComponentControl(_, _, _, _) with FocusableTrait)
+    (false, false) -> (new XFormsComponentControl     (_, _, _, _)                         ),
+    (false, true)  -> (new XFormsComponentControl     (_, _, _, _) with FocusableTrait), // `ReadonlyFocusableTrait`?
+    (true,  false) -> (new XFormsValueComponentControl(_, _, _, _)                    ),
+    (true,  true)  -> (new XFormsValueComponentControl(_, _, _, _) with ReadonlyFocusableTrait)
   )
 
   // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
@@ -119,14 +119,14 @@ object XFormsControlFactory {
 
     val factory =
       staticElement match {
-        case component: ComponentControl ⇒
+        case component: ComponentControl =>
           ComponentFactories.get(component.isInstanceOf[ValueTrait], component.abstractBinding.modeFocus)
-        case lhhaAnalysis: LHHAAnalysis ⇒
+        case lhhaAnalysis: LHHAAnalysis =>
           if (! lhhaAnalysis.isLocal)
             Some(new XFormsLHHAControl(_, _, _, _))
           else
             None
-        case _ ⇒
+        case _ =>
           ControlOrActionFactory(staticElement.element.getQName)
       }
 

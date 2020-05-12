@@ -35,7 +35,7 @@ import scala.collection.compat._
 
 trait ScalaToXml {
 
-  val mustConvertAdtType: String ⇒ Boolean = (name: String) ⇒ name.headOption exists (_.isUpper)
+  val mustConvertAdtType: String => Boolean = (name: String) => name.headOption exists (_.isUpper)
 
   type MyState
 
@@ -89,10 +89,10 @@ trait ScalaToXml {
       XFormsAPI.setvalue(ref = simplifiedXmlDoc.rootElement att TypeQName, value = typeName)
 
     val elemsForAdtTypes =
-      simplifiedXmlDoc descendant * filter (e ⇒ mustConvertAdtType(e.localname))
+      simplifiedXmlDoc descendant * filter (e => mustConvertAdtType(e.localname))
 
     // `reverse` so that nested elements are moved first
-    elemsForAdtTypes.to(List).reverse foreach { elem ⇒
+    elemsForAdtTypes.to(List).reverse foreach { elem =>
 
       val parent   = elem.parentUnsafe
       val typeName = elem.localname
@@ -103,6 +103,7 @@ trait ScalaToXml {
       XFormsAPI.delete(ref = elem, doDispatch = false)
     }
 
+    // Mutable → immutable
     TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, TransformerUtils.tinyTreeToString(simplifiedXmlDoc), false, false)
   }
 
@@ -110,15 +111,15 @@ trait ScalaToXml {
 
     val fullXmlDoc = TransformerUtils.extractAsMutableDocument(simplifiedXmlDoc)
 
-    val elemsWithNonStandardType = fullXmlDoc descendant * filter { elem ⇒
+    val elemsWithNonStandardType = fullXmlDoc descendant * filter { elem =>
       elem attValueOpt TypeQName match {
-        case Some(typ) if ! StandardJsonTypes(typ) ⇒ true
-        case _ ⇒ false
+        case Some(typ) if ! StandardJsonTypes(typ) => true
+        case _ => false
       }
     }
 
     // `reverse` so that nested elements are moved first
-    elemsWithNonStandardType.to(List).reverse foreach { elem ⇒
+    elemsWithNonStandardType.to(List).reverse foreach { elem =>
 
       val typeAtt  = elem /@ TypeQName
       val typeName = typeAtt.stringValue

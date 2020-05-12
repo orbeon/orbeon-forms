@@ -13,39 +13,39 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.junit.Test
 import org.orbeon.oxf.resources.URLFactory
-import ImageMetadata._
-import org.orbeon.saxon.value.Int64Value
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.orbeon.oxf.test.ResourceManagerSupport
+import org.orbeon.oxf.util.ImageMetadata._
+import org.scalatest.funspec.AnyFunSpecLike
 
-class ImageMetadataTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class ImageMetadataTest
+  extends ResourceManagerSupport
+     with AnyFunSpecLike {
 
-  @Test def readMetadata(): Unit = {
+  describe("Reading metadata") {
 
     val URLPrefix = "oxf:/org/orbeon/oxf/util/hs-2010-13-a-web"
 
-    val ExtensionsToMediatypes = Map(
-      "jpg" → "image/jpeg",
-      "png" → "image/png",
-      "gif" → "image/gif",
-      "bmp" → "image/bmp")
+    val ExtensionsToMediatypes = List(
+      "jpg" -> "image/jpeg",
+      "png" -> "image/png",
+      "gif" -> "image/gif",
+      "bmp" -> "image/bmp"
+    )
 
-    for (extension ← ExtensionsToMediatypes.keys) {
+    for ((extension, mediatype) <- ExtensionsToMediatypes) {
+
       def openStream = URLFactory.createURL(URLPrefix + "." + extension).openStream()
 
-      val mediatype = findImageMediatype(openStream).get
-
-      assert(ExtensionsToMediatypes(extension) === mediatype)
+      it(s"must find the `$mediatype` mediatype") {
+        assert(findImageMediatype(openStream).contains(mediatype))
+      }
 
       if (extension != "bmp") { // some .bmp don't have the width/height metadata
-
-        val width  = findKnownMetadata(openStream, "width").get.asInstanceOf[Int64Value].longValue
-        val height = findKnownMetadata(openStream, "height").get.asInstanceOf[Int64Value].longValue
-
-        assert(400L === width)
-        assert(368L === height)
+        it(s"must find the width and height for mediatype `$mediatype`") {
+          assert(findKnownMetadata(openStream, "width").contains(400))
+          assert(findKnownMetadata(openStream, "height").contains(368))
+        }
       }
     }
   }

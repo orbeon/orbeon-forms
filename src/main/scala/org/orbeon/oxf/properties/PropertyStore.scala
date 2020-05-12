@@ -14,7 +14,7 @@
 package org.orbeon.oxf.properties
 
 import java.net.{URI, URISyntaxException}
-import java.{lang ⇒ jl, util ⇒ ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, Element, QName}
@@ -54,7 +54,7 @@ object PropertyStore {
 
     // NOTE: The use of `attribute` is for special use of the property store by certain processors.
     // NOTE: Don't use XPathCache, because that depends on properties, which we are initializing here!
-    for (node ← (dw descendant "property") ++ (dw descendant "attribute")) {
+    for (node <- (dw descendant "property") ++ (dw descendant "attribute")) {
 
       val propertyElement = unsafeUnwrapElement(node)
 
@@ -69,15 +69,15 @@ object PropertyStore {
 
         val value =
           propertyElement.attributeValueOpt("value") match {
-            case Some(valueFromAttribute) ⇒ valueFromAttribute
-            case None                     ⇒ trimAllToEmpty(propertyElement.getText)
+            case Some(valueFromAttribute) => valueFromAttribute
+            case None                     => trimAllToEmpty(propertyElement.getText)
           }
 
         propertyElement.attributeValueOpt("processor-name") match {
-          case Some(_) ⇒
+          case Some(_) =>
             val processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name")
             getProcessorPropertySet(processorQName).setProperty(propertyElement, name, typeQName, value)
-          case None ⇒
+          case None =>
             globalPropertySet.setProperty(propertyElement, name, typeQName, value)
         }
       }
@@ -86,18 +86,18 @@ object PropertyStore {
     new PropertyStore(globalPropertySet, processorPropertySets)
   }
 
-  private val SupportedTypes = Map[QName, (String, Element) ⇒ AnyRef](
-    XS_STRING_QNAME             → convertString,
-    XS_INTEGER_QNAME            → convertInteger,
-    XS_BOOLEAN_QNAME            → convertBoolean,
-    XS_DATE_QNAME               → convertDate,
-    XS_DATETIME_QNAME           → convertDate,
-    XS_QNAME_QNAME              → convertQName,
-    XS_ANYURI_QNAME             → convertURI,
-    XS_NCNAME_QNAME             → convertNCName,
-    XS_NMTOKEN_QNAME            → convertNMTOKEN,
-    XS_NMTOKENS_QNAME           → convertNMTOKENS,
-    XS_NONNEGATIVEINTEGER_QNAME → convertNonNegativeInteger
+  private val SupportedTypes = Map[QName, (String, Element) => AnyRef](
+    XS_STRING_QNAME             -> convertString,
+    XS_INTEGER_QNAME            -> convertInteger,
+    XS_BOOLEAN_QNAME            -> convertBoolean,
+    XS_DATE_QNAME               -> convertDate,
+    XS_DATETIME_QNAME           -> convertDate,
+    XS_QNAME_QNAME              -> convertQName,
+    XS_ANYURI_QNAME             -> convertURI,
+    XS_NCNAME_QNAME             -> convertNCName,
+    XS_NMTOKEN_QNAME            -> convertNMTOKEN,
+    XS_NMTOKENS_QNAME           -> convertNMTOKENS,
+    XS_NONNEGATIVEINTEGER_QNAME -> convertNonNegativeInteger
   )
 
   /**
@@ -121,7 +121,7 @@ object PropertyStore {
     try {
       new URI(value)
     } catch {
-      case e: URISyntaxException ⇒
+      case e: URISyntaxException =>
         throw new ValidationException(e, null)
     }
 
@@ -139,7 +139,7 @@ object PropertyStore {
 
   private def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
     val tokens = value.splitTo[Set]()
-    for (token ← tokens) {
+    for (token <- tokens) {
       if (! Name10Checker.getInstance.isValidNmtoken(token))
         throw new ValidationException(s"Not an NMTOKENS: $value" , null)
     }

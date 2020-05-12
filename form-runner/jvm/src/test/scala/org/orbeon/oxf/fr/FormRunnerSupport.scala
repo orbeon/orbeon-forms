@@ -34,7 +34,7 @@ object FormRunnerSupport {
 
 trait FormRunnerSupport extends DocumentTestBase {
 
-  def withFormRunnerDocument[T](processorService: ProcessorService, doc: XFormsContainingDocument)(thunk: ⇒ T): T =
+  def withFormRunnerDocument[T](processorService: ProcessorService, doc: XFormsContainingDocument)(thunk: => T): T =
     ProcessorService.withProcessorService(processorService) {
       setupDocument(doc) // FIXME: to make it available to XFormsSupport
       withContainingDocument(doc) {
@@ -46,7 +46,7 @@ trait FormRunnerSupport extends DocumentTestBase {
       // NOTE: We can't yet just dispatch `fr-insert-below` to the section, so find the nested repeater.
       val repeater =
         ControlsIterator(sectionControl, includeSelf = false) collectFirst {
-          case c: XFormsComponentControl if c.localName == "repeater" ⇒  c
+          case c: XFormsComponentControl if c.localName == "repeater" =>  c
         } get
 
       dispatch(name = action, effectiveId = repeater.effectiveId)

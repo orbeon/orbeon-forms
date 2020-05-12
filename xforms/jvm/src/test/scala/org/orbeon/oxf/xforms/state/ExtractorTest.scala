@@ -42,7 +42,7 @@ class ExtractorTest
     val ElementsToExclude = Set("properties", "last-id", "template")
     val extractorOutput = new ElementFilterXMLReceiver(
       extractorCollector,
-      (level, uri, localname, _) ⇒ ! ElementsToExclude(localname)
+      (level, uri, localname, _) => ! ElementsToExclude(localname)
     )
 
     XMLParsing.urlToSAX(
@@ -76,26 +76,26 @@ class ExtractorTest
     )
 
     import JXQName._
-    import javax.xml.namespace.{QName ⇒ JQName}
+    import javax.xml.namespace.{QName => JQName}
 
     val XMLURI    = "http://www.w3.org/XML/1998/namespace"
     val XFormsURI = "http://www.w3.org/2002/xforms"
 
     val Id     : JQName = "id"
-    val XMLBase: JQName = XMLURI → "base"
+    val XMLBase: JQName = XMLURI -> "base"
 
     val ExpectedEvents: List[SAXEvent] = List(
       StartDocument,
-        StartElement("static-state", List("is-html" → "true")),
-          StartElement("root", List("id" → "#document")),
+        StartElement("static-state", List("is-html" -> "true")),
+          StartElement("root", List("id" -> "#document")),
             StartPrefixMapping("xh", "http://www.w3.org/1999/xhtml"),
             StartPrefixMapping("xf", "http://www.w3.org/2002/xforms"),
             StartPrefixMapping("xi", "http://www.w3.org/2001/XInclude"),
             StartElement(
-              XFormsURI → "model",
-              List(Id → "my-model", XMLBase → ".")
+              XFormsURI -> "model",
+              List(Id -> "my-model", XMLBase -> ".")
             ),
-            EndElement(XFormsURI → "model"),
+            EndElement(XFormsURI -> "model"),
             EndPrefixMapping("xh"),
             EndPrefixMapping("xf"),
             EndPrefixMapping("xi"),
@@ -103,26 +103,26 @@ class ExtractorTest
             StartPrefixMapping("xf", "http://www.w3.org/2002/xforms"),
             StartPrefixMapping("xi", "http://www.w3.org/2001/XInclude"),
             StartElement(
-              XFormsURI → "group",
-              List(Id → "my-group", XMLBase → ".")
+              XFormsURI -> "group",
+              List(Id -> "my-group", XMLBase -> ".")
             ),
               StartPrefixMapping("xi", ""),
               StartPrefixMapping("foo", "http://example.org/foo"),
-              StartElement(XFormsURI → "var", List("id" → "my-var1", "name" → "lang", "value" → "()")),
-              EndElement(XFormsURI → "var"),
+              StartElement(XFormsURI -> "var", List("id" -> "my-var1", "name" -> "lang", "value" -> "()")),
+              EndElement(XFormsURI -> "var"),
               EndPrefixMapping("xi"),
               EndPrefixMapping("foo"),
               // This is what we really want to test
               StartPrefixMapping("xi", ""),
               StartPrefixMapping("foo", "http://example.org/foo"),
               StartElement(
-                XFormsURI → "var",
-                List("id" → "my-var2", "name" → "v2", "value" → "foo:bar()")
+                XFormsURI -> "var",
+                List("id" -> "my-var2", "name" -> "v2", "value" -> "foo:bar()")
               ),
-              EndElement(XFormsURI → "var"),
+              EndElement(XFormsURI -> "var"),
               EndPrefixMapping("xi"),
               EndPrefixMapping("foo"),
-            EndElement(XFormsURI → "group"),
+            EndElement(XFormsURI -> "group"),
             EndPrefixMapping("xh"),
             EndPrefixMapping("xf"),
             EndPrefixMapping("xi"),

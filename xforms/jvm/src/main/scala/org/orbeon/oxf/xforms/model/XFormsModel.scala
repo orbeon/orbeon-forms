@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.net.{URI, URISyntaxException}
-import java.{util ⇒ ju}
+import java.net.URI
+import java.{util => ju}
 
-import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -55,7 +54,7 @@ class XFormsModel(
      with XFormsModelInstances
      with XFormsModelEventTarget {
 
-  selfModel ⇒
+  selfModel =>
 
   def updateEffectiveId(effectiveId: String): Unit =
     selfModel.effectiveId = effectiveId
@@ -71,7 +70,7 @@ class XFormsModel(
     Map(
       (
         for {
-          staticSubmission ← staticModel.submissions
+          staticSubmission <- staticModel.submissions
         } yield
           (staticSubmission.staticId, new XFormsModelSubmission(selfModel.container, staticSubmission, selfModel))
       ): _*
@@ -84,16 +83,15 @@ class XFormsModel(
           staticEventHandler <- staticModel.eventHandlers
           parent             =
             staticEventHandler.parent match {
-              case Some(sp: Submission) ⇒ _submissions(sp.staticId)
-              case _                    ⇒ selfModel
+              case Some(sp: Submission) => _submissions(sp.staticId)
+              case _                    => selfModel
             }
         } yield
           (staticEventHandler.staticId, new XFormsModelAction(parent, staticEventHandler))
       ): _*
     )
 
-  private val _modelBindsOpt: Option[XFormsModelBinds] = XFormsModelBinds(selfModel)
-  def modelBindsOpt: Option[XFormsModelBinds] = _modelBindsOpt
+  val modelBindsOpt: Option[XFormsModelBinds] = XFormsModelBinds(selfModel)
 
   def findObjectByEffectiveId(effectiveId: String): Option[XFormsObject] = {
 
@@ -116,7 +114,7 @@ class XFormsModel(
       findInstance(targetStaticId)             orElse
       _submissions.get(targetStaticId)         orElse
       _actions.get(targetStaticId)             orElse
-      (_modelBindsOpt flatMap (_.resolveBind(targetStaticId, contextItemOpt)))
+      (modelBindsOpt flatMap (_.resolveBind(targetStaticId, contextItemOpt)))
   }
 
   // Restore the state of the model when the model object was just recreated
@@ -137,55 +135,53 @@ class XFormsModel(
 
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
-      case ev: XFormsModelConstructEvent ⇒
+      case ev: XFormsModelConstructEvent =>
         // 4.2.1 The xforms-model-construct Event
         // Bubbles: Yes / Cancelable: No / Context Info: None
         doModelConstruct(ev.rrr)
-      case _: XFormsReadyEvent ⇒
+      case _: XFormsReadyEvent =>
         // This is called after xforms-ready events have been dispatched to all models
         doAfterReady()
-      case _: XFormsModelConstructDoneEvent ⇒
+      case _: XFormsModelConstructDoneEvent =>
         // 4.2.2 The xforms-model-construct-done Event
         // TODO: implicit lazy instance construction
-      case _: XFormsRebuildEvent ⇒
+      case _: XFormsRebuildEvent =>
         // 4.3.7 The xforms-rebuild Event
         // Bubbles: Yes / Cancelable: Yes / Context Info: None
         doRebuild()
-      case _: XFormsModelDestructEvent ⇒
+      case _: XFormsModelDestructEvent =>
         containingDocument.getXPathDependencies.modelDestruct(selfModel)
-      case _: XFormsRecalculateEvent ⇒
+      case _: XFormsRecalculateEvent | _: XFormsRevalidateEvent =>
+        // 4.3.5 The xforms-revalidate Event
         // 4.3.6 The xforms-recalculate Event
         // Recalculate and revalidate are unified
         // See https://github.com/orbeon/orbeon-forms/issues/1650
         doRecalculateRevalidate()
-      case _: XFormsRevalidateEvent ⇒
-        // 4.3.5 The xforms-revalidate Event
-        doRecalculateRevalidate()
-      case _: XFormsRefreshEvent ⇒
+      case _: XFormsRefreshEvent =>
         // 4.3.4 The xforms-refresh Event
         doRefresh()
-      case _: XFormsResetEvent ⇒
+      case _: XFormsResetEvent =>
         // 4.3.8 The xforms-reset Event
         doReset()
-      case ev: XFormsLinkExceptionEvent ⇒
+      case ev: XFormsLinkExceptionEvent =>
         // 4.5.2 The xforms-link-exception Event
         // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
         // The default action for this event results in the following: Fatal error.
         ev.throwable match {
-          case e: RuntimeException ⇒ throw e
-          case t ⇒ throw new ValidationException(s"Received fatal error event: `${ev.name}`", t, getLocationData)
+          case e: RuntimeException => throw e
+          case t => throw new ValidationException(s"Received fatal error event: `${ev.name}`", t, getLocationData)
         }
-      case ev: XXFormsXPathErrorEvent ⇒
+      case ev: XXFormsXPathErrorEvent =>
         // Custom event for XPath errors
         // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
         // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
         XFormsError.handleNonFatalXPathError(container, ev.throwable)
-      case ev: XXFormsBindingErrorEvent ⇒
+      case ev: XXFormsBindingErrorEvent =>
         // Custom event for binding errors
         XFormsError.handleNonFatalSetvalueError(selfModel, ev.locationData, ev.reason)
-      case ev: XXFormsActionErrorEvent ⇒
+      case ev: XXFormsActionErrorEvent =>
         XFormsError.handleNonFatalActionError(selfModel, ev.throwable)
-      case _ ⇒ // NOP
+      case _ => // NOP
     }
 
   private def doReset(): Unit = {
@@ -207,7 +203,7 @@ class XFormsModel(
     // 1. The XML Schemas, if any, are loaded
     try schemaValidator
     catch {
-      case NonFatal(t) ⇒
+      case NonFatal(t) =>
         val schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME)
         Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(selfModel, schemaAttribute, t))
     }
@@ -239,8 +235,7 @@ trait XFormsModelEventTarget
   extends XFormsEventTarget
      with ListenersTrait  {
 
-  def effectiveId: String
-  val staticModel: Model
+  selfModel: XFormsModel =>
 
   def scope: Scope = staticModel.scope
 
@@ -262,7 +257,7 @@ trait XFormsModelEventTarget
 
 trait XFormsModelVariables {
 
-  selfModel: XFormsModel ⇒
+  selfModel: XFormsModel =>
 
   private var topLevelVariables: ju.Map[String, ValueRepresentation] =
     new ju.LinkedHashMap[String, ValueRepresentation]
@@ -295,10 +290,10 @@ trait XFormsModelVariables {
     defaultEvaluationContext = contextStack.getCurrentBindingContext
   }
 
-  val variableResolver: (StructuredQName, XPathContext) ⇒ ValueRepresentation =
-    (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
+  val variableResolver: (StructuredQName, XPathContext) => ValueRepresentation =
+    (variableQName: StructuredQName, xpathContext: XPathContext) =>
       staticModel.bindsByName.get(variableQName.getLocalName) match {
-        case Some(targetStaticBind) ⇒
+        case Some(targetStaticBind) =>
           // Variable value is a bind nodeset to resolve
           BindVariableResolver.resolveClosestBind(
             modelBinds          = modelBindsOpt.get, // TODO XXX
@@ -306,7 +301,7 @@ trait XFormsModelVariables {
             targetStaticBind    = targetStaticBind
           ) map (new SequenceExtent(_)) getOrElse
             (throw new IllegalStateException)
-        case None ⇒
+        case None =>
           // Try top-level model variables
           val modelVariables = getDefaultEvaluationContext.getInScopeVariables
           // NOTE: With XPath analysis on, variable scope has been checked statically
@@ -317,11 +312,7 @@ trait XFormsModelVariables {
 
 trait XFormsModelInstances {
 
-  selfModel: XFormsModel ⇒
-
-  val container: XBLContainer
-  def effectiveId: String
-  val staticModel: Model
+  selfModel: XFormsModel =>
 
   private val (_instanceIds: Seq[String], _instances: Array[XFormsInstance], _instancesMap: ju.Map[String, XFormsInstance]) =
     (
@@ -334,7 +325,7 @@ trait XFormsModelInstances {
     _instances(position) ne null
 
   def defaultInstanceOpt: Option[XFormsInstance] =
-    _instances.headOption
+    _instances.find(_ ne null)
 
   // Iterate over all initialized instances
   def instancesIterator: Iterator[XFormsInstance] =
@@ -374,13 +365,13 @@ trait XFormsModelInstances {
 
     val instanceStatesIt =
       for {
-        instanceStates ← Controls.restoringInstances.iterator
-        instanceState  ← instanceStates
+        instanceStates <- Controls.restoringInstances.iterator
+        instanceState  <- instanceStates
         if effectiveId == instanceState.modelEffectiveId  // NOTE: Here instance must contain document
       } yield
         instanceState
 
-    instanceStatesIt foreach { state ⇒
+    instanceStatesIt foreach { state =>
 
       XFormsInstance.restoreInstanceFromState(selfModel, state, loadInstance)
       indentedLogger.logDebug(
@@ -400,18 +391,20 @@ trait XFormsModelInstances {
       } yield
         instance
 
-    missingInstancesIt foreach { instance ⇒
+    missingInstancesIt foreach { instance =>
       setInlineInstance(instance)
     }
   }
 
   private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentInfo =
     SubmissionUtils.readTinyTree(
-      model          = selfModel,
-      resolvedURL    = URLRewriterUtils.rewriteServiceURL(
-        NetUtils.getExternalContext.getRequest,
-        pathOrAbsoluteURI,
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+      model               = selfModel,
+      resolvedAbsoluteUrl = new URI(
+        URLRewriterUtils.rewriteServiceURL(
+          NetUtils.getExternalContext.getRequest,
+          pathOrAbsoluteURI,
+          URLRewriter.REWRITE_MODE_ABSOLUTE
+        )
       ),
       handleXInclude = handleXInclude
     )
@@ -422,7 +415,7 @@ trait XFormsModelInstances {
     indexInstance(XFormsInstance(selfModel, instance, instance.inlineContent))
 
   protected def loadInitialInstance(instance: Instance): Unit =
-    withDebug("loading instance", List("instance id" → instance.staticId)) {
+    withDebug("loading instance", List("instance id" -> instance.staticId)) {
       if (instance.useExternalContent) {
         // Load from `@src` or `@resource`
         loadInitialExternalInstanceFromCacheIfNeeded(instance)
@@ -430,7 +423,7 @@ trait XFormsModelInstances {
         // Load from inline content
         try setInlineInstance(instance)
         catch {
-          case NonFatal(_) ⇒
+          case NonFatal(_) =>
             Dispatch.dispatchEvent(
               new XFormsLinkExceptionEvent(
                 selfModel,
@@ -466,7 +459,12 @@ trait XFormsModelInstances {
     }
 
   private def resolveInstanceURL(instance: Instance): String =
-    XFormsUtils.resolveServiceURL(containingDocument, instance.element, instance.instanceSource.get, URLRewriter.REWRITE_MODE_ABSOLUTE)
+    XFormsUtils.resolveServiceURL(
+      containingDocument,
+      instance.element,
+      instance.instanceSource.get,
+      URLRewriter.REWRITE_MODE_ABSOLUTE
+    )
 
   private def loadInitialExternalInstanceFromCacheIfNeeded(instance: Instance): Unit = {
     val instanceResource = instance.instanceSource.get
@@ -491,7 +489,7 @@ trait XFormsModelInstances {
         loadNonCachedExternalInstance(instance)
       }
     } catch {
-      case NonFatal(e) ⇒
+      case NonFatal(e) =>
         Dispatch.dispatchEvent(
           new XFormsLinkExceptionEvent(
             selfModel,
@@ -528,7 +526,7 @@ trait XFormsModelInstances {
         implicit val ec: ExternalContext = NetUtils.getExternalContext
 
         val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-          scheme           = UriScheme.withName(absoluteResolvedUrl.getScheme),
+          url              = absoluteResolvedUrl,
           hasCredentials   = instance.credentials.isDefined,
           customHeaders    = Headers.EmptyHeaders,
           headersToForward = Connection.headersToForwardFromProperty,
@@ -549,7 +547,7 @@ trait XFormsModelInstances {
             saveState = true
           )
 
-        ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is ⇒
+        ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
           // TODO: Handle validating and XInclude!
           // Read result as XML
           // TODO: use submission code?

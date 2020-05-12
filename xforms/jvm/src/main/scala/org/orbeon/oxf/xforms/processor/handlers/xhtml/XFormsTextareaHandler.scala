@@ -67,13 +67,13 @@ class XFormsTextareaHandler(
       // Output xxf:* extension attributes
       textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
 
-      if (isHTMLDisabled(textareaControl))
-        XFormsBaseHandlerXHTML.outputDisabledAttribute(htmlTextareaAttributes)
+      if (isXFormsReadonlyButNotStaticReadonly(textareaControl))
+        XFormsBaseHandlerXHTML.outputReadonlyAttribute(htmlTextareaAttributes)
 
       XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
 
       // Add attribute even if the control is not concrete
-      placeHolderInfo foreach { placeHolderInfo ⇒
+      placeHolderInfo foreach { placeHolderInfo =>
         if (placeHolderInfo.value ne null) // unclear whether this can ever be null
           htmlTextareaAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
       }

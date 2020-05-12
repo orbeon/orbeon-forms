@@ -31,26 +31,23 @@ trait XFormsRebuildFunctions extends RRRFunctions {
   def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
 }
 
-trait XFormsRecalculateFunctions extends RRRFunctions {
+// Make `<xf:recalculate>` do the same thing as `<xf:revalidate>`
+// See:
+// - https://github.com/orbeon/orbeon-forms/issues/1650
+// - https://github.com/orbeon/orbeon-forms/issues/4506
+trait XFormsRecalculateRevalidateFunctions extends RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean) =
     model.deferredActionContext.markRecalculateRevalidate(
-      if (applyDefaults) AllDefaultsStrategy else NoDefaultsStrategy,
-      None
+      defaultsStrategy = if (applyDefaults) AllDefaultsStrategy else NoDefaultsStrategy,
+      instanceIdOpt    = None
     )
   def createEvent(model: XFormsModel) = new XFormsRecalculateEvent(model)
 }
 
-trait XFormsRevalidateFunctions extends RRRFunctions {
-  // With recalculate and revalidate unified, make revalidate no longer eager by not setting the flag anymore
-  // See https://github.com/orbeon/orbeon-forms/issues/1650
-  def setFlag(model: XFormsModel, applyDefaults: Boolean) = ()
-  def createEvent(model: XFormsModel) = new XFormsRevalidateEvent(model)
-}
-
 // Concrete action classes
 class XFormsRebuildAction     extends RRRAction with XFormsRebuildFunctions
-class XFormsRecalculateAction extends RRRAction with XFormsRecalculateFunctions
-class XFormsRevalidateAction  extends RRRAction with XFormsRevalidateFunctions
+class XFormsRecalculateAction extends RRRAction with XFormsRecalculateRevalidateFunctions
+class XFormsRevalidateAction  extends RRRAction with XFormsRecalculateRevalidateFunctions
 
 // Common functionality
 trait RRRAction extends XFormsAction with RRRFunctions {
@@ -63,7 +60,7 @@ trait RRRAction extends XFormsAction with RRRFunctions {
     def resolve(qName: QName) =
       (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
 
-    modelOpt foreach { model ⇒
+    modelOpt foreach { model =>
       val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
       val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
@@ -86,7 +83,7 @@ object RRRAction {
   }
 
   private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
-  private object ConcreteRecalculateFunctions extends XFormsRecalculateFunctions
+  private object ConcreteRecalculateFunctions extends XFormsRecalculateRevalidateFunctions
 
   def rebuild(model: XFormsModel, deferred: Boolean = false) =
     execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)

@@ -80,7 +80,7 @@ class NumberSupportTest extends AnyFunSpec {
       ("1234≡56"   , ',', None     , Some(2), false,  "1234.56"     )
     )
 
-    for (t @ (stored, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenFormatting, expected) ← Expected)
+    for (t @ (stored, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenFormatting, expected) <- Expected)
       it (s"must format for $t") {
 
         val data = TestNode(stored, None, Map.empty)
@@ -157,7 +157,7 @@ class NumberSupportTest extends AnyFunSpec {
       ("  abcd  ",        '.', Some(','), Some(2), true,  "  abcd  "      ) // Q: Should trim?
     )
 
-    for (t @ (value, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenStoring, expected) ← Expected)
+    for (t @ (value, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenStoring, expected) <- Expected)
       it (s"must format for $t") {
 
         val data = TestNode("", None, Map.empty)
@@ -189,7 +189,7 @@ class NumberSupportTest extends AnyFunSpec {
       ("-2.5",       0, "-2")
     )
 
-    for (t @ (value, precision, expected) ← Expected)
+    for (t @ (value, precision, expected) <- Expected)
       it (s"must round for $t") {
         assert(expected === TestNumberSupport.roundBigDecimal(scala.BigDecimal(value), precision).bigDecimal.toPlainString)
       }

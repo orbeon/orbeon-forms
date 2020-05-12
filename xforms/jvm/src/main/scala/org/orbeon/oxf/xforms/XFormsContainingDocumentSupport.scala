@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.util.concurrent.Callable
 import java.util.concurrent.locks.Lock
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
@@ -53,27 +53,27 @@ import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i, mutable ⇒ m}
+import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
 
 object XFormsContainingDocumentSupport {
 
-  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument ⇒ T): T = {
+  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): T = {
     withLock(RequestParameters(uuid, None, None, None), timeout) {
-      case Some(containingDocument) ⇒
+      case Some(containingDocument) =>
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
-      case None ⇒
+      case None =>
         // This happens if the timeout expires!
         throw new IllegalStateException
     }
   }
 
-  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] ⇒ T): T = {
+  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): T = {
 
-    LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" → params.uuid))
+    LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
     XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
-      case Some(lock) ⇒
+      case Some(lock) =>
         try {
 
           LifecycleLogger.eventAssumingRequest(
@@ -81,8 +81,8 @@ object XFormsContainingDocumentSupport {
             "got document lock",
             LifecycleLogger.basicRequestDetailsAssumingRequest(
               List(
-                "uuid" → params.uuid,
-                "wait" → LifecycleLogger.formatDelay(System.currentTimeMillis)
+                "uuid" -> params.uuid,
+                "wait" -> LifecycleLogger.formatDelay(System.currentTimeMillis)
               )
             )
           )
@@ -102,13 +102,13 @@ object XFormsContainingDocumentSupport {
         } finally {
           XFormsStateManager.releaseDocumentLock(lock)
         }
-      case None ⇒
-        LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" → params.uuid))
+      case None =>
+        LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid))
         block(None)
     }
   }
 
-  def withUpdateResponse[T](containingDocument: XFormsContainingDocument, ignoreSequence: Boolean)(block: ⇒ T): T = {
+  def withUpdateResponse[T](containingDocument: XFormsContainingDocument, ignoreSequence: Boolean)(block: => T): T = {
     XFormsStateManager.beforeUpdateResponse(containingDocument, ignoreSequence = ignoreSequence)
     val result = block
     XFormsStateManager.afterUpdateResponse(containingDocument)
@@ -138,7 +138,7 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     with ContainingDocumentCacheable
     with XFormsObject {
 
-  self: XFormsContainingDocument ⇒
+  self: XFormsContainingDocument =>
 }
 
 
@@ -173,7 +173,7 @@ trait ContainingDocumentTransientState {
     throw new ValidationException("Unable to run a two-pass submission and `xf:load` within a same action sequence.", locationData)
 
   def setTransientState[T](name: String, value: T): Unit =
-    transientState.byName += name → value
+    transientState.byName += name -> value
 
   def getTransientState[T: ClassTag](name: String): Option[T] =
     transientState.byName.get(name) flatMap collectByErasedType[T]
@@ -189,7 +189,7 @@ trait ContainingDocumentTransientState {
   def setActiveSubmissionFirstPass(submission: XFormsModelSubmission): Unit = {
 
     transientState.activeSubmissionFirstPass foreach
-      (_ ⇒ throw new ValidationException("There is already an active submission.", submission.getLocationData))
+      (_ => throw new ValidationException("There is already an active submission.", submission.getLocationData))
 
     if (transientState.nonJavaScriptLoadsToRun.nonEmpty)
       throwConflict(submission.getLocationData)
@@ -206,9 +206,9 @@ trait ContainingDocumentTransientState {
 
   def addLoadToRun(load: Load): Unit =
     transientState.activeSubmissionFirstPass match {
-      case Some(s) ⇒
+      case Some(s) =>
         throwConflict(s.getLocationData)
-      case None ⇒
+      case None =>
         if (load.isJavaScript)
           transientState.scriptsToRun :+= Left(load)
         else
@@ -261,9 +261,9 @@ trait ContainingDocumentTransientState {
 
   def getClientHelpControlEffectiveId: Option[String] =
     for {
-      controlId         ← transientState.helpEffectiveControlId
-      xformsControl     ← findControlByEffectiveId(controlId)
-      singleNodeControl ← xformsControl.narrowTo[XFormsSingleNodeControl]
+      controlId         <- transientState.helpEffectiveControlId
+      xformsControl     <- findControlByEffectiveId(controlId)
+      singleNodeControl <- xformsControl.narrowTo[XFormsSingleNodeControl]
       if singleNodeControl.isRelevant
     } yield
       controlId
@@ -295,7 +295,7 @@ trait ContainingDocumentUpload {
 
       def evaluateAsLong(expr: CompiledExpression) =
         defaultModel match {
-          case Some(m) ⇒
+          case Some(m) =>
             val bindingContext = m.getDefaultEvaluationContext
             XPath.evaluateSingle(
               contextItems       = bindingContext.nodeset,
@@ -304,7 +304,7 @@ trait ContainingDocumentUpload {
               functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
               variableResolver   = m.variableResolver
             )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
-          case None ⇒
+          case None =>
             throw new AssertionError("can only evaluate dynamic properties if a model is present")
         }
 
@@ -332,13 +332,13 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) → allowedMediatypesMaybeRange
+    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange
   }
 }
 
 trait ContainingDocumentMisc {
 
-  self: XBLContainer ⇒
+  self: XBLContainer =>
 
   protected def initializeModels(): Unit =
     initializeModels(
@@ -360,7 +360,7 @@ trait ContainingDocumentMisc {
 
 trait ContainingDocumentEvent {
 
-  self: XBLContainer ⇒
+  self: XBLContainer =>
 
   private var eventStack: List[XFormsEvent] = Nil
 
@@ -368,7 +368,7 @@ trait ContainingDocumentEvent {
   def endHandleEvent()                    : Unit                = eventStack = eventStack.tail
   def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
 
-  def withOutermostActionHandler[T](block: ⇒ T): T = {
+  def withOutermostActionHandler[T](block: => T): T = {
     startOutermostActionHandler()
     val r = block
     endOutermostActionHandler()
@@ -398,40 +398,40 @@ trait ContainingDocumentProperties {
 
   // Used by the property() function
   def getProperty(propertyName: String): Any = propertyName match {
-    case READONLY_APPEARANCE_PROPERTY ⇒ if (staticReadonly) READONLY_APPEARANCE_STATIC_VALUE else READONLY_APPEARANCE_DYNAMIC_VALUE
-    case NOSCRIPT_PROPERTY            ⇒ false
-    case ENCRYPT_ITEM_VALUES_PROPERTY ⇒ encodeItemValues
-    case ORDER_PROPERTY               ⇒ lhhacOrder
-    case _                            ⇒ getStaticState.propertyMaybeAsExpression(propertyName).left.get
+    case READONLY_APPEARANCE_PROPERTY => if (staticReadonly) READONLY_APPEARANCE_STATIC_VALUE else READONLY_APPEARANCE_DYNAMIC_VALUE
+    case NOSCRIPT_PROPERTY            => false
+    case ENCRYPT_ITEM_VALUES_PROPERTY => encodeItemValues
+    case ORDER_PROPERTY               => lhhacOrder
+    case _                            => getStaticState.propertyMaybeAsExpression(propertyName).left.get
   }
 
   private object Memo {
     private val cache = m.Map.empty[String, Any]
 
-    private def memo[T](name: String, get: ⇒ T) =
+    private def memo[T](name: String, get: => T) =
       cache.getOrElseUpdate(name, get).asInstanceOf[T]
 
     def staticStringProperty (name: String) = memo(name, getStaticState.staticStringProperty(name))
     def staticBooleanProperty(name: String) = memo(name, getStaticState.staticBooleanProperty(name))
     def staticIntProperty    (name: String) = memo(name, getStaticState.staticIntProperty(name))
 
-    def staticBooleanProperty[T](name: String, pred: T ⇒ Boolean) =
+    def staticBooleanProperty[T](name: String, pred: T => Boolean) =
       memo(name, pred(getStaticState.staticProperty(name).asInstanceOf[T]))
 
-    def dynamicProperty[T](name: String, convert: String ⇒ T) =
+    def dynamicProperty[T](name: String, convert: String => T) =
       memo[T](
         name,
         convert(
           getStaticState.propertyMaybeAsExpression(name) match {
-            case Left(value) ⇒ value.toString
-            case Right(expr) ⇒ evaluateStringPropertyAVT(expr)
+            case Left(value) => value.toString
+            case Right(expr) => evaluateStringPropertyAVT(expr)
           }
         )
       )
 
     def evaluateStringPropertyAVT(expr: CompiledExpression) =
       defaultModel match {
-        case Some(m) ⇒
+        case Some(m) =>
           val bindingContext = m.getDefaultEvaluationContext
           XPath.evaluateAsString(
             contextItems       = bindingContext.nodeset,
@@ -440,7 +440,7 @@ trait ContainingDocumentProperties {
             functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
             variableResolver   = m.variableResolver
           )(getRequestStats.getReporter)
-        case None ⇒
+        case None =>
           throw new AssertionError("can only evaluate AVT properties if a model is present")
       }
   }
@@ -492,8 +492,8 @@ trait ContainingDocumentProperties {
 
   def isNoUpdatesStatic =
     getStaticState.propertyMaybeAsExpression(NO_UPDATES) match {
-      case Left(value) ⇒ value.toString == "true"
-      case _ ⇒ false
+      case Left(value) => value.toString == "true"
+      case _ => false
     }
 
   // Static properties
@@ -591,7 +591,7 @@ trait ContainingDocumentRequest {
   def getContainerNamespace    = _containerNamespace // always "" for servlets.
   def getVersionedPathMatchers = _versionedPathMatchers
 
-  def headersGetter: String ⇒ Option[List[String]] = getRequestHeaders.get
+  def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
   def isPortletContainer         = _containerType == "portlet"
   def isEmbedded                 = _isEmbedded
@@ -605,7 +605,7 @@ trait ContainingDocumentRequest {
 
   protected def initializeRequestInformation(): Unit =
     Option(NetUtils.getExternalContext.getRequest) match {
-      case Some(request) ⇒
+      case Some(request) =>
         // Remember if filter provided separate deployment information
 
         import OrbeonXFormsFilter._
@@ -615,9 +615,9 @@ trait ContainingDocumentRequest {
 
         _deploymentType =
           rendererDeploymentType match {
-            case "separate"   ⇒ DeploymentType.Separate
-            case "integrated" ⇒ DeploymentType.Integrated
-            case _            ⇒ DeploymentType.Standalone
+            case "separate"   => DeploymentType.Separate
+            case "integrated" => DeploymentType.Integrated
+            case _            => DeploymentType.Standalone
           }
 
         // Try to get request context path
@@ -640,7 +640,7 @@ trait ContainingDocumentRequest {
         _containerType = request.getContainerType
         _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
         _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
-      case None ⇒
+      case None =>
         // Special case when we run outside the context of a request
         _deploymentType = DeploymentType.Standalone
         _requestContextPath = ""
@@ -660,7 +660,7 @@ trait ContainingDocumentRequest {
 
   protected def restoreRequestInformation(dynamicState: DynamicState): Unit =
     dynamicState.deploymentType match {
-      case Some(_) ⇒
+      case Some(_) =>
         // Normal case where information below was previously serialized
         _deploymentType             = (dynamicState.deploymentType map DeploymentType.withNameInsensitive orNull)
         _requestContextPath         = dynamicState.requestContextPath.orNull
@@ -671,7 +671,7 @@ trait ContainingDocumentRequest {
         _containerType              = dynamicState.decodeContainerTypeJava
         _containerNamespace         = dynamicState.decodeContainerNamespaceJava
         _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
-      case None ⇒
+      case None =>
         // Use information from the request
         // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
         initializeRequestInformation()
@@ -683,7 +683,7 @@ trait ContainingDocumentRequest {
 
 trait ContainingDocumentDelayedEvents {
 
-  self: XBLContainer with ContainingDocumentEvent ⇒
+  self: XBLContainer with ContainingDocumentEvent =>
 
   private val _delayedEvents = m.ListBuffer[DelayedEvent]()
 
@@ -735,11 +735,11 @@ trait ContainingDocumentDelayedEvents {
         _delayedEvents.clear()
         _delayedEvents ++= futureEvents
 
-        dueEvents foreach { dueEvent ⇒
+        dueEvents foreach { dueEvent =>
 
           withOutermostActionHandler {
             self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
-              case eventTarget: XFormsEventTarget ⇒
+              case eventTarget: XFormsEventTarget =>
                 ClientEvents.processEvent(
                   self.containingDocument,
                   XFormsEventFactory.createEvent(
@@ -750,13 +750,13 @@ trait ContainingDocumentDelayedEvents {
                     cancelable = dueEvent.cancelable
                   )
                 )
-              case _ ⇒
+              case _ =>
                 implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
                 debug(
                   "ignoring delayed event with invalid target id",
                   List(
-                    "target id"  → dueEvent.targetEffectiveId,
-                    "event name" → dueEvent.eventName
+                    "target id"  -> dueEvent.targetEffectiveId,
+                    "event name" -> dueEvent.eventName
                   )
                 )
             }
@@ -774,7 +774,7 @@ trait ContainingDocumentDelayedEvents {
 
 trait ContainingDocumentClientState {
 
-  self: XFormsContainingDocument ⇒
+  self: XFormsContainingDocument =>
 
   private var _initialClientScript: Option[String] = None
 
@@ -812,7 +812,7 @@ trait ContainingDocumentClientState {
 
 trait ContainingDocumentCacheable extends Cacheable {
 
-  self: XFormsContainingDocument ⇒
+  self: XFormsContainingDocument =>
 
   def added(): Unit =
     XFormsStateManager.instance.onAddedToCache(getUUID)

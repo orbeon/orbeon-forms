@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.controller
 
-import java.lang.{Boolean ⇒ JBoolean}
+import java.lang.{Boolean => JBoolean}
 import java.net.URI
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
@@ -40,40 +39,55 @@ object Authorizer extends Logging {
   private val AuthorizedKey = "org.orbeon.oxf.controller.service.authorized"
 
   // Whether the incoming request is authorized either with a token or via the delegate
-  def authorized(ec: ExternalContext)(implicit logger: IndentedLogger, propertySet: PropertySet) =
-    authorizedWithToken(ec) || (if (RememberAuthorization) authorizeIfNeededAndRemember(ec.getRequest) else authorizedWithDelegate(ec.getRequest))
+  def authorized(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean =
+    authorizedWithToken(ec) || (
+      if (RememberAuthorization)
+        authorizeIfNeededAndRemember(ec)
+      else
+        authorizedWithDelegate(ec)
+    )
 
   // Whether the incoming request is authorized with a token
   def authorizedWithToken(ec: ExternalContext): Boolean =
-    authorizedWithToken(k ⇒ Option(ec.getRequest.getHeaderValuesMap.get(k)), k ⇒ ec.getWebAppContext.attributes.get(k))
+    authorizedWithToken(k => Option(ec.getRequest.getHeaderValuesMap.get(k)), k => ec.getWebAppContext.attributes.get(k))
 
-  def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
+  def authorizedWithToken(header: String => Option[Array[String]], attribute: String => Option[AnyRef]): Boolean = {
 
     val requestToken =
       header(OrbeonTokenLower).toList.flatten.headOption
 
     def applicationToken =
-      attribute(OrbeonTokenLower) collect { case token: String ⇒ token }
+      attribute(OrbeonTokenLower) collect { case token: String => token }
 
     requestToken.isDefined && requestToken == applicationToken
   }
 
   // Check the session to see if the request is already authorized. If not, try to authorize, and remember the
   // authorization if successful. Return whether the request is authorized.
-  def authorizeIfNeededAndRemember(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
+  private def authorizeIfNeededAndRemember(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean = {
 
-    def alreadyAuthorized =
+    val request = ec.getRequest
+
+    def alreadyAuthorized: Boolean =
       request.sessionOpt flatMap
       (_.getAttribute(AuthorizedKey)) collect
-      { case value: JBoolean ⇒ value.booleanValue() } exists
+      { case value: JBoolean => value.booleanValue() } exists
       identity
 
-    def rememberAuthorized() =
+    def rememberAuthorized(): Unit =
       Option(request.getSession(true)) foreach
       (_.setAttribute(AuthorizedKey, JBoolean.TRUE))
 
     if (! alreadyAuthorized) {
-      val newlyAuthorized = authorizedWithDelegate(request)
+      val newlyAuthorized = authorizedWithDelegate(ec)
       if (newlyAuthorized)
         rememberAuthorized()
       newlyAuthorized
@@ -82,7 +96,13 @@ object Authorizer extends Logging {
   }
 
   // Authorize the given request with the given delegate service
-  def authorizedWithDelegate(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
+  private def authorizedWithDelegate(
+    ec          : ExternalContext)(implicit
+    logger      : IndentedLogger,
+    propertySet : PropertySet
+  ): Boolean = {
+
+    val request = ec.getRequest
 
     def appendToURI(uri: URI, path: String, query: Option[String]) = {
 
@@ -95,10 +115,10 @@ object Authorizer extends Logging {
     // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
     def delegateAbsoluteBaseURIOpt =
       propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) map
-        (p ⇒ new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
+        (p => new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
 
     delegateAbsoluteBaseURIOpt match {
-      case Some(baseDelegateURI) ⇒
+      case Some(baseDelegateURI) =>
         // Forward method and headers but not the body
 
         // NOTE: There is a question of whether we need to forward cookies for authorization purposes. If we
@@ -114,7 +134,7 @@ object Authorizer extends Logging {
           val proxiedHeaders =
             proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true).toMap mapValues (_.toList)
 
-          proxiedHeaders + (OrbeonRemoteAddress → Option(request.getRemoteAddr).toList)
+          proxiedHeaders + (OrbeonRemoteAddress -> Option(request.getRemoteAddr).toList)
         }
 
         val content = Connection.requiresRequestBody(method) option
@@ -125,31 +145,33 @@ object Authorizer extends Logging {
             None
           )
 
-        debug("Delegating to authorizer", Seq("url" → newURL.toString))
+        debug("Delegating to authorizer", Seq("url" -> newURL.toString))
 
         val connection =
           Connection(
-            method      = method,
-            url         = newURL,
-            credentials = None,
-            content     = content,
-            headers     = allHeaders,
-            loadState   = true,
-            logBody     = false
+            method          = method,
+            url             = newURL,
+            credentials     = None,
+            content         = content,
+            headers         = allHeaders,
+            loadState       = true,
+            logBody         = false)(
+            logger          = logger,
+            externalContext = ec
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
-        try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ ⇒ true)
+        try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ => true)
         catch {
-          case HttpStatusCodeException(code, _, _) ⇒
-            debug("Unauthorized", Seq("code" → code.toString))
+          case HttpStatusCodeException(code, _, _) =>
+            debug("Unauthorized", Seq("code" -> code.toString))
             false
-          case NonFatal(t) ⇒
-            error("Could not connect to authorizer", Seq("url" → newURL.toString))
+          case NonFatal(t) =>
+            error("Could not connect to authorizer", Seq("url" -> newURL.toString))
             error(OrbeonFormatter.format(t))
             false
         }
-      case None ⇒
+      case None =>
         // No authorizer
         debug("No authorizer configured")
         false

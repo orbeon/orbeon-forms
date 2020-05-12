@@ -22,16 +22,16 @@ import org.orbeon.oxf.xforms.event.events._
 
 trait ControlEventSupport extends ListenersTrait {
 
-  self: XFormsControl ⇒
+  self: XFormsControl =>
 
   def performDefaultAction(event: XFormsEvent): Unit = event match {
-    case _ @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) ⇒
+    case _ @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) =>
       // Try to update xf:repeat indexes based on this
 
       // Find current path through ancestor xf:repeat elements, if any
       val repeatIterationsToModify =
         new AncestorOrSelfIterator(self) collect
-          { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration ⇒ ri.getEffectiveId }
+          { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration => ri.getEffectiveId }
 
       // NOTE: It would be nice to review whether it makes sense to re-obtain controls by id in the code below. Is
       // there a use case for it? Events can be dispatched via setIndex(), which means that repeats and relevance
@@ -39,7 +39,7 @@ trait ControlEventSupport extends ListenersTrait {
       if (repeatIterationsToModify.nonEmpty) {
         val controls = containingDocument.getControls
         // Find all repeat iterations and controls again
-        for (repeatIterationEffectiveId ← repeatIterationsToModify) {
+        for (repeatIterationEffectiveId <- repeatIterationsToModify) {
           val repeatIterationControl =
             containingDocument.getControlByEffectiveId(repeatIterationEffectiveId).asInstanceOf[XFormsRepeatIterationControl]
           val newRepeatIndex = repeatIterationControl.iterationIndex
@@ -54,7 +54,7 @@ trait ControlEventSupport extends ListenersTrait {
 
       // Focus on current control if possible
       event match {
-        case focusEvent: XFormsFocusEvent ⇒
+        case focusEvent: XFormsFocusEvent =>
 
           // Try to update hidden `xf:case` controls
           // NOTE: We don't allow this behavior when events come from the client in ClientEvents
@@ -69,29 +69,28 @@ trait ControlEventSupport extends ListenersTrait {
             (includes.isEmpty || includes.contains(qName)) && ! excludes.contains(qName)
           }
 
-          focusableControls              filterNot
-            Focus.isHidden               find
+          focusableControls              find
             satisfiesIncludesAndExcludes foreach
             Focus.focusWithEvents
 
-        case _ ⇒
+        case _ =>
       }
 
-    case _: XFormsHelpEvent ⇒
+    case _: XFormsHelpEvent =>
       containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
-    case ev: XXFormsBindingErrorEvent ⇒
+    case ev: XXFormsBindingErrorEvent =>
       XFormsError.handleNonFatalSetvalueError(this, ev.locationData, ev.reason)
-    case ev: XXFormsActionErrorEvent ⇒
+    case ev: XXFormsActionErrorEvent =>
       XFormsError.handleNonFatalActionError(this, ev.throwable)
-    case _ ⇒
+    case _ =>
   }
 
   def performTargetAction(event: XFormsEvent): Unit = ()
 
   // Check whether this concrete control supports receiving the external event specified
   final def allowExternalEvent(eventName: String): Boolean = staticControl match {
-    case viewTrait: ViewTrait ⇒ viewTrait.externalEvents(eventName)
-    case _ ⇒ false
+    case viewTrait: ViewTrait => viewTrait.externalEvents(eventName)
+    case _ => false
   }
 
   // TODO LATER: should probably return true because most controls could then dispatch relevance events

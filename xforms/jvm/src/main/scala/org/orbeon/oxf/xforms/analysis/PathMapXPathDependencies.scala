@@ -26,7 +26,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.w3c.dom.Node._
 
-import scala.collection.{mutable ⇒ m}
+import scala.collection.{mutable => m}
 
 class PathMapXPathDependencies(
   containingDocument: XFormsContainingDocument
@@ -52,13 +52,13 @@ class PathMapXPathDependencies(
       if (! hasStructuralChanges) {
 
         val instanceKey  = ModelOrInstanceKey(instance)
-        val instancePath = instanceKey → path
+        val instancePath = instanceKey -> path
 
         recalculateChangeset += instancePath
         if (revalidateChangeset ne recalculateChangeset)
           revalidateChangeset += instancePath // also add to revalidate changeset if it is different
 
-        RefreshState.instancesByKey   += instanceKey → instance
+        RefreshState.instancesByKey   += instanceKey -> instance
         RefreshState.refreshChangeset += instancePath
       }
     }
@@ -75,14 +75,14 @@ class PathMapXPathDependencies(
           val path = createFingerprintedPath(n)
 
           val instanceKey  = ModelOrInstanceKey(instance)
-          val instancePath = instanceKey → path
+          val instancePath = instanceKey -> path
 
           // Update model and view changesets
           recalculateChangeset += instancePath
           if (revalidateChangeset ne recalculateChangeset)
             revalidateChangeset += instancePath // also add to revalidate changeset if it is different
 
-          RefreshState.instancesByKey   += instanceKey → instance
+          RefreshState.instancesByKey   += instanceKey -> instance
           RefreshState.refreshChangeset += instancePath
 
           // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
@@ -186,10 +186,10 @@ class PathMapXPathDependencies(
     private def compareWithPredicate(
       firstWithPrefixedIds   : collection.Iterable[String],
       secondWithInstanceKeys : collection.Iterable[ModelOrInstanceKey],
-      predicate              : ModelOrInstanceKey ⇒ Boolean
+      predicate              : ModelOrInstanceKey => Boolean
     ): Boolean =
-      firstWithPrefixedIds exists { firstPrefixedId ⇒
-        secondWithInstanceKeys exists { secondInstanceKey ⇒
+      firstWithPrefixedIds exists { firstPrefixedId =>
+        secondWithInstanceKeys exists { secondInstanceKey =>
           secondInstanceKey.prefixedId == firstPrefixedId && predicate(secondInstanceKey)
         }
       }
@@ -212,7 +212,7 @@ class PathMapXPathDependencies(
       compareWithPredicate(
         firstWithPrefixedIds.map.keys,
         secondWithInstanceKeys.map.keys,
-        instanceKey ⇒ {
+        instanceKey => {
 
           val matchesRepeatIterations =
             ! controlIsWithinRepeat ||
@@ -238,7 +238,7 @@ class PathMapXPathDependencies(
       compareWithPredicate(
         analysis.dependentModels,
         touchedModelsEffectiveIds,
-        modelKey ⇒ {
+        modelKey => {
           ! controlIsWithinRepeat ||
           // If there is a match we know that the control depends on the given model, and we
           // know that this means the control statically share the model's ancestor repeats,
@@ -330,7 +330,7 @@ class PathMapXPathDependencies(
     // Remove all references to concrete models and instances
     modelStates -= getOrCreateModelState(model).modelKey
 
-    for (instance ← model.instancesIterator)
+    for (instance <- model.instancesIterator)
       instancesByKey -= ModelOrInstanceKey(instance)
   }
 
@@ -343,17 +343,17 @@ class PathMapXPathDependencies(
     debug(
       "refresh done",
       List(
-        "bindings updated"        → bindingUpdateCount.toString,
-        "values updated"          → valueUpdateCount.toString,
-        "MIPs updated"            → mipUpdateCount.toString,
-        "Binding XPath optimized" → bindingXPathOptimizedCount.toString,
-        "Value XPath optimized"   → valueXPathOptimizedCount.toString,
-        "MIP XPath optimized"     → mipXPathOptimizedCount.toString,
-        "Total XPath optimized"   → (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString
+        "bindings updated"        -> bindingUpdateCount.toString,
+        "values updated"          -> valueUpdateCount.toString,
+        "MIPs updated"            -> mipUpdateCount.toString,
+        "Binding XPath optimized" -> bindingXPathOptimizedCount.toString,
+        "Value XPath optimized"   -> valueXPathOptimizedCount.toString,
+        "MIP XPath optimized"     -> mipXPathOptimizedCount.toString,
+        "Total XPath optimized"   -> (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString
       )
     )
 
-    for (modelState ← modelStates.values)
+    for (modelState <- modelStates.values)
       modelState.refreshDone()
 
     RefreshState.refreshDone()
@@ -404,16 +404,16 @@ class PathMapXPathDependencies(
   private def outputLHHAItemsetStats(): Unit = {
       debug("summary after response",
         List(
-          "LHHA evaluations"             → lhhaEvaluationCount.toString,
-          "LHHA optimized"               → lhhaOptimizedCount.toString,
-          "LHHA unknown dependencies"    → lhhaUnknownDependencies.toString,
-          "LHHA intersections"           → lhhaHitCount.toString,
-          "LHHA disjoints"               → lhhaMissCount.toString,
-          "Itemset evaluations"          → itemsetEvaluationCount.toString,
-          "Itemset optimized"            → itemsetOptimizedCount.toString,
-          "Itemset unknown dependencies" → itemsetUnknownDependencies.toString,
-          "Itemset intersections"        → itemsetHitCount.toString,
-          "Itemset disjoints"            → itemsetMissCount.toString
+          "LHHA evaluations"             -> lhhaEvaluationCount.toString,
+          "LHHA optimized"               -> lhhaOptimizedCount.toString,
+          "LHHA unknown dependencies"    -> lhhaUnknownDependencies.toString,
+          "LHHA intersections"           -> lhhaHitCount.toString,
+          "LHHA disjoints"               -> lhhaMissCount.toString,
+          "Itemset evaluations"          -> itemsetEvaluationCount.toString,
+          "Itemset optimized"            -> itemsetOptimizedCount.toString,
+          "Itemset unknown dependencies" -> itemsetUnknownDependencies.toString,
+          "Itemset intersections"        -> itemsetHitCount.toString,
+          "Itemset disjoints"            -> itemsetMissCount.toString
         )
       )
   }
@@ -440,14 +440,14 @@ class PathMapXPathDependencies(
   ): Option[RepeatCacheKey] = {
     if (control.isWithinRepeat) {
       analyses match {
-        case analyses if analyses.nonEmpty && (analyses forall(_.figuredOutDependencies)) ⇒
+        case analyses if analyses.nonEmpty && (analyses forall(_.figuredOutDependencies)) =>
 
           val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap(_.dependentModels.iterator)
 
           // TODO: This could be cached in the ElementAnalysis. Would need for binding, value, LHHA, itemset.
           val maxDependentModelDepth =
             if (allDependentModelsPrefixedIdsIt.nonEmpty)
-              allDependentModelsPrefixedIdsIt map { modelPrefixedId ⇒
+              allDependentModelsPrefixedIdsIt map { modelPrefixedId =>
                 containingDocument.getStaticOps.getControlAnalysis(modelPrefixedId).ancestorRepeatsAcrossParts.size
               } max
             else
@@ -459,7 +459,7 @@ class PathMapXPathDependencies(
               XFormsId.getEffectiveIdSuffixParts(controlEffectiveId) take maxDependentModelDepth toList
             )
           )
-        case _ ⇒
+        case _ =>
           None
       }
     } else
@@ -475,17 +475,17 @@ class PathMapXPathDependencies(
     val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
     val updateResult: UpdateResult =
       cached match {
-        case Some(result) ⇒
+        case Some(result) =>
           result
-        case None ⇒
+        case None =>
           val tempResult = control.getBindingAnalysis match {
-            case None ⇒
+            case None =>
               // Control does not have an XPath binding
               MustNotUpdateResultZero
-            case Some(analysis) if ! analysis.figuredOutDependencies ⇒
+            case Some(analysis) if ! analysis.figuredOutDependencies =>
               // Binding dependencies are unknown
               MustUpdateResultOne
-            case Some(analysis) ⇒
+            case Some(analysis) =>
               // Binding dependencies are known
               UpdateResult(
                 intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
@@ -498,13 +498,13 @@ class PathMapXPathDependencies(
             debug(
               "binding requires update",
               List(
-                "effective id" → controlEffectiveId,
-                "XPath"        → control.getBindingAnalysis.get.xpathString
+                "effective id" -> controlEffectiveId,
+                "XPath"        -> control.getBindingAnalysis.get.xpathString
               )
             )
 
-          resultCacheKey foreach { key ⇒
-            modifiedBindingCacheForRepeats += key → tempResult
+          resultCacheKey foreach { key =>
+            modifiedBindingCacheForRepeats += key -> tempResult
           }
 
           tempResult
@@ -527,7 +527,7 @@ class PathMapXPathDependencies(
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
       cached match {
-        case Some(result) ⇒
+        case Some(result) =>
           (
             result,
             if (result.requireUpdate)
@@ -535,16 +535,16 @@ class PathMapXPathDependencies(
             else
               null
           )
-        case None ⇒
+        case None =>
           val tempValueAnalysis = control.getValueAnalysis
           val tempUpdateResult = tempValueAnalysis match {
-            case None ⇒
+            case None =>
               // Control does not have a value
               MustUpdateResultNA//TODO: should be able to return false here; change once markDirty is handled better
-            case Some(analysis) if ! analysis.figuredOutDependencies ⇒
+            case Some(analysis) if ! analysis.figuredOutDependencies =>
               // Value dependencies are unknown
               MustUpdateResultNA
-            case Some(analysis) ⇒
+            case Some(analysis) =>
               // Value dependencies are known
               UpdateResult(
                 intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
@@ -555,13 +555,13 @@ class PathMapXPathDependencies(
             debug(
               "value requires update",
               List(
-                "effective id" → controlEffectiveId,
-                "XPath"        → tempValueAnalysis.get.xpathString
+                "effective id" -> controlEffectiveId,
+                "XPath"        -> tempValueAnalysis.get.xpathString
               )
             )
 
-          resultCacheKey foreach { key ⇒
-            modifiedValueCacheForRepeats += key → tempUpdateResult
+          resultCacheKey foreach { key =>
+            modifiedValueCacheForRepeats += key -> tempUpdateResult
           }
 
           (tempUpdateResult, tempValueAnalysis)
@@ -598,10 +598,10 @@ class PathMapXPathDependencies(
 
       def requireUpdateForAnalysis(analysis: XPathAnalysis) =
         analysis match {
-          case analysis if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
+          case analysis if ! analysis.figuredOutDependencies => // dependencies are unknown
             lhhaUnknownDependencies += 1
             true
-          case analysis ⇒ // dependencies are known
+          case analysis => // dependencies are known
             val result =
               intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
                 intersectsValue(controlEffectiveId, analysis, refreshChangeset)
@@ -614,8 +614,8 @@ class PathMapXPathDependencies(
     }
 
     buildRepeatResultCacheKey(control, analyses, controlEffectiveId: String) match {
-      case Some(key) ⇒ modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
-      case None      ⇒ requireUpdate
+      case Some(key) => modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
+      case None      => requireUpdate
     }
   }
 
@@ -625,22 +625,22 @@ class PathMapXPathDependencies(
 
     def requireUpdate =
       control.getItemsetAnalysis match {
-        case Some(analysis) if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
+        case Some(analysis) if ! analysis.figuredOutDependencies => // dependencies are unknown
           itemsetUnknownDependencies += 1
           true
-        case Some(analysis) ⇒ // dependencies are known
+        case Some(analysis) => // dependencies are known
           val result =
             intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
               intersectsValue(controlEffectiveId, analysis, refreshChangeset)
           if (result) itemsetHitCount += 1 else itemsetMissCount += 1
           result
-        case None ⇒
+        case None =>
           throw new IllegalStateException("Itemset not analyzed")
       }
 
     buildRepeatResultCacheKey(control, control.getItemsetAnalysis.toList, controlEffectiveId: String) match {
-      case Some(key) ⇒ modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
-      case None      ⇒ requireUpdate
+      case Some(key) => modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
+      case None      => requireUpdate
     }
   }
 
@@ -656,10 +656,10 @@ class PathMapXPathDependencies(
 
     // Get constraints by the level specified
     val mips = mip match {
-      case Model.Constraint ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
-      case Model.Type       ⇒ bind.typeMIPOpt.toList
-      case Model.Whitespace ⇒ bind.nonPreserveWhitespaceMIPOpt.toList
-      case _                ⇒ bind.getXPathMIPs(mip.name)
+      case Model.Constraint => bind.constraintsByLevel.getOrElse(level, Nil)
+      case Model.Type       => bind.typeMIPOpt.toList
+      case Model.Whitespace => bind.nonPreserveWhitespaceMIPOpt.toList
+      case _                => bind.getXPathMIPs(mip.name)
     }
 
     val modelState = getOrCreateModelState(model)
@@ -675,23 +675,23 @@ class PathMapXPathDependencies(
         // We don't check whether we need to update the type MIP, since it is constant, but we check whether
         // the value to type check has changed.
         val valueAnalysis = mip match {
-          case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
-          case _: StaticBind#TypeMIP         ⇒ bind.getValueAnalysis
-          case _: StaticBind#WhitespaceMIP   ⇒ bind.getValueAnalysis
-          case _                             ⇒ throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
+          case xpathMIP: StaticBind#XPathMIP => Some(xpathMIP.analysis)
+          case _: StaticBind#TypeMIP         => bind.getValueAnalysis
+          case _: StaticBind#WhitespaceMIP   => bind.getValueAnalysis
+          case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 
         def dependsOnOtherModel(analysis: XPathAnalysis) =
           analysis.dependentModels exists (_ != model.getPrefixedId)
 
         val updateResult = valueAnalysis match {
-          case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
+          case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) =>
             // Value dependencies are unknown OR we depend on another model
             // A this time, if we depend on another model, we have to update because we don't have
             // the other model's dependencies reliably available, e.g. if the other model has
             // already done a recalculate, its dependencies are cleared.
             MustUpdateResultOne
-          case Some(analysis) ⇒
+          case Some(analysis) =>
             // Value dependencies are known
             UpdateResult(
               intersectsValue(
@@ -701,7 +701,7 @@ class PathMapXPathDependencies(
               ),
               1
             )
-          case _ ⇒
+          case _ =>
             throw new IllegalStateException(s"No value analysis found for `xf:bind` with name = ${mip.name}")
         }
 
@@ -709,9 +709,9 @@ class PathMapXPathDependencies(
           debug(
             "MIP requires update",
             List(
-              "prefixed id" → bind.prefixedId,
-              "MIP name"    → mip.name,
-              "XPath"       → valueAnalysis.get.xpathString
+              "prefixed id" -> bind.prefixedId,
+              "MIP name"    -> mip.name,
+              "XPath"       -> valueAnalysis.get.xpathString
             )
           )
 
@@ -721,10 +721,10 @@ class PathMapXPathDependencies(
     // Stats and return value
     // Require an update of all MIPs of the given name/level if at least one dependency fails
     mips.iterator map resultForMIP find (_.requireUpdate) match {
-      case Some(firstUpdateResult) ⇒
+      case Some(firstUpdateResult) =>
         mipUpdateCount += mips.size
         true
-      case None ⇒
+      case None =>
         mipXPathOptimizedCount += mips.size // NOTE: stats a bit rough here
         false
     }
@@ -763,10 +763,10 @@ private object PathMapXPathDependencies {
     // Fingerprint representation of the element and attribute nodes
     val pathElements =
       if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
-        ancestorOrSelf.tail map { node ⇒
+        ancestorOrSelf.tail map { node =>
           node.getNodeKind match {
-            case ELEMENT_NODE   ⇒ node.getFingerprint
-            case ATTRIBUTE_NODE ⇒ "@" + node.getFingerprint
+            case ELEMENT_NODE   => node.getFingerprint
+            case ATTRIBUTE_NODE => "@" + node.getFingerprint
           }
         }
       else

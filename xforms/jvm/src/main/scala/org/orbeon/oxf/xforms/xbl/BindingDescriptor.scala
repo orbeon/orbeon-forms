@@ -96,13 +96,13 @@ object BindingDescriptor {
 
     val virtualNameAndAppearanceOpt =
       for {
-        descriptor                                ← findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+        descriptor                                <- findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
         if descriptor.att.isEmpty                 // only a direct binding can be an alias for another related binding
         relatedBindings                           = findRelatedBindings(descriptor, descriptors)
-        BindingDescriptor(elemNameOpt, _, attOpt) ← findRelatedVaryNameAndAppearance(datatype, relatedBindings)
-        elemName                                  ← elemNameOpt
+        BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(datatype, relatedBindings)
+        elemName                                  <- elemNameOpt
       } yield
-        (elemName, attOpt collect { case BindingAttributeDescriptor(APPEARANCE_QNAME, _, value) ⇒ value })
+        (elemName, attOpt collect { case BindingAttributeDescriptor(APPEARANCE_QNAME, _, value) => value })
 
     virtualNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
   }
@@ -116,10 +116,10 @@ object BindingDescriptor {
 
     val newNameAndAppearanceOpt =
       for {
-        descriptor                           ← findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
+        descriptor                           <- findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
         relatedBindings                      = findRelatedBindings(descriptor, descriptors)
-        BindingDescriptor(elemNameOpt, _, _) ← findDirectBinding(relatedBindings)
-        elemName                             ← elemNameOpt
+        BindingDescriptor(elemNameOpt, _, _) <- findDirectBinding(relatedBindings)
+        elemName                             <- elemNameOpt
       } yield
         (elemName, None)
 
@@ -141,13 +141,13 @@ object BindingDescriptor {
             Some(`elemName`),
             d @ (None | Some(Datatype1 | Datatype2)),
             None
-          ) ⇒
+          ) =>
           (None, b.binding, d.isDefined)
         case b @ BindingDescriptor(
             Some(`elemName`), // None | would also match raw attribute selectors
             d @ (None | Some(Datatype1 | Datatype2)),
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, attValue))
-          ) ⇒
+          ) =>
           (Some(attValue), b.binding, d.isDefined)
       }
 
@@ -161,7 +161,7 @@ object BindingDescriptor {
 
   private def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping) =
     selectorOpt collect {
-      case TypeSelector(Some(Some(prefix)), localname) ⇒ QName(localname, prefix, ns.mapping(prefix))
+      case TypeSelector(Some(Some(prefix)), localname) => QName(localname, prefix, ns.mapping(prefix))
     }
 
   // Example: fr|number, xf|textarea
@@ -173,7 +173,7 @@ object BindingDescriptor {
         ElementWithFiltersSelector(
           Some(TypeSelector(Some(Some(prefix)), localname)),
           Nil),
-        Nil) ⇒
+        Nil) =>
 
       BindingDescriptor(
         Some(QName(localname, prefix, ns.mapping(prefix))),
@@ -192,7 +192,7 @@ object BindingDescriptor {
           Some(TypeSelector(Some(Some(prefix)), localname)),
           List(FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))))
         ),
-        Nil) ⇒
+        Nil) =>
 
       BindingDescriptor(
         Some(QName(localname, prefix, ns.mapping(prefix))),
@@ -214,7 +214,7 @@ object BindingDescriptor {
           typeSelectorOpt,
           List(AttributeFilter(None, attName, Some(AttributePredicate(attPredicate, attValue))))
         ),
-        Nil) ⇒
+        Nil) =>
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
@@ -236,7 +236,7 @@ object BindingDescriptor {
             AttributeFilter(None, attName, Some(AttributePredicate(attPredicate, attValue)))
           )
         ),
-        Nil) ⇒
+        Nil) =>
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
@@ -248,7 +248,7 @@ object BindingDescriptor {
   def getAllRelevantDescriptors(bindings: Seq[NodeInfo]): Seq[BindingDescriptor] =
     getAllSelectorsWithPF(
       bindings,
-      (ns, binding) ⇒
+      (ns, binding) =>
         directBindingPF              (ns, Some(binding)) orElse
         datatypeBindingPF            (ns, Some(binding)) orElse
         attributeBindingPF           (ns, Some(binding)) orElse
@@ -257,7 +257,7 @@ object BindingDescriptor {
 
   private def getAllSelectorsWithPF(
     bindings  : Seq[NodeInfo],
-    collector : (NamespaceMapping, NodeInfo) ⇒ PartialFunction[Selector, BindingDescriptor]
+    collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
   ): Seq[BindingDescriptor] = {
 
     def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
@@ -267,15 +267,15 @@ object BindingDescriptor {
       CSSSelectorParser.parseSelectors(selectors) collect collector(ns, binding)
 
     for {
-      binding         ← bindings
+      binding         <- bindings
       (selectors, ns) = getBindingSelectorsAndNamespaces(binding)
-      descriptor      ← descriptorsForSelectors(selectors, ns, binding)
+      descriptor      <- descriptorsForSelectors(selectors, ns, binding)
     } yield
       descriptor
   }
 
   def findRelatedBindings(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]): Seq[BindingDescriptor] =
-    descriptors filter (d ⇒ d.binding == descriptor.binding)
+    descriptors filter (d => d.binding == descriptor.binding)
 
   def findDirectBinding(
     relatedBindings : Seq[BindingDescriptor]
@@ -285,7 +285,7 @@ object BindingDescriptor {
           Some(_),
           None,
           None
-        ) ⇒ descriptor
+        ) => descriptor
     }
 
   def findRelatedVaryNameAndAppearance(
@@ -302,7 +302,7 @@ object BindingDescriptor {
             Some(_),
             Some(Datatype1 | Datatype2),
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, _))
-          ) ⇒ descriptor
+          ) => descriptor
       }
 
     def findWithNameAndDatatype =
@@ -311,7 +311,7 @@ object BindingDescriptor {
             Some(_),
             Some(Datatype1 | Datatype2),
             None
-          ) ⇒ descriptor
+          ) => descriptor
       }
 
     def findWithNameAndAppearance =
@@ -320,7 +320,7 @@ object BindingDescriptor {
             Some(_),
             None,
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, _))
-          ) ⇒ descriptor
+          ) => descriptor
       }
 
     findWithNameDatatypeAndAppearance orElse
@@ -340,7 +340,7 @@ object BindingDescriptor {
             Some(`elemName`),
             None,
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, appearance))
-          ) if appearances(appearance) ⇒ descriptor
+          ) if appearances(appearance) => descriptor
       }
 
     def findByNameOnly =
@@ -349,7 +349,7 @@ object BindingDescriptor {
             Some(`elemName`),
             None,
             None
-          ) ⇒ descriptor
+          ) => descriptor
       }
 
     findByNameAndAppearance orElse findByNameOnly
@@ -371,7 +371,7 @@ object BindingDescriptor {
             Some(`elemName`),
             Some(Datatype1 | Datatype2),
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, appearance))
-          ) if appearances(appearance) ⇒ descriptor
+          ) if appearances(appearance) => descriptor
       }
 
     def findWithDatatypeOnly =
@@ -380,7 +380,7 @@ object BindingDescriptor {
             Some(`elemName`),
             Some(Datatype1 | Datatype2),
             None
-          ) ⇒ descriptor
+          ) => descriptor
       }
 
     findWithDatatypeAndAppearance orElse findWithDatatypeOnly

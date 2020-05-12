@@ -45,7 +45,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 
     it("Returns all operations if the form has no permissions") {
-      for (userRoles ← List(Nil, List(SimpleRole("clerk")))) {
+      for (userRoles <- List(Nil, List(SimpleRole("clerk")))) {
         val user = juser.copy(roles = userRoles)
         val ops  = authorizedOperations(
           UndefinedPermissions,
@@ -119,12 +119,12 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         )
 
         val checks = List(
-          "lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
-          "lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
-          "prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
+          "lets direct manager access the data"                -> ParametrizedRole("manager", "c") -> fullOperations,
+          "lets manager of manager access the data"            -> ParametrizedRole("manager", "b") -> fullOperations,
+          "prevents unrelated manager from accessing the data" -> ParametrizedRole("manager", "d") -> guestOperations
         )
 
-        for (((specText, roles), operations) ← checks) {
+        for (((specText, roles), operations) <- checks) {
           it(specText) {
             val ops = authorizedOperations(
               clerkAndManagerPermissions,

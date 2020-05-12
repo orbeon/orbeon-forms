@@ -18,7 +18,7 @@ import enumeratum._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
 import org.orbeon.xforms.facade.Utils
-import org.orbeon.xforms.{$, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
@@ -55,14 +55,14 @@ trait GridSectionMenus {
   private var currentComponentOpt: Option[CurrentComponent] = None
 
   // Initialization
-  globalMenuElem foreach { _ ⇒
+  globalMenuElem foreach { _ =>
     // Click on our own button moves and shows the menu
     $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-dropdown-button", moveAndShowMenuHandler _)
     $(document).on(s"keydown$ListenerSuffix", s".fr-$componentName-dropdown-button", delegateKeyEventToBootstrapButtonHandler _)
     $(document).on(s"click$ListenerSuffix",   s".fr-$componentName-remove-button",   removeIterationHandler _)
 
     // Listeners for all menu actions
-    Operation.values foreach { op ⇒
+    Operation.values foreach { op =>
       $(document).on(s"click$ListenerSuffix", s".fr-$componentName-dropdown-menu .fr-${op.entryName}", actionHandler(op))
     }
   }
@@ -75,7 +75,7 @@ trait GridSectionMenus {
     val button  = jButton(0)
 
     componentId(e).zip(findIterationForElemWithId(button.asInstanceOf[html.Element])) foreach {
-      case (currentComponentId, currentIteration) ⇒
+      case (currentComponentId, currentIteration) =>
         dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
     }
   }
@@ -112,7 +112,7 @@ trait GridSectionMenus {
     $(globalMenuElem).css("position", "absolute")
     Offset.offset($(globalMenuElem), Offset(dropdownOffset.left, dropdownOffset.top + jButton.outerHeight()))
 
-    Operation.values foreach { op ⇒
+    Operation.values foreach { op =>
       $(globalMenuElem).find(".dropdown-menu").children(s".fr-${op.entryName}").toggleClass(
         "disabled",
         ! $(iteration(e)).is(s".can-${op.entryName}")
@@ -120,7 +120,7 @@ trait GridSectionMenus {
     }
 
     componentId(e).zip(findIterationForElemWithId(button)) foreach {
-      case (currentComponentId, currentIteration) ⇒ currentComponentOpt = Some(CurrentComponent(currentComponentId, currentIteration))
+      case (currentComponentId, currentIteration) => currentComponentOpt = Some(CurrentComponent(currentComponentId, currentIteration))
     }
   }
 
@@ -149,20 +149,20 @@ trait GridSectionMenus {
     )
   }
 
-  def actionHandler(op: Operation): JQueryEventObject ⇒ js.Any = e ⇒ asUnit {
+  def actionHandler(op: Operation): JQueryEventObject => js.Any = e => asUnit {
     currentComponentOpt foreach {
-      case CurrentComponent(currentComponentId, currentIteration) ⇒
+      case CurrentComponent(currentComponentId, currentIteration) =>
         dispatchActionEvent(op, currentComponentId, currentIteration)
     }
     e.preventDefault()
   }
 
   def dispatchActionEvent(op: Operation, currentComponentId: String, currentIteration: Int): Unit =
-    AjaxEvent.dispatchEvent(
+    AjaxClient.fireEvent(
       AjaxEvent(
         eventName  = s"fr-${op.entryName}",
         targetId   = currentComponentId,
-        properties = Map("row" → currentIteration.toString)
+        properties = Map("row" -> currentIteration.toString)
       )
     )
 

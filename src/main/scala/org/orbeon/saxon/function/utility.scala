@@ -57,21 +57,21 @@ class ProcessTemplate extends DefaultFunctionSupport {
 
     val templateArgument  = stringArgument(0)
     val langArgument      = stringArgument(1)
-    val templateParamsOpt = itemsArgumentOpt(2) map (it ⇒ MapFunctions.collectMapValues(it.iterator).next())
+    val templateParamsOpt = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it.iterator).next())
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
-        case Some(params) ⇒
+        case Some(params) =>
 
           val javaNamedParamsIt = params.iterator map {
-            case (key, value) ⇒
+            case (key, value) =>
               val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
-              key.getStringValue → javaParamOpt.orNull
+              key.getStringValue -> javaParamOpt.orNull
           }
 
           ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), Configuration.getLocale(langArgument))
 
-        case None ⇒
+        case None =>
           resourceOrTemplate
       }
 
@@ -103,25 +103,25 @@ object ProcessTemplate {
 
     // TODO
     def formatValue(v: Any) = v match {
-      case null       ⇒ ""
-      case v: Byte    ⇒ v
-      case v: Short   ⇒ v
-      case v: Int     ⇒ v
-      case v: Long    ⇒ v
-      case v: Float   ⇒ v
-      case v: Double  ⇒ v
-      case v: Boolean ⇒ v
-      case other      ⇒ other.toString
+      case null       => ""
+      case v: Byte    => v
+      case v: Short   => v
+      case v: Int     => v
+      case v: Long    => v
+      case v: Float   => v
+      case v: Double  => v
+      case v: Boolean => v
+      case other      => other.toString
     }
 
     val nameToPos = javaNamedParams.iterator.map(_._1).zipWithIndex.toMap
 
     val templateWithPositions =
-      MatchTemplateKey.replaceAllIn(templateWithNames, m ⇒ {
+      MatchTemplateKey.replaceAllIn(templateWithNames, m => {
         Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
-      })
+      }).replaceAllLiterally("'", "''")
 
     new MessageFormat(templateWithPositions, currentLocale)
-      .format(javaNamedParams.map(v ⇒ formatValue(v._2)).to(Array))
+      .format(javaNamedParams.map(v => formatValue(v._2)).to(Array))
   }
 }

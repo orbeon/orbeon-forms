@@ -23,10 +23,10 @@ import org.orbeon.oxf.xml.Dom4j
 
 trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
 
-  self: ComponentControl ⇒
+  self: ComponentControl =>
 
   // Return all the children to consider, including relevant shadow tree elements
-  override def findRelevantChildrenElements: Seq[(Element, Scope)] = bindingOpt map { binding ⇒
+  override def findRelevantChildrenElements: Seq[(Element, Scope)] = bindingOpt map { binding =>
 
     def annotateChild(child: Element) = {
       // Inner scope in effect for the component element itself (NOT the shadow tree's scope)
@@ -68,7 +68,7 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
     def directlyNestedLHHA =
       if (abstractBinding.modeLHHA)
         Dom4j.elements(element) filter
-          (e ⇒ LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null)) map
+          (e => LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null)) map
             annotateChild
       else
         Nil

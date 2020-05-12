@@ -59,13 +59,13 @@ trait FormRunnerResourcesOps {
   // Find control resource holders with their language
   def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     for {
-      (lang, resource) ← allLangsWithResources(resourcesRootElem)
-      holder           ← resource child controlName headOption // there *should* be only one
+      (lang, resource) <- allLangsWithResources(resourcesRootElem)
+      holder           <- resource child controlName headOption // there *should* be only one
     } yield
       (lang, holder)
 
   private def readUrlAsImmutableXmlDocument(url: String) =
-    useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+    useAndClose(URLFactory.createURL(url).openStream()) { is =>
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
     }
 }

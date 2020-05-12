@@ -46,37 +46,37 @@ import scala.collection.compat._
 
 trait FormRunnerActions {
 
-  self ⇒
+  self =>
 
   import FormRunnerRenderedFormat._
 
   def runningProcessId: Option[String]
 
   def AllowedFormRunnerActions = Map[String, Action](
-    "pending-uploads"        → tryPendingUploads,
-    "validate"               → tryValidate,
-    "save"                   → trySaveAttachmentsAndData,
-    "relinquish-lease"       → tryRelinquishLease,
-    "success-message"        → trySuccessMessage,
-    "error-message"          → tryErrorMessage,
-    "confirm"                → tryConfirm,
-    "email"                  → trySendEmail,
-    "send"                   → trySend,
-    "navigate"               → tryNavigate,
-    "review"                 → tryNavigateToReview,
-    "edit"                   → tryNavigateToEdit,
-    "open-rendered-format"   → tryOpenRenderedFormat,
-    "visit-all"              → tryShowRelevantErrors,
-    "show-relevant-errors"   → tryShowRelevantErrors,
-    "unvisit-all"            → tryUnvisitAll,
-    "expand-all"             → tryExpandAllSections,
-    "expand-invalid"         → tryExpandInvalidSections,
-    "collapse-all"           → tryCollapseSections,
-    "result-dialog"          → tryShowResultDialog,
-    "captcha"                → tryCaptcha,
-    "set-data-status"        → trySetDataStatus,
-    "wizard-update-validity" → tryUpdateCurrentWizardPageValidity,
-    "new-to-edit"            → tryNewToEdit
+    "pending-uploads"        -> tryPendingUploads,
+    "validate"               -> tryValidate,
+    "save"                   -> trySaveAttachmentsAndData,
+    "relinquish-lease"       -> tryRelinquishLease,
+    "success-message"        -> trySuccessMessage,
+    "error-message"          -> tryErrorMessage,
+    "confirm"                -> tryConfirm,
+    "email"                  -> trySendEmail,
+    "send"                   -> trySend,
+    "navigate"               -> tryNavigate,
+    "review"                 -> tryNavigateToReview,
+    "edit"                   -> tryNavigateToEdit,
+    "open-rendered-format"   -> tryOpenRenderedFormat,
+    "visit-all"              -> tryShowRelevantErrors,
+    "show-relevant-errors"   -> tryShowRelevantErrors,
+    "unvisit-all"            -> tryUnvisitAll,
+    "expand-all"             -> tryExpandAllSections,
+    "expand-invalid"         -> tryExpandInvalidSections,
+    "collapse-all"           -> tryCollapseSections,
+    "result-dialog"          -> tryShowResultDialog,
+    "captcha"                -> tryCaptcha,
+    "set-data-status"        -> trySetDataStatus,
+    "wizard-update-validity" -> tryUpdateCurrentWizardPageValidity,
+    "new-to-edit"            -> tryNewToEdit
   )
 
   // Check whether there are pending uploads
@@ -98,7 +98,7 @@ trait FormRunnerActions {
       // In case of explicit validation mode
       if (formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
         inScopeContainingDocument.synchronizeAndRefresh()
-        XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control ⇒
+        XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control =>
           XXFormsUpdateValidityAction.updateValidity(control, recurse = true)
         }
       }
@@ -180,26 +180,26 @@ trait FormRunnerActions {
 
       (beforeURLs, afterURLs, isDraft)
     } map {
-      case result @ (_, _, isDraft) ⇒
+      case result @ (_, _, isDraft) =>
         // Mark data clean
-        trySetDataStatus(Map(Some("status") → "safe", Some("draft") → isDraft.toString))
+        trySetDataStatus(Map(Some("status") -> "safe", Some("draft") -> isDraft.toString))
         result
     } map {
-      case (beforeURLs, afterURLs, _) ⇒
+      case (beforeURLs, afterURLs, _) =>
         // Notify that the data is saved (2014-07-07: used by FB only)
         dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
-          "before-urls" → Some(beforeURLs),
-          "after-urls"  → Some(afterURLs)
+          "before-urls" -> Some(beforeURLs),
+          "after-urls"  -> Some(afterURLs)
         ))
     } onFailure {
-      case _ ⇒
+      case _ =>
         dispatch(name = "fr-data-save-error", targetId = FormModel)
     }
 
   def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
     val leaseState = persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
-      send("fr-relinquish-lease-submission", Map.empty)(_ ⇒ ())
+      send("fr-relinquish-lease-submission", Map.empty)(_ => ())
       setvalue(leaseState, "relinquished")
     }
   }
@@ -229,7 +229,7 @@ trait FormRunnerActions {
   }
 
   private def messageFromResourceOrParam(params: ActionParams) = {
-    def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources / "detail" / "messages" / k stringValue)
+    def fromResource = paramByNameOrDefault(params, "resource") map (k => currentFRResources / "detail" / "messages" / k stringValue)
     def fromParam    = paramByName(params, "message")
 
     fromResource orElse fromParam
@@ -246,13 +246,13 @@ trait FormRunnerActions {
       def defaultMessage = currentFRResources / "detail" / "messages" / "confirmation-dialog-message" stringValue
       def message        = messageFromResourceOrParam(params).map(evaluateValueTemplate) getOrElse defaultMessage
 
-      show("fr-confirmation-dialog", Map("message" → Some(message)))
+      show("fr-confirmation-dialog", Map("message" -> Some(message)))
     }
 
   def tryShowResultDialog(params: ActionParams): Try[Any] =
     Try {
       show("fr-submission-result-dialog", Map(
-        "fr-content" → Some(topLevelInstance(FormModel, "fr-create-update-submission-response").get.rootElement)
+        "fr-content" -> Some(topLevelInstance(FormModel, "fr-create-update-submission-response").get.rootElement)
       ))
     }
 
@@ -269,7 +269,7 @@ trait FormRunnerActions {
       ensureDataCalculationsAreUpToDate()
 
       val selectedRenderFormats =
-        RenderedFormat.values filter { format ⇒
+        RenderedFormat.values filter { format =>
           booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
         }
 
@@ -280,15 +280,15 @@ trait FormRunnerActions {
 
       val pdfTiffParams =
         for {
-          format    ← RenderedFormat.values.to(List)
-          (path, _) ← pdfOrTiffPathOpt(
+          format    <- RenderedFormat.values.to(List)
+          (path, _) <- pdfOrTiffPathOpt(
               urlsInstanceRootElem = findUrlsInstanceRootElem.get,
               format               = format,
               pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
             )
         } yield
-          format.entryName → path
+          format.entryName -> path
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
@@ -299,13 +299,13 @@ trait FormRunnerActions {
 
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
-    "method"              → HttpMethod.POST.entryName.toLowerCase,
-    NonRelevantName       → RelevanceHandling.Remove.entryName.toLowerCase,
-    "annotate"            → "",
-    "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
-    "content"             → "xml",
-    DataFormatVersionName → DataFormatVersion.V400.entryName,
-    "parameters"          → s"app form form-version document valid language process $DataFormatVersionName"
+    "method"              -> HttpMethod.POST.entryName.toLowerCase,
+    NonRelevantName       -> RelevanceHandling.Remove.entryName.toLowerCase,
+    "annotate"            -> "",
+    "replace"             -> XFORMS_SUBMIT_REPLACE_NONE,
+    "content"             -> "xml",
+    DataFormatVersionName -> DataFormatVersion.V400.entryName,
+    "parameters"          -> s"app form form-version document valid language process $DataFormatVersionName"
   )
 
   private val SendParameterKeys = List(
@@ -333,7 +333,7 @@ trait FormRunnerActions {
       def findParamValue(name: String): Option[String] = {
 
         def fromParam    = paramByName(params, name)
-        def fromProperty = propertyPrefixOpt flatMap (prefix ⇒ formRunnerProperty(prefix + "." + name))
+        def fromProperty = propertyPrefixOpt flatMap (prefix => formRunnerProperty(prefix + "." + name))
         def fromDefault  = DefaultSendParameters.get(name)
 
         fromParam orElse fromProperty orElse fromDefault
@@ -367,14 +367,14 @@ trait FormRunnerActions {
           s.replaceAllLiterally("\\r\\n", "\n").replaceAllLiterally("\\n", "\n")
 
         val propertiesAsPairs =
-          SendParameterKeys map (key ⇒ key → findParamValue(key))
+          SendParameterKeys map (key => key -> findParamValue(key))
 
         propertiesAsPairs map {
-          case (n @ "uri",     s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map updateUri)
-          case (n @ "method",  s @ Some(_)) ⇒ n → (s map evaluateValueTemplate map (_.toLowerCase))
-          case (n @ "headers", s @ Some(_)) ⇒ n → (s map updateLineBreaks map evaluateValueTemplate)
-          case (n,             s @ Some(_)) ⇒ n → (s map evaluateValueTemplate)
-          case other                       ⇒ other
+          case (n @ "uri",     s @ Some(_)) => n -> (s map evaluateValueTemplate map updateUri)
+          case (n @ "method",  s @ Some(_)) => n -> (s map evaluateValueTemplate map (_.toLowerCase))
+          case (n @ "headers", s @ Some(_)) => n -> (s map updateLineBreaks map evaluateValueTemplate)
+          case (n,             s @ Some(_)) => n -> (s map evaluateValueTemplate)
+          case other                       => other
         } toMap
       }
 
@@ -386,9 +386,9 @@ trait FormRunnerActions {
       val evaluatedSendProperties = {
 
         def findDefaultSerialization(method: String) = method match {
-          case "post" | "put" if renderedFormatContentToken.isDefined ⇒ "application/octet-stream"
-          case "post" | "put"                                         ⇒ ContentTypes.XmlContentType
-          case _                                                      ⇒ "none"
+          case "post" | "put" if renderedFormatContentToken.isDefined => "application/octet-stream"
+          case "post" | "put"                                         => ContentTypes.XmlContentType
+          case _                                                      => "none"
         }
 
         def findDefaultContentType =
@@ -397,8 +397,8 @@ trait FormRunnerActions {
             Some(ContentTypes.XmlContentType)
 
         def findDefaultPruneMetadata(dataFormatVersion: String) = dataFormatVersion match {
-          case "edge" ⇒ "false"
-          case _      ⇒ "true"
+          case "edge" => "false"
+          case _      => "true"
         }
 
         val effectiveSerialization =
@@ -417,21 +417,21 @@ trait FormRunnerActions {
 
         val effectiveNonRelevant =
           evaluatedPropertiesAsMap.get("prune").flatten collect {
-            case "false" ⇒ RelevanceHandling.Keep.entryName.toLowerCase
-            case _       ⇒ RelevanceHandling.Remove.entryName.toLowerCase
+            case "false" => RelevanceHandling.Keep.entryName.toLowerCase
+            case _       => RelevanceHandling.Remove.entryName.toLowerCase
           } orElse
             evaluatedPropertiesAsMap.get(NonRelevantName).flatten
 
         evaluatedPropertiesAsMap +
-          ("serialization"   → effectiveSerialization)  +
-          ("mediatype"       → effectiveContentType  )  + // `<xf:submission>` uses `mediatype`
-          (PruneMetadataName → effectivePruneMetadata)  +
-          (NonRelevantName   → effectiveNonRelevant)
+          ("serialization"   -> effectiveSerialization)  +
+          ("mediatype"       -> effectiveContentType  )  + // `<xf:submission>` uses `mediatype`
+          (PruneMetadataName -> effectivePruneMetadata)  +
+          (NonRelevantName   -> effectiveNonRelevant)
       }
 
       // Create PDF and/or TIFF if needed
       val selectedRenderFormatOpt =
-        RenderedFormat.values find { format ⇒
+        RenderedFormat.values find { format =>
           val formatString = format.entryName
           Set(formatString, s"$formatString-url")(contentToken)
         }
@@ -447,17 +447,17 @@ trait FormRunnerActions {
         setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
       val evaluatedSendPropertiesWithKey =
-        evaluatedSendProperties + ("binary-content-key" → formatKeyOpt)
+        evaluatedSendProperties + ("binary-content-key" -> formatKeyOpt)
 
-      debug(s"`send` action sending submission", evaluatedSendPropertiesWithKey.iterator collect { case (k, Some(v)) ⇒ k → v } toList)
+      debug(s"`send` action sending submission", evaluatedSendPropertiesWithKey.iterator collect { case (k, Some(v)) => k -> v } toList)
 
       sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithKey)
     }
 
-  private val StateParams = List[(String, (() ⇒ String, String ⇒ Boolean))](
-    LanguageParam    → (() ⇒ currentLang,                             _ ⇒ false  ),
-    EmbeddableParam  → (() ⇒ isEmbeddable.toString,                   _ == "true"),
-    FormVersionParam → (() ⇒ FormRunnerParams().formVersion.toString, _ ⇒ false  )
+  private val StateParams = List[(String, (() => String, String => Boolean))](
+    LanguageParam    -> (() => currentLang,                             _ => false  ),
+    EmbeddableParam  -> (() => isEmbeddable.toString,                   _ == "true"),
+    FormVersionParam -> (() => FormRunnerParams().formVersion.toString, _ => false  )
   )
 
   private val StateParamNames               = StateParams map (_._1) toSet
@@ -478,14 +478,14 @@ trait FormRunnerActions {
 
       val newParams =
         for {
-          (name, (valueFromCurrent, keepValue)) ← StateParams
-          valueFromPath                         = params collectFirst { case (`name`, v) ⇒ v }
+          (name, (valueFromCurrent, keepValue)) <- StateParams
+          valueFromPath                         = params collectFirst { case (`name`, v) => v }
           effectiveValue                        = valueFromPath getOrElse valueFromCurrent.apply
           if ! forNavigate || forNavigate && (valueFromPath.isDefined || keepValue(effectiveValue)) // keep parameter if explicit!
         } yield
-          name → effectiveValue
+          name -> effectiveValue
 
-      recombineQuery(path, newParams ::: (params filterNot (p ⇒ StateParamNames(p._1))))
+      recombineQuery(path, newParams ::: (params filterNot (p => StateParamNames(p._1))))
     } else
       pathQueryOrUrl
 
@@ -495,11 +495,11 @@ trait FormRunnerActions {
 
     val newParams =
       for {
-        (name, values) ← inScopeContainingDocument.getRequestParameters.to(List)
+        (name, values) <- inScopeContainingDocument.getRequestParameters.to(List)
         if ! ParamsToExcludeUponModeChange(name)
-        value          ← values
+        value          <- values
       } yield
-        name → value
+        name -> value
 
     recombineQuery(path, newParams ::: params)
   }
@@ -517,17 +517,17 @@ trait FormRunnerActions {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
-          Some(             Some("method")                → HttpMethod.POST.entryName.toLowerCase),
-          Some(             Some(NonRelevantName)         → RelevanceHandling.Keep.entryName.toLowerCase),
-          Some(             Some("replace")               → replace),
-          Some(             Some(ShowProgressName)        → showProgress.toString),
-          Some(             Some("content")               → "xml"),
-          Some(             Some(DataFormatVersionName)   → DataFormatVersion.Edge.entryName),
-          Some(             Some(PruneMetadataName)       → false.toString),
-          Some(             Some("parameters")            → s"$FormVersionParam $DataFormatVersionName"),
-          formTargetOpt.map(Some(FormTargetName)          → _),
-          Some(             Some("response-is-resource")  → responseIsResource.toString)
+          Some(             Some("uri")                   -> prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
+          Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
+          Some(             Some("replace")               -> replace),
+          Some(             Some(ShowProgressName)        -> showProgress.toString),
+          Some(             Some("content")               -> "xml"),
+          Some(             Some(DataFormatVersionName)   -> DataFormatVersion.Edge.entryName),
+          Some(             Some(PruneMetadataName)       -> false.toString),
+          Some(             Some("parameters")            -> s"$FormVersionParam $DataFormatVersionName"),
+          formTargetOpt.map(Some(FormTargetName)          -> _),
+          Some(             Some("response-is-resource")  -> responseIsResource.toString)
         )
       params.flatten.toMap
     } flatMap
@@ -600,7 +600,7 @@ trait FormRunnerActions {
 
       recombineQuery(
         s"/fr/$app/$form/$renderedFormatString/$document",
-        ("fr-rendered-filename" → fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
+        ("fr-rendered-filename" -> fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
       tryChangeMode(
@@ -620,7 +620,7 @@ trait FormRunnerActions {
 
   def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
     Try {
-      ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName ⇒
+      ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName =>
         val sectionId = FormRunner.sectionId(sectionName)
         dispatch(name = "fr-expand", targetId = sectionId)
       }
@@ -645,8 +645,8 @@ trait FormRunnerActions {
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
       ) match {
-        case Some((_, key)) ⇒ key
-        case None ⇒
+        case Some((_, key)) => key
+        case None =>
 
           implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 
@@ -669,7 +669,7 @@ trait FormRunnerActions {
                 create               = true
               ).get
 
-            response.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile ⇒
+            response.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile =>
               setvalue(
                 ref   = node,
                 value = pathToTmpFile

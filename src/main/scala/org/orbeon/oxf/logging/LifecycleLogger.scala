@@ -73,16 +73,16 @@ object LifecycleLogger {
   private val globalRequestCounter = new AtomicInteger(0)
 
   private def arrayToParams(params: Array[String]) =
-    params.grouped(2) map { case Array(x, y) ⇒ (x, y) } toList
+    params.grouped(2) map { case Array(x, y) => (x, y) } toList
 
   private def getRequestId(req: Request) =
     req.getAttributesMap.get(LoggerName + ".request-id").asInstanceOf[String]
 
   private def requestIdSetIfNeeded(req: Request): (String, Boolean) =
-    Option(getRequestId(req)) map (_ → true) getOrElse {
+    Option(getRequestId(req)) map (_ -> true) getOrElse {
       val requestId = globalRequestCounter.incrementAndGet().toString
       req.getAttributesMap.put(LoggerName + ".request-id", requestId)
-      requestId → false
+      requestId -> false
     }
 
   private def findSessionId(req: Request): Option[String] =
@@ -93,12 +93,12 @@ object LifecycleLogger {
       val (requestId, existingId) = requestIdSetIfNeeded(req)
       event(requestId, findSessionId(req), source, message, (if (existingId) Nil else basicRequestDetails(req)) ++ params)
     } catch {
-      case NonFatal(t) ⇒ logInternalError(t)
+      case NonFatal(t) => logInternalError(t)
     }
 
   private def event(requestId: String, sessionIdOpt: Option[String], source: String, message: String, params: Seq[(String, String)]): Unit = {
-    val all = ("request" → requestId) +: ("session" → sessionIdOpt.orNull) +: ("source" → source) +: ("message" → message) +: params
-    val formatted = all collect { case (name, value) if value ne null ⇒ s""""$name": "${JSON.quoteValue(value)}"""" }
+    val all = ("request" -> requestId) +: ("session" -> sessionIdOpt.orNull) +: ("source" -> source) +: ("message" -> message) +: params
+    val formatted = all collect { case (name, value) if value ne null => s""""$name": "${JSON.quoteValue(value)}"""" }
     Logger.info(formatted.mkString("""event: {""", ", ", "}"))
   }
 
@@ -110,21 +110,21 @@ object LifecycleLogger {
 
   def basicRequestDetails(req: Request) =
     List(
-      "path"   → req.getRequestPath,
-      "method" → req.getMethod.entryName
+      "path"   -> req.getRequestPath,
+      "method" -> req.getMethod.entryName
     )
 
-  def withEventAssumingRequest[T](source: String, message: String, params: Seq[(String, String)])(body: ⇒ T): T =
+  def withEventAssumingRequest[T](source: String, message: String, params: Seq[(String, String)])(body: => T): T =
     withEvent(NetUtils.getExternalContext.getRequest, source, message, params)(body)
 
-  def withEvent[T](req: Request, source: String, message: String, params: Seq[(String, String)])(body: ⇒ T): T = {
+  def withEvent[T](req: Request, source: String, message: String, params: Seq[(String, String)])(body: => T): T = {
     val timestamp = System.currentTimeMillis
     var currentThrowable: Throwable = null
     event(req, source, s"start: $message", params)
     try {
       body
     } catch {
-      case t: Throwable ⇒
+      case t: Throwable =>
         currentThrowable = t
         throw t
     } finally {
@@ -138,11 +138,11 @@ object LifecycleLogger {
 
   def eventAssumingRequestJava(source: String, message: String, params: Array[String]): Unit =
     try eventAssumingRequest(source, message, arrayToParams(params))
-    catch { case NonFatal(t) ⇒ logInternalError(t) }
+    catch { case NonFatal(t) => logInternalError(t) }
 
   def eventAssumingRequest(source: String, message: String, params: Seq[(String, String)]): Unit =
     try event(NetUtils.getExternalContext.getRequest, source, message, params)
-    catch { case NonFatal(t) ⇒ logInternalError(t) }
+    catch { case NonFatal(t) => logInternalError(t) }
 
   def formatDelay(timestamp: Long) =
     (System.currentTimeMillis - timestamp).toString

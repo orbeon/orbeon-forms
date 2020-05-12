@@ -49,7 +49,7 @@ object ErrorSummary {
   // Return the subset of section names passed which contain errors in the global error summary
   def topLevelSectionsWithErrors(sectionNamesSet: Set[String], onlyVisible: Boolean): Map[String, (Int, Int)] =
     findErrorsInstance match {
-      case Some(errorsInstance) ⇒
+      case Some(errorsInstance) =>
 
         val relevantErrorsIt = {
 
@@ -61,30 +61,30 @@ object ErrorSummary {
 
         val sectionNameErrors = (
           relevantErrorsIt
-          map    { e ⇒ e.attValue(SectionNameAttName) → e }
-          filter { case (name, _) ⇒ sectionNamesSet(name) }
+          map    { e => e.attValue(SectionNameAttName) -> e }
+          filter { case (name, _) => sectionNamesSet(name) }
           toList
         )
 
-        sectionNameErrors groupBy (_._1) map  { case (sectionName, list) ⇒
+        sectionNameErrors groupBy (_._1) map  { case (sectionName, list) =>
 
           val requiredButEmptyCount =
             list count (_._2.attValue(RequiredEmptyAttName) == true.toString)
 
-          sectionName → (requiredButEmptyCount, list.size - requiredButEmptyCount)
+          sectionName -> (requiredButEmptyCount, list.size - requiredButEmptyCount)
         }
 
-      case None ⇒
+      case None =>
         Map.empty
     }
 
   // Returns all sections that contain an invalid control, either directly or indirectly through a subsection
   def sectionsWithVisibleErrors: List[String] = {
     val invalidControlIds    = visibleErrorsIt.map(_.attValue(IdAttName))
-    val sectionsWithErrorsIt = invalidControlIds.flatMap { absoluteControlId ⇒
+    val sectionsWithErrorsIt = invalidControlIds.flatMap { absoluteControlId =>
       val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
       val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
-      controlOpt.toIterable flatMap { control ⇒
+      controlOpt.toIterable flatMap { control =>
         val containingSections = ancestorSectionsIt(control)
         containingSections.map(_.getId).flatMap(FormRunner.controlNameFromIdOpt)
       }
@@ -94,7 +94,7 @@ object ErrorSummary {
 
   def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
     new AncestorOrSelfIterator(control.parent) collect {
-      case section: XFormsComponentControl if section.localName == "section" ⇒ section
+      case section: XFormsComponentControl if section.localName == "section" => section
     }
 
   def controlSearchIndexes(absoluteId: String): Iterator[Int] = {
@@ -110,7 +110,7 @@ object ErrorSummary {
 
     val repeatsIt =
       repeatsFromLeaf.reverseIterator map (_.index) zip iterations.iterator flatMap {
-        case (index, iteration) ⇒ Iterator(index, iteration)
+        case (index, iteration) => Iterator(index, iteration)
       }
 
     repeatsIt ++ Iterator.single(inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get) // argument must be a view control
@@ -141,10 +141,10 @@ object ErrorSummary {
       event.property[T](xxfName(name))
 
     val eventLevelOpt = event match {
-      case e: XXFormsConstraintsChangedEvent           ⇒ e.property[String]("level")  map ValidationLevel.withNameInsensitive
-      case _: XFormsEnabledEvent                       ⇒ xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
-      case _: XFormsValidEvent | _: XFormsInvalidEvent ⇒ Some(ValidationLevel.ErrorLevel)
-      case _                                           ⇒ None
+      case e: XXFormsConstraintsChangedEvent           => e.property[String]("level")  map ValidationLevel.withNameInsensitive
+      case _: XFormsEnabledEvent                       => xxfProperty[String]("level") map ValidationLevel.withNameInsensitive
+      case _: XFormsValidEvent | _: XFormsInvalidEvent => Some(ValidationLevel.ErrorLevel)
+      case _                                           => None
     }
 
     // Ideally, we would evaluate this lazily, but we use it in the pattern match below
@@ -162,8 +162,8 @@ object ErrorSummary {
 
     def requiredEmpty =
       bindingFromEventOpt exists {
-        case n: NodeInfo ⇒ InstanceData.getRequired(n) && n.stringValue.isEmpty
-        case _           ⇒ false
+        case n: NodeInfo => InstanceData.getRequired(n) && n.stringValue.isEmpty
+        case _           => false
       }
 
     val previousStatusIsValid =
@@ -181,7 +181,7 @@ object ErrorSummary {
       )
 
     (currentErrorOpt, eventLevelOpt, alertOpt) match {
-      case (Some(currentError), Some(actualEventLevel), Some(alert)) ⇒
+      case (Some(currentError), Some(actualEventLevel), Some(alert)) =>
 
         val levelAtt      = currentError /@ LevelAttName
         val previousLevel = ValidationLevel.withNameInsensitive(levelAtt.stringValue)
@@ -198,14 +198,14 @@ object ErrorSummary {
             updateValidStatusByScanning()
         }
 
-      case (Some(currentError), _, _) ⇒
+      case (Some(currentError), _, _) =>
 
         XFormsAPI.delete(currentError)
 
         if ((currentError attValue LevelAttName) == ErrorLevel.entryName)
           updateValidStatusByScanning()
 
-      case (None, Some(actualEventLevel), Some(alert)) ⇒
+      case (None, Some(actualEventLevel), Some(alert)) =>
 
         insertNewError(
           errorsInstanceDoc,
@@ -222,7 +222,7 @@ object ErrorSummary {
         if (previousStatusIsValid && actualEventLevel == ValidationLevel.ErrorLevel)
           updateValidStatus(false)
 
-      case _ ⇒
+      case _ =>
     }
   }
 
@@ -257,8 +257,8 @@ object ErrorSummary {
         val iterationsMap    = fromIterations zip toIterations toMap
 
         val newIterations = idIterationPairs map {
-          case (fromIt, `repeatPrefixedId`) if iterationsMap.contains(fromIt) ⇒ iterationsMap(fromIt).toString.asInstanceOf[AnyRef]
-          case (iteration, _)                                                 ⇒ iteration.toString.asInstanceOf[AnyRef]
+          case (fromIt, `repeatPrefixedId`) if iterationsMap.contains(fromIt) => iterationsMap(fromIt).toString.asInstanceOf[AnyRef]
+          case (iteration, _)                                                 => iteration.toString.asInstanceOf[AnyRef]
         }
 
         val newEffectiveId = XFormsId.buildEffectiveId(prefixedId, newIterations)
@@ -272,9 +272,9 @@ object ErrorSummary {
     val rootElem = errorsInstanceDoc.rootElement
 
     val affectedErrors =
-      rootElem / * map { e ⇒
-        e → updateIteration(e.id, absoluteTargetId, fromIterations, toIterations)
-      } filter { case (e, updatedId) ⇒
+      rootElem / * map { e =>
+        e -> updateIteration(e.id, absoluteTargetId, fromIterations, toIterations)
+      } filter { case (e, updatedId) =>
         e.id != updatedId
       }
 
@@ -282,7 +282,7 @@ object ErrorSummary {
     XFormsAPI.delete(affectedErrors map (_._1))
 
     // Reinsert updated errors
-    affectedErrors foreach { case (e, updatedId) ⇒
+    affectedErrors foreach { case (e, updatedId) =>
 
       insertNewError(
         errorsInstanceDoc,
@@ -300,9 +300,9 @@ object ErrorSummary {
 
   implicit object IntIteratorOrdering extends Ordering[Iterator[Int]] {
     def compare(x: Iterator[Int], y: Iterator[Int]): Int =
-      x.zipAll(y, 0, 0) dropWhile { case (a, b) ⇒ a == b } nextOption() match {
-        case Some((a, b)) ⇒ a.compare(b)
-        case None         ⇒ 0
+      x.zipAll(y, 0, 0) dropWhile { case (a, b) => a == b } nextOption() match {
+        case Some((a, b)) => a.compare(b)
+        case None         => 0
       }
   }
 
@@ -322,29 +322,29 @@ object ErrorSummary {
     // Needed for `binarySearch` below
     implicit object ErrorNodeOrdering extends Ordering[dom.Node] {
       def compare(x: dom.Node, y: dom.Node): Int = (x, y) match {
-        case (n1: dom.Element, n2: dom.Element) ⇒
+        case (n1: dom.Element, n2: dom.Element) =>
 
           IntIteratorOrdering.compare(
             x = controlSearchIndexes(n1.attributeValue(IdAttName)),
             y = controlSearchIndexes(n2.attributeValue(IdAttName))
           )
 
-        case (n1: dom.Namespace, n2: dom.Element)   ⇒ -1                       // all elements are after the namespace nodes
-        case (n1: dom.Element,   n2: dom.Namespace) ⇒ +1                       // all elements are after the namespace nodes
-        case (n1: dom.Namespace, n2: dom.Namespace) ⇒ n1.uri.compareTo(n2.uri) // predictable order even though they won't be sorted
-        case _                                      ⇒ throw new IllegalStateException
+        case (n1: dom.Namespace, n2: dom.Element)   => -1                       // all elements are after the namespace nodes
+        case (n1: dom.Element,   n2: dom.Namespace) => +1                       // all elements are after the namespace nodes
+        case (n1: dom.Namespace, n2: dom.Namespace) => n1.uri.compareTo(n2.uri) // predictable order even though they won't be sorted
+        case _                                      => throw new IllegalStateException
       }
     }
 
     def visibleErrorsIt: Iterator[NodeInfo] =
-      findErrorSummaryModel.iterator flatMap (m ⇒ Implicits.asScalaIterator(m.getVariable("visible-errors"))) collect {
-        case n: NodeInfo ⇒ n
+      findErrorSummaryModel.iterator flatMap (m => Implicits.asScalaIterator(m.getVariable("visible-errors"))) collect {
+        case n: NodeInfo => n
       }
 
     def findErrorSummaryControl = (
       ErrorSummaryIds
-      flatMap      { id ⇒ Option(inScopeContainingDocument.getControlByEffectiveId(id)) }
-      collectFirst { case c: XFormsComponentControl ⇒ c }
+      flatMap      { id => Option(inScopeContainingDocument.getControlByEffectiveId(id)) }
+      collectFirst { case c: XFormsComponentControl => c }
     )
 
     def findErrorSummaryModel =
@@ -357,7 +357,7 @@ object ErrorSummary {
       findErrorSummaryModel map (_.getInstance("fr-state-instance"))
 
     def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
-      inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId)) flatMap { control ⇒
+      inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId)) flatMap { control =>
         ancestorSectionsIt(control).lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
       }
 
@@ -397,8 +397,8 @@ object ErrorSummary {
 
       val insertionPoint =
         rootElemDomContent.binarySearch(newElemForSorting, 0, rootElemDomContent.length) match {
-          case InsertionPoint(p) ⇒ p
-          case Found(i)          ⇒ throw new IllegalStateException // must not be an existing error; we know because we search for it above
+          case InsertionPoint(p) => p
+          case Found(i)          => throw new IllegalStateException // must not be an existing error; we know because we search for it above
         }
 
       val afterElemList =
@@ -412,8 +412,7 @@ object ErrorSummary {
       XFormsAPI.insert(
         into          = rootElem,
         after         = afterElemList,
-        origin        = newErrorElem,
-        updateRepeats = false
+        origin        = newErrorElem
       )
     }
   }
@@ -430,9 +429,9 @@ object BinarySearching {
       if (to == from) InsertionPoint(from) else {
         val idx = from + (to - from - 1) / 2
         math.signum(ord.compare(elem, coll(idx))) match {
-          case -1 ⇒ binarySearch(elem, from, idx)(ord)
-          case  1 ⇒ binarySearch(elem, idx + 1, to)(ord)
-          case  _ ⇒ Found(idx)
+          case -1 => binarySearch(elem, from, idx)(ord)
+          case  1 => binarySearch(elem, idx + 1, to)(ord)
+          case  _ => Found(idx)
         }
       }
     }

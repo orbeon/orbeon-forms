@@ -179,40 +179,52 @@
                 }
             }
 
+            .generateColumnStart(@x) when (@x > 0) {
+                .fr-grid-td[data-fr-x =  '@{x}'], .fr-grid-th[data-fr-x =  '@{x}'] { grid-column-start: @x; }
+                .generateColumnStart(@x - 1)
+            }
+
+            .generateRowStart(@y) when (@y > 0) {
+                .fr-grid-td[data-fr-y =  '@{y}'] { grid-row-start: @y; }
+                .generateRowStart(@y - 1)
+            }
+
+            .generateColumnEnd(@w) when (@w > 0) {
+                .fr-grid-td[data-fr-w =  '@{w}'], .fr-grid-th[data-fr-w =  '@{w}'] { grid-column-end: span @w; }
+                .generateColumnEnd(@w - 1)
+            }
+
+            .generateRowEnd(@h) when (@h > 0) {
+                .fr-grid-td[data-fr-h =  '@{h}'] { grid-row-end: span @h; }
+                .generateRowEnd(@h - 1)
+            }
+
+            &.fr-grid-12 {
+                .fr-grid-head, .fr-grid-body {
+                    grid-template-columns: repeat(12, 1fr);
+                    //grid-template-rows: repeat(3, minmax(120px, max-content));
+                    //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
+                    .generateColumnStart(12);
+                    .generateColumnEnd(12);
+                }
+            }
+
+            &.fr-grid-24 {
+                .fr-grid-head, .fr-grid-body {
+                    grid-template-columns: repeat(24, 1fr);
+                    .generateColumnStart(24);
+                    .generateColumnEnd(24);
+                }
+            }
+
             .fr-grid-head, .fr-grid-body {
                 display: grid;
-                grid-template-columns: repeat(12, 1fr);
-                //grid-template-rows: repeat(3, minmax(120px, max-content));
-                //grid-template-rows: repeat(auto-fill, 1fr); // TODO: vertical repeat sizes must be definite; figure out how to do min-height
-
-                .generateColumnStart(@x) when (@x > 0) {
-                    .fr-grid-td[data-fr-x =  '@{x}'], .fr-grid-th[data-fr-x =  '@{x}'] { grid-column-start: @x; }
-                    .generateColumnStart(@x - 1)
+                .fr-grid-td {
+                    grid-column-end: span  1;
+                    grid-column-end: span  1;
+                    grid-row-end: span  1;
                 }
-
-                .generateColumnStart(12);
-
-                .generateRowStart(@y) when (@y > 0) {
-                    .fr-grid-td[data-fr-y =  '@{y}'] { grid-row-start: @y; }
-                    .generateRowStart(@y - 1)
-                }
-
                 .generateRowStart(20);
-
-                .generateColumnEnd(@w) when (@w > 0) {
-                    .fr-grid-td[data-fr-w =  '@{w}'], .fr-grid-th[data-fr-w =  '@{w}'] { grid-column-end: span @w; }
-                    .generateColumnEnd(@w - 1)
-                }
-
-                .fr-grid-td                { grid-column-end: span  1; }
-                .generateColumnEnd(12);
-
-                .generateRowEnd(@h) when (@h > 0) {
-                    .fr-grid-td[data-fr-h =  '@{h}'] { grid-row-end: span @h; }
-                    .generateRowEnd(@h - 1)
-                }
-
-                .fr-grid-td                { grid-row-end: span  1; }
                 .generateRowEnd(20);
             }
         }

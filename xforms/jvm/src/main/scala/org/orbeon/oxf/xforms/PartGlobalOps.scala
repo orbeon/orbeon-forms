@@ -72,14 +72,14 @@ trait PartGlobalOps {
   def hasBinding(prefixedId: String) = findControlAnalysis(prefixedId) exists (_.hasBinding)
 
   def getControlPosition(prefixedId: String): Option[Int] = findControlAnalysis(prefixedId) collect {
-    case viewTrait: ViewTrait ⇒ viewTrait.index
+    case viewTrait: ViewTrait => viewTrait.index
   }
 
   def isValueControl(effectiveId: String) =
     findControlAnalysis(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 
   def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
-    findControlAnalysis(prefixedId) foreach { controlAnalysis ⇒
+    findControlAnalysis(prefixedId) foreach { controlAnalysis =>
       val controlClasses = controlAnalysis.classes
       if (StringUtils.isNotEmpty(controlClasses)) {
         if (sb.length > 0)
@@ -89,7 +89,7 @@ trait PartGlobalOps {
     }
 
   // LHHA
-  def getLHH(prefixedId: String, lhha: LHHA) =
+  def getLHH(prefixedId: String, lhha: LHHA): LHHAAnalysis =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha)) orNull
 
   def getAlerts(prefixedId: String) =

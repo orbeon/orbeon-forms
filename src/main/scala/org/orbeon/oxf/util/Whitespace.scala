@@ -37,10 +37,10 @@ object Whitespace  {
 
     val resultCS =
       policy match {
-        case Policy.Preserve  ⇒ s
-        case Policy.Normalize ⇒ saxon.value.Whitespace.collapseWhitespace(s)
-        case Policy.Collapse  ⇒ collapseWhitespaceNoTrim(s)
-        case Policy.Trim      ⇒ s.toString.trimAllToEmpty
+        case Policy.Preserve  => s
+        case Policy.Normalize => saxon.value.Whitespace.collapseWhitespace(s)
+        case Policy.Collapse  => collapseWhitespaceNoTrim(s)
+        case Policy.Trim      => s.toString.trimAllToEmpty
       }
 
     if (resultCS.length > 0) resultCS.toString else ""
@@ -58,12 +58,12 @@ object Whitespace  {
       var i = 0
       while (i < length) {
         cs.charAt(i) match {
-          case c @ ('\n' | '\r' | '\t' | ' ') ⇒
+          case c @ ('\n' | '\r' | '\t' | ' ') =>
             if (! inWhitespace) {
               sb.append(' ')
               inWhitespace = true
             }
-          case c ⇒
+          case c =>
             sb.append(c)
             inWhitespace = false
         }

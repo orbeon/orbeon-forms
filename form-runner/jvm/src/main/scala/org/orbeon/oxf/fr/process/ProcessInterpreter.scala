@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
-import org.orbeon.oxf.{util ⇒ u}
+import org.orbeon.oxf.{util => u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
@@ -42,7 +42,7 @@ trait ProcessInterpreter extends Logging {
 
   import ProcessInterpreter._
 
-  type Action       = ActionParams ⇒ Try[Any]
+  type Action       = ActionParams => Try[Any]
 
   val EmptyActionParams: ActionParams = Map.empty
 
@@ -70,14 +70,14 @@ trait ProcessInterpreter extends Logging {
     import org.orbeon.oxf.util.DynamicVariable
 
     val StandardActions: Map[String, Action] = Map(
-      "success"  → trySuccess,
-      "failure"  → tryFailure,
-      "process"  → tryProcess,
-      "suspend"  → trySuspend,
-      "resume"   → tryResume,
-      "abort"    → tryAbort,
-      "rollback" → tryRollback,
-      "nop"      → tryNop
+      "success"  -> trySuccess,
+      "failure"  -> tryFailure,
+      "process"  -> tryProcess,
+      "suspend"  -> trySuspend,
+      "resume"   -> tryResume,
+      "abort"    -> tryAbort,
+      "rollback" -> tryRollback,
+      "nop"      -> tryNop
     )
 
     val AllAllowedActions = StandardActions ++ extensionActions
@@ -87,14 +87,14 @@ trait ProcessInterpreter extends Logging {
     val processBreaks   = new Breaks
 
     // Scope an empty stack around a process execution
-    def withEmptyStack[T](scope: String)(body: ⇒ T): T = {
+    def withEmptyStack[T](scope: String)(body: => T): T = {
       processStackDyn.withValue(Process(scope, createUniqueProcessId, Nil)) {
         body
       }
     }
 
     // Push a stack frame, run the body, and pop the frame
-    def withStackFrame[T](group: GroupNode, programCounter: Int)(body: ⇒ T): T = {
+    def withStackFrame[T](group: GroupNode, programCounter: Int)(body: => T): T = {
       processStackDyn.value.get.frames = StackFrame(group, programCounter) :: processStackDyn.value.get.frames
       try body
       finally processStackDyn.value.get.frames = processStackDyn.value.get.frames.tail
@@ -109,8 +109,8 @@ trait ProcessInterpreter extends Logging {
       // top-level process.
       val continuation =
         process.frames flatMap {
-          case StackFrame(group, pos) ⇒
-            group.rest drop pos flatMap { case (combinator, expr) ⇒
+          case StackFrame(group, pos) =>
+            group.rest drop pos flatMap { case (combinator, expr) =>
               List(combinator.name, expr.serialize)
             }
         }
@@ -126,15 +126,15 @@ trait ProcessInterpreter extends Logging {
     def runSubProcess(process: String): Try[Any] = {
 
       def runAction(action: ActionNode) =
-        withDebug("process: running action", Seq("action" → action.toString)) {
+        withDebug("process: running action", Seq("action" -> action.toString)) {
           // Push and pop the stack frame (for suspend/resume)
           val result = (
             AllAllowedActions
-            getOrElse (action.name, (_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name)))
+            getOrElse (action.name, (_: ActionParams) => tryProcess(Map(Some("name") -> action.name)))
             apply     action.params
           )
 
-          debugResults(Seq("result" → (if (result.isSuccess) "success" else "failure")))
+          debugResults(Seq("result" -> (if (result.isSuccess) "success" else "failure")))
 
           result
         }
@@ -151,17 +151,17 @@ trait ProcessInterpreter extends Logging {
           val newTried =
             withStackFrame(group, pos) {
               nextCombinator match {
-                case ThenCombinator ⇒
-                  debug("process: combining with then", Seq("action" → nextExpr.toString))
-                  tried flatMap (_ ⇒ runExpr(nextExpr))
-                case RecoverCombinator ⇒
-                  debug("process: combining with recover", Seq("action" → nextExpr.toString))
+                case ThenCombinator =>
+                  debug("process: combining with then", Seq("action" -> nextExpr.toString))
+                  tried flatMap (_ => runExpr(nextExpr))
+                case RecoverCombinator =>
+                  debug("process: combining with recover", Seq("action" -> nextExpr.toString))
                   tried recoverWith {
-                    case t: ControlThrowable ⇒
+                    case t: ControlThrowable =>
                       debug("process: rethrowing ControlThrowable")
                       throw t
-                    case NonFatal(t) ⇒
-                      debug("process: recovering", Seq("throwable" → OrbeonFormatter.format(t)))
+                    case NonFatal(t) =>
+                      debug("process: recovering", Seq("throwable" -> OrbeonFormatter.format(t)))
                       runExpr(nextExpr)
                   }
               }
@@ -175,7 +175,7 @@ trait ProcessInterpreter extends Logging {
         val ConditionNode(xpath, thenBranch, elseBranch) = condition
         Try {
           evaluateBoolean(xpath)
-        } flatMap { cond ⇒
+        } flatMap { cond =>
           if (cond)
             runExpr(thenBranch)
           else if (elseBranch.isDefined)
@@ -187,18 +187,18 @@ trait ProcessInterpreter extends Logging {
 
       def runExpr(expr: ExprNode): Try[Any] =
         expr match {
-          case e: ActionNode    ⇒ runAction(e)
-          case e: GroupNode     ⇒ runGroup(e)
-          case e: ConditionNode ⇒ runCondition(e)
+          case e: ActionNode    => runAction(e)
+          case e: GroupNode     => runGroup(e)
+          case e: ConditionNode => runCondition(e)
         }
 
       def parseProcess(process: String) =
         StringUtils.isNotBlank(process) option ProcessParser.parse(process)
 
       parseProcess(process) match {
-        case Some(expr) ⇒
+        case Some(expr) =>
           runExpr(expr)
-        case None ⇒
+        case None =>
           debug("process: empty process, canceling process")
           Success(())
       }
@@ -215,18 +215,18 @@ trait ProcessInterpreter extends Logging {
   // Main entry point for starting a process associated with a named button
   //@XPathFunction
   def runProcessByName(scope: String, name: String): Try[Any] =
-    LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" → currentXFormsDocumentId, "scope" → scope, "name" → name)) {
+    LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
       runProcess(scope, rawProcessByName(scope, name))
     }
 
   // Main entry point for starting a literal process
   //@XPathFunction
   def runProcess(scope: String, process: String): Try[Any] =
-    withDebug("process: running", Seq("process" → process)) {
+    withDebug("process: running", Seq("process" -> process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
-        beforeProcess() flatMap { _ ⇒
+        beforeProcess() flatMap { _ =>
           tryBreakable {
             runSubProcess(process)
           } catchBreak {
@@ -234,7 +234,7 @@ trait ProcessInterpreter extends Logging {
           }
         } doEitherWay {
           afterProcess()
-        } recoverWith { case t ⇒
+        } recoverWith { case t =>
           // Log and send a user error if there is one
           // NOTE: In the future, it would be good to provide the user with an error id.
           error(OrbeonFormatter.format(t))
@@ -265,7 +265,7 @@ trait ProcessInterpreter extends Logging {
     writeSuspendedProcess(serializeContinuation)
     Success(())
   } flatMap
-    (_ ⇒ trySuccess(EmptyActionParams))
+    (_ => trySuccess(EmptyActionParams))
 
   // Resume a process
   def tryResume(params: ActionParams): Try[Any] = {
@@ -354,16 +354,16 @@ object ProcessInterpreter {
   val StandardNamespaceMapping =
     NamespaceMapping(
       Map(
-        XSD_PREFIX           → XMLConstants.XSD_URI,
-        XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
-        XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
-        XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
-        XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
-        XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
-        XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI,
-        XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
-        XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI,
-        XMLNames.FRPrefix    → XMLNames.FR
+        XSD_PREFIX           -> XMLConstants.XSD_URI,
+        XFORMS_PREFIX        -> XFORMS_NAMESPACE_URI,
+        XFORMS_SHORT_PREFIX  -> XFORMS_NAMESPACE_URI,
+        XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
+        XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
+        XHTML_PREFIX         -> XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_PREFIX         -> XMLConstants.XHTML_NAMESPACE_URI,
+        XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI,
+        XMLNames.FRPrefix    -> XMLNames.FR
       )
     )
 

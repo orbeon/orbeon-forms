@@ -18,7 +18,6 @@ package org.orbeon.oxf.xforms.submission
 import java.net.URI
 import java.util.concurrent.Callable
 
-import org.orbeon.io.UriScheme
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
@@ -42,9 +41,11 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val timingLogger  = getTimingLogger(p, p2)
     val detailsLogger = getDetailsLogger(p, p2)
 
+    val externalContext = NetUtils.getExternalContext
+
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        scheme           = UriScheme.withName(absoluteResolvedURL.getScheme),
+        url              = absoluteResolvedURL,
         method           = p.httpMethod,
         hasCredentials   = p2.credentialsOpt.isDefined,
         mediatype        = sp.actualRequestMediatype,
@@ -53,7 +54,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         headersToForward = Connection.headersToForwardFromProperty,
         getHeader        = containingDocument.headersGetter)(
         logger           = detailsLogger,
-        externalContext  = NetUtils.getExternalContext
+        externalContext  = externalContext
       )
 
     val submissionEffectiveId = submission.getEffectiveId
@@ -67,14 +68,15 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     // Prepare Connection in this thread as async submission can't access the request object
     val connection =
       Connection(
-        method      = p.httpMethod,
-        url         = absoluteResolvedURL,
-        credentials = p2.credentialsOpt,
-        content     = content,
-        headers     = headers,
-        loadState   = true,
-        logBody     = BaseSubmission.isLogBody)(
-        logger      = detailsLogger
+        method          = p.httpMethod,
+        url             = absoluteResolvedURL,
+        credentials     = p2.credentialsOpt,
+        content         = content,
+        headers         = headers,
+        loadState       = true,
+        logBody         = BaseSubmission.isLogBody)(
+        logger          = detailsLogger,
+        externalContext = externalContext
       )
 
     // Pack external call into a Callable so it can be run:
@@ -122,7 +124,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
 
           new SubmissionResult(submissionEffectiveId, replacer, connectionResult)
         } catch {
-          case throwable: Throwable ⇒
+          case throwable: Throwable =>
             // Exceptions are handled further down
             new SubmissionResult(submissionEffectiveId, throwable, connectionResult)
         } finally {

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, DocumentFactory, Element}
@@ -61,7 +61,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     val bubbles           = attributeValue("bubbles")    != "false" // default is true
     val cancelable        = attributeValue("cancelable") != "false" // default is true
 
-    lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Some(e.getText)) } toMap
+    lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e => (e.attributeValue("name"), Some(e.getText)) } toMap
     lazy val valueOpt     = properties.get("value").flatten
     lazy val serverEventsValue = properties.get("value").flatten getOrElse element.getText // global vs. inline server events don't have the same format
   }
@@ -90,32 +90,32 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           (LocalEvent(_, trusted = true)) toList
 
       // All global server events
-      val globalServerEvents = serverEventsElements flatMap (e ⇒ decodeServerEvents(e.getStringValue))
+      val globalServerEvents = serverEventsElements flatMap (e => decodeServerEvents(e.getStringValue))
 
       // Gather all events including decoding action server events
       globalServerEvents ++ (
         clientEvents flatMap {
-          case event if event.name == EventNames.XXFormsServerEvents ⇒ decodeServerEvents(event.serverEventsValue)
-          case event                                                 ⇒ List(event)
+          case event if event.name == EventNames.XXFormsServerEvents => decodeServerEvents(event.serverEventsValue)
+          case event                                                 => List(event)
         }
       )
     }
 
     def filterEvents(events: List[LocalEvent]) = events filter {
-      case a if a.name == EventNames.XXFormsAllEventsRequired ⇒ false
-      case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
+      case a if a.name == EventNames.XXFormsAllEventsRequired => false
+      case a if (a.name eq null) || (a.targetEffectiveId eq null) =>
         debug("ignoring invalid client event", List(
-          "control id" → a.targetEffectiveId,
-          "event name" → a.name)
+          "control id" -> a.targetEffectiveId,
+          "event name" -> a.name)
         )(doc.indentedLogger)
         false
-      case _ ⇒ true
+      case _ => true
     }
 
     def combineValueEvents(events: List[LocalEvent]): List[XFormsEvent] = events match {
-      case Nil              ⇒ Nil
-      case List(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
-      case _                ⇒
+      case Nil              => Nil
+      case List(localEvent) => safelyCreateAndMapEvent(doc, localEvent).toList
+      case _                =>
 
         // Grouping key for value change events
         case class EventGroupingKey(name: String, targetId: String) {
@@ -128,7 +128,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
         // beforehand.
         (events ++ DummyEvent).sliding(2).toList flatMap {
-          case List(a, b) ⇒
+          case List(a, b) =>
             if (a.name != EventNames.XXFormsValue || new EventGroupingKey(a) != new EventGroupingKey(b))
               safelyCreateAndMapEvent(doc, a)
             else
@@ -137,7 +137,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     }
 
     // Combine and process events
-    for (event ← combineValueEvents(filterEvents(allClientAndServerEvents)))
+    for (event <- combineValueEvents(filterEvents(allClientAndServerEvents)))
       processEvent(doc, event)
 
     // Gather some metadata about the events received to help with the response to the client
@@ -148,14 +148,14 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
     // Set of all control ids for which we got value events
     val valueChangeControlIdsAndValues = allClientAndServerEvents collect {
-      case e if e.name == EventNames.XXFormsValue ⇒ e.targetEffectiveId → e.valueOpt.get
+      case e if e.name == EventNames.XXFormsValue => e.targetEffectiveId -> e.valueOpt.get
     }
 
     // Last focus/blur event received from the client
     // This ignores server events, see: https://github.com/orbeon/orbeon-forms/issues/2567
     val clientFocusControlIdOpt = allClientAndServerEvents.reverse filterNot (_.trusted) collectFirst {
-      case e if e.name == XFORMS_FOCUS ⇒ Some(e.targetEffectiveId)
-      case e if e.name == XXFORMS_BLUR ⇒ None
+      case e if e.name == XFORMS_FOCUS => Some(e.targetEffectiveId)
+      case e if e.name == XXFORMS_BLUR => None
     }
 
     EventsFindings(gotAllEvents, valueChangeControlIdsAndValues.toMap, clientFocusControlIdOpt)
@@ -168,16 +168,16 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853.
   def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
     doc.getStaticOps.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)) match {
-      case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == XFormsId.getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒
+      case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == XFormsId.getEffectiveIdSuffixParts(effectiveId).size - 1 =>
         XFormsId.getRelatedEffectiveId(effectiveId, repeat.iteration.get.staticId)
-      case _ ⇒
+      case _ =>
         effectiveId
     }
 
   // Send an error document
   def errorDocument(message: String, code: Int)(implicit receiver: XMLReceiver): Unit =
     withDocument {
-      processingInstruction("orbeon-serializer", List("status-code" → code.toString))
+      processingInstruction("orbeon-serializer", List("status-code" -> code.toString))
       withElement("error") {
         element("title", text = message)
       }
@@ -186,7 +186,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // Send an error response consisting of just a status code
   def errorResponse(code: Int)(implicit receiver: XMLReceiver): Unit =
     withDocument {
-      processingInstruction("orbeon-serializer", List("status-code" → code.toString))
+      processingInstruction("orbeon-serializer", List("status-code" -> code.toString))
     }
 
   def assertSessionExists(): Unit =
@@ -213,10 +213,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       clientEvents exists isUploadProgress
 
     def hasOther(clientEvents: List[LocalEvent]) =
-      clientEvents exists (e ⇒ ! isHeartbeat(e) && ! isUploadProgress(e))
+      clientEvents exists (e => ! isHeartbeat(e) && ! isUploadProgress(e))
 
     // Helper to make it easier to output simple Ajax responses
-    def eventResponse(messageType: String, message: String)(block: XMLReceiverHelper ⇒ Unit): Boolean = {
+    def eventResponse(messageType: String, message: String)(block: XMLReceiverHelper => Unit): Boolean = {
       withDebug(message) {
         // Hook-up debug content handler if we must log the response document
         val (responseReceiver, debugContentHandler) =
@@ -242,14 +242,14 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         helper.endDocument()
 
         debugContentHandler foreach
-          (ch ⇒ debugResults(Seq("ajax response" → ch.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))))
+          (ch => debugResults(Seq("ajax response" -> ch.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))))
       }
 
       true
     }
 
     def logEvent(message: String) =
-      LifecycleLogger.eventAssumingRequest("xforms", message, List("uuid" → XFormsStateManager.getRequestUUID(requestDocument)))
+      LifecycleLogger.eventAssumingRequest("xforms", message, List("uuid" -> XFormsStateManager.getRequestUUID(requestDocument)))
 
     if (hasOther(clientEvents)) {
       // Return other events
@@ -257,7 +257,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       clientEvents filterNot isHeartbeat filterNot isUploadProgress
     } else if (hasUploadProgress(clientEvents)) {
       // Directly output progress information for all controls found
-      eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
+      eventResponse("ajax response", "handling quick upload progress Ajax response") { helper =>
 
         logEvent("ajax upload progress")
 
@@ -265,7 +265,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         val ids                  = uploadProgressEvents map (_.targetEffectiveId)
 
         val requestUUID          = XFormsStateManager.getRequestUUID(requestDocument)
-        val allProgress          = ids flatMap (id ⇒ UploaderServer.getUploadProgress(request, requestUUID, id).toList)
+        val allProgress          = ids flatMap (id => UploaderServer.getUploadProgress(request, requestUUID, id).toList)
 
         if (allProgress.nonEmpty) {
 
@@ -273,7 +273,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "control-values")
 
           allProgress foreach {
-            progress ⇒
+            progress =>
               helper.element(
                 "xxf", XXFORMS_NAMESPACE_URI, "control",
                 Array[String]("id", request.getContainerNamespace + progress.fieldName,
@@ -292,12 +292,12 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     } else if (hasHeartBeat(clientEvents)) {
       // Output empty Ajax response
       logEvent("ajax heartbeat")
-      eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
+      eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper => ())
       Nil
     } else {
       // No events to process
       logEvent("ajax empty")
-      eventResponse("ajax response", "handling quick empty response")(helper ⇒ ())
+      eventResponse("ajax response", "handling quick empty response")(helper => ())
       Nil
     }
   }
@@ -316,8 +316,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       def warn(condition: String) = {
         debug("ignoring invalid client event on " + condition, Seq(
-          "control id" → eventTarget.getEffectiveId,
-          "event name" → event.name)
+          "control id" -> eventTarget.getEffectiveId,
+          "event name" -> event.name)
         )(doc.indentedLogger)
         false
       }
@@ -345,35 +345,40 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
         warn("ghost target")
 
-      } else (eventTarget, event) match {
-        // Controls accept event only if they are relevant
-        case (control: XFormsControl, _) if ! control.isRelevant ⇒
-          warn("non-relevant control")
+      } else {
 
-        // Output control not subject to readonly condition below
-        case (control: XFormsOutputControl, _) ⇒
-          true
+        def allowFocusEvent(c: XFormsControl, e: XFormsEvent) =
+          c.focusableControls.nonEmpty && (
+            e.isInstanceOf[XFormsFocusEvent] ||
+              e.isInstanceOf[XXFormsBlurEvent] && (doc.getControls.getFocusedControl exists (_ eq c))
+          )
 
-        // Single node controls accept event only if they are not readonly
-        case (control: XFormsSingleNodeControl, _) if control.isReadonly ⇒
-          warn("read-only control")
+        (eventTarget, event) match {
+          // Controls accept event only if they are relevant
+          case (c: XFormsControl, _) if ! c.isRelevant =>
+            warn("non-relevant control")
 
-        // Disallow focus/blur if the control is not focusable
-        // Relevance and read-only above are already caught. This catches hidden controls, which must not be
-        // focusable from the client.
-        case (control: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! (control.isFocusable && ! Focus.isHidden(control)) ⇒
-          warn(s"non-focusable control for ${e.name}")
+          // These controls can accept focus events
+          case (c: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if allowFocusEvent(c, e) =>
+            true
 
-        // The client must dispatch xxforms-blur only to a control which had the focus
-        case (control: XFormsControl, e: XXFormsBlurEvent) if ! (doc.getControls.getFocusedControl exists (_ eq control)) ⇒
-          warn(s"control doesn't have focus control for ${e.name}")
+          // Other readonly single node controls accept events only if they are not readonly
+          case (c: XFormsSingleNodeControl, _) if c.isReadonly =>
+            warn("read-only control")
 
-        case _ ⇒
-          true
+          // Disallow focus/blur if the control is not focusable
+          // Relevance and read-only above are already caught. This catches hidden controls, which must not be
+          // focusable from the client.
+          case (c: XFormsControl, e @ (_: XFormsFocusEvent | _: XXFormsBlurEvent)) if ! allowFocusEvent(c, e) =>
+            warn(s"non-focusable control for `${e.name}`")
+
+          case _ =>
+            true
+        }
       }
     }
 
-    def dispatchEventCheckTarget(event: XFormsEvent) =
+    def dispatchEventCheckTarget(event: XFormsEvent): Unit =
       if (checkEventTarget(event))
         Dispatch.dispatchEvent(event)
 
@@ -383,20 +388,20 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     val targetEffectiveId = target.getEffectiveId
     val eventName         = event.name
 
-    withDebug("handling external event", Seq("target id" → targetEffectiveId, "event name" → eventName)) {
+    withDebug("handling external event", Seq("target id" -> targetEffectiveId, "event name" -> eventName)) {
 
       // Optimize case where a value change event won't change the control value to actually change
       (event, target) match {
-        case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue == valueChange.value ⇒
+        case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue == valueChange.value =>
           // We completely ignore the event if the value in the instance is the same.
           // This also saves dispatching xxforms-repeat-activate below.
           debug("ignoring value change event as value is the same", Seq(
-            "control id" → targetEffectiveId,
-            "event name" → eventName,
-            "value" → target.getExternalValue)
+            "control id" -> targetEffectiveId,
+            "event name" -> eventName,
+            "value" -> target.getExternalValue)
           )
           return
-        case _ ⇒
+        case _ =>
       }
 
       // NOTES:
@@ -446,11 +451,11 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       // Get event target
       val eventTarget =
         doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetEffectiveId))) match {
-          case eventTarget: XFormsEventTarget ⇒ eventTarget
-          case _ ⇒
+          case eventTarget: XFormsEventTarget => eventTarget
+          case _ =>
             debug(
               "ignoring client event with invalid target id",
-              List("target id" → event.targetEffectiveId, "event name" → event.name)
+              List("target id" -> event.targetEffectiveId, "event name" -> event.name)
             )
             return None
         }
@@ -471,7 +476,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           if (! explicitlyAllowed)
             debug(
               "ignoring invalid client event on target",
-              List("id" → eventTarget.getEffectiveId, "event name" → event.name)
+              List("id" -> eventTarget.getEffectiveId, "event name" -> event.name)
             )
           explicitlyAllowed
         }
@@ -482,7 +487,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // Event is trusted, don't check if it is allowed
         debug(
           "processing trusted event",
-          List("target id" → eventTarget.getEffectiveId, "event name" → event.name)
+          List("target id" -> eventTarget.getEffectiveId, "event name" -> event.name)
         )
       else if (! checkAllowedExternalEvents)
         return None // event is not trusted and is not allowed
@@ -492,14 +497,14 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       def standardProperties =
         for {
-          attributeNames ← AllStandardProperties.get(eventName).toList
-          attributeName  ← attributeNames
+          attributeNames <- AllStandardProperties.get(eventName).toList
+          attributeName  <- attributeNames
           attributeValue = event.attributeValue(attributeName)
           if attributeValue ne null
         } yield
-          attributeName → Option(attributeValue)
+          attributeName -> Option(attributeValue)
 
-      def eventValue = eventName == EventNames.XXFormsValue list ("value" → event.valueOpt)
+      def eventValue = eventName == EventNames.XXFormsValue list ("value" -> event.valueOpt)
 
       Some(
         XFormsEventFactory.createEvent(

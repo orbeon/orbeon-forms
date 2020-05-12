@@ -11,7 +11,7 @@ object ProcessParser extends Parser {
   case object ThenCombinator    extends Combinator("then")
   case object RecoverCombinator extends Combinator("recover")
 
-  val CombinatorsByName = Seq(ThenCombinator, RecoverCombinator) map (c ⇒ c.name → c) toMap
+  val CombinatorsByName = Seq(ThenCombinator, RecoverCombinator) map (c => c.name -> c) toMap
 
   private def quote(s: String) =
     "\"" + StringEscapeUtils.escapeJava(s) + "\""
@@ -23,8 +23,8 @@ object ProcessParser extends Parser {
 
     private def serializeParams =
       if (params.isEmpty) "" else params map {
-        case (Some(name), value) ⇒ name + " = " + quote(value)
-        case (None, value)       ⇒ quote(value)
+        case (Some(name), value) => name + " = " + quote(value)
+        case (None, value)       => quote(value)
       } mkString ("(", ", ", ")")
 
     def serialize = name + serializeParams
@@ -33,7 +33,7 @@ object ProcessParser extends Parser {
   case class GroupNode(expr: ExprNode, rest: List[(Combinator, ExprNode)]) extends ExprNode {
 
     private def serializeRest =
-      if (rest.isEmpty) "" else " " + (rest flatMap { case (combinator, expr) ⇒ List(combinator.name, expr.serialize) } mkString " ")
+      if (rest.isEmpty) "" else " " + (rest flatMap { case (combinator, expr) => List(combinator.name, expr.serialize) } mkString " ")
 
     def serialize = "(" + expr.serialize + serializeRest + ")"
   }
@@ -64,12 +64,12 @@ object ProcessParser extends Parser {
   }
 
   def CombinatorActionPair: Rule1[(Combinator, ExprNode)] = rule {
-    WhiteSpace ~ Combinator ~ WhiteSpace ~ Expr ~~> (_ → _)
+    WhiteSpace ~ Combinator ~ WhiteSpace ~ Expr ~~> (_ -> _)
   }
 
   def Action: Rule1[ActionNode] = rule {
     Name ~ optional("(" ~ OptWhiteSpace ~ zeroOrMore(Param, ParamSeparator) ~ OptWhiteSpace ~ ")") ~~>
-      ((name, params) ⇒ ActionNode(name, params.getOrElse(Nil).toMap))
+      ((name, params) => ActionNode(name, params.getOrElse(Nil).toMap))
   }
 
   def Condition: Rule1[ConditionNode] = rule {
@@ -86,7 +86,7 @@ object ProcessParser extends Parser {
   def NameAfter: Rule0    = rule { NameStart | "0" - "9" | ":" }
 
   def Param: Rule1[(Option[String], String)] = rule {
-    optional(OptWhiteSpace ~ Name ~ OptWhiteSpace ~ "=") ~ OptWhiteSpace ~ ValueString ~~> (_ → _)
+    optional(OptWhiteSpace ~ Name ~ OptWhiteSpace ~ "=") ~ OptWhiteSpace ~ ValueString ~~> (_ -> _)
   }
 
   def ParamSeparator = OptWhiteSpace ~ "," ~ OptWhiteSpace
@@ -117,8 +117,8 @@ object ProcessParser extends Parser {
   def parse(process: String): GroupNode = {
     val parsingResult = ReportingParseRunner(Process).run(process)
     parsingResult.result match {
-      case Some(astRoot) ⇒ astRoot
-      case None          ⇒ throw new ParsingException("Invalid source:\n" + ErrorUtils.printParseErrors(parsingResult))
+      case Some(astRoot) => astRoot
+      case None          => throw new ParsingException("Invalid source:\n" + ErrorUtils.printParseErrors(parsingResult))
     }
   }
 }

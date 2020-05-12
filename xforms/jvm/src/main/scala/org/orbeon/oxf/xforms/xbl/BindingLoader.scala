@@ -64,10 +64,10 @@ trait BindingLoader extends Logging {
             (Dom4jUtils.extractTextValueQName(property.namespaces.asJava, _, true))
 
         def pathsForQNames(qNames: Set[QName]) =
-          qNames flatMap { qName ⇒
+          qNames flatMap { qName =>
             findBindingPathByNameUseMappings(urlMappings, qName.namespace.uri, qName.localName)
           } partition (_._2) match {
-            case (found, notFound) ⇒ (found map (_._1), notFound map (_._1))
+            case (found, notFound) => (found map (_._1), notFound map (_._1))
           }
 
         val (foundBaselinePaths, notFoundBaselinePaths) =
@@ -108,8 +108,8 @@ trait BindingLoader extends Logging {
 
         import XBLAssets._
 
-        def collectUniqueReferenceElements(getHeadElements : AbstractBinding ⇒ Seq[HeadElement]) =
-          (orderedHeadElements(baselineBindings, getHeadElements).iterator.collect{ case e: ReferenceElement ⇒ e.src }.to(mutable.LinkedHashSet).to(List))
+        def collectUniqueReferenceElements(getHeadElements : AbstractBinding => Seq[HeadElement]) =
+          (orderedHeadElements(baselineBindings, getHeadElements).iterator.collect{ case e: ReferenceElement => e.src }.to(mutable.LinkedHashSet).to(List))
 
         (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles), allCheckedPaths)
       }
@@ -139,7 +139,7 @@ trait BindingLoader extends Logging {
     // evaluate() above to be a new index with up-to-date library bindings.
     if (checkUpToDate)
       for {
-        index ← indexOpt
+        index <- indexOpt
         if originalOrUpdatedIndexOpt exists (_ eq index)
       } locally {
         originalOrUpdatedIndexOpt = Some(updateOutOfDateBindings(index, checkedPaths))
@@ -148,9 +148,9 @@ trait BindingLoader extends Logging {
     debug(
       "library and baseline paths",
       List(
-        "paths"   → (checkedPaths mkString ", "),
-        "scripts" → (scripts      mkString ", "),
-        "styles"  → (styles       mkString ", ")
+        "paths"   -> (checkedPaths mkString ", "),
+        "scripts" -> (scripts      mkString ", "),
+        "styles"  -> (styles       mkString ", ")
       )
     )
 
@@ -171,8 +171,8 @@ trait BindingLoader extends Logging {
     def mustCheckBindingPath(binding: IndexableBinding) =
       checkedPaths.isDefined && (
         binding.path match {
-          case Some(path) if ! currentCheckedPaths(path) ⇒ true
-          case _                                         ⇒ false
+          case Some(path) if ! currentCheckedPaths(path) => true
+          case _                                         => false
         }
       )
 
@@ -182,7 +182,7 @@ trait BindingLoader extends Logging {
       val attsSeq = convertAttributes(atts)
 
       BindingIndex.findMostSpecificBinding(currentIndex, qName, attsSeq) match {
-        case Some((binding, true)) if mustCheckBindingPath(binding) ⇒
+        case Some((binding, true)) if mustCheckBindingPath(binding) =>
 
           // We found a binding by name, but we haven't checked if that path is up-to-date yet. So make sure
           // the binding is removed or updated, and add the path to the list of paths we have checked.
@@ -199,27 +199,27 @@ trait BindingLoader extends Logging {
           else
             Some(binding)
 
-        case Some((binding, _)) ⇒
+        case Some((binding, _)) =>
           // Binding is either not by name, or it's by name and we don't need to check that it is up-to-date
           Some(binding)
-        case _ ⇒
+        case _ =>
           None
       }
     }
 
     def findFromAutomaticBinding: Option[AbstractBinding] =
       findBindingPathByName(uri, localname) match {
-        case Some((path, true)) ⇒
+        case Some((path, true)) =>
           val (newIndex, newBindings) = extractAndIndexFromPaths(currentIndex, List(path))
 
           currentIndex = newIndex
           currentCheckedPaths += path
 
           newBindings.headOption
-        case Some((path, false)) ⇒
+        case Some((path, false)) =>
           currentCheckedPaths += path
           None
-        case None ⇒
+        case None =>
           None
       }
 
@@ -239,8 +239,8 @@ trait BindingLoader extends Logging {
 
     val newBindings =
       for {
-        elem       ← elements.to(List)
-        newBinding ← extractXBLBindings(None, -1, elem)
+        elem       <- elements.to(List)
+        newBinding <- extractXBLBindings(None, -1, elem)
       } yield
         newBinding
 
@@ -257,9 +257,9 @@ trait BindingLoader extends Logging {
 
     val newBindings =
       for {
-        xblPath              ← paths.to(List)
+        xblPath              <- paths.to(List)
         (elem, lastModified) = readXBLResource(xblPath)
-        newBinding           ← extractXBLBindings(Some(xblPath), lastModified, elem)
+        newBinding           <- extractXBLBindings(Some(xblPath), lastModified, elem)
       } yield
         newBinding
 
@@ -272,7 +272,7 @@ trait BindingLoader extends Logging {
   private def indexBindings(index: BindingIndex[IndexableBinding], bindings: List[AbstractBinding]) = {
     var currentIndex = index
 
-    bindings foreach { binding ⇒
+    bindings foreach { binding =>
       currentIndex = BindingIndex.indexBinding(currentIndex, binding)
     }
 
@@ -306,8 +306,8 @@ trait BindingLoader extends Logging {
     var currentIndex = index
 
     for {
-      path    ← paths
-      binding ← BindingIndex.distinctBindingsForPath(currentIndex, path)
+      path    <- paths
+      binding <- BindingIndex.distinctBindingsForPath(currentIndex, path)
     } locally {
       currentIndex = updateBindingIfOutOfDate(currentIndex, path, binding.lastModified)
     }
@@ -315,7 +315,7 @@ trait BindingLoader extends Logging {
     currentIndex
   }
 
-  // E.g. http://orbeon.org/oxf/xml/form-runner → orbeon
+  // E.g. http://orbeon.org/oxf/xml/form-runner -> orbeon
   // NOTE: The caching is not optimal, as we need, to cache, to iterate all properties with propertiesStartsWith!
   // Would need a way to cache against PropertySet.
   private def readURLMappingsCacheAgainstProperty: Map[String, String] = {
@@ -326,18 +326,18 @@ trait BindingLoader extends Logging {
 
     def evaluate(property: Property) = (
       for {
-        propertyName ← mappingProperties
+        propertyName <- mappingProperties
         uri          = propertySet.getNonBlankString(propertyName) getOrElse ""
         prefix       = propertyName.substring(XBLMappingPropertyPrefix.length)
       } yield
-        uri → prefix
+        uri -> prefix
     ) toMap
 
     // Associate result with the property so it won't be computed until properties are reloaded
     mappingProperties.headOption match {
-      case Some(firstPropertyName) ⇒
+      case Some(firstPropertyName) =>
         propertySet.getPropertyOrThrow(firstPropertyName).associatedValue(evaluate)
-      case None ⇒
+      case None =>
         Map()
     }
   }
@@ -345,9 +345,9 @@ trait BindingLoader extends Logging {
   def bindingPathByName(prefix: String, localname: String) =
     s"/xbl/$prefix/$localname/$localname.xbl"
 
-  // E.g. fr:tabview → oxf:/xbl/orbeon/tabview/tabview.xbl
+  // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
   private def findBindingPathByNameUseMappings(mappings: Map[String, String], uri: String, localname: String) =
-    mappings.get(uri) map { prefix ⇒
+    mappings.get(uri) map { prefix =>
       val path = bindingPathByName(prefix, localname)
       (path, existsByPath(path))
     }
@@ -383,15 +383,15 @@ trait BindingLoader extends Logging {
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement ← Dom4j.elements(xblElement, XBL_BINDING_QNAME).to(List)
-      _              ← Option(bindingElement.attributeValue(ELEMENT_QNAME))
+      bindingElement <- Dom4j.elements(xblElement, XBL_BINDING_QNAME).to(List)
+      _              <- Option(bindingElement.attributeValue(ELEMENT_QNAME))
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)
   }
 
   private def convertAttributes(atts: Attributes) =
-    for (i ← 0 until atts.getLength)
-      yield QName(atts.getLocalName(i), "", atts.getURI(i)) → atts.getValue(i)
+    for (i <- 0 until atts.getLength)
+      yield QName(atts.getLocalName(i), "", atts.getURI(i)) -> atts.getValue(i)
 }
 
 object BindingLoader extends BindingLoader {
@@ -404,17 +404,17 @@ object BindingLoader extends BindingLoader {
   def getPropertySet = Properties.instance.getPropertySet
 
   def lastModifiedByPath(path: String): Long = {
-    debug("checking last modified", List("path" → path))
+    debug("checking last modified", List("path" -> path))
     rm.lastModified(path, true)
   }
 
   def existsByPath(path: String): Boolean = {
-    debug("checking existence", List("path" → path))
+    debug("checking existence", List("path" -> path))
     rm.exists(path)
   }
 
   def contentAsDOM4J(path: String): Document = {
-    debug("reading content", List("path" → path))
+    debug("reading content", List("path" -> path))
     rm.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
   }
 }

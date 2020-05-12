@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.{util ⇒ ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
@@ -26,7 +26,7 @@ import scala.collection.mutable
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {
 
-  self: PartAnalysisImpl ⇒
+  self: PartAnalysisImpl =>
 
   private[PartModelAnalysis] val modelsByScope             = mutable.LinkedHashMap[Scope, mutable.Buffer[Model]]()
   private[PartModelAnalysis] val modelsByPrefixedId        = mutable.LinkedHashMap[String, Model]()
@@ -57,15 +57,15 @@ trait PartModelAnalysis extends TransientState {
   def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance] =
     getModelsForScope(scope).iterator flatMap
       (_.instances.iterator)          collectFirst
-      { case (`instanceStaticId`, instance) ⇒ instance }
+      { case (`instanceStaticId`, instance) => instance }
 
   // NOTE: This searches ancestor scopes as well.
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String] = {
 
     val prefixedIdIt =
       for {
-        scope ← Iterator.iterateOpt(startScope)(_.parent)
-        model ← getModelsForScope(scope)
+        scope <- Iterator.iterateOpt(startScope)(_.parent)
+        model <- getModelsForScope(scope)
         if model.instances.contains(instanceStaticId)
       } yield
         scope.prefixedIdForStaticId(instanceStaticId)
@@ -76,24 +76,24 @@ trait PartModelAnalysis extends TransientState {
   protected def indexModel(model: Model): Unit = {
     val models = modelsByScope.getOrElseUpdate(model.scope, mutable.Buffer[Model]())
     models += model
-    modelsByPrefixedId += model.prefixedId → model
+    modelsByPrefixedId += model.prefixedId -> model
 
-    for (instance ← model.instances.values)
-      modelByInstancePrefixedId += instance.prefixedId → model
+    for (instance <- model.instances.values)
+      modelByInstancePrefixedId += instance.prefixedId -> model
   }
 
   protected def deindexModel(model: Model): Unit = {
     modelsByScope.get(model.scope) foreach (_ -= model)
     modelsByPrefixedId -= model.prefixedId
 
-    for (instance ← model.instances.values)
+    for (instance <- model.instances.values)
       modelByInstancePrefixedId -= instance.prefixedId
   }
 
   protected def analyzeModelsXPath(): Unit =
     for {
-      models ← modelsByScope.valuesIterator
-      model  ← models.iterator
+      models <- modelsByScope.valuesIterator
+      model  <- models.iterator
     } locally {
       model.analyzeXPath()
     }
@@ -101,7 +101,7 @@ trait PartModelAnalysis extends TransientState {
   override def freeTransientState(): Unit = {
     super.freeTransientState()
 
-    for (model ← modelsByPrefixedId.values)
+    for (model <- modelsByPrefixedId.values)
       model.freeTransientState()
   }
 }

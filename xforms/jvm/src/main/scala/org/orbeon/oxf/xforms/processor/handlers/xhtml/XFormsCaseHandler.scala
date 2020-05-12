@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.{lang ⇒ jl}
+import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -129,7 +129,7 @@ class XFormsCaseHandler(
           new OutputInterceptor(
             currentSavedOutput,
             spanQName,
-            outputInterceptor ⇒ {
+            outputInterceptor => {
 
               // Classes on first delimiter
               val firstDelimiterClasses = {
@@ -166,7 +166,7 @@ class XFormsCaseHandler(
     xformsHandlerContext.popCaseContext()
 
     currentOutputInterceptorOpt match {
-      case None ⇒
+      case None =>
         if (isVisible) {
           val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
           val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
@@ -175,7 +175,7 @@ class XFormsCaseHandler(
           if (xformsHandlerContext.hasFullUpdateTopLevelControl)
             currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
         }
-      case Some(currentOutputInterceptor) ⇒
+      case Some(currentOutputInterceptor) =>
         currentOutputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
         if (isMustGenerateBeginEndDelimiters) {
           // Make sure first delimiter was output

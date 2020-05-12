@@ -56,7 +56,7 @@ class Instance(
     new ExtendedLocationData(
       locationData,
       Some("processing XForms instance"),
-      List("id" → staticId),
+      List("id" -> staticId),
       Option(element)
     )
 
@@ -71,7 +71,7 @@ class Instance(
         parent flatMap (_.parent) flatMap ( _.narrowTo[ComponentControl])
 
       componentOpt match {
-        case Some(component) ⇒
+        case Some(component) =>
 
           val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == XFORMS_MODEL_QNAME.localName)
           val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == XFORMS_INSTANCE_QNAME.localName)
@@ -79,24 +79,24 @@ class Instance(
           debug(
             "getting readonly inline instance from abstract binding",
             List(
-              "model id"       → parent.get.staticId,
-              "instance id"    → staticId,
-              "scope id"       → (component.bindingOpt map (_.innerScope.scopeId) orNull),
-              "binding name"   → component.abstractBinding.debugBindingName,
-              "model index"    → modelIndex.toString,
-              "instance index" → instanceIndex.toString
+              "model id"       -> parent.get.staticId,
+              "instance id"    -> staticId,
+              "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
+              "binding name"   -> component.abstractBinding.debugBindingName,
+              "model index"    -> modelIndex.toString,
+              "instance index" -> instanceIndex.toString
             )
           )
 
           component.abstractBinding.constantInstances((modelIndex, instanceIndex))
-        case None ⇒
+        case None =>
 
           debug(
             "getting readonly inline instance from top-level",
             List(
-              "model id"       → parent.get.staticId,
-              "instance id"    → staticId,
-              "scope id"       → scope.scopeId
+              "model id"       -> parent.get.staticId,
+              "instance id"    -> staticId,
+              "scope id"       -> scope.scopeId
             )
           )
 
@@ -181,7 +181,7 @@ trait InstanceMetadata {
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
   private def getAttributeEncode(qName: QName): Option[String] =
-    Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trimAllToEmpty, true))
+    Option(element.attributeValue(qName)) map (att => NetUtils.encodeHRRI(att.trimAllToEmpty, true))
 
   private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
   private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)
@@ -192,16 +192,16 @@ trait InstanceMetadata {
 
   val (instanceSource, dependencyURL) =
     (if (useInlineContent) None else src orElse resource) match {
-      case someSource @ Some(source) if ProcessorImpl.isProcessorOutputScheme(source) ⇒
-        someSource → None // input:* doesn't add a URL dependency, but is handled by the pipeline engine
-      case someSource @ Some(_) ⇒
-        someSource → someSource
-      case _ ⇒
-        None → None
+      case someSource @ Some(source) if ProcessorImpl.isProcessorOutputScheme(source) =>
+        someSource -> None // input:* doesn't add a URL dependency, but is handled by the pipeline engine
+      case someSource @ Some(_) =>
+        someSource -> someSource
+      case _ =>
+        None -> None
     }
 
   // Don't allow a blank `src` attribute
-  if (useExternalContent && instanceSource.exists(_.isBlank))
+  if (useExternalContent && instanceSource.exists(_.isAllBlank))
     throw new ValidationException("`xf:instance` must not specify a blank URL", extendedLocationData)
 }
 
@@ -230,13 +230,13 @@ object Instance {
     // NOTE: Should implement namespace fixup, the code below can break serialization
     def extractDocument =
       excludeResultPrefixes match {
-        case prefixes if prefixes("#all") ⇒
+        case prefixes if prefixes("#all") =>
           // Special #all
           Dom4jUtils.createDocumentCopyElement(element)
-        case prefixes if prefixes.nonEmpty ⇒
+        case prefixes if prefixes.nonEmpty =>
           // List of prefixes
           Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
-        case _ ⇒
+        case _ =>
           // No exclusion
           Dom4jUtils.createDocumentCopyParentNamespaces(element)
       }

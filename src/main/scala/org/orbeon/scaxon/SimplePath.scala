@@ -40,7 +40,7 @@ object SimplePath {
 
   implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.namespace.uri, attName.localName))
   implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
-  implicit def uriQualifiedNameToTest(name: URIQualifiedName): Test = new NodeQNameTest(name.uri → name.localName)
+  implicit def uriQualifiedNameToTest(name: URIQualifiedName): Test = new NodeQNameTest(name.uri -> name.localName)
 
   // Node test
   abstract class Test {
@@ -67,7 +67,7 @@ object SimplePath {
       val pool = nodeInfo.getNamePool
 
       // For now just test on the local name
-      // TODO: support for testing on qualified name → requires namespace context
+      // TODO: support for testing on qualified name -> requires namespace context
 //                    val fingerprint = pool.getFingerprint(uri, qName._2)
 //                    val test = new NameTest(nodeKind, fingerprint, pool)
 
@@ -127,6 +127,7 @@ object SimplePath {
 
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
+    // Q: If the QName is specified, zero or one attribute can be returned. Should return `Option`?
     def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
     def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.localName), Some(Type.ATTRIBUTE)))
     def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
@@ -159,23 +160,23 @@ object SimplePath {
     def hasAtt(attName: QName) = att(attName).nonEmpty
 
     def attValueOpt(attName: String) = /@(attName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
+      case Seq() => None
+      case s     => Some(s.stringValue)
     }
 
     def attValueOpt(attName: QName) = /@(attName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
+      case Seq() => None
+      case s     => Some(s.stringValue)
     }
 
     def attValueOpt(test: Test) = /@(test) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
+      case Seq() => None
+      case s     => Some(s.stringValue)
     }
 
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue) filter (_.nonBlank)
+      case Seq() => None
+      case s     => Some(s.stringValue) filter (_.nonAllBlank)
     }
 
     def attValueNonBlankOrThrow(attName: String): String =
@@ -187,13 +188,13 @@ object SimplePath {
     def elemValue(elemName: QName)  = /(elemName).stringValue
 
     def elemValueOpt(elemName: String) = /(elemName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
+      case Seq() => None
+      case s     => Some(s.stringValue)
     }
 
     def elemValueOpt(elemName: QName) = /(elemName) match {
-      case Seq() ⇒ None
-      case s     ⇒ Some(s.stringValue)
+      case Seq() => None
+      case s     => Some(s.stringValue)
     }
 
     def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
@@ -220,7 +221,7 @@ object SimplePath {
     def sibling(test: Test): Seq[NodeInfo] = precedingSibling(test) ++ followingSibling(test)
 
     def namespaces        = find(Axis.NAMESPACE, AnyTest)
-    def namespaceMappings = namespaces map (n ⇒ n.getLocalPart → n.getStringValue)
+    def namespaceMappings = namespaces map (n => n.getLocalPart -> n.getStringValue)
 
     def prefixesForURI(uri: String) = prefixesForURIImpl(uri, this)
     def nonEmptyPrefixesForURI(uri: String) = prefixesForURI(uri) filter (_ != "")
@@ -358,8 +359,8 @@ object SimplePath {
     // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
     // XPath 1.0 compatibility mode.
     def stringValue = seq match {
-      case Seq() ⇒ ""
-      case Seq(nodeInfo, _*) ⇒ nodeInfo.getStringValue
+      case Seq() => ""
+      case Seq(nodeInfo, _*) => nodeInfo.getStringValue
     }
 
     def effectiveBooleanValue: Boolean =
@@ -404,8 +405,8 @@ object SimplePath {
       override def matches(node: NodeInfo) =
         ElementOrAttribute(node.getNodeKind.toShort) && (
           node match {
-            case _: FingerprintedNode ⇒ node.getFingerprint == fingerprint
-            case _                    ⇒ localName == node.getLocalPart && uri == node.getURI
+            case _: FingerprintedNode => node.getFingerprint == fingerprint
+            case _                    => localName == node.getLocalPart && uri == node.getURI
           }
         )
 
@@ -424,6 +425,6 @@ object SimplePath {
     // "implementation restriction: nested class is not allowed in value class
     //  This restriction is planned to be removed in subsequent releases."
     def prefixesForURIImpl(uri: String, ops: NodeInfoOps) =
-      ops.namespaceMappings collect { case (prefix, `uri`) ⇒ prefix }
+      ops.namespaceMappings collect { case (prefix, `uri`) => prefix }
   }
 }

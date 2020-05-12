@@ -448,9 +448,11 @@
     <xsd:element name="item">
         <xsd:complexType>
             <xsd:sequence>
-
                 <xsd:element ref="xforms:label"/>
-                <xsd:element ref="xforms:value"/>
+                <xsd:choice>
+                    <xsd:element ref="xforms:value"/>
+                    <xsd:element ref="xforms:copy"/>
+                </xsd:choice>
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>

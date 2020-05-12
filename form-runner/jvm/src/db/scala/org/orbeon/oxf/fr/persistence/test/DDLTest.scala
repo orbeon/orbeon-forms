@@ -39,7 +39,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
    * information is returned varies depending on the database, hence the Any return type.
    */
   private def sqlToTableInfo(provider: Provider, sql: Seq[String]): List[TableMeta] = {
-    Connect.withNewDatabase(provider) { connection ⇒
+    Connect.withNewDatabase(provider) { connection =>
       val statement = connection.createStatement
       SQL.executeStatements(provider, statement, sql)
       val query = provider match {
@@ -47,21 +47,21 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
         // - Column order is "non-relevant", so we order by column name instead of position
         // - We don't test on the owner with `= user` because the user is still `sys` after
         //   `ALTER SESSION SET CURRENT_SCHEMA = c##orbeon`
-        case MySQL ⇒
+        case MySQL =>
           """   SELECT *
             |     FROM information_schema.columns
             |    WHERE table_name = ?
             |          AND table_schema = DATABASE()
             | ORDER BY ordinal_position"""
       }
-      Connect.getTableNames(provider, connection).map { tableName ⇒
-        useAndClose(connection.prepareStatement(query.stripMargin)) { ps ⇒
+      Connect.getTableNames(provider, connection).map { tableName =>
+        useAndClose(connection.prepareStatement(query.stripMargin)) { ps =>
           ps.setString(1, tableName)
-          useAndClose(ps.executeQuery()) { tableInfoResultSet ⇒
+          useAndClose(ps.executeQuery()) { tableInfoResultSet =>
             def tableInfo(): ColMeta = {
               val colName = tableInfoResultSet.getString("column_name")
               val interestingKeys = Set("is_nullable", "data_type")
-              val colKeyVals = for (metaKey ← interestingKeys) yield
+              val colKeyVals = for (metaKey <- interestingKeys) yield
                 ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
               ColMeta(colName, colKeyVals)
             }
@@ -76,7 +76,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
 
   private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
     val name = provider.entryName
-    withDebug("comparing upgrade to straight", List("provider" → name, "from" → from, "to" → to)) {
+    withDebug("comparing upgrade to straight", List("provider" -> name, "from" -> from, "to" -> to)) {
       val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
       val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))
       assert(upgrade === straight, s"$name from $from to $to")
@@ -85,14 +85,14 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
 
   @Test def createAndUpgradeTest(): Unit = {
     Connect.ProvidersTestedAutomatically.foreach {
-      case provider @ MySQL ⇒
+      case provider @ MySQL =>
         assertSameTable(provider, "4_3"    , "4_4")
         assertSameTable(provider, "4_4"    , "4_5")
         assertSameTable(provider, "4_5"    , "4_6")
         assertSameTable(provider, "4_5"    , "4_6")
         assertSameTable(provider, "4_6"    , "2016_2")
         assertSameTable(provider, "2016_2" , "2016_3")
-      case provider @ PostgreSQL ⇒
+      case provider @ PostgreSQL =>
         assertSameTable(provider, "4_8"    , "2016_2")
         assertSameTable(provider, "2016_2" , "2016_3")
         assertSameTable(provider, "2016_3" , "2017_2")

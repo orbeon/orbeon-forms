@@ -1,0 +1,125 @@
+// Copyright (C) 2020 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+    .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+
+        .xforms-dnd-item {
+
+            border-radius: @inputBorderRadius;
+            border: 1px solid @inputBorder;
+            padding: 4px 6px;
+            margin: 2px 0;
+
+            display: flex;
+            align-items: center;
+
+            .fr-attachment-icon {
+                flex-grow: 0;
+                margin-right: 4px;
+            }
+
+            .fr-attachment-filename {
+                flex-grow: 1;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .fr-attachment-size {
+                flex-grow: 0;
+                white-space: nowrap;
+            }
+
+            .fr-attachment-remove {
+                flex-grow: 0;
+                margin-left: 4px;
+            }
+        }
+
+        .fr-attachment-drop, .fr-attachment-empty {
+            display: block;
+            border-width: 2px;
+            border-color: @inputBorder;
+            border-radius: 4px;
+            margin: 3px 0;
+            padding: 1em;
+            color: @inputBorder;
+            text-align: center;
+        }
+
+        .fr-attachment-drop {
+
+            border-style: dashed;
+
+            &.fr-attachment-dragover {
+                background-color: @inputBorder;
+                color: white;
+            }
+        }
+
+        .fr-attachment-empty {
+            border-style: solid;
+        }
+
+        .xforms-upload-progress .progress {
+            margin-bottom: 2px;
+        }
+
+        // Try to make this look a little nicer, but ideally we'd like a custom link/button
+        .xforms-upload-cancel {
+            float: right;
+        }
+
+        .xforms-upload:not(.xforms-upload-state-progress):not(.xforms-upload-state-file) {
+            display: none;
+        }
+    }
+
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+            .fr-attachment-drop, .fr-attachment-upload, .fr-attachment-select, .fr-attachment-remove {
+                display: none;
+            }
+        }
+    }
+
+    @media print {
+        .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+
+            .xforms-dnd-item {
+
+                display: table;
+                width: 100%;
+                box-sizing: border-box;
+
+                // Font Awesome icons won't show as of 2020-05-18
+                .fr-attachment-icon {
+                    display: none;
+                }
+
+                .fr-attachment-filename {
+                    display: table-cell;
+                    padding-left: 4px;
+                }
+
+                .fr-attachment-size {
+                    display: table-cell;
+                    padding-right: 4px;
+                }
+            }
+        }
+    }
+}

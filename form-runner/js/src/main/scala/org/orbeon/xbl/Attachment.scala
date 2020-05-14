@@ -12,7 +12,8 @@ object Attachment {
     if (event.key == "Enter" || event.key == " ")
       event.target match {
         case targetElement: html.Element =>
-          targetElement.closest(".xbl-fr-attachment").foreach { attachmentControl =>
+          targetElement.closest(".xbl-fr-attachment, .xbl-fr-attachment-multiple").foreach { attachmentControl =>
+            event.preventDefault() // so that the page doesn't scroll
             val inputElement = attachmentControl.querySelector("input").asInstanceOf[html.Input]
             inputElement.click()
           }

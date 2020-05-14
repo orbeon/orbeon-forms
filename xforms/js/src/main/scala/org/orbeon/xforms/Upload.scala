@@ -21,7 +21,6 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 object Upload {
@@ -34,7 +33,6 @@ object Upload {
   Page.registerControlConstructor(() => new Upload, (e: html.Element) => $(e).hasClass("xforms-upload"))
 }
 
-// Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 class Upload {
 
   self =>
@@ -67,25 +65,28 @@ class Upload {
            |  <a href="#" class="$UploadCancelClass">Cancel</a>
            |</span>""".stripMargin
 
-      $(markup).insertAfter(findDescendantElem(UploadSelectClass))
+      $(markup).insertAfter(getInput)
 
       // Register listener on the cancel link
-      val cancelAnchor = findDescendantElem(UploadCancelClass)
-
-      $(cancelAnchor).on(ClickEvent, self.cancelButtonActivated _)
+      findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
+        $(cancelAnchor).on(ClickEvent, self.cancelButtonActivated _)
+      }
     }
   }
 
-  // The change event corresponds to a file being selected. This will queue an event to submit this file in the
-  // background  as soon as possible (pseudo-Ajax request).
+  // The change event corresponds to a file being selected. This will queue an event to submit files in the
+  // background as soon as possible.
   @JSExport
   def change(): Unit = {
     scribe.debug("change -> queueing")
-    UploaderClient.uploadEventQueue.add(
-      UploadEvent(getAncestorForm, self),
-      Properties.delayBeforeIncrementalRequest.get().millis,
-      ExecutionWait.MinWait
-    )
+    val files = getInput.files
+    for (i <- 0 until files.length) {
+      UploaderClient.uploadEventQueue.add(
+        event    = UploadEvent(self, files(i)),
+        wait     = Properties.delayBeforeIncrementalRequest.get().millis,
+        waitType = ExecutionWait.MinWait
+      )
+    }
   }
 
   // This method is called when the server sends us a progress update for this upload control. If the upload was
@@ -147,7 +148,7 @@ class Upload {
 
     scribe.debug("clear")
 
-    val oldInputElement = findDescendantElem(UploadSelectClass).get.asInstanceOf[html.Input]
+     val oldInputElement = getInput
 
     // TODO: Would be good to copy attributes generically.
     val newInputElement =
@@ -167,6 +168,14 @@ class Upload {
     $(oldInputElement).replaceWith(newInputElement)
   }
 
+  def getAncestorForm: html.Form =
+    $(_container).parents("form")(0).asInstanceOf[html.Form]
+
+  def getInput: html.Input =
+    findDescendantElem(UploadSelectClass) map
+      (_.asInstanceOf[html.Input])        getOrElse
+      (throw new IllegalStateException)
+
   // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
   private def cancelButtonActivated(event: JQueryEventObject): Unit = {
     scribe.debug("cancel button activated")
@@ -174,14 +183,11 @@ class Upload {
     UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
   }
 
-  private def findDescendantElem(className: String): js.UndefOr[html.Element] =
-    $(_container).find(s".$className")(0)
-
-  private def getAncestorForm: html.Form =
-    $(_container).parents("form")(0).asInstanceOf[html.Form]
+  private def findDescendantElem(className: String): Option[html.Element] =
+    Option(_container.querySelector(s".$className")) map (_.asInstanceOf[html.Element])
 
   private def findProgressBar: Option[html.Element] =
-    findDescendantElem(s"$UploadProgressClass-bar").toOption map {
+    findDescendantElem(s"$UploadProgressClass-bar") map {
       _.querySelector(".bar").asInstanceOf[html.Element]
     }
 }

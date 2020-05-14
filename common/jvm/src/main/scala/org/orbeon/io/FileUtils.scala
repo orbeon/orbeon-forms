@@ -27,4 +27,7 @@ object FileUtils {
 
   def findFileUriPath(uri: URI): Option[String] =
     uri.getScheme == "file" option uri.normalize.getPath
+
+  def findTemporaryFilePath(uri: URI): Option[String] =
+    isTemporaryFileUri(uri) flatOption findFileUriPath(uri)
 }

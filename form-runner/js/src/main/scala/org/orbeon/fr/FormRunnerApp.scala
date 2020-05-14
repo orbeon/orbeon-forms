@@ -34,6 +34,7 @@ object FormRunnerApp extends App {
     xbl.AutosizeTextarea
     xbl.TinyMCE
     xbl.Attachment
+    xbl.AttachmentMultiple
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI

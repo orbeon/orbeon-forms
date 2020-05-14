@@ -17,7 +17,7 @@ import java.io.File
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.dom.Element
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
@@ -134,69 +135,59 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     storeExternalValueAndMetadata(value, "", "", "")
   }
 
-  private def storeExternalValueAndMetadata(rawNewValue: String, filename: String, mediatype: String, size: String): Unit = {
+  private def storeExternalValueAndMetadata(rawNewValue: String, filename: String, mediatype: String, size: String): Unit =
+    try {
 
-    def isFileURL(url: String) =
-      NetUtils.getProtocol(url) == "file"
+      val oldValueOpt = getValue.trimAllToOpt
 
-    def deleteFileIfPossible(url: String): Unit =
-      if (isFileURL(url))
-        try {
-          val file = new File(new URI(PathUtils.splitQuery(url)._1))
-          if (file.exists) {
-            if (file.delete())
-              debug("deleted temporary file upon upload", List("path" -> file.getCanonicalPath))
-            else
-              warn("could not delete temporary file upon upload", List("path" -> file.getCanonicalPath))
-          }
-        } catch {
-          case NonFatal(_) =>
-            error("could not delete temporary file upon upload", List("path" -> url))
+      val newTmpFileUriOpt =
+        rawNewValue.trimAllToOpt map (new URI(_).normalize()) match {
+          case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
+            someNewValueUri
+          case Some(newValueUri) =>
+            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `${newValueUri}`")
+          case None =>
+            None
         }
 
-    // Clean values
-    val newValue = rawNewValue.trimAllToEmpty
-    val oldValue = getValue.trimAllToEmpty
-    try {
-      // Only process if the new value is different from the old one
+      // Attempt to delete the temporary file both when:
+      //
+      // - replacing an existing value
+      // - clearing an existing value
+      //
+      // Note that the value might not point to a temporary file. In particular, it can
+      // point to the persistence layer, in which case it will contain a path. When that's
+      // the case, `deleteFileIfPossible()` will not attempt to delete the file.
+      //
+      oldValueOpt foreach deleteFileIfPossible
+
       val valueToStore =
-        if (isFileURL(newValue)) {
-          // Setting new file
-          val convertedValue = {
+        newTmpFileUriOpt match {
+          case Some(newValueUri) =>
+
+            val newValueUriString = newValueUri.toString
+
+            // Setting new file
             val isTargetBase64 = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)(valueType)
             if (isTargetBase64) {
-              // Convert value to Base64 and delete incoming file
-              val converted = NetUtils.anyURIToBase64Binary(newValue)
-              deleteFileIfPossible(newValue)
+              val converted = NetUtils.anyURIToBase64Binary(newValueUriString)
+              deleteFileIfPossible(newValueUriString)
               converted
             } else {
-              // Leave value as is and make file expire with session
-              val newFile = NetUtils.renameAndExpireWithSession(newValue, logger.getLogger)
+              val newFile    = NetUtils.renameAndExpireWithSession(newValueUriString, logger.getLogger)
               val newFileURL = newFile.toURI.toString
 
-              // The result is a file: append a MAC
               hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))
             }
-          }
-          // Store the converted value
-          convertedValue
 
-        } else if (newValue.isEmpty) {
-          // Setting blank value
+          case None =>
 
-          if (oldValue.nonEmpty)
             // TODO: This should probably take place during refresh instead.
-            Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter))
+            if (oldValueOpt.nonEmpty)
+              Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter))
 
-          // Try to delete temporary file associated with old value if any
-          deleteFileIfPossible(oldValue)
-
-          // Store blank value
-          ""
-
-        } else
-          // Only accept file or blank
-          throw new OXFException("Unexpected incoming value for xf:upload: " + newValue)
+            ""
+        }
 
       // Store the value
       doStoreExternalValue(valueToStore)
@@ -213,7 +204,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     } catch {
       case NonFatal(t) => throw new ValidationException(t, getLocationData)
     }
-  }
 
   // Don't expose an external value
   override def evaluateExternalValue(): Unit = setExternalValue(null)
@@ -253,6 +243,36 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 object XFormsUploadControl {
 
   private val MacParamName = "mac"
+
+  // Delete the temporary file associated with the old value if possible
+
+  // Here, "possible" means the value is:
+  //
+  // - non-blank
+  // - contains a URI
+  // - that URI is a `file:` URI
+  // - that `file:` URI points to a temporary file
+  // - that file exists and can be deleted
+  //
+  // The caller can pass other types of URIs. In such cases, no file will be deleted.
+  //
+  //@XPathFunction
+  def deleteFileIfPossible(urlString: String): Unit =
+    IOUtils.runQuietly {
+      for {
+        nonBlankUrlString <- urlString.trimAllToOpt
+        uri               = new URI(nonBlankUrlString)
+        temporaryFilePath <- FileUtils.findTemporaryFilePath(uri)
+      } locally {
+        val file = new File(temporaryFilePath)
+        if (file.exists) {
+          if (file.delete())
+            XFormsServer.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
+          else
+            XFormsServer.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
+        }
+      }
+    }
 
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
   def mediatypeToAccept(s: String): String = s.splitTo() mkString ","

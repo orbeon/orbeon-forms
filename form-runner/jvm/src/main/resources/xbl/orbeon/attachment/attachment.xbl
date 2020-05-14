@@ -22,7 +22,7 @@
     <xbl:binding
             id="fr-attachment"
             element="fr|attachment"
-            xxbl:mode="binding lhha value"
+            xxbl:mode="binding lhha javascript-lifecycle value"
             xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -141,137 +141,13 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/attachment/attachment.css"/>
+            <xbl:style src="/xbl/orbeon/attachment/attachment-multiple.css"/>
         </xbl:resources>
 
-        <xbl:implementation>
-            <xf:model>
-                <xf:instance id="orbeon-resources" xxf:readonly="true">
-                    <_>
-                        <resource xml:lang="en">
-                            <download>Download</download>
-                            <select>Select file</select>
-                        </resource>
-                        <resource xml:lang="es">
-                            <download>Bajar Archivo</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="fi">
-                            <download>Lataa</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="fr">
-                            <download>Télécharger</download>
-                            <select>Sélectionner un fichier</select>
-                        </resource>
-                        <resource xml:lang="ru">
-                            <download>Download</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="it">
-                            <download>Scaricare</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="de">
-                            <download>Herunterladen</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="sv">
-                            <download>Ladda ner</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="nl">
-                            <download>Download</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="pt">
-                            <download>Baixar</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="lt">
-                            <download>Parsisiųsti</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                        <resource xml:lang="da">
-                            <download>Hent</download>
-                            <select todo="true">[Select file]</select>
-                        </resource>
-                    </_>
-                </xf:instance>
-            </xf:model>
-        </xbl:implementation>
-        <xbl:template>
-            <xf:var
-                name="binding"
-                value="xxf:binding('fr-attachment')"/>
-            <xf:var
-                name="readonly"
-                value="xxf:readonly($binding)"/>
-
-            <xf:upload
-                id="xf-upload"
-                ref="$binding"
-                accept="{
-                    (
-                        xxf:custom-mip($binding, 'upload-mediatypes'), (: 1st from common constraint :)
-                        fr:component-param-value('accept')             (: 2nd because there might be a property always defined :)
-                    )[xxf:non-blank()][1]
-                }"
-                xxf:title="{xxf:label('fr-attachment')}">
-
-                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
-                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xxf:size     ref="@size"      xxbl:scope="outer"/>
-
-                <!-- Retarget of upload events -->
-                <!-- NOTE: Duplicated logic in image-attachment.xbl -->
-                <xf:dispatch
-                    event="xxforms-upload-start xxforms-upload-cancel"
-                    targetid="fr-attachment"
-                    name="{event('xxf:type')}"/>
-                <xf:dispatch
-                    event="xxforms-upload-done"
-                    targetid="fr-attachment"
-                    name="{event('xxf:type')}"
-                    propagate="stop"
-                    defaultAction="cancel">
-                    <xf:property name="file"           value="event('file')"/>
-                    <xf:property name="filename"       value="event('filename')"/>
-                    <xf:property name="content-type"   value="event('content-type')"/>
-                    <xf:property name="content-length" value="event('content-length')"/>
-                </xf:dispatch>
-                <xf:dispatch
-                    event="xxforms-upload-error"
-                    targetid="fr-attachment"
-                    name="{event('xxf:type')}"
-                    propagate="stop"
-                    defaultAction="cancel">
-                    <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
-                    <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>
-                    <xf:property name="xxf:actual"     value="event('xxf:actual')"/>
-                </xf:dispatch>
-
-            </xf:upload>
-
-            <xh:label
-                class="btn btn-default btn-file{if ($readonly) then ' disabled' else ''}"
-                for="xf-upload≡xforms-input"
-                role="button"
-                tabindex="{if ($readonly) then '-1' else '0'}">
-                <xf:output value="xxf:r('select')"/>
-            </xh:label>
-
-            <xf:output
-                appearance="xxf:download"
-                ref="$binding[xxf:non-blank() and not(fr:component-param-value('allow-download') = 'false')]">
-                <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
-                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
-                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xf:header ref="fr:form-version()">
-                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                    <xf:value value="."/>
-                </xf:header>
-            </xf:output>
-        </xbl:template>
+        <!-- Delegate to fr:attachment-multiple -->
+        <xi:include
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            href="/xbl/orbeon/attachment-multiple/attachment-multiple.xbl"
+            xpointer="xpath(/xbl:xbl/xbl:binding/xbl:implementation, /xbl:xbl/xbl:binding/xbl:handlers, /xbl:xbl/xbl:binding/xbl:template)"/>
     </xbl:binding>
 </xbl:xbl>

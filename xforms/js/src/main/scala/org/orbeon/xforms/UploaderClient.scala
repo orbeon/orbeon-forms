@@ -15,20 +15,18 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.facade.{AjaxServer, Properties}
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
-import org.scalajs.dom.ext._
-import org.scalajs.dom.html
+
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.util.{Failure, Success}
-import scala.collection.compat._
 
-case class UploadEvent(form: html.Form, upload: Upload)
+case class UploadEvent(upload: Upload, file: dom.raw.File)
 
 // - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 // - Other enhancements are listed here: https://github.com/orbeon/orbeon-forms/issues/3150
@@ -119,94 +117,69 @@ object UploaderClient {
 
       val currentEvent = events.head
 
-      // If we can't extract form data, we don't attempt to do anything. That *might* happen if, between the time the
-      // event is queued and the time it is processed, the event is gone from the DOM (repeat iteration removed, wizard
-      // page toggled?). But we don't have a formal proof it can happen.
+      val formData = extractFormData(currentEvent)
 
-      extractFormData(currentEvent.form, currentEvent.upload) foreach { formData =>
+      val requestFormId = currentEvent.upload.getAncestorForm.id
 
-        val requestFormId = currentEvent.form.id
+      currentEventOpt = currentEvent.some
+      remainingEvents = events.tail
 
-        currentEventOpt = currentEvent.some
-        remainingEvents = events.tail
+      val controller = new AbortController
+      currentAbortControllerOpt = controller.some
 
-        val controller = new AbortController
-        currentAbortControllerOpt = controller.some
+      // Switch the upload to progress state, so users can't change the file and know the upload is in progress
+      currentEvent.upload.setState("progress")
 
-        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-        currentEvent.upload.setState("progress")
+      // Tell server we're starting uploads
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName    = EventNames.XXFormsUploadStart,
+          targetId     = currentEvent.upload.container.id,
+          showProgress = false
+        )
+      )
 
-        // Tell server we're starting uploads
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName    = EventNames.XXFormsUploadStart,
-            targetId     = currentEvent.upload.container.id,
-            showProgress = false
-          )
+      val responseF =
+        Support.fetchText(
+          url         = Page.getForm(requestFormId).xformsServerUploadPath,
+          requestBody = formData,
+          contentType = None,
+          formId      = requestFormId,
+          abortSignal = controller.signal.some
         )
 
-        val responseF =
-          Support.fetchText(
-            url         = Page.getForm(requestFormId).xformsServerUploadPath,
-            requestBody = formData,
-            contentType = None,
-            formId      = requestFormId,
-            abortSignal = controller.signal.some
-          )
+      askForProgressUpdate()
 
-        askForProgressUpdate()
-
-        responseF.onComplete {
-          case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
-            // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-            currentEvent.upload.clear()
-            // The Ajax response only contains "server events"
-            AjaxServer.handleResponseDom(responseXml, requestFormId, ignoreErrors = false)
-            // Are we done, or do we still need to handle events for other forms?
-            continueWithRemainingEvents()
-          case Success((_, responseText, responseXmlOpt)) =>
-            // Here we can at least get 413, 409, and 500 status codes at least as those are explicity set by the server
-            cancel(doAbort = false, EventNames.XXFormsUploadError)
-            AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
-          case Failure(_) =>
-            // NOTE: can be an `AbortError` (to verify)
-            cancel(doAbort = false, EventNames.XXFormsUploadError)
-            AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
-        }
+      responseF.onComplete {
+        case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
+          // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+          currentEvent.upload.clear()
+          // The Ajax response only contains "server events"
+          AjaxServer.handleResponseDom(responseXml, requestFormId, ignoreErrors = false)
+          // Are we done, or do we still need to handle events for other forms?
+          continueWithRemainingEvents()
+        case Success((_, responseText, responseXmlOpt)) =>
+          // Here we can at least get 413, 409, and 500 status codes at least as those are explicity set by the server
+          cancel(doAbort = false, EventNames.XXFormsUploadError)
+          AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
+        case Failure(_) =>
+          // NOTE: can be an `AbortError` (to verify)
+          cancel(doAbort = false, EventNames.XXFormsUploadError)
+          AjaxClient.logAndShowError(_, requestFormId, ignoreErrors = false)
       }
     }
 
-    // This is a lot of work just to get two form fields and their values!
-    private def extractFormData(form: html.Form, upload: Upload): Option[dom.FormData] = {
-
-      object UuidExtractor {
-        def unapply(e: html.Input): Option[(String, String)] =
-          e.name == Constants.UuidFieldName option (e.name, e.value)
-      }
-
-      object FileExtractor {
-        def unapply(e: html.Input): Option[(String, dom.FileList)] =
-          (
-            $(e).hasClass(controls.Upload.UploadSelectClass) &&
-            $.contains(upload.container, e)     &&
-            e.files.length > 0
-          ) option (e.name, e.files)
-      }
-
-      val it =
-        form.elements.iterator collect[(String, js.Any)] {
-          case UuidExtractor(name, value) => name -> value
-          case FileExtractor(name, value) => name -> value(0) // for now take the first file only
-        }
-
-      it.to(List) match {
-        case l @ List(_, _) => // exactly two items
-          val d = new dom.FormData
-          l foreach { case (name, value) => d.append(name, value) }
-          d.some
-        case _ =>
-          None
-      }
-    }
+    private def extractFormData(uploadEvent: UploadEvent): dom.FormData =
+      new dom.FormData |!> (
+        _.append(
+          Constants.UuidFieldName,
+          Page.getForm(uploadEvent.upload.getAncestorForm.id).uuid
+        )
+      ) |!> (
+        _.append(
+          uploadEvent.upload.getInput.name,
+          uploadEvent.file
+        )
+      )
   }
 }

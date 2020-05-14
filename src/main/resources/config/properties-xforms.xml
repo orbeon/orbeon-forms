@@ -203,6 +203,7 @@
         fr:dropdown-select1-search
         fr:databound-select1-search
         fr:autosize-textarea
+        fr:attachment-multiple
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

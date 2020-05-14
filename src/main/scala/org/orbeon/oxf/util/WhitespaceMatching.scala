@@ -117,10 +117,10 @@ object WhitespaceMatching  {
                 List((ChildCombinator, ElementWithFiltersSelector(Some(UniversalSelector(None)), Nil)))) =>
               AnyElementChildOfMatcher(ns(prefix) -> localname)
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)),
-                List(NegationFilter(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue)))))), Nil) =>
+                List(NegationFilter(AttributeFilter(None, attrName, AttributePredicate.Equal(attrValue))))), Nil) =>
               ElementAttributeValueMatcher(ns(prefix) -> localname, attrName, attrValue, negate = true)
             case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)),
-                List(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue))))), Nil) =>
+                List(AttributeFilter(None, attrName, AttributePredicate.Equal(attrValue)))), Nil) =>
               ElementAttributeValueMatcher(ns(prefix) -> localname, attrName, attrValue, negate = false)
             case _ =>
               throw new IllegalArgumentException(s"Unrecognized whitespace policy: $value")

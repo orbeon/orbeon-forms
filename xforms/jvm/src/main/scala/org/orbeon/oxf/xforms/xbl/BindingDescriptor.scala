@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser
+import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -51,7 +52,7 @@ case class BindingDescriptor(
 )
 
 // Represent a single attribute biding
-case class BindingAttributeDescriptor(name: QName, predicate: String, value: String)
+case class BindingAttributeDescriptor(name: QName, predicate: AttributePredicate)
 
 object BindingDescriptor {
 
@@ -102,7 +103,13 @@ object BindingDescriptor {
         BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(datatype, relatedBindings)
         elemName                                  <- elemNameOpt
       } yield
-        (elemName, attOpt collect { case BindingAttributeDescriptor(APPEARANCE_QNAME, _, value) => value })
+        (
+          elemName,
+          attOpt collect {
+            case BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(value)) => value
+            case BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(value)) => value
+          }
+        )
 
     virtualNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
   }
@@ -146,7 +153,13 @@ object BindingDescriptor {
         case b @ BindingDescriptor(
             Some(`elemName`), // None | would also match raw attribute selectors
             d @ (None | Some(Datatype1 | Datatype2)),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, attValue))
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(attValue)))
+          ) =>
+          (Some(attValue), b.binding, d.isDefined)
+        case b @ BindingDescriptor(
+            Some(`elemName`), // None | would also match raw attribute selectors
+            d @ (None | Some(Datatype1 | Datatype2)),
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(attValue)))
           ) =>
           (Some(attValue), b.binding, d.isDefined)
       }
@@ -212,14 +225,14 @@ object BindingDescriptor {
     case Selector(
         ElementWithFiltersSelector(
           typeSelectorOpt,
-          List(AttributeFilter(None, attName, Some(AttributePredicate(attPredicate, attValue))))
+          List(AttributeFilter(None, attName, attPredicate))
         ),
         Nil) =>
 
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
         None,
-        Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
+        Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
       )(binding)
   }
 
@@ -233,7 +246,7 @@ object BindingDescriptor {
           typeSelectorOpt,
           List(
             FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))),
-            AttributeFilter(None, attName, Some(AttributePredicate(attPredicate, attValue)))
+            AttributeFilter(None, attName, attPredicate)
           )
         ),
         Nil) =>
@@ -241,7 +254,7 @@ object BindingDescriptor {
       BindingDescriptor(
         qNameFromElementSelector(typeSelectorOpt, ns),
         datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
-        Some(BindingAttributeDescriptor(QName(attName), attPredicate, attValue))// TODO: QName for attName
+        Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
       )(binding)
   }
 
@@ -301,7 +314,7 @@ object BindingDescriptor {
         case descriptor @ BindingDescriptor(
             Some(_),
             Some(Datatype1 | Datatype2),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, _))
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
           ) => descriptor
       }
 
@@ -319,7 +332,7 @@ object BindingDescriptor {
         case descriptor @ BindingDescriptor(
             Some(_),
             None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, _))
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
           ) => descriptor
       }
 
@@ -339,7 +352,12 @@ object BindingDescriptor {
         case descriptor @ BindingDescriptor(
             Some(`elemName`),
             None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, appearance))
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) if appearances(appearance) => descriptor
+        case descriptor @ BindingDescriptor(
+            Some(`elemName`),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
           ) if appearances(appearance) => descriptor
       }
 
@@ -370,7 +388,12 @@ object BindingDescriptor {
         case descriptor @ BindingDescriptor(
             Some(`elemName`),
             Some(Datatype1 | Datatype2),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _, appearance))
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) if appearances(appearance) => descriptor
+        case descriptor @ BindingDescriptor(
+            Some(`elemName`),
+            Some(Datatype1 | Datatype2),
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
           ) if appearances(appearance) => descriptor
       }
 

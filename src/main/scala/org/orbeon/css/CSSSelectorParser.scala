@@ -42,13 +42,33 @@ object CSSSelectorParser extends Parser {
   case class TypeSelector(prefix: Option[Option[String]], name: String) extends SimpleElementSelector
   case class UniversalSelector(prefix: Option[Option[String]]) extends SimpleElementSelector
 
-  // TODO: Attribute existence.
-  case class AttributePredicate(op: String, value: String)
+  sealed trait AttributePredicate
+  object AttributePredicate {
+
+    case object Exist                   extends AttributePredicate
+    case class  Equal   (value: String) extends AttributePredicate
+    case class  Token   (value: String) extends AttributePredicate
+    case class  Lang    (value: String) extends AttributePredicate
+    case class  Start   (value: String) extends AttributePredicate
+    case class  End     (value: String) extends AttributePredicate
+    case class  Contains(value: String) extends AttributePredicate
+
+    def apply(op: String, value: String): AttributePredicate =
+      op match {
+        case "="   => Equal   (value)
+        case "~="  => Token   (value)
+        case "|="  => Lang    (value)
+        case "^="  => Start   (value)
+        case "$="  => End     (value)
+        case "*="  => Contains(value)
+        case other => throw new IllegalArgumentException(other)
+      }
+  }
 
   trait Filter extends SelectorNode
   case class IdFilter(id: String) extends Filter
   case class ClassFilter(className: String) extends Filter
-  case class AttributeFilter(prefix: Option[Option[String]], name: String, predicate: Option[AttributePredicate]) extends Filter
+  case class AttributeFilter(prefix: Option[Option[String]], name: String, predicate: AttributePredicate) extends Filter
   case class NegationFilter(selector: SelectorNode) extends Filter
 
   trait Expr extends SelectorNode
@@ -66,7 +86,7 @@ object CSSSelectorParser extends Parser {
   case class ElementWithFiltersSelector(element: Option[SimpleElementSelector], filters: List[Filter]) extends SelectorNode
 
   object Combinator {
-    def apply(s: String) = s match {
+    def apply(s: String): Combinator = s match {
       case "+" => ImmediatelyFollowingCombinator
       case ">" => ChildCombinator
       case "~" => FollowingCombinator
@@ -93,7 +113,7 @@ object CSSSelectorParser extends Parser {
   }
 
   def simpleSelectorSequence: Rule1[ElementWithFiltersSelector] = rule {
-    ((typeSelector | universal) ~ zeroOrMore(filters) ~~> ElementWithFiltersSelector.apply2 _) | (oneOrMore(filters) ~~> ElementWithFiltersSelector.apply1 _)
+    ((typeSelector | universal) ~ zeroOrMore(filters) ~~> ElementWithFiltersSelector.apply2 _) | (oneOrMore(filters) ~~> ElementWithFiltersSelector.apply1)
   }
 
   def filters: Rule1[Filter] = rule {
@@ -122,11 +142,15 @@ object CSSSelectorParser extends Parser {
       push[Option[Option[String]]](None) ~ //FIXME: optional(namespacePrefix) ~
       ident ~
       OptWhiteSpace ~
-      optional(
-        ("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~> identity ~
-        OptWhiteSpace ~
-        (string | ident) ~
-        OptWhiteSpace ~~> AttributePredicate
+      (
+        (
+          ("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~> identity ~
+          OptWhiteSpace ~
+          (string | ident) ~
+          OptWhiteSpace  ~~> AttributePredicate.apply _
+        ) | (
+          push(AttributePredicate.Exist)
+        )
       ) ~~> AttributeFilter ~
     "]"
   }

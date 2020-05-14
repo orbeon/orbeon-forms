@@ -40,13 +40,15 @@ class BindingIndexTest extends AnyFunSpec {
         foo|bar,
         foo|baz,
         [appearance ~= baz],
-        [appearance  = gaga],
+        [appearance =  gaga],
         [appearance ~= gaga],
         [appearance |= gaga],
         [appearance ^= gaga],
         [appearance $= gaga],
         [appearance *= gaga],
-        foo|bar[appearance ~= baz]
+        foo|bar[appearance ~= baz],
+        foo|bar[repeat = content],
+        foo|bar[repeat]
       """.trimAllToEmpty
     )
 
@@ -64,6 +66,8 @@ class BindingIndexTest extends AnyFunSpec {
       appearanceEndsWithGagaBinding   ::
       appearanceContainsGagaBinding   ::
       fooBarAppearanceBazBinding      ::
+      fooBarRepeatContent             ::
+      fooBarRepeat                    ::
       Nil
     ) = AllBindings
 
@@ -114,6 +118,8 @@ class BindingIndexTest extends AnyFunSpec {
     assertElemMatched(currentIndex, """<foo:baz appearance="baz"/>""",           appearanceTokenBazBinding)
     assertElemMatched(currentIndex, """<foo:baz appearance="fuzz baz toto"/>""", appearanceTokenBazBinding)
     assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",           fooBarAppearanceBazBinding)
+    assertElemMatched(currentIndex, """<foo:bar repeat="content"/>""",           fooBarRepeatContent)
+    assertElemMatched(currentIndex, """<foo:bar repeat="true"/>""",              fooBarRepeat)
   }
 
   describe("Matching by attribute") {

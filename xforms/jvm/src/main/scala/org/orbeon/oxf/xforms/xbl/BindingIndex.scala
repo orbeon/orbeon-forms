@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StringUtils._
 
@@ -76,9 +77,9 @@ object BindingIndex {
     var currentIndex = index
 
     attDescriptors ++ nameOnlyDescriptors foreach {
-      case b @ BindingDescriptor(Some(elemName), None, Some(BindingAttributeDescriptor(name, pred, value))) =>
+      case b @ BindingDescriptor(Some(elemName), None, Some(BindingAttributeDescriptor(name, predicate))) =>
         currentIndex = currentIndex.copy(nameAndAttSelectors = (b -> binding) :: currentIndex.nameAndAttSelectors)
-      case b @ BindingDescriptor(None, None, Some(BindingAttributeDescriptor(name, pred, value))) =>
+      case b @ BindingDescriptor(None, None, Some(BindingAttributeDescriptor(name, predicate))) =>
         currentIndex = currentIndex.copy(attOnlySelectors = (b -> binding) :: currentIndex.attOnlySelectors)
       case b @ BindingDescriptor(Some(elemName), None, None) =>
         currentIndex = currentIndex.copy(nameOnlySelectors = (b -> binding) :: currentIndex.nameOnlySelectors)
@@ -116,22 +117,27 @@ object BindingIndex {
     atts  : Iterable[(QName, String)]
   ): Option[(IndexableBinding, Boolean)] = {
 
-    def attValueMatches(attDesc: BindingAttributeDescriptor, attValue: String) = attDesc.predicate match {
-      //case "" => // TODO: attribute existence (fix parser).
-      case "="  => attValue == attDesc.value
-      case "~=" => attValue.tokenizeToSet.contains(attDesc.value)
-      case "|=" => attValue == attDesc.value || attValue.startsWith(attDesc.value + '-')
-      case "^=" => attDesc.value != "" && attValue.startsWith(attDesc.value)
-      case "$=" => attDesc.value != "" && attValue.endsWith(attDesc.value)
-      case "*=" => attDesc.value != "" && attValue.contains(attDesc.value)
+    def attValueMatches(attPredicate: AttributePredicate, attValue: String) = attPredicate match {
+      case AttributePredicate.Exist           => true
+      case AttributePredicate.Equal   (value) => attValue == value
+      case AttributePredicate.Token   (value) => attValue.tokenizeToSet.contains(value)
+      case AttributePredicate.Lang    (value) => attValue == value || attValue.startsWith(value + '-')
+      case AttributePredicate.Start   (value) => value != "" && attValue.startsWith(value)
+      case AttributePredicate.End     (value) => value != "" && attValue.endsWith(value)
+      case AttributePredicate.Contains(value) => value != "" && attValue.contains(value)
     }
 
     def attMatches(attDesc: BindingAttributeDescriptor) =
       atts exists {
-        case (attName, attValue) => attName == attDesc.name && attValueMatches(attDesc, attValue)
+        case (attName, attValue) => attName == attDesc.name && attValueMatches(attDesc.predicate, attValue)
       }
 
-    def fromNameAndAtt =
+    def attExists(name: QName) =
+      atts exists {
+        case (attName, _) => attName == name
+      }
+
+    def fromNameAndAttValue =
       index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
         indexedBindings.collectFirst {
           case (BindingDescriptor(_, None, Some(attDesc)), binding) if attMatches(attDesc) =>
@@ -139,20 +145,44 @@ object BindingIndex {
         }
       }
 
-    def fromAttOnly =
+    def fromNameAndAttExistence =
+      index.byNameWithAtt.get(qName) flatMap { indexedBindings =>
+        indexedBindings.collectFirst {
+          case (BindingDescriptor(_, None, Some(BindingAttributeDescriptor(attName, AttributePredicate.Exist))), binding) if attExists(attName) =>
+            (binding, false)
+        }
+      }
+
+    def fromAttValueOnly =
       index.attOnlySelectors collectFirst {
         case (BindingDescriptor(None, None, Some(attDesc)), binding) if attMatches(attDesc) =>
+          (binding, false)
+      }
+
+    def fromAttExistenceOnly =
+      index.attOnlySelectors collectFirst {
+        case (BindingDescriptor(None, None, Some(BindingAttributeDescriptor(attName, AttributePredicate.Exist))), binding) if attExists(attName) =>
           (binding, false)
       }
 
     def fromNameOnly =
       index.byNameOnly.get(qName) flatMap (_.headOption) map (_._2 -> true)
 
-    // Specificity: http://dev.w3.org/csswg/selectors-4/#specificity
+    // Specificity: https://drafts.csswg.org/selectors-4/#specificity
     //
     //   foo[bar ~= baz] > [bar ~= baz] > foo
     //
-    fromNameAndAtt orElse fromAttOnly orElse fromNameOnly
+    // It doesn't look like the spec specifies that:
+    //
+    //   [bar ~= baz] > [bar]
+    //
+    // But that would be reasonable.
+    //
+    fromNameAndAttValue       orElse
+      fromNameAndAttExistence orElse
+      fromAttValueOnly        orElse
+      fromAttExistenceOnly    orElse
+      fromNameOnly
   }
 
   private val abstractPF: PartialFunction[(BindingDescriptor, IndexableBinding), (BindingDescriptor, AbstractBinding)] =

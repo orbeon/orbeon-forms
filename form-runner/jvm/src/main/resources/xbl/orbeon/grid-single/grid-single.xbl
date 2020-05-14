@@ -1,0 +1,138 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
+         such as xh:, xf:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
+
+    <xbl:binding
+        id="fr-grid-single-binding"
+        element="fr|grid-single, fr|grid[ref], fr|grid[nodeset], fr|grid[bind]"
+        class="xbl-fr-grid"
+        xxbl:mode="binding">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/grid/grid.css"/>
+        </xbl:resources>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="../grid-common/grid-common.xsl"/>
+
+                <xsl:template match="/*">
+
+                    <xf:group appearance="xxf:internal">
+
+                        <xsl:if test="$is-editable">
+                            <!-- Point to the design-time source -->
+                            <xf:var name="grid" value="{$edit-ref}"/>
+                        </xsl:if>
+
+                        <xf:var name="binding" value="xxf:binding('fr-grid-single-binding')"/>
+                        <xf:var name="binding-outer" xxbl:scope="outer">
+                            <xxf:value value="$binding" xxbl:scope="inner"/>
+                        </xf:var>
+
+                        <!-- Grid containing element -->
+                        <xsl:element name="{$table-elem}">
+
+                            <xsl:variable
+                                name="classes-for-runtime"
+                                select="
+                                    'fr-grid',
+                                    concat('fr-grid-', $static-col-count),
+                                    'fr-grid-css'[$use-css-grids-output],
+                                    (: Control name might not be available (unclear why normalize-space() is needed) :)
+                                    for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
+                                    'fr-grid-readonly'[$readonly],
+                                    'fr-norepeat'
+                            "/>
+
+                            <!-- We don't have `fbf:gridCanDoClasses` when running Form Runner tests. -->
+                            <xsl:attribute
+                                use-when="function-available('fbf:gridCanDoClasses')"
+                                name="class"
+                                select="$classes-for-runtime, if ($is-editable) then fbf:gridCanDoClasses(@id) else ()"/>
+
+                            <xsl:attribute
+                                use-when="not(function-available('fbf:gridCanDoClasses'))"
+                                name="class"
+                                select="$classes-for-runtime"/>
+
+                            <!-- This can possibly help accessibility -->
+                            <xsl:if test="$is-table">
+                                <xsl:attribute name="role" select="'presentation'"/>
+                            </xsl:if>
+
+                            <xsl:variable
+                                name="rows-content"
+                                select="fr:rows-content(false(), false(), false(), ())"/>
+
+                            <xsl:variable name="maybe-repeated-content">
+
+                                <!-- Place all grid `<xf:var>`s here for now -->
+                                <!-- See discussion in https://github.com/orbeon/orbeon-forms/issues/2738  -->
+                                <xsl:apply-templates
+                                    select="
+                                        ($root/*:body | $root/self::*)/
+                                        (*:tr | self::*)/
+                                        xf:var
+                                "/>
+
+                                <xsl:choose>
+                                    <xsl:when test="not($use-css-grids-output)">
+                                        <xsl:element name="{$tbody-elem}">
+                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
+                                            <xsl:copy-of select="$rows-content"/>
+                                        </xsl:element>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- CSS grids output -->
+                                        <xsl:element name="xh:div">
+                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
+                                            <xsl:copy-of select="$rows-content"/>
+                                        </xsl:element>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:variable>
+
+                            <xf:group appearance="xxf:internal" ref="$binding-outer" xxbl:scope="outer">
+                                <xf:group appearance="xxf:internal" xxbl:scope="inner">
+                                    <xsl:copy-of select="$maybe-repeated-content"/>
+                                </xf:group>
+                            </xf:group>
+                        </xsl:element><!-- $table-elem -->
+
+                        <xsl:copy-of select="fr:bottom-div()"/>
+                    </xf:group>
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

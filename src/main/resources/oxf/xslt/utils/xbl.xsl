@@ -17,7 +17,6 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xsl:function name="xxbl:parameter">

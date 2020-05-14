@@ -13,29 +13,32 @@
  */
 package org.orbeon.css
 
-import CSSSelectorParser._
-import org.junit.Test
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.orbeon.css.CSSSelectorParser._
+import org.scalatest.funspec.AnyFunSpec
 
 
-class CSSSelectorParserTest extends AssertionsForJUnit {
-  @Test def complexSelector(): Unit = {
-    assert(
-      List(
-        Selector(
-          ElementWithFiltersSelector(
-            Some(TypeSelector(Some(Some("xf")), "input")),
-            List(
-              AttributeFilter(None, "appearance", AttributePredicate.Equal("minimal")),
-              FunctionalPseudoClassFilter("xxf-type", List(StringExpr("xs:decimal")))
-            )
-          ),
-        Nil)
-      ) === CSSSelectorParser.parseSelectors("xf|input[appearance = 'minimal']:xxf-type('xs:decimal')"))
+class CSSSelectorParserTest extends AnyFunSpec {
+
+  describe("Complex selector") {
+    it("must match") {
+      assert(
+        List(
+          Selector(
+            ElementWithFiltersSelector(
+              Some(TypeSelector(Some(Some("xf")), "input")),
+              List(
+                AttributeFilter(None, "appearance", AttributePredicate.Equal("minimal")),
+                FunctionalPseudoClassFilter("xxf-type", List(StringExpr("xs:decimal")))
+              )
+            ),
+          Nil)
+        ) == CSSSelectorParser.parseSelectors("xf|input[appearance = 'minimal']:xxf-type('xs:decimal')"))
+    }
   }
 
-  @Test def selectors(): Unit = {
-    val Expected = Seq(
+  describe("Selectors") {
+
+    val Expected = List(
       "*"                                                 -> Selector(ElementWithFiltersSelector(Some(UniversalSelector(None)),Nil),Nil),
       "E"                                                 -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"E")),Nil),Nil),
       "E[foo]"                                            -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"E")),List(AttributeFilter(None,"foo",AttributePredicate.Exist))),Nil),
@@ -100,7 +103,6 @@ class CSSSelectorParserTest extends AssertionsForJUnit {
       "bar:nth-child(1n+0)"                               -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"bar")),List(FunctionalPseudoClassFilter("nth-child",List(DimensionExpr("1","n"), PlusExpr, NumberExpr("0"))))),Nil),
       "bar:nth-child(n+0)"                                -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"bar")),List(FunctionalPseudoClassFilter("nth-child",List(IdentExpr("n"), PlusExpr, NumberExpr("0"))))),Nil),
       "bar:nth-child(n)"                                  -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"bar")),List(FunctionalPseudoClassFilter("nth-child",List(IdentExpr("n"))))),Nil),
-      "tr:nth-child(2n+0)"                                -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"tr")),List(FunctionalPseudoClassFilter("nth-child",List(DimensionExpr("2","n"), PlusExpr, NumberExpr("0"))))),Nil),
       "tr:nth-child(2n)"                                  -> Selector(ElementWithFiltersSelector(Some(TypeSelector(None,"tr")),List(FunctionalPseudoClassFilter("nth-child",List(DimensionExpr("2","n"))))),Nil),
       ":nth-child( 3n + 1 )"                              -> Selector(ElementWithFiltersSelector(None,List(FunctionalPseudoClassFilter("nth-child",List(DimensionExpr("3","n"), PlusExpr, NumberExpr("1"))))),Nil),
       ":nth-child( +3n - 2 )"                             -> Selector(ElementWithFiltersSelector(None,List(FunctionalPseudoClassFilter("nth-child",List(PlusExpr, DimensionExpr("3","n"), MinusExpr, NumberExpr("2"))))),Nil),
@@ -127,6 +129,8 @@ class CSSSelectorParserTest extends AssertionsForJUnit {
     )
 
     for ((selector, expected) <- Expected)
-      assert(List(expected) === CSSSelectorParser.parseSelectors(selector))
+      it(s"must match for `$selector`") {
+        assert(List(expected) == CSSSelectorParser.parseSelectors(selector))
+      }
   }
 }

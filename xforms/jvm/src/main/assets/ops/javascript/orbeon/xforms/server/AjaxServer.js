@@ -389,6 +389,8 @@
 
                                         if (_.isObject(promiseOrUndef) && _.isFunction(promiseOrUndef.done))
                                             promiseOrUndef.done(setServerValue);
+                                        else if (_.isObject(promiseOrUndef) && _.isFunction(promiseOrUndef.then))
+                                            promiseOrUndef.then(setServerValue);
                                         else
                                             setServerValue();
                                     }

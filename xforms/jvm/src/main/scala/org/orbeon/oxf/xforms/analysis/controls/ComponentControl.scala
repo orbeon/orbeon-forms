@@ -59,10 +59,10 @@ class ComponentControl(
   }
 
   // Only support binding if the control defines it has a binding
-  override def hasBinding = abstractBinding.modeBinding && super.hasBinding
+  override def hasBinding: Boolean = abstractBinding.modeBinding && super.hasBinding
 
   // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
-  override protected def computeBindingAnalysis =
+  override protected def computeBindingAnalysis: Option[XPathAnalysis] =
     if (abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis
 
   // Leave as 'def' as the binding can, in theory, mutate

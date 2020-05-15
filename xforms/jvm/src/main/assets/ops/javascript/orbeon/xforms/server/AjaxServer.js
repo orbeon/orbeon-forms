@@ -417,13 +417,13 @@
 
                             if (_.isObject(instance)) {
                                 if (relevant != null) {
-                                    if (relevant) {
+                                    if (relevant == "true") {
                                         // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
                                         // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
                                         // bit confusing.
                                         // if (_.isFunction(instance.init))
                                         //     instance.init();
-                                    } else {
+                                    } else if (relevant == "false") {
 
                                         if (_.isFunction(instance.destroy))
                                             instance.destroy();

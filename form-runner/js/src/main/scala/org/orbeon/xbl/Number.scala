@@ -145,7 +145,7 @@ object Number {
 
         // Also update disabled because this might be called upon an iteration being moved, in which
         // case all the control properties must be updated.
-        updateReadonly($(containerElem).hasClass("xforms-readonly"))
+        updateReadonly(containerElem.classList.contains("xforms-readonly"))
       }
 
       override def xformsFocus(): Unit = {

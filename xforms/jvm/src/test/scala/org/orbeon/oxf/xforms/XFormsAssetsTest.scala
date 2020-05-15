@@ -23,7 +23,6 @@ class XFormsAssetsTest extends AnyFunSpec{
       {
         "css": [
           { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
-          { "full": "/ops/yui/progressbar/assets/skins/sam/progressbar.css",               "min": false },
           { "full": "/ops/yui/calendar/assets/skins/sam/calendar.css",                     "min": false },
           { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
           { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
@@ -47,7 +46,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
           { "full": "/ops/yui/element/element.js",                                         "min": true  },
           { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-          { "full": "/ops/yui/progressbar/progressbar.js",                                 "min": true  },
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
@@ -96,7 +94,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
           { "full": "/ops/yui/element/element.js",                                         "min": true  },
           { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-          { "full": "/ops/yui/progressbar/progressbar.js",                                 "min": true  },
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
@@ -128,7 +125,6 @@ class XFormsAssetsTest extends AnyFunSpec{
         """+/apps/fr/resources/scalajs/orbeon-form-runner.js
            -/ops/yui/calendar/assets/skins/sam/calendar.css
            +/apps/fr/assets/foo.css
-           -/ops/yui/progressbar/assets/skins/sam/progressbar.css
         """.stripMargin
       )
 

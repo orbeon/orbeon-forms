@@ -13,10 +13,7 @@
   */
 package org.orbeon.xforms
 
-import org.scalajs.dom.html.Element
-
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 
 // YUI definitions. Eventually this will go away, see:
 // https://github.com/orbeon/orbeon-forms/issues/1599
@@ -26,12 +23,4 @@ trait YUICustomEvent extends js.Object {
   def subscribe(fn: js.Function)   : Unit = js.native
   def unsubscribe(fn: js.Function) : Unit = js.native
   def fire(args: Any*)             : Unit = js.native
-}
-
-@JSGlobal("YAHOO.widget.ProgressBar")
-@js.native
-class ProgressBar(config: js.Object) extends js.Object {
-  def render(parent: Element, before: js.UndefOr[Element] = js.undefined) : Unit       = js.native
-  def set(key: String, value: Int)                                        : Unit       = js.native
-  def get(key: String)                                                    : js.Dynamic = js.native
 }

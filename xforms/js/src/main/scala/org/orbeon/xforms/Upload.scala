@@ -15,15 +15,14 @@ package org.orbeon.xforms
 
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
-import org.orbeon.xforms.facade.{Events, Properties}
+import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom.html
-import org.scalajs.dom.html.Element
 import org.scalajs.jquery.JQueryEventObject
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object Upload {
 
@@ -42,10 +41,8 @@ class Upload {
 
   import Upload._
 
-  private var _yuiProgressBar: ProgressBar = null
-
   private var _container: html.Element = null
-  def container: Element = self._container
+  def container: html.Element = self._container
 
   // Creates markup for loading progress indicator element, if necessary
   def init(container: html.Element): Unit = {
@@ -58,8 +55,19 @@ class Upload {
 
       // Add markup to the DOM
       // TODO: i18n of "Cancel" link
-      val innerHtml = s"""<span class="$UploadProgressClass-bar"></span><a href="#" class="$UploadCancelClass">Cancel</a>"""
-      $(s"""<span class="$UploadProgressClass">$innerHtml</span>""").insertAfter(findDescendantElem(UploadSelectClass))
+
+      val markup =
+        s"""
+           |<span class="$UploadProgressClass">
+           |  <span class="$UploadProgressClass-bar">
+           |    <div class="progress progress-striped active">
+           |      <div class="bar"></div>
+           |    </div>
+           |  </span>
+           |  <a href="#" class="$UploadCancelClass">Cancel</a>
+           |</span>""".stripMargin
+
+      $(markup).insertAfter(findDescendantElem(UploadSelectClass))
 
       // Register listener on the cancel link
       val cancelAnchor = findDescendantElem(UploadCancelClass)
@@ -90,10 +98,12 @@ class Upload {
       case "interrupted"                     =>
         UploaderClient.cancel(doAbort = true, XXFormsUploadError)
         scribe.debug("cancel")
-      case _ if self._yuiProgressBar ne null =>
-        self._yuiProgressBar.set("value", 10 + 110 * received / expected)
-        scribe.debug(s"update progress ${100 * received / expected}")
       case _ =>
+        findProgressBar foreach { bar =>
+          val pct = 100 * received / expected max 10
+          scribe.debug(s"update progress $pct%")
+          bar.style.width = s"$pct%"
+        }
     }
 
   // Called by UploadServer when the upload for this control is finished.
@@ -126,26 +136,10 @@ class Upload {
 
     $(_container).addClass(StateClassPrefix + state)
 
-    if (state == "progress") {
-      // Create or recreate progress bar
-      val progressBarSpan = findDescendantElem(s"$UploadProgressClass-bar").get
-      progressBarSpan.innerHTML = ""
-
-      self._yuiProgressBar = new ProgressBar(
-        new js.Object {
-          val width    = 100
-          val height   = 10
-          val value    = 0
-          val minValue = 0
-          val maxValue = 110
-          val anim     = true
-        }
-      )
-
-      self._yuiProgressBar.get("anim").duration = Properties.delayBeforeUploadProgressRefresh.get() / 1000 * 1.5
-      self._yuiProgressBar.render(progressBarSpan)
-      self._yuiProgressBar.set("value", 10)
-    }
+    if (state == "progress")
+      findProgressBar foreach {
+        _.style.width = s"10%"
+      }
   }
 
   // Clears the upload field by recreating it.
@@ -166,8 +160,7 @@ class Upload {
           |  name="${oldInputElement.name}"
           |  size="${oldInputElement.size}"
           |  accept="${oldInputElement.accept}"
-          |  unselectable="on"
-          |>
+          |  unselectable="on">
         """.stripMargin
       )
 
@@ -186,4 +179,9 @@ class Upload {
 
   private def getAncestorForm: html.Form =
     $(_container).parents("form")(0).asInstanceOf[html.Form]
+
+  private def findProgressBar: Option[html.Element] =
+    findDescendantElem(s"$UploadProgressClass-bar").toOption map {
+      _.querySelector(".bar").asInstanceOf[html.Element]
+    }
 }

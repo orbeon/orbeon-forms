@@ -106,7 +106,6 @@
         <output name="data">
             <xh:head xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:link href="/ops/yui/container/assets/skins/sam/container.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/progressbar/assets/skins/sam/progressbar.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/calendar/assets/skins/sam/calendar.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/bootstrap/css/bootstrap.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
@@ -132,7 +131,6 @@
                 <xh:script src="/ops/yui/dom/dom.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/element/element.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/animation/animation.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/progressbar/progressbar.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dragdrop/dragdrop.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/container/container.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/examples/container/assets/containerariaplugin.min.js" class="xforms-baseline"/>

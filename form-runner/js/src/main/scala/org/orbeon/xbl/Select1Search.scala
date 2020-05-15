@@ -102,10 +102,8 @@ private class Select1SearchCompanion extends XBLCompanion {
   private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
     val control  = event.control.asInstanceOf[html.Element]
     val newValue = event.newValue.asInstanceOf[String]
-    if (containerElem.querySelector(".xforms-select1") == control) {
-      org.scalajs.dom.console.log("onXFormsSettingValue", control, newValue)
+    if (containerElem.querySelector(".xforms-select1") == control)
       $(containerElem).find("select").trigger("change")
-    }
   }
 
   private def onChange(event: JQueryEventObject): Unit = {

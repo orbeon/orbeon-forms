@@ -16,7 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.toJQuerySelect2
 import org.orbeon.jquery._
-import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
@@ -82,6 +82,7 @@ private class Select1SearchCompanion extends XBLCompanion {
 
       initOrUpdatePlaceholder()
       onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
+      Controls.afterValueChange.subscribe(onXFormsSelect1ValueChange _)
     }
 
   override def xformsFocus(): Unit =
@@ -94,6 +95,17 @@ private class Select1SearchCompanion extends XBLCompanion {
       attributes = true,
       attributeFilter = js.Array(attributeName)
     ))
+  }
+
+  // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
+  // tell the Select2 component that the value has changed
+  private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
+    val control  = event.control.asInstanceOf[html.Element]
+    val newValue = event.newValue.asInstanceOf[String]
+    if (containerElem.querySelector(".xforms-select1") == control) {
+      org.scalajs.dom.console.log("onXFormsSettingValue", control, newValue)
+      $(containerElem).find("select").trigger("change")
+    }
   }
 
   private def onChange(event: JQueryEventObject): Unit = {

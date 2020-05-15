@@ -122,6 +122,7 @@ object Controls extends js.Object {
   def setFocus(controlId: String)                                    : Unit                  = js.native
   def removeFocus(controlId: String)                                 : Unit                  = js.native
   def getForm(control: dom.Element)                                  : js.UndefOr[html.Form] = js.native
+  val afterValueChange                                               : YUICustomEvent        = js.native
 }
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object

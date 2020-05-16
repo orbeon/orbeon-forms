@@ -232,7 +232,9 @@
                 <xf:dispatch
                     event="xxforms-upload-done"
                     targetid="fr-attachment"
-                    name="{event('xxf:type')}">
+                    name="{event('xxf:type')}"
+                    propagate="stop"
+                    defaultAction="cancel">
                     <xf:property name="file"           value="event('file')"/>
                     <xf:property name="filename"       value="event('filename')"/>
                     <xf:property name="content-type"   value="event('content-type')"/>
@@ -241,7 +243,9 @@
                 <xf:dispatch
                     event="xxforms-upload-error"
                     targetid="fr-attachment"
-                    name="{event('xxf:type')}">
+                    name="{event('xxf:type')}"
+                    propagate="stop"
+                    defaultAction="cancel">
                     <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
                     <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>
                     <xf:property name="xxf:actual"     value="event('xxf:actual')"/>

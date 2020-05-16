@@ -127,27 +127,31 @@ trait AjaxEventQueue[EventType] {
     // Return `None` if we don't need to create a new schedule
     def updatedQueueSchedule(existingSchedule: Option[EventSchedule]): Option[EventSchedule] = {
 
-      val newScheduleDelay =
-        if (state.hasNonIncremental)
-          shortDelay
-        else
-          incrementalDelay
+      val currentTime = System.currentTimeMillis()
 
-      val newScheduleTime =
-        state.oldestEventTime + newScheduleDelay.toMillis
+      val newScheduleTimeAtLeastCurrentTime = {
+
+        val newScheduleDelay =
+          if (state.hasNonIncremental)
+            shortDelay
+          else
+            incrementalDelay
+
+        (state.oldestEventTime + newScheduleDelay.toMillis) max currentTime
+      }
 
       // There is only *one* timer set at a time at most
       def createNewSchedule = {
         val p = Promise[Unit]()
         EventSchedule(
-          handle = timers.setTimeout(newScheduleDelay) { p.success(())},
-          time   = newScheduleTime,
+          handle = timers.setTimeout(newScheduleTimeAtLeastCurrentTime - currentTime) { p.success(())},
+          time   = newScheduleTimeAtLeastCurrentTime,
           done   = p.future
         )
       }
 
       existingSchedule match {
-        case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
+        case Some(existingSchedule) if newScheduleTimeAtLeastCurrentTime < existingSchedule.time =>
           timers.clearTimeout(existingSchedule.handle)
           createNewSchedule.some
         case None if state.events.nonEmpty =>

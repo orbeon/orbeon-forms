@@ -42,6 +42,8 @@ trait AjaxEventQueue[EventType] {
   // can return some of the events to the queue.
   def eventsReady(eventsReversed: NonEmptyList[EventType]): Unit
 
+  def canSendEvents: Boolean
+
   // Configurable delays
   val shortDelay      : FiniteDuration
   val incrementalDelay: FiniteDuration
@@ -61,9 +63,16 @@ trait AjaxEventQueue[EventType] {
         case newScheduleOpt @ Some(EventSchedule(_, _, done)) =>
 
           done foreach { _ =>
-            val events = state.events
-            state = emptyState
-            NonEmptyList.fromList(events) foreach eventsReady
+
+            if (canSendEvents) {
+              val events = state.events
+              state = emptyState
+              NonEmptyList.fromList(events) foreach eventsReady
+            } else {
+              // We expect that once `canSendEvents` becomes true again, `updateQueueSchedule()`
+              // will be called again. A new schedule will be created then.
+              state = state.copy(schedule = None)
+            }
           }
 
           newScheduleOpt
@@ -141,9 +150,9 @@ trait AjaxEventQueue[EventType] {
         case Some(existingSchedule) if newScheduleTime < existingSchedule.time =>
           timers.clearTimeout(existingSchedule.handle)
           createNewSchedule.some
-        case None =>
+        case None if state.events.nonEmpty =>
           createNewSchedule.some
-        case Some(_) =>
+        case _ =>
           None
       }
     }

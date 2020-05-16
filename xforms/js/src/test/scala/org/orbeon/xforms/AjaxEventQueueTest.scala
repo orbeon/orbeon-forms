@@ -18,6 +18,7 @@ import org.scalatest.funspec.AsyncFunSpec
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Promise}
+import scala.scalajs.js
 
 
 class AjaxEventQueueTest extends AsyncFunSpec {
@@ -40,9 +41,9 @@ class AjaxEventQueueTest extends AsyncFunSpec {
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit = {
+        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit =
           p.success(eventsReversed)
-        }
+        val canSendEvents = true
       }
 
       EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = false)
@@ -59,9 +60,9 @@ class AjaxEventQueueTest extends AsyncFunSpec {
       val p = Promise[NonEmptyList[MyEventType]]()
 
       object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
-        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit = {
+        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit =
           p.success(eventsReversed)
-        }
+        val canSendEvents = true
       }
 
       EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = true)
@@ -75,6 +76,31 @@ class AjaxEventQueueTest extends AsyncFunSpec {
         assert(t2 < t1)
         assert(t3 == t2)
         assert(List(MyEventType("baz"), MyEventType("bar"), MyEventType("foo")) == eventsReversed.toList)
+        assert(EventQueue.isEmpty)
+      }
+    }
+
+    it("must eventually fire events if initially events couldn't be fired") {
+
+      val p = Promise[NonEmptyList[MyEventType]]()
+
+      object EventQueue extends AjaxEventQueue[MyEventType] with Delays {
+        def eventsReady(eventsReversed: NonEmptyList[MyEventType]): Unit =
+          p.success(eventsReversed)
+        var canSendEvents = false
+      }
+
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("foo"), incremental = false)
+      EventQueue.addEventAndUpdateQueueSchedule(MyEventType("bar"), incremental = false)
+
+      // Simulate a response arriving after the first attempt at firing the events took place
+      js.timers.setTimeout(EventQueue.shortDelay * 3) {
+        EventQueue.canSendEvents = true
+        EventQueue.updateQueueSchedule()
+      }
+
+      p.future map { eventsReversed =>
+        assert(List( MyEventType("bar"), MyEventType("foo")) == eventsReversed.toList)
         assert(EventQueue.isEmpty)
       }
     }

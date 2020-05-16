@@ -292,11 +292,12 @@ object AjaxClient {
   private object EventQueue extends AjaxEventQueue[AjaxEvent] {
 
     def eventsReady(eventsReversed: NonEmptyList[AjaxEvent]): Unit =
-      if (! EventQueue.ajaxRequestInProgress)
-        findEventsToProcess(eventsReversed) foreach {
-          case (currentForm, eventsForCurrentForm, _) =>
-            processEvents(currentForm, eventsForCurrentForm.reverse)
-        }
+      findEventsToProcess(eventsReversed) foreach {
+        case (currentForm, eventsForCurrentForm, _) =>
+          processEvents(currentForm, eventsForCurrentForm.reverse)
+      }
+
+    def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
 
     val shortDelay                                  : FiniteDuration          = Properties.internalShortDelay.get().toInt.millis
     val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis

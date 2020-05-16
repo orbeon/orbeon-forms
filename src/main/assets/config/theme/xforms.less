@@ -170,8 +170,14 @@
     // Prevent display of border when static read-only
     .xforms-static { border: none }
 
-    .xforms-trigger a {
-        cursor: pointer; // Isn't the default since we're not putting an href, per issue #2652
+    // See #2652, #4210
+    .xforms-trigger:not(.xforms-readonly) a {
+        cursor: pointer;
+    }
+
+    // See #2652, #4210
+    .xforms-trigger.xforms-readonly a {
+        cursor: not-allowed;
     }
 
     .xforms-output {

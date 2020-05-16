@@ -458,7 +458,7 @@
                 </xf:action>
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <local valid="true">
+                    <_ valid="true">
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
                         <standard-classes/>         <!-- fr-summary, fr-search... -->
@@ -497,7 +497,7 @@
 
                         <prev-control-id/>
                         <next-control-id/>
-                    </local>
+                    </_>
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>

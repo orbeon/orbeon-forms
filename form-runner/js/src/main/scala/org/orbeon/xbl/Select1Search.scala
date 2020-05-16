@@ -32,6 +32,8 @@ object Select1Search {
 
 private class Select1SearchCompanion extends XBLCompanion {
 
+  import Private._
+
   val DataPlaceholder           = "data-placeholder"
   val DataServicePerformsSearch = "data-service-performs-search"
   val DataInitialLabel          = "data-initial-label"
@@ -101,61 +103,6 @@ private class Select1SearchCompanion extends XBLCompanion {
   override def xformsFocus(): Unit =
     containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
 
-  private var onXFormsSelect1ValueChangeJs: Option[js.Function] = None
-
-  // TODO: not specific to the autocomplete, should be moved to a utility class
-  private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
-    val observer = new MutationObserver((_, _) => listener())
-    observer.observe(element.get(0), MutationObserverInit(
-      attributes = true,
-      attributeFilter = js.Array(attributeName)
-    ))
-  }
-
-  // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
-  // tell the Select2 component that the value has changed
-  private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
-    val control  = event.control.asInstanceOf[html.Element]
-    val newValue = event.newValue.asInstanceOf[String]
-    if (containerElem.querySelector(".xforms-select1") == control)
-      $(containerElem).find("select").trigger("change")
-  }
-
-  private def onChange(event: JQueryEventObject): Unit = {
-    val htmlSelect = event.target.asInstanceOf[html.Select]
-    if (htmlSelect.selectedIndex == -1) {
-      // `selectedIndex` is -1 when the value was cleared
-      dispatchFrChange(
-        label = "",
-        value = ""
-      )
-    } else {
-      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
-      dispatchFrChange(
-        label = selectedOption.text,
-        value = selectedOption.value
-      )
-    }
-  }
-
-  private def dispatchFrChange(
-    label : String,
-    value : String
-  ): Unit = {
-    AjaxClient.fireEvent(
-      AjaxEvent(
-        eventName  = "fr-change",
-        targetId   = containerElem.id,
-        properties = Map(
-          "fr-label" -> label,
-          "fr-value" -> value
-        )
-      )
-    )
-  }
-
-  var select2SuccessCallbacks = new mutable.Queue[Select2.Success]
-
   def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results)
     val data = new Select2.Data {
@@ -168,29 +115,86 @@ private class Select1SearchCompanion extends XBLCompanion {
     success(data)
   }
 
-  object Select2Ajax extends Select2.Ajax {
+  private object Private {
 
-    val delay = Properties.delayBeforeIncrementalRequest.get()
+    val select2SuccessCallbacks                           = new mutable.Queue[Select2.Success]
+    var onXFormsSelect1ValueChangeJs: Option[js.Function] = None
 
-    def transport(
-      params  : Select2.Params,
-      success : Select2.Success,
-      failure : js.Function0[Unit]
+    // TODO: not specific to the autocomplete, should be moved to a utility class
+    def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
+      val observer = new MutationObserver((_, _) => listener())
+      observer.observe(element.get(0), MutationObserverInit(
+        attributes = true,
+        attributeFilter = js.Array(attributeName)
+      ))
+    }
+
+    // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
+    // tell the Select2 component that the value has changed
+    def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
+      val control  = event.control.asInstanceOf[html.Element]
+      val newValue = event.newValue.asInstanceOf[String]
+      if (containerElem.querySelector(".xforms-select1") == control)
+        $(containerElem).find("select").trigger("change")
+    }
+
+    def onChange(event: JQueryEventObject): Unit = {
+      val htmlSelect = event.target.asInstanceOf[html.Select]
+      if (htmlSelect.selectedIndex == -1) {
+        // `selectedIndex` is -1 when the value was cleared
+        dispatchFrChange(
+          label = "",
+          value = ""
+        )
+      } else {
+        val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+        dispatchFrChange(
+          label = selectedOption.text,
+          value = selectedOption.value
+        )
+      }
+    }
+
+    def dispatchFrChange(
+      label : String,
+      value : String
     ): Unit = {
-
-      val searchValue = params.data.term.getOrElse("")
-      val searchPage  = params.data.page.getOrElse(1)
-      select2SuccessCallbacks.enqueue(success)
       AjaxClient.fireEvent(
         AjaxEvent(
-          eventName  = "fr-search",
+          eventName  = "fr-change",
           targetId   = containerElem.id,
           properties = Map(
-            "fr-search-value" -> searchValue,
-            "fr-search-page"  -> searchPage.toString
+            "fr-label" -> label,
+            "fr-value" -> value
           )
         )
       )
+    }
+
+    object Select2Ajax extends Select2.Ajax {
+
+      val delay = Properties.delayBeforeIncrementalRequest.get()
+
+      def transport(
+        params  : Select2.Params,
+        success : Select2.Success,
+        failure : js.Function0[Unit]
+      ): Unit = {
+
+        val searchValue = params.data.term.getOrElse("")
+        val searchPage  = params.data.page.getOrElse(1)
+        select2SuccessCallbacks.enqueue(success)
+        AjaxClient.fireEvent(
+          AjaxEvent(
+            eventName  = "fr-search",
+            targetId   = containerElem.id,
+            properties = Map(
+              "fr-search-value" -> searchValue,
+              "fr-search-page"  -> searchPage.toString
+            )
+          )
+        )
+      }
     }
   }
 }

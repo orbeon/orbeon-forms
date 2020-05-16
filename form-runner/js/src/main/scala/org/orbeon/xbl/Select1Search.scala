@@ -37,7 +37,7 @@ private class Select1SearchCompanion extends XBLCompanion {
   val DataInitialLabel          = "data-initial-label"
   val DataInitialValue          = "data-initial-value"
 
-  override def init(): Unit =
+  override def init(): Unit = {
     for {
       jContainer        <- $(containerElem).headJQuery
       jXFormsSelect     <- jContainer.find(".xforms-select1").headJQuery
@@ -82,11 +82,26 @@ private class Select1SearchCompanion extends XBLCompanion {
 
       initOrUpdatePlaceholder()
       onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
-      Controls.afterValueChange.subscribe(onXFormsSelect1ValueChange _)
+
+      // Register and remember listener on value change
+      val listener: js.Function = onXFormsSelect1ValueChange _
+      onXFormsSelect1ValueChangeJs = Some(listener)
+      Controls.afterValueChange.subscribe(listener)
     }
+  }
+
+  override def destroy(): Unit = {
+    // Unsubscribe to listener on value change
+    onXFormsSelect1ValueChangeJs.foreach { listener =>
+      Controls.afterValueChange.unsubscribe(listener)
+      onXFormsSelect1ValueChangeJs = None
+    }
+  }
 
   override def xformsFocus(): Unit =
     containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
+
+  private var onXFormsSelect1ValueChangeJs: Option[js.Function] = None
 
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {

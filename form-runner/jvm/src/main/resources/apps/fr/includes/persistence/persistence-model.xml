@@ -180,7 +180,11 @@
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
                  in the binds are updated). -->
             <xf:action if="$mode = ('new', 'test') and ($new-from-service or $is-submit)">
-                <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs in the binds are updated) -->
+                <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs
+                     in the binds are updated).
+
+                     2020-05-19: Confirming that upon XML POST, we want initial values to be evaluated.
+                     Use case: POSTing current form data to `/new` and clearing some fields only. -->
                 <xf:message level="xxf:log-debug">Updating initial values for externally-loaded new document</xf:message>
                 <xf:rebuild model="fr-form-model"/>
                 <xf:recalculate xxf:defaults="true" model="fr-form-model"/>

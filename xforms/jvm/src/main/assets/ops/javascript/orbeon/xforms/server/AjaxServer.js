@@ -418,27 +418,37 @@
                             var instance = ORBEON.xforms.XBL.instanceForControl(documentElement);
 
                             if (_.isObject(instance)) {
-                                if (relevant != null) {
-                                    if (relevant == "true") {
-                                        // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
-                                        // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
-                                        // bit confusing.
-                                        // if (_.isFunction(instance.init))
-                                        //     instance.init();
-                                    } else if (relevant == "false") {
 
-                                        if (_.isFunction(instance.destroy))
-                                            instance.destroy();
+                                var becomesRelevant    = relevant == "true";
+                                var becomesNonRelevant = relevant == "false";
 
-                                        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
-                                        // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
-                                        // take place here as well.
-                                        $(documentElement).data("xforms-xbl-object", null);
+                                function callXFormsUpdateReadonlyIfNeeded() {
+                                    if (readonly != null && _.isFunction(instance.xformsUpdateReadonly)) {
+                                        instance.xformsUpdateReadonly(readonly == "true");
                                     }
                                 }
 
-                                if (readonly != null && _.isFunction(instance.xformsUpdateReadonly)) {
-                                    instance.xformsUpdateReadonly(readonly == "true");
+                                if (becomesRelevant) {
+                                    // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
+                                    // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
+                                    // bit confusing.
+                                    // if (_.isFunction(instance.init))
+                                    //     instance.init();
+                                    callXFormsUpdateReadonlyIfNeeded();
+                                } else if (becomesNonRelevant) {
+
+                                    // We ignore `readonly` when we become non-relevant
+
+                                    if (_.isFunction(instance.destroy))
+                                        instance.destroy();
+
+                                    // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
+                                    // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
+                                    // take place here as well.
+                                    $(documentElement).data("xforms-xbl-object", null);
+                                } else {
+                                    // Stays relevant or non-relevant (but we should never be here if we are non-relevant)
+                                    callXFormsUpdateReadonlyIfNeeded();
                                 }
 
                                 _.each(elem.childNodes, function(childNode) {

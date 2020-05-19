@@ -131,6 +131,10 @@ trait GridSectionMenus {
 
     val keyboardEvent = e.asInstanceOf[KeyboardEvent]
 
+    // Avoid page scrolling upon cursor keys, in particular cursor down
+    if (keyboardEvent.keyCode >= 37 && keyboardEvent.keyCode <= 40)
+      e.preventDefault()
+
     $(globalMenuElem).find(".dropdown-toggle").trigger(
       $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade
         keyboardEvent.`type`,

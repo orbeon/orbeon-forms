@@ -258,7 +258,7 @@
 
                 </xf:action>
 
-                <xf:action if="not($is-singleton)">
+                <xf:action if="not($is-singleton) and not($is-submit)"><!-- https://github.com/orbeon/orbeon-forms/issues/4546 -->
 
                     <!-- Do we have updatable drafts for documents that were never saved? -->
                     <xf:action if="$autosave-enabled">

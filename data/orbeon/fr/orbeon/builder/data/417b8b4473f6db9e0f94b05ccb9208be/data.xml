@@ -76,21 +76,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <attachment-controls>
                         <grid-7>
                             <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
-                        </grid-7>
-                        <image-attachments>
-                            <image-attachments-iteration>
                                 <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
                                                   size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
-                                <file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
-                                                 size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</file-attachment>
-                            </image-attachments-iteration>
-                            <image-attachments-iteration>
-                                <image-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg"
-                                                  size="117440">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</image-attachment>
-                                <file-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg"
-                                                 size="117440">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</file-attachment>
-                            </image-attachments-iteration>
-                        </image-attachments>
+                            <single-file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
+                                                    size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</single-file-attachment>
+                            <multiple-file-attachment>
+                                <_ filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
+                                   size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</_>
+                                <_ filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg"
+                                   size="117440">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</_>
+                            </multiple-file-attachment>
+                        </grid-7>
+
                     </attachment-controls>
                     <buttons>
                         <grid-8>
@@ -107,7 +104,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <state>DC</state>
                             <zip>20500</zip>
                         </grid-1>
-
                     </us-address>
                 </form>
             </xf:instance>
@@ -169,15 +165,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                          name="attachment-controls">
                     <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
                         <xf:bind ref="static-image" id="static-image-bind" type="xf:anyURI" name="static-image"/>
-                    </xf:bind>
-                    <xf:bind id="image-attachments-bind" ref="image-attachments" name="image-attachments">
-                        <xf:bind id="image-attachments-iteration-bind" ref="image-attachments-iteration"
-                                 name="image-attachments-iteration">
+                        <xf:bind id="single-file-attachment-bind" ref="single-file-attachment" type="xf:anyURI"
+                                 name="single-file-attachment"/>
+                        <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment"
+                                 type="xf:anyURI"
+                                 name="multiple-file-attachment"/>
                             <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment"
                                      type="xf:anyURI"/>
-                            <xf:bind id="file-attachment-bind" ref="file-attachment" type="xf:anyURI"
-                                     name="file-attachment"/>
-                        </xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="buttons-bind" ref="buttons" name="buttons"
@@ -314,14 +308,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Handwritten Signature</label>
                             <hint/>
                         </handwritten-signature>
-                        <image-attachment>
-                            <label>Image Attachment</label>
-                            <hint/>
-                        </image-attachment>
-                        <file-attachment>
-                            <label>File Attachment</label>
-                            <hint/>
-                        </file-attachment>
+
+
                         <buttons>
                             <label>Buttons</label>
                         </buttons>
@@ -357,6 +345,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Static Image</label>
                             <hint/>
                         </static-image>
+                        <image-attachment>
+                            <label>Image Attachment</label>
+                            <hint/>
+                        </image-attachment>
+                        <single-file-attachment>
+                            <label>Single File Attachment</label>
+                            <hint/>
+                        </single-file-attachment>
+                        <multiple-file-attachment>
+                            <label>Multiple File Attachment</label>
+                            <hint/>
+                        </multiple-file-attachment>
                         <selection-controls>
                             <label>Selection Controls</label>
                         </selection-controls>
@@ -567,14 +567,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Signature manuscrite</label>
                             <hint/>
                         </handwritten-signature>
-                        <image-attachment>
-                            <label>Image jointe</label>
-                            <hint/>
-                        </image-attachment>
-                        <file-attachment>
-                            <label>Fichier joint</label>
-                            <hint/>
-                        </file-attachment>
+
+
                         <buttons>
                             <label>Boutons</label>
                         </buttons>
@@ -610,6 +604,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Image fixe</label>
                             <hint/>
                         </static-image>
+                        <image-attachment>
+                            <label>Image jointe</label>
+                            <hint/>
+                        </image-attachment>
+                        <single-file-attachment>
+                            <label>Fichier joint</label>
+                            <hint/>
+                        </single-file-attachment>
+                        <multiple-file-attachment>
+                            <label>Fichier joint</label>
+                            <hint/>
+                        </multiple-file-attachment>
                         <selection-controls>
                             <label>Contrôles de sélection</label>
                         </selection-controls>
@@ -729,13 +735,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all"
-                         id="image-attachments-template">
-                <image-attachments-iteration>
-                    <image-attachment filename="" mediatype="" size=""/>
-                    <file-attachment filename="" mediatype="" size=""/>
-                </image-attachments-iteration>
-            </xf:instance>
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -1024,18 +1024,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
                     <xf:label ref="$form-resources/attachment-controls/label"/>
                     <fr:grid id="grid-7-grid" bind="grid-7-bind">
-                        <fr:c y="1" x="1" w="12">
+                        <fr:c y="1" x="1" w="6">
                             <fr:image bind="static-image-bind" id="static-image-control">
                                 <xf:label ref="$form-resources/static-image/label"/>
                             </fr:image>
                         </fr:c>
-                    </fr:grid>
-                    <fr:grid id="image-attachments-control" bind="image-attachments-bind" repeat="content"
-                             min="1"
-                             template="instance('image-attachments-template')"
-                             apply-defaults="true"
-                             fb:initial-iterations="first">
-                        <fr:c y="1" x="1" w="6">
+                        <fr:c x="7" y="1" w="6" h="1">
                             <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                  id="image-attachment-control"
@@ -1046,10 +1040,21 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:image-attachment>
                         </fr:c>
-                        <fr:c y="1" x="7" w="6">
-                            <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
-                                <xf:label ref="$form-resources/file-attachment/label"/>
-                                <xf:hint ref="$form-resources/file-attachment/hint"/>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:attachment bind="single-file-attachment-bind" id="single-file-attachment-control"
+                                           class="fr-attachment">
+                                <xf:label ref="$form-resources/single-file-attachment/label"/>
+                                <xf:hint ref="$form-resources/single-file-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6" h="1">
+                            <fr:attachment bind="multiple-file-attachment-bind" id="multiple-file-attachment-control"
+                                           multiple="true"
+                                           class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-file-attachment/label"/>
+                                <xf:hint ref="$form-resources/multiple-file-attachment/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:attachment>
                         </fr:c>

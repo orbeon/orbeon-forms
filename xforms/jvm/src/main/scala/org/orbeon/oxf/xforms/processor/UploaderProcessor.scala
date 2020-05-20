@@ -51,7 +51,8 @@ class UploaderProcessor extends ProcessorImpl {
                   // sure it expires with the session only.
                   val sessionURL =
                     NetUtils.renameAndExpireWithSession(
-                      RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE), XFormsServer.logger
+                      RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE),
+                      XFormsServer.logger
                     ).toURI.toString
 
                   (name, fileItem, sessionURL, size)

@@ -209,7 +209,7 @@
                             ref="$start-end"
                             value="
                                 let $param-name := concat(local-name($start-end), '-year'),
-                                    $r          := trace(fr:component-param-value($param-name), .)
+                                    $r          := fr:component-param-value($param-name)
                                 return
                                     if ($r castable as xs:integer) then
                                         $r cast as xs:integer

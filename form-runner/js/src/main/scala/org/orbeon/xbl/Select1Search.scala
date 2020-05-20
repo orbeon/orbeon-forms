@@ -83,12 +83,15 @@ private class Select1SearchCompanion extends XBLCompanion {
       }
 
       initOrUpdatePlaceholder()
-      onAttributeChange(elementWithData, DataPlaceholder, initOrUpdatePlaceholder)
+      onAttributeChange(elementWithData, DataPlaceholder,  initOrUpdatePlaceholder)
+      onAttributeChange(elementWithData, DataInitialLabel, initOrUpdatePlaceholder)
 
       // Register and remember listener on value change
-      val listener: js.Function = onXFormsSelect1ValueChange _
-      onXFormsSelect1ValueChangeJs = Some(listener)
-      Controls.afterValueChange.subscribe(listener)
+      if (! servicePerformsSearch) {
+        val listener: js.Function = onXFormsSelect1ValueChange _
+        onXFormsSelect1ValueChangeJs = Some(listener)
+        Controls.afterValueChange.subscribe(listener)
+      }
     }
   }
 

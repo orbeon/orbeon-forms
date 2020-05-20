@@ -404,4 +404,6 @@ object XFormsConstants {
 
   val SELECTED_QNAME = QName("selected")
   val CASEREF_QNAME = QName("caseref")
+
+  val XXFORMS_MULTIPLE_QNAME = QName("multiple", XXFORMS_NAMESPACE)
 }

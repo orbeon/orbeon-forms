@@ -292,6 +292,7 @@
                 id="xf-upload"
                 class="fr-attachment-upload"
                 ref="if ($readonly) then '' else instance()"
+                xbl:attr="xxf:multiple=multiple"
                 accept="{
                     (
                         xxf:custom-mip($binding, 'upload-mediatypes'), (: 1st from common constraint :)

@@ -145,27 +145,8 @@ class Upload {
 
   // Clears the upload field by recreating it.
   def clear(): Unit = {
-
     scribe.debug("clear")
-
-     val oldInputElement = getInput
-
-    // TODO: Would be good to copy attributes generically.
-    val newInputElement =
-      $(
-        s"""
-          |<input
-          |  class="${oldInputElement.className}"
-          |  id="${oldInputElement.id}"
-          |  type="${oldInputElement.`type`}"
-          |  name="${oldInputElement.name}"
-          |  size="${oldInputElement.size}"
-          |  accept="${oldInputElement.accept}"
-          |  unselectable="on">
-        """.stripMargin
-      )
-
-    $(oldInputElement).replaceWith(newInputElement)
+    getInput.value = "" // this should now work from IE11 up
   }
 
   def getAncestorForm: html.Form =

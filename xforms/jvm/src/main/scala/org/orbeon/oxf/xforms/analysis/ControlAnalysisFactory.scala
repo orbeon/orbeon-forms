@@ -103,6 +103,8 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
 
+    val multiple: Boolean = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME) contains "true"
+
     override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
     override val externalEvents = externalEventsDef
 

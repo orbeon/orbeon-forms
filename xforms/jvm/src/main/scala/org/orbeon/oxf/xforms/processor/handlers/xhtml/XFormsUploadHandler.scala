@@ -17,6 +17,7 @@ import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.UploadControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
@@ -85,6 +86,11 @@ class XFormsUploadHandler(
 
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
         handleAriaByAtts(reusableAttributes)
+
+        // `@multiple="multiple"`
+        if (staticControlOpt exists (_.asInstanceOf[UploadControl].multiple))
+          reusableAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
+
         element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
       }
 

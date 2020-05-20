@@ -64,6 +64,7 @@
                 </xf:header>
             </xf:output>
             <fr:attachment
+                fr:keep-if-design-time="true"
                 class="fr-image-attach"
                 ref="
                     if (fr:is-design-time())

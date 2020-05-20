@@ -47,15 +47,15 @@ private class Select1SearchCompanion extends XBLCompanion {
       htmlSelect        = select.asInstanceOf[dom.html.Select]
     } locally {
 
-      val elementWithData = jContainer.children(s"[$DataPlaceholder]")
-      val performsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
+      val elementWithData        = jContainer.children(s"[$DataPlaceholder]")
+      val servicePerformsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
 
       def initOrUpdatePlaceholder(): Unit = {
 
         // Store server value for the dropdown on initialization, as a workaround to #4198
         ServerValueStore.set(jXFormsSelect.attr("id").get, htmlSelect.value)
 
-        if (performsSearch) {
+        if (servicePerformsSearch) {
           val initialLabel = elementWithData.attr(DataInitialLabel).get
           val initialValue = elementWithData.attr(DataInitialValue).get
           if (initialValue.nonEmpty) {
@@ -69,7 +69,7 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         object options extends Select2.Options {
           allowClear     = true
-          ajax           = if (performsSearch) Select2Ajax else null
+          ajax           = if (servicePerformsSearch) Select2Ajax else null
           width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =
             new Select2.Option {

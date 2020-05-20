@@ -83,8 +83,18 @@
             float: right;
         }
 
-        .xforms-upload:not(.xforms-upload-state-progress):not(.xforms-upload-state-file) {
-            display: none;
+        .xforms-upload {
+
+            // Only show something then we have a progress bar
+            &:not(.xforms-upload-state-progress) {
+                display: none;
+            }
+
+            // But always hide the selector itself as well as the info
+            .xforms-upload-select, .xforms-upload-info {
+                display: none;
+            }
+
         }
     }
 

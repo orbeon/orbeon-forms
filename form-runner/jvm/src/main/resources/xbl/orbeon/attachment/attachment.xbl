@@ -141,7 +141,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/attachment/attachment-multiple.css"/>
+            <xbl:style src="/xbl/orbeon/attachment-multiple/attachment-multiple.css"/>
         </xbl:resources>
 
         <!-- Delegate to fr:attachment-multiple -->

@@ -184,11 +184,12 @@
             <!-- Scala.js asks us to call the service to get a list of suggestions -->
             <xbl:handler event="fr-search">
 
-                <!-- Build URL -->
-                <xf:var name="fr-search-value" value="event('fr-search-value')"/>
-                <xf:var name="fr-search-page"  value="event('fr-search-page')"/>
-                <xf:var name="resource-attr"   value="instance('local')/resource-attr"/>
-                <xf:var name="resource"        value="xxf:evaluate-avt($resource-attr)"/>
+                <!-- Evaluate resource URL, done in the view to have access to the outer scope -->
+                <xf:dispatch name="fr-update-resource" targetid="view">
+                    <xf:property name="fr-search-value" value="event('fr-search-value')"/>
+                    <xf:property name="fr-search-page"  value="event('fr-search-page')"/>
+                </xf:dispatch>
+                <xf:var name="resource" value="instance('local')/resource"/>
 
                 <!-- Call service -->
                 <xf:send submission="get-result">
@@ -242,7 +243,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:template match="/*">
-                    <xf:group appearance="xxf:internal">
+                    <xf:group appearance="xxf:internal" id="view">
 
                         <xf:model>
 
@@ -266,6 +267,7 @@
                             <xf:instance id="local">
                                 <_>
                                     <resource-attr><xsl:value-of select="@resource"/></resource-attr>
+                                    <resource/>
                                     <service-supports-paging><xsl:value-of select="@service-supports-paging"/></service-supports-paging>
                                     <is-last-page-ref><xsl:value-of select="@is-last-page"/></is-last-page-ref>
                                     <itemset-ref><xsl:value-of select="xf:itemset/@ref"/></itemset-ref>
@@ -299,6 +301,19 @@
                             </xf:submission>
 
                         </xf:model>
+
+                        <xf:action event="fr-update-resource">
+                            <xf:action xxbl:scope="outer">
+                                <xf:var name="fr-search-value"><xxf:value xxbl:scope="inner" value="event('fr-search-value')"/></xf:var>
+                                <xf:var name="fr-search-page" ><xxf:value xxbl:scope="inner" value="event('fr-search-page')"/></xf:var>
+                                <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
+                                <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)"/>
+                                <xf:action xxbl:scope="inner">
+                                    <xf:var name="resource"><xxf:value xxbl:scope="outer" value="$resource"/></xf:var>
+                                    <xf:setvalue ref="instance('local')/resource" value="$resource"/>
+                                </xf:action>
+                            </xf:action>
+                        </xf:action>
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search = 'true'"/>
                         <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>

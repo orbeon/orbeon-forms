@@ -57,6 +57,8 @@ class XFormsControl(
      with MaybeFocusableTrait
      with Logging {
 
+  self =>
+
   // Type of the associated static control
   type Control <: ElementAnalysis // TODO: Use more specific to represent controls. Note that those can also be actions.
 
@@ -79,7 +81,7 @@ class XFormsControl(
   def visited = false
 
   parent match {
-    case container: XFormsContainerControl => container.addChild(this)
+    case container: XFormsContainerControl => container.addChild(self)
     case _ =>
   }
 
@@ -117,7 +119,7 @@ class XFormsControl(
 
   // Used by repeat iterations
   def setEffectiveId(effectiveId: String): Unit =
-    this.effectiveId = effectiveId
+    self.effectiveId = effectiveId
 
   final def getLocationData: LocationData =
     if (staticControl ne null) staticControl.locationData else if (element ne null) element.getData.asInstanceOf[LocationData] else null
@@ -135,7 +137,7 @@ class XFormsControl(
   def preceding: Option[XFormsControl] = {
     // Unlike ElementAnalysis we don't store a `preceding` pointer so we have to search for it
     val siblingsOrSelf = parent.asInstanceOf[XFormsContainerControl].children
-    val index          = siblingsOrSelf indexWhere (this eq)
+    val index          = siblingsOrSelf indexWhere (self eq)
 
     index > 0 option siblingsOrSelf(index - 1)
   }
@@ -183,7 +185,7 @@ class XFormsControl(
     // NOTE: See https://github.com/orbeon/orbeon-forms/issues/2857. We might consider removing this
     // optimization as it is dangerous. `XFormsValueControl` works around it by calling
     // `compareExternalUseExternalValue` directly.
-    (previousControlOpt exists (_ eq this)) && (getInitialLocal eq getCurrentLocal) ||
+    (previousControlOpt exists (_ eq self)) && (getInitialLocal eq getCurrentLocal) ||
     compareExternalUseExternalValue(previousValueOpt, previousControlOpt)
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
@@ -243,7 +245,7 @@ class XFormsControl(
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
   def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]): Unit =
     staticControl match {
-      case withChildren: ChildrenBuilderTrait => Controls.buildChildren(this, withChildren.children, buildTree, idSuffix)
+      case withChildren: ChildrenBuilderTrait => Controls.buildChildren(self, withChildren.children, buildTree, idSuffix)
       case _ =>
     }
 }

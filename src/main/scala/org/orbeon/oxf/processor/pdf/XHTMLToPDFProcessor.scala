@@ -13,13 +13,11 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.{InputStream, OutputStream}
-import java.net.URI
+import java.io.OutputStream
 
 import com.lowagie.text.pdf.BaseFont
-import org.orbeon.io.{IOUtils, UriScheme}
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.io.IOUtils
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
@@ -27,12 +25,9 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOu
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
-import org.xhtmlrenderer.pdf.{ITextRenderer, ITextUserAgent}
-import org.xhtmlrenderer.resource.ImageResource
+import org.xhtmlrenderer.pdf.ITextRenderer
 
-import scala.collection.mutable
 import scala.util.control.NonFatal
 
 // XHTML to PDF converter using the Flying Saucer library.
@@ -88,120 +83,26 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
      outputStream    : OutputStream
   ): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
 
-    val domDocument = readInputAsDOM(pipelineContext, input)
     val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val renderer    = new ITextRenderer(DefaultDotsPerPoint, DefaultDotsPerPixel)
 
     try {
       embedFontsConfiguredInProperties(renderer)
 
-      val callback = new ITextUserAgent(renderer.getOutputDevice) {
-
-        implicit val indentedLogger = new IndentedLogger(XHTMLToPDFProcessor.logger)
-
-        // See https://github.com/orbeon/orbeon-forms/issues/1996
-        // Use our own local cache (`NaiveUserAgent` has one too) so that we can cache against the absolute URL
-        // yet pass a local URL to `super.getImageResource()`.
-        // This doesn't live beyond the production of this PDF as the `ITextUserAgent` is created each time.
-        val localImageCache = mutable.HashMap[String, ImageResource]()
-
-        // Called for:
-        //
-        // - CSS URLs
-        // - image URLs
-        // - link clicked / form submission (not relevant for our usage)
-        // - resolveAndOpenStream below
-        override def resolveURI(uri: String): String = {
-
-          // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
-          // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
-          // the servlet context and version number if needed. In addition, CSS resources must either use
-          // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
-          // which also generates absolute paths.
-          // So all we need to do here is rewrite the resulting path to an absolute URL.
-          // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
-          // However this caused issues, for example resources like background images referred by CSS files
-          // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
-          indentedLogger.logDebug("pdf", "before resolving URL", "url", uri)
-
-          val resolved =
-            URLRewriterUtils.rewriteServiceURL(
-              requestOpt.orNull,
-              uri,
-              URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT
-            )
-
-          indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)
-          resolved
-        }
-
-        // Called by:
-        // - getCSSResource
-        // - getImageResource below
-        // - getBinaryResource (not sure when called)
-        // - getXMLResource (not sure when called)
-        override protected def resolveAndOpenStream(uri: String): InputStream = {
-
-          val resolvedURI = resolveURI(uri)
-
-          // TODO: Use xf:submission code instead
-          // Tell callee we are loading that we are a servlet environment, as in effect we act like
-          // a browser retrieving resources directly, not like a portlet. This is the case also if we are
-          // called by the proxy portlet or if we are directly within a portlet.
-
-          val url = new URI(resolvedURI)
-          val headers =
-            Connection.buildConnectionHeadersCapitalizedIfNeeded(
-              url              = url,
-              hasCredentials   = false,
-              customHeaders    = Map(Headers.OrbeonClient -> List("servlet")),
-              headersToForward = Connection.headersToForwardFromProperty,
-              cookiesToForward = Connection.cookiesToForwardFromProperty,
-              getHeader        = name => requestOpt flatMap (r => Connection.getHeaderFromRequest(r)(name))
-            )
-
-          val cxr =
-            Connection(
-              method          = HttpMethod.GET,
-              url             = url,
-              credentials     = None,
-              content         = None,
-              headers         = headers,
-              loadState       = true,
-              logBody         = false)(
-              logger          = indentedLogger,
-              externalContext = externalContext
-            ).connect(
-              saveState = true
-            )
-
-          ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {
-            pipelineContext.addContextListener((_: Boolean) => cxr.close())
-          } get
-        }
-
-        override def getImageResource(uri: String): ImageResource = {
-          val resolvedURI = resolveURI(uri)
-          localImageCache.getOrElseUpdate(
-            resolvedURI,
-            {
-              val is = resolveAndOpenStream(resolvedURI)
-              val localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, XHTMLToPDFProcessor.logger)
-              indentedLogger.logDebug("pdf", "getting image resource", "url", uri, "local", localURI)
-              super.getImageResource(localURI)
-            }
-          )
-        }
-      }
-
-      callback.setSharedContext(renderer.getSharedContext)
-      renderer.getSharedContext.setUserAgentCallback(callback)
+      renderer.getSharedContext.setUserAgentCallback(
+        new CustomUserAgent(
+          pipelineContext,
+          renderer.getOutputDevice,
+          renderer.getSharedContext
+        )
+      )
       // renderer.getSharedContext().setDPI(150);
 
       renderer.setDocument(
-        domDocument,
+        readInputAsDOM(pipelineContext, input),
         requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
       )
 

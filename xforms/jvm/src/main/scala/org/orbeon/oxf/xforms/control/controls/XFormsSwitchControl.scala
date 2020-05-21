@@ -294,11 +294,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
   override def serializeLocal =
     ju.Collections.singletonMap("case-id", XFormsId.getStaticIdFromId(getSelectedCaseEffectiveId))
 
-  override def focusableControls =
-    if (isRelevant)
-      selectedCaseIfRelevantOpt.iterator flatMap (_.focusableControls)
-    else
-      Iterator.empty
+  override def followDescendantsForFocus: Iterator[XFormsControl] =
+    selectedCaseIfRelevantOpt.iterator
 
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],

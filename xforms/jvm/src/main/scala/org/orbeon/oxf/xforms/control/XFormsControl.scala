@@ -54,6 +54,7 @@ class XFormsControl(
      with ControlBindingSupport
      with ControlXMLDumpSupport
      with XFormsEventTarget
+     with MaybeFocusableTrait
      with Logging {
 
   // Type of the associated static control
@@ -238,12 +239,6 @@ class XFormsControl(
 
     cloned
   }
-
-  // Whether focus can be set to this control
-  def isDirectlyFocusable = false
-
-  // By default, a control doesn't accept focus
-  def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
   def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]): Unit =

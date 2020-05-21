@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.control.{FocusableTrait, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.{SingleNodeFocusableTrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 /**
@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  */
 class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
     extends XFormsSingleNodeControl(container, parent, element, id)
-    with FocusableTrait {
+    with SingleNodeFocusableTrait {
 
   import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl._
 

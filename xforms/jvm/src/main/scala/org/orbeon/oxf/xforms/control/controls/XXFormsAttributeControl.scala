@@ -181,8 +181,6 @@ class XXFormsAttributeControl(
     }
   }
 
-  override def focusableControls = Iterator.empty
-
   override def supportFullAjaxUpdates = false
 }
 

@@ -48,7 +48,7 @@ class XFormsSelect1Control(
   element,
   id
 ) with XFormsValueControl
-  with FocusableTrait {
+  with SingleNodeFocusableTrait {
 
   selfControl =>
 
@@ -357,8 +357,8 @@ class XFormsSelect1Control(
     super.findAriaByControlEffectiveId
 
   // Don't accept focus if we have the internal appearance
-  override def isDirectlyFocusable: Boolean =
-    ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.isDirectlyFocusable
+  override def isDirectlyFocusableMaybeWithToggle: Boolean =
+    ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.isDirectlyFocusableMaybeWithToggle
 
   override def supportAjaxUpdates: Boolean =
     ! staticControl.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)

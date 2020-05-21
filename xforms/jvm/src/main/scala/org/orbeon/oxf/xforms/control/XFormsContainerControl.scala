@@ -77,10 +77,9 @@ trait XFormsContainerControl extends VisitableTrait {
         currentControl.iterationRemoved()
   }
 
-  // focus to the first form control in the container that is able to accept focus"
-  override def focusableControls: Iterator[XFormsControl] =
-    if (isRelevant && hasChildren)
-      _children.iterator flatMap (_.focusableControls)
+  override def followDescendantsForFocus: Iterator[XFormsControl] =
+    if (hasChildren)
+      _children.iterator
     else
       Iterator.empty
 

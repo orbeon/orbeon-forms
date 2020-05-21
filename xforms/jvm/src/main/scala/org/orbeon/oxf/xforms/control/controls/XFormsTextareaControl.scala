@@ -29,7 +29,7 @@ class XFormsTextareaControl(
   parent,
   element,
   id
-) with XFormsValueControl with ReadonlyFocusableTrait {
+) with XFormsValueControl with ReadonlySingleNodeFocusableTrait {
 
   // Replacement-based input sanitation
   override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] =

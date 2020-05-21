@@ -29,7 +29,7 @@ class XFormsSecretControl(
   element,
   effectiveId
 ) with XFormsValueControl
-  with FocusableTrait {
+  with SingleNodeFocusableTrait {
 
   override def getFormattedValue: Option[String] = {
     Some(XFormsSecretControl.HiddenPasswordPlaceholder)

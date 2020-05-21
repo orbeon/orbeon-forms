@@ -46,7 +46,7 @@ import scala.util.control.NonFatal
 class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
     extends XFormsSingleNodeControl(container, parent, element, id)
     with XFormsValueControl
-    with FocusableTrait
+    with SingleNodeFocusableTrait
     with FileMetadata {
 
   def supportedFileMetadata: Seq[String] = FileMetadata.AllMetadataNames

@@ -57,7 +57,6 @@ class XFormsVariableControl(
   override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
 
   override def supportAjaxUpdates = false
-  override def focusableControls: Iterator[XFormsControl] = Iterator.empty
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)

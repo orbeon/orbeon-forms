@@ -19,6 +19,16 @@ import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.Implicits._
 
 class XXFormsFocusable extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext).iterator flatMap (_.focusableControls) nonEmpty
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
+
+    implicit val ctx = xpathContext
+
+    val it =
+      if (booleanArgument(1, default = true))
+        relevantControl(0).iterator flatMap (_.directlyFocusableControlsMaybeWithToggle)
+      else
+        relevantControl(0).iterator flatMap (_.directlyFocusableControls)
+
+     it.nonEmpty
+  }
 }

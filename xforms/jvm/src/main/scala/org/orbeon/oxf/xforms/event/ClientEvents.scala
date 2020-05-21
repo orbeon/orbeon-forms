@@ -348,7 +348,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       } else {
 
         def allowFocusEvent(c: XFormsControl, e: XFormsEvent) =
-          c.focusableControls.nonEmpty && (
+          c.directlyFocusableControls.nonEmpty && (
             e.isInstanceOf[XFormsFocusEvent] ||
               e.isInstanceOf[XXFormsBlurEvent] && (doc.getControls.getFocusedControl exists (_ eq c))
           )

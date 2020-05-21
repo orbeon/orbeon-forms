@@ -69,7 +69,7 @@ trait ControlEventSupport extends ListenersTrait {
             (includes.isEmpty || includes.contains(qName)) && ! excludes.contains(qName)
           }
 
-          focusableControls              find
+          directlyFocusableControls      find
             satisfiesIncludesAndExcludes foreach
             Focus.focusWithEvents
 

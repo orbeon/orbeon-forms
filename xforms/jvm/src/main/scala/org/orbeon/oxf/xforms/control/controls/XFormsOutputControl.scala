@@ -41,7 +41,7 @@ class XFormsOutputControl(
   id        : String
 ) extends XFormsSingleNodeControl(container, parent, element, id)
   with XFormsValueControl
-  with ReadonlyFocusableTrait
+  with ReadonlySingleNodeFocusableTrait
   with VisitableTrait
   with FileMetadata {
 
@@ -234,8 +234,8 @@ class XFormsOutputControl(
 
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
   // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
-  override def isDirectlyFocusable: Boolean =
-    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusable
+  override def isDirectlyFocusableMaybeWithToggle: Boolean =
+    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusableMaybeWithToggle
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)

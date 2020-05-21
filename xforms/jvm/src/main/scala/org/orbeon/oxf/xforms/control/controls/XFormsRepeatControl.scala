@@ -504,9 +504,9 @@ class XFormsRepeatControl(
 
   // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
   // repeat object associated with the repeat index"
-  override def focusableControls: Iterator[XFormsControl] =
-    if (isRelevant && getIndex > 0)
-      children(getIndex - 1).focusableControls
+  override def followDescendantsForFocus: Iterator[XFormsControl] =
+    if (getIndex > 0)
+      Iterator(children(getIndex - 1))
     else
       Iterator.empty
 

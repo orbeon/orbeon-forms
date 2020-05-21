@@ -352,7 +352,7 @@
                                                             '&lt;span/>'"/>
                                                 <xf:var
                                                     name="focusable"
-                                                    value="xxf:focusable(@id)"/>
+                                                    value="xxf:focusable(@id, true())"/>
 
                                                 <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
                                                 <xf:switch caseref="$focusable" xxf:xforms11-switch="true">

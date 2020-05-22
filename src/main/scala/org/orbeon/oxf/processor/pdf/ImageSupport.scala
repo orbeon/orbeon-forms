@@ -82,14 +82,14 @@ object ImageSupport {
             (_.scale(-1.0, 1.0))         |!>
             (_.translate(-height, 0))    |!>
             (_.translate(0, width))      |!>
-            (_.rotate(  3 * Math.PI / 2))
+            (_.rotate(3 * Math.PI / 2))
         )
       case 8 =>
         // 270 degree rotation
         Some(
           new AffineTransform            |!>
             (_.translate(0, width))      |!>
-            (_.rotate(  3 * Math.PI / 2))
+            (_.rotate(3 * Math.PI / 2))
         )
       case _ =>
         None

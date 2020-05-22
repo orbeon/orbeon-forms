@@ -310,9 +310,14 @@
         navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/new")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*">
+        if ("xxf:get-request-method() = 'GET'")
+        then navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/edit/{fr:document-id()}")
+        else edit
+    </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >
         xf:show("fr-clear-confirm-dialog")

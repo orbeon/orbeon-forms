@@ -141,7 +141,7 @@ object SimpleDataMigration {
 
     import enumeratum._
 
-    sealed abstract class DataMigrationBehavior extends EnumEntry with Lowercase
+    sealed trait DataMigrationBehavior extends EnumEntry with Lowercase
 
     object DataMigrationBehavior extends Enum[DataMigrationBehavior] {
 

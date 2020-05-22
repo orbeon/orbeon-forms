@@ -21,7 +21,7 @@ import scala.concurrent.duration.FiniteDuration
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-sealed abstract class ExecutionWait extends EnumEntry
+sealed trait ExecutionWait extends EnumEntry
 
 object ExecutionWait extends Enum[ExecutionWait] {
 

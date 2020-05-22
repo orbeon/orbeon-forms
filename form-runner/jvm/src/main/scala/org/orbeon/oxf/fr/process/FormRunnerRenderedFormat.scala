@@ -30,7 +30,7 @@ import scala.language.postfixOps
 
 object FormRunnerRenderedFormat {
 
-  sealed abstract class RenderedFormat extends EnumEntry with Lowercase
+  sealed trait RenderedFormat extends EnumEntry with Lowercase
 
   object RenderedFormat extends Enum[RenderedFormat] {
 

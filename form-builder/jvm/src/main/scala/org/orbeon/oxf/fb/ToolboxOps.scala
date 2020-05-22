@@ -367,7 +367,7 @@ object ToolboxOps {
   </xcv>
   */
 
-  sealed abstract class XcvEntry extends EnumEntry with Lowercase
+  sealed trait XcvEntry extends EnumEntry with Lowercase
   object XcvEntry extends Enum[XcvEntry] {
     val values = findValues
     case object Control   extends XcvEntry

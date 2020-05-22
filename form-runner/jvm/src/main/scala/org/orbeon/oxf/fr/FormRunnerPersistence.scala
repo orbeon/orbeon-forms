@@ -42,7 +42,7 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-sealed abstract class FormOrData extends EnumEntry with Lowercase
+sealed trait FormOrData extends EnumEntry with Lowercase
 
 object FormOrData extends Enum[FormOrData] {
 

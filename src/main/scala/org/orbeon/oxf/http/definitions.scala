@@ -226,7 +226,7 @@ object StatusCode {
   val ServiceUnavailable    = 503
 }
 
-sealed abstract class HttpMethod extends EnumEntry
+sealed trait HttpMethod extends EnumEntry
 
 object HttpMethod extends Enum[HttpMethod] {
 

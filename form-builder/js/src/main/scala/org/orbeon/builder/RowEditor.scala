@@ -43,7 +43,7 @@ object RowEditor {
       gridIsInDocument option f(currentGridBody)
     }
 
-  sealed abstract class RowEditor extends EnumEntry with Hyphencase {
+  sealed trait RowEditor extends EnumEntry with Hyphencase {
     def className = s".fb-row-$entryName"
   }
   object RowEditor extends Enum[RowEditor] {

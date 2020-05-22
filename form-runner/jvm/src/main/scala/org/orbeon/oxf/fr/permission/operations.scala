@@ -20,7 +20,7 @@ sealed trait                                                        Operations
 case object AnyOperation                                    extends Operations
 case class  SpecificOperations(operations: List[Operation]) extends Operations
 
-sealed abstract class Operation extends EnumEntry with Lowercase
+sealed trait Operation extends EnumEntry with Lowercase
 
 object Operation extends Enum[Operation] {
 

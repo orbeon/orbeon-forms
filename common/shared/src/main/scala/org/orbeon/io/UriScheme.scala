@@ -16,7 +16,7 @@ package org.orbeon.io
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 
-sealed abstract class UriScheme extends EnumEntry with Lowercase
+sealed trait UriScheme extends EnumEntry with Lowercase
 
 object UriScheme extends Enum[UriScheme] {
 

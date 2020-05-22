@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.oxf.util.CoreUtils._
 
-sealed abstract class Provider extends EnumEntry with Lowercase
+sealed trait Provider extends EnumEntry with Lowercase
 
 object Provider extends Enum[Provider] {
 

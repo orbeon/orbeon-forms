@@ -35,7 +35,7 @@ import scala.collection.mutable
 import scala.util.control.Breaks
 
 // xml:lang reference
-sealed abstract class LangRef
+sealed trait LangRef
 case class LiteralLangRef(lang: String) extends LangRef
 case class AVTLangRef(att: AttributeControl) extends LangRef
 

@@ -41,7 +41,7 @@ object StateHandling {
     sequence : Int
   )
 
-  sealed abstract class StateResult extends EnumEntry
+  sealed trait StateResult extends EnumEntry
 
   object StateResult extends Enum[StateResult] {
 

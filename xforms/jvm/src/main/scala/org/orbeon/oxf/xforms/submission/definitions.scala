@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
-sealed abstract class ReplaceType extends EnumEntry with Lowercase
+sealed trait ReplaceType extends EnumEntry with Lowercase
 
 object ReplaceType extends Enum[ReplaceType] {
 
@@ -39,7 +39,7 @@ object ReplaceType extends Enum[ReplaceType] {
   def isReplaceBinary  (replaceType: ReplaceType) = replaceType == Binary
 }
 
-sealed abstract class RelevanceHandling extends EnumEntry
+sealed trait RelevanceHandling extends EnumEntry
 
 object RelevanceHandling extends Enum[RelevanceHandling] {
 
@@ -57,7 +57,7 @@ case class RefContext(
   xpathContext                 : XPathContext
 )
 
-sealed abstract class UrlType extends EnumEntry
+sealed trait UrlType extends EnumEntry
 
 object UrlType extends Enum[UrlType] {
 

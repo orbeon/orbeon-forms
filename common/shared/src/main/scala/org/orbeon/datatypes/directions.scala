@@ -16,7 +16,7 @@ package org.orbeon.datatypes
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 
-sealed abstract class Direction extends EnumEntry with Lowercase
+sealed trait Direction extends EnumEntry with Lowercase
 
 object Direction extends Enum[Direction] with CirceEnum[Direction] {
 
@@ -35,7 +35,7 @@ object Direction extends Enum[Direction] with CirceEnum[Direction] {
   }
 }
 
-sealed abstract class Orientation extends EnumEntry with Lowercase
+sealed trait Orientation extends EnumEntry with Lowercase
 
 object Orientation extends Enum[Orientation] with CirceEnum[Orientation] {
 
@@ -52,7 +52,7 @@ object Orientation extends Enum[Orientation] with CirceEnum[Orientation] {
   }
 }
 
-sealed abstract class AboveBelow extends EnumEntry with Lowercase
+sealed trait AboveBelow extends EnumEntry with Lowercase
 
 object AboveBelow extends Enum[AboveBelow] {
 

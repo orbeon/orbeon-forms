@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorImpl, ProcessorI
 
 object ScopeProcessorBase {
 
-  sealed abstract class Scope extends EnumEntry
+  sealed trait Scope extends EnumEntry
   object Scope extends Enum[Scope] {
 
     val values = findValues

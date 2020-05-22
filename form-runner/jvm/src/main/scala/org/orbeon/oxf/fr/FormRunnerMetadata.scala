@@ -57,7 +57,7 @@ object FormRunnerMetadata {
 
   case class Lang(lang: String) extends AnyVal
 
-  sealed abstract class ControlValue { val storageValue: String }
+  sealed trait ControlValue { val storageValue: String }
   case class SingleControlValue(storageValue: String, formattedValue: Option[String]) extends ControlValue
   case class MultipleControlValue(storageValue: String, formattedValues: List[String]) extends ControlValue
 

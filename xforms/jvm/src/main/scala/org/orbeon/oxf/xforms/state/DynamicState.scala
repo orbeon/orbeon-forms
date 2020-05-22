@@ -23,6 +23,7 @@ import control.Controls.ControlsIterator
 import org.orbeon.dom
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.xforms.XFormsId
@@ -32,6 +33,7 @@ case class DynamicState(
   uuid                : String,
   sequence            : Long,
   deploymentType      : Option[String],
+  requestMethod       : Option[HttpMethod],
   requestContextPath  : Option[String],
   requestPath         : Option[String],
   requestHeaders      : List[(String, List[String])],
@@ -262,6 +264,7 @@ object DynamicState {
       uuid                = document.getUUID,
       sequence            = document.getSequence,
       deploymentType      = Option(document.getDeploymentType) map (_.toString),
+      requestMethod       = Option(document.getRequestMethod),
       requestContextPath  = Option(document.getRequestContextPath),
       requestPath         = Option(document.getRequestPath),
       requestHeaders      = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList

@@ -27,6 +27,8 @@ trait IndependentRequestFunctions extends OrbeonFunctionLibrary {
 
   Namespace(IndependentFunctionsNS) {
 
+    Fun("get-request-method", classOf[GetRequestMethod], op = 0, min = 0, STRING, ALLOWS_ONE)
+
     Fun("get-request-path", classOf[GetRequestPath], op = 0, 0, STRING, ALLOWS_ONE)
 
     Fun("get-request-header", classOf[GetRequestHeader], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,

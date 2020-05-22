@@ -47,9 +47,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     )
 
     // TODO: Split this out into separate trait
-    Fun("get-request-method", classOf[GetRequestMethod], op = 0, min = 0, STRING, ALLOWS_ONE)
-
-    // TODO: Split this out into separate trait
     Fun("get-portlet-mode", classOf[GetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
 
     // TODO: Split this out into separate trait

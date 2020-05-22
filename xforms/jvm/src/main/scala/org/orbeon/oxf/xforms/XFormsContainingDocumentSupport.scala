@@ -23,7 +23,7 @@ import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
@@ -572,6 +572,7 @@ trait ContainingDocumentRequest {
   def getStaticState : XFormsStaticState
 
   private var _deploymentType             : DeploymentType = null
+  private var _requestMethod              : HttpMethod = null
   private var _requestContextPath         : String = null
   private var _requestPath                : String = null
   private var _requestHeaders             : Map[String, List[String]] = null
@@ -583,6 +584,7 @@ trait ContainingDocumentRequest {
   private var _isPortletContainerOrRemote : Boolean = false
 
   def getDeploymentType        = _deploymentType
+  def getRequestMethod         = _requestMethod
   def getRequestContextPath    = _requestContextPath
   def getRequestPath           = _requestPath
   def getRequestHeaders        = _requestHeaders
@@ -620,6 +622,8 @@ trait ContainingDocumentRequest {
             case _            => DeploymentType.Standalone
           }
 
+        _requestMethod = request.getMethod
+
         // Try to get request context path
         _requestContextPath = request.getClientContextPath("/")
 
@@ -643,6 +647,7 @@ trait ContainingDocumentRequest {
       case None =>
         // Special case when we run outside the context of a request
         _deploymentType = DeploymentType.Standalone
+        _requestMethod = HttpMethod.GET
         _requestContextPath = ""
         _requestPath = "/"
         _requestHeaders = Map.empty
@@ -663,6 +668,7 @@ trait ContainingDocumentRequest {
       case Some(_) =>
         // Normal case where information below was previously serialized
         _deploymentType             = (dynamicState.deploymentType map DeploymentType.withNameInsensitive orNull)
+        _requestMethod              = dynamicState.requestMethod.orNull
         _requestContextPath         = dynamicState.requestContextPath.orNull
         _requestPath                = dynamicState.decodeRequestPathJava
         _requestHeaders             = dynamicState.requestHeaders.toMap

@@ -293,6 +293,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(NODE_TYPE, EXACTLY_ONE)
     )
 
+    Fun("get-request-method", classOf[GetRequestMethodTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
     Fun("get-request-context-path", classOf[GetRequestContextPathTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
 
     Fun("get-request-path", classOf[GetRequestPathTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)

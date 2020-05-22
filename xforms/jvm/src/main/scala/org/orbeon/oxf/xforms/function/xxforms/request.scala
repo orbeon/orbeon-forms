@@ -52,6 +52,11 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
   }
 }
 
+class GetRequestMethodTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    getContainingDocument(xpathContext).getRequestMethod.entryName.toUpperCase
+}
+
 class GetRequestPathTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     getContainingDocument(xpathContext).getRequestPath

@@ -16,6 +16,7 @@ package org.orbeon.saxon.function
 import java.io.{ByteArrayInputStream, InputStream}
 
 import org.apache.commons.codec.binary.Base64
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
 import org.orbeon.oxf.util.NetUtils
@@ -41,9 +42,11 @@ class ImageMetadata extends DefaultFunctionSupport {
         new ByteArrayInputStream(Base64.decodeBase64(content))
 
     def findMetadata(is: InputStream) =
-      stringArgument(1) match {
-        case "mediatype" => findImageMediatype(is) map stringToStringValue
-        case name        => findKnownMetadata(is, name) map SaxonUtils.anyToItem
+      IOUtils.useAndClose(is) { _ =>
+        stringArgument(1) match {
+          case "mediatype" => findImageMediatype(is) map stringToStringValue
+          case name        => findKnownMetadata(is, MetadataType.withName(name)) map SaxonUtils.anyToItem
+        }
       }
 
     argumentAsString map createStream flatMap findMetadata orNull

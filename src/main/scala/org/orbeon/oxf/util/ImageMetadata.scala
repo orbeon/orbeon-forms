@@ -20,21 +20,34 @@ import com.drew.metadata.bmp.BmpHeaderDirectory
 import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
-import org.orbeon.io.IOUtils._
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 
 import scala.collection.JavaConverters._
+
 
 // Functions to extract image metadata from a stream
 object ImageMetadata {
 
+  sealed trait MetadataType extends EnumEntry with Lowercase
+
+  object MetadataType extends Enum[MetadataType] {
+
+    val values = findValues
+
+    case object Width       extends MetadataType
+    case object Height      extends MetadataType
+    case object Orientation extends MetadataType
+  }
+
   // Given a name in KnownNames, try to extract its value and return it as a Java object
   // 2020-03-25: Currently return java.lang.Integer
-  def findKnownMetadata(content: InputStream, name: String): Option[Any] =
+  def findKnownMetadata(content: InputStream, name: MetadataType): Option[Any] =
     KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _))
 
   // Try to find the type of the image
   def findImageMediatype(content: InputStream): Option[String] = {
-    val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
+    val metadata = ImageMetadataReader.readMetadata(content)
 
     // Support formats thar are supported by web browsers only
     // http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
@@ -49,7 +62,7 @@ object ImageMetadata {
   // Try to extract the value of the given metadata item
   private def findMetadata(content: InputStream, name: String): Option[Any] = {
 
-    val metadata = useAndClose(content)(ImageMetadataReader.readMetadata)
+    val metadata = ImageMetadataReader.readMetadata(content)
 
     val directoryIterator =
       for {
@@ -65,8 +78,9 @@ object ImageMetadata {
     }
   }
 
-  private val KnownNamesToMetadataExtractorNames = Map(
-    "width"  -> "Image Width",
-    "height" -> "Image Height"
+  private val KnownNamesToMetadataExtractorNames = Map[MetadataType, String](
+    MetadataType.Width       -> "Image Width",
+    MetadataType.Height      -> "Image Height",
+    MetadataType.Orientation -> "Orientation"
   )
 }

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.orbeon.oxf.util.ImageMetadata._
@@ -38,13 +39,19 @@ class ImageMetadataTest
       def openStream = URLFactory.createURL(URLPrefix + "." + extension).openStream()
 
       it(s"must find the `$mediatype` mediatype") {
-        assert(findImageMediatype(openStream).contains(mediatype))
+        IOUtils.useAndClose(openStream) { is =>
+          assert(findImageMediatype(is).contains(mediatype))
+        }
       }
 
       if (extension != "bmp") { // some .bmp don't have the width/height metadata
         it(s"must find the width and height for mediatype `$mediatype`") {
-          assert(findKnownMetadata(openStream, "width").contains(400))
-          assert(findKnownMetadata(openStream, "height").contains(368))
+          IOUtils.useAndClose(openStream) { is =>
+            assert(findKnownMetadata(is, MetadataType.Width).contains(400))
+          }
+          IOUtils.useAndClose(openStream) { is =>
+            assert(findKnownMetadata(is, MetadataType.Height).contains(368))
+          }
         }
       }
     }

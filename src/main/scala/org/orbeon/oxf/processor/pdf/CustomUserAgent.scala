@@ -18,17 +18,21 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.InputStream
+import java.awt.Color
+import java.awt.geom.AffineTransform
+import java.awt.image.{AffineTransformOp, BufferedImage}
+import java.io.{BufferedInputStream, InputStream}
 import java.net.URI
 
 import com.lowagie.text.Image
+import javax.imageio.ImageIO
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, ImageMetadata, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.{ITextFSImage, ITextOutputDevice, PDFAsImage}
 import org.xhtmlrenderer.resource.ImageResource
@@ -56,41 +60,43 @@ class CustomUserAgent(
     )
   ) {
 
-  val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
+  import Private._
 
-  // See https://github.com/orbeon/orbeon-forms/issues/1996
-  // Use our own local cache (`NaiveUserAgent` has one too) so that we can cache against the absolute URL
-  // yet pass a local URL to `super.getImageResource()`.
-  // This doesn't live beyond the production of this PDF as the `ITextUserAgent` is created each time.
-  val localImageCache = mutable.HashMap[String, ImageResource]()
+  private val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
 
   override def getImageResource(originalUriString: String): ImageResource = {
 
     def fromBase64(uriString: String): Option[Try[ImageResource]] =
-        ImageUtil.isEmbeddedBase64Image(uriString) option
-          Try(loadEmbeddedBase64ImageResource(uriString)) // always return an `ImageResource``
+      ImageUtil.isEmbeddedBase64Image(uriString) option
+        Try(loadEmbeddedBase64ImageResource(uriString)) // always return an `ImageResource``
 
     // Not sure we even ever need to read a PDF "image"!
     def fromPdf(uriString: String): ImageResource = {
-      val uri = new URI(uriString)
-      val reader = outputDevice.getReader(uri)
-      val image = new PDFAsImage(uri)
-      val rect = reader.getPageSizeWithRotation(1)
-      image.setInitialWidth(rect.getWidth * outputDevice.getDotsPerPoint)
-      image.setInitialHeight(rect.getHeight * outputDevice.getDotsPerPoint)
+
+      val uri   = new URI(uriString)
+      val rect  = outputDevice.getReader(uri).getPageSizeWithRotation(1)
+
+      val image = new PDFAsImage(uri) |!>
+        (_.setInitialWidth(rect.getWidth * outputDevice.getDotsPerPoint)) |!>
+        (_.setInitialHeight(rect.getHeight * outputDevice.getDotsPerPoint))
+
       new ImageResource(uriString, image)
     }
 
     def fromImage(is: InputStream, uriString: String): ImageResource = {
-      val array = NetUtils.inputStreamToByteArray(is)
-      try{
-        val image = Image.getInstance(array)
-        scaleToOutputResolution(image)
-        new ImageResource(uriString, new ITextFSImage(image))
-      } catch {
-        case NonFatal(t) =>
-          new ImageResource(uriString, null)
-      }
+
+      val (bis, orientationOpt) = findImageOrientation(is)
+      val sourceImage           = ImageIO.read(bis)
+
+      val rotatedImageOpt =
+        orientationOpt flatMap
+          (findTransformation(_, sourceImage.getWidth, sourceImage.getHeight)) map
+          (transformImage(sourceImage, _))
+
+      val iTextImage = Image.getInstance(rotatedImageOpt getOrElse sourceImage, null)
+      scaleToOutputResolution(iTextImage)
+
+      new ImageResource(uriString, new ITextFSImage(iTextImage))
     }
 
     def fromPdfOrImage(uriString: String): Try[ImageResource] =
@@ -210,21 +216,120 @@ class CustomUserAgent(
     resolved
   }
 
-  private def loadEmbeddedBase64ImageResource(uri: String): ImageResource =
-    try {
-      val buffer = ImageUtil.getEmbeddedBase64Image(uri)
-      val image = Image.getInstance(buffer)
-      scaleToOutputResolution(image)
-      new ImageResource(null, new ITextFSImage(image))
-    } catch {
-      case NonFatal(t) =>
-        XRLog.exception(s"Can't read XHTML embedded image.", t)
-        new ImageResource(null, null)
+  private object Private {
+
+    // See https://github.com/orbeon/orbeon-forms/issues/1996
+    // Use our own local cache (`NaiveUserAgent` has one too) so that we can cache against the absolute URL
+    // yet pass a local URL to `super.getImageResource()`. This doesn't live beyond the production of this
+    // PDF as the user agent instance is created each time.
+    val localImageCache: mutable.Map[String, ImageResource] = mutable.HashMap()
+
+    def loadEmbeddedBase64ImageResource(uri: String): ImageResource =
+      try {
+        val buffer = ImageUtil.getEmbeddedBase64Image(uri)
+        val image = Image.getInstance(buffer)
+        scaleToOutputResolution(image)
+        new ImageResource(null, new ITextFSImage(image))
+      } catch {
+        case NonFatal(t) =>
+          XRLog.exception(s"Can't read XHTML embedded image.", t)
+          new ImageResource(null, null)
+      }
+
+    def scaleToOutputResolution(image: com.lowagie.text.Image): Unit = {
+      val factor = sharedContext.getDotsPerPixel
+      if (factor != 1.0f)
+        image.scaleAbsolute(image.getPlainWidth * factor, image.getPlainHeight * factor)
     }
 
-  private def scaleToOutputResolution(image: Image): Unit = {
-    val factor = sharedContext.getDotsPerPixel
-    if (factor != 1.0f)
-      image.scaleAbsolute(image.getPlainWidth * factor, image.getPlainHeight * factor)
+    val MaxExifSize: Int = 64 * 1024
+
+    def findImageOrientation(is: InputStream): (BufferedInputStream, Option[Int]) = {
+
+      val bis = new BufferedInputStream(is, MaxExifSize)
+      bis.mark(MaxExifSize)
+
+      val orientationOpt =
+        ImageMetadata.findKnownMetadata(bis, ImageMetadata.MetadataType.Orientation) collect {
+          case i: Int => i.intValue
+        }
+
+      bis.reset()
+
+      (bis, orientationOpt)
+    }
+
+    def findTransformation(orientation: Int, width: Int, height: Int): Option[AffineTransform] =
+      orientation match {
+        case 2 =>
+          // Horizontal flip
+          Some(
+            new AffineTransform            |!>
+              (_.scale(-1.0, 1.0))         |!>
+              (_.translate(-width, 0))
+          )
+        case 3 =>
+          // 180 degree rotation
+          Some(
+            new AffineTransform            |!>
+              (_.translate(width, height)) |!>
+              (_.rotate(Math.PI))
+          )
+        case 4 =>
+          // Vertical flip
+          Some(
+            new AffineTransform            |!>
+              (_.scale(1.0, -1.0))         |!>
+              (_.translate(0, -height))
+          )
+        case 5 =>
+          Some(
+            new AffineTransform            |!>
+              (_.rotate(-Math.PI / 2))     |!>
+              (_.scale(-1.0, 1.0))
+          )
+        case 6 =>
+          // 90 degree rotation
+          Some(
+            new AffineTransform            |!>
+              (_.translate(height, 0))     |!>
+              (_.rotate(Math.PI / 2))
+          )
+        case 7 =>
+          Some(
+            new AffineTransform            |!>
+              (_.scale(-1.0, 1.0))         |!>
+              (_.translate(-height, 0))    |!>
+              (_.translate(0, width))      |!>
+              (_.rotate(  3 * Math.PI / 2))
+          )
+        case 8 =>
+          // 270 degree rotation
+          Some(
+            new AffineTransform            |!>
+              (_.translate(0, width))      |!>
+              (_.rotate(  3 * Math.PI / 2))
+          )
+        case _ =>
+          None
+      }
+
+    def transformImage(sourceImage: BufferedImage, transform: AffineTransform): BufferedImage = {
+
+      val op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC)
+
+      val destinationImage =
+        op.createCompatibleDestImage(
+          sourceImage,
+          if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY) sourceImage.getColorModel else null
+        )
+
+      // Not sure we need to clear
+      val g = destinationImage.createGraphics
+      g.setBackground(Color.WHITE)
+      g.clearRect(0, 0, destinationImage.getWidth, destinationImage.getHeight)
+
+      op.filter(sourceImage, destinationImage)
+    }
   }
 }

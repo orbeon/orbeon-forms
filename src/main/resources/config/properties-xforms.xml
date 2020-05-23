@@ -189,8 +189,6 @@
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library">
-        fr:grid-single
-        fr:grid-multiple
         fr:tinymce
         fr:dropdown-select1
         fr:dropdown-date

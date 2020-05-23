@@ -56,7 +56,7 @@ object TreeSelect1 {
 
       override def xformsGetValue(): String = this.currentValue
 
-      override def xformsUpdateValue(newValue: String): Unit =
+      override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
         if (this.hasJavaScriptTree) {
           logDebug(s"xformsUpdateValue = `$newValue`")
 
@@ -67,6 +67,8 @@ object TreeSelect1 {
           if (activatedNodeOpt.isEmpty)
             logDebug(s"no matching node for `$newValue`")
         }
+        js.undefined
+      }
 
       override def xformsFocus(): Unit =
         if (this.hasJavaScriptTree) {

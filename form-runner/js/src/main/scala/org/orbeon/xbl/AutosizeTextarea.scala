@@ -17,6 +17,10 @@ import org.orbeon.facades.Autosize
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
+import org.scalajs.jquery.JQueryPromise
+
+import scala.scalajs.js
+import scala.scalajs.js.|
 
 
 object AutosizeTextarea {
@@ -34,8 +38,10 @@ object AutosizeTextarea {
       override def destroy(): Unit =
         Autosize.destroy(textarea)
 
-      override def xformsUpdateValue(newValue: String): Unit =
+      override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
         Autosize.update(textarea)
+        js.undefined
+      }
 
       // In order to be notified of value updates, we enable the `external-value` mode.
       // This means that we also need to implement this method, even though we don't

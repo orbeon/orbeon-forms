@@ -16,7 +16,10 @@ package org.orbeon.xbl
 import io.circe.{Decoder, Encoder, parser}
 import org.orbeon.xforms.DocumentAPI
 import org.orbeon.xforms.facade.XBLCompanion
+import org.scalajs.jquery.JQueryPromise
 
+import scala.scalajs.js
+import scala.scalajs.js.|
 import scala.util.{Failure, Success, Try}
 
 abstract class XBLCompanionWithState extends XBLCompanion {
@@ -36,7 +39,7 @@ abstract class XBLCompanionWithState extends XBLCompanion {
   final override def xformsGetValue(): String =
     stateOpt map encode getOrElse ""
 
-  final override def xformsUpdateValue(newValue: String): Unit =
+  final override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
     decode(newValue) match {
       case Success(newState) =>
 
@@ -48,6 +51,8 @@ abstract class XBLCompanionWithState extends XBLCompanion {
       case Failure(t) =>
         scribe.debug(s"error decoding value: ${t.getMessage}")
     }
+    js.undefined
+  }
 
   final def updateStateAndSendValueToServerIfNeeded(newState: State, valueFromState: State => String): Boolean = {
 

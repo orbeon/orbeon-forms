@@ -94,13 +94,13 @@ class XBLCompanion extends js.Object {
 
   // Lifecycle
 
-  def init()                                  : Unit   = ()
-  def destroy()                               : Unit   = ()
+  def init()                                  : Unit                                         = ()
+  def destroy()                               : Unit                                         = ()
 
-  def xformsGetValue()                        : String = null
-  def xformsUpdateValue(newValue: String)     : Unit   = ()
-  def xformsUpdateReadonly(readonly: Boolean) : Unit   = ()
-  def xformsFocus()                           : Unit   = ()
+  def xformsGetValue()                        : String                                       = null
+  def xformsUpdateValue(newValue: String)     : js.UndefOr[js.Promise[Unit] | JQueryPromise] = js.undefined
+  def xformsUpdateReadonly(readonly: Boolean) : Unit                                         = ()
+  def xformsFocus()                           : Unit                                         = ()
 
   // Helpers
 

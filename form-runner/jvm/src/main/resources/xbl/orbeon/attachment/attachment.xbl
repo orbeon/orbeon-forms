@@ -27,10 +27,10 @@
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">File Attachment</display-name>
+            <display-name lang="en">Single File Attachment</display-name>
             <display-name lang="es">Archivos Adjuntos</display-name>
             <display-name lang="fi">Tiedoston liittäminen</display-name>
-            <display-name lang="fr">Fichier joint</display-name>
+            <display-name lang="fr">Fichier joint unique</display-name>
             <display-name lang="ru">Загрузка файла</display-name>
             <display-name lang="it">File allegato</display-name>
             <display-name lang="de">Datei Anhang</display-name>

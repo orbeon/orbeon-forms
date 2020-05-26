@@ -26,16 +26,16 @@
             xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Multiple File Attachment</display-name>
-            <display-name lang="es">[Multiple File Attachment]</display-name>
-            <display-name lang="fi">[Multiple File Attachment]</display-name>
-            <display-name lang="fr">Fichier joint multiple</display-name>
-            <display-name lang="ru">[Multiple File Attachment]</display-name>
-            <display-name lang="it">[Multiple File Attachment]</display-name>
-            <display-name lang="de">[Multiple File Attachment]</display-name>
-            <display-name lang="sv">[Multiple File Attachment]</display-name>
-            <display-name lang="nl">[Multiple File Attachment]</display-name>
-            <display-name lang="pt">[Multiple File Attachment]</display-name>
+            <display-name lang="en">Multiple File Attachments</display-name>
+            <display-name lang="es">[Multiple File Attachments]</display-name>
+            <display-name lang="fi">[Multiple File Attachments]</display-name>
+            <display-name lang="fr">Fichiers joints multiples</display-name>
+            <display-name lang="ru">[Multiple File Attachments]</display-name>
+            <display-name lang="it">[Multiple File Attachments]</display-name>
+            <display-name lang="de">[Multiple File Attachments]</display-name>
+            <display-name lang="sv">[Multiple File Attachments]</display-name>
+            <display-name lang="nl">[Multiple File Attachments]</display-name>
+            <display-name lang="pt">[Multiple File Attachments]</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-files-o</icon-class>
             </icon>
@@ -96,84 +96,96 @@
                     <_>
                         <resource xml:lang="en">
                             <download>Download</download>
-                            <select>Select File</select>
+                            <select-file>Select File</select-file>
+                            <select-files>Select Files</select-files>
                             <drag>Drag files here or use the button below.</drag>
                             <empty>No attachment.</empty>
                             <remove>Remove Attachment</remove>
                         </resource>
                         <resource xml:lang="es">
+                            <select-file>[Select File]</select-file>
                             <download>Bajar Archivo</download>
-                            <select todo="true">[Select File]</select>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="fi">
                             <download>Lataa</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="fr">
                             <download>Télécharger</download>
-                            <select>Sélectionner un fichier</select>
+                            <select-file>Sélectionner fichier</select-file>
+                            <select-files>Sélectionner fichiers</select-files>
                             <drag>Déposer les fichiers ici ou utiliser le bouton ci-dessous.</drag>
                             <empty>Pas de fichier joint.</empty>
                             <remove>Supprimer le fichier joint</remove>
                         </resource>
                         <resource xml:lang="ru">
                             <download>Download</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="it">
                             <download>Scaricare</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="de">
                             <download>Herunterladen</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="sv">
                             <download>Ladda ner</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="nl">
                             <download>Download</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="pt">
                             <download>Baixar</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="lt">
                             <download>Parsisiųsti</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
                         </resource>
                         <resource xml:lang="da">
                             <download>Hent</download>
-                            <select todo="true">[Select File]</select>
+                            <select-file>[Select File]</select-file>
+                            <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
                             <remove todo="true">[Remove Attachment]</remove>
@@ -370,7 +382,7 @@
                 for="xf-upload≡xforms-input"
                 role="button"
                 tabindex="{if ($readonly) then '-1' else '0'}">
-                <xf:output value="xxf:r('select')"/>
+                <xf:output value="if ($multiple) then xxf:r('select-files') else xxf:r('select-file')"/>
             </xh:label>
 
 <!--            <fr:xforms-inspector/>-->

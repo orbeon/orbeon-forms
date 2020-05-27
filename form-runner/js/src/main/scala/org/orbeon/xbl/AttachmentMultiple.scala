@@ -79,7 +79,7 @@ object AttachmentMultiple {
         // versions not based on Chromium/Blink, so until version 18) support it:
         // https://stackoverflow.com/questions/47515232/how-to-set-file-input-value-when-dropping-file-on-page#answer-47522812
         def browserSupportsFileDrop: Boolean =
-          ! (Bowser.msedge.contains(true) || Bowser.msie.contains(true))
+          ! Bowser.msie.contains(true)
 
         def registerAllDropListeners(): Unit = {
           // "A listener for the dragenter and dragover events are used to indicate valid drop targets,

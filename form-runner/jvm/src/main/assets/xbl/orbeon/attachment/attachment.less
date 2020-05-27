@@ -106,6 +106,23 @@
         }
     }
 
+    // We *should* have `.orbeon.xforms-ios` on the same element, but when embedding,
+    // it's not yet (2020-05-26) the case and we have `.xforms-ios .orbeon`.
+    &.xforms-ios, .xforms-ios & {
+        // Trying to hide the drop area on iOS, by which we really mean "Safari and the OS
+        // don't support drag and drop". But this is hard to know. So for now, we hide it
+        // with a narrow viewport, knowing that the viewport can:
+        //
+        // 1. Be wider in landscape mode, for example with iPhone 11
+        // 2. Probably be narrower on an iPad too in some cases
+        //
+        .fr-attachment-drop {
+            @media (max-width: 640px) {
+                display: none;
+            }
+        }
+    }
+
     @media print {
         .xbl-fr-attachment, .xbl-fr-attachment-multiple {
 

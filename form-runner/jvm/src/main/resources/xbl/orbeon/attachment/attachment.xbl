@@ -140,14 +140,15 @@
             </control-details>
         </metadata>
 
-        <xbl:resources>
-            <xbl:style src="/xbl/orbeon/attachment-multiple/attachment-multiple.css"/>
-        </xbl:resources>
-
-        <!-- Delegate to fr:attachment-multiple -->
+        <!-- Delegate to `fr:attachment-multiple` -->
         <xi:include
             xmlns:xi="http://www.w3.org/2001/XInclude"
             href="/xbl/orbeon/attachment-multiple/attachment-multiple.xbl"
-            xpointer="xpath(/xbl:xbl/xbl:binding/xbl:implementation, /xbl:xbl/xbl:binding/xbl:handlers, /xbl:xbl/xbl:binding/xbl:template)"/>
+            xpointer="xpath(
+                /xbl:xbl/xbl:binding/xbl:resources,
+                /xbl:xbl/xbl:binding/xbl:implementation,
+                /xbl:xbl/xbl:binding/xbl:handlers,
+                /xbl:xbl/xbl:binding/xbl:template
+            )"/>
     </xbl:binding>
 </xbl:xbl>

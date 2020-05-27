@@ -114,18 +114,18 @@ object InitSupport {
 
   def setupGlobalClassesIfNeeded(): Unit = {
 
-    val jBody = $(dom.document.body)
+    val body = dom.document.body
 
     // For embedding as we don't have control over the generation of the `<body>` element
     // Remove once we no longer depend on YUI widgets at all anymore.
-    jBody.addClass(Constants.YuiSkinSamClass)
+    body.classList.add(Constants.YuiSkinSamClass)
 
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
-      jBody.addClass(Constants.XFormsIosClass)
+      body.classList.add(Constants.XFormsIosClass)
 
     if (Bowser.mobile.contains(true))
-      jBody.addClass(Constants.XFormsMobileClass)
+      body.classList.add(Constants.XFormsMobileClass)
   }
 
   @JSExport

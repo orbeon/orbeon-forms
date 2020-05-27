@@ -42,7 +42,7 @@ private class DateCompanion extends XBLCompanionWithState {
   val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
   def inputEl    : JQuery     = $(containerElem).find("input").first()
-  def iOS        : Boolean    = $(dom.document.body).hasClass("xforms-ios")
+  def iOS        : Boolean    = dom.document.body.classList.contains("xforms-ios")
   var datePicker : DatePicker = _
 
   override def init(): Unit = {

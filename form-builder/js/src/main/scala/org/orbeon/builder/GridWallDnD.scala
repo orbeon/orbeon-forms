@@ -287,7 +287,7 @@ object GridWallDnD {
         currentCellOpt.foreach { currentCell =>
           val startSide = {
             val wallIndex = source.getAttribute("data-index").toInt
-            val isVertical = $(source).hasClass(WallVerticalClass)
+            val isVertical = source.classList.contains(WallVerticalClass)
             if (isVertical) if (wallIndex == currentCell.x - 1) Direction.Left else Direction.Right
             else            if (wallIndex == currentCell.y - 1) Direction.Up   else Direction.Down
           }

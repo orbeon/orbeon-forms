@@ -14,14 +14,14 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Bowser
-import org.orbeon.xforms.{ExecutionWait, Page, UploadEvent, UploaderClient}
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
+import org.orbeon.xforms.{ExecutionWait, Page, UploadEvent, UploaderClient}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.scalajs.js
 import scala.concurrent.duration._
+import scala.scalajs.js
 
 // Companion for `fr:dnd-repeat`
 object AttachmentMultiple {
@@ -48,7 +48,7 @@ object AttachmentMultiple {
         scribe.debug("init")
 
         if (! companion.isMarkedReadonly && browserSupportsFileDrop) {
-          registerAllDropListeners()
+          registerAllListeners()
         } else if (! browserSupportsFileDrop) {
           scribe.debug("disabling drag and drop of files for unsupported browser")
           dropElem.classList.add("xforms-hidden")
@@ -57,21 +57,32 @@ object AttachmentMultiple {
 
       override def destroy(): Unit = {
         scribe.debug("destroy")
-        clearAllDropListeners()
+        clearAllListeners()
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit =
         if (readonly)
-          clearAllDropListeners()
+          clearAllListeners()
         else
-          registerAllDropListeners()
+          registerAllListeners()
 
       private object Private {
 
         def dropElem          = containerElem.querySelector(".fr-attachment-drop")
         def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
 
-        var listeners: List[(String, js.Function1[dom.raw.DragEvent, _])] = Nil
+        var listeners: List[(dom.raw.Element, String, js.Function1[_, _])] = Nil
+
+        def addListener[E <: dom.raw.UIEvent](el: dom.raw.Element, name: String, fn: E => Unit): Unit = {
+          val jsFn: js.Function1[E, _] = fn
+          dropElem.addEventListener(name, jsFn)
+          listeners ::= (el, name, jsFn)
+        }
+
+        def clearAllListeners(): Unit = {
+          listeners foreach { case (el, name, jsFn) => el.removeEventListener(name, jsFn) }
+          listeners = Nil
+        }
 
         // Both IE and Edge <= 18 (before Chromium) don't support assigning the `.files` property
         // so we disable drag and drop of files for these browsers. Other older browsers might not
@@ -81,7 +92,7 @@ object AttachmentMultiple {
         def browserSupportsFileDrop: Boolean =
           ! Bowser.msie.contains(true)
 
-        def registerAllDropListeners(): Unit = {
+        def registerAllListeners(): Unit = {
           // "A listener for the dragenter and dragover events are used to indicate valid drop targets,
           // that is, places where dragged items may be dropped. Most areas of a web page or application
           // are not valid places to drop data. Thus, the default handling of these events is not to allow
@@ -97,11 +108,8 @@ object AttachmentMultiple {
           def removeClass() =
             dropElem.classList.remove("fr-attachment-dragover")
 
-          def addDropListener(name: String, fn: dom.raw.DragEvent => Unit): Unit = {
-            val jsFn: js.Function1[dom.raw.DragEvent, _] = fn
-            dropElem.addEventListener(name, jsFn)
-            listeners ::= name -> jsFn
-          }
+          def addDropListener(name: String, fn: dom.raw.DragEvent => Unit): Unit =
+            addListener(dropElem, name, fn)
 
           addDropListener(
             "drop",
@@ -153,12 +161,18 @@ object AttachmentMultiple {
               }
             }
           )
-        }
 
-        def clearAllDropListeners(): Unit = {
-          val el = dropElem
-          listeners foreach { case (name, jsFn) => el.removeEventListener(name, jsFn) }
-          listeners = Nil
+          // On click on label, simulate click on the input, so users can press enter or space to select a file
+          addListener[dom.raw.KeyboardEvent](
+            uploadControlElem,
+            "keypress",
+            ev => {
+              if (ev.key == "Enter" || ev.key == " ") {
+                ev.preventDefault() // so that the page doesn't scroll
+                uploadControlElem.click()
+              }
+            }
+          )
         }
       }
     }

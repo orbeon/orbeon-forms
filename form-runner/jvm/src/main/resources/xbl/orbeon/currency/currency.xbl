@@ -367,7 +367,7 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
-        <!-- Delegate to fr:number -->
+        <!-- Delegate to `fr:number` -->
         <xi:include
             href="/xbl/orbeon/number/number.xbl"
             xpointer="xpath(/xbl:xbl/xbl:binding/xbl:handlers, /xbl:xbl/xbl:binding/xbl:template)"/>

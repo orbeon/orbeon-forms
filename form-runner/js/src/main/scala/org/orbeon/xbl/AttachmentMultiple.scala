@@ -84,11 +84,6 @@ object AttachmentMultiple {
           listeners = Nil
         }
 
-        // Both IE and Edge <= 18 (before Chromium) don't support assigning the `.files` property
-        // so we disable drag and drop of files for these browsers. Other older browsers might not
-        // support this either, but since late 2017, apparently, all major browsers (except Edge
-        // versions not based on Chromium/Blink, so until version 18) support it:
-        // https://stackoverflow.com/questions/47515232/how-to-set-file-input-value-when-dropping-file-on-page#answer-47522812
         def browserSupportsFileDrop: Boolean =
           ! Bowser.msie.contains(true)
 

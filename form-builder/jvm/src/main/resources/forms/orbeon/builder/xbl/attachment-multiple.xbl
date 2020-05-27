@@ -1,0 +1,46 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xbl:binding id="fr-attachment" element="fr|attachment">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Multiple File Attachments</display-name>
+            <display-name lang="es">[Multiple File Attachments]</display-name>
+            <display-name lang="fi">[Multiple File Attachments]</display-name>
+            <display-name lang="fr">Fichiers joints multiples</display-name>
+            <display-name lang="ru">[Multiple File Attachments]</display-name>
+            <display-name lang="it">[Multiple File Attachments]</display-name>
+            <display-name lang="de">[Multiple File Attachments]</display-name>
+            <display-name lang="sv">[Multiple File Attachments]</display-name>
+            <display-name lang="nl">[Multiple File Attachments]</display-name>
+            <display-name lang="pt">[Multiple File Attachments]</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-files-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI"/>
+                <view>
+                     <fr:attachment multiple="true" id="" ref="" class="fr-attachment">
+                        <xf:label ref=""/>
+                        <xf:hint  ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:attachment>
+                </view>
+            </templates>
+        </metadata>
+    </xbl:binding>
+</xbl:xbl>

@@ -68,7 +68,7 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/attachment-controls.xbl
         oxf:/xbl/orbeon/attachment/attachment.xbl
-        oxf:/xbl/orbeon/attachment-multiple/attachment-multiple.xbl
+        oxf:/forms/orbeon/builder/xbl/attachment-multiple.xbl
         oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
         oxf:/xbl/orbeon/image/image.xbl
         oxf:/xbl/orbeon/wpaint/wpaint.xbl

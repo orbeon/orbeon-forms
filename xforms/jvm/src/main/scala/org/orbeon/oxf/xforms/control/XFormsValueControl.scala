@@ -261,7 +261,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     // NOTE: Call `compareExternalUseExternalValue` directly so as to avoid check on
     // `(previousControlOpt exists (_ eq this)) && (getInitialLocal eq getCurrentLocal)` which
     // causes part of https://github.com/orbeon/orbeon-forms/issues/2857.
-    compareExternalUseExternalValue(previousValueOpt orElse externalValueOpt, previousControlOpt)
+    compareExternalUseExternalValue(previousValueOpt orElse (previousControlOpt flatMap (_.asInstanceOf[XFormsValueControl].externalValueOpt)), previousControlOpt)
 
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],
@@ -270,8 +270,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     handleExternalValue && (
       previousControl match {
         case Some(other: XFormsValueControl) =>
-          previousExternalValue == other.externalValueOpt &&
-          super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+          previousExternalValue == externalValueOpt &&
+            super.compareExternalUseExternalValue(previousExternalValue, previousControl)
         case _ => false
       }
     )

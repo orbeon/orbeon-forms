@@ -231,11 +231,15 @@
             <!-- Scala.js tells us that a new value was selected, save the label -->
             <xbl:handler event="fr-change">
                 <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
-                <!-- Create `label` attribute if necessary  -->
-                <xf:insert if="empty($binding/@label)" context="$binding" origin="xf:attribute('label')"/>
                 <!-- Save label and value -->
                 <xf:setvalue ref="$binding/@label" value="event('fr-label')"/>
                 <xf:setvalue ref="$binding"        value="event('fr-value')"/>
+            </xbl:handler>
+
+            <!-- Create the `label` attribute if necessary, and always do it, so code looking at the instance can easily know whether
+                 the `label` attribute is expected by the component -->
+            <xbl:handler event="xforms-enabled">
+                <xf:insert if="empty($binding/@label)" context="$binding" origin="xf:attribute('label')"/>
             </xbl:handler>
 
         </xbl:handlers>

@@ -285,6 +285,7 @@
                 <relinquish>Relinquish lease</relinquish>
                 <renew>Renew lease</renew>
                 <try-acquire>Try to acquire lease</try-acquire>
+                <show-in-view-mode>Show in read-only mode</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -759,6 +760,7 @@
                 <relinquish>Renoncer au bail</relinquish>
                 <renew>Renouveler le bail</renew>
                 <try-acquire>Essayer d'obtenir le bail</try-acquire>
+                <show-in-view-mode>Visualiser en lecture seule</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -1222,6 +1224,7 @@
                 <relinquish>Libherar Bloqueo</relinquish>
                 <renew>Renovar Bloqueo</renew>
                 <try-acquire>Intentar adquirir Bloqueo</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -1685,6 +1688,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -2144,6 +2148,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -2611,6 +2616,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -3082,6 +3088,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -3553,6 +3560,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -4024,6 +4032,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -4494,6 +4503,7 @@
                 <relinquish>Lease afstaan</relinquish>
                 <renew>Lease vernieuwen</renew>
                 <try-acquire>Lease proberen te krijgen</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -4964,6 +4974,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -5425,6 +5436,7 @@
                 <relinquish todo="true">[Relinquish lease]</relinquish>
                 <renew todo="true">[Renew lease]</renew>
                 <try-acquire todo="true">[Try to acquire lease]</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>
@@ -5892,6 +5904,7 @@
                 <relinquish>Odblokuj dokument do edycji dla innych użytkowników.</relinquish>
                 <renew>Przedłuż swoje prawo do edycji dokumentu.</renew>
                 <try-acquire>Spróbuj uzyskać prawo do edycji dokumentu.</try-acquire>
+                <show-in-view-mode todo="true">[Show in read-only mode]</show-in-view-mode>
             </lease>
         </detail>
         <save-locally>

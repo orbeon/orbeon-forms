@@ -27,6 +27,7 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+        xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
         xmlns:d="DAV:">
 
     <xsl:variable name="metadata"       select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
@@ -187,6 +188,15 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="$persistence-instance/lease-load-document">true</xf:setvalue>
                                     <xf:send submission="fr-acquire-lease-submission"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger>
+                                <xf:label ref="$fr-resources/detail/lease/show-in-view-mode"/>
+                                <xf:action event="DOMActivate" type="xpath">
+                                    process:runProcess(
+                                        'oxf.fr.detail.process',
+                                        'navigate(uri = ''/fr/{fr:app-name()}/{fr:form-name()}/view/{fr:document-id()}'')'
+                                    )
                                 </xf:action>
                             </xf:trigger>
                         </xf:case>

@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.WhitelistObjectInputStream;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.xml.sax.SAXException;
+import scala.collection.immutable.Nil$;
 
 import javax.xml.transform.Source;
 import java.io.ByteArrayInputStream;
@@ -92,7 +93,7 @@ public class EncodeDecode {
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        final SAXStore saxStore = new SAXStore(WhitelistObjectInputStream.apply(byteArrayInputStream, SAXStore.class));
+        final SAXStore saxStore = new SAXStore(WhitelistObjectInputStream.apply(byteArrayInputStream, SAXStore.class, scala.collection.immutable.List.empty()));
 
         // Deserialize SAXStore to dom4j document
         // TODO: This is not optimal

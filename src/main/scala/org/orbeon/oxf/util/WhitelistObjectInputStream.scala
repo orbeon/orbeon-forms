@@ -16,13 +16,13 @@ package org.orbeon.oxf.util
 import java.io.{InputStream, ObjectInputStream, ObjectStreamClass}
 
 
-class WhitelistObjectInputStream(is: InputStream, classNames: Set[String]) extends ObjectInputStream(is) {
+class WhitelistObjectInputStream(is: InputStream, classNames: Set[String], prefixes: List[String]) extends ObjectInputStream(is) {
 
   override def resolveClass(desc: ObjectStreamClass): Class[_] = {
 
     val name = desc.getName
 
-    if (! (classNames(name) || WhitelistObjectInputStream.AllowedPrefixes.exists(name.startsWith)))
+    if (! (classNames(name) || prefixes.exists(name.startsWith)))
       throw new IllegalArgumentException(s"cannot deserialize class `$name`")
 
     super.resolveClass(desc)
@@ -31,8 +31,8 @@ class WhitelistObjectInputStream(is: InputStream, classNames: Set[String]) exten
 
 object WhitelistObjectInputStream {
 
-  def apply(is: InputStream, clazz: Class[_]): WhitelistObjectInputStream =
-    new WhitelistObjectInputStream(is, AllowedClasses ++ Set(clazz.getName))
+  def apply(is: InputStream, clazz: Class[_], prefixes: List[String]): WhitelistObjectInputStream =
+    new WhitelistObjectInputStream(is, AllowedClasses ++ Set(clazz.getName), prefixes ::: AllowedPrefixes)
 
   private val AllowedPrefixes = List(
     "scala.collection.",

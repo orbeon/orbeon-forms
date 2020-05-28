@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.state
 
 import java.io._
+
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
-
 import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.WhitelistObjectInputStream
@@ -58,7 +58,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       new ObjectOutputStream(new JavaOutputStream(output)).writeObject(o)
 
     def reads(input: Input) =
-      WhitelistObjectInputStream(new JavaInputStream(input), allowedClass).readObject.asInstanceOf[T]
+      WhitelistObjectInputStream(new JavaInputStream(input), allowedClass, List("org.orbeon.oxf.http.HttpMethod$")).readObject.asInstanceOf[T]
   }
 
   implicit object DynamicStateFormat extends SerializableFormat[DynamicState] { def allowedClass = classOf[DynamicState] }

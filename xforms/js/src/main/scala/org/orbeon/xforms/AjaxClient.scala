@@ -202,26 +202,6 @@ object AjaxClient {
   def hasShowProgressEvent: Boolean =
     EventQueue.eventsReversed exists (_.showProgress)
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
-  def hasChangedIdsRequest(controlId: String): Boolean =
-    EventQueue.changedIdsRequest.contains(controlId)
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.clearChangedIdsRequestIfPresentForChange")
-  def clearChangedIdsRequestIfPresentForChange(controlId: String): Unit =
-    EventQueue.changedIdsRequest.get(controlId) foreach { _ =>
-      EventQueue.changedIdsRequest += controlId -> 0
-    }
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.setOrIncrementChangedIdsRequestForKeyDown")
-  def setOrIncrementChangedIdsRequestForKeyDown(controlId: String): Unit =
-    EventQueue.changedIdsRequest += controlId -> (EventQueue.changedIdsRequest.getOrElse(controlId, 0) + 1)
-
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.decrementChangedIdsRequestIfPresentForKeyUp")
-  def decrementChangedIdsRequestIfPresentForKeyUp(controlId: String): Unit =
-    EventQueue.changedIdsRequest.get(controlId) foreach { v =>
-      EventQueue.changedIdsRequest += controlId -> (v - 1)
-    }
-
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvent")
   def fireEvent(event: AjaxEvent): Unit = {
 
@@ -304,7 +284,6 @@ object AjaxClient {
 
     var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
     var requestTryCount       : Int     = 0                  // attempts to run the current Ajax request done so far
-    var changedIdsRequest     : Map[String, Int] = Map.empty // see https://github.com/orbeon/orbeon-forms/issues/1732
   }
 
   private object Private {
@@ -351,7 +330,7 @@ object AjaxClient {
         scribe.debug("after `handleResponseDom`")
 
         // Reset changes, as changes are included in this batch of events
-        EventQueue.changedIdsRequest = Map.empty
+        AjaxKeyboardEventTracker.clear()
         ServerValueStore.purgeExpired()
 
         EventQueue.ajaxRequestInProgress = false
@@ -489,11 +468,7 @@ object AjaxClient {
 
     def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      // Remove from this list of ids that changed the id of controls for
-      // which we have received the keyup corresponding to the keydown.
-      // Use `filter`/`filterNot` which makes a copy so we don't have to worry about deleting keys being iterated upon
-      // Q: Should we do this only for the controls in the form we are currently processing?
-      EventQueue.changedIdsRequest = EventQueue.changedIdsRequest filterNot (_._2 == 0)
+      AjaxKeyboardEventTracker.keepOnlyNonBalanced()
 
       events.toList foreach { event =>
 

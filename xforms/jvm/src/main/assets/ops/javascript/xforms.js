@@ -2455,9 +2455,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // Dispatch change event to upload control
                     ORBEON.xforms.Page.getUploadControl(target).change();
                 } else {
-                    // When we move out from a field, we don't receive the keyup events corresponding to keydown
-                    // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
-                    ORBEON.xforms.server.AjaxServer.clearChangedIdsRequestIfPresentForChange(target.id);
 
                     if ($(target).is('.xforms-select1-appearance-compact')) {
                         // For select1 list, make sure we have exactly one value selected
@@ -2510,24 +2507,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        /**
-         * Rational:
-         *      Remember that the user is editing this field, so don't overwrite when we receive an event
-         *      from the server
-         * Testing on key code:
-         *      Ignore some key codes that won't modify the value of the field
-         *      (including when key code if undefined, which the RTE triggers in some cases).
-         * Testing on type control:
-         *      We only do this for text fields and text areas, because for other inputs (say select/select1) the user
-         *      can press a key that doesn't change the value of the field, in which case we *do* want to update the
-         *      control with a new value coming from the server.
-         */
-        _isChangingKey: function (control, keyCode) {
-            return ! _.isUndefined(keyCode) &&
-                    keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
-                    ($(control).is('.xforms-input, .xforms-secret, .xforms-textarea'));
-        },
-
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keydown: function (event) {
 
@@ -2545,9 +2524,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             var control = ORBEON.xforms.Events._findParentXFormsControl(target);
             if (control != null) {
                 ORBEON.xforms.Events.keydownEvent.fire({control: control, target: target});
-                if (ORBEON.xforms.Events._isChangingKey(control, event.keyCode)) {
-                    ORBEON.xforms.server.AjaxServer.setOrIncrementChangedIdsRequestForKeyDown(control.id);
-                }
             }
         },
 
@@ -2594,9 +2570,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                // Remember we have received the keyup for this element
-                if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
-                    ORBEON.xforms.server.AjaxServer.decrementChangedIdsRequestIfPresentForKeyUp(target.id);
                 // Incremental control: treat keypress as a value change event
                 if ($(target).is('.xforms-incremental')) {
                     var event =

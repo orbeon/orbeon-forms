@@ -232,6 +232,8 @@ object InitSupport {
       dom.document.addEventListener("focusout", Events.blur)
       $(dom.document).on           ("change",   Events.change)
 
+      AjaxFieldChangeTracker.initialize()
+
       // Register events that bubble on document for all browsers
       // TODO: Move away from YUI even listeners.
       if (! Globals.topLevelListenerRegistered) {

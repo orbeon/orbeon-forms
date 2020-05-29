@@ -330,7 +330,7 @@ object AjaxClient {
         scribe.debug("after `handleResponseDom`")
 
         // Reset changes, as changes are included in this batch of events
-        AjaxKeyboardEventTracker.clear()
+        AjaxFieldChangeTracker.afterResponseProcessed()
         ServerValueStore.purgeExpired()
 
         EventQueue.ajaxRequestInProgress = false
@@ -468,9 +468,11 @@ object AjaxClient {
 
     def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      AjaxKeyboardEventTracker.keepOnlyNonBalanced()
+      val eventsAsList = events.toList
 
-      events.toList foreach { event =>
+      AjaxFieldChangeTracker.beforeRequestSent(eventsAsList)
+
+      eventsAsList foreach { event =>
 
         // 2019-11-22: called by `LabelEditor`
         val updateProps: js.Function1[js.Dictionary[js.Any], Unit] =

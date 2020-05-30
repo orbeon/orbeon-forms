@@ -19,7 +19,7 @@ import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore}
 import org.scalajs.dom
-import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
+import org.scalajs.dom.{FocusEvent, MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
@@ -41,14 +41,28 @@ private class Select1SearchCompanion extends XBLCompanion {
 
   override def init(): Unit = {
     for {
-      jContainer        <- $(containerElem).headJQuery
-      jXFormsSelect     <- jContainer.find(".xforms-select1").headJQuery
-      (select, jSelect) <- jXFormsSelect.find("select").headElemJQuery
-      htmlSelect        = select.asInstanceOf[dom.html.Select]
+      jContainer                    <- $(containerElem).headJQuery
+      (xformsSelect, jXFormsSelect) <- jContainer.find(".xforms-select1").headElemJQuery
+      (select, jSelect)             <- jXFormsSelect.find("select").headElemJQuery
+      htmlSelect                    = select.asInstanceOf[dom.html.Select]
     } locally {
 
       val elementWithData        = jContainer.children(s"[$DataPlaceholder]")
       val servicePerformsSearch  = elementWithData.attr(DataServicePerformsSearch).contains("true")
+
+      // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
+      // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
+      // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
+      // `<xf:select1>` having lost the focus
+      xformsSelect.addEventListener(
+        "focusout",
+        (event: FocusEvent) => {
+          val target = event.target.asInstanceOf[dom.html.Element]
+          if (target.classList.contains("select2-selection--single"))
+            event.stopPropagation()
+        },
+        useCapture = true
+      )
 
       def initOrUpdatePlaceholder(): Unit = {
 

@@ -15,7 +15,7 @@ package org.orbeon.xforms.facade
 
 import org.orbeon.xforms.YUICustomEvent
 import org.scalajs.dom
-import org.scalajs.dom.{html, raw}
+import org.scalajs.dom.{FocusEvent, html, raw}
 import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
@@ -134,20 +134,20 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @js.native
 object Events extends js.Object {
 
-  val errorEvent                  : YUICustomEvent = js.native
-  val orbeonLoadedEvent           : YUICustomEvent = js.native
-  val componentChangedLayoutEvent : YUICustomEvent = js.native
+  val errorEvent                  : YUICustomEvent                 = js.native
+  val orbeonLoadedEvent           : YUICustomEvent                 = js.native
+  val componentChangedLayoutEvent : YUICustomEvent                 = js.native
 
-  val focus                       : js.Function    = js.native
-  val blur                        : js.Function    = js.native
-  val change                      : js.Function    = js.native
-  val keypress                    : js.Function    = js.native
-  val keydown                     : js.Function    = js.native
-  val keyup                       : js.Function    = js.native
-  val mouseover                   : js.Function    = js.native
-  val mouseout                    : js.Function    = js.native
-  val click                       : js.Function    = js.native
-  val scrollOrResize              : js.Function    = js.native
+  val focus                       : js.Function1[FocusEvent, Unit] = js.native
+  val blur                        : js.Function1[FocusEvent, Unit] = js.native
+  val change                      : js.Function1[FocusEvent, Unit] = js.native
+  val keypress                    : js.Function                    = js.native
+  val keydown                     : js.Function                    = js.native
+  val keyup                       : js.Function                    = js.native
+  val mouseover                   : js.Function                    = js.native
+  val mouseout                    : js.Function                    = js.native
+  val click                       : js.Function                    = js.native
+  val scrollOrResize              : js.Function                    = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")

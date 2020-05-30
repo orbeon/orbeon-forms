@@ -222,9 +222,15 @@ object InitSupport {
       dispatchInitialServerEvents(initializations.events, formId)
 
       // Special registration for `focus`, `blur`, and `change` events
-      $(dom.document).on("focusin",  Events.focus)
-      $(dom.document).on("focusout", Events.blur)
-      $(dom.document).on("change",   Events.change)
+      // - We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blue`, maybe
+      //   for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
+      //   we're then unable stopping the propagation of those events
+      // - We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
+      //   event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
+      //   updated on the server
+      dom.document.addEventListener("focusin" , Events.focus)
+      dom.document.addEventListener("focusout", Events.blur)
+      $(dom.document).on           ("change",   Events.change)
 
       // Register events that bubble on document for all browsers
       // TODO: Move away from YUI even listeners.

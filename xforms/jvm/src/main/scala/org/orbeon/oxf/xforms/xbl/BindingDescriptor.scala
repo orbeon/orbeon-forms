@@ -151,9 +151,9 @@ object BindingDescriptor {
           (Some(attValue), b.binding, d.isDefined)
       }
 
-    // Prioritize: if there is a match on a datatype, the datatype is significant and we filter out matches which
-    // don't have a datatype.
-    if (appearancesToBinding exists (_._3))
+    if (appearancesToBinding forall (_._1.isEmpty)) // no appearance -> no choice (#4558)
+      Nil
+    else if (appearancesToBinding exists (_._3))    // datatype is significant -> filter out matches which don't have a datatype
       appearancesToBinding filter (_._3)
     else
       appearancesToBinding

@@ -123,7 +123,12 @@
                         "
                     />
 
-                    <xsl:for-each select="$attachment-holders[normalize-space() != '']">
+                    <xsl:for-each
+                        select="
+                            $attachment-holders/(
+                                self::*[@filename and normalize-space() != ''], (: single attachment    :)
+                                _[@filename and normalize-space() != '']        (: multiple attachments :)
+                            )">
                         <attachment filename="{@filename}" mediatype="{@mediatype}">
                             <!-- URL may be absolute or already point to persistence layer -->
                             <xsl:value-of select="p:rewrite-service-uri(normalize-space(), true())"/>

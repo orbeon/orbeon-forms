@@ -239,6 +239,7 @@
             <!-- Create the `label` attribute if necessary, and always do it, so code looking at the instance can easily know whether
                  the `label` attribute is expected by the component -->
             <xbl:handler event="xforms-enabled">
+                <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
                 <xf:insert if="empty($binding/@label)" context="$binding" origin="xf:attribute('label')"/>
             </xbl:handler>
 

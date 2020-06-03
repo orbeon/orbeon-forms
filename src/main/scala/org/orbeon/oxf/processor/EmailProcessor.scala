@@ -174,12 +174,15 @@ class EmailProcessor extends ProcessorImpl {
 
     // Set Reply-To
     locally {
-      val replyTo = createAddresses(messageElement.element("reply-to"))
 
-      // We might be able to just call `setReplyTo` with the above, but it's unclear
-      // what's the behavior in there is nothing set. Also, can there be a default?
-      if (replyTo.nonEmpty)
-        message.setReplyTo(replyTo)
+      messageElement.elementOpt("reply-to") foreach { replyToElem =>
+        val replyTo = createAddresses(replyToElem)
+
+        // We might be able to just call `setReplyTo` with the above, but it's unclear
+        // what's the behavior in there is nothing set. Also, can there be a default?
+        if (replyTo.nonEmpty)
+          message.setReplyTo(replyTo)
+      }
     }
 
     // Set To

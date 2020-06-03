@@ -13,7 +13,7 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
-    .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+    .xbl-fr-attachment {
 
         .xforms-dnd-item {
 
@@ -99,7 +99,7 @@
     }
 
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+        .xbl-fr-attachment {
             .fr-attachment-drop, .fr-attachment-upload, .fr-attachment-select, .fr-attachment-remove {
                 display: none;
             }
@@ -117,7 +117,14 @@
     }
 
     @media print {
-        .xbl-fr-attachment, .xbl-fr-attachment-multiple {
+        .xbl-fr-attachment {
+
+            .xforms-output-appearance-xxforms-download {
+                a {
+                    text-decoration: none;
+                    color: @textColor !important; // because there is another `!important`
+                }
+            }
 
             .xforms-dnd-item {
 

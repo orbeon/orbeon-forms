@@ -400,9 +400,9 @@
                 }"
                 xxf:title="{xxf:label('fr-attachment')}">
 
-                <xf:filename  ref="@filename"/>
-                <xf:mediatype ref="@mediatype"/>
-                <xxf:size     ref="@size"/>
+                <xf:filename  ref="if ($readonly) then '' else @filename"/>
+                <xf:mediatype ref="if ($readonly) then '' else @mediatype"/>
+                <xxf:size     ref="if ($readonly) then '' else @size"/>
 
                 <!-- Retarget of upload events -->
                 <!-- NOTE: Duplicated logic in image-attachment.xbl -->

@@ -39,7 +39,7 @@
                             <static-dropdown>cat</static-dropdown>
                             <control-1>cat</control-1>
                             <dynamic-data-dropdown itemset-empty="false">ca</dynamic-data-dropdown>
-                            <control-2 itemset-empty="false">ca</control-2>
+                            <control-2 itemset-empty="false" label="">ca</control-2>
                             <checkboxes>cat bird</checkboxes>
                             <multiple-list>cat bird</multiple-list>
                             <radio-buttons>cat</radio-buttons>
@@ -147,14 +147,17 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>controls</form-name>
-                    <title xml:lang="en">Form Builder Controls</title>
+                    <title xml:lang="en">Form Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
-                    <title xml:lang="fr">Contrôles de Form Builder</title>
+                    <title xml:lang="fr">Contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
+                    <updated-with-version>2020.1</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
-                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
+                    <xbl>
+                        <fr:calculated-value appearance="full"/>
+                    </xbl>
                     <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"output"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"us-phone"},{"value":"number"},{"value":"currency"},{"value":"us-state"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date"},{"value":"time"},{"value":"datetime"},{"value":"dropdown-date"},{"value":"fields-date"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"static-dropdown"},{"value":"control-1"},{"value":"dynamic-data-dropdown"},{"value":"control-2"},{"value":"checkboxes"},{"value":"multiple-list"},{"value":"radio-buttons"},{"value":"open-select1"},{"value":"yesno-input"},{"value":"checkbox-input"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"image-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"us-address"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"street-number"},{"value":"street-name"},{"value":"apt-suite"},{"value":"city"},{"value":"state"},{"value":"zip"}],"topLevel":false}]}</migration>
                 </metadata>
             </xf:instance>

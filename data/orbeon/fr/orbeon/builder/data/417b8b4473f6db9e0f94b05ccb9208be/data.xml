@@ -59,7 +59,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <static-dropdown>cat</static-dropdown>
                             <control-1>cat</control-1>
                             <dynamic-data-dropdown itemset-empty="false">ca</dynamic-data-dropdown>
-                            <control-2 itemset-empty="false">ca</control-2>
+                            <control-2 itemset-empty="false" label="">ca</control-2>
                             <checkboxes>cat bird</checkboxes>
                             <multiple-list>cat bird</multiple-list>
                             <radio-buttons>cat</radio-buttons>
@@ -196,15 +196,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
-                    <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <form-name>controls</form-name>
-                    <title xml:lang="en">Form Builder Controls</title>
+                    <title xml:lang="en">Form Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
-                    <title xml:lang="fr">Contrôles de Form Builder</title>
+                    <title xml:lang="fr">Contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
+                    <updated-with-version>2020.1</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
+                    <xbl>
+                        <fr:calculated-value appearance="full"/>
+                    </xbl>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

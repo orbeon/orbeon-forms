@@ -2518,7 +2518,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // Prevent default behavior when the esc key is pressed, which would otherwise reset all the form fields on IE,
             // up to IE11 included. See https://github.com/orbeon/orbeon-forms/issues/131
             if (event.keyCode == 27)
-                YAHOO.util.Event.preventDefault(event);
+                event.preventDefault();
 
             var target = YAHOO.util.Event.getTarget(event);
             var control = ORBEON.xforms.Events._findParentXFormsControl(target);
@@ -2714,7 +2714,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             var handled = false;
             if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger
-                YAHOO.util.Event.preventDefault(event);
+                event.preventDefault();
                 if (! $(target).is('.xforms-readonly')) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
                     // send the focus event here. This is useful for anchors (we don't listen on the

@@ -2561,7 +2561,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        keyup: function (event) {
+        input: function (event) {
 
             if (ORBEON.xforms.Globals.modalProgressPanelShown) {
                event.preventDefault();
@@ -2572,7 +2572,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (target != null) {
                 // Incremental control: treat keypress as a value change event
                 if ($(target).is('.xforms-incremental')) {
-                    var event =
                     ORBEON.xforms.server.AjaxServer.fireEvent(
                         new ORBEON.xforms.server.AjaxServer.Event(
                             {

@@ -239,7 +239,7 @@ object InitSupport {
       if (! Globals.topLevelListenerRegistered) {
         g.YAHOO.util.Event.addListener(dom.document, "keypress",  Events.keypress)
         g.YAHOO.util.Event.addListener(dom.document, "keydown",   Events.keydown)
-        g.YAHOO.util.Event.addListener(dom.document, "keyup",     Events.keyup)
+        g.YAHOO.util.Event.addListener(dom.document, "input",     Events.input)
         g.YAHOO.util.Event.addListener(dom.document, "mouseover", Events.mouseover)
         g.YAHOO.util.Event.addListener(dom.document, "mouseout",  Events.mouseout)
         g.YAHOO.util.Event.addListener(dom.document, "click",     Events.click)

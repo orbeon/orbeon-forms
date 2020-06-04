@@ -222,7 +222,7 @@ object InitSupport {
       dispatchInitialServerEvents(initializations.events, formId)
 
       // Special registration for `focus`, `blur`, and `change` events
-      // - We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blue`, maybe
+      // - We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blur`, maybe
       //   for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
       //   we're then unable stopping the propagation of those events
       // - We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery

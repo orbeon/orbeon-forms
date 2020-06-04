@@ -2507,6 +2507,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
+        // TODO: 2020-06-04: Only used by legacy `Calendar.js` and the IE 11 `preventDefault()` below.
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keydown: function (event) {
 

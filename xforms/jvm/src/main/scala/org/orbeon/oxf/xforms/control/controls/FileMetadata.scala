@@ -186,7 +186,7 @@ object FileMetadata {
     ) filter
       (_.fieldName == metadata.getEffectiveId)
 
-  private def childMetadataValue(m: FileMetadata, element: Element) = {
+  private def childMetadataValue(m: FileMetadata, element: Element): String = {
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
     contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))

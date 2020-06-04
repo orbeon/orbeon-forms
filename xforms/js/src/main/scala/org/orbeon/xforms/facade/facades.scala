@@ -15,7 +15,7 @@ package org.orbeon.xforms.facade
 
 import org.orbeon.xforms.YUICustomEvent
 import org.scalajs.dom
-import org.scalajs.dom.{FocusEvent, html, raw}
+import org.scalajs.dom.{FocusEvent, UIEvent, html, raw}
 import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
@@ -140,13 +140,13 @@ object Events extends js.Object {
 
   val focus                       : js.Function1[FocusEvent, Unit] = js.native
   val blur                        : js.Function1[FocusEvent, Unit] = js.native
-  val change                      : js.Function1[FocusEvent, Unit] = js.native
-  val keypress                    : js.Function                    = js.native
-  val keydown                     : js.Function                    = js.native
-  val input                       : js.Function                    = js.native
-  val mouseover                   : js.Function                    = js.native
-  val mouseout                    : js.Function                    = js.native
-  val click                       : js.Function                    = js.native
+  val change                      : js.Function1[UIEvent, Unit]    = js.native
+  val keypress                    : js.Function1[UIEvent, Unit]    = js.native
+  val keydown                     : js.Function1[UIEvent, Unit]    = js.native
+  val input                       : js.Function1[UIEvent, Unit]    = js.native
+  val mouseover                   : js.Function1[UIEvent, Unit]    = js.native
+  val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
+  val click                       : js.Function1[UIEvent, Unit]    = js.native
   val scrollOrResize              : js.Function                    = js.native
 
   def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`

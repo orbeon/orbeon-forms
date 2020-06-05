@@ -519,10 +519,10 @@
     </xf:instance>
 
     <xf:instance id="fb-static-upload">
-        <static-upload>
+        <_>
             <empty/>
             <non-empty>content</non-empty>
-        </static-upload>
+        </_>
     </xf:instance>
 
     <xf:bind ref="instance('fb-triggers-instance')">
@@ -742,7 +742,7 @@
 
     <!-- Schema upload dialog -->
     <xf:instance id="fb-schema-upload-instance">
-        <validation>
+        <_>
             <schema-uri filename="" mediatype="" size=""/>
             <schema>
                 <!-- Content will be like this -->
@@ -751,7 +751,7 @@
                 <!--</xs:schema>-->
             </schema>
             <temp-type/>
-        </validation>
+        </_>
     </xf:instance>
 
     <xf:bind ref="instance('fb-schema-upload-instance')">
@@ -760,15 +760,15 @@
 
     <!-- Cut/copy/paste instance -->
     <xf:instance id="fb-xcv-instance" xxf:index="id">
-        <xcv/>
+        <_/>
     </xf:instance>
 
     <xf:instance id="fb-xcv-triggers-instance" xxf:index="id">
-        <xcv>
+        <_>
             <cut-trigger/>
             <copy-trigger/>
             <paste-trigger/>
-        </xcv>
+        </_>
     </xf:instance>
     <xf:var name="xcv" value="instance('fb-xcv-triggers-instance')"/>
 
@@ -780,12 +780,12 @@
 
     <!-- Undo stack -->
     <xf:instance id="fb-undo-instance">
-        <undo>
+        <_>
             <undos/>
             <redos/>
             <undo-trigger/>
             <redo-trigger/>
-        </undo>
+        </_>
     </xf:instance>
     <xf:var name="undo" value="instance('fb-undo-instance')"/>
 

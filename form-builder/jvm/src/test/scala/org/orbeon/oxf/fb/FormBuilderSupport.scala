@@ -81,16 +81,16 @@ trait FormBuilderSupport extends XFormsSupport {
             <xf:var name="selected-cell" value="$variables/selected-cell"/>
 
             <xf:instance id="fb-xcv-instance">
-              <xcv/>
+              <_/>
             </xf:instance>
 
             <xf:instance id="fb-undo-instance">
-                <undo>
+                <_>
                     <undos/>
                     <redos/>
                     <undo-trigger/>
                     <redo-trigger/>
-                </undo>
+                </_>
             </xf:instance>
             <xf:var name="undo" value="instance('fb-undo-instance')"/>
 

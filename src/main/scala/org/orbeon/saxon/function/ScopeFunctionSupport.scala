@@ -55,7 +55,7 @@ object ScopeFunctionSupport {
   def convertAttributeValue(
     valueOpt        : Option[Any],
     contentTypeOpt  : Option[String],
-    key             : String)(implicit
+    keyForLogging   : String)(implicit
     xpathContext    : XPathContext
   ): SequenceIterator =
     valueOpt match {
@@ -68,7 +68,7 @@ object ScopeFunctionSupport {
             // We don't have any particular mappings to pass to serialize objects
             val mapping = new Mapping
             mapping.loadMapping(new InputSource(new StringReader("<mapping/>")))
-            ScopeGenerator.getSAXStore(v, mapping, contentTypeOpt.orNull, key)
+            ScopeGenerator.getSAXStore(v, mapping, contentTypeOpt.orNull, keyForLogging)
           } catch {
             case NonFatal(t) =>
               throw new OXFException(t)

@@ -758,11 +758,6 @@
         <xf:bind ref="temp-type" readonly="true()"/>
     </xf:bind>
 
-    <!-- Cut/copy/paste instance -->
-    <xf:instance id="fb-xcv-instance" xxf:index="id">
-        <_/>
-    </xf:instance>
-
     <xf:instance id="fb-xcv-triggers-instance" xxf:index="id">
         <_>
             <cut-trigger/>
@@ -775,7 +770,6 @@
     <xf:bind ref="$xcv">
         <xf:bind ref="cut-trigger"   readonly="not(exists($current-td/*))"/>
         <xf:bind ref="copy-trigger"  readonly="not(exists($current-td/*))"/>
-        <xf:bind ref="paste-trigger" readonly="not(exists(instance('fb-xcv-instance')/control/*))"/>
     </xf:bind>
 
     <!-- Undo stack -->

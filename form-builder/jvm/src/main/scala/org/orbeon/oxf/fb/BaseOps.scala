@@ -131,9 +131,9 @@ trait BaseOps extends Logging {
         // Ids coming from the form definition
         iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)) ++ {
         // Ids coming from the special cut/copy/paste instance, if present
-        ctx.xcvInstance match {
-          case Some(xcvInstance) => iterateNamesInUse(Left(xcvInstance))
-          case None              => Nil
+        ToolboxOps.readXcvFromClipboard match {
+          case Some(xcvNode) => iterateNamesInUse(Right(xcvNode))
+          case None          => Nil
         }
       }
 

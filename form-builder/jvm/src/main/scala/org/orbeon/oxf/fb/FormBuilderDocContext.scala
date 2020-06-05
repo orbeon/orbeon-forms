@@ -28,7 +28,6 @@ case class FormBuilderDocContext(
   FormRunnerDocContext {
 
   lazy val formDefinitionInstance = formBuilderModel flatMap (_.findInstance("fb-form-instance"))
-  lazy val xcvInstance            = formBuilderModel flatMap (_.findInstance("fb-xcv-instance"))
   lazy val undoInstance           = formBuilderModel flatMap (_.findInstance("fb-undo-instance"))
   lazy val userAgentInstance      = formBuilderModel flatMap (_.findInstance("fb-user-agent-instance"))
 
@@ -37,7 +36,6 @@ case class FormBuilderDocContext(
   lazy val componentBindings: Seq[NodeInfo] =
     asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-  lazy val clipboardXcvRootElem = xcvInstance.get.rootElement
   lazy val undoRootElem         = undoInstance.get.rootElement
 
   lazy val modelElem             = getModelElem(formDefinitionRootElem)

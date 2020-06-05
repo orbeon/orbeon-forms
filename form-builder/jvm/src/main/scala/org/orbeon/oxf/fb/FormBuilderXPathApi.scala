@@ -645,7 +645,7 @@ object FormBuilderXPathApi {
     suffix      : String
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.readXcvFromClipboard flatMap
+    ToolboxOps.readXcvFromClipboardAndClone flatMap
       (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty)) foreach
       Undo.pushUserUndoAction
   }

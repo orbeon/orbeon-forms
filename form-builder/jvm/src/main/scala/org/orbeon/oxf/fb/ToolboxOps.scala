@@ -26,20 +26,21 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
+import org.orbeon.oxf.xml.{SAXStore, TransformerUtils, XMLConstants}
+import org.orbeon.saxon.function.ScopeFunctionSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
 
 
 object ToolboxOps {
@@ -379,7 +380,7 @@ object ToolboxOps {
   def controlOrContainerElemToXcv(
     controlOrContainerElem : NodeInfo)(implicit
     ctx                    : FormBuilderDocContext
-  ): Option[NodeInfo] = {
+  ): Option[NodeInfo] = { // returns an `<xcv>` root element
 
     val resourcesRootElem = resourcesRoot
 
@@ -458,19 +459,32 @@ object ToolboxOps {
     deleteControlWithinCell(cellElem, updateTemplates = true) foreach Undo.pushUserUndoAction
   }
 
-  def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
-    val xcvElem = ctx.clipboardXcvRootElem
+  private val FormBuilderClipboardSessionAttributeName = "orbeon-form-builder-clipboard"
 
-    (xcvElem / XcvEntry.Control.entryName / * nonEmpty) option {
+  def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+    NetUtils.getExternalContext.getRequest.getSession(true).getAttribute(FormBuilderClipboardSessionAttributeName) collect {
+      case s: SAXStore => TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, s).rootElement
+    }
+
+  // Returns an `<xcv>` root elementBaseOps.scala
+  def readXcvFromClipboardAndClone(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
+
+    val xcvElemAsList = readXcvFromClipboard.toList
+
+    (xcvElemAsList / XcvEntry.Control.entryName / * nonEmpty) option {
       val clone = elementInfo("xcv", Nil)
-      insert(into = clone, origin = (xcvElem /@ @*) ++ (xcvElem / *))
+      insert(into = clone, origin = (xcvElemAsList /@ @*) ++ (xcvElemAsList / *))
       clone
     }
   }
 
-  def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
-    insert(into = ctx.clipboardXcvRootElem.root, origin = xcv)
-  }
+  // `xcv` must be an `<xcv>` root element
+  def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
+    ScopeFunctionSupport.storeAttribute(
+      NetUtils.getExternalContext.getRequest.getSession(true).setAttribute(_, _),
+      FormBuilderClipboardSessionAttributeName,
+      xcv
+    )
 
   def dndControl(
     sourceCellElem : NodeInfo,
@@ -519,7 +533,7 @@ object ToolboxOps {
     suffix      : String)(implicit
     ctx         : FormBuilderDocContext
   ): Option[Seq[(String, String, Boolean)]] =
-    readXcvFromClipboard map
+    readXcvFromClipboardAndClone map
       (namesToRenameForPaste(_, prefix, suffix, Set.empty))
 
   private def namesToRenameForPaste(
@@ -732,7 +746,7 @@ object ToolboxOps {
 
     implicit val ctx = FormBuilderDocContext()
 
-    readXcvFromClipboard flatMap { xcvElem =>
+    readXcvFromClipboardAndClone flatMap { xcvElem =>
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 

@@ -216,25 +216,29 @@
 
                             <xf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
 
-<!--                            &lt;!&ndash; Cut/copy/paste/undo/redo &ndash;&gt;-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>-->
+                            <!-- Cut/copy/paste/undo/redo -->
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>
 
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="z" name="DOMActivate" targetid="undo-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="y" name="DOMActivate" targetid="redo-trigger"/>-->
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="z" name="DOMActivate" targetid="undo-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl"          xxf:text="y" name="DOMActivate" targetid="redo-trigger"/>
 
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>-->
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>
 
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="z" name="DOMActivate" targetid="undo-trigger"/>-->
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command shift" xxf:text="z" name="DOMActivate" targetid="redo-trigger"/>-->
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="z" name="DOMActivate" targetid="undo-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command shift" xxf:text="z" name="DOMActivate" targetid="redo-trigger"/>
 
-<!--                            &lt;!&ndash; Buttons &ndash;&gt;-->
-<!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command" xxf:text="s">-->
-<!--                                fr:run-process-by-name('oxf.fr.detail.process', 'save')-->
-<!--                            </xf:action>-->
+                            <!-- Buttons -->
+                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl" xxf:text="s">
+                                fr:run-process-by-name('oxf.fr.detail.process', 'save')
+                            </xf:action>
+
+                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command" xxf:text="s">
+                                fr:run-process-by-name('oxf.fr.detail.process', 'save')
+                            </xf:action>
 
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'test')-->

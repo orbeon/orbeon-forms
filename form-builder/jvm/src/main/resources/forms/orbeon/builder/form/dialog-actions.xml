@@ -18,6 +18,7 @@
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
 
@@ -142,12 +143,12 @@
                                         <xf:label
                                             value="
                                                 utils:truncateWithEllipsis(
-                                                    for $id in substring-before(@id, '-control')
+                                                    for $name in frf:controlNameFromId(@id)
                                                     return
                                                         concat(
-                                                            $current-resources/*[name() = $id]/label,
+                                                            $current-resources/*[name() = $name]/label,
                                                             ' (',
-                                                            $id,
+                                                            $name,
                                                             ')'
                                                         ),
                                                     60,
@@ -268,18 +269,18 @@
                                         <xf:label
                                             value="
                                                 utils:truncateWithEllipsis(
-                                                    for $id in substring-before(@id, '-control')
+                                                    for $name in frf:controlNameFromId(@id)
                                                     return
                                                         concat(
-                                                            $current-resources/*[name() = $id]/label,
+                                                            $current-resources/*[name() = $name]/label,
                                                             ' (',
-                                                            $id,
+                                                            $name,
                                                             ')'
                                                         ),
                                                     60,
                                                     6
                                                 )"/>
-                                        <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
                                     </xf:itemset>
                                 </xf:select1>
 
@@ -368,18 +369,18 @@
                                         <xf:label
                                             value="
                                                 utils:truncateWithEllipsis(
-                                                    for $id in substring-before(@id, '-control')
+                                                    for $name in frf:controlNameFromId(@id)
                                                     return
                                                         concat(
-                                                            $current-resources/*[name() = $id]/label,
+                                                            $current-resources/*[name() = $name]/label,
                                                             ' (',
-                                                            $id,
+                                                            $name,
                                                             ')'
                                                         ),
                                                     60,
                                                     6
                                                 )"/>
-                                        <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
                                     </xf:itemset>
                                 </xf:select1>
 
@@ -510,12 +511,12 @@
                                             <xf:label
                                                 value="
                                                     utils:truncateWithEllipsis(
-                                                        for $id in substring-before(@id, '-control')
-                                                            return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'),
+                                                        for $name in frf:controlNameFromId(@id)
+                                                            return concat($current-resources/*[name() = $name]/label, ' (', $name, ')'),
                                                         60,
                                                         6
                                                     )"/>
-                                            <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                            <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
                                         </xf:itemset>
                                     </xf:select1>
                                     <xf:textarea
@@ -535,8 +536,8 @@
                                         <xf:label ref="$form-resources/dialog-actions/destination-selection-control/label" class="xforms-hidden"/>
                                         <xf:itemset ref="$controls-with-itemset">
                                             <!-- Try to build a reasonably user-friendly label -->
-                                            <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                            <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                            <xf:label value="for $name in frf:controlNameFromId(@id) return concat($current-resources/*[name() = $name]/label, ' (', $name, ')')"/>
+                                            <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
                                         </xf:itemset>
                                     </xf:select1>
                                     <xh:div class="fb-action-option-3-col-span-1">

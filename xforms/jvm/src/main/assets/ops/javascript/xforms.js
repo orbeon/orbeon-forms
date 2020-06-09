@@ -2528,6 +2528,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
+        // TODO: Should move to `keydown` or `keyup` as `keypress` is old and deprecated.
         keypressEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keypress: function (event) {
 

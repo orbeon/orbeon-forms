@@ -61,7 +61,16 @@ trait FormDefinition {
     htmlLabel : Boolean,
     resources : List[(String, NodeInfo)]
   ) {
-    def toXML: NodeInfo =
+    def toXML: NodeInfo = {
+
+      def matchForControl(control: String): String =
+        if (control == "input" || control == "textarea")
+          "substring"
+        else if (control == "select")
+          "token"
+        else
+          "substring"
+
       <query
         name={name}
         path={xpath}
@@ -69,7 +78,7 @@ trait FormDefinition {
         control={control}
         search-field={inSearch.toString}
         summary-field={inSummary.toString}
-        match="substring"
+        match={matchForControl(control)}
         html-label={htmlLabel.toString}>{
         for ((lang, resourceHolder) <- resources)
           yield
@@ -89,5 +98,6 @@ trait FormDefinition {
               labelElemOpt.toList ++ itemElems
             }</resources>
       }</query>
+    }
   }
 }

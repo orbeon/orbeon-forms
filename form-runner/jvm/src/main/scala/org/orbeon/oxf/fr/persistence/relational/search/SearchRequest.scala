@@ -73,11 +73,25 @@ trait SearchRequest {
                   filterType  = filterOpt match {
                     case None => FilterType.None
                     case Some(filter) =>
-                      c.attValue("control") match {
-                        case "input" | "textarea" => FilterType.Substring(filter)
-                        case "select"             => FilterType.Token(filter.splitTo[List]())
-                        case _                    => FilterType.Exact(filter)
-                      }
+
+                      def fromMatch: Option[FilterType] =
+                        c.attValueOpt("match") map {
+                          case "substring" => FilterType.Substring(filter)
+                          case "token"     => FilterType.Token(filter.splitTo[List]())
+                          case "exact"     => FilterType.Exact(filter)
+                          case other       => throw new IllegalArgumentException(other)
+                        }
+
+                      def fromControl: Option[FilterType] =
+                        c.attValueOpt("control") map {
+                          case "input" | "textarea" => FilterType.Substring(filter)
+                          case "select"             => FilterType.Token(filter.splitTo[List]())
+                          case _                    => FilterType.Exact(filter)
+                        }
+
+                      fromMatch     orElse
+                        fromControl getOrElse
+                        FilterType.Exact(filter)
                   }
                 )
               },

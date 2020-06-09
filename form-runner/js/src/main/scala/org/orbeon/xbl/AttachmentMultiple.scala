@@ -81,7 +81,7 @@ object AttachmentMultiple {
 
         def addListener[E <: dom.raw.UIEvent](el: dom.raw.Element, name: String, fn: E => Unit): Unit = {
           val jsFn: js.Function1[E, _] = fn
-          dropElem.addEventListener(name, jsFn)
+          el.addEventListener(name, jsFn)
           listeners ::= (el, name, jsFn)
         }
 
@@ -163,14 +163,13 @@ object AttachmentMultiple {
             }
           )
 
-          // On click on label, simulate click on the input, so users can press enter or space to select a file
           addListener[dom.raw.KeyboardEvent](
-            uploadControlElem,
-            "keypress",
+            selectLabel,
+            "keydown",
             ev => {
               if (ev.key == "Enter" || ev.key == " ") {
                 ev.preventDefault() // so that the page doesn't scroll
-                uploadControlElem.click()
+                uploadInput.click()
               }
             }
           )

@@ -47,6 +47,10 @@ object AttachmentMultiple {
 
         scribe.debug("init")
 
+        // https://github.com/orbeon/orbeon-forms/issues/4562
+        val label = selectLabel
+        label.htmlFor = Page.namespaceIdIfNeeded(uploadInput.form.id, label.htmlFor)
+
         if (! companion.isMarkedReadonly && browserSupportsFileDrop) {
           registerAllListeners()
         } else if (! browserSupportsFileDrop) {
@@ -70,6 +74,8 @@ object AttachmentMultiple {
 
         def dropElem          = containerElem.querySelector(".fr-attachment-drop")
         def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
+        def uploadInput       = containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input]
+        def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
 
         var listeners: List[(dom.raw.Element, String, js.Function1[_, _])] = Nil
 

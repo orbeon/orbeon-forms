@@ -32,9 +32,13 @@ object StateHandling {
 
   // Restore state after hash changes
   def initializeHashChangeListener(): Unit =
-    dom.window.addEventListener("hashchange", (_: HashChangeEvent) => {
-      Private.rawState.foreach(Private.replaceState)
-    })
+    GlobalEventListenerSupport.addListener(
+      dom.window,
+      "hashchange",
+      (_: HashChangeEvent) => {
+        Private.rawState.foreach(Private.replaceState)
+      }
+    )
 
   case class ClientState(
     uuid     : String,

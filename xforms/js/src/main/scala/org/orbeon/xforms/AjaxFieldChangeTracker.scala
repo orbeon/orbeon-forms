@@ -31,7 +31,11 @@ object AjaxFieldChangeTracker {
   import Private._
 
   def initialize(): Unit =
-    dom.document.addEventListener("input", onInput: js.Function1[UIEvent, _])
+    GlobalEventListenerSupport.addListener(
+      dom.document,
+      "input",
+      onInput _
+    )
 
   @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
   def hasChangedIdsRequest(controlId: String): Boolean =

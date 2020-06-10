@@ -15,13 +15,12 @@ package org.orbeon.xbl
 
 import org.orbeon.facades.Bowser
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{ExecutionWait, Page, UploadEvent, UploaderClient}
+import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.scalajs.js
 
 // Companion for `fr:dnd-repeat`
 object AttachmentMultiple {
@@ -61,34 +60,23 @@ object AttachmentMultiple {
 
       override def destroy(): Unit = {
         scribe.debug("destroy")
-        clearAllListeners()
+        EventSupport.clearAllListeners()
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit =
         if (readonly)
-          clearAllListeners()
+          EventSupport.clearAllListeners()
         else
           registerAllListeners()
 
       private object Private {
 
+        object EventSupport extends EventListenerSupport
+
         def dropElem          = containerElem.querySelector(".fr-attachment-drop")
         def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
         def uploadInput       = containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input]
         def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
-
-        var listeners: List[(dom.raw.Element, String, js.Function1[_, _])] = Nil
-
-        def addListener[E <: dom.raw.UIEvent](el: dom.raw.Element, name: String, fn: E => Unit): Unit = {
-          val jsFn: js.Function1[E, _] = fn
-          el.addEventListener(name, jsFn)
-          listeners ::= (el, name, jsFn)
-        }
-
-        def clearAllListeners(): Unit = {
-          listeners foreach { case (el, name, jsFn) => el.removeEventListener(name, jsFn) }
-          listeners = Nil
-        }
 
         def browserSupportsFileDrop: Boolean =
           ! Bowser.msie.contains(true)
@@ -110,7 +98,7 @@ object AttachmentMultiple {
             dropElem.classList.remove("fr-attachment-dragover")
 
           def addDropListener(name: String, fn: dom.raw.DragEvent => Unit): Unit =
-            addListener(dropElem, name, fn)
+            EventSupport.addListener(dropElem, name, fn)
 
           addDropListener(
             "drop",
@@ -163,10 +151,10 @@ object AttachmentMultiple {
             }
           )
 
-          addListener[dom.raw.KeyboardEvent](
+          EventSupport.addListener(
             selectLabel,
             "keydown",
-            ev => {
+            (ev: dom.raw.KeyboardEvent) => {
               if (ev.key == "Enter" || ev.key == " ") {
                 ev.preventDefault() // so that the page doesn't scroll
                 uploadInput.click()

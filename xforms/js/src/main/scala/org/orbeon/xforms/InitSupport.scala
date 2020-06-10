@@ -256,6 +256,7 @@ object InitSupport {
 
         AjaxFieldChangeTracker.initialize()
 
+        // TODO: Get rid of this. What code uses it?
         g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)
         g.YAHOO.widget.Overlay.windowResizeEvent.subscribe(Events.scrollOrResize)
 

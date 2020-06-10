@@ -240,6 +240,41 @@
                                 fr:run-process-by-name('oxf.fr.detail.process', 'save')
                             </xf:action>
 
+                            <!-- Cursor navigation -->
+                            <xf:action
+                                xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="left"
+                                if="$dialogs-closed"
+                                type="xpath">
+
+                                for $id in $current-td/*/@id
+                                return
+                                    for $name in frf:controlNameFromIdOpt($id)
+                                    return
+                                        for $prev in fbf:findNextControlId($name, 'previous')
+                                        return
+                                            fbf:selectCellForControlId($prev)
+                            </xf:action>
+
+                            <xf:action
+                                xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="right"
+                                if="$dialogs-closed"
+                                type="xpath">
+
+                                for $id in $current-td/*/@id
+                                return
+                                    for $name in frf:controlNameFromIdOpt($id)
+                                    return
+                                        for $next in fbf:findNextControlId($name, 'next')
+                                        return
+                                            fbf:selectCellForControlId($next)
+                            </xf:action>
+
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'test')-->
 <!--                            </xf:action>-->

@@ -1435,8 +1435,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                ORBEON.xforms.Page.loadingIndicator().show();
-                ORBEON.xforms.Globals.loadingOtherPage = true;
+                ORBEON.xforms.Page.loadingIndicator().showIfNotAlreadyVisible();
             }
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway

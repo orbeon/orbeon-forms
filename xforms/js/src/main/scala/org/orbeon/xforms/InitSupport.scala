@@ -242,6 +242,16 @@ object InitSupport {
         dom.document.addEventListener("mouseout",  Events.mouseout)
         dom.document.addEventListener("click",     Events.click)
 
+        // We could do this on `pageshow` or `pagehide`
+        // https://github.com/orbeon/orbeon-forms/issues/4552
+        dom.window.addEventListener(
+          "pagehide",
+          (ev: dom.raw.PageTransitionEvent) => {
+            if (ev.persisted)
+              Page.loadingIndicator().hideIfAlreadyVisible()
+          }
+        )
+
         AjaxFieldChangeTracker.initialize()
 
         g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)

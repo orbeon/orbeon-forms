@@ -314,7 +314,12 @@ object AjaxClient {
       result.future
     }
 
-    def handleResponse(responseXML: dom.Document, formId: String, ignoreErrors: Boolean): Unit = {
+    def handleResponse(
+      responseXML  : dom.Document,
+      formId       : String,
+      showProgress : Boolean,
+      ignoreErrors : Boolean
+    ): Unit = {
 
       // This is a little tricky. Some code registers callbacks or `Future`s for the Ajax response received.
       // However, scheduling futures in the JavaScript contact is done via a global queue. We want to make sure
@@ -334,7 +339,7 @@ object AjaxClient {
         ServerValueStore.purgeExpired()
 
         EventQueue.ajaxRequestInProgress = false
-        Page.loadingIndicator().requestEnded()
+        Page.loadingIndicator().requestEnded(showProgress)
 
         // Notify listeners that we are done processing this request
         ajaxResponseProcessed.fire(details)
@@ -357,7 +362,12 @@ object AjaxClient {
         timers.setTimeout(delay.millis)(requestFunction())
     }
 
-    def asyncAjaxRequest(requestFormId: String, requestBody: String | FormData, ignoreErrors: Boolean): Unit = {
+    def asyncAjaxRequest(
+      requestFormId : String,
+      requestBody   : String | FormData,
+      showProgress  : Boolean,
+      ignoreErrors  : Boolean
+    ): Unit = {
 
       val requestForm = Page.getForm(requestFormId)
       EventQueue.requestTryCount += 1
@@ -369,7 +379,7 @@ object AjaxClient {
       }
 
       EventQueue.ajaxRequestInProgress = true
-      Page.loadingIndicator().requestStarted()
+      Page.loadingIndicator().requestStarted(showProgress)
 
       Support.fetchText(
         url         = requestForm.xformsServerPath,
@@ -384,16 +394,16 @@ object AjaxClient {
           response match {
             case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
               // We ignore HTTP status and just check that we have a well-formed response document
-              handleResponse(responseXml, requestFormId, ignoreErrors)
+              handleResponse(responseXml, requestFormId, showProgress, ignoreErrors)
             case Success((503, _, _)) =>
               // We return an explicit 503 when the Ajax server is still busy
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
             case Success((_, responseText, responseXmlOpt)) =>
               if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
-                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
             case Failure(_) =>
               logAndShowError(_, requestFormId, ignoreErrors)
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, ignoreErrors))
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
           }
         }
       }
@@ -521,13 +531,10 @@ object AjaxClient {
       if (foundEventOtherThanHeartBeat)
         Page.getForm(currentFormId).clearDiscardableTimerIds()
 
-      // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
-      Page.loadingIndicator().setNextConnectShow(showProgress)
-
       // Don't ignore errors if any of the events tell us not to ignore errors
       // So we only ignore errors if all of the events tell us to ignore errors
       val ignoreErrors = events.forall(_.ignoreErrors)
-      asyncAjaxRequest(currentFormId, AjaxRequest.buildXmlRequest(currentFormId, events), ignoreErrors)
+      asyncAjaxRequest(currentFormId, AjaxRequest.buildXmlRequest(currentFormId, events), showProgress, ignoreErrors)
     }
   }
 }

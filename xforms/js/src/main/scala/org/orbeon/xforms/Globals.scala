@@ -27,7 +27,6 @@ object Globals {
   var yuiCalendar                 : js.Object                 = null                // reusable calendar widget
   var tooltipLibraryInitialized   : Boolean                   = false
 
-  var loadingOtherPage            : Boolean                   = false               // flag set when loading other page that prevents the loading indicator to disappear
   var activeControl               : js.Object                 = null                // the currently active control, used to disable hint
   var dialogs                     : js.Dictionary[js.Dynamic] = js.Dictionary.empty // map for dialogs: id -> YUI dialog object
   var hintTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element

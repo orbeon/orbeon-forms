@@ -28,13 +28,12 @@ object NProgress extends js.Object {
 
 class LoadingIndicator extends js.Object { // so that properties/methods can be accessed from JavaScript
 
-  private var nextConnectShow = false
-  private var shownCounter    = 0
+  private var shownCounter = 0
 
   NProgress.configure(new js.Object { val showSpinner = false })
 
-  def requestStarted(): Unit =
-    if (nextConnectShow) {
+  def requestStarted(showProgress: Boolean): Unit = {
+    if (showProgress) {
       if (shownCounter == 0) {
         // Show the indicator after a delay
         val delay = Properties.delayBeforeDisplayLoading.get()
@@ -47,33 +46,35 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
         shownCounter += 1
       }
     }
+  }
 
-  def requestEnded(): Unit =
-    if (nextConnectShow) {
+  def requestEnded(showProgress: Boolean): Unit =
+    if (showProgress) {
       // Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
       js.timers.setTimeout(1) {
-        shownCounter -= 1
-        if (shownCounter == 0)
-          hide()
+        hideIfAlreadyVisible()
       }
     }
 
-  // NOTE: Called externally from `AjaxClient`.
-  def setNextConnectShow(nextConnectShow: Boolean): Unit =
-    this.nextConnectShow = nextConnectShow
-
-  private def showIfNotAlreadyVisible(): Unit = {
+  // Public for `AjaxServer.js`
+  def showIfNotAlreadyVisible(): Unit = {
     shownCounter += 1
     if (shownCounter == 1)
       show()
   }
 
+  def hideIfAlreadyVisible(): Unit =
+    if (shownCounter > 0) {
+      shownCounter -= 1
+      if (shownCounter == 0)
+        hide()
+    }
+
   // Actually shows the loading indicator (no delay or counter)
-  def show(): Unit =
+  private def show(): Unit =
     NProgress.start()
 
   // Actually hides the loading indicator (no counter)
   private def hide(): Unit =
-    if (! Globals.loadingOtherPage)
-      NProgress.done()
+    NProgress.done()
 }

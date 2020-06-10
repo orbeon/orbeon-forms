@@ -34,6 +34,4 @@ object Globals {
   var helpTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
   var sliderYui                   : js.Dictionary[js.Any]     = js.Dictionary.empty // maps slider id to the YUI object for that slider
   var lastDialogZIndex            : Int                       = 1050                // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
-
-  var topLevelListenerRegistered  : Boolean                   = false               // have we already registered the listeners on the top-level elements, which never change
 }

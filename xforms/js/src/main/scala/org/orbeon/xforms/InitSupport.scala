@@ -154,6 +154,7 @@ object InitSupport {
 
     val pageContainsFormsMarkupPromise = Promise[Unit]()
 
+    private var topLevelListenerRegistered = false
     private var heartBeatInitialized       = false
     private var orbeonLoadedEventScheduled = false
 
@@ -223,7 +224,7 @@ object InitSupport {
 
       // Register events that bubble on document for all browsers
       // TODO: Move away from YUI even listeners.
-      if (! Globals.topLevelListenerRegistered) {
+      if (! topLevelListenerRegistered) {
 
         // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
         // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
@@ -258,7 +259,7 @@ object InitSupport {
         g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)
         g.YAHOO.widget.Overlay.windowResizeEvent.subscribe(Events.scrollOrResize)
 
-        Globals.topLevelListenerRegistered = true
+        topLevelListenerRegistered = true
       }
 
       // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"

@@ -621,6 +621,7 @@
         <xsl:variable name="to-control-name" select="@control/string()"            as="xs:string"/>
         <xsl:variable name="items-expr"      select="@items/string()"              as="xs:string"/>
         <xsl:variable name="label-expr"      select="@label/string()"              as="xs:string"/>
+        <xsl:variable name="hint-expr"       select="@hint/string()"               as="xs:string?"/>
         <xsl:variable name="value-expr"      select="@value/string()"              as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"                 as="xs:string?"/>
         <xsl:variable name="context"         select="@expression-context/string()" as="xs:string?"/>
@@ -671,10 +672,36 @@
                 <xf:action iterate="$response-items">
                     <xf:var name="item-label" value="{$label-expr}"/>
                     <xf:var name="item-value" value="{$value-expr}"/>
-                    <xf:insert
-                        context="$new-choices-holder"
-                        ref="*"
-                        origin="xf:element('item', (xf:element('label', xs:string($item-label)), xf:element('value', xs:string($item-value))))"/>
+                    <xsl:choose>
+                        <xsl:when test="exists($hint-expr)">
+                            <xf:var name="item-hint"  value="{$hint-expr}"/>
+                            <xf:insert
+                                context="$new-choices-holder"
+                                ref="*"
+                                origin="
+                                    xf:element(
+                                        'item',
+                                        (
+                                            xf:element('label', xs:string($item-label)),
+                                            xf:element('hint',  xs:string($item-hint)),
+                                            xf:element('value', xs:string($item-value))
+                                        )
+                                    )"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xf:insert
+                                context="$new-choices-holder"
+                                ref="*"
+                                origin="
+                                    xf:element(
+                                        'item',
+                                        (
+                                            xf:element('label', xs:string($item-label)),
+                                            xf:element('value', xs:string($item-value))
+                                        )
+                                    )"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xf:action>
             </xf:action>
 

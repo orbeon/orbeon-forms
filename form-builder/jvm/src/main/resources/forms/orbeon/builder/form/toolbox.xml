@@ -45,6 +45,7 @@
                             <xf:property name="form"                          value="bind('form-name-bind')"/>
                             <xf:property name="title"                         value="bind('title-bind')"/>
                             <xf:property name="description"                   value="bind('description-bind')"/>
+                            <xf:property name="description-mediatype"         value="bind('description-bind')/@mediatype/string()"/>
                             <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                             <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                             <xf:property name="singleton"                     value="bind('singleton-bind')"/>

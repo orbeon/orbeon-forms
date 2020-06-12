@@ -132,6 +132,25 @@
             white-space: nowrap;
         }
 
+        .fr-summary-td .xforms-output.xforms-mediatype-text-html .xforms-output-output {
+
+            div, ul, ol, li {
+                display: inline;
+            }
+
+            div[style] {
+                padding-left: 0.2em !important; // there can be an inline style for indent, like `style="padding-left: 40px;"`
+            }
+
+            ol, ul {
+                margin-left: 0;
+            }
+
+            li {
+                margin-left: 0.2em;
+            }
+        }
+
         .fr-summary-repeat-labels, .fr-summary-created, .fr-summary-modified {
             .narrow-td();
         }

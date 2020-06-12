@@ -954,7 +954,7 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td>
+                                                        <xh:td class="fr-summary-td">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"
@@ -1043,15 +1043,30 @@
                                                                                         $raw
                                                                                 else
                                                                                     $raw
-                                                            "/>
-                                                            <xf:group ref=".[$edit-view != '']">
-                                                                <xh:a href="{$current-document-href}">
+                                                                "/>
+                                                            <xf:switch
+                                                                caseref="
+                                                                    ($is-fb and starts-with(normalize-space($detail), '&lt;div&gt;')), (: HTML:)
+                                                                    xxf:non-blank($edit-view)                                          (: link :)
+                                                                "
+                                                                xxf:update="full">
+                                                                <xf:case value="true(), true()">
+                                                                    <xh:a href="{$current-document-href}">
+                                                                        <xf:output mediatype="text/html" value="$detail"/>
+                                                                    </xh:a>
+                                                                </xf:case>
+                                                                <xf:case value="true(), false()">
+                                                                    <xf:output mediatype="text/html" value="$detail"/>
+                                                                </xf:case>
+                                                                <xf:case value="false(), true()">
+                                                                    <xh:a href="{$current-document-href}">
+                                                                        <xf:output value="$detail"/>
+                                                                    </xh:a>
+                                                                </xf:case>
+                                                                <xf:case value="false(), false()">
                                                                     <xf:output value="$detail"/>
-                                                                </xh:a>
-                                                            </xf:group>
-                                                            <xf:group ref=".[$edit-view = '']">
-                                                                <xf:output value="$detail"/>
-                                                            </xf:group>
+                                                                </xf:case>
+                                                            </xf:switch>
                                                         </xh:td>
                                                     </xf:group>
                                                 </xf:repeat>

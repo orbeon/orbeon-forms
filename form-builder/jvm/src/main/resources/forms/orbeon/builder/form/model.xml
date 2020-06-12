@@ -379,6 +379,7 @@
                 <xf:property name="form"                          value="$requested-form"/>
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="description-mediatype"         value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                     value="()"/>
@@ -411,6 +412,7 @@
                 <xf:property name="form"                          value="($requested-form,        bind('form-name-bind'))[1]"/>
                 <xf:property name="title"                         value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description"                   value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="description-mediatype"         value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
                 <xf:property name="singleton"                     value="()"/>

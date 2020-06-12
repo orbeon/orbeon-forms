@@ -516,6 +516,12 @@
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                                         <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
 
+                                        <xf:delete ref="bind('description-bind')/@mediatype"/>
+                                        <xf:insert
+                                            if="event('description-mediatype') = 'text/html'"
+                                            context="bind('description-bind')"
+                                            origin="xf:attribute('mediatype', 'text/html')"/>
+
                                         <!-- Add/remove singleton setting as needed -->
                                         <xf:delete
                                             bind="singleton-bind"/>

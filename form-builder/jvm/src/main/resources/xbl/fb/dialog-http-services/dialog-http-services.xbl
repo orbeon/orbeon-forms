@@ -546,6 +546,8 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
+                                        <!-- https://github.com/orbeon/orbeon-forms/issues/4571 -->
+                                        <xf:var name="current-method-value" value="$request/method/string()"/>
                                         <xf:select1 ref="$request/method" id="fb-service-method">
                                             <xf:label ref="$resources/dialog-http-services/method/label"/>
                                             <xf:item>
@@ -568,7 +570,7 @@
                                             <!-- Switch serialization when needed -->
                                             <xf:action event="xforms-select">
                                                 <xf:setvalue
-                                                    if="not(event('xxf:item-value') = ('get', 'delete')) and . = ('get', 'delete')"
+                                                    if="not(event('xxf:item-value') = ('get', 'delete')) and $current-method-value = ('get', 'delete')"
                                                     ref="../serialization"
                                                     value="'application/xml'"/>
                                             </xf:action>
@@ -578,7 +580,7 @@
                                     <xh:td>
                                         <xf:select1 ref="$request/serialization">
                                             <xf:label ref="$resources/dialog-http-services/serialization/label"/>
-                                            <xf:itemset ref=".[not($has-request-body)]">
+                                            <xf:itemset ref=".[not($has-request-body) or $request/serialization = 'none']">
                                                 <xf:label>None</xf:label>
                                                 <xf:value>none</xf:value>
                                             </xf:itemset>

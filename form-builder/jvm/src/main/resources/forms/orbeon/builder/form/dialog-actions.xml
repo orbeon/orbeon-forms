@@ -498,9 +498,11 @@
 
                             </xf:select1>
 
-                            <xf:switch caseref="@class">
+                            <!-- `xxf:xforms11-switch="true"` is for dropdowns in hidden cases to be non-relevant -->
+                            <xf:switch caseref="@class" xxf:xforms11-switch="true">
                                 <xf:case value="'fr-set-control-value-action'">
                                     <xf:select1
+                                        id="fb-choose-any-control"
                                         appearance="search"
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
                                         class="fb-action-option-3-col-span-1">
@@ -529,9 +531,9 @@
                                 <xf:case value="'fr-itemset-action'">
                                     <!-- Only list selection controls -->
                                     <xf:select1
+                                        id="fb-choose-selection-control"
                                         appearance="search"
                                         ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
-                                        id="fb-actions-control"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/destination-selection-control/label" class="xforms-hidden"/>
                                         <xf:itemset ref="$controls-with-itemset">

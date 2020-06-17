@@ -429,9 +429,9 @@
                     name="{event('xxf:type')}"
                     propagate="stop"
                     defaultAction="cancel">
-                    <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
-                    <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>
-                    <xf:property name="xxf:actual"     value="event('xxf:actual')"/>
+                    <xf:property name="error-type" value="event('error-type')"/>
+                    <xf:property name="permitted"  value="event('permitted')"/>
+                    <xf:property name="actual"     value="event('actual')"/>
                 </xf:dispatch>
 
                 <xf:action event="xxforms-upload-done">

@@ -93,7 +93,8 @@ private class Select1SearchCompanion extends XBLCompanion {
         }
 
         jSelect.select2(options)
-        jSelect.on("change", onChange _)
+        if (servicePerformsSearch)
+          jSelect.on("change", onChange _)
       }
 
       initOrUpdatePlaceholder()

@@ -70,7 +70,10 @@ object Multipart {
 
   import Private._
 
-  val DefaultBufferSize = 4096  // match MultipartStream.DEFAULT_BUFSIZE
+  // Initially we set this to `MultipartStream.DEFAULT_BUFSIZE`.
+  // But one user had an issue with a very large header causing errors. So we are making this larger now.
+  // https://github.com/orbeon/orbeon-forms/issues/4579
+  val DefaultBufferSize = 3 * 4096
 
   // Return fully successful requests only
   def getParameterMapMultipart(

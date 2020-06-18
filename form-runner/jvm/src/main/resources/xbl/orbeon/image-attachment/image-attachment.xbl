@@ -64,7 +64,8 @@
             <xf:var
                 name="binding"
                 value="xxf:binding('fr-image-attachment')"/>
-            <xf:upload
+
+            <fr:attachment
                 ref="$binding"
                 accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
 
@@ -102,7 +103,7 @@
                     <xf:property name="actual"     value="event('actual')"/>
                 </xf:dispatch>
 
-            </xf:upload>
+            </fr:attachment>
             <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>

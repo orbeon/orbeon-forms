@@ -12,8 +12,9 @@
 
 .orbeon {
     .select2-container {
-        ul                { margin: initial }
-        .select2-dropdown { z-index: 9999999; }     // Dropdown to be always above everything else
+        ul                 { margin: initial }
+        .select2-selection { border: 1px solid #ccc } // Be consistent with border of other form controls
+        .select2-dropdown  { z-index: 9999999 }       // Dropdown to be always above everything else
     }
     .select2-selection__clear {
         // Better alignment of the clear icon with the selection / arrow down icon

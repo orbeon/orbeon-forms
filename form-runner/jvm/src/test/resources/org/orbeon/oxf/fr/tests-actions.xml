@@ -379,7 +379,7 @@
                                         <xf:insert
                                             context="$new-choices-holder"
                                             ref="*"
-                                            origin="xf:element('item', (xf:element('label', xs:string($item-label)), xf:element('value', xs:string($item-value))))"/>
+                                            origin="                                     xf:element(                                         'item',                                         (                                             xf:element('label', xs:string($item-label)),                                             xf:element('value', xs:string($item-value))                                         )                                     )"/>
                                     </xf:action>
                                 </xf:action>
 

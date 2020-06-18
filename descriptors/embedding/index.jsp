@@ -4,11 +4,12 @@
   String ApiCookieName = "orbeon-embedding-api";
   Cookie[] cookies     = request.getCookies();
   String embeddingApi  = "java";
-  for (int i = 0; i < cookies.length; i++) {
-    Cookie cookie = cookies[i];
-    if (cookie.getName().equals(ApiCookieName))
-      embeddingApi = cookie.getValue();
-  }
+  if (cookies != null)
+    for (int i = 0; i < cookies.length; i++) {
+      Cookie cookie = cookies[i];
+      if (cookie.getName().equals(ApiCookieName))
+        embeddingApi = cookie.getValue();
+    }
   boolean isEmbeddingApiJava = embeddingApi.equals("java");
   boolean isEmbeddingApiJS   = ! isEmbeddingApiJava;
   String  disabledIfJava     = isEmbeddingApiJava ? "disabled" : "";

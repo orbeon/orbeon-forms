@@ -29,16 +29,14 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.{FunSpec, FunSpecLike}
 
-import scala.util.control.NonFatal
 import scala.collection.compat._
+import scala.util.control.NonFatal
 
 
 abstract class ProcessorTestBase(

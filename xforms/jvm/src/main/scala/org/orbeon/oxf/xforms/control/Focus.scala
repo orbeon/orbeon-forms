@@ -194,15 +194,15 @@ object Focus {
 
   // Whether the control is hidden within a non-visible case or dialog
   def isHidden(control: XFormsControl): Boolean = new AncestorOrSelfIterator(control.parent) exists {
-    case c: XFormsCaseControl     if ! c.isVisible => true
-    case c: XXFormsDialogControl  if ! c.isVisible => true
-    case _                                         => false
+    case c: XFormsCaseControl     if ! c.isCaseVisible   => true
+    case c: XXFormsDialogControl  if ! c.isDialogVisible => true
+    case _                                               => false
   }
 
   // Return all the ancestor-or-self hidden cases
   def ancestorOrSelfHiddenCases(control: XFormsControl): Iterator[XFormsCaseControl] =
     new AncestorOrSelfIterator(control) collect {
-      case switchCase: XFormsCaseControl if ! switchCase.isVisible => switchCase
+      case switchCase: XFormsCaseControl if ! switchCase.isCaseVisible => switchCase
     }
 
   // Dispatch DOMFocusOut and DOMFocusIn

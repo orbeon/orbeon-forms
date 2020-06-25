@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.xml.sax.helpers.AttributesImpl
 
 private case class XXFormsDialogControlLocal(
-  var visible             : Boolean,
+  var dialogVisible       : Boolean,
   var constrainToViewport : Boolean,
   var neighborControlId   : Option[String]
 ) extends XFormsControlLocal
@@ -67,7 +67,7 @@ class XXFormsDialogControl(
     state match {
       case Some(ControlState(_, _, keyValues)) =>
         setLocal(XXFormsDialogControlLocal(
-          visible             = keyValues("visible") == "true",
+          dialogVisible       = keyValues("visible") == "true",
           constrainToViewport = keyValues.get("constrain") contains "true",
           neighborControlId   = keyValues.get("neighbor")
         ))
@@ -75,7 +75,7 @@ class XXFormsDialogControl(
         // This can happen with xxf:dynamic, which does not guarantee the stability of ids, therefore state for
         // a particular control might not be found.
         setLocal(XXFormsDialogControlLocal(
-          visible             = initiallyVisible,
+          dialogVisible       = initiallyVisible,
           constrainToViewport = false,
           neighborControlId   = None
         ))
@@ -87,8 +87,8 @@ class XXFormsDialogControl(
 
   private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
 
-  def isVisible             = dialogCurrentLocal.visible
-  def wasVisible            = getInitialLocal.asInstanceOf[XXFormsDialogControlLocal].visible
+  def isDialogVisible       = dialogCurrentLocal.dialogVisible
+  def wasDialogVisible      = getInitialLocal.asInstanceOf[XXFormsDialogControlLocal].dialogVisible
   def neighborControlId     = dialogCurrentLocal.neighborControlId orElse defaultNeighborControlId
   def isConstrainToViewport = dialogCurrentLocal.constrainToViewport
 
@@ -98,7 +98,7 @@ class XXFormsDialogControl(
       case dialogOpenEvent: XXFormsDialogOpenEvent =>
 
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-        localForUpdate.visible             = true
+        localForUpdate.dialogVisible       = true
         localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
         localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
 
@@ -108,7 +108,7 @@ class XXFormsDialogControl(
       case _: XXFormsDialogCloseEvent =>
 
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-        localForUpdate.visible             = false
+        localForUpdate.dialogVisible       = false
         localForUpdate.neighborControlId   = None
         localForUpdate.constrainToViewport = false
 
@@ -124,11 +124,11 @@ class XXFormsDialogControl(
       case _: XXFormsDialogOpenEvent =>
         // If dialog is closed and the focus is within the dialog, remove the focus
         // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
-        if (isVisible && ! Focus.isFocusWithinContainer(this))
+        if (isDialogVisible && ! Focus.isFocusWithinContainer(this))
           Dispatch.dispatchEvent(new XFormsFocusEvent(this, Set.empty, Set.empty))
       case _: XXFormsDialogCloseEvent =>
         // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
-        if (! isVisible && Focus.isFocusWithinContainer(this))
+        if (! isDialogVisible && Focus.isFocusWithinContainer(this))
           Focus.removeFocus(containingDocument)
       case _ =>
     }
@@ -140,8 +140,8 @@ class XXFormsDialogControl(
     val local = dialogCurrentLocal
     val result = new ju.HashMap[String, String](3)
 
-    result.put("visible", local.visible.toString)
-    if (local.visible) {
+    result.put("visible", local.dialogVisible.toString)
+    if (local.dialogVisible) {
       result.put("constrain", local.constrainToViewport.toString)
       local.neighborControlId foreach (result.put("neighbor", _))
     }
@@ -155,7 +155,7 @@ class XXFormsDialogControl(
     previousControl match {
       case Some(other: XXFormsDialogControl) =>
         // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
-        other.wasVisible == isVisible &&
+        other.wasDialogVisible == isDialogVisible &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ => false
   }
@@ -182,8 +182,8 @@ class XXFormsDialogControl(
       val atts = new AttributesImpl
       atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
 
-      val visible = isVisible
-      if (previousControl.isEmpty || previousDialog.exists(_.wasVisible != visible)) {
+      val visible = isDialogVisible
+      if (previousControl.isEmpty || previousDialog.exists(_.wasDialogVisible != visible)) {
         atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")
         doOutputElement = true
       }
@@ -207,5 +207,5 @@ class XXFormsDialogControl(
 
   }
 
-  override def contentVisible = isVisible
+  override def contentVisible = isDialogVisible
 }

@@ -233,7 +233,7 @@ object ScriptBuilder {
     val dialogsToOpen =
       for {
         dialogControl <- containingDocument.getControls.getCurrentControlTree.getDialogControls
-        if dialogControl.isVisible
+        if dialogControl.isDialogVisible
       } yield
         dialogControl
 

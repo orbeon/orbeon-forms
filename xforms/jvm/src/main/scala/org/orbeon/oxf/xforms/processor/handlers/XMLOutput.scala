@@ -153,7 +153,7 @@ object XMLOutput extends XMLReceiverSupport {
     }
 
   def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit =
-    c.narrowTo[XXFormsDialogControl] filter (_.isVisible) foreach { _ =>
+    c.narrowTo[XXFormsDialogControl] filter (_.isDialogVisible) foreach { _ =>
       element("visible", text = "true")(xmlReceiver)
     }
 

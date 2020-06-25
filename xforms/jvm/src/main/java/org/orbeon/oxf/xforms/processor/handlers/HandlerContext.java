@@ -355,7 +355,7 @@ public class HandlerContext {
                 pushPartAnalysis(((XXFormsDynamicControl) currentControl).nested().get().partAnalysis());
             } else if (currentControl instanceof XFormsCaseControl) {
                 // Case (not used as of 2012-04-16)
-                pushCaseContext(((XFormsCaseControl) currentControl).isVisible());
+                pushCaseContext(((XFormsCaseControl) currentControl).isCaseVisible());
             }
         }
     }

@@ -39,7 +39,7 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
   def isSelected: Boolean = getEffectiveId == getSwitch.getSelectedCaseEffectiveId
 
   // Whether to show this case.
-  def isVisible: Boolean = isSelected || getSwitch.isStaticReadonly
+  def isCaseVisible: Boolean = isSelected || getSwitch.isStaticReadonly
 
   // Toggle to this case and dispatch events if this causes a change in selected cases.
   def toggle(): Unit = {

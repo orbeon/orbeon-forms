@@ -100,8 +100,6 @@ trait ControlEventSupport extends ListenersTrait {
   def dispatchCreationEvents(): Unit = {
     commitCurrentUIState()
     Dispatch.dispatchEvent(new XFormsEnabledEvent(this))
-    if (! Focus.isHidden(this))
-      Dispatch.dispatchEvent(new XXFormsVisibleEvent(this))
   }
 
   // Dispatch change events (between the control becoming enabled and disabled)
@@ -109,10 +107,6 @@ trait ControlEventSupport extends ListenersTrait {
 
   // Dispatch destruction events
   def dispatchDestructionEvents(): Unit = {
-
-    if (! Focus.isHidden(this))
-      Dispatch.dispatchEvent(new XXFormsHiddenEvent(this))
-
     // Don't test for relevance here
     // - in iteration removal case, control is still relevant
     // - in refresh case, control is non-relevant

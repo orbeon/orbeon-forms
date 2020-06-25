@@ -15,8 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CaseControl
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl
+import org.orbeon.oxf.xforms.control.{VisibilityTrait, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 /**
@@ -25,7 +24,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xf:switch holds this information.
  */
 class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
+       with VisibilityTrait {
 
   override type Control <: CaseControl
 
@@ -40,6 +40,8 @@ class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element:
 
   // Whether to show this case.
   def isCaseVisible: Boolean = isSelected || getSwitch.isStaticReadonly
+
+  override def locallyVisible: Boolean = isCaseVisible
 
   // Toggle to this case and dispatch events if this causes a change in selected cases.
   def toggle(): Unit = {

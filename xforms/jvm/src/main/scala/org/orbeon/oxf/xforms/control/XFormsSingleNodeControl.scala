@@ -38,7 +38,8 @@ import scala.collection.{immutable => i}
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
 */
 abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsControl(container, parent, element, effectiveId) {
+    extends XFormsControl(container, parent, element, effectiveId)
+       with VisibilityTrait {
 
   import XFormsSingleNodeControl._
 

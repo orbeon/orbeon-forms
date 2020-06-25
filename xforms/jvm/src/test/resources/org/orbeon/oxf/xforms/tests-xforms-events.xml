@@ -1591,6 +1591,7 @@
                                     <event type="xforms-enabled" target="input1" indexes=""/>
                                     <event type="xxforms-visible" target="input1" indexes=""/>
                                     <event type="xforms-deselect" target="case1" indexes=""/>
+                                    <event type="xxforms-hidden" target="input1" indexes=""/>
                                     <event type="xforms-disabled" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
                                     <event type="xxforms-visible" target="input2" indexes=""/>
@@ -1682,9 +1683,9 @@
                                     <event type="xxforms-visible" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
                                     <event type="xforms-deselect" target="case1" indexes=""/>
+                                    <event type="xforms-select" target="case2" indexes=""/>
                                     <event type="xxforms-hidden" target="input1" indexes=""/>
                                     <event type="xxforms-visible" target="input2" indexes=""/>
-                                    <event type="xforms-select" target="case2" indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -2104,7 +2105,6 @@
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                      <event type="xforms-enabled" target="my-repeat" indexes=""/>
-                                     <event type="xxforms-visible" target="my-repeat" indexes=""/>
                                      <event type="xforms-enabled" target="my-input" indexes="1"/>
                                      <event type="xxforms-visible" target="my-input" indexes="1"/>
                                      <event type="xforms-enabled" target="my-trigger" indexes="1"/>
@@ -2113,8 +2113,7 @@
                                      <event type="xforms-disabled" target="my-input" indexes="1"/>
                                      <event type="xxforms-hidden" target="my-trigger" indexes="1"/>
                                      <event type="xforms-disabled" target="my-trigger" indexes="1"/>
-                                     <event type="xxforms-hidden" target="my-repeat" indexes=""/>
-                                    <event type="xforms-disabled" target="my-repeat" indexes=""/>
+                                     <event type="xforms-disabled" target="my-repeat" indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -2692,7 +2691,7 @@
 
                         <xf:insert
                             observer="my-switch"
-                            event="xxforms-enabled xforms-disabled xxforms-visible xxforms-hidden"
+                            event="xforms-enabled xforms-disabled xxforms-visible xxforms-hidden"
                             context="instance('events')"
                             ref="*"
                             origin="xf:element(event('xxf:type'), xf:attribute('targetid', event('xxf:targetid')))"/>
@@ -2734,12 +2733,13 @@
                            </instance>
                            <instance id="events" model-id="model">
                                <events>
+                                   <xforms-enabled targetid="my-switch"/>
                                    <xxforms-visible targetid="my-switch"/>
+                                   <xforms-enabled targetid="my-input11"/>
                                    <xxforms-visible targetid="my-input11"/>
+                                   <xforms-enabled targetid="my-input21"/>
                                    <xxforms-hidden targetid="my-input11"/>
-                                   <xxforms-visible targetid="my-input21"/>
                                    <xforms-disabled targetid="my-input11"/>
-                                   <xxforms-hidden targetid="my-input21"/>
                                    <xforms-disabled targetid="my-input21"/>
                                </events>
                            </instance>

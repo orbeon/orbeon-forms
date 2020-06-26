@@ -67,10 +67,6 @@
                         value="fbf:hasViewTemplateSupportElementFor($xbl-binding, $support-element-name)"/>
                 </xf:action>
 
-                <xf:dispatch
-                    name="fb-process-xbl-fb-control-details"
-                    targetid="fb-dialog-control-details"/>
-
                 <!-- Clear default alert -->
                 <xf:var name="default-alert" value="$i/default-alert"/>
                 <xf:delete ref="$default-alert/node()"/>
@@ -167,6 +163,10 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
+                <xf:dispatch
+                    name="fb-process-xbl-fb-control-details"
+                    targetid="fb-dialog-control-details"/>
+
                 <xxf:show dialog="dialog"/>
 
                 <!-- Tell custom settings to initialize -->
@@ -193,7 +193,6 @@
                 <xf:delete
                     ref="instance('dynamic')/*"/>
 
-                <!-- Get control and insert in a new document, so the form isn't changed if we update the control appearance -->
                 <xf:var
                     name="control-document"
                     value="xxf:create-document()"/>
@@ -201,21 +200,22 @@
                     context="$control-document"
                     origin="fbf:findControlByNameOrEmpty($i/original-control-name)"/>
 
-                <!-- If the form author changed the appearance, change it on the control before we get the XBL binding -->
                 <xf:var
                     name="control"
                     value="$control-document/*"/>
                 <xf:var
                     name="new-appearance"
                     value="event('fb-new-appearance')"/>
-                <xf:setvalue
-                    if="exists($new-appearance)"
-                    ref="$control/@appearance"
-                    value="$new-appearance"/>
 
                 <xf:var
                     name="xbl-binding"
-                    value="fbf:bindingForControlElementOrEmpty($control)"/>
+                    value="
+                        fbf:findNewControlBinding(
+                            $i/original-control-name,
+                            $i/validations/validation[@type = 'datatype'],
+                            ($new-appearance, $i/appearances/@selection/string())[1]
+                        )"/>
+
                 <xf:var
                     name="control-details"
                     value="$xbl-binding/fb:metadata/fb:control-details"/>

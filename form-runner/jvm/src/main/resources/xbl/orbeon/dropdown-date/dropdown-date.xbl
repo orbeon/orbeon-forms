@@ -86,12 +86,24 @@
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <resource xml:lang="en">
-                                <start-year>Start date</start-year>
-                                <end-year>End date</end-year>
+                                <start-year>
+                                    <label>Start year</label>
+                                    <hint>Constant or XPath value template</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>End year</label>
+                                    <hint>Constant or XPath value template</hint>
+                                </end-year>
                             </resource>
                             <resource xml:lang="fr">
-                                <start-year>Date de début</start-year>
-                                <end-year>Date de fin</end-year>
+                                <start-year>
+                                    <label>Année de début</label>
+                                    <hint>Constante ou modèle XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Année de fin</label>
+                                    <hint>Constante ou modèle XPath</hint>
+                                </end-year>
                             </resource>
                         </_>
                     </xf:instance>
@@ -100,13 +112,15 @@
                 <fr:grid xmlns="" id="fb-editor-dropdown-date-grid">
                     <fr:c x="1" y="1" w="12">
                         <xf:input ref="instance('local')/start-year" id="start-year-control">
-                            <xf:label ref="xxf:r('start-year')"/>
+                            <xf:label ref="xxf:r('start-year.label')"/>
+                            <xf:hint ref="xxf:r('start-year.hint')"/>
                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                         </xf:input>
                     </fr:c>
                     <fr:c x="1" y="2" w="12">
                         <xf:input ref="instance('local')/end-year" id="end-year-control">
-                            <xf:label ref="xxf:r('end-year')"/>
+                            <xf:label ref="xxf:r('end-year.label')"/>
+                            <xf:hint ref="xxf:r('end-year.hint')"/>
                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                         </xf:input>
                     </fr:c>

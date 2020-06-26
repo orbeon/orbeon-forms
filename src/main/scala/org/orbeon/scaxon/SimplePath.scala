@@ -232,10 +232,10 @@ object SimplePath {
     def prefix       = nodeInfo.getPrefix
 
     // Like XPath local-name(), name(), namespace-uri(), resolve-QName()
-    def localname    = nodeInfo.getLocalPart
-    def name         = nodeInfo.getDisplayName
+    def localname: String = nodeInfo.getLocalPart
+    def name     : String = nodeInfo.getDisplayName
 
-    def namespaceURI = {
+    def namespaceURI: String = {
       val uri = nodeInfo.getURI
       if (uri eq null) "" else uri
     }
@@ -261,11 +261,11 @@ object SimplePath {
     // Return a qualified name as a (namespace uri, local name) pair
     // NOTE: The "URI qualified name" terminology comes from XPath 3:
     // ([`URIQualifiedName`](https://www.w3.org/TR/xpath-31/#doc-xpath31-URIQualifiedName)).
-    def uriQualifiedName = URIQualifiedName(nodeInfo.getURI, nodeInfo.getLocalPart)
+    def uriQualifiedName: URIQualifiedName = URIQualifiedName(nodeInfo.getURI, nodeInfo.getLocalPart)
 
-    def stringValue = nodeInfo.getStringValue
+    def stringValue: String = nodeInfo.getStringValue
 
-    def hasIdValue(id: String) = nodeInfo.id == id
+    def hasIdValue(id: String): Boolean = nodeInfo.id == id
 
     def isAttribute          : Boolean = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
     def isElement            : Boolean = nodeInfo.getNodeKind.toShort == Type.ELEMENT

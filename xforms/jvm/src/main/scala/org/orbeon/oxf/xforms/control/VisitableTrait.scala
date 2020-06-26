@@ -43,6 +43,7 @@ trait VisitableTrait extends XFormsControl {
         (_.deferredActionContext.markRecalculateRevalidate(NoDefaultsStrategy, None))
 
       containingDocument.requireRefresh()
+
       _visited = visited
     }
 

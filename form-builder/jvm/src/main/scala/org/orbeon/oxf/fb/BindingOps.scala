@@ -202,7 +202,7 @@ trait BindingOps {
     }
   }
 
-  // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
+  // From a control element (say `<fr:autocomplete>`), returns the corresponding `<xbl:binding>`
   def bindingForControlElement(controlElem: NodeInfo, bindings: Seq[NodeInfo]): Option[NodeInfo] = {
 
     val elemName    = controlElem.uriQualifiedName

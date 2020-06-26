@@ -181,7 +181,6 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
   def getChildrenCases =
     children collect { case c: XFormsCaseControl => c }
 
-  // Set the currently selected case.
   def setSelectedCase(caseControlToSelect: XFormsCaseControl): Unit = {
 
     require(caseControlToSelect.parent eq this, s"xf:case '${caseControlToSelect.effectiveId}' is not child of current xf:switch")

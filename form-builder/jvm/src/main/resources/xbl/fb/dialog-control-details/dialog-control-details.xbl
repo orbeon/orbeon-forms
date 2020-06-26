@@ -53,18 +53,23 @@
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
-                <xf:var
-                    name="xbl-binding"
-                    value="fbf:bindingForControlElementOrEmpty($control)"/>
-
                 <!-- Figure which one of label, hint, help, or text the control supports -->
-                <xf:action iterate="$i/(label, hint, help, text)">
+                <xf:action>
                     <xf:var
-                        name="support-element-name"
-                        value="local-name()"/>
-                    <xf:setvalue
-                        ref="@supported"
-                        value="fbf:hasViewTemplateSupportElementFor($xbl-binding, $support-element-name)"/>
+                        name="xbl-binding"
+                        value="fbf:bindingForControlElementOrEmpty($control)"/>
+                    <xf:action iterate="$i/(label, hint, help, text)">
+                        <xf:var
+                            name="support-element-name"
+                            value="local-name()"/>
+                        <xf:setvalue
+                            ref="@supported"
+                            value="
+                                fbf:hasViewTemplateSupportElementFor(
+                                    $xbl-binding,
+                                    $support-element-name
+                                )"/>
+                    </xf:action>
                 </xf:action>
 
                 <!-- Clear default alert -->
@@ -319,11 +324,11 @@
                     </xf:action>
 
                     <xf:var
-                        name="control-details"
+                        name="original-control-details"
                         value="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
 
                     <!-- Update custom XBL properties -->
-                    <xf:action if="exists($control-details) and instance('modified')/@dynamic = true()">
+                    <xf:action if="exists($original-control-details) and instance('modified')/@dynamic = true()">
 
                         <!-- Replace all attributes and content -->
                         <xf:delete

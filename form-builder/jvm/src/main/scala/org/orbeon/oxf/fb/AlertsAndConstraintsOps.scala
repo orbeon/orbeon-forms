@@ -75,9 +75,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val allValidations = {
       val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).toIterator
       validationElemsSeq map (v => v -> (v attValue "type")) flatMap {
-        case (e, Required.name) => RequiredValidation.fromXML(e, idsIterator)
-        case (e, "datatype")    => DatatypeValidation.fromXML(e, idsIterator, inDoc, controlName)
-        case (e, _)             => ConstraintValidation.fromXML(e, idsIterator)
+        case (e, Required.name) => Some(RequiredValidation.fromXml(e, idsIterator))
+        case (e, "datatype")    => Some(DatatypeValidation.fromXml(e, idsIterator, inDoc, controlName))
+        case (e, _)             => ConstraintValidation.fromXmlOpt(e, idsIterator)
       }
     }
 
@@ -295,18 +295,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
       } getOrElse
         DefaultRequireValidation
 
-    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[RequiredValidation] = {
+    def fromXml(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): RequiredValidation = {
       require(validationElem /@ "type" === Required.name)
 
       val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
       val required        = validationElem / Required.name stringValue
 
-      Some(
-        RequiredValidation(
-          validationIdOpt,
-          xpathOptToEither(required.trimAllToOpt),
-          AlertDetails.fromValidationXML(validationElem, validationIdOpt)
-        )
+      RequiredValidation(
+        validationIdOpt,
+        xpathOptToEither(required.trimAllToOpt),
+        AlertDetails.fromValidationXML(validationElem, validationIdOpt)
       )
     }
 
@@ -413,13 +411,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
         DefaultDataTypeValidation
     }
 
-    def fromXML(
+    def fromXml(
       validationElem : NodeInfo,
       newIds         : Iterator[String],
       inDoc          : NodeInfo,
       controlName    : String)(implicit
       ctx            : FormBuilderDocContext
-    ): Option[DatatypeValidation] = {
+    ): DatatypeValidation = {
       require(validationElem /@ "type" === "datatype")
 
       val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
@@ -460,12 +458,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
         Either.cond(schemaTypeOpt.isDefined, schemaTypeQName, builtinTypeQName)
       }
 
-      Some(
-        DatatypeValidation(
-          validationIdOpt,
-          datatype,
-          AlertDetails.fromValidationXML(validationElem, validationIdOpt)
-        )
+      DatatypeValidation(
+        validationIdOpt,
+        datatype,
+        AlertDetails.fromValidationXML(validationElem, validationIdOpt)
       )
     }
   }
@@ -512,7 +508,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           ConstraintValidation(idOpt, level, value, alertOpt)
       }
 
-    def fromXML(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[ConstraintValidation] = {
+    def fromXmlOpt(validationElem: NodeInfo, newIds: Iterator[String])(implicit ctx: FormBuilderDocContext): Option[ConstraintValidation] = {
 
       def normalizedAttOpt(attName: String) =
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt

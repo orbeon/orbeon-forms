@@ -75,7 +75,7 @@ object BindingDescriptor {
       findVirtualNameAndAppearance(oldElemName, oldDatatype, oldAppearances, descriptors)
 
     val newTuple =
-      findStaticNameAndAppearance(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+      findDirectNameAndAppearance(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
 
     val oldTuple = (oldElemName, oldAppearances.headOption)
 
@@ -114,7 +114,7 @@ object BindingDescriptor {
     virtualNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
   }
 
-  private def findStaticNameAndAppearance(
+  private def findDirectNameAndAppearance(
     elemName    : QName,
     datatype    : QName,
     appearances : Set[String],

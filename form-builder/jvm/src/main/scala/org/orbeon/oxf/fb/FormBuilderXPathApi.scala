@@ -21,13 +21,15 @@ import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, FormRunner, Names}
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
@@ -573,6 +575,45 @@ object FormBuilderXPathApi {
   def findControlByNameOrEmpty(controlName: String): NodeInfo = {
     implicit val ctx = FormBuilderDocContext()
     FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
+  }
+
+  //@XPathFunction
+  def findNewControlBinding(
+    controlName              : String,
+    newDatatypeValidationElem: NodeInfo,
+    newAppearanceOpt         : Option[String]
+  ): Option[NodeInfo] = {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    val descriptors = getAllRelevantDescriptors(ctx.componentBindings)
+
+    val originalControlElem = findControlByNameOrEmpty(controlName)
+    val originalDatatype    = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+
+    val newDatatype =
+      DatatypeValidation.fromXml(
+        validationElem  = newDatatypeValidationElem,
+        newIds          = nextTmpIds(token = Names.Validation, count = 1).toIterator,
+        inDoc           = ctx.formDefinitionRootElem,
+        controlName     = controlName
+      ).datatypeQName
+
+    val (virtualName, _) =
+      findVirtualNameAndAppearance(
+        elemName    = originalControlElem.uriQualifiedName,
+        datatype    = originalDatatype,
+        appearances = originalControlElem attTokens XFormsConstants.APPEARANCE_QNAME,
+        descriptors = descriptors
+      )
+
+    for {
+      descriptor      <- findMostSpecificWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+      relatedBindings = findRelatedBindings(descriptor, descriptors)
+      directBinding   <- findDirectBinding(relatedBindings)
+      binding         <- directBinding.binding
+    } yield
+      binding
   }
 
   private def renamingDetailsToXPath(renamingDetails: Option[Seq[(String, String, Boolean)]]): SequenceIterator =

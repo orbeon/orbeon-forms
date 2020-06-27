@@ -18,9 +18,9 @@ import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
+import org.orbeon.oxf.xforms.XFormsConstants.{APPEARANCE_QNAME, XFORMS_STRING_EXPLODED_QNAME, XFORMS_STRING_QNAME, XS_STRING_EXPLODED_QNAME}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -74,8 +74,16 @@ object BindingDescriptor {
     val (virtualName, _) =
       findVirtualNameAndAppearance(oldElemName, oldDatatype, oldAppearances, descriptors)
 
+    val newTupleOpt =
+      for {
+        descriptor                <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+        relatedDescriptors        = findRelatedDescriptors(descriptor, descriptors)
+        (elemName, appearanceOpt) <- findStaticBindingInRelated(virtualName, newAppearanceOpt.to(Set), relatedDescriptors)
+      } yield
+        elemName -> appearanceOpt
+
     val newTuple =
-      findDirectNameAndAppearance(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+      newTupleOpt getOrElse (virtualName, newAppearanceOpt)
 
     val oldTuple = (oldElemName, oldAppearances.headOption)
 
@@ -98,9 +106,9 @@ object BindingDescriptor {
     val virtualNameAndAppearanceOpt =
       for {
         descriptor                                <- findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
-        if descriptor.att.isEmpty                 // only a direct binding can be an alias for another related binding
-        relatedBindings                           = findRelatedBindings(descriptor, descriptors)
-        BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(datatype, relatedBindings)
+        if descriptor.att.isEmpty // only a direct binding can be an alias for another related binding
+        relatedDescriptors                        = findRelatedDescriptors(descriptor, descriptors)
+        BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(datatype, relatedDescriptors)
         elemName                                  <- elemNameOpt
       } yield
         (
@@ -112,25 +120,6 @@ object BindingDescriptor {
         )
 
     virtualNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
-  }
-
-  private def findDirectNameAndAppearance(
-    elemName    : QName,
-    datatype    : QName,
-    appearances : Set[String],
-    descriptors : Seq[BindingDescriptor]
-  ): (QName, Option[String]) = {
-
-    val newNameAndAppearanceOpt =
-      for {
-        descriptor                           <- findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
-        relatedBindings                      = findRelatedBindings(descriptor, descriptors)
-        BindingDescriptor(elemNameOpt, _, _) <- findDirectBinding(relatedBindings)
-        elemName                             <- elemNameOpt
-      } yield
-        (elemName, None)
-
-    newNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
   }
 
   def possibleAppearancesWithBindings(
@@ -287,30 +276,19 @@ object BindingDescriptor {
       descriptor
   }
 
-  def findRelatedBindings(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]): Seq[BindingDescriptor] =
+  def findRelatedDescriptors(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]): Seq[BindingDescriptor] =
     descriptors filter (d => d.binding == descriptor.binding)
 
-  def findDirectBinding(
-    relatedBindings : Seq[BindingDescriptor]
-  ): Option[BindingDescriptor] =
-    relatedBindings collectFirst {
-      case descriptor @ BindingDescriptor(
-          Some(_),
-          None,
-          None
-        ) => descriptor
-    }
-
   def findRelatedVaryNameAndAppearance(
-    datatype        : QName,
-    relatedBindings : Seq[BindingDescriptor]
+    datatype           : QName,
+    relatedDescriptors : Seq[BindingDescriptor]
   ): Option[BindingDescriptor] = {
 
     val Datatype1 = datatype
     val Datatype2 = Model.getVariationTypeOrKeep(datatype)
 
     def findWithNameDatatypeAndAppearance =
-      relatedBindings collectFirst {
+      relatedDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
             Some(_),
             Some(Datatype1 | Datatype2),
@@ -319,7 +297,7 @@ object BindingDescriptor {
       }
 
     def findWithNameAndDatatype =
-      relatedBindings collectFirst {
+      relatedDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
             Some(_),
             Some(Datatype1 | Datatype2),
@@ -328,7 +306,7 @@ object BindingDescriptor {
       }
 
     def findWithNameAndAppearance =
-      relatedBindings collectFirst {
+      relatedDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
             Some(_),
             None,
@@ -339,6 +317,52 @@ object BindingDescriptor {
     findWithNameDatatypeAndAppearance orElse
     findWithNameAndDatatype           orElse
     findWithNameAndAppearance
+  }
+
+  private def findStaticBindingInRelated(
+    elemName           : QName,
+    appearances        : Set[String],
+    relatedDescriptors : Seq[BindingDescriptor]
+  ): Option[(QName, Option[String])] = {
+
+    def findByNameAndAppearance =
+      relatedDescriptors collectFirst {
+        case descriptor @ BindingDescriptor(
+            Some(`elemName`),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) if appearances(appearance) => elemName -> Some(appearance)
+        case descriptor @ BindingDescriptor(
+            Some(`elemName`),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+          ) if appearances(appearance) => elemName -> Some(appearance)
+      }
+
+    def findByAppearanceOnly =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(elemName),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+          ) if appearances(appearance) => elemName -> Some(appearance)
+        case BindingDescriptor(
+            Some(elemName),
+            None,
+            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+          ) if appearances(appearance) => elemName -> Some(appearance)
+      }
+
+    def findDirect =
+      relatedDescriptors collectFirst {
+        case BindingDescriptor(
+            Some(elemName),
+            None,
+            None
+          ) => elemName -> None
+      }
+
+    findByNameAndAppearance orElse findByAppearanceOnly orElse findDirect
   }
 
   def findMostSpecificWithoutDatatype(
@@ -374,10 +398,10 @@ object BindingDescriptor {
   }
 
   def findMostSpecificWithDatatype(
-    elemName        : QName,
-    datatype        : QName,
-    appearances     : Set[String],
-    descriptors     : Seq[BindingDescriptor]
+    elemName    : QName,
+    datatype    : QName,
+    appearances : Set[String],
+    descriptors : Seq[BindingDescriptor]
   ): Option[BindingDescriptor] = {
 
     val Datatype1 = datatype
@@ -408,4 +432,17 @@ object BindingDescriptor {
 
     findWithDatatypeAndAppearance orElse findWithDatatypeOnly
   }
+
+  val StringQNames: Set[QName] = Set(XMLConstants.XS_STRING_QNAME, XFORMS_STRING_QNAME)
+
+  def findMostSpecificMaybeWithDatatype(
+    elemName    : QName,
+    datatype    : QName,
+    appearances : Set[String],
+    descriptors : Seq[BindingDescriptor]
+  ): Option[BindingDescriptor] =
+    if (StringQNames(datatype))
+      findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+    else
+      findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
 }

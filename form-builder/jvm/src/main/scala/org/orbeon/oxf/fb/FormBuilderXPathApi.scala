@@ -608,10 +608,8 @@ object FormBuilderXPathApi {
       )
 
     for {
-      descriptor      <- findMostSpecificWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
-      relatedBindings = findRelatedBindings(descriptor, descriptors)
-      directBinding   <- findDirectBinding(relatedBindings)
-      binding         <- directBinding.binding
+      descriptor <- findMostSpecificMaybeWithDatatype(virtualName, newDatatype, newAppearanceOpt.to(Set), descriptors)
+      binding    <- descriptor.binding
     } yield
       binding
   }

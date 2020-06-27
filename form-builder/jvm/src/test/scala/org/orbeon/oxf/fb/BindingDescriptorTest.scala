@@ -144,7 +144,7 @@ class BindingDescriptorTest
 
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , None                     )(Some(XF -> "input"        , None))
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , Some("fields")           )(Some(FR -> "fields-date"  , None))
-    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "string" , Some("fields")           )(Some(XF -> "input"        , Some("fields")))
+    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "string" , Some("fields")           )(Some(XF -> "input"        , None))
 
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("dropdown")         )(Some(XF -> "select1"      , Some("dropdown")))
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("dropdown")         , XS -> "string" , Some("full")             )(Some(XF -> "select1"      , Some("full")))
@@ -162,7 +162,7 @@ class BindingDescriptorTest
       elemName : QName,
       dataType : QName)(
       expected : Seq[(Option[String], String)]
-    ) =
+    ): Unit =
       it(s"must pass with $elemName/$dataType") {
         for {
           newT <- List(dataType, Model.getVariationTypeOrKeep(dataType))

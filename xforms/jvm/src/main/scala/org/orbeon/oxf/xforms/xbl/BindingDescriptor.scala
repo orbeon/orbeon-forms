@@ -18,10 +18,10 @@ import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.{APPEARANCE_QNAME, XFORMS_STRING_EXPLODED_QNAME, XFORMS_STRING_QNAME, XS_STRING_EXPLODED_QNAME}
+import org.orbeon.oxf.xforms.XFormsConstants.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
@@ -57,6 +57,7 @@ case class BindingAttributeDescriptor(name: QName, predicate: AttributePredicate
 object BindingDescriptor {
 
   import CSSSelectorParser._
+  import Private._
 
   // Return a new element name and appearance for the control if needed.
   // See `BindingDescriptorTest.testNewElementName()` for examples.
@@ -97,18 +98,18 @@ object BindingDescriptor {
   // support them because datatypes can change dynamically at runtime and that is a big change, see:
   // https://github.com/orbeon/orbeon-forms/issues/1248
   def findVirtualNameAndAppearance(
-    elemName    : QName,
-    datatype    : QName,
-    appearances : Set[String],
-    descriptors : Seq[BindingDescriptor]
+    searchElemName    : QName,
+    searchDatatype    : QName,
+    searchAppearances : Set[String],
+    descriptors       : Seq[BindingDescriptor]
   ): (QName, Option[String]) = {
 
     val virtualNameAndAppearanceOpt =
       for {
-        descriptor                                <- findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+        descriptor                                <- findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
         if descriptor.att.isEmpty // only a direct binding can be an alias for another related binding
         relatedDescriptors                        = findRelatedDescriptors(descriptor, descriptors)
-        BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(datatype, relatedDescriptors)
+        BindingDescriptor(elemNameOpt, _, attOpt) <- findRelatedVaryNameAndAppearance(searchDatatype, relatedDescriptors)
         elemName                                  <- elemNameOpt
       } yield
         (
@@ -119,7 +120,7 @@ object BindingDescriptor {
           }
         )
 
-    virtualNameAndAppearanceOpt getOrElse (elemName, appearances.headOption) // ASSUMPTION: Take first appearance.
+    virtualNameAndAppearanceOpt getOrElse (searchElemName, searchAppearances.headOption) // ASSUMPTION: Take first appearance.
   }
 
   def possibleAppearancesWithBindings(
@@ -161,12 +162,7 @@ object BindingDescriptor {
       appearancesToBinding
   }
 
-  private def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping) =
-    selectorOpt collect {
-      case TypeSelector(Some(Some(prefix)), localname) => QName(localname, prefix, ns.mapping(prefix))
-    }
-
-  // Example: fr|number, xf|textarea
+  // Example: `fr|number`, `xf|textarea`
   def directBindingPF(
     ns      : NamespaceMapping,
     binding : Option[NodeInfo]
@@ -184,29 +180,10 @@ object BindingDescriptor {
       )(binding)
   }
 
-  // Example: xf|input:xxf-type("xs:decimal")
-  private def datatypeBindingPF(
-    ns      : NamespaceMapping,
-    binding : Option[NodeInfo]
-  ): PartialFunction[Selector, BindingDescriptor] = {
-    case Selector(
-        ElementWithFiltersSelector(
-          Some(TypeSelector(Some(Some(prefix)), localname)),
-          List(FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))))
-        ),
-        Nil) =>
-
-      BindingDescriptor(
-        Some(QName(localname, prefix, ns.mapping(prefix))),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
-        None
-      )(binding)
-  }
-
   // Examples:
   //
-  // - xf:select1[appearance ~= full]
-  // - [appearance ~= character-counter]
+  // - `xf:select1[appearance ~= full]`
+  // - `[appearance ~= character-counter]`
   def attributeBindingPF(
     ns      : NamespaceMapping,
     binding : Option[NodeInfo]
@@ -225,28 +202,6 @@ object BindingDescriptor {
       )(binding)
   }
 
-  // Example: xf|input:xxf-type('xs:date')[appearance ~= dropdowns]
-  private def datatypeAndAttributeBindingPF(
-    ns      : NamespaceMapping,
-    binding : Option[NodeInfo]
-  ): PartialFunction[Selector, BindingDescriptor] = {
-    case Selector(
-        ElementWithFiltersSelector(
-          typeSelectorOpt,
-          List(
-            FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))),
-            AttributeFilter(None, attName, attPredicate)
-          )
-        ),
-        Nil) =>
-
-      BindingDescriptor(
-        qNameFromElementSelector(typeSelectorOpt, ns),
-        datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)),
-        Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
-      )(binding)
-  }
-
   def getAllRelevantDescriptors(bindings: Seq[NodeInfo]): Seq[BindingDescriptor] =
     getAllSelectorsWithPF(
       bindings,
@@ -257,138 +212,30 @@ object BindingDescriptor {
         datatypeAndAttributeBindingPF(ns, Some(binding))
     )
 
-  private def getAllSelectorsWithPF(
-    bindings  : Seq[NodeInfo],
-    collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
-  ): Seq[BindingDescriptor] = {
-
-    def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
-      (bindingElem attValue "element", NamespaceMapping(bindingElem.namespaceMappings.toMap))
-
-    def descriptorsForSelectors(selectors: String, ns: NamespaceMapping, binding: NodeInfo) =
-      CSSSelectorParser.parseSelectors(selectors) collect collector(ns, binding)
-
-    for {
-      binding         <- bindings
-      (selectors, ns) = getBindingSelectorsAndNamespaces(binding)
-      descriptor      <- descriptorsForSelectors(selectors, ns, binding)
-    } yield
-      descriptor
-  }
-
-  def findRelatedDescriptors(descriptor: BindingDescriptor, descriptors: Seq[BindingDescriptor]): Seq[BindingDescriptor] =
-    descriptors filter (d => d.binding == descriptor.binding)
-
-  def findRelatedVaryNameAndAppearance(
-    datatype           : QName,
-    relatedDescriptors : Seq[BindingDescriptor]
-  ): Option[BindingDescriptor] = {
-
-    val Datatype1 = datatype
-    val Datatype2 = Model.getVariationTypeOrKeep(datatype)
-
-    def findWithNameDatatypeAndAppearance =
-      relatedDescriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(_),
-            Some(Datatype1 | Datatype2),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
-          ) => descriptor
-      }
-
-    def findWithNameAndDatatype =
-      relatedDescriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(_),
-            Some(Datatype1 | Datatype2),
-            None
-          ) => descriptor
-      }
-
-    def findWithNameAndAppearance =
-      relatedDescriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(_),
-            None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
-          ) => descriptor
-      }
-
-    findWithNameDatatypeAndAppearance orElse
-    findWithNameAndDatatype           orElse
-    findWithNameAndAppearance
-  }
-
-  private def findStaticBindingInRelated(
-    elemName           : QName,
-    appearances        : Set[String],
-    relatedDescriptors : Seq[BindingDescriptor]
-  ): Option[(QName, Option[String])] = {
-
-    def findByNameAndAppearance =
-      relatedDescriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(`elemName`),
-            None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
-          ) if appearances(appearance) => elemName -> Some(appearance)
-        case descriptor @ BindingDescriptor(
-            Some(`elemName`),
-            None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
-          ) if appearances(appearance) => elemName -> Some(appearance)
-      }
-
-    def findByAppearanceOnly =
-      relatedDescriptors collectFirst {
-        case BindingDescriptor(
-            Some(elemName),
-            None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
-          ) if appearances(appearance) => elemName -> Some(appearance)
-        case BindingDescriptor(
-            Some(elemName),
-            None,
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
-          ) if appearances(appearance) => elemName -> Some(appearance)
-      }
-
-    def findDirect =
-      relatedDescriptors collectFirst {
-        case BindingDescriptor(
-            Some(elemName),
-            None,
-            None
-          ) => elemName -> None
-      }
-
-    findByNameAndAppearance orElse findByAppearanceOnly orElse findDirect
-  }
-
   def findMostSpecificWithoutDatatype(
-    elemName    : QName,
-    appearances : Set[String],
-    descriptors : Seq[BindingDescriptor]
+    searchElemName    : QName,
+    searchAppearances : Set[String],
+    searchDescriptors : Seq[BindingDescriptor]
   ): Option[BindingDescriptor] = {
 
     def findByNameAndAppearance =
-      descriptors collectFirst {
+      searchDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
-            Some(`elemName`),
+            Some(`searchElemName`),
             None,
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
-          ) if appearances(appearance) => descriptor
+          ) if searchAppearances(appearance) => descriptor
         case descriptor @ BindingDescriptor(
-            Some(`elemName`),
+            Some(`searchElemName`),
             None,
             Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
-          ) if appearances(appearance) => descriptor
+          ) if searchAppearances(appearance) => descriptor
       }
 
     def findByNameOnly =
-      descriptors collectFirst {
+      searchDescriptors collectFirst {
         case descriptor @ BindingDescriptor(
-            Some(`elemName`),
+            Some(`searchElemName`),
             None,
             None
           ) => descriptor
@@ -397,52 +244,213 @@ object BindingDescriptor {
     findByNameAndAppearance orElse findByNameOnly
   }
 
-  def findMostSpecificWithDatatype(
-    elemName    : QName,
-    datatype    : QName,
-    appearances : Set[String],
-    descriptors : Seq[BindingDescriptor]
-  ): Option[BindingDescriptor] = {
-
-    val Datatype1 = datatype
-    val Datatype2 = Model.getVariationTypeOrKeep(datatype)
-
-    def findWithDatatypeAndAppearance =
-      descriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(`elemName`),
-            Some(Datatype1 | Datatype2),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
-          ) if appearances(appearance) => descriptor
-        case descriptor @ BindingDescriptor(
-            Some(`elemName`),
-            Some(Datatype1 | Datatype2),
-            Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
-          ) if appearances(appearance) => descriptor
-      }
-
-    def findWithDatatypeOnly =
-      descriptors collectFirst {
-        case descriptor @ BindingDescriptor(
-            Some(`elemName`),
-            Some(Datatype1 | Datatype2),
-            None
-          ) => descriptor
-      }
-
-    findWithDatatypeAndAppearance orElse findWithDatatypeOnly
-  }
-
-  val StringQNames: Set[QName] = Set(XMLConstants.XS_STRING_QNAME, XFORMS_STRING_QNAME)
-
   def findMostSpecificMaybeWithDatatype(
-    elemName    : QName,
-    datatype    : QName,
-    appearances : Set[String],
-    descriptors : Seq[BindingDescriptor]
+    searchElemName    : QName,
+    searchDatatype    : QName,
+    searchAppearances : Set[String],
+    descriptors       : Seq[BindingDescriptor]
   ): Option[BindingDescriptor] =
-    if (StringQNames(datatype))
-      findMostSpecificWithoutDatatype(elemName, appearances, descriptors)
+    if (StringQNames(searchDatatype))
+      findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
     else
-      findMostSpecificWithDatatype(elemName, datatype, appearances, descriptors)
+      findMostSpecificWithDatatype(searchElemName, searchDatatype, searchAppearances, descriptors)
+
+  private object Private {
+
+    // The `xs:string` and `xf:string` types are default types and considered the same as no type specification
+    val StringQNames: Set[QName] = Set(XMLConstants.XS_STRING_QNAME, XFORMS_STRING_QNAME)
+
+    def findRelatedDescriptors(
+        searchDescriptor : BindingDescriptor,
+        descriptors      : Seq[BindingDescriptor]
+    ): Seq[BindingDescriptor] =
+      descriptors filter (d => d.binding == searchDescriptor.binding)
+
+    def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping): Option[QName] =
+      selectorOpt collect {
+        case TypeSelector(Some(Some(prefix)), localname) => QName(localname, prefix, ns.mapping(prefix))
+      }
+
+    // Example: `xf|input:xxf-type("xs:decimal")`
+    def datatypeBindingPF(
+      ns      : NamespaceMapping,
+      binding : Option[NodeInfo]
+    ): PartialFunction[Selector, BindingDescriptor] = {
+      case Selector(
+          ElementWithFiltersSelector(
+            Some(TypeSelector(Some(Some(prefix)), localname)),
+            List(FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))))
+          ),
+          Nil) =>
+
+        BindingDescriptor(
+          Some(QName(localname, prefix, ns.mapping(prefix))),
+          datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          None
+        )(binding)
+    }
+
+    // Example: xf|input:xxf-type('xs:date')[appearance ~= dropdowns]
+    def datatypeAndAttributeBindingPF(
+      ns      : NamespaceMapping,
+      binding : Option[NodeInfo]
+    ): PartialFunction[Selector, BindingDescriptor] = {
+      case Selector(
+          ElementWithFiltersSelector(
+            typeSelectorOpt,
+            List(
+              FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype))),
+              AttributeFilter(None, attName, attPredicate)
+            )
+          ),
+          Nil) =>
+
+        BindingDescriptor(
+          qNameFromElementSelector(typeSelectorOpt, ns),
+          datatype.trimAllToOpt map (extractTextValueQName(ns.mapping.asJava, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
+        )(binding)
+    }
+
+    def getAllSelectorsWithPF(
+      bindings  : Seq[NodeInfo],
+      collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
+    ): Seq[BindingDescriptor] = {
+
+      def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
+        (bindingElem attValue "element", NamespaceMapping(bindingElem.namespaceMappings.toMap))
+
+      def descriptorsForSelectors(selectors: String, ns: NamespaceMapping, binding: NodeInfo) =
+        CSSSelectorParser.parseSelectors(selectors) collect collector(ns, binding)
+
+      for {
+        binding         <- bindings
+        (selectors, ns) = getBindingSelectorsAndNamespaces(binding)
+        descriptor      <- descriptorsForSelectors(selectors, ns, binding)
+      } yield
+        descriptor
+    }
+
+    def findStaticBindingInRelated(
+      searchElemName     : QName,
+      searchAppearances  : Set[String],
+      relatedDescriptors : Seq[BindingDescriptor]
+    ): Option[(QName, Option[String])] = {
+
+      def findByNameAndAppearance =
+        relatedDescriptors collectFirst {
+          case BindingDescriptor(
+              Some(`searchElemName`),
+              None,
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+            ) if searchAppearances(appearance) => searchElemName -> Some(appearance)
+          case BindingDescriptor(
+              Some(`searchElemName`),
+              None,
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+            ) if searchAppearances(appearance) => searchElemName -> Some(appearance)
+        }
+
+      def findByAppearanceOnly =
+        relatedDescriptors collectFirst {
+          case BindingDescriptor(
+              Some(elemName),
+              None,
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+            ) if searchAppearances(appearance) => elemName -> Some(appearance)
+          case BindingDescriptor(
+              Some(elemName),
+              None,
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+            ) if searchAppearances(appearance) => elemName -> Some(appearance)
+        }
+
+      def findDirect =
+        relatedDescriptors collectFirst {
+          case BindingDescriptor(
+              Some(elemName),
+              None,
+              None
+            ) => elemName -> None
+        }
+
+      findByNameAndAppearance orElse findByAppearanceOnly orElse findDirect
+    }
+
+    def findMostSpecificWithDatatype(
+      searchElemName    : QName,
+      searchDatatype    : QName,
+      searchAppearances : Set[String],
+      descriptors       : Seq[BindingDescriptor]
+    ): Option[BindingDescriptor] = {
+
+      val Datatype1 = searchDatatype
+      val Datatype2 = Model.getVariationTypeOrKeep(searchDatatype)
+
+      def findWithDatatypeAndAppearance =
+        descriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(`searchElemName`),
+              Some(Datatype1 | Datatype2),
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Equal(appearance)))
+            ) if searchAppearances(appearance) => descriptor
+          case descriptor @ BindingDescriptor(
+              Some(`searchElemName`),
+              Some(Datatype1 | Datatype2),
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, AttributePredicate.Token(appearance)))
+            ) if searchAppearances(appearance) => descriptor
+        }
+
+      def findWithDatatypeOnly =
+        descriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(`searchElemName`),
+              Some(Datatype1 | Datatype2),
+              None
+            ) => descriptor
+        }
+
+      findWithDatatypeAndAppearance orElse findWithDatatypeOnly
+    }
+
+    def findRelatedVaryNameAndAppearance(
+      searchDatatype     : QName,
+      relatedDescriptors : Seq[BindingDescriptor]
+    ): Option[BindingDescriptor] = {
+
+      val Datatype1 = searchDatatype
+      val Datatype2 = Model.getVariationTypeOrKeep(searchDatatype)
+
+      def findWithNameDatatypeAndAppearance =
+        relatedDescriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(_),
+              Some(Datatype1 | Datatype2),
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
+            ) => descriptor
+        }
+
+      def findWithNameAndDatatype =
+        relatedDescriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(_),
+              Some(Datatype1 | Datatype2),
+              None
+            ) => descriptor
+        }
+
+      def findWithNameAndAppearance =
+        relatedDescriptors collectFirst {
+          case descriptor @ BindingDescriptor(
+              Some(_),
+              None,
+              Some(BindingAttributeDescriptor(APPEARANCE_QNAME, _))
+            ) => descriptor
+        }
+
+      findWithNameDatatypeAndAppearance orElse
+      findWithNameAndDatatype           orElse
+      findWithNameAndAppearance
+    }
+  }
 }

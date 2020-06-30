@@ -46,10 +46,10 @@ trait BindingOps {
       controlElem                  <- findControlByName(ctx.formDefinitionRootElem, controlName).toList
       originalDatatype             = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
       (virtualName, appearanceOpt) = findVirtualNameAndAppearance(
-          elemName    = controlElem.uriQualifiedName,
-          datatype    = originalDatatype,
-          appearances = controlElem attTokens APPEARANCE_QNAME,
-          descriptors = descriptors
+          searchElemName    = controlElem.uriQualifiedName,
+          searchDatatype    = originalDatatype,
+          searchAppearances = controlElem attTokens APPEARANCE_QNAME,
+          descriptors       = descriptors
         )
       newDatatype                  = Model.qNameForBuiltinTypeName(builtinDatatype, required = false)
       appearanceElem               <- possibleAppearancesWithLabelAsXML(

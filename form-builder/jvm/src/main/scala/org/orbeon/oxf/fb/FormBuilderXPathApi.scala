@@ -601,10 +601,10 @@ object FormBuilderXPathApi {
 
     val (virtualName, _) =
       findVirtualNameAndAppearance(
-        elemName    = originalControlElem.uriQualifiedName,
-        datatype    = originalDatatype,
-        appearances = originalControlElem attTokens XFormsConstants.APPEARANCE_QNAME,
-        descriptors = descriptors
+        searchElemName    = originalControlElem.uriQualifiedName,
+        searchDatatype    = originalDatatype,
+        searchAppearances = originalControlElem attTokens XFormsConstants.APPEARANCE_QNAME,
+        descriptors       = descriptors
       )
 
     for {

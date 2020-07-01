@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.InputStream
+import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 
 import com.lowagie.text.Image
@@ -69,16 +69,31 @@ class CustomUserAgent(
     def fromImage(is: InputStream, uriString: String): ImageResource = {
 
       val (bis, orientationOpt) = findImageOrientation(is)
-      val sourceImage           = ImageIO.read(bis)
 
-      val rotatedImageOpt =
-        orientationOpt flatMap
-          (findTransformation(_, sourceImage.getWidth, sourceImage.getHeight)) map
-          (transformImage(sourceImage, _))
+      val iTextImage =
+        orientationOpt match {
+          case Some(orientation) if orientation >= 2 && orientation <= 8 =>
 
-      val iTextImage = Image.getInstance(rotatedImageOpt getOrElse sourceImage, null)
+            val sourceImage = ImageIO.read(bis)
+
+            val rotatedImage =
+              transformImage(
+                sourceImage,
+                findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight).getOrElse(throw new IllegalStateException)
+              )
+
+            val os = new ByteArrayOutputStream
+
+            // https://github.com/orbeon/orbeon-forms/issues/4593
+            if (ImageIO.write(rotatedImage, "JPG", os))
+              Image.getInstance(os.toByteArray)
+            else
+              throw new IllegalArgumentException("can't find encoder for image")
+          case _ =>
+             Image.getInstance(NetUtils.inputStreamToByteArray(bis))
+        }
+
       scaleToOutputResolution(iTextImage)
-
       new ImageResource(uriString, new ITextFSImage(iTextImage))
     }
 

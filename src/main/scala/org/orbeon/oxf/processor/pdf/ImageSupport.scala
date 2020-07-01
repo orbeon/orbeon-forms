@@ -97,18 +97,16 @@ object ImageSupport {
 
   def transformImage(sourceImage: BufferedImage, transform: AffineTransform): BufferedImage = {
 
-    val op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC)
+    // Use `TYPE_NEAREST_NEIGHBOR` because we use transformations that shouldn't need more, and
+    // if we uwe instead `TYPE_BICUBIC`, we end up with a color model that requires transparency,
+    // and then `ImageIO.write()` cannot encode the image.
+    val op = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
 
     val destinationImage =
       op.createCompatibleDestImage(
         sourceImage,
         if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY) sourceImage.getColorModel else null
       )
-
-    // Not sure we need to clear
-    val g = destinationImage.createGraphics
-    g.setBackground(Color.WHITE)
-    g.clearRect(0, 0, destinationImage.getWidth, destinationImage.getHeight)
 
     op.filter(sourceImage, destinationImage)
   }

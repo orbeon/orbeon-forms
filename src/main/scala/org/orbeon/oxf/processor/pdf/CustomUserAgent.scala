@@ -27,10 +27,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.xhtmlrenderer.layout.SharedContext
-import org.xhtmlrenderer.pdf.{ITextFSImage, ITextOutputDevice, PDFAsImage}
+import org.xhtmlrenderer.pdf.ITextFSImage
 import org.xhtmlrenderer.resource.ImageResource
 import org.xhtmlrenderer.swing.NaiveUserAgent
-import org.xhtmlrenderer.util.{ContentTypeDetectingInputStreamWrapper, ImageUtil, XRLog}
+import org.xhtmlrenderer.util.{ImageUtil, XRLog}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -39,7 +39,6 @@ import scala.util.control.NonFatal
 
 class CustomUserAgent(
   pipelineContext : PipelineContext,
-  outputDevice    : ITextOutputDevice,
   sharedContext   : SharedContext)(implicit
   externalContext : ExternalContext,
   indentedLogger  : IndentedLogger
@@ -53,60 +52,39 @@ class CustomUserAgent(
       ImageUtil.isEmbeddedBase64Image(uriString) option
         Try(loadEmbeddedBase64ImageResource(uriString)) // always return an `ImageResource``
 
-    // Not sure we even ever need to read a PDF "image"!
-    def fromPdf(uriString: String): ImageResource = {
-
-      val uri   = new URI(uriString)
-      val rect  = outputDevice.getReader(uri).getPageSizeWithRotation(1)
-
-      val image = new PDFAsImage(uri) |!>
-        (_.setInitialWidth(rect.getWidth * outputDevice.getDotsPerPoint)) |!>
-        (_.setInitialHeight(rect.getHeight * outputDevice.getDotsPerPoint))
-
-      new ImageResource(uriString, image)
-    }
-
-    def fromImage(is: InputStream, uriString: String): ImageResource = {
-
-      val (bis, orientationOpt) = findImageOrientation(is)
-
-      val iTextImage =
-        orientationOpt match {
-          case Some(orientation) if orientation >= 2 && orientation <= 8 =>
-
-            val sourceImage = ImageIO.read(bis)
-
-            val rotatedImage =
-              transformImage(
-                sourceImage,
-                findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight).getOrElse(throw new IllegalStateException)
-              )
-
-            val os = new ByteArrayOutputStream
-
-            // https://github.com/orbeon/orbeon-forms/issues/4593
-            if (ImageIO.write(rotatedImage, "JPG", os))
-              Image.getInstance(os.toByteArray)
-            else
-              throw new IllegalArgumentException("can't find encoder for image")
-          case _ =>
-             Image.getInstance(NetUtils.inputStreamToByteArray(bis))
-        }
-
-      scaleToOutputResolution(iTextImage)
-      new ImageResource(uriString, new ITextFSImage(iTextImage))
-    }
-
-    def fromPdfOrImage(uriString: String): Try[ImageResource] =
+    def fromImage(uriString: String): Try[ImageResource] =
       Try {
         IOUtils.useAndClose(resolveAndOpenStream(uriString)) { is =>
-          val cis = new ContentTypeDetectingInputStreamWrapper(is)
-          if (cis.isPdf)
-            fromPdf(uriString)
-          else
-            fromImage(cis, uriString)
-        }
+
+        val (bis, orientationOpt) = findImageOrientation(is)
+
+        val iTextImage =
+          orientationOpt match {
+            case Some(orientation) if orientation >= 2 && orientation <= 8 =>
+
+              val sourceImage = ImageIO.read(bis)
+
+              val rotatedImage =
+                transformImage(
+                  sourceImage,
+                  findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight).getOrElse(throw new IllegalStateException)
+                )
+
+              val os = new ByteArrayOutputStream
+
+              // https://github.com/orbeon/orbeon-forms/issues/4593
+              if (ImageIO.write(rotatedImage, "JPG", os))
+                Image.getInstance(os.toByteArray)
+              else
+                throw new IllegalArgumentException("can't find encoder for image")
+            case _ =>
+               Image.getInstance(NetUtils.inputStreamToByteArray(bis))
+          }
+
+        scaleToOutputResolution(iTextImage)
+        new ImageResource(uriString, new ITextFSImage(iTextImage))
       }
+    }
 
     // Not sure why this cloning is needed (was from original code)
     def maybeClone(resource: ImageResource): ImageResource =
@@ -126,9 +104,9 @@ class CustomUserAgent(
 
       indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUri)
 
-      fromBase64(localUri)       getOrElse
-        fromPdfOrImage(localUri) map
-        maybeClone               getOrElse
+      fromBase64(localUri)  getOrElse
+        fromImage(localUri) map
+        maybeClone          getOrElse
         new ImageResource(originalUriString, null) // for some reason, we return a "null" image resource
     }
 

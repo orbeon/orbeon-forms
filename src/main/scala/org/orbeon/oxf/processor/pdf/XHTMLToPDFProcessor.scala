@@ -95,7 +95,6 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
       renderer.getSharedContext.setUserAgentCallback(
         new CustomUserAgent(
           pipelineContext,
-          renderer.getOutputDevice,
           renderer.getSharedContext
         )
       )

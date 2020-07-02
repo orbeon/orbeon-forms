@@ -271,7 +271,8 @@ private object FormRunnerFunctions {
         actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
         targetControlName      = stringArgument(0),
         followIndexes          = booleanArgumentOpt(1) getOrElse false
-      ) map { _ map (_.getStringValue): SequenceIterator
+      ) map {
+        _ map (_.getStringValue): SequenceIterator
       } getOrElse
         EmptyIterator.getInstance
     }

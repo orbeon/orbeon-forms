@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.xhtmlrenderer.pdf.ITextRenderer
 
+import scala.util.Try
 import scala.util.control.NonFatal
 
 // XHTML to PDF converter using the Flying Saucer library.
@@ -61,7 +62,7 @@ private object XHTMLToPDFProcessor {
 
         renderer.getFontResolver.addFont(absolutePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
       } catch {
-        case NonFatal(e) =>
+        case NonFatal(_) =>
           logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
       }
     }
@@ -92,8 +93,18 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     try {
       embedFontsConfiguredInProperties(renderer)
 
+
+      // NOTE: Default compression level is 0.75:
+      // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
+      val jpegCompressionLevel =
+        Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
+          (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
+          (f => f >= 0f && f <= 1.0f) getOrElse
+          0.9f
+
       renderer.getSharedContext.setUserAgentCallback(
         new CustomUserAgent(
+          jpegCompressionLevel,
           pipelineContext,
           renderer.getSharedContext
         )

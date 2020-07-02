@@ -38,10 +38,11 @@ import scala.util.control.NonFatal
 
 
 class CustomUserAgent(
-  pipelineContext : PipelineContext,
-  sharedContext   : SharedContext)(implicit
-  externalContext : ExternalContext,
-  indentedLogger  : IndentedLogger
+  jpegCompressionLevel : Float,
+  pipelineContext      : PipelineContext,
+  sharedContext        : SharedContext)(implicit
+  externalContext      : ExternalContext,
+  indentedLogger       : IndentedLogger
 ) extends NaiveUserAgent {
 
   import Private._
@@ -72,9 +73,7 @@ class CustomUserAgent(
                   )
 
                 // https://github.com/orbeon/orbeon-forms/issues/4593
-                // NOTE: Default compression level is 0.75:
-                // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
-                compressJpegImage(rotatedImage, 0.9f)
+                compressJpegImage(rotatedImage, jpegCompressionLevel)
               case _ =>
                 NetUtils.inputStreamToByteArray(bis)
             }

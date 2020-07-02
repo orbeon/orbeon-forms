@@ -220,6 +220,9 @@
     -->
     <property as="xs:string" name="oxf.fr.pdf.template.font.paths"                              value=""/>
 
+    <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->
+    <property as="xs:string" name="oxf.fr.pdf.jpeg.compression"                                 value="0.9"/>
+
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.port.*.*"                                 value=""/>

@@ -17,12 +17,14 @@ import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
 
 import com.lowagie.text.Image
-import javax.imageio.ImageIO
+import javax.imageio.stream.MemoryCacheImageOutputStream
+import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.pdf.ImageSupport._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils, URLRewriterUtils}
@@ -32,6 +34,7 @@ import org.xhtmlrenderer.resource.ImageResource
 import org.xhtmlrenderer.swing.NaiveUserAgent
 import org.xhtmlrenderer.util.{ImageUtil, XRLog}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -70,13 +73,29 @@ class CustomUserAgent(
                   findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight).getOrElse(throw new IllegalStateException)
                 )
 
-              val os = new ByteArrayOutputStream
-
               // https://github.com/orbeon/orbeon-forms/issues/4593
-              if (ImageIO.write(rotatedImage, "JPG", os))
-                Image.getInstance(os.toByteArray)
-              else
-                throw new IllegalArgumentException("can't find encoder for image")
+              ImageIO.getImageWritersByFormatName("jpg").asScala.nextOption() match {
+                case Some(jpgWriter) =>
+
+                  val os = new ByteArrayOutputStream
+
+                  val jpgWriteParam =
+                    jpgWriter.getDefaultWriteParam |!>
+                    (_.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)) |!>
+                    (_.setCompressionQuality(0.9f)) // default is 0.75 https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
+
+                  jpgWriter.setOutput(new MemoryCacheImageOutputStream(os))
+                  jpgWriter.write(
+                    null,
+                    new IIOImage(rotatedImage, null, null),
+                    jpgWriteParam
+                  )
+                  jpgWriter.dispose()
+
+                  Image.getInstance(os.toByteArray)
+                case None =>
+                  throw new IllegalArgumentException("can't find encoder for image")
+              }
             case _ =>
                Image.getInstance(NetUtils.inputStreamToByteArray(bis))
           }

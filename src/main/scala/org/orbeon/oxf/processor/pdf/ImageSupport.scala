@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.image.{AffineTransformOp, BufferedImage}
-import java.io.{BufferedInputStream, InputStream}
+import java.io.{BufferedInputStream, ByteArrayOutputStream, InputStream}
 
+import javax.imageio.stream.MemoryCacheImageOutputStream
+import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ImageMetadata
+
+import scala.collection.JavaConverters._
 
 object ImageSupport {
 
@@ -110,4 +114,28 @@ object ImageSupport {
 
     op.filter(sourceImage, destinationImage)
   }
+
+  def compressJpegImage(image: BufferedImage, compressionLevel: Float): Array[Byte] =
+    ImageIO.getImageWritersByFormatName("jpg").asScala.nextOption() match {
+      case Some(jpgWriter) =>
+
+        val os = new ByteArrayOutputStream
+
+        val jpgWriteParam =
+          jpgWriter.getDefaultWriteParam |!>
+          (_.setCompressionMode(ImageWriteParam.MODE_EXPLICIT)) |!>
+          (_.setCompressionQuality(compressionLevel))
+
+        jpgWriter.setOutput(new MemoryCacheImageOutputStream(os))
+        jpgWriter.write(
+          null,
+          new IIOImage(image, null, null),
+          jpgWriteParam
+        )
+        jpgWriter.dispose()
+
+        os.toByteArray
+      case None =>
+        throw new IllegalArgumentException("can't find encoder for image")
+    }
 }

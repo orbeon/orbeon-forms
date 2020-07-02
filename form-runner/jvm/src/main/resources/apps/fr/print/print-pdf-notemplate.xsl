@@ -163,7 +163,9 @@
                 p:is-blank(.)]"
         mode="#all"/>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/4596 -->
     <xsl:template
+        priority="10"
         match="
             *[
                 p:has-class('xforms-disabled')                   or

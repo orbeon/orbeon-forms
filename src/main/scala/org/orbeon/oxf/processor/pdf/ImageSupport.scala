@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.pdf
 
 import java.awt.geom.AffineTransform
 import java.awt.image.{AffineTransformOp, BufferedImage}
-import java.io.{BufferedInputStream, ByteArrayOutputStream, InputStream}
+import java.io.{ByteArrayOutputStream, InputStream}
 
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
@@ -27,22 +27,10 @@ import scala.collection.JavaConverters._
 
 object ImageSupport {
 
-  private val MaxExifSize: Int = 64 * 1024
-
-  def findImageOrientation(is: InputStream): (BufferedInputStream, Option[Int]) = {
-
-    val bis = new BufferedInputStream(is, MaxExifSize)
-    bis.mark(MaxExifSize)
-
-    val orientationOpt =
-      ImageMetadata.findKnownMetadata(bis, ImageMetadata.MetadataType.Orientation) collect {
-        case i: Int => i.intValue
-      }
-
-    bis.reset()
-
-    (bis, orientationOpt)
-  }
+  def findImageOrientation(is: InputStream): Option[Int] =
+    ImageMetadata.findKnownMetadata(is, ImageMetadata.MetadataType.Orientation) collect {
+      case i: Int => i.intValue
+    }
 
   def findTransformation(orientation: Int, width: Int, height: Int): Option[AffineTransform] =
     orientation match {

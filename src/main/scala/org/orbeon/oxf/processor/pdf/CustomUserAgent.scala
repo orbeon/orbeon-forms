@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URI
 
 import com.lowagie.text.Image
@@ -57,13 +57,13 @@ class CustomUserAgent(
       Try {
         IOUtils.useAndClose(resolveAndOpenStream(uriString)) { is =>
 
-          val (bis, orientationOpt) = findImageOrientation(is)
+          val sourceStreamBytes = NetUtils.inputStreamToByteArray(is)
 
           val imageBytes =
-            orientationOpt match {
+            findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
               case Some(orientation) if orientation >= 2 && orientation <= 8 =>
 
-                val sourceImage = ImageIO.read(bis)
+                val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceStreamBytes))
 
                 val rotatedImage =
                   transformImage(
@@ -75,7 +75,7 @@ class CustomUserAgent(
                 // https://github.com/orbeon/orbeon-forms/issues/4593
                 compressJpegImage(rotatedImage, jpegCompressionLevel)
               case _ =>
-                NetUtils.inputStreamToByteArray(bis)
+                sourceStreamBytes
             }
 
           new ImageResource(

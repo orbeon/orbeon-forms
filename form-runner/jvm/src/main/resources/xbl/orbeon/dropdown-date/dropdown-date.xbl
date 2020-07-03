@@ -80,7 +80,7 @@
                         <xf:bind
                             ref="start-year | end-year"
                             xxf:whitespace="trim"
-                            type="xxf:xpath2"/>
+                            type="xxf:XPath2ValueTemplate"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">

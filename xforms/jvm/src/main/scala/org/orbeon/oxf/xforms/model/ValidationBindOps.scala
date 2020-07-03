@@ -31,7 +31,6 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
 
@@ -180,15 +179,15 @@ trait ValidationBindOps extends Logging {
         throw new ValidationException(s"Invalid schema type `${typeQName.qualifiedName}`", staticBind.locationData)
 
       if (isBuiltInXFormsType && nodeValue.isEmpty) {
-        // Don't consider the node invalid if the string is empty with xf:* types
+        // Don't consider the node invalid if the string is empty with `xf:*` types
         true
       } else if (isBuiltInXFormsType && typeLocalname == "email") {
         EmailValidatorNoDomainValidation.isValid(nodeValue)
       } else if (isBuiltInXFormsType && (typeLocalname == "HTMLFragment")) {
         // Just a marker type
         true
-      } else if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames.contains(typeLocalname)) {
-        // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
+      } else if (isBuiltInXFormsType && Model.XFormsSchemaTypeNames(typeLocalname)) {
+        // `xf:dayTimeDuration`, `xf:yearMonthDuration`, `xf:email`, `xf:card-number`
         val validationError = xformsValidator.validateDatatype(
           nodeValue,
           typeNamespaceURI,
@@ -243,7 +242,7 @@ trait ValidationBindOps extends Logging {
         val isOptionalAndEmpty = ! required && nodeValue == ""
         if (typeLocalname == "xml") {
           isOptionalAndEmpty || XMLParsing.isWellFormedXML(nodeValue)
-        } else if (typeLocalname == "xpath2") {
+        } else if (ValidationBindOps.SupportedBuiltInXXFormsTypeNames(typeLocalname)) {
 
           // Find element which scopes namespaces
           val namespaceNodeInfo =
@@ -256,11 +255,11 @@ trait ValidationBindOps extends Logging {
             // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
             val namespaceElement = unsafeUnwrapElement(namespaceNodeInfo)
             val namespaceMapping = NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
-            isOptionalAndEmpty || XPath.isXPath2Expression(
+            isOptionalAndEmpty || XPath.isXPath2ExpressionOrValueTemplate(
               nodeValue,
               namespaceMapping,
               containingDocument.getFunctionLibrary,
-              staticBind.locationData
+              typeLocalname == "XPath2ValueTemplate"
             )
           } else {
             // This means that we are bound to a node which is not an element and which does not have a
@@ -367,4 +366,14 @@ trait ValidationBindOps extends Logging {
           ! Model.DEFAULT_VALID
       }
   }
+}
+
+object ValidationBindOps {
+
+  val SupportedBuiltInXXFormsTypeNames: Set[String] = Set(
+    "xpath2",
+    "XPath2",
+    "XPath2ValueTemplate"
+  )
+
 }

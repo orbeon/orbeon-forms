@@ -402,8 +402,6 @@ object Model {
     "card-number"
   )
 
-  val jXFormsSchemaTypeNames = XFormsSchemaTypeNames.asJava
-
   private val CoreXFormsVariationTypeNames = Set(
     "dateTime",
     "time",

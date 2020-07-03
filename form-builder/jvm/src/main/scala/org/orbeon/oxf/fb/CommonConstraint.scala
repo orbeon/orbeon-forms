@@ -42,7 +42,8 @@ object CommonConstraint {
             namespaceMapping,
             functionLibrary
           ),
-          xpathString   = xpathString
+          xpathString   = xpathString,
+          avt           = false
         )
       )
 

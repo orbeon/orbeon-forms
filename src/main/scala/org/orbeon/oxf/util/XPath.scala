@@ -17,11 +17,11 @@ import java.util.{List => JList}
 
 import javax.xml.transform._
 import javax.xml.transform.sax.SAXSource
-import org.apache.commons.lang3.StringUtils._
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
@@ -251,12 +251,18 @@ object XPath {
 
   def compileExpressionMinimal(
     staticContext : XPathStaticContext,
-    xpathString   : String
-  ): Expression = {
-    val exp = ExpressionTool.make(xpathString, staticContext, 0, -1, 1, false)
-    exp.setContainer(staticContext)
-    exp
-  }
+    xpathString   : String,
+    avt           : Boolean
+  ): Expression =
+    if (avt) {
+      val exp = AttributeValueTemplate.make(xpathString, -1, staticContext)
+      exp.setContainer(staticContext)
+      exp
+    } else {
+      val exp = ExpressionTool.make(xpathString, staticContext, 0, -1, 1, false)
+      exp.setContainer(staticContext)
+      exp
+    }
 
   // Ideally: add this to Saxon XPathEvaluator
   private def prepareExpressionForAVT(staticContext: XPathStaticContext, expression: Expression): XPathExpression = {
@@ -397,14 +403,14 @@ object XPath {
   // Whether the given string contains a well-formed XPath 2.0 expression.
   // NOTE: Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
   // NOTE: We should probably just do the parse and typeCheck parts and skip simplify and a few smaller operations
-  def isXPath2Expression(
+  def isXPath2ExpressionOrValueTemplate(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,
-    locationData     : LocationData)(implicit
+    avt              : Boolean)(implicit
     logger           : IndentedLogger
   ): Boolean =
-    isNotBlank(xpathString) &&
+    (avt || xpathString.nonAllBlank) &&
     Try(
       compileExpressionMinimal(
         staticContext = new ShareableXPathStaticContext(
@@ -412,7 +418,8 @@ object XPath {
           namespaceMapping,
           functionLibrary
         ),
-        xpathString   = xpathString
+        xpathString   = xpathString,
+        avt           = avt
       )
     ).isSuccess
 }

@@ -107,14 +107,14 @@ trait ValidationBindOps extends Logging {
 
       // 1. Check type validity
 
-      // Type MIP @type attribute is special:
+      // Type MIP `@type` attribute is special:
       //
       // - it is not an XPath expression
       // - but because type validation can be expensive, we want to optimize that if we can
-      // - so requireModelMIPUpdate(Model.TYPE) actually means "do we need to update type validity"
+      // - so `requireModelMIPUpdate(Model.TYPE)` actually means "do we need to update type validity"
       //
-      // xxf:xml and xxf:XPath2 also depend on requiredness, which is probably not a good idea. To handle
-      // this condition (partially), if the same bind has @type and @required, we also reevaluate type validity if
+      // `xxf:XML` and `xxf:XPath2` also depend on requiredness, which is probably not a good idea. To handle
+      // this condition (partially), if the same bind has `@type` and `@required`, we also reevaluate type validity if
       // requiredness has changed. Ideally:
       //
       // - we would not depend on requiredness
@@ -240,9 +240,9 @@ trait ValidationBindOps extends Logging {
         // Built-in extension types
 
         val isOptionalAndEmpty = ! required && nodeValue == ""
-        if (typeLocalname == "xml") {
+        if (ValidationBindOps.SupportedXmlTypeNames(typeLocalname)) {
           isOptionalAndEmpty || XMLParsing.isWellFormedXML(nodeValue)
-        } else if (ValidationBindOps.SupportedBuiltInXXFormsTypeNames(typeLocalname)) {
+        } else if (ValidationBindOps.SupportedXPath2TypeNames(typeLocalname)) {
 
           // Find element which scopes namespaces
           val namespaceNodeInfo =
@@ -370,7 +370,12 @@ trait ValidationBindOps extends Logging {
 
 object ValidationBindOps {
 
-  val SupportedBuiltInXXFormsTypeNames: Set[String] = Set(
+  val SupportedXmlTypeNames: Set[String] = Set(
+    "xml",
+    "XML"
+  )
+
+  val SupportedXPath2TypeNames: Set[String] = Set(
     "xpath2",
     "XPath2",
     "XPath2ValueTemplate"

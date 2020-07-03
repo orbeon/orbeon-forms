@@ -247,7 +247,7 @@
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
             <xf:bind ref="datasource" type="xs:string" required="true()"/>
             <!-- Check that the resulting XML document is well-formed -->
-            <xf:bind ref="query-xml" type="xxf:xml"
+            <xf:bind ref="query-xml" type="xxf:XML"
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
             <xf:bind ref="query" constraint="valid(../query-xml)" required="true()"/>
 

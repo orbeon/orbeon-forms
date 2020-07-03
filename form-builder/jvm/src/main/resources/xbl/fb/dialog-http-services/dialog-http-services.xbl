@@ -428,7 +428,7 @@
                         />
                         <xf:bind
                             ref="body"
-                            type="xxf:xml"
+                            type="xxf:XML"
                             required="$has-request-body"
                         />
                         <xf:bind

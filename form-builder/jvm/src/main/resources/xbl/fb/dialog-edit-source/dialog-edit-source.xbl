@@ -69,7 +69,7 @@
 
                 <xf:bind
                     ref="source"
-                    type="xxf:xml"
+                    type="xxf:XML"
                     required="true()"
                     constraint="xxf:non-blank()"/>
 

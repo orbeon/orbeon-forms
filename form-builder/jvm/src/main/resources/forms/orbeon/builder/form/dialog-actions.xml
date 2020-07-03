@@ -751,7 +751,7 @@
                             <xf:bind
                                 ref=".[../@name = ('control-value')]"
                                 xxf:whitespace="trim"
-                                type="xxf:xpath2"
+                                type="xxf:XPath2"
                             />
                         </xf:bind>
                     </xf:bind>
@@ -764,7 +764,7 @@
                             <xf:bind
                                 ref=".[../@name = ('response-items', 'item-label', 'item-value')]"
                                 xxf:whitespace="trim"
-                                type="xxf:xpath2"
+                                type="xxf:XPath2"
                             />
                         </xf:bind>
                     </xf:bind>

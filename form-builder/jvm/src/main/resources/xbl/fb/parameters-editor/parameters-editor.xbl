@@ -51,7 +51,7 @@
                 <xf:bind
                     ref="fr:param/fr:expr"
                     required="true()"
-                    type="xxf:xpath2"
+                    type="xxf:XPath2"
                     xxf:whitespace="trim"/>
 
                 <xf:bind

@@ -164,7 +164,7 @@
                         )"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
-                     allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
+                     allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
@@ -656,7 +656,7 @@
 
                         <xf:bind
                             ref="constraint/@expression"
-                            type="xxf:xpath2"
+                            type="xxf:XPath2"
                             xxf:whitespace="trim"
                             required="false()"
                             relevant="$type = 'formula'"/>
@@ -679,11 +679,11 @@
 
                         <xf:bind
                             ref="constraint/@argument[../../@type = 'excluded-dates']"
-                            type="xxf:xpath2"/>
+                            type="xxf:XPath2"/>
 
                         <xf:bind
                             ref="required"
-                            type="xxf:xpath2"
+                            type="xxf:XPath2"
                             xxf:whitespace="trim"
                             required="true()"/>
 
@@ -695,7 +695,7 @@
 
                 <xf:bind
                     ref="relevant | readonly | default | calculate"
-                    type="xxf:xpath2"
+                    type="xxf:XPath2"
                     xxf:whitespace="trim"
                     required="false()"/>
 

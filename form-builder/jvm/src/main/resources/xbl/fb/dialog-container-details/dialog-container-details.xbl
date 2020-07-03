@@ -85,7 +85,7 @@
                 <xf:setvalue ref="$i/initial-iterations"             value="$control/@fb:initial-iterations = 'first'"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
-                     allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
+                     allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
@@ -389,7 +389,7 @@
 
                 <xf:bind
                     ref="relevant | readonly"
-                    type="xxf:xpath2"
+                    type="xxf:XPath2"
                     required="false()"/>
 
                 <xf:bind
@@ -430,10 +430,10 @@
                         . = $i/original-custom-iteration-name or
                         not(. = xxf:split($i/control-names))"/>
 
-                <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
+                <!-- Use xxf:XPath2 as integer values are also XPath expressions! -->
                 <xf:bind
                     ref="min-repeat | max-repeat | freeze"
-                    type="xxf:xpath2"
+                    type="xxf:XPath2"
                     readonly="../user-can-add-remove = false()"
                     xxf:whitespace="trim"/>
 

@@ -94,7 +94,7 @@
                         calculate="if (../@service-performs-search = true()) then . else 'false'"/>
                     <xf:bind
                         ref="@is-last-page"
-                        type="xxf:xpath2"
+                        type="xxf:XPath2"
                         readonly="../@service-supports-paging = false()"
                         required="../@service-supports-paging = true()"
                         calculate="if (../@service-supports-paging = true()) then . else ''"/>
@@ -104,7 +104,7 @@
                     <xf:bind ref="xf:itemset">
                         <xf:bind
                             ref="@ref | xf:label/@ref | xf:value/@ref"
-                            type="xxf:xpath2"
+                            type="xxf:XPath2"
                             required="true()"/>
                     </xf:bind>
                 </xf:model>

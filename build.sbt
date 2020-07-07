@@ -101,7 +101,7 @@ val CoreLibraryDependencies = Seq(
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.64",  // for `itext`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.66",  // for `itext`, also pulls `bcprov` and `bcpkix`
 
   "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
   "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided

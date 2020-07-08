@@ -323,21 +323,35 @@
                         fbf:saveControlToUndoStack($old-name, $new-name)
                     </xf:action>
 
-                    <xf:var
-                        name="original-control-details"
-                        value="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
+                    <xf:action if="instance('modified')/@dynamic = true()">
 
-                    <!-- Update custom XBL properties -->
-                    <xf:action if="exists($original-control-details) and instance('modified')/@dynamic = true()">
+                        <xf:var
+                            name="original-control-has-custom-editor"
+                            value="exists(fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details)"/>
 
-                        <!-- Replace all attributes and content -->
+                        <xf:var
+                            name="current-control-has-custom-editor"
+                            value="exists(instance('dynamic')//xf:instance[1]/*)"/>
+
+                        <!--
+                            Update custom XBL properties
+                            https://github.com/orbeon/orbeon-forms/issues/4592
+                        -->
                         <xf:delete
-                            ref="$control/(@* except (@id, @bind), node())"/>
+                            if="$original-control-has-custom-editor or $current-control-has-custom-editor"
+                            ref="$control/(@* except (@id, @bind))"/>
 
-                        <xf:insert
-                            context="$control"
-                            origin="instance('dynamic')//xf:instance[1]/*/(@* except (@id, @bind), node())"/>
+                        <xf:action if="$current-control-has-custom-editor">
 
+
+                            <xf:delete
+                                ref="$control/node()"/>
+
+                            <xf:insert
+                                context="$control"
+                                origin="instance('dynamic')//xf:instance[1]/*/(@* except (@id, @bind), node())"/>
+
+                        </xf:action>
                     </xf:action>
 
                     <xf:action if="instance('modified')/@i = true()">

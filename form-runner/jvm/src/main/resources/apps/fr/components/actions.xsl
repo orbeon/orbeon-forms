@@ -453,6 +453,8 @@
                     <xsl:attribute name="replace">instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- https://github.com/orbeon/orbeon-forms/issues/4606 -->
+            <xsl:apply-templates select="xf:header"/>
         </xsl:copy>
     </xsl:template>
 

@@ -218,7 +218,7 @@
                         fbf:findNewControlBinding(
                             $i/original-control-name,
                             $i/validations/validation[@type = 'datatype'],
-                            ($new-appearance, $i/appearances/@selection/string())[1]
+                            ($new-appearance, $i/appearances/@selection/string())[xxf:non-blank()][1]
                         )"/>
 
                 <xf:var

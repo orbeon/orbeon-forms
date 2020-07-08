@@ -253,7 +253,8 @@ object BindingDescriptor {
     if (StringQNames(searchDatatype))
       findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
     else
-      findMostSpecificWithDatatype(searchElemName, searchDatatype, searchAppearances, descriptors)
+      findMostSpecificWithDatatype(searchElemName, searchDatatype, searchAppearances, descriptors) orElse
+        findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
 
   private object Private {
 

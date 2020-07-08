@@ -134,6 +134,10 @@
         </xbl:implementation>
         <xbl:template>
             <xf:var name="binding" value="xxf:binding('fr-databound-select1')"/>
+            <xf:var name="itemset" value="instance('itemset')"/>
+            <xf:var name="itemset" xxbl:scope="outer">
+                <xxf:value value="$itemset" xxbl:scope="inner"/>
+            </xf:var>
             <!-- When the component is initialized or when resources URL changes, update our internal itemset -->
             <xf:var name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
             <xf:var name="resource">
@@ -157,9 +161,9 @@
                      models here because the select1 is bound via the xxf:binding() function. So if we don't
                      change the context explicitly, the itemset will evaluate in the wrong context (and fail to
                      produce the correct result). -->
-                <xf:choices context="instance()">
+                <xf:choices context="$itemset" xxbl:scope="outer">
                     <!-- Itemset unconventionally evaluates wrt inner scope -->
-                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices" xxbl:scope="inner"/>
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
                 </xf:choices>
             </xf:select1>
 

@@ -31,7 +31,6 @@
                 <icon-class>fa fa-fw fa-files-o</icon-class>
             </icon>
             <templates>
-                <bind type="xf:anyURI"/>
                 <view>
                      <fr:attachment multiple="true" id="" ref="" class="fr-attachment">
                         <xf:label ref=""/>

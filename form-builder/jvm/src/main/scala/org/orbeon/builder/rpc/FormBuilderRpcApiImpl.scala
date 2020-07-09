@@ -153,7 +153,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   def containerEditDetails(containerId: String): Unit =
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
-      targetId   = "dialog-container-details",
+      targetId   = "dialog-container-settings",
       properties = Map("container" -> Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
     )
 

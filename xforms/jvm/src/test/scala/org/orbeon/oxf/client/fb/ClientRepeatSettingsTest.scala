@@ -22,9 +22,9 @@ trait ClientRepeatSettingsTest extends AssertionsForJUnit with FormBuilderOps wi
 
   private object Private {
 
-    val GridDetailsDialogPrefix    = "dialog-container-details≡"
+    val GridDetailsDialogPrefix    = "dialog-container-settings≡"
     val RepeatedContentTab         = s"${GridDetailsDialogPrefix}tabs≡repeat-tab-grid≡"
-    val SwitchToRepeatedContentTab = "a[href = '#dialog-container-details≡tabs≡tab-pane-2']"
+    val SwitchToRepeatedContentTab = "a[href = '#dialog-container-settings≡tabs≡tab-pane-2']"
 
     val MinRepeatSelect1Id         = s"${RepeatedContentTab}min-repeat"
     val MaxRepeatSelect1Id         = s"${RepeatedContentTab}max-repeat"

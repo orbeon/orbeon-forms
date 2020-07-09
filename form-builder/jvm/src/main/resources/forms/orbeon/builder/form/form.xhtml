@@ -687,13 +687,13 @@
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>
 
-                                <fb:dialog-control-settings    id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-container-details   id="dialog-container-details" ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-itemsets            id="dialog-itemsets"                           resources-ref="$form-resources"/>
-                                <fb:dialog-edit-source         id="dialog-edit-source"       ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-http-services       id="dialog-http-services"     ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-ids                 id="dialog-ids"               ref="$form"      resources-ref="$form-resources"/>
-                                <fb:dialog-pdf                 id="dialog-pdf"               ref="$form"      resources-ref="$form-resources">
+                                <fb:dialog-control-settings   id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-itemsets           id="dialog-itemsets"                            resources-ref="$form-resources"/>
+                                <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-http-services      id="dialog-http-services"      ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-ids                id="dialog-ids"                ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-pdf                id="dialog-pdf"                ref="$form"      resources-ref="$form-resources">
                                     <xf:action ev:event="fb-apply">
                                         <xf:delete bind="pdf-attachments-bind"/>
                                         <xf:insert

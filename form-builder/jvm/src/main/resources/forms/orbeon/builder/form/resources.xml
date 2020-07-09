@@ -684,7 +684,7 @@
             <use-html>Use HTML</use-html>
             <parameters>Template Parameters</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Section/Grid Settings</label>
             <control-name>
                 <label>Name</label>
@@ -770,7 +770,7 @@
             <no-minimum>No minimum</no-minimum>
             <tab-base><label>Basic Settings and Formulas</label></tab-base>
             <tab-repeat><label>Repeated Content</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Confirm</label>
         </dialog-confirmation>
@@ -1945,7 +1945,7 @@
             <use-html>En HTML</use-html>
             <parameters>Paramètres du modèle</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Paramètres de la section/grille</label>
             <control-name>
                 <label>Nom</label>
@@ -2031,7 +2031,7 @@
             <no-minimum>Pas de minimum</no-minimum>
             <tab-base><label>Paramètres de base et formules</label></tab-base>
             <tab-repeat><label>Contenu répété</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Confirmation</label>
         </dialog-confirmation>
@@ -3190,7 +3190,7 @@
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label todo="true">Rediger seksjonsdetaljer</label>
             <control-name>
                 <label todo="true">Seksjonsnavn</label>
@@ -3276,7 +3276,7 @@
             <no-minimum todo="true">[No minimum]</no-minimum>
             <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Bekreft</label>
         </dialog-confirmation>
@@ -4461,7 +4461,7 @@
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label todo="true">Настройки раздела</label>
             <control-name>
                 <label todo="true">Название раздела</label>
@@ -4547,7 +4547,7 @@
             <no-minimum todo="true">[No minimum]</no-minimum>
             <tab-base><label todo="true">[Basic Settings and Formulas]</label></tab-base>
             <tab-repeat><label todo="true">[Repeated Content]</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Подтвердить</label>
         </dialog-confirmation>
@@ -5733,7 +5733,7 @@
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Impostazioni sezione/griglia</label>
             <control-name>
                 <label>Nome</label>
@@ -5819,7 +5819,7 @@
             <no-minimum>Nessun minimo</no-minimum>
             <tab-base><label>Impostazioni di base e formule</label></tab-base>
             <tab-repeat><label>Contenuto ripetuto</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Conferma</label>
         </dialog-confirmation>
@@ -6997,7 +6997,7 @@
             <use-html>HTML verwenden</use-html>
             <parameters>Vorlagen-Parameter</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
             <control-name>
                 <label>Name</label>
@@ -7083,7 +7083,7 @@
             <no-minimum>Kein Minimum</no-minimum>
             <tab-base><label>Grundeinstellungen und Formeln</label></tab-base>
             <tab-repeat><label>Wiederholter Inhalt</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Bestätigen</label>
         </dialog-confirmation>
@@ -8264,7 +8264,7 @@
             <use-html>Käytä HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label todo="true">Lohkon yksityiskohdat</label>
             <control-name>
                 <label todo="true">Lohkon nimi</label>
@@ -8350,7 +8350,7 @@
             <no-minimum>Ei vähimmäismäärää</no-minimum>
             <tab-base><label>Perusasetukset ja lausekkeet</label></tab-base>
             <tab-repeat><label>Toistettu sisältö</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Vahvista</label>
         </dialog-confirmation>
@@ -9528,7 +9528,7 @@
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Detalles de Sección/Grilla</label>
             <control-name>
                 <label>Nombre</label>
@@ -9614,7 +9614,7 @@
             <no-minimum>Sin mínimo</no-minimum>
             <tab-base><label>Configuración y Formulas Básicas</label></tab-base>
             <tab-repeat><label>Repetir Contenido</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
@@ -10793,7 +10793,7 @@
             <use-html>Gebruik HTML</use-html>
             <parameters>Templateparameters</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Sectie/grid instellingen</label>
             <control-name>
                 <label>Naam</label>
@@ -10879,7 +10879,7 @@
             <no-minimum>Geen minimum</no-minimum>
             <tab-base><label>Basis-instellingen en formules Settings and Formulas</label></tab-base>
             <tab-repeat><label>Herhalende inhoud</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Bevestig</label>
         </dialog-confirmation>
@@ -12037,7 +12037,7 @@
             <use-html>Usar HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Configurações da Secção/Grelha</label>
             <control-name>
                 <label>Nome</label>
@@ -12123,7 +12123,7 @@
             <no-minimum>Sem mínimo</no-minimum>
             <tab-base><label>Configurações Básicas e Fórmulas</label></tab-base>
             <tab-repeat><label>Conteúdo Repetido</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Confirmar</label>
         </dialog-confirmation>
@@ -13308,7 +13308,7 @@
             <use-html>Använd HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
         </dialog-control-settings>
-        <dialog-container-details>
+        <dialog-container-settings>
             <label>Sektions-/rutnätsinställningar</label>
             <control-name>
                 <label>Namn</label>
@@ -13394,7 +13394,7 @@
             <no-minimum>Inget minsta antal</no-minimum>
             <tab-base><label>Grundinställningar och formler</label></tab-base>
             <tab-repeat><label>Upprepat innehåll</label></tab-repeat>
-        </dialog-container-details>
+        </dialog-container-settings>
         <dialog-confirmation>
             <label>Bekräfta</label>
         </dialog-confirmation>

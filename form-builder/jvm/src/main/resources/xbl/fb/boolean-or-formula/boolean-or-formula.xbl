@@ -32,7 +32,7 @@
 
             <xf:var name="binding"       value="xxf:binding('fb-boolean-or-formula')"/>
             <xf:var name="true-or-false" value="$binding = ('true()', 'false()')"/>
-            <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
+            <xf:var name="items"         value="$resources/dialog-control-settings/required/item"/>
 
             <xf:select1 ref="$binding" appearance="full xxf:horizontal">
                 <xf:itemset ref="$items[@id = (0, 1, 2)]">
@@ -54,8 +54,8 @@
                 ref="if ($true-or-false) then '' else $binding"
                 class="fb-control-settings-required-formula">
 
-                <xf:label ref="$resources/dialog-control-details/formula/label" appearance="minimal"/>
-                <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
+                <xf:label ref="$resources/dialog-control-settings/formula/label" appearance="minimal"/>
+                <xf:alert ref="$resources/dialog-control-settings/formula/alert"/>
 
                 <!-- When the control appears and its value is empty, it means that the
                      user just chose the "Formula" option. -->

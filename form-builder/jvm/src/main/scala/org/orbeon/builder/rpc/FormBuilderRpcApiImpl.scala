@@ -81,7 +81,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   def controlEditDetails(controlId: String): Unit =
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
-      targetId   = "dialog-control-details",
+      targetId   = "dialog-control-settings",
       properties = Map("control-id" -> Some(XFormsId.getStaticIdFromId(controlId)))
     )
 

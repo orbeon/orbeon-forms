@@ -292,16 +292,16 @@ trait FormBuilderOps extends FormRunnerOps {
         getFieldValue("control-name-input")
 
       def applySettings() =
-        clickOn(cssSelector("#dialog-control-details≡save-button"))
+        clickOn(cssSelector("#dialog-control-settings≡save-button"))
 
       def cancelSettings() =
-        clickOn(cssSelector("#dialog-control-details≡cancel-button"))
+        clickOn(cssSelector("#dialog-control-settings≡cancel-button"))
 
       private def setFieldValue(controlId: String, value: String) =
-        textField(cssSelector(s"#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡$controlId input")).ensuring(_.isDisplayed).value = value
+        textField(cssSelector(s"#dialog-control-settings≡fb-tabbable≡fb-base-tab-grid≡$controlId input")).ensuring(_.isDisplayed).value = value
 
       private def getFieldValue(controlId: String) =
-        cssSelector(s"#dialog-control-details≡fb-tabbable≡fb-base-tab-grid≡$controlId").element.fieldText
+        cssSelector(s"#dialog-control-settings≡fb-tabbable≡fb-base-tab-grid≡$controlId").element.fieldText
     }
 
     def countAllToolboxControlButtons =

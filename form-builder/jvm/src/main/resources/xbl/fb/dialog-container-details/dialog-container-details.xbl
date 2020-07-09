@@ -749,7 +749,7 @@
                         <fr:tab id="label-help-tab" ref="(label, help, iteration-label)[true() or @supported = 'true']">
                             <fr:label
                                 ref="
-                                    $resources/dialog-control-details/*[
+                                    $resources/dialog-control-settings/*[
                                         name() = concat('control-', local-name(context()))
                                     ]/label"/>
 
@@ -760,14 +760,14 @@
                             <xf:var
                                 name="resource"
                                 value="
-                                    $resources/dialog-control-details/*[
+                                    $resources/dialog-control-settings/*[
                                         name() = concat('control-', $lhh)
                                     ]"/>
 
                             <fr:grid>
                                 <fr:c x="1" y="1" w="12">
                                     <fr:checkbox-input ref="@isHTML">
-                                        <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                        <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                     </fr:checkbox-input>
                                     <xf:var name="is-html" value="@isHTML = 'true'"/>
                                     <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value">
@@ -785,7 +785,7 @@
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
                                     <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
-                                        <xf:label ref="$resources/dialog-control-details/parameters"/>
+                                        <xf:label ref="$resources/dialog-control-settings/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>
                             </fr:grid>

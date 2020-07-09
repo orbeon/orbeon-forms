@@ -25,12 +25,12 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details" xxbl:mode="binding">
+    <xbl:binding id="fb-dialog-control-settings" element="fb|dialog-control-settings" xxbl:mode="binding">
         <xbl:handlers>
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog fb-load" phase="target" defaultAction="cancel">
 
-                <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+                <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
 
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
 
@@ -47,7 +47,7 @@
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
-                <xf:var name="standard-classes"             value="$resources/dialog-control-details/(options | email-options)/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
+                <xf:var name="standard-classes"             value="$resources/dialog-control-settings/(options | email-options)/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
                 <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
 
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
@@ -172,7 +172,7 @@
 
                 <xf:dispatch
                     name="fb-process-xbl-fb-control-details"
-                    targetid="fb-dialog-control-details">
+                    targetid="fb-dialog-control-settings">
                     <xf:property name="datatype-validation" value="$i/validations/validation[@type = 'datatype']"/>
                 </xf:dispatch>
 
@@ -309,7 +309,7 @@
 
                 <xf:dispatch
                     name="fb-save"
-                    targetid="fb-dialog-control-details"/>
+                    targetid="fb-dialog-control-settings"/>
 
                 <!-- Don't leave this stuff around -->
                 <xf:delete
@@ -318,7 +318,7 @@
             </xbl:handler>
             <xbl:handler event="fb-save" phase="target">
 
-                <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+                <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
 
                 <xf:action if="instance('modified')/@* = true()">
 
@@ -421,7 +421,7 @@
                     <xf:dispatch
                         if="not($must-close)"
                         name="fb-save"
-                        targetid="fb-dialog-control-details"/>
+                        targetid="fb-dialog-control-settings"/>
                 </xf:action>
 
                 <!-- Mark all visited if the data is invalid -->
@@ -444,7 +444,7 @@
                                 next-control-id
                         )/string()"/>
 
-                <xf:dispatch if="exists($new-control-id)" name="fb-load" targetid="fb-dialog-control-details">
+                <xf:dispatch if="exists($new-control-id)" name="fb-load" targetid="fb-dialog-control-settings">
                     <xf:property name="control-id" value="$new-control-id"/>
                 </xf:dispatch>
 
@@ -531,7 +531,7 @@
                             if="$binding-changed"
 
                             name="fb-process-xbl-fb-control-details"
-                            targetid="fb-dialog-control-details">
+                            targetid="fb-dialog-control-settings">
                             <xf:property name="datatype-validation" value="$mutable-datatype-validation"/>
                         </xf:dispatch>
                     </xf:action>
@@ -792,10 +792,10 @@
                     <xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/>
                 </xf:var>
 
-                <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-details">
-                    <xf:label ref="$resources/dialog-control-details/label"/>
+                <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-settings">
+                    <xf:label ref="$resources/dialog-control-settings/label"/>
 
-                    <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+                    <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
 
                     <!-- Figure out schema prefix if any -->
                     <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
@@ -809,7 +809,7 @@
 
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
-                            <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
+                            <fr:label ref="$resources/dialog-control-settings/tab-base/label"/>
 
                             <xh:div class="fb-base-tab-div">
                                 <xh:div class="fb-base-tab-left">
@@ -818,9 +818,9 @@
                                             <xh:td>
                                                 <!-- Control name -->
                                                 <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
-                                                    <xf:label ref="$resources/dialog-control-details/control-name/label"/>
-                                                    <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
-                                                    <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
+                                                    <xf:label ref="$resources/dialog-control-settings/control-name/label"/>
+                                                    <xf:alert ref="$resources/dialog-control-settings/control-name/alert"/>
+                                                    <xf:hint  ref="$resources/dialog-control-settings/control-name/hint"/>
                                                 </xf:input>
                                             </xh:td>
                                         </xh:tr>
@@ -829,7 +829,7 @@
                                                 <xf:var
                                                     name="items-to-show"
                                                     value="
-                                                        $resources/dialog-control-details/options/item[
+                                                        $resources/dialog-control-settings/options/item[
                                                             (fr:is-pe() or value != 'fr-encrypt') or
                                                             not(contains(value, 'email'))
                                                         ]
@@ -883,7 +883,7 @@
                                                 <xf:var
                                                     name="email-items-to-show"
                                                     value="
-                                                        $resources/dialog-control-details/email-options/item[
+                                                        $resources/dialog-control-settings/email-options/item[
                                                             (
                                                                 $is-attachment or value != 'fr-email-attachment'
                                                             ) and not(
@@ -893,7 +893,7 @@
                                                     "/>
 
                                                 <xf:select ref="$i/standard-classes" appearance="full">
-                                                    <xf:label ref="$resources/dialog-control-details/email-options/label"/>
+                                                    <xf:label ref="$resources/dialog-control-settings/email-options/label"/>
                                                     <xf:itemset ref="$email-items-to-show[contains(value, 'email')]">
                                                         <xf:label ref="label"/>
                                                         <xf:value ref="value"/>
@@ -920,7 +920,7 @@
                                         <xh:tr>
                                             <xh:td>
                                                 <xf:output value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
-                                                    <xf:label ref="$resources/dialog-control-details/pdf-field-name/label"/>
+                                                    <xf:label ref="$resources/dialog-control-settings/pdf-field-name/label"/>
                                                 </xf:output>
                                             </xh:td>
                                         </xh:tr>
@@ -938,14 +938,14 @@
                                                     <xf:action event="xforms-value-changed">
                                                         <xf:dispatch
                                                             name="fb-process-xbl-fb-control-details"
-                                                            targetid="fb-dialog-control-details">
+                                                            targetid="fb-dialog-control-settings">
                                                             <xf:property name="new-appearance"      value="event('xxf:value')"/>
                                                             <xf:property name="datatype-validation" value="$i/validations/validation[@type = 'datatype']"/>
                                                         </xf:dispatch>
                                                     </xf:action>
                                                     <!-- Propose a choice between multiple items -->
                                                     <xf:select1 ref="$i/appearances/@selection[$multi]" appearance="full">
-                                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                                        <xf:label ref="$resources/dialog-control-settings/control-appearance/label"/>
                                                         <xf:itemset ref="$i/appearances/appearance">
                                                             <xf:label
                                                                 mediatype="text/html"
@@ -964,7 +964,7 @@
                                                     </xf:select1>
                                                     <!-- Simplified case where we just show a checkbox -->
                                                     <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
-                                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                                        <xf:label ref="$resources/dialog-control-settings/control-appearance/label"/>
                                                         <xf:itemset ref="$i/appearances/appearance[xxf:non-blank(value)]">
                                                             <xf:label
                                                                 mediatype="text/html"
@@ -991,15 +991,15 @@
                             </xh:div>
                         </fr:tab>
                         <fr:tab id="validations-tab" context="validations">
-                            <fr:label ref="$resources/dialog-control-details/tab-validations/label"/>
+                            <fr:label ref="$resources/dialog-control-settings/tab-validations/label"/>
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <fr:checkbox-input ref="instance()/whitespace" selected-value="trim" deselected-value="">
-                                            <xf:label value="xxf:r('dialog-control-details.whitespace.item.label', '|fr-form-resources|')"/>
+                                            <xf:label value="xxf:r('dialog-control-settings.whitespace.item.label', '|fr-form-resources|')"/>
                                         </fr:checkbox-input>
                                         <fr:checkbox-input ref="$i/default-alert/alert/@global">
-                                            <xf:label ref="$resources/dialog-control-details/use-global-alert/label"/>
+                                            <xf:label ref="$resources/dialog-control-settings/use-global-alert/label"/>
                                             <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
                                             <xf:action event="xforms-value-changed">
                                                 <xf:rebuild/>
@@ -1009,8 +1009,8 @@
                                     </xh:td>
                                     <xh:td>
                                         <xf:input bind="default-alert">
-                                            <xf:label ref="$resources/dialog-control-details/default-alert/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/default-hint/label"/>
+                                            <xf:label ref="$resources/dialog-control-settings/default-alert/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/default-hint/label"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
@@ -1051,16 +1051,16 @@
                                     "/>
 
                                     <xf:select1 ref="$validation-type" appearance="minimal" id="fb-validation-type-control">
-                                        <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
+                                        <xf:label ref="$resources/dialog-control-settings/validation-type/label"/>
                                         <xf:itemset ref=".[. = 'required']">
-                                            <xf:label ref="$resources/dialog-control-details/required/label"/>
+                                            <xf:label ref="$resources/dialog-control-settings/required/label"/>
                                             <xf:value>required</xf:value>
                                         </xf:itemset>
                                         <xf:itemset ref=".[. = 'datatype']">
-                                            <xf:label ref="$resources/dialog-control-details/types/label"/>
+                                            <xf:label ref="$resources/dialog-control-settings/types/label"/>
                                             <xf:value>datatype</xf:value>
                                         </xf:itemset>
-                                        <xf:itemset ref="$resources/dialog-control-details/constraint/item[@id = $allowed-constraints]">
+                                        <xf:itemset ref="$resources/dialog-control-settings/constraint/item[@id = $allowed-constraints]">
                                             <xf:label ref="."/>
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
@@ -1075,7 +1075,7 @@
                                 </fr:c>
                                 <fr:c y="1" x="4" w="3">
                                     <xf:group appearance="xxf:internal" id="fb-validation-details-control">
-                                        <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
+                                        <xf:label ref="$resources/dialog-control-settings/validation-details/label"/>
 
                                         <xf:var
                                             name="validation-type"
@@ -1098,15 +1098,15 @@
                                             <xf:var name="current-builtin-type" value="builtin-type/string()"/>
                                             <xf:select1 ref="builtin-type">
                                                 <!-- Only show label if there is a schema -->
-                                                <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
+                                                <xf:label ref="$resources/dialog-control-settings/builtin-type/label[exists($schema)]"/>
                                                 <!-- Add placeholder if there is a schema type -->
                                                 <xf:itemset ref=".[../schema-type != '']">
-                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
+                                                    <xf:label ref="$resources/dialog-control-settings/builtin-type/use-schema-type"/>
                                                     <xf:value/>
                                                 </xf:itemset>
                                                 <xf:itemset
                                                     ref="
-                                                        $resources/dialog-control-details/builtin-type/choices//(
+                                                        $resources/dialog-control-settings/builtin-type/choices//(
                                                             choices[
                                                                 exists(type[. = $supported])
                                                             ]
@@ -1129,7 +1129,7 @@
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
                                             <fr:dropdown-select1 ref="schema-type[exists($schema)]">
-                                                <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
+                                                <xf:label ref="$resources/dialog-control-settings/schema-type/label"/>
                                                 <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
                                                 <xf:itemset ref="$schema/xs:simpleType">
                                                     <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
@@ -1145,8 +1145,8 @@
                                                 <xf:label
                                                     class="xforms-hidden"
                                                     appearance="minimal"
-                                                    ref="$resources/dialog-control-details/formula/label"/>
-                                                <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
+                                                    ref="$resources/dialog-control-settings/formula/label"/>
+                                                <xf:alert ref="$resources/dialog-control-settings/formula/alert"/>
                                             </xf:textarea>
                                             <fr:number
                                                 ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
@@ -1157,8 +1157,8 @@
                                                         if ($validation-type = 'upload-max-size') then
                                                             $resources/dialog-form-settings/attachment-max-size/label
                                                         else
-                                                            $resources/dialog-control-details/integer-argument/label"/>
-                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                                            $resources/dialog-control-settings/integer-argument/label"/>
+                                                <xf:alert ref="$resources/dialog-control-settings/integer-argument/alert"/>
                                             </fr:number>
                                             <!-- NOTE: Later label/hint can be different depending on specific constraint -->
                                             <xf:input ref="constraint/@argument[$validation-type = 'upload-mediatypes']">
@@ -1166,7 +1166,7 @@
                                                     appearance="minimal"
                                                     ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
                                                 <xf:hint ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
-                                                <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                                <xf:alert ref="$resources/dialog-control-settings/integer-argument/alert"/>
                                             </xf:input>
                                         </xf:group>
                                     </xf:group>
@@ -1174,7 +1174,7 @@
                                 </fr:c>
                                 <fr:c y="1" x="7" w="2">
                                     <xf:select1 ref="@level" id="fb-validation-level-control">
-                                        <xf:label ref="$resources/dialog-control-details/level/label"/>
+                                        <xf:label ref="$resources/dialog-control-settings/level/label"/>
                                         <xf:item>
                                             <xf:label>Error</xf:label>
                                             <xf:value>error</xf:value>
@@ -1193,7 +1193,7 @@
                                     <!-- HACK: Internal group with label will not show as `fieldset`, which we have trouble styling
                                          with CSS. However, `fr:grid` will obtain the label and place it in the grid header. -->
                                     <xf:group id="fb-validation-alert-control" appearance="xxf:internal">
-                                        <xf:label ref="$resources/dialog-control-details/alert/label"/>
+                                        <xf:label ref="$resources/dialog-control-settings/alert/label"/>
                                         <!-- Since the group above is internal, we need an additional span so we can style with CSS. -->
                                         <xh:span class="fb-control-settings-alert-block">
                                             <xf:input
@@ -1202,10 +1202,10 @@
                                                         alert/@message
                                                     else
                                                         $i/default-alert/@readonly-alert-message">
-                                                <xf:label ref="$resources/dialog-control-details/alert/label"/>
+                                                <xf:label ref="$resources/dialog-control-settings/alert/label"/>
                                             </xf:input>
                                             <xf:input ref=".[@level = 'error']/@default-alert">
-                                                <xf:label ref="$resources/dialog-control-details/use-default-alert/label"/>
+                                                <xf:label ref="$resources/dialog-control-settings/use-default-alert/label"/>
                                             </xf:input>
                                         </xh:span>
                                     </xf:group>
@@ -1213,37 +1213,37 @@
                             </fr:grid>
                         </fr:tab>
                         <fr:tab id="formulas-tab">
-                            <fr:label ref="$resources/dialog-control-details/tab-formulas/label"/>
+                            <fr:label ref="$resources/dialog-control-settings/tab-formulas/label"/>
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
                                         <xf:textarea ref="calculate">
-                                            <xf:label ref="$resources/dialog-control-details/calculate/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/calculate/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/calculate/hint" appearance="minimal"/>
+                                            <xf:label ref="$resources/dialog-control-settings/calculate/label"/>
+                                            <xf:alert ref="$resources/dialog-control-settings/calculate/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/calculate/hint" appearance="minimal"/>
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
                                         <xf:textarea ref="default">
-                                            <xf:label ref="$resources/dialog-control-details/default/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/default/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/default/hint" appearance="minimal"/>
+                                            <xf:label ref="$resources/dialog-control-settings/default/label"/>
+                                            <xf:alert ref="$resources/dialog-control-settings/default/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/default/hint" appearance="minimal"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
                                         <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
-                                            <xf:label ref="$resources/dialog-control-details/visibility/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/visibility/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/visibility/hint" appearance="minimal"/>
+                                            <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
+                                            <xf:alert ref="$resources/dialog-control-settings/visibility/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/visibility/hint" appearance="minimal"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
                                         <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
-                                            <xf:label ref="$resources/dialog-control-details/readonly/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/readonly/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/readonly/hint" appearance="minimal"/>
+                                            <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
+                                            <xf:alert ref="$resources/dialog-control-settings/readonly/alert"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/readonly/hint" appearance="minimal"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>
@@ -1252,7 +1252,7 @@
                         <fr:tab id="label-hint-help-tab" ref="(text, label, hint, help)[@supported = 'true']">
                             <fr:label
                                 ref="
-                                    $resources/dialog-control-details/*[
+                                    $resources/dialog-control-settings/*[
                                         name() = concat('control-', local-name(context()))
                                     ]/label"/>
 
@@ -1263,14 +1263,14 @@
                             <xf:var
                                 name="resource"
                                 value="
-                                    $resources/dialog-control-details/*[
+                                    $resources/dialog-control-settings/*[
                                         name() = concat('control-', $lhh)
                                     ]"/>
 
                             <fr:grid>
                                 <fr:c x="1" y="1" w="12">
                                     <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML">
-                                        <xf:label ref="$resources/dialog-control-details/use-html"/>
+                                        <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                     </fr:checkbox-input>
                                     <xf:var name="is-html" value="@isHTML = 'true'"/>
                                     <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value">
@@ -1288,7 +1288,7 @@
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
                                     <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
-                                        <xf:label ref="$resources/dialog-control-details/parameters"/>
+                                        <xf:label ref="$resources/dialog-control-settings/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>
                             </fr:grid>

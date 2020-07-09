@@ -260,9 +260,9 @@
         <move-left-icon>
             <label>Move Left</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Control Settings</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Switch Appearance</label>
         </switch-appearance-icon>
@@ -447,7 +447,7 @@
             <created-with-version>Created with Version</created-with-version>
             <updated-with-versions>Updated with Versions</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Control Settings</label>
             <tab-base><label>Basic Settings</label></tab-base>
             <tab-validations><label>Validations and Alerts</label></tab-validations>
@@ -683,7 +683,7 @@
             <level><label>Level</label></level>
             <use-html>Use HTML</use-html>
             <parameters>Template Parameters</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Section/Grid Settings</label>
             <control-name>
@@ -1521,9 +1521,9 @@
         <move-left-icon>
             <label>Déplacer vers la gauche</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Paramètres du contrôle</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Changer l'apparence</label>
         </switch-appearance-icon>
@@ -1708,7 +1708,7 @@
             <created-with-version>Créé avec la version</created-with-version>
             <updated-with-versions>Mis à jour avec les versions</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Paramètres du contrôle</label>
             <tab-base><label>Paramètres de base</label></tab-base>
             <tab-validations><label>Validations et alertes</label></tab-validations>
@@ -1944,7 +1944,7 @@
             <level><label>Niveau</label></level>
             <use-html>En HTML</use-html>
             <parameters>Paramètres du modèle</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Paramètres de la section/grille</label>
             <control-name>
@@ -2765,9 +2765,9 @@
         <move-left-icon>
             <label todo="true">[Move Left]</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Elementdetaljer</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Endre utseende</label>
         </switch-appearance-icon>
@@ -2952,7 +2952,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Rediger elementdetaljer</label>
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
@@ -3189,7 +3189,7 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label todo="true">Rediger seksjonsdetaljer</label>
             <control-name>
@@ -4037,9 +4037,9 @@
         <move-left-icon>
             <label>Переместить влево</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Настройки элемента</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Переключить внешний вид</label>
         </switch-appearance-icon>
@@ -4224,7 +4224,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Настройки элемента</label>
             <tab-base><label todo="true">[Basic Settings]</label></tab-base>
             <tab-validations><label todo="true">[Validations and Alerts]</label></tab-validations>
@@ -4460,7 +4460,7 @@
             <level><label todo="true">[Level]</label></level>
             <use-html todo="true">[Use HTML]</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label todo="true">Настройки раздела</label>
             <control-name>
@@ -5309,9 +5309,9 @@
         <move-left-icon>
             <label>Sposta a sinistra</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Impostazioni di controllo</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Cambia aspetto</label>
         </switch-appearance-icon>
@@ -5496,7 +5496,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Impostazioni di controllo</label>
             <tab-base><label>Impostazioni di base</label></tab-base>
             <tab-validations><label>Convalide e avvisi</label></tab-validations>
@@ -5732,7 +5732,7 @@
             <level><label>Livello</label></level>
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Impostazioni sezione/griglia</label>
             <control-name>
@@ -6573,9 +6573,9 @@
         <move-left-icon>
             <label>Nach links verschieben</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Einstellungen Steuerelemente</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Ansicht wechseln</label>
         </switch-appearance-icon>
@@ -6760,7 +6760,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Einstellungen Steuerelemente</label>
             <tab-base><label>Grundeinstellungen</label></tab-base>
             <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
@@ -6996,7 +6996,7 @@
             <level><label>Level</label></level>
             <use-html>HTML verwenden</use-html>
             <parameters>Vorlagen-Parameter</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Abschnitteigenschaften/Tabelleneigenschaften</label>
             <control-name>
@@ -7840,9 +7840,9 @@
         <move-left-icon>
             <label>Siirry vasemmalle</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Kontrollin yksityiskohdat</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Kytkimen ulkonäkö</label>
         </switch-appearance-icon>
@@ -8027,7 +8027,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Kontrolliyksityiskohdat</label>
             <tab-base><label>Perusasetukset</label></tab-base>
             <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
@@ -8263,7 +8263,7 @@
             <level><label>Taso</label></level>
             <use-html>Käytä HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label todo="true">Lohkon yksityiskohdat</label>
             <control-name>
@@ -9104,9 +9104,9 @@
         <move-left-icon>
             <label>Mover Izquierda</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Configuración de Controles</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Cambiar Apariencia</label>
         </switch-appearance-icon>
@@ -9291,7 +9291,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Configuración de Controles</label>
             <tab-base><label>Configuración Básica</label></tab-base>
             <tab-validations><label>Validaciones y Alertas</label></tab-validations>
@@ -9527,7 +9527,7 @@
             <level><label>Nivel</label></level>
             <use-html>Usa HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Detalles de Sección/Grilla</label>
             <control-name>
@@ -10369,9 +10369,9 @@
         <move-left-icon>
             <label>Naar links</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Control-instellingen</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Wissel weergave</label>
         </switch-appearance-icon>
@@ -10556,7 +10556,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Control-instellingen</label>
             <tab-base><label>Basis-instellingen</label></tab-base>
             <tab-validations><label>Validatie en waarschuwingen</label></tab-validations>
@@ -10792,7 +10792,7 @@
             <level><label>Niveau</label></level>
             <use-html>Gebruik HTML</use-html>
             <parameters>Templateparameters</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Sectie/grid instellingen</label>
             <control-name>
@@ -11613,9 +11613,9 @@
         <move-left-icon>
             <label>Mover para a Esquerda</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Configurações do Controlo</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Mudar a aparência</label>
         </switch-appearance-icon>
@@ -11800,7 +11800,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Configurações do Controlo</label>
             <tab-base><label>Configurações Básicas</label></tab-base>
             <tab-validations><label>Validações e Alertas</label></tab-validations>
@@ -12036,7 +12036,7 @@
             <level><label>Nível</label></level>
             <use-html>Usar HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Configurações da Secção/Grelha</label>
             <control-name>
@@ -12884,9 +12884,9 @@
         <move-left-icon>
             <label>Flytta åt vänster</label>
         </move-left-icon>
-        <control-details-icon>
+        <control-settings-icon>
             <label>Inställningar för kontroll</label>
-        </control-details-icon>
+        </control-settings-icon>
         <switch-appearance-icon>
             <label>Ändra utseende</label>
         </switch-appearance-icon>
@@ -13071,7 +13071,7 @@
             <created-with-version todo="true">[Created with Version]</created-with-version>
             <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
         </dialog-form-settings>
-        <dialog-control-details>
+        <dialog-control-settings>
             <label>Inställningar för kontroll</label>
             <tab-base><label>Basinställningar</label></tab-base>
             <tab-validations><label>Valideringar och aviseringar</label></tab-validations>
@@ -13307,7 +13307,7 @@
             <level><label>Nivå</label></level>
             <use-html>Använd HTML</use-html>
             <parameters todo="true">[Template Parameters]</parameters>
-        </dialog-control-details>
+        </dialog-control-settings>
         <dialog-container-details>
             <label>Sektions-/rutnätsinställningar</label>
             <control-name>

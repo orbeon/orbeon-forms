@@ -136,7 +136,7 @@
                 <!-- Process fb:control-details -->
 
                 <!-- Initialize specific control settings -->
-                <!-- NOTE: Part of this is duplicated in `dialog-control-details.xbl`. -->
+                <!-- NOTE: Part of this is duplicated in `dialog-control-settings.xbl`. -->
                 <xf:action>
 
                     <xf:delete

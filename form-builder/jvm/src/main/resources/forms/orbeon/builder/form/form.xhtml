@@ -290,7 +290,7 @@
 <!--                            &lt;!&ndash; Open dialogs &ndash;&gt;-->
 <!--                            <xxf:show if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o s" dialog="dialog-edit-source"/>-->
 
-<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o c" name="fb-show-dialog" targetid="dialog-control-details">-->
+<!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o c" name="fb-show-dialog" targetid="dialog-control-settings">-->
 <!--                                <xf:property name="control-id" value="$current-td/*/@id"/>-->
 <!--                            </xf:dispatch>-->
 
@@ -687,7 +687,7 @@
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>
 
-                                <fb:dialog-control-details     id="dialog-control-details"   ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-control-settings    id="dialog-control-settings"   ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-container-details   id="dialog-container-details" ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-itemsets            id="dialog-itemsets"                           resources-ref="$form-resources"/>
                                 <fb:dialog-edit-source         id="dialog-edit-source"       ref="$form"      resources-ref="$form-resources"/>
@@ -797,7 +797,7 @@
                                 <xh:i
                                     class="fb-control-edit-details fa fa-cogs fa-fw"
                                     role="button"
-                                    title="{$fb-resources/control-details-icon/label}"/>
+                                    title="{$fb-resources/control-settings-icon/label}"/>
                                 <xh:i
                                     class="fb-control-delete fa fa-minus-circle fa-fw"
                                     role="button"

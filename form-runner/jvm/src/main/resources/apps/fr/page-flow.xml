@@ -38,8 +38,8 @@
     <!-- ==== Built-in relational persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-        <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-             model="persistence/relational/crud.xpl"/>
+    <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+         model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
     <service path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/search/([^/^.]+)/([^/^.]+)"

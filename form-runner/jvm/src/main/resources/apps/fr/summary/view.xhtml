@@ -1044,26 +1044,18 @@
                                                                                 else
                                                                                     $raw
                                                                 "/>
+                                                            <xf:group ref=".[xxf:non-blank($edit-view)]">
+                                                                <!-- We use CSS to make the link area take the entire cell, without wrapping around the content -->
+                                                                <xh:a href="{$current-document-href}"/>
+                                                            </xf:group>
+                                                            <!-- https://github.com/orbeon/orbeon-forms/issues/2955 -->
                                                             <xf:switch
-                                                                caseref="
-                                                                    ($is-fb and starts-with(normalize-space($detail), '&lt;div&gt;')), (: HTML:)
-                                                                    xxf:non-blank($edit-view)                                          (: link :)
-                                                                "
+                                                                caseref="($is-fb and starts-with(normalize-space($detail), '&lt;div&gt;'))"
                                                                 xxf:update="full">
-                                                                <xf:case value="true(), true()">
-                                                                    <xh:a href="{$current-document-href}">
-                                                                        <xf:output mediatype="text/html" value="$detail"/>
-                                                                    </xh:a>
-                                                                </xf:case>
-                                                                <xf:case value="true(), false()">
+                                                                <xf:case value="true()">
                                                                     <xf:output mediatype="text/html" value="$detail"/>
                                                                 </xf:case>
-                                                                <xf:case value="false(), true()">
-                                                                    <xh:a href="{$current-document-href}">
-                                                                        <xf:output value="$detail"/>
-                                                                    </xh:a>
-                                                                </xf:case>
-                                                                <xf:case value="false(), false()">
+                                                                <xf:case value="false()">
                                                                     <xf:output value="$detail"/>
                                                                 </xf:case>
                                                             </xf:switch>

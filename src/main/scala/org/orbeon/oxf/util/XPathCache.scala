@@ -138,7 +138,7 @@ object XPathCache {
   }
 
   // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
-  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item time.
+  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
   def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
 
   // Evaluate an XPath expression on the document and keep Item objects in the result

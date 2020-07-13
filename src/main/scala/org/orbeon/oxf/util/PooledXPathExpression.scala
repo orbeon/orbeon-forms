@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.XPath._
 import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation}
 import org.orbeon.saxon.sxpath.{XPathExpression, XPathVariable}
-import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
+import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
@@ -131,6 +131,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     new ju.ArrayList(i.to(mutable.ArrayBuffer).asJava)
 
   private def itemToJavaKeepNodeInfoOrNull(item: Item) = item match {
+    case v: ObjectValue => v // don't convert for `Array` and `Map` types
     case v: AtomicValue => Value.convertToJava(v)
     case v              => v
   }

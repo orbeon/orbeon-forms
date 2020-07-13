@@ -15,6 +15,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava"
 
@@ -47,6 +48,10 @@
             - app name passed originally
         - `versions as xs:integer+*`:
             - all available versions
+        - `all-versions as xs:integer+*`:
+            - all versions including non-available ones, as an `array` with
+                - `$version as xs:integer`
+                - `$available as xs:boolean`
         - `latest-version as xs:integer`
             - the latest version number
         - `default-selected-version as xs:integer?`
@@ -119,6 +124,19 @@
                         for $v in instance('fr-versioning-form-metadata')/form[not(available = 'false')]/form-version
                         return xs:integer($v)"/>
                 <xf:property
+                    name="all-versions"
+                    value="
+                        for $f in instance('fr-versioning-form-metadata')/form
+                        return
+                            array:append(
+                                array:append(
+                                    array:join(()),
+                                    xs:integer($f/form-version)
+                                ),
+                                not($f/available = 'false')
+                            )
+                        "/>
+                <xf:property
                     name="latest-version"
                     value="instance('fr-versioning-instance')/latest-version/data(.)"/>
                 <xf:property
@@ -150,6 +168,16 @@
                 <xf:property
                     name="versions"
                     value="1"/>
+                <xf:property
+                    name="all-versions"
+                    value="
+                        array:append(
+                            array:append(
+                                array:join(()),
+                                1
+                            ),
+                            true()
+                        )"/>
                 <xf:property
                     name="latest-version"
                     value="1"/>

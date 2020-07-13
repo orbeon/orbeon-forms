@@ -16,6 +16,7 @@
     xmlns:xf  = "http://www.w3.org/2002/xforms"
     xmlns:xs  = "http://www.w3.org/2001/XMLSchema"
     xmlns:xxf = "http://orbeon.org/oxf/xml/xforms"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:fr  = "http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf = "java:org.orbeon.oxf.fr.FormRunner"
 
@@ -286,12 +287,22 @@
                 origin="
                     for $v in
                         xxf:sort(
-                            event('versions'),
-                            .,
+                            event('all-versions'),
+                            array:get(., 1),
                             'number',
                             'descending'
                         )
-                    return xf:element('version', $v)"/>
+                    return
+                        xf:element(
+                            'version',
+                            (
+                                xf:attribute(
+                                    'available',
+                                    array:get($v, 2)
+                                ),
+                                array:get($v, 1)
+                            )
+                        )"/>
         </xf:action>
 
         <!-- Clean-up upon close -->

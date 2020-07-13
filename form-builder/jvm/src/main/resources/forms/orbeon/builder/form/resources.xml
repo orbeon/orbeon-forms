@@ -796,7 +796,7 @@
             <publish-error>There was an error during form publishing.</publish-error>
             <latest-published-version>Latest published version</latest-published-version>
             <create-new-version-item>create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -2057,7 +2057,7 @@
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <latest-published-version>Dernière version publiée</latest-published-version>
             <create-new-version-item>créer une nouvelle définition de formulaire avec numéro de version {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>remplacer la définition de formulaire avec numéro de version {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>remplacer la définition de formulaire avec numéro de version {0,number,integer} ({1,choice,0#non disponible|1#disponible})</overwrite-version-item>
             <create-new-version-help>
                 VEUILLEZ NOTER: Publier cette définition de formulaire va créer une nouvelle version dans la base de
                 données. Les données existantes dans la base de donnée seront visualisées et éditées avec la ou les
@@ -3302,7 +3302,7 @@
             <publish-error>Det oppsto en feil ved publisering.</publish-error>
             <latest-published-version todo="true">Latest published version</latest-published-version>
             <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help todo="true">
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -4573,7 +4573,7 @@
             <publish-error>При публикации формы произошла ошибка.</publish-error>
             <latest-published-version todo="true">Latest published version</latest-published-version>
             <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help todo="true">
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -5845,7 +5845,7 @@
             <publish-error>Si è verificato un errore durante la pubblicazione del modulo.</publish-error>
             <latest-published-version>Ultima versione pubblicata</latest-published-version>
             <create-new-version-item>Crea una nuova definizione di modulo con il numero di versione {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>Sovrascrivi la definizione del modulo attuale con il numero di versione {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>Sovrascrivi la definizione del modulo attuale con il numero di versione {0,number,integer} ({1,choice,0#non disponibile|1#disponibile})</overwrite-version-item>
             <create-new-version-help>
                 NOTA: La pubblicazione di questa definizione di modulo creerà una nuova versione della definizione del modulo nel database. I dati che esistono già nel database potranno ancora essere visualizzati e modificati con le versioni precedenti di questa definizione del modulo che sono associati con tali dati. La nuova versione della definizione del modulo verrà utilizzata per creare nuovi dati.
             </create-new-version-help>
@@ -7109,7 +7109,7 @@
             <publish-error>Beim Veröffentlichen des Formulars ist ein Fehler aufgetreten.</publish-error>
             <latest-published-version>Letzte veröffentlichte Version</latest-published-version>
             <create-new-version-item>Erstelle eine neue Formulardefinition mit der Versionsnummer {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 BITTE BEACHTEN SIE: Die Veröffentlichung dieser Formulardefinition erstellt eine neue Version der Formulardefiniton in der Datenbank. Daten, die sich bereits in der Datenbank befinden 		können noch in den vorherigen Versionen der Formulardefintion angezeigt und bearbeitet werden, welche mit ihnen verknüpft ist. Die neue Version der Formulardefinition wird verwendet, um 			neue Daten zu erstellen.
             </create-new-version-help>
@@ -8376,7 +8376,7 @@
             <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
             <latest-published-version>Viimeisin julkaistu versio</latest-published-version>
             <create-new-version-item>luo uusi lomakemäärittely versionumerolla {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 HUOMAA: Tämän lomakemäärittelyn julkaiseminen luo uuden lomakemäärittelyversion tietokantaan. Tietoja, jotka jo ovat tietokannassa voidaan yhä tarkastella ja editoida niillä edellisillä lomakemäärittelyversioilla, jotka liittyvät tietoihin. Uutta lomakemäärittelyversiota käytetään uusien tietojen luomiseen.
             </create-new-version-help>
@@ -9640,7 +9640,7 @@
             <publish-error>Hubo un error durante la publicación.</publish-error>
             <latest-published-version>Última versión publicada</latest-published-version>
             <create-new-version-item>crear una nueva versión con número de versión {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>sobre escribir la definición actual con número de versión {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">sobre escribir la definición actual con número de versión {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 NOTA: Al publicar esta definición del formulario se creará una nueva versión en la base de datos. Los datos de los formularios existentes en la base de datos serán vistos y editados en sus versiones correspondientes. Esta nueva versión se usará para crear los nuevos formularios.
             </create-new-version-help>
@@ -10905,7 +10905,7 @@
             <publish-error>Er is een fout opgetreden tijdens het publiceren.</publish-error>
             <latest-published-version>Laatst gepubliceerde versie</latest-published-version>
             <create-new-version-item>maak een nieuwe formdefinitie met versienummer {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>overschrijf de huidige formdefinitie met versienummer {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">overschrijf de huidige formdefinitie met versienummer {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 MERK OP: Publiceren van deze formdefinitie maakt een nieuwe versie van de formdefinitie in de database.
                 Bestaande gegevens in de database kunnen nog wel met de vorige versies van deze formdefinitie waaraan
@@ -12149,7 +12149,7 @@
             <publish-error>Ocorreu um erro na publicação.</publish-error>
             <latest-published-version>Última versão publicada</latest-published-version>
             <create-new-version-item>criar uma nova definição de formulário com número de versão {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>substituir a definição de formulário actual pela versão com número {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">substituir a definição de formulário actual pela versão com número {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 ATENÇÃO: A publicação desta definição do formulário irá criar uma nova versão da definição do formulário na
                 base de dados. Os dados já existentes na base de dados continuarão a ser visualizados e editados com as versões anteriores
@@ -13420,7 +13420,7 @@
             <publish-error>Ett fel inträffade under publiceringen.</publish-error>
             <latest-published-version>Senast publicerade version</latest-published-version>
             <create-new-version-item>skapa ett nytt formulär med version {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>ersätt existerande formulär med version {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">ersätt existerande formulär med version {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
 	        OBS: Publicering av detta formulär skapar en ny version av formulärdefinitionen i
 		databasen. Ifyllda formulär som redan finns i databasen visas och redigeras med de tidigare

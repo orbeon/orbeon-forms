@@ -112,7 +112,15 @@
                                     </xf:item>
                                     <!-- All existing versions sorted from newest to oldest -->
                                     <xf:itemset ref="$versions">
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, xs:integer(.))"/>
+                                        <xf:label
+                                            value="
+                                                xxf:format-message(
+                                                    $form-resources/dialog-publish/overwrite-version-item,
+                                                    (
+                                                        xs:integer(.),
+                                                        if (@available = 'true') then 1 else 0
+                                                    )
+                                                )"/>
                                         <xf:value value="."/>
                                     </xf:itemset>
 

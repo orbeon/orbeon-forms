@@ -206,8 +206,17 @@
 
                     <!-- Insert new submission if needed -->
                     <xf:action if="not(exists($model/fb:submission[@id = $submission-id]))">
-                        <xf:insert context="$model" ref="xf:* | fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
-                        <xf:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
+                        <xf:insert
+                            context="$model"
+                            ref="
+                                (
+                                    fb:submission[last()], (: after existing services :)
+                                    *[last()]              (: or after everything :)
+                                )[1]"
+                            origin="instance('fb-submission-template')"/>
+                        <xf:setvalue
+                            ref="$model/fb:submission[last()]/@id"
+                            value="$submission-id"/>
                     </xf:action>
 
                     <!-- Set submission properties -->

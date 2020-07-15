@@ -222,10 +222,10 @@
                     <!-- Set submission properties -->
                     <xf:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
                     <xf:action context="$submission">
-                        <xf:setvalue ref="@method" value="$request/method"/>
+                        <xf:setvalue ref="@method"        value="$request/method"/>
                         <xf:setvalue ref="@serialization" value="$request/serialization"/>
-                        <xf:setvalue ref="@resource" value="$request/resource"/>
-                        <xf:setvalue ref="@mediatype" value="$request/mediatype"/>
+                        <xf:setvalue ref="@resource"      value="$request/resource"/>
+                        <xf:setvalue ref="@mediatype"     value="$request/mediatype"/>
 
                         <xf:var name="is-auth" value="string($request/is-auth) = 'true'"/>
                         <xf:action if="$is-auth">
@@ -246,7 +246,9 @@
                     <xf:action if="not(exists($model/fb:instance[@id = $instance-id]))">
                         <xf:insert ref="$submission" position="before" origin="instance('fb-instance-template')"/>
                         <!-- Don't reuse $submission because it might be out of date due to the insertion before! -->
-                        <xf:setvalue ref="$model/fb:submission[@id = $submission-id]/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
+                        <xf:setvalue
+                            ref="$model/fb:submission[@id = $submission-id]/preceding-sibling::fb:instance[1]/@id"
+                            value="$instance-id"/>
                     </xf:action>
 
                     <!-- Set instance document -->

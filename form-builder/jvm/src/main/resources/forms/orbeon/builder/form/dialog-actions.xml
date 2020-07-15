@@ -647,11 +647,27 @@
                 <!-- Save changes to form -->
                 <xf:action event="DOMActivate">
 
-                    <!-- Delete existing binding if any -->
-                    <xf:delete ref="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
+                    <xf:var
+                        name="existing-binding-opt"
+                        value="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
 
-                    <!-- Insert new binding -->
-                    <xf:insert context="$model" ref="*" origin="$instance/fb:action[1]"/>
+                    <!--
+                        Insert new binding
+                        https://github.com/orbeon/orbeon-forms/issues/4610
+                    -->
+                    <xf:insert
+                        context="$model"
+                        ref="
+                            (
+                                $existing-binding-opt,                         (: keep position if possible :)
+                                fb:action[ends-with(@id, '-binding')][last()], (: or after existing actions :)
+                                *[last()]                                      (: or after everything :)
+                            )[1]"
+                        origin="$instance/fb:action[1]"/>
+
+                    <!-- Delete existing binding if any -->
+                    <xf:delete
+                        ref="$existing-binding-opt"/>
 
                     <!-- Hide dialog -->
                     <xxf:hide dialog="fb-action-dialog"/>

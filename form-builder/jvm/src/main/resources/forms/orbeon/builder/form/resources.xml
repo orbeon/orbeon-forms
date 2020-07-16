@@ -2398,6 +2398,10 @@
                 <label>Expression XPath de la valeur</label>
                 <hint>Relative au nœud du choix</hint>
             </item-value>
+            <item-hint>
+                <label>Expression XPath de la suggestion</label>
+                <hint>Relative au nœud du choix</hint>
+            </item-hint>
             <is-last-page>
                 <label>Expression XPath indiquant s'il s'agit de la dernière page</label>
             </is-last-page>
@@ -3670,6 +3674,10 @@
                 <label>Verdi</label>
                 <hint todo="true">[XPath expression relative to an item node]</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -4941,6 +4949,10 @@
                 <label>Значение</label>
                 <hint>Выражение XPath, возвращает значение.</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -6205,6 +6217,10 @@
                 <label>Valore</label>
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -7470,6 +7486,10 @@
                 <label>Wert</label>
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
@@ -8737,6 +8757,10 @@
                 <label>Arvo</label>
                 <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -10001,6 +10025,10 @@
                 <label>Valor</label>
                 <hint>Expresión XPath relativa al nodo-item</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -11245,6 +11273,10 @@
                 <label>Waarde XPath expressie</label>
                 <hint>Relatief aan gekozen node</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -12516,6 +12548,10 @@
                 <label>Valor</label>
                 <hint>Expressão XPath relativa a um item de um nodo</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -13788,6 +13824,10 @@
                 <label>Värde</label>
                 <hint>XPath-uttryck relativt en nod</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>

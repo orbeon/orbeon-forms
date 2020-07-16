@@ -58,7 +58,7 @@ val CoreLibraryDependencies = Seq(
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "joda-time"                   %  "joda-time"                      % "2.10.6",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.10",
+  "org.apache.commons"          %  "commons-lang3"                  % "3.11",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.14",

@@ -1136,6 +1136,10 @@
                 <label>Value XPath expression</label>
                 <hint>Relative to choice node</hint>
             </item-value>
+            <item-hint>
+                <label>Hint XPath expression</label>
+                <hint>Relative to choice node</hint>
+            </item-hint>
             <is-last-page>
                 <label>Is last page XPath expression</label>
             </is-last-page>

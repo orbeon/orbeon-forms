@@ -1239,8 +1239,8 @@
             <delete-column>Are you sure you want to delete the current column?</delete-column>
             <delete-row>Are you sure you want to delete the current row?</delete-row>
             <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
-            <delete-service>Are you sure you want to delete service</delete-service>
-            <delete-action>Are you sure you want to delete action</delete-action>
+            <delete-service>Are you sure you want to delete service "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Are you sure you want to delete action "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
             <new-metadata-output>Please provide an application and form name to identify your form. You can easily change those later.</new-metadata-output>
@@ -2501,8 +2501,8 @@
             <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante ?</delete-column>
             <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante ?</delete-row>
             <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
-            <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
-            <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
+            <delete-service>Etes-vous sûr de vouloir supprimer le service "{0}" ?{1,choice,0# Aucune action ne l'utilise.|1# 1 action l''''utilise.|1&lt; {1,number,integer} actions l''''utilisent.}</delete-service>
+            <delete-action>Etes-vous sûr de vouloir supprimer l''action "{0}" ?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire. Vous pourrez les changer plus tard.</new-metadata-output>
@@ -3773,8 +3773,8 @@
             <delete-column>Er du sikker på at du ønsker å slette denne kolonnen?</delete-column>
             <delete-row>Er du sikker på at du ønsker å slette denne raden?</delete-row>
             <delete-resources>Er du sikker på at du ønsker å slette alle ressursene for språket</delete-resources>
-            <delete-service>Er du sikker på at du ønsker å slette sørvisen</delete-service>
-            <delete-action>Er du sikker på at du ønsker å slette handlingen</delete-action>
+            <delete-service todo="true">Er du sikker på at du ønsker å slette sørvisen "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Er du sikker på at du ønsker å slette handlingen "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere).</new-metadata-output>
@@ -5044,8 +5044,8 @@
             <delete-column>Вы уверены, что хотите удалить текущий столбец?</delete-column>
             <delete-row>Вы уверены, что хотите удалить текущую строку?</delete-row>
             <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
-            <delete-service>Вы уверены, что хотите удалить сервис?</delete-service>
-            <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
+            <delete-service todo="true">Вы уверены, что хотите удалить сервис "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Вы уверены, что хотите удалить действие "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
@@ -6308,8 +6308,8 @@
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
             <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
             <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
-            <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
-            <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
+            <delete-service todo="true">Sei sicuro di voler cancellare il servizio "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Sei sicuro di voler cancellare l''azione "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
             <new-metadata-output>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo (è possibile cambiarli più tardi).</new-metadata-output>
@@ -7573,8 +7573,8 @@
             <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
             <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
             <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
-            <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
-            <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
+            <delete-service todo="true">Sind Sie sicher, dass Sie Dienst "{0}" löschen wollen?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Sind Sie sicher, dass Sie Aktion "{0}" löschen wollen?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
             <metadata-edit-title>Formularmetadaten</metadata-edit-title>
             <new-metadata-output>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden (Sie können sie auch später ändern).</new-metadata-output>
@@ -8840,8 +8840,8 @@
             <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
             <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
             <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
-            <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
-            <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
+            <delete-service todo="true">Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
             <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
             <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin).</new-metadata-output>
@@ -10104,8 +10104,8 @@
             <delete-column>Está seguro de eliminar la Columna actual?</delete-column>
             <delete-row>Está seguro de eliminar la Fila actual?</delete-row>
             <delete-resources>Está seguro de eliminar todos los recursos para los idiomas</delete-resources>
-            <delete-service>Está seguro de eliminar el Servicio?</delete-service>
-            <delete-action>Está seguro de eliminar la Acción?</delete-action>
+            <delete-service todo="true">Está seguro de eliminar el Servicio "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Está seguro de eliminar la Acción "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>
             <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
             <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario (se pueden ingresar más adelante).</new-metadata-output>
@@ -11348,8 +11348,8 @@
             <delete-column>Weet u zeker dat u de huidige kolom wilt verwijderen?</delete-column>
             <delete-row>Weet u zeker dat u de huidige rij wilt verwijderen?</delete-row>
             <delete-resources>Weet u zeker dat u alle resources voor de taal wilt verwijderen</delete-resources>
-            <delete-service>Weet u zeker dat u de service wilt verwijderen</delete-service>
-            <delete-action>Weet u zeker dat u de actie wilt verwijderen</delete-action>
+            <delete-service todo="true">Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
             <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
             <metadata-edit-title>Form metagegevens</metadata-edit-title>
             <new-metadata-output>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form (u kunt deze later nog wijzigen).</new-metadata-output>
@@ -12619,8 +12619,8 @@
             <delete-column>Tem a certeza que deseja remover a coluna actual?</delete-column>
             <delete-row>Tem a certeza que deseja remover a linha actual?</delete-row>
             <delete-resources>Tem a certeza que deseja remover a todos os recursos para esta língua</delete-resources>
-            <delete-service>Tem a certeza que deseja remover o serviço</delete-service>
-            <delete-action>Tem a certeza que deseja remover a acção</delete-action>
+            <delete-service todo="true">Tem a certeza que deseja remover o serviço "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Tem a certeza que deseja remover a acção "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nenhum controlo será apagado|1#1 controlo será apagado|1&lt;{0,number,integer} controlos serão apagados} .</controls-will-be-deleted>
             <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
             <new-metadata-output>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário(ambos podem ser alterados posteriormente).</new-metadata-output>
@@ -13891,8 +13891,8 @@
             <delete-column>Bekräfta att du vill ta bort denna kolumn</delete-column>
             <delete-row>Bekräfta att du vill ta bort denna rad</delete-row>
             <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
-            <delete-service>Bekräfta att du vill ta bort denna tjänst</delete-service>
-            <delete-action>Bekräfta att du vill ta bort detta kommando</delete-action>
+            <delete-service todo="true">Bekräfta att du vill ta bort denna tjänst "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
             <metadata-edit-title>Metadata</metadata-edit-title>
             <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare).</new-metadata-output>

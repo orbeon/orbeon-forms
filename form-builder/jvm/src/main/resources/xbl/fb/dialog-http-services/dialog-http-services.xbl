@@ -357,12 +357,11 @@
             <!-- Delete service with confirmation -->
             <xbl:handler event="DOMActivate" observer="fb-service-delete-trigger">
                 <xf:dispatch name="fb-request-delete-http-service" target="fb-dialog-http-services">
-                    <xf:property name="service-name" value="$i/initial-name"/>
+                    <xf:property name="service-name" value="$i/initial-name/string()"/>
                 </xf:dispatch>
             </xbl:handler>
 
             <xbl:handler event="fb-confirm-delete-http-service" phase="target">
-                <!-- TODO: Service can be in use by actions -->
                 <xf:delete
                     ref="
                         $model/(

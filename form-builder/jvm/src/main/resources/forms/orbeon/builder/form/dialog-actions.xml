@@ -610,11 +610,9 @@
                             <xf:property
                                 name="fr:message"
                                 value="
-                                    concat(
-                                        $form-resources/messages/delete-service,
-                                        ' ''',
-                                        $instance/name,
-                                        '''?'
+                                    xxf:format-message(
+                                        $form-resources/messages/delete-action,
+                                        $instance/name/string()
                                     )"/>
                             <xf:property
                                 name="fr:confirmation-target"

@@ -377,8 +377,8 @@
 
             <xf:model id="model">
 
-                <xf:var name="form"            value="xxf:binding('fb-dialog-http-services')"/>
-                <xf:var name="model"           value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xf:var name="form"  value="xxf:binding('fb-dialog-http-services')"/>
+                <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <submission>

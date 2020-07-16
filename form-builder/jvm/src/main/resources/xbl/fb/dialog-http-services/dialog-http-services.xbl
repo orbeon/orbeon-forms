@@ -444,11 +444,11 @@
 
                     <xf:bind ref="request">
 
-                        <!-- TODO: validate as XPath 2 XVT -->
                         <xf:bind
                             ref="resource"
                             required="true()"
                             xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"
                             constraint="
                                 (: https://github.com/orbeon/orbeon-forms/issues/3577 :)
                                 (: https://github.com/orbeon/orbeon-forms/issues/3720 :)

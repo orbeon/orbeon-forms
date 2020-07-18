@@ -774,8 +774,8 @@
     <xf:var name="xcv" value="instance('fb-xcv-triggers-instance')"/>
 
     <xf:bind ref="$xcv">
-        <xf:bind ref="cut-trigger"   readonly="not(exists($current-td/*))"/>
-        <xf:bind ref="copy-trigger"  readonly="not(exists($current-td/*))"/>
+        <xf:bind ref="cut-trigger"   readonly="empty($current-td/*)"/>
+        <xf:bind ref="copy-trigger"  readonly="empty($current-td/*)"/>
     </xf:bind>
 
     <!-- Undo stack -->

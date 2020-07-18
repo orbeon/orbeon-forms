@@ -78,13 +78,13 @@
             <!-- Insert condition on action if missing -->
             <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
             <xf:insert
-                if="not(exists($action1/@if))"
+                if="empty($action1/@if)"
                 context="$action1"
                 origin="xf:attribute('if', 'true()')"/>
             <!-- Insert hint on itemset action if missing -->
             <xf:action iterate="$instance//xf:action[@class = 'fr-itemset-action']">
                 <xf:insert
-                    if="not(exists(xf:var[@name = 'item-hint']))"
+                    if="empty(xf:var[@name = 'item-hint'])"
                     context="."
                     origin="xf:element('xf:var', (
                         xf:attribute('name', 'item-hint'),

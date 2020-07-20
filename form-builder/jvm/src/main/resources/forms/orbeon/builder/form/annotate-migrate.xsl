@@ -371,6 +371,7 @@
                             'response-items',
                             'item-label',
                             'item-value',
+                            'item-hint',
                             'dataset-name'
                         )
                     ]"/>
@@ -383,7 +384,8 @@
                         *//(*:variable | *:var)[
                             @name = (
                                 'item-label',
-                                'item-value'
+                                'item-value',
+                                'item-hint'
                             )
                         ]
                     else

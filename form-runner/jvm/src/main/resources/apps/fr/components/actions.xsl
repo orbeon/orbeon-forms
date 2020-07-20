@@ -846,9 +846,22 @@
 
                                             <!-- Should use a version of `XFormsItemUtils.evaluateItemset()`
                                                  See https://github.com/orbeon/orbeon-forms/issues/3125 -->
+                                            <xsl:variable
+                                                name="item-hint-xpath"
+                                                select="xs:string(.//(*:variable | *:var)[@name = ('item-hint')]/(@value | @select)[1])"/>
                                             <xf:action iterate="$response-items">
                                                 <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
                                                 <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
+
+                                                <xsl:choose>
+                                                    <xsl:when test="$item-hint-xpath != ''">
+                                                        <xf:var name="item-hint"    value="{$item-hint-xpath}"/>
+                                                        <xf:var name="element-hint" value="xf:element('hint', xs:string($item-hint))"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xf:var name="element-hint" value="()"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
                                                 <xf:insert
                                                     context="$new-choices-holder"
                                                     ref="*"
@@ -857,7 +870,8 @@
                                                             'item',
                                                             (
                                                                 xf:element('label', xs:string($item-label)),
-                                                                xf:element('value', xs:string($item-value))
+                                                                xf:element('value', xs:string($item-value)),
+                                                                $element-hint
                                                             )
                                                         )"/>
                                             </xf:action>
@@ -909,6 +923,7 @@
                 <xsl:copy-of select="xf:label/@mediatype"/>
             </xf:label>
             <xf:value ref="value"/>
+            <xf:hint ref="hint"/>
         </xf:itemset>
     </xsl:template>
 

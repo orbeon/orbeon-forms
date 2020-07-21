@@ -609,9 +609,6 @@ class XFormsServer extends ProcessorImpl {
 
     val ignoreSequence = ! isAjaxRequest
 
-    // Get files if any (those come from xforms-server-submit.xpl upon submission)
-    val filesElement = requestDocument.getRootElement.element(XXFORMS_FILES_QNAME)
-
     // Gather server events containers if any
     val serverEventsElements = ClientEvents.extractServerEventsElements(requestDocument.getRootElement)
 
@@ -660,9 +657,8 @@ class XFormsServer extends ProcessorImpl {
               val eventsFindingsOpt = {
 
                 val hasEvents = remainingClientEvents.nonEmpty || serverEventsElements.nonEmpty
-                val hasFiles  = XFormsUploadControl.hasSubmittedFiles(filesElement)
 
-                if (hasEvents || hasFiles) {
+                if (hasEvents) {
                   // Scope the containing document for the XForms API
                   XFormsAPI.withContainingDocument(containingDocument) {
 
@@ -671,16 +667,10 @@ class XFormsServer extends ProcessorImpl {
 
                       // Start external events
                       containingDocument.beforeExternalEvents(response)
-                      // Handle uploaded files for noscript if any
-                      if (hasFiles) {
-                        debug("handling uploaded files")(eventsIndentedLogger)
-                        XFormsUploadControl.handleSubmittedFiles(containingDocument, filesElement)
-                      }
 
                       // Dispatch the events
                       val result =
-                        hasEvents option
-                          ClientEvents.processEvents(containingDocument, remainingClientEvents, serverEventsElements)
+                        Some(ClientEvents.processEvents(containingDocument, remainingClientEvents, serverEventsElements))
 
                       // End external events
                       containingDocument.afterExternalEvents()

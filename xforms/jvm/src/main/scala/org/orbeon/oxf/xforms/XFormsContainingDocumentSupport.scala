@@ -744,8 +744,8 @@ trait ContainingDocumentDelayedEvents {
         dueEvents foreach { dueEvent =>
 
           withOutermostActionHandler {
-            self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
-              case eventTarget: XFormsEventTarget =>
+            self.findObjectByEffectiveId(dueEvent.targetEffectiveId) match {
+              case Some(eventTarget: XFormsEventTarget) =>
                 ClientEvents.processEvent(
                   self.containingDocument,
                   XFormsEventFactory.createEvent(

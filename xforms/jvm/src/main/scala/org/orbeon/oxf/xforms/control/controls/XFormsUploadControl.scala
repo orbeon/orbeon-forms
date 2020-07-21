@@ -145,7 +145,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
           case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
             someNewValueUri
           case Some(newValueUri) =>
-            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `${newValueUri}`")
+            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `$newValueUri`")
           case None =>
             None
         }

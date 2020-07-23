@@ -469,7 +469,7 @@
 
         <xsl:variable name="data-iterate-elem" select="."/>
 
-        <xf:action if="empty({@ref})">
+        <xf:action if="empty(({@ref}))">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
                 targetid="fr-form-model">

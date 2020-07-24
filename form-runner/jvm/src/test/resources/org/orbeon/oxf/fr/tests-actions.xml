@@ -321,7 +321,7 @@
                </xf:action>
                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-4-id" context="xxf:instance('fr-service-response-instance')">
                     <xf:action type="xpath">frf:repeatClear('my-section false none my-grid true none')</xf:action>
-                    <xf:action if="empty(/response/row)">
+                    <xf:action if="empty((/response/row))">
                         <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model"/>
                     </xf:action>
                     <xf:action iterate="/response/row">
@@ -428,7 +428,7 @@
                 </xf:action>
                 <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id"  context="xxf:instance('fr-service-response-instance')">
                     <xf:action type="xpath">frf:repeatRemoveIteration('my-section false none my-grid true start')</xf:action>
-                    <xf:action if="empty(/response/row[exists(foo)])">
+                    <xf:action if="empty((/response/row[exists(foo)]))">
                         <xf:dispatch name="fr-action-continuation-my-action-7-id" targetid="fr-form-model"/>
                     </xf:action>
                     <xf:action iterate="/response/row[exists(foo)]">
@@ -632,7 +632,7 @@
                            context="xxf:instance('fr-service-response-instance')"
                            if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
                     <xf:message>2</xf:message>
-                    <xf:action if="empty(/*/record)">
+                    <xf:action if="empty((/*/record))">
                         <xf:dispatch name="fr-action-continuation-my-action-6-id" targetid="fr-form-model"/>
                     </xf:action>
                     <xf:action iterate="/*/record">
@@ -787,7 +787,7 @@
                     context="xxf:instance('fr-service-response-instance')"
                     if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
                     <xf:action type="xpath">frf:repeatClear('my-section true none')</xf:action>
-                    <xf:action if="empty(/*/level1)">
+                    <xf:action if="empty((/*/level1))">
                         <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model"/>
                     </xf:action>
                     <xf:action iterate="/*/level1">
@@ -796,7 +796,7 @@
                             <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
                             <xf:action type="xpath">frf:repeatAddIteration('my-section true end', true())</xf:action>
                             <xf:action type="xpath">frf:repeatClear('my-section true end my-grid true none')</xf:action>
-                            <xf:action if="empty(level2)">
+                            <xf:action if="empty((level2))">
                                 <xf:dispatch name="fr-action-continuation-my-action-3-id" targetid="fr-form-model"/>
                             </xf:action>
                             <xf:action iterate="level2" context="xxf:get-request-attribute('fr-iteration-context-1')">

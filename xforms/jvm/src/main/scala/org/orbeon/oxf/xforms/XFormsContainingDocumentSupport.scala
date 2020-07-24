@@ -704,11 +704,14 @@ trait ContainingDocumentDelayedEvents {
     cancelable        : Boolean,
     time              : Long,
     showProgress      : Boolean,
-    allowDuplicates   : Boolean
+    allowDuplicates   : Boolean // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
   ): Unit = {
 
+    // For `xxforms-poll`, we *could* attempt to preserve the earlier time. But currently,
+    // `addClientDelayEventIfNeeded()` for async submissions always uses a newer time at
+    // each call.
     def isDuplicate(e: DelayedEvent) =
-      e.eventName == eventName && e.targetEffectiveId == targetEffectiveId // xxx what about `time` used for `xxforms-poll`?
+      e.eventName == eventName && e.targetEffectiveId == targetEffectiveId
 
     if (allowDuplicates || ! (_delayedEvents exists isDuplicate))
       _delayedEvents += DelayedEvent(

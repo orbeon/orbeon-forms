@@ -333,7 +333,11 @@ trait FormRunnerBaseOps {
   // Display an error message
   //@XPathFunction
   def errorMessage(message: String): Unit =
-    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" -> Some(message)))
+    dispatch(
+      name       = "fr-show",
+      targetId   = "fr-error-dialog",
+      properties = Map("message" -> Some(message))
+    )
 
   def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
 

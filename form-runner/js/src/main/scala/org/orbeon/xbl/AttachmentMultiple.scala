@@ -46,11 +46,15 @@ object AttachmentMultiple {
 
         scribe.debug("init")
 
-        // https://github.com/orbeon/orbeon-forms/issues/4562
-        val label = selectLabel
-        label.htmlFor = Page.namespaceIdIfNeeded(uploadInput.form.id, label.htmlFor)
+        val isStaticReadonly = uploadInputOpt.isEmpty
 
-        if (! companion.isMarkedReadonly && browserSupportsFileDrop) {
+        // https://github.com/orbeon/orbeon-forms/issues/4562
+        uploadInputOpt foreach { uploadInput =>
+          val label = selectLabel
+          label.htmlFor = Page.namespaceIdIfNeeded(uploadInput.form.id, label.htmlFor)
+        }
+
+        if (! isStaticReadonly && ! companion.isMarkedReadonly && browserSupportsFileDrop) {
           registerAllListeners()
         } else if (! browserSupportsFileDrop) {
           scribe.debug("disabling drag and drop of files for unsupported browser")
@@ -74,9 +78,10 @@ object AttachmentMultiple {
         object EventSupport extends EventListenerSupport
 
         def dropElem          = containerElem.querySelector(".fr-attachment-drop")
-        def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
-        def uploadInput       = containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input]
         def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
+
+        def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
+        def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
         def browserSupportsFileDrop: Boolean =
           ! Bowser.msie.contains(true)
@@ -157,7 +162,7 @@ object AttachmentMultiple {
             (ev: dom.raw.KeyboardEvent) => {
               if (ev.key == "Enter" || ev.key == " ") {
                 ev.preventDefault() // so that the page doesn't scroll
-                uploadInput.click()
+                uploadInputOpt foreach (_.click())
               }
             }
           )

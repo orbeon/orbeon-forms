@@ -956,6 +956,10 @@
                 <label>Request Body</label>
                 <hint>XML data (can be a SOAP envelope)</hint>
             </request-body>
+            <is-binary-response>
+                <label>Service Response has Binary Content</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Response</label>
             </response>
@@ -2222,6 +2226,10 @@
                 <label>Corps de la requête</label>
                 <hint>Document XML (peut être une enveloppe SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label>La réponse du service a un contenu binaire</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Réponse</label>
             </response>
@@ -3470,6 +3478,10 @@
                 <label>Forespørselens body</label>
                 <hint>XML-data (kan være en SOAP-konvolutt)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Respons</label>
             </response>
@@ -4745,6 +4757,10 @@
                 <label>Тело запроса</label>
                 <hint>Данные XML (может быть SOAP-обертка)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Ответ</label>
             </response>
@@ -6013,6 +6029,10 @@
                 <label>Corpo della richiesta</label>
                 <hint>Dati XML (puo essere un involucro SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Risposta</label>
             </response>
@@ -7282,6 +7302,10 @@
                 <label>Hauptteil der Anfrage</label>
                 <hint>XML-Daten (kann ein SOAP-Umschlag sein)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Antwort</label>
             </response>
@@ -8553,6 +8577,10 @@
                 <label>Ohjelmakoodin pyyntö</label>
                 <hint>XML-data (voi olla SOAP-kuori)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Vastaus</label>
             </response>
@@ -9821,6 +9849,10 @@
                 <label>Cuerpo de la Solicitud</label>
                 <hint>Datos XML (pueder ser un "SOAP envelope")</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Respuesta</label>
             </response>
@@ -11097,6 +11129,10 @@
                 <label>Request body</label>
                 <hint>XML data (kan een SOAP envelope zijn)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Response</label>
             </response>
@@ -12344,6 +12380,10 @@
                 <label>Corpo do Pedido</label>
                 <hint>dados XML (pode ser um envelope SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Resposta</label>
             </response>
@@ -13620,6 +13660,10 @@
                 <label>Anrop</label>
                 <hint>XML-data, troligen SOAP envelope</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint/>
+            </is-binary-response>
             <response>
                 <label>Svar</label>
             </response>

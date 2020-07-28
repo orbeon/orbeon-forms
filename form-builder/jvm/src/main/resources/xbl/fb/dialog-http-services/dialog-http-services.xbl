@@ -35,11 +35,12 @@
                 <!-- Clear instance entirely -->
                 <xf:setvalue iterate="$i//*[not(*)]" ref="."/>
 
-                <xf:setvalue ref="$request/is-soap"       value="false()"/>
-                <xf:setvalue ref="$request/is-auth"       value="false()"/>
-                <xf:setvalue ref="$request/method"        value="instance('fb-submission-template')/@method"/>
-                <xf:setvalue ref="$request/serialization" value="instance('fb-submission-template')/@serialization"/>
+                <xf:setvalue ref="$request/method"             value="instance('fb-submission-template')/@method"/>
+                <xf:setvalue ref="$request/serialization"      value="instance('fb-submission-template')/@serialization"/>
+                <xf:setvalue ref="$request/is-soap"            value="false()"/>
+                <xf:setvalue ref="$request/is-auth"            value="false()"/>
                 <xf:delete   ref="$request/params/param"/>
+                <xf:setvalue ref="$request/is-binary-response" value="false()"/>
                 <xf:delete   ref="$response/headers/header"/>
 
                 <!-- Copy parameters if any -->
@@ -116,9 +117,10 @@
                         ref="$request/soap-action"
                         value="xxf:trim(tokenize($soap-action, '=')[2])"/>
 
-                    <xf:setvalue ref="$request/is-auth"  value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
-                    <xf:setvalue ref="$request/username" value="$submission/@xxf:username"/>
-                    <xf:setvalue ref="$request/password" value="$submission/@xxf:password"/>
+                    <xf:setvalue ref="$request/is-auth"            value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
+                    <xf:setvalue ref="$request/username"           value="$submission/@xxf:username"/>
+                    <xf:setvalue ref="$request/password"           value="$submission/@xxf:password"/>
+                    <xf:setvalue ref="$request/is-binary-response" value="$submission/@replace = 'xxf:binary'"/>
 
                 </xf:action>
 
@@ -297,6 +299,16 @@
                             <xf:delete context="." ref="@xxf:username"/>
                             <xf:delete context="." ref="@xxf:password"/>
                         </xf:action>
+
+                        <xf:var name="is-binary-response" value="string($request/is-binary-response) = 'true'"/>
+                        <xf:action if="$is-binary-response">
+                            <xf:insert
+                                context="."
+                                origin="xf:attribute('replace', 'xxf:binary')"/>
+                        </xf:action>
+                        <xf:action if="not($is-binary-response)">
+                            <xf:delete context="." ref="@replace"/>
+                        </xf:action>
                     </xf:action>
 
                     <!-- Insert new instance just before submission if needed -->
@@ -388,7 +400,6 @@
                             <method/>
                             <serialization/>
                             <resource/>
-                            <!--<replace/>-->
                             <is-soap>false</is-soap>
                             <soap-action/>
                             <is-auth>false</is-auth>
@@ -397,6 +408,7 @@
                             <mediatype/>
                             <body/>
                             <params/>
+                            <is-binary-response>false</is-binary-response>
                         </request>
                         <response>
                             <error-type/>
@@ -507,6 +519,10 @@
                             ref="params/param/@name"
                             type="xs:NCName"
                             required="true()"/>
+                        <xf:bind
+                            ref="is-binary"
+                            type="xs:boolean"
+                        />
                     </xf:bind>
 
                     <xf:bind ref="response">
@@ -701,6 +717,14 @@
                                             <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:checkbox-input ref="$request/is-binary-response">
+                                            <xf:label ref="$resources/dialog-http-services/is-binary-response/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/is-binary-response/hint"/>
+                                        </fr:checkbox-input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

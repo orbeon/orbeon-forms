@@ -958,7 +958,7 @@
             </request-body>
             <is-binary-response>
                 <label>Service Response has Binary Content</label>
-                <hint/>
+                <hint>Check this if the response is used to set an attachment control value</hint>
             </is-binary-response>
             <response>
                 <label>Response</label>
@@ -2228,7 +2228,7 @@
             </request-body>
             <is-binary-response>
                 <label>La réponse du service a un contenu binaire</label>
-                <hint/>
+                <hint>Sélectionner si la réponse est utilisée comme valeur d'un fichier joint</hint>
             </is-binary-response>
             <response>
                 <label>Réponse</label>
@@ -3480,7 +3480,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Respons</label>
@@ -4759,7 +4759,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Ответ</label>
@@ -6031,7 +6031,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Risposta</label>
@@ -7304,7 +7304,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Antwort</label>
@@ -8579,7 +8579,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Vastaus</label>
@@ -9851,7 +9851,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Respuesta</label>
@@ -11131,7 +11131,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Response</label>
@@ -12382,7 +12382,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Resposta</label>
@@ -13662,7 +13662,7 @@
             </request-body>
             <is-binary-response>
                 <label todo="true">[Service Response has Binary Content]</label>
-                <hint/>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
             </is-binary-response>
             <response>
                 <label>Svar</label>

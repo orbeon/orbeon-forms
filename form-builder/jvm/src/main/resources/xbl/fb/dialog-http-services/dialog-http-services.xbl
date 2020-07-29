@@ -719,14 +719,6 @@
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
-                                <xh:tr>
-                                    <xh:td>
-                                        <fr:checkbox-input ref="$request/is-binary-response">
-                                            <xf:label ref="$resources/dialog-http-services/is-binary-response/label"/>
-                                            <xf:hint ref="$resources/dialog-http-services/is-binary-response/hint"/>
-                                        </fr:checkbox-input>
-                                    </xh:td>
-                                </xh:tr>
                             </fr:grid>
                         </fr:tab>
                         <fr:tab>
@@ -734,17 +726,11 @@
 
                             <fr:grid>
                                 <xh:tr>
-                                    <xh:td>
-                                        <fr:checkbox-input ref="$request/is-soap">
-                                            <xf:label ref="$resources/dialog-http-services/soap-submission/label"/>
-                                            <xf:hint ref="$resources/dialog-http-services/soap-submission/hint"/>
+                                    <xh:td colspan="2">
+                                        <fr:checkbox-input ref="$request/is-binary-response">
+                                            <xf:label ref="$resources/dialog-http-services/is-binary-response/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/is-binary-response/hint"/>
                                         </fr:checkbox-input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input ref="$request/soap-action" incremental="true">
-                                            <xf:label ref="$resources/dialog-http-services/soap-action/label"/>
-                                            <xf:hint ref="$resources/dialog-http-services/soap-action/hint"/>
-                                        </xf:input>
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
@@ -763,6 +749,20 @@
                                             <xf:label ref="$resources/dialog-http-services/password/label"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:secret>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:checkbox-input ref="$request/is-soap">
+                                            <xf:label ref="$resources/dialog-http-services/soap-submission/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-submission/hint"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$request/soap-action" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/soap-action/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-action/hint"/>
+                                        </xf:input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

@@ -32,7 +32,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         super(uri, localname, qName, attributes, matched, handlerContext);
     }
 
-    private static final String ENCLOSING_ELEMENT_NAME = "a";
+    private static final String ENCLOSING_ELEMENT_NAME = "button";
 
     public void handleControlStart() throws SAXException {
 
@@ -42,23 +42,20 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         final AttributesImpl htmlAnchorAttributes =
             getEmptyNestedControlAttributesMaybeWithId(getEffectiveId(), triggerControl, true);
 
-        htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0");
-        htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "button");
-        // https://github.com/orbeon/orbeon-forms/issues/4210
-        htmlAnchorAttributes.addAttribute("", "href"    , "href"    , XMLReceiverHelper.CDATA, "#");
+        htmlAnchorAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "btn-link");
 
         // Output xxf:* extension attributes
         triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());
 
-        // xhtml:a
+        // xhtml:button
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
-        final String aQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
-        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, htmlAnchorAttributes);
+        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
+        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, spanQName, htmlAnchorAttributes);
         {
             final String labelValue = getTriggerLabel(triggerControl);
             final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
             outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, scala.Option.apply(triggerControl.getLocationData()), xmlReceiver);
         }
-        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
+        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, spanQName);
     }
 }

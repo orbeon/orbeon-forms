@@ -88,11 +88,11 @@
                 vertical-align: top;            // Avoid space at the bottom (http://stackoverflow.com/q/36146704/5295)
 
                 // <a> is collapsible section, <output> for non-collapsible
-                a, .xforms-output-output {
+                .btn-link, .xforms-output-output {
                     display: table-cell;        // So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
                 }
-                a {
+                .btn-link {
                     text-decoration: none;
                     color: @frHeaderColor;      // Don't use the default styling for anchors
                 }

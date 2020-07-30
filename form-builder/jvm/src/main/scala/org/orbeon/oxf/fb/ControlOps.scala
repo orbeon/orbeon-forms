@@ -495,16 +495,23 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
   def writeAndNormalizeMip(
-    controlName : String,
-    mip         : MIP, // `CalculateMIP | ValidateMIP` depending on caller
-    mipValue    : String)(implicit
-    ctx         : FormBuilderDocContext
+    controlNameOpt : Option[String],
+    mip            : MIP, // `CalculateMIP | ValidateMIP` depending on caller
+    mipValue       : String)(implicit
+    ctx            : FormBuilderDocContext
   ): Unit = {
-    findControlByName(ctx.formDefinitionRootElem, controlName) foreach { control =>
 
-      // Get or create the bind element
-      val bindElem = ensureBinds(findContainerNamesForModel(control) :+ controlName)
+    val bindElemOpt =
+      controlNameOpt match {
+        case Some(controlName) =>
+          findControlByName(ctx.formDefinitionRootElem, controlName) map { control =>
+            ensureBinds(findContainerNamesForModel(control) :+ controlName)
+          }
+        case None =>
+          FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, Names.FormBinds)
+      }
 
+    bindElemOpt foreach {bindElem =>
       val valueOpt =
         normalizeMipValue(
           mip          = mip,

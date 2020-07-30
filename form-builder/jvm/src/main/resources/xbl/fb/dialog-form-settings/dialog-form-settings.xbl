@@ -118,6 +118,11 @@
                 </xf:action>
 
                 <xf:setvalue
+                    iterate="'relevant', 'readonly'"
+                    ref="$i/*[name() = context()]"
+                    value="event(context())"/>
+
+                <xf:setvalue
                     ref="$i/html-page-layout"
                     value="(event('html-page-layout')[. = ('fixed', 'fluid')], 'default')[1]"/>
 
@@ -311,6 +316,8 @@
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
                     <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
                     <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
+                    <xf:property name="relevant"                      value="$i/relevant/string()"/>
+                    <xf:property name="readonly"                      value="$i/readonly/string()"/>
                     <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
                     <xf:property name="analysis-calculate"            value="$i/analysis-calculate/string()"/>
 
@@ -374,6 +381,8 @@
                         <wizard-subsections-toc/>
                         <rendered-page-orientation/>
                         <rendered-page-size/>
+<!--                        <relevant/>-->
+                        <readonly/>
                         <html-page-layout/>
                         <attachment-max-size/>
                         <attachment-max-size-aggregate/>
@@ -456,6 +465,12 @@
                 <xf:bind
                     ref="data-migration"
                     relevant="fr:is-pe()"/>
+
+                <xf:bind
+                    ref="relevant | readonly"
+                    type="xxf:XPath2"
+                    xxf:whitespace="trim"
+                    required="false()"/>
 
                 <xf:instance id="dynamic" xxf:exclude-result-prefixes="#all">
                     <forms/>
@@ -908,6 +923,27 @@
                                                     <xf:value ref="@id"/>
                                                 </xf:itemset>
                                             </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+                            </fr:tab>
+
+                            <!-- Formulas -->
+                            <fr:tab visible="$is-form-settings">
+                                <fr:label ref="$resources/dialog-control-settings/tab-formulas/label"/>
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
+                                                <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
+                                                <xf:hint  ref="$resources/dialog-control-settings/readonly/hint" appearance="minimal"/>
+                                            </fb:boolean-or-formula>
+                                        </xh:td>
+                                        <xh:td>
+                                            <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
+                                                <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
+                                                <xf:hint  ref="$resources/dialog-control-settings/visibility/hint" appearance="minimal"/>
+                                            </fb:boolean-or-formula>
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>

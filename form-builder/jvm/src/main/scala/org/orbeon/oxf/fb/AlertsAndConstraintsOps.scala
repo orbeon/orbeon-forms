@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import cats.syntax.option._
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names
@@ -146,7 +147,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
         // NOTE: We could optimize further by taking this branch if there is no type or required validation.
-        writeAndNormalizeMip(controlName, mip, value)
+        writeAndNormalizeMip(controlName.some, mip, value)
         delete(existingElementValidations)
       case _ =>
         val nestedValidations =

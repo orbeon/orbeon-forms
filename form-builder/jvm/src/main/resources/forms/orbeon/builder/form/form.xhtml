@@ -622,6 +622,10 @@
                                                 origin="xf:element($n, event($n))"/>
                                         </xf:action>
 
+                                        <xf:action iterate="'relevant', 'readonly'" type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                                            fbf:writeAndNormalizeCalculatedMip((), ., event(.))
+                                        </xf:action>
+
                                         <xf:delete
                                             bind="analysis-calculate-bind"/>
                                         <xf:insert

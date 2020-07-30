@@ -936,15 +936,15 @@
                                         <xh:td>
                                             <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                                 <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
-                                                <xf:hint  ref="$resources/dialog-control-settings/readonly/hint" appearance="minimal"/>
+                                                <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                             </fb:boolean-or-formula>
                                         </xh:td>
-                                        <xh:td>
-                                            <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
-                                                <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
-                                                <xf:hint  ref="$resources/dialog-control-settings/visibility/hint" appearance="minimal"/>
-                                            </fb:boolean-or-formula>
-                                        </xh:td>
+<!--                                        <xh:td>-->
+<!--                                            <fb:boolean-or-formula ref="relevant" resources-ref="$resources">-->
+<!--                                                <xf:label ref="$resources/dialog-control-settings/visibility/label"/>-->
+<!--                                                <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>-->
+<!--                                            </fb:boolean-or-formula>-->
+<!--                                        </xh:td>-->
                                     </xh:tr>
                                 </fr:grid>
                             </fr:tab>

@@ -390,10 +390,7 @@
             </xf:group>
 
             <xh:div class="{if ($cant-take-upload) then 'xforms-hidden' else ''}">
-                <xh:div
-                    class="fr-attachment-drop">
-                    <xf:output value="xxf:r('drag')"/>
-                </xh:div>
+                <xf:output class="fr-attachment-drop" value="xxf:r('drag')"/>
                 <xf:upload
                     id="xf-upload"
                     class="fr-attachment-upload"

@@ -53,9 +53,8 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
   // NOTE: Use `WrappedArray` so that `Array` content comparison works
   case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: m.WrappedArray[Byte])
 
-  def convertFileItemContent(a: AnyRef) = a match {
-    case f: FileItem => FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, inputStreamToByteArray(f.getInputStream))
-    case other       => other
+  def convertFileItemContent(item: UploadItem): Either[String, FileItemContent] = item map { f =>
+    FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, inputStreamToByteArray(f.getInputStream))
   }
 
   def newTrustedUploadContext(body: Array[Byte]) = new UploadContext {
@@ -75,7 +74,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     def getContentLength     = -1 // this won't be used anyway
   }
 
-  def newRead(session: Session, maxSize: Long): (List[(String, AnyRef)], Option[String]) = {
+  def newRead(session: Session, maxSize: Long): (List[(String, Either[String, FileItemContent])], Option[String]) = {
 
     val uploadContext = newTrustedUploadContext(body)
 
@@ -101,8 +100,8 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustSucceedWithLimits = List(-1L, 8326L, 10000L)
 
     val expectedPairs = List(
-      Constants.UuidFieldName -> UUID,
-      FieldName               -> FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables)
+      Constants.UuidFieldName -> Left(UUID),
+      FieldName               -> Right(FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables))
     )
 
     for (limit <- MustSucceedWithLimits) {
@@ -145,7 +144,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
     val MustFailWithLimits = List(0, 4097, 8000)// NOTE: any value under 4096 is the same as 4096 (buffer size)
 
     val expectedPairs = List(
-      Constants.UuidFieldName -> UUID
+      Constants.UuidFieldName -> Left(UUID)
     )
 
     for (limit <- MustFailWithLimits) {

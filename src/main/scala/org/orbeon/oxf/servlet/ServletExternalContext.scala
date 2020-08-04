@@ -146,10 +146,10 @@ class ServletExternalContext(
           )
 
         // Decode the multipart data
-        val result = Multipart.getParameterMapMultipart(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)
+        val result = Multipart.getParameterMapMultipartJava(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)
         // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
         getParameterMapMultipartFormDataCalled = true
-        result.asJava
+        result
       } else {
         // Set the input character encoding before getting the stream as this can cause issues with Jetty
         handleInputEncoding()

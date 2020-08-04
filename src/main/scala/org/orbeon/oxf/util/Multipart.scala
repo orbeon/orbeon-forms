@@ -244,7 +244,7 @@ object Multipart {
               }
             )
           } catch {
-            // Clean-up FileItem right away in case of failure
+            // Clean-up `FileItem` right away in case of failure
             case NonFatal(t) =>
               runQuietly(fileItem.delete())
               throw t

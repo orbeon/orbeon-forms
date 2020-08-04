@@ -102,10 +102,10 @@ object AttachmentMultiple {
           def removeClass() =
             dropElem.classList.remove("fr-attachment-dragover")
 
-          def addDropListener(name: String, fn: dom.raw.DragEvent => Unit): Unit =
+          def addListenerOnDropElem(name: String, fn: dom.raw.DragEvent => Unit): Unit =
             EventSupport.addListener(dropElem, name, fn)
 
-          addDropListener(
+          addListenerOnDropElem(
             "drop",
             ev => {
               removeClass()
@@ -125,18 +125,10 @@ object AttachmentMultiple {
             }
           )
 
-          // Necessary to indicate the drop target
-          addDropListener(
+          addListenerOnDropElem(
             "dragover",
             ev => {
-              ev.preventDefault()
-            }
-          )
-
-          addDropListener(
-            "dragenter",
-            ev => {
-              ev.preventDefault()
+              ev.preventDefault() // Necessary to indicate the drop target
               // "add an entry to L consisting of the string "Files""
               if (ev.dataTransfer.types contains "Files") {
                 scribe.debug(s"${ev.`type`} with files")
@@ -145,7 +137,7 @@ object AttachmentMultiple {
             }
           )
 
-          addDropListener(
+          addListenerOnDropElem(
             "dragleave", // doesn't seem like `dragexit` is a thing anymore
             ev => {
               scribe.debug(ev.`type`)

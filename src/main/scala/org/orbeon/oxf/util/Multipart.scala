@@ -23,12 +23,13 @@ import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
+import shapeless.syntax.typeable._
 
 import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
@@ -202,12 +203,13 @@ object Multipart {
         try {
 
           val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName).asInstanceOf[DiskFileItem]
+
           try {
 
             // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
             for {
               fisHeaders     <- Option(fis.getHeaders) // `getHeaders` can be null
-              headersSupport <- collectByErasedType[FileItemHeadersSupport](fileItem)
+              headersSupport <- fileItem.cast[FileItemHeadersSupport]
             } locally {
               headersSupport.setHeaders(fisHeaders)
             }

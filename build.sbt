@@ -20,6 +20,7 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
+val ShapelessVersion              = "2.3.3"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -51,6 +52,7 @@ val LiferayPortalKernelVersion    = "5.3.0"
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
+  "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
   "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,

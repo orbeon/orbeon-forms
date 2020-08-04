@@ -81,7 +81,13 @@ object LabelEditor {
           val labelInput = $("<input class='fb-edit-section-label'/>")
           $(".fb-main").append(labelInput)
           labelInput.on("blur", () => asUnit { if (labelInput.is(":visible")) sendNewLabelValue() })
-          labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit { if (e.which == 13) sendNewLabelValue() })
+          labelInput.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit {
+            if (e.which == 13) {
+              // Avoid "enter" from being dispatched to other control that might get the focus
+              e.preventDefault()
+              sendNewLabelValue()
+            }
+          })
           AjaxClient.ajaxResponseProcessed.add(_ => labelInput.hide())
           labelInputOpt = labelInput
           labelInput

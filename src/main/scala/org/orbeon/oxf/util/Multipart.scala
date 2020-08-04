@@ -103,9 +103,7 @@ object Multipart {
       case (nameValues, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListener {
-          def contextDestroyed(success: Boolean) = quietlyDeleteFileItems(nameValues)
-        })
+        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValues))
 
         val foldedValues =
           nameValues map { case (k, v) => k -> v.fold(identity, identity) }
@@ -277,7 +275,7 @@ object Multipart {
       }
     }
 
-    def asScalaIterator(i: FileItemIterator) = new Iterator[FileItemStream] {
+    def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
       def hasNext = i.hasNext
       def next()  = i.next()
       override def toString = "Iterator wrapping FileItemIterator" // super.toString is dangerous when running in a debugger

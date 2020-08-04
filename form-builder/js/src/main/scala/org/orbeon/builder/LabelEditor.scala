@@ -32,7 +32,7 @@ object LabelEditor {
   locally {
 
     val SectionTitleSelector = ".fr-section-title:first"
-    val SectionLabelSelector = ".fr-section-label:first a, .fr-section-label:first .xforms-output-output"
+    val SectionLabelSelector = ".fr-section-label:first .btn-link, .fr-section-label:first .xforms-output-output"
 
     var labelInputOpt: js.UndefOr[JQuery] = js.undefined
 

@@ -85,7 +85,7 @@ object BlockCache {
                 .getOrElse(section)
             // Handle both collapsible and non-collapsible title
             // https://github.com/orbeon/orbeon-forms/issues/3530
-            titleAnchor = section.find(".fr-section-title .fr-section-label").find("a, .xforms-output-output")
+            titleAnchor = section.find(".fr-section-title .fr-section-label").find(".btn-link, .xforms-output-output")
             if titleAnchor.length > 0
           } yield
             Block(

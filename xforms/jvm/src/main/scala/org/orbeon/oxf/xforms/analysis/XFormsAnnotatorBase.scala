@@ -17,13 +17,15 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
+import org.orbeon.xforms.Constants.DocumentId
 import org.xml.sax.{Attributes, Locator}
 import shapeless.syntax.typeable._
 
 abstract class XFormsAnnotatorBase(
   templateReceiver  : XMLReceiver,
   extractorReceiver : XMLReceiver,
-  metadata          : Metadata
+  metadata          : Metadata,
+  isTopLevel        : Boolean
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents {
 
@@ -192,6 +194,9 @@ abstract class XFormsAnnotatorBase(
       templateReceiver.startDocument()
     if (extractorReceiver ne null)
       extractorReceiver.startDocument()
+
+    // https://github.com/orbeon/orbeon-forms/issues/153
+    metadata.addNamespaceMapping(rewriteId(DocumentId), Map.empty)
   }
 
   override def endDocument(): Unit = {

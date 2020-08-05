@@ -15,6 +15,7 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.CellOps
 import org.orbeon.oxf.fr.ClientNames._
+import org.orbeon.polyfills.HTMLPolyfills._
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -31,8 +32,8 @@ object HtmlElementCell {
     def parent         (u: Element)                   : Element            = u.parentElement
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
-    def cellsForGrid   (u: Element)                   : List[html.Element] = u.firstElementChild.firstElementChild.children.to(List).asInstanceOf[List[html.Element]]
-    def gridForCell    (u: Element)                   : Element            = parent(parent(parent(u)))
+    def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAll(".fr-grid-td").to(List).asInstanceOf[List[html.Element]]
+    def gridForCell    (u: Element)                   : Element            = u.closest(".fr-grid-body").get
 
     def maxGridWidth(u: Element): Int =
       if (u.firstElementChild.classList.contains("fr-grid-24")) 24 else 12

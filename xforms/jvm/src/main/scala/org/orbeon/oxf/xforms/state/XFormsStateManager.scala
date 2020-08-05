@@ -47,12 +47,11 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
   // This must be called once exactly when the session is destroyed
-  def sessionDestroyed(session: ExternalContext.Session): Unit = {
-    XFormsStateManager.getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid =>
+  def sessionDestroyed(session: ExternalContext.Session): Unit =
+    getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid =>
       XFormsDocumentCache.remove(uuid)
       EhcacheStateStore.removeDynamicState(uuid)
     }
-  }
 
   val LogType = "state manager"
   val Logger  = Loggers.getIndentedLogger("state")
@@ -94,7 +93,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     if (containingDocument.getStaticState.isClientStateHandling || ! containingDocument.isSessionHeartbeat) {
       -1L
     } else {
-        // 80% of session expiration time, in ms
+      // 80% of session expiration time, in ms
       externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 800
     }
 
@@ -150,7 +149,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
     // which is not desirable. Further, we now have a lock stored in the session.
     val lock =
-      XFormsStateManager.getDocumentLock(uuid) getOrElse
+      getDocumentLock(uuid) getOrElse
         (throw SessionExpiredException("Unknown form document requested."))
 
     // Lock document for at most the max retry delay plus an increment
@@ -189,7 +188,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     containingDocument   : XFormsContainingDocument,
     keepDocument         : Boolean,
     disableDocumentCache : Boolean
-  ): Unit = {
+  ): Unit =
     if (keepDocument) {
       // Re-add document to the cache
       Logger.logDebug(LogType, "Keeping document in cache.")
@@ -200,9 +199,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
       // Remove all information about this document from the session
       val uuid = containingDocument.getUUID
       removeUuidFromSession(uuid)
-      XFormsStateManager.removeSessionDocument(uuid)
+      removeSessionDocument(uuid)
     }
-  }
 
   // Find or restore a document based on an incoming request.
   // NOTE: If found in cache, document is removed from cache.
@@ -272,10 +270,10 @@ object XFormsStateManager extends XFormsStateLifecycle {
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
 
   def createDocumentFromStore(
-      parameters     : RequestParameters,
-      isInitialState : Boolean,
-      disableUpdates : Boolean
-    ): XFormsContainingDocument = {
+    parameters     : RequestParameters,
+    isInitialState : Boolean,
+    disableUpdates : Boolean
+  ): XFormsContainingDocument = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
@@ -304,10 +302,10 @@ object XFormsStateManager extends XFormsStateLifecycle {
   }
 
   def getStateFromParamsOrStore(
-      parameters      : RequestParameters,
-      isInitialState  : Boolean)(implicit
-      externalContext : ExternalContext
-    ): XFormsState = {
+    parameters      : RequestParameters,
+    isInitialState  : Boolean)(implicit
+    externalContext : ExternalContext
+  ): XFormsState = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 

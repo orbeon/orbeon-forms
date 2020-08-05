@@ -830,11 +830,11 @@ trait ContainingDocumentCacheable extends Cacheable {
   self: XFormsContainingDocument =>
 
   def added(): Unit =
-    XFormsStateManager.instance.onAddedToCache(getUUID)
+    XFormsStateManager.onAddedToCache(getUUID)
 
   // WARNING: This can be called while another threads owns this document lock
   def removed(): Unit =
-    XFormsStateManager.instance.onRemovedFromCache(getUUID)
+    XFormsStateManager.onRemovedFromCache(getUUID)
 
   // Return lock or `null` in case session just expired
   def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(getUUID)
@@ -844,5 +844,5 @@ trait ContainingDocumentCacheable extends Cacheable {
   // the lock on the document first and will not evict us if we have the lock. This means that this will be called
   // only if no thread is dealing with this document.
   def evicted(): Unit =
-    XFormsStateManager.instance.onEvictedFromCache(self)
+    XFormsStateManager.onEvictedFromCache(self)
 }

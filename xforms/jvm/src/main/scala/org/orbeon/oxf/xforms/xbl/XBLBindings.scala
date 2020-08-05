@@ -174,7 +174,7 @@ class XBLBindings(
     containerScope : Scope
   ): Element = annotateSubtree1(
       Some(boundElement),
-      Dom4jUtils.createDocumentCopyParentNamespaces(element, false),
+      Dom4jUtils.createDocumentCopyParentNamespaces(element, detach = false),
       innerScope,
       outerScope,
       startScope,

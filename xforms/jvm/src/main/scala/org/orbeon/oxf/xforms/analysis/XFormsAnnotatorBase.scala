@@ -72,7 +72,7 @@ abstract class XFormsAnnotatorBase(
       startElement2(uri, localname, qName, atts)
     }
 
-    def endElement() = endElementName foreach {
+    def endElement(): Unit = endElementName foreach {
       case (uri, localname, qName) => endElement2(uri, localname, qName)
     }
 
@@ -178,7 +178,7 @@ abstract class XFormsAnnotatorBase(
   def doesClosestXHTMLRequireSeparatorAppearance =
     currentStackElement.ancestors find (_.isXHTML) exists (e => SeparatorAppearanceElements(e.localname))
 
-  override def setDocumentLocator(locator: Locator): Unit = {
+  def setDocumentLocator(locator: Locator): Unit = {
     this._documentLocator = locator
 
     if (keepLocationData) {
@@ -189,7 +189,7 @@ abstract class XFormsAnnotatorBase(
     }
   }
 
-  override def startDocument(): Unit = {
+  def startDocument(): Unit = {
     if (templateReceiver ne null)
       templateReceiver.startDocument()
     if (extractorReceiver ne null)
@@ -199,7 +199,7 @@ abstract class XFormsAnnotatorBase(
     metadata.addNamespaceMapping(rewriteId(DocumentId), Map.empty)
   }
 
-  override def endDocument(): Unit = {
+  def endDocument(): Unit = {
     if (templateReceiver ne null)
       templateReceiver.endDocument()
     if (extractorReceiver ne null)
@@ -210,7 +210,7 @@ abstract class XFormsAnnotatorBase(
   private def isOutputToTemplate =
     (templateReceiver ne null) && ! isInXBLBinding // && ! (inHead && inXForms && ! inTitle);
 
-  override def characters(ch: Array[Char], start: Int, length: Int): Unit =
+  def characters(ch: Array[Char], start: Int, length: Int): Unit =
     if (length > 0) {
       if (isOutputToTemplate)
         templateReceiver.characters(ch, start, length)
@@ -220,7 +220,7 @@ abstract class XFormsAnnotatorBase(
 
   def endPrefixMapping(prefix: String): Unit = ()
 
-  override def processingInstruction(target: String, data: String): Unit =
+  def processingInstruction(target: String, data: String): Unit =
     if (isInPreserve) {
       // Preserve comments within e.g. instances
       if (isOutputToTemplate)
@@ -229,7 +229,7 @@ abstract class XFormsAnnotatorBase(
         extractorReceiver.processingInstruction(target, data)
     }
 
-  override def comment(ch: Array[Char], start: Int, length: Int): Unit =
+  def comment(ch: Array[Char], start: Int, length: Int): Unit =
     if (isInPreserve) {
       // Preserve comments within e.g. instances
       if (isOutputToTemplate)

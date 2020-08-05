@@ -318,5 +318,5 @@ object ControlAnalysisFactory {
     factory map (_(context, controlElement, parent, preceding, scope))
   }
 
-  def isVariable(qName: QName) = variableFactory.contains(qName)
+  def isVariable(qName: QName): Boolean = variableFactory.contains(qName)
 }

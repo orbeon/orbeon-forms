@@ -350,7 +350,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         }
 
         // Check for preserved content
-        if (!inPreserve) {
+        if (! inPreserve) {
             if (inXForms) {
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other xf: check for labels, xf:instance, and xs:schema

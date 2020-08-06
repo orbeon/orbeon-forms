@@ -347,7 +347,8 @@ body.orbeon {
         z-index: 2000; // because YUI dialogs are > 1000
 
         // <a> nested one more level
-        > li > span > a {
+        > li > span > a,
+        > li > span > .btn-link {
             display: block;
             padding: 3px 20px;
             clear: both;
@@ -358,12 +359,16 @@ body.orbeon {
             text-decoration: none;
         }
 
-        a {
+        a,
+        .btn-link {
             text-decoration: none;
+            width: 100%;
+            text-align: left;
         }
 
         // Restore regular icons for disabled menu items (they are opacified instead, see .opacity() above)
-        > li.disabled > a:hover > [class^="icon-"] {
+        > li.disabled > a:hover > [class^="icon-"],
+        > li.disabled > .btn-link:hover > [class^="icon-"] {
             background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings.png);
         }
     }
@@ -371,8 +376,11 @@ body.orbeon {
     // Hover state
     // -----------
     .dropdown-menu > li > span > a:hover,
+    .dropdown-menu > li > span > .btn-link:hover,
     .dropdown-menu > li > span > a:focus,
-    .dropdown-submenu:hover > a {
+    .dropdown-menu > li > span > .btn-link:focus,
+    .dropdown-submenu:hover > a,
+    .dropdown-submenu:hover > .btn-link {
       text-decoration: none;
       color: @dropdownLinkColorHover;
       background-color: @dropdownLinkBackgroundHover;
@@ -382,7 +390,9 @@ body.orbeon {
     // Active state
     // ------------
     .dropdown-menu > .active > span > a,
-    .dropdown-menu > .active > span > a:hover {
+    .dropdown-menu > .active > span > .btn-link,
+    .dropdown-menu > .active > span > a:hover,
+    .dropdown-menu > .active > span > .btn-link:hover {
       color: @dropdownLinkColorHover;
       text-decoration: none;
       outline: 0;
@@ -394,11 +404,14 @@ body.orbeon {
     // --------------
     // Gray out text and ensure the hover state remains gray
     .dropdown-menu > .disabled > span > a,
-    .dropdown-menu > .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > .btn-link,
+    .dropdown-menu > .disabled > span > a:hover,
+    .dropdown-menu > .disabled > span > .btn-link:hover {
       color: @grayLight;
     }
     // Nuke hover effects
-    .dropdown-menu > .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > a:hover,
+    .dropdown-menu > .disabled > span > .btn-link:hover {
       text-decoration: none;
       background-color: transparent;
       background-image: none;

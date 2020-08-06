@@ -151,6 +151,21 @@
                     <_ filename="" mediatype="" size=""/>
                 </xf:instance>
 
+                <!-- Propagate `base64Binary` -->
+                <xf:bind
+                    ref="
+                        if (
+                            local-name-from-QName(
+                                xxf:type(
+                                    xxf:binding('fr-attachment')
+                                )
+                            ) = 'base64Binary'
+                        ) then
+                            instance()
+                        else
+                            ()"
+                    type="xf:base64Binary"/>
+
                 <!-- Manual copy of upload constraints from the bound node -->
                 <xf:bind
                     ref="instance()"
@@ -299,14 +314,14 @@
                 name="cant-take-upload"
                 value="
                     $readonly or
-                    (not(xxf:is-blank($binding)) and not($multiple))"/>
+                    (not(xxf:is-blank(string($binding))) and not($multiple))"/>
 
             <fr:dnd-repeat
                 ref="
                     if ($multiple) then
-                        $binding/_[xxf:non-blank()]
+                        $binding/_[xxf:non-blank(string(.))]
                     else
-                        $binding[xxf:non-blank()]">
+                        $binding[xxf:non-blank(string(.))]">
 
                 <xh:div class="xforms-dnd-item xforms-dnd-moves">
 
@@ -367,7 +382,7 @@
                         <xf:label><xh:i class="fa fa-fw fa-times"/></xf:label>
                         <xf:action event="DOMActivate">
                             <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
-                                upload:deleteFileIfPossible(.)
+                                upload:deleteFileIfPossible(string(.))
                             </xf:action>
                             <xf:delete
                                 if="$multiple"
@@ -385,7 +400,7 @@
 
             <xf:group
                 class="fr-attachment-empty"
-                ref="$binding[$view and (if ($multiple) then count(_[xxf:non-blank(.)]) = 0 else xxf:is-blank(.))]">
+                ref="$binding[$view and (if ($multiple) then count(_[xxf:non-blank(string(.))]) = 0 else xxf:is-blank(string(.)))]">
                 <xf:output value="xxf:r('empty')"/>
             </xf:group>
 
@@ -450,7 +465,7 @@
 
                         <xf:action if="not($multiple)">
                             <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
-                                upload:deleteFileIfPossible($binding)
+                                upload:deleteFileIfPossible(string($binding))
                             </xf:action>
                             <xf:setvalue
                                 ref="$binding"

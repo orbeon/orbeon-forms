@@ -1875,7 +1875,10 @@
 			var parsed = {},
 				setters_order = ['yyyy', 'yy', 'M', 'MM', 'm', 'mm', 'd', 'dd'],
 				setters_map = {
-					yyyy: function(d,v){
+					yyyy: function(d,v) {
+					    // We only support years on 4 digits; if more are provided, trim them
+                        if (v >= 10000)
+                            v = parseInt(v.toString().substring(0, 4));
 						return d.setUTCFullYear(assumeNearby ? applyNearbyYear(v, assumeNearby) : v);
 					},
 					m: function(d,v){

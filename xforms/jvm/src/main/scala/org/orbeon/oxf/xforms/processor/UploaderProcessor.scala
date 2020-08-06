@@ -40,7 +40,7 @@ class UploaderProcessor extends ProcessorImpl {
               // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
               // handle more than one here.
               val files = nameValues collect {
-                case (name, fileItem: FileItem) if fileItem.getName.nonAllBlank =>
+                case (name, Right(fileItem)) if fileItem.getName.nonAllBlank =>
 
                   // Get size before renaming below
                   val size = fileItem.getSize

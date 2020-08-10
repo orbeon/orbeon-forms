@@ -126,6 +126,9 @@ object Number {
       }
 
       override def destroy(): Unit = {
+
+        scribe.debug("destroy")
+
         $(companion.visibleInputElem).off()
         companion.visibleInputElem = null
       }

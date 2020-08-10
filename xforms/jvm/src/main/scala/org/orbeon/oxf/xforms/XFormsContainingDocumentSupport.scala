@@ -813,7 +813,7 @@ trait ContainingDocumentClientState {
         ScriptBuilder.buildJavaScriptInitialData(
           containingDocument   = this,
           rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
+          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
         )
       )
 

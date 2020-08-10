@@ -294,6 +294,11 @@
                                             <attribute name="id">
                                                 <data type="string"/>
                                             </attribute>
+                                            <optional>
+                                                <element name="xxf:destroy">
+                                                    <data type="string"/>
+                                                </element>
+                                            </optional>
                                             <element name="xxf:value">
                                                 <data type="string"/>
                                             </element>

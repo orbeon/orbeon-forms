@@ -52,34 +52,31 @@ object ScriptBuilder {
       write("}\n")
     }
 
-  def gatherJavaScriptInitializations(startControl: XFormsControl): List[(String, Option[String])] = {
+  def gatherJavaScriptInitializations(startControl: XFormsControl, includeValue: Boolean): List[(String, Option[String])] = {
 
     val controlsToInitialize = ListBuffer[(String, Option[String])]()
-
-    def addControlToInitialize(effectiveId: String, value: Option[String]) =
-      controlsToInitialize += effectiveId -> value
 
     Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
       case c: XFormsValueComponentControl =>
         if (c.isRelevant) {
           val abstractBinding = c.staticControl.abstractBinding
           if (abstractBinding.modeJavaScriptLifecycle)
-            addControlToInitialize(
-              c.getEffectiveId,
-              if (abstractBinding.modeExternalValue)
-                c.externalValueOpt
-              else
-                None
-            )
+            controlsToInitialize +=
+              c.getEffectiveId -> (
+                if (includeValue && abstractBinding.modeExternalValue)
+                  c.externalValueOpt
+                else
+                  None
+              )
         }
       case c: XFormsComponentControl =>
         if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
-          addControlToInitialize(c.getEffectiveId, None)
+          controlsToInitialize += c.getEffectiveId -> None
       case c =>
         // Legacy JavaScript initialization
-        // As of 2016-08-04: xxf:dialog, xf:select1[appearance = compact], xf:range
+        // As of 2016-08-04: `xxf:dialog`, `xf:select1[appearance = compact]`, `xf:range`
         if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
-          addControlToInitialize(c.getEffectiveId, None)
+          controlsToInitialize += c.getEffectiveId -> None
     }
 
     controlsToInitialize.result

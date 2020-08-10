@@ -909,17 +909,23 @@
                         }
 
                         function handleInnerHtml(elem) {
-
-                            var innerHTML = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
-                            var initElem  = childrenWithLocalName(elem, 'init')[0];
-                            var initValue = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
-                            var controlId = ORBEON.util.Dom.getAttribute(elem, "id");
+initElem
+                            var innerHTML    = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
+                            var initElem     = childrenWithLocalName(elem, 'init')[0];
+                            var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
+                            var destroyElem  = childrenWithLocalName(elem, 'destroy')[0];
+                            var destroyValue = _.isUndefined(destroyElem) ? null : ORBEON.util.Dom.getStringValue(destroyElem);
+                            var controlId    = ORBEON.util.Dom.getAttribute(elem, "id");
 
                             var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(controlId);
 
                             function endsWith(text, suffix) {
                               var index = text.lastIndexOf(suffix);
                               return index !== -1 && index + suffix.length === text.length;
+                            }
+
+                            if (destroyValue) {
+                                ORBEON.xforms.InitSupport.destroyJavaScriptControlsFromSerialized(destroyValue);
                             }
 
                             if (endsWith(prefixedId, "~iteration")) {
@@ -994,7 +1000,6 @@
                                 }
                             }
 
-                            // Handle initializations
                             if (initValue) {
                                 ORBEON.xforms.InitSupport.initializeJavaScriptControlsFromSerialized(initValue);
                             }

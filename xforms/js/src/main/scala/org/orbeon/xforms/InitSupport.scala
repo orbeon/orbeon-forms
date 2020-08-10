@@ -139,6 +139,16 @@ object InitSupport {
     }
 
   @JSExport
+  def destroyJavaScriptControlsFromSerialized(initData: String): Unit =
+    decode[List[rpc.Control]](initData) match {
+      case Left(_)  =>
+        // TODO: error
+        None
+      case Right(controls) =>
+        destroyJavaScriptControls(controls)
+    }
+
+  @JSExport
   def processRepeatHierarchyUpdateForm(formId: String, repeatTreeString: String): Unit = {
 
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
@@ -378,6 +388,19 @@ object InitSupport {
           } else if (classList.contains("xforms-range")) {
               // Legacy JavaScript initialization
               Init._range(control)
+          }
+        }
+      }
+
+    def destroyJavaScriptControls(controls: List[rpc.Control]): Unit =
+      controls foreach { case rpc.Control(id, _) =>
+        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
+          if (XBL.isComponent(control)) {
+            for {
+              instance <- Option(XBL.instanceForControl(control))
+            } locally {
+              instance.destroy()
+            }
           }
         }
       }

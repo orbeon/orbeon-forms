@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLSupport}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -243,16 +243,17 @@ object XFormsStaticStateImpl {
 
   // Create analyzed static state for the given static state document.
   // Used by XFormsToXHTML.
-  def createFromStaticStateBits(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
+  def createFromStaticStateBits(staticStateBits: StaticStateBits): XFormsStaticStateImpl = {
+
     val startScope = new Scope(None, "")
-    val staticStateDocument = new StaticStateDocument(staticStateXML)
+    val staticStateDocument = new StaticStateDocument(staticStateBits.staticStateDocument)
 
     new XFormsStaticStateImpl(
       staticStateDocument.asBase64,
-      digest,
+      staticStateBits.staticStateDigest,
       startScope,
-      metadata,
-      staticStateDocument.template map (_ => template),    // only keep the template around if needed
+      staticStateBits.metadata,
+      staticStateDocument.template map (_ => staticStateBits.template),    // only keep the template around if needed
       staticStateDocument
     )
   }

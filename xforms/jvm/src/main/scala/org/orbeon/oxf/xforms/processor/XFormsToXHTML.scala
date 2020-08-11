@@ -33,26 +33,26 @@ class XFormsToXHTML extends XFormsToSomething {
   import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
 
   protected def produceOutput(
-      pipelineContext      : PipelineContext,
-      outputName           : String,
-      externalContext      : ExternalContext,
-      indentedLogger       : IndentedLogger,
-      stage2CacheableState : XFormsToSomething.Stage2CacheableState,
-      containingDocument   : XFormsContainingDocument,
-      xmlReceiver          : XMLReceiver): Unit =
-    if (outputName == "document")
-      outputResponseDocument(
-        externalContext,
-        stage2CacheableState.template,
-        containingDocument,
-        xmlReceiver
-      )(indentedLogger)
-    else
-      testOutputResponseState(
-        containingDocument,
-        indentedLogger,
-        xmlReceiver
-      )
+    pipelineContext      : PipelineContext,
+    outputName           : String,
+    externalContext      : ExternalContext,
+    indentedLogger       : IndentedLogger,
+    template             : AnnotatedTemplate,
+    containingDocument   : XFormsContainingDocument,
+    xmlReceiver          : XMLReceiver): Unit =
+  if (outputName == "document")
+    outputResponseDocument(
+      externalContext,
+      template,
+      containingDocument,
+      xmlReceiver
+    )(indentedLogger)
+  else
+    testOutputResponseState(
+      containingDocument,
+      indentedLogger,
+      xmlReceiver
+    )
 }
 
 object XFormsToXHTML {

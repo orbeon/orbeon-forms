@@ -15,9 +15,7 @@ package org.orbeon.oxf.xforms.processor
 
 import java.{lang => jl}
 
-import javax.xml.transform.stream.StreamResult
-import org.orbeon.dom.Document
-import org.orbeon.io.StringBuilderWriter
+import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Credentials
@@ -25,14 +23,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.URIProcessorOutputImpl.{URIReferences, URIReferencesState}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils, NumberUtils, WhitespaceMatching}
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.{IdGenerator, Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
-import org.xml.sax.SAXException
 
 import scala.util.control.NonFatal
 
@@ -47,13 +42,13 @@ abstract class XFormsToSomething extends ProcessorImpl {
   import XFormsToSomething._
 
   protected def produceOutput(
-    pipelineContext      : PipelineContext,
-    outputName           : String,
-    externalContext      : ExternalContext,
-    indentedLogger       : IndentedLogger,
-    stage2CacheableState : Stage2CacheableState,
-    containingDocument   : XFormsContainingDocument,
-    xmlReceiver          : XMLReceiver
+    pipelineContext    : PipelineContext,
+    outputName         : String,
+    externalContext    : ExternalContext,
+    indentedLogger     : IndentedLogger,
+    template           : AnnotatedTemplate,
+    containingDocument : XFormsContainingDocument,
+    xmlReceiver        : XMLReceiver
   ): Unit
 
   addInputInfo(new ProcessorInputOutputInfo(InputAnnotatedDocument))
@@ -63,24 +58,23 @@ abstract class XFormsToSomething extends ProcessorImpl {
   /**
    * Case where an XML response must be generated.
    */
-  override def createOutput(outputName: String): ProcessorOutput = {
+  override def createOutput(outputName: String): ProcessorOutput =
+    addOutput(
+      outputName,
+      new URIProcessorOutputImpl(selfProcessor, outputName, InputAnnotatedDocument) {
 
-    val output = new URIProcessorOutputImpl(selfProcessor, outputName, InputAnnotatedDocument) {
+        def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
+          doIt(pipelineContext, xmlReceiver, this, outputName)
 
-      def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit =
-        doIt(pipelineContext, xmlReceiver, this, outputName)
+        override protected def supportsLocalKeyValidity = true
 
-      override protected def supportsLocalKeyValidity = true
-
-      // NOTE: As of 2010-03, caching of the output should never happen
-      // - more work is needed to make this work properly
-      // - not many use cases benefit
-      override def getLocalKeyValidity(pipelineContext: PipelineContext, uriReferences: URIReferences): ProcessorImpl.KeyValidity =
-        null
-    }
-    addOutput(outputName, output)
-    output
-  }
+        // NOTE: As of 2010-03, caching of the output should never happen
+        // - more work is needed to make this work properly
+        // - not many use cases benefit
+        override def getLocalKeyValidity(pipelineContext: PipelineContext, uriReferences: URIReferences): ProcessorImpl.KeyValidity =
+          null
+      }
+    )
 
   override def createInput(inputName: String): ProcessorInput =
     if (inputName == InputAnnotatedDocument) {
@@ -115,11 +109,8 @@ abstract class XFormsToSomething extends ProcessorImpl {
     val htmlLogger      = Loggers.getIndentedLogger("html")
     val cachingLogger   = Loggers.getIndentedLogger("cache")
 
-    val customTracer = pipelineContext.getAttribute("orbeon.cache.test.tracer").asInstanceOf[XFormsStaticStateCache.CacheTracer]
     val cacheTracer =
-      if (customTracer != null)
-        customTracer
-      else
+      Option(pipelineContext.getAttribute("orbeon.cache.test.tracer").asInstanceOf[XFormsStaticStateCache.CacheTracer]) getOrElse
         new LoggingCacheTracer(cachingLogger)
 
     val initializeXFormsDocument =
@@ -147,7 +138,8 @@ abstract class XFormsToSomething extends ProcessorImpl {
               selfProcessor.getState(pipelineContext).asInstanceOf[Stage2TransientState].stage1CacheableState = stage1CacheableState
 
               // Read static state from input
-              val (stage2CacheableState, staticState) = readStaticState(pipelineContext, cachingLogger, cacheTracer)
+              val (stage2CacheableState, staticState) =
+                readStaticState(readInputAsSAX(pipelineContext, InputAnnotatedDocument, _), cachingLogger, cacheTracer)
 
               // Create containing document and initialize XForms engine
               // NOTE: Create document here so we can do appropriate analysis of caching dependencies
@@ -168,11 +160,11 @@ abstract class XFormsToSomething extends ProcessorImpl {
                   initializeXFormsDocument
                 )
 
-              gatherInputDependencies(containingDocument, cachingLogger) foreach {
+              collectDependencies(containingDocument, cachingLogger) foreach {
                 case (url, credentialsOpt) => stage1CacheableState.addReference(null, url, credentialsOpt.orNull)
               }
 
-              containingDocumentOpt = Some(containingDocument)
+              containingDocumentOpt = containingDocument.some
               stage2CacheableState
             }
 
@@ -201,20 +193,21 @@ abstract class XFormsToSomething extends ProcessorImpl {
                   // Found static state in cache
                   cacheTracer.staticStateStatus(found = true, cachedState.digest)
                   cachedState
-                case _ =>
+                case other =>
                   // Not found static state in cache OR it is out of date, create static state from input
                   // NOTE: In out of date case, could clone static state and reprocess instead?
 
-                  //xxxxx just logging
-    //              if (cachedState != null)
-    //                cachingLogger.logDebug("", "out-of-date static state by digest in cache due to: " + cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava)
-                  val staticStateBits = new StaticStateBits(pipelineContext, cachingLogger, stage2CacheableState.staticStateDigest)
+                  other foreach { case (cachedState, _) =>
+                    cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava}")
+                  }
+
                   val staticState =
                     XFormsStaticStateImpl.createFromStaticStateBits(
-                      staticStateBits.staticStateDocument,
-                      stage2CacheableState.staticStateDigest,
-                      staticStateBits.metadata,
-                      staticStateBits.template
+                      StaticStateBits.fromXmlReceiver(
+                        stage2CacheableState.staticStateDigest.some,
+                        readInputAsSAX(pipelineContext, InputAnnotatedDocument, _))(
+                        cachingLogger
+                      )
                     )
                   cacheTracer.staticStateStatus(found = false, staticState.digest)
                   XFormsStaticStateCache.storeDocument(staticState)
@@ -244,7 +237,7 @@ abstract class XFormsToSomething extends ProcessorImpl {
 
       // Output resulting document
       if (initializeXFormsDocument)
-        produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState, containingDocument, xmlReceiver)
+        produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState.template, containingDocument, xmlReceiver)
 
       // Notify state manager
       // Scope because dynamic properties can cause lazy XPath evaluations
@@ -257,146 +250,15 @@ abstract class XFormsToSomething extends ProcessorImpl {
         throw new OXFException(t)
     }
   }
-
-  private def readStaticState(
-    pipelineContext : PipelineContext,
-    logger          : IndentedLogger,
-    cacheTracer     : XFormsStaticStateCache.CacheTracer
-  ): (Stage2CacheableState, XFormsStaticState) = {
-
-    val staticStateBits = new StaticStateBits(pipelineContext, logger, null)
-    val staticState =
-      XFormsStaticStateCache.findDocument(staticStateBits.staticStateDigest) match {
-        case Some((cachedState, _)) if cachedState.topLevelPart.metadata.bindingsIncludesAreUpToDate =>
-          cacheTracer.staticStateStatus(found = true, cachedState.digest)
-          cachedState
-        case _ =>
-          // Not found static state in cache OR it is out of date, create and initialize static state object
-          // xxxx logging
-  //        if (cachedState != null)
-  //          logger.logDebug("", "out-of-date static state by digest in cache due to: " + cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava)
-          val newStaticState = XFormsStaticStateImpl.createFromStaticStateBits(
-            staticStateBits.staticStateDocument,
-            staticStateBits.staticStateDigest,
-            staticStateBits.metadata,
-            staticStateBits.template
-          )
-          cacheTracer.staticStateStatus(found = false, newStaticState.digest)
-          XFormsStaticStateCache.storeDocument(newStaticState)
-          newStaticState
-      }
-
-    // Update input dependencies object
-    (new Stage2CacheableState(staticStateBits.staticStateDigest, staticStateBits.template), staticState)
-  }
-
-  private class StaticStateBits(
-    val pipelineContext           : PipelineContext,
-    val logger                    : IndentedLogger,
-    val existingStaticStateDigest : String
-  ) {
-
-    private val isLogStaticStateInput = XFormsProperties.getDebugLogging.contains("html-static-state")
-    private val computeDigest         = isLogStaticStateInput || existingStaticStateDigest == null
-
-    val metadata: Metadata = Metadata(new IdGenerator(1), isTopLevelPart = true)
-
-    logger.startHandleOperation("", "reading input", "existing digest", existingStaticStateDigest)
-
-    private val digestReceiver = if (computeDigest) new DigestContentHandler else null
-    val documentResult = new LocationDocumentResult
-    private val extractorOutput = {
-
-      val documentReceiver = TransformerUtils.getIdentityTransformerHandler
-      documentReceiver.setResult(documentResult)
-
-      if (isLogStaticStateInput)
-        if (computeDigest)
-          new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver(logger))
-        else
-          new TeeXMLReceiver(documentReceiver, getDebugReceiver(logger))
-      else
-        if (computeDigest)
-          new TeeXMLReceiver(documentReceiver, digestReceiver)
-        else
-          documentReceiver
-    }
-
-    // Read the input through the annotator and gather namespace mappings
-    //
-    // Output of annotator is:
-    // - annotated page template (TODO: this should not include model elements)
-    // - extractor
-    // Output of extractor is:
-    // - static state document
-    // - optionally: digest
-    // - optionally: debug output
-    val template: AnnotatedTemplate = AnnotatedTemplate(new SAXStore)
-
-    readInputAsSAX(
-      pipelineContext,
-      InputAnnotatedDocument,
-      new WhitespaceXMLReceiver(
-        new XFormsAnnotator(
-          this.template.saxStore,
-          new XFormsExtractor(
-            Option[XMLReceiver](
-              new WhitespaceXMLReceiver(
-                extractorOutput,
-                WhitespaceMatching.defaultBasePolicy,
-                WhitespaceMatching.basePolicyMatcher
-              )
-            ),
-            metadata,
-            Option[AnnotatedTemplate](template),
-            ".",
-            XXBLScope.Inner,
-            true,
-            false
-          ),
-          metadata,
-          true
-        ),
-        WhitespaceMatching.defaultHTMLPolicy,
-        WhitespaceMatching.htmlPolicyMatcher
-      )
-    )
-
-    val staticStateDocument: Document = documentResult.getDocument
-
-    val staticStateDigest: String =
-      if (computeDigest)
-        NumberUtils.toHexString(digestReceiver.getResult)
-      else
-        null
-
-    assert(! isLogStaticStateInput || existingStaticStateDigest == null || this.staticStateDigest == existingStaticStateDigest)
-
-    logger.endHandleOperation("computed digest", this.staticStateDigest)
-
-    private def getDebugReceiver(indentedLogger: IndentedLogger): ForwardingXMLReceiver = {
-      val identity = TransformerUtils.getIdentityTransformerHandler
-      val writer = new StringBuilderWriter(new jl.StringBuilder)
-      identity.setResult(new StreamResult(writer))
-      new ForwardingXMLReceiver(identity) {
-        @throws[SAXException]
-        override def endDocument(): Unit = {
-          super.endDocument()
-          // Log out at end of document
-          indentedLogger.logDebug("", "static state input", "input", writer.result)
-        }
-      }
-    }
-  }
 }
 
-object XFormsToSomething {
+private object XFormsToSomething {
 
-  private val InputAnnotatedDocument = "annotated-document"
-  private val OutputDocument         = "document"
+  val InputAnnotatedDocument = "annotated-document"
+  val OutputDocument         = "document"
 
   // What can be cached by the first stage: URI dependencies
-  private class Stage1CacheableState extends URIReferences
+  class Stage1CacheableState extends URIReferences
 
   // What can be cached by the second stage: SAXStore and static state
   class Stage2CacheableState(val staticStateDigest: String, val template: AnnotatedTemplate) extends URIReferences
@@ -405,11 +267,11 @@ object XFormsToSomething {
   // NOTE: This extends URIReferencesState because we use URIProcessorOutputImpl.
   // It is not clear that we absolutely need URIProcessorOutputImpl in the second stage, but right now we keep it,
   // because XFormsURIResolver requires URIProcessorOutputImpl.
-  private class Stage2TransientState extends URIReferencesState {
+  class Stage2TransientState extends URIReferencesState {
     var stage1CacheableState: Stage1CacheableState = null
   }
 
-  private def gatherInputDependencies(
+  def collectDependencies(
     containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
   ): Iterator[(String, Option[Credentials])] = {
@@ -456,5 +318,36 @@ object XFormsToSomething {
         yield ("oxf:" + include, None)
 
     instanceDependencies ++ xmlSchemaDependencies ++ xblBindingDependencies
+  }
+
+  def readStaticState(
+    read          : XMLReceiver => Unit,
+    cachingLogger : IndentedLogger,
+    cacheTracer   : XFormsStaticStateCache.CacheTracer
+  ): (Stage2CacheableState, XFormsStaticState) = {
+
+    val staticStateBits =
+      StaticStateBits.fromXmlReceiver(None, read)(cachingLogger)
+
+    val staticState =
+      XFormsStaticStateCache.findDocument(staticStateBits.staticStateDigest) match {
+        case Some((cachedState, _)) if cachedState.topLevelPart.metadata.bindingsIncludesAreUpToDate =>
+          cacheTracer.staticStateStatus(found = true, cachedState.digest)
+          cachedState
+        case other =>
+          // Not found static state in cache OR it is out of date, create and initialize static state object
+
+          other foreach { case (cachedState, _) =>
+            cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava}")
+          }
+
+          val newStaticState = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits)
+          cacheTracer.staticStateStatus(found = false, newStaticState.digest)
+          XFormsStaticStateCache.storeDocument(newStaticState)
+          newStaticState
+      }
+
+    // Update input dependencies object
+    (new Stage2CacheableState(staticStateBits.staticStateDigest, staticStateBits.template), staticState)
   }
 }

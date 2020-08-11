@@ -125,8 +125,6 @@ trait ModelInstances {
   lazy val instances: collection.Map[String, Instance] =
     m.LinkedHashMap(children collect { case instance: Instance => instance.staticId -> instance }: _*)
 
-  def instancesMap: util.Map[String, Instance] = instances.asJava
-
   // General info about instances
   lazy val hasInstances = instances.nonEmpty
   lazy val defaultInstanceOpt = instances.headOption map (_._2)

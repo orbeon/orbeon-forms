@@ -32,11 +32,8 @@ trait XFormsModelRebuildRecalculateRevalidate {
   def schemaValidator: XFormsModelSchemaValidator = _schemaValidator
   def hasSchema: Boolean = _schemaValidator.hasSchema
 
-  def getSchemaURIs: Array[String] =
-    if (hasSchema)
-      _schemaValidator.getSchemaURIs
-    else
-      null
+  def getSchemaURIs: Option[Array[String]] =
+    hasSchema option _schemaValidator.getSchemaURIs
 
   def markStructuralChange(instanceOpt: Option[XFormsInstance], defaultsStrategy: DefaultsStrategy): Unit = {
     deferredActionContext.markStructuralChange(defaultsStrategy, instanceOpt map (_.getId))

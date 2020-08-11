@@ -202,7 +202,7 @@ trait BindingMetadata extends Logging {
 
   def baselineResources          : (List[String], List[String]) = _baselineResources
   def allBindingsMaybeDuplicates : Iterable[AbstractBinding]    = bindingsByControlPrefixedId.values collect { case b: AbstractBinding => b }
-  def getBindingIncludesJava     : util.Set[String]             = bindingsPaths.asJava
+  def bindingIncludes            : Set[String]                  = bindingsPaths
 
   private def pathExistsAndIsUpToDate(path: String)(implicit rm: ResourceManager) = {
     val last = rm.lastModified(path, true)

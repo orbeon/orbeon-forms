@@ -201,9 +201,6 @@ trait ModelContainer {
   def defaultModel    = _models.headOption
   def getDefaultModel = _models.headOption.orNull
 
-  // Get a list of all the models in this container
-  def getModelsJava: JList[XFormsModel] = _models.asJava
-
   // Get a list of all the relevant models in this container and all sub-containers
   def allModels: Iterator[XFormsModel] =
     if (isRelevant)

@@ -30,8 +30,6 @@ case class AnnotatedTemplate(saxStore: SAXStore) {
 
 object AnnotatedTemplate {
 
-  def applyJava(saxStore: SAXStore) = AnnotatedTemplate(saxStore)
-  
   // Restore based on bytes
   def apply(bytes: Seq[Byte]): AnnotatedTemplate =
     AnnotatedTemplate(fromByteSeq[SAXStore](bytes))

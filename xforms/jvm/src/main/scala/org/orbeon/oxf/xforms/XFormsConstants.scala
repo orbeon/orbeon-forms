@@ -27,8 +27,6 @@ import org.orbeon.xforms.{EventNames, Namespaces}
 //
 object XFormsConstants {
 
-  val InnerScopeJava = XXBLScope.Inner
-
   val SeparateDeploymentTypeJava = DeploymentType.Separate
   val StandaloneDeploymentTypeJava = DeploymentType.Standalone
 

@@ -161,8 +161,6 @@ trait InstanceMetadata {
     Option(username) map (Credentials(_, password, preemptiveAuth, domain))
   }
 
-  def credentialsOrNull: Credentials = credentials.orNull
-
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
 
   // Inline root element if any

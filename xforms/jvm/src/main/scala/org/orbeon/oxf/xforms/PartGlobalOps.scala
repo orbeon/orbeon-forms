@@ -32,7 +32,6 @@ trait PartGlobalOps {
 
   // Models
   def getModelsForScope(scope: Scope): Seq[Model]
-  def jGetModelsForScope(scope: Scope) = getModelsForScope(scope).asJava
   def getInstances(modelPrefixedId: String): Seq[Instance]
 
   // Controls

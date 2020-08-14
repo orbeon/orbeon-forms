@@ -70,7 +70,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (relevant) {
       // Control is relevant
       // NOTE: Ugly test on staticControl is to handle the case of `xf:output` within LHHA
-      if ((_value eq null) || (staticControl eq null) || containingDocument.getXPathDependencies.requireValueUpdate(staticControl, effectiveId)) {
+      if ((_value eq null) || (staticControl eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, effectiveId)) {
         _value = null
         markExternalValueDirty()
       }

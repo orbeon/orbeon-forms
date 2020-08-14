@@ -80,7 +80,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                 expression,
                 staticVariable.valueNamespaceMapping,
                 bindingContext.getInScopeVariables(scopeModelVariables),
-                containingDocument.getFunctionLibrary,
+                containingDocument.functionLibrary,
                 functionContext,
                 null,
                 getLocationData,

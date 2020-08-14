@@ -224,7 +224,7 @@ object DataModel {
       case None =>
         // Value modified is not in an instance
         // Q: Is the code below the right thing to do?
-        containingDocument.getControls.markDirtySinceLastRequest(true)
+        containingDocument.controls.markDirtySinceLastRequest(true)
     }
 
   private def setValueForNode(node: dom.Node, newValue: String): Unit =

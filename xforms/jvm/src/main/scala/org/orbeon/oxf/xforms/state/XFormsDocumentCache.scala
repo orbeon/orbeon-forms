@@ -23,7 +23,7 @@ object XFormsDocumentCache {
 
   // Add a document to the cache using the document's UUID as cache key.
   def put(containingDocument: XFormsContainingDocument): Unit =
-    cache.add(createCacheKey(containingDocument.getUUID), ConstantValidity, containingDocument)
+    cache.add(createCacheKey(containingDocument.uuid), ConstantValidity, containingDocument)
 
   // Find a document in the cache. If found, the document is removed from the cache.
   def take(uuid: String): Option[XFormsContainingDocument] =

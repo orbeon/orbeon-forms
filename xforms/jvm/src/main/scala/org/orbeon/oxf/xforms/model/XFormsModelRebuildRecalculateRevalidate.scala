@@ -38,7 +38,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
   def markStructuralChange(instanceOpt: Option[XFormsInstance], defaultsStrategy: DefaultsStrategy): Unit = {
     deferredActionContext.markStructuralChange(defaultsStrategy, instanceOpt map (_.getId))
     // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter.
-    containingDocument.getXPathDependencies.markStructuralChange(selfModel, instanceOpt)
+    containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)
   }
 
   def markValueChange(nodeInfo: NodeInfo, isCalculate: Boolean): Unit = {
@@ -46,7 +46,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
     deferredActionContext.markValueChange(isCalculate)
     // Notify dependencies of the change
     if (nodeInfo ne null)
-      containingDocument.getXPathDependencies.markValueChanged(selfModel, nodeInfo)
+      containingDocument.xpathDependencies.markValueChanged(selfModel, nodeInfo)
   }
 
   // NOP now that deferredActionContext is always created
@@ -85,7 +85,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
         deferredActionContext.resetRebuild()
       }
     }
-    containingDocument.getXPathDependencies.rebuildDone(selfModel)
+    containingDocument.xpathDependencies.rebuildDone(selfModel)
   }
 
   // Recalculate and revalidate are a combined operation
@@ -103,7 +103,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
         try {
 
           doRecalculate(deferredActionContext.defaultsStrategy, collector)
-          containingDocument.getXPathDependencies.recalculateDone(selfModel)
+          containingDocument.xpathDependencies.recalculateDone(selfModel)
 
           // Validate only if needed, including checking the flags, because if validation state is clean, validation
           // being idempotent, revalidating is not needed.
@@ -111,7 +111,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
 
           mustRevalidate option {
             val invalidInstances = doRevalidate(collector)
-            containingDocument.getXPathDependencies.revalidateDone(selfModel)
+            containingDocument.xpathDependencies.revalidateDone(selfModel)
             invalidInstances
           }
         } finally {
@@ -167,7 +167,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
   // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
   // FIXME: See https://github.com/orbeon/orbeon-forms/issues/1650
   protected def doRefresh(): Unit =
-    if (containingDocument.getControls.isRequireRefresh)
+    if (containingDocument.controls.isRequireRefresh)
       container.synchronizeAndRefresh()
 
   private object Private {

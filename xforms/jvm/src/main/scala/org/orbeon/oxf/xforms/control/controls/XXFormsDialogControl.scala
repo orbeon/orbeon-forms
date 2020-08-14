@@ -102,8 +102,8 @@ class XXFormsDialogControl(
         localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
         localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
 
-        containingDocument.getControls.markDirtySinceLastRequest(true)
-        containingDocument.getControls.doPartialRefresh(this)
+        containingDocument.controls.markDirtySinceLastRequest(true)
+        containingDocument.controls.doPartialRefresh(this)
 
       case _: XXFormsDialogCloseEvent =>
 
@@ -112,8 +112,8 @@ class XXFormsDialogControl(
         localForUpdate.neighborControlId   = None
         localForUpdate.constrainToViewport = false
 
-        containingDocument.getControls.markDirtySinceLastRequest(false)
-        containingDocument.getControls.doPartialRefresh(this)
+        containingDocument.controls.markDirtySinceLastRequest(false)
+        containingDocument.controls.doPartialRefresh(this)
 
       case _ =>
     }

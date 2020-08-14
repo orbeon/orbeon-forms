@@ -206,7 +206,7 @@ private object AsynchronousSubmissionManager {
         threadPool
     }
 
-  def sessionKey(doc: XFormsContainingDocument): String = AsyncSubmissionsSessionKeyPrefix + doc.getUUID
+  def sessionKey(doc: XFormsContainingDocument): String = AsyncSubmissionsSessionKeyPrefix + doc.uuid
 
   def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
 

@@ -182,7 +182,7 @@ object SubmissionUtils {
 
         val boundRelevantPendingUploadControlsIt =
           for {
-            uploadControl <- doc.getControls.getCurrentControlTree.getUploadControls.iterator
+            uploadControl <- doc.controls.getCurrentControlTree.getUploadControls.iterator
             if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
             node          <- uploadControl.boundNodeOpt
             if (instance.model.findInstanceForNode(node) exists (_ eq instance))

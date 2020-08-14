@@ -51,11 +51,11 @@ class XFormsStateManagerTest
         def createDoc() = {
 
           val doc =
-            new XFormsContainingDocument(
+            XFormsContainingDocument(
               XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml"),
-              null,
-              null,
-              true
+              None,
+              None,
+              mustInitialize = true
             )
 
           XFormsStateManager.afterInitialResponse(doc, disableDocumentCache = false)
@@ -66,8 +66,8 @@ class XFormsStateManagerTest
         val docs = List(createDoc(), createDoc())
 
         docs foreach { doc =>
-          assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
-          assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
+          assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.uuid))
+          assert(doc eq XFormsDocumentCache.peekForTests(doc.uuid).get)
         }
 
         // Expire session
@@ -75,7 +75,7 @@ class XFormsStateManagerTest
 
         // Test that the document is no longer in cache
         docs foreach { doc =>
-          assert(XFormsDocumentCache.take(doc.getUUID).isEmpty)
+          assert(XFormsDocumentCache.take(doc.uuid).isEmpty)
         }
       }
     }
@@ -94,7 +94,7 @@ class XFormsStateManagerTest
       def apply(doc: XFormsContainingDocument): TestState =
         TestState(
           document           = doc,
-          uuid               = doc.getUUID,
+          uuid               = doc.uuid,
           staticStateString  = XFormsStateManager.getClientEncodedStaticState(doc),
           dynamicStateString = XFormsStateManager.getClientEncodedDynamicState(doc)
         )
@@ -108,7 +108,7 @@ class XFormsStateManagerTest
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
         // Initialize document and get initial document state
-        val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
+        val state1 = TestState(XFormsContainingDocument(staticState, None, None, mustInitialize = true))
 
         locally {
 
@@ -170,7 +170,7 @@ class XFormsStateManagerTest
 
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
-        val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
+        val state1 = TestState(XFormsContainingDocument(staticState, None, None, mustInitialize = true))
 
         val initialDynamicStateString = {
           assert(state1.uuid.length === SecureUtils.HexIdLength)
@@ -182,7 +182,7 @@ class XFormsStateManagerTest
           DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState, isForceEncryption = false)
         }
 
-        assert(1 === state1.document.getSequence)
+        assert(1 === state1.document.sequence)
 
         val state2 = doUpdate(isCache, state1, doc =>
           List(
@@ -195,20 +195,20 @@ class XFormsStateManagerTest
 
         // UUID can't change
         assert(state1.uuid === state2.uuid)
-        assert(2 === state2.document.getSequence)
+        assert(2 === state2.document.sequence)
 
         assertEmptyClientState(state2)
 
         val state3 = doUpdate(isCache, state2, _ => Nil)
 
         assert(state1.uuid === state3.uuid)
-        assert(3 === state3.document.getSequence)
+        assert(3 === state3.document.sequence)
         assertEmptyClientState(state3)
 
         val state4 = getInitialState(state1, isCache)
 
         assert(state1.uuid === state4.uuid)
-        assert(1 === state4.document.getSequence)
+        assert(1 === state4.document.sequence)
         assertEmptyClientState(state4)
         assert(
           stripSequenceNumber(initialDynamicStateString) ===

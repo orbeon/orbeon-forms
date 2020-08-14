@@ -96,7 +96,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             xpathString        = caseref,
             namespaceMapping   = staticControl.namespaceMapping,
             variableToValueMap = bindingContext.getInScopeVariables,
-            functionLibrary    = containingDocument.getFunctionLibrary,
+            functionLibrary    = containingDocument.functionLibrary,
             functionContext    = newFunctionContext,
             baseURI            = null,
             locationData       = staticControl.locationData,
@@ -148,7 +148,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
           xpathString        = expr,
           namespaceMapping   = c.namespaceMapping,
           variableToValueMap = bindingContext.getInScopeVariables,
-          functionLibrary    = containingDocument.getFunctionLibrary,
+          functionLibrary    = containingDocument.functionLibrary,
           functionContext    = newFunctionContext,
           baseURI            = null,
           locationData       = c.locationData,
@@ -224,11 +224,11 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       if (isXForms11Switch) {
         // Partial refresh on the case that is being deselected
         // Do this after xforms-deselect is dispatched
-        containingDocument.getControls.doPartialRefresh(previouslySelectedCaseControl)
+        containingDocument.controls.doPartialRefresh(previouslySelectedCaseControl)
 
         // Partial refresh on the case that is being selected
         // Do this before xforms-select is dispatched
-        containingDocument.getControls.doPartialRefresh(caseControlToSelect)
+        containingDocument.controls.doPartialRefresh(caseControlToSelect)
       }
 
       // "2. Dispatching an xforms-select event to the case to be selected."

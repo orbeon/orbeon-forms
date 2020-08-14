@@ -230,7 +230,7 @@ object SubmissionParameters {
     val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
-    val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.isInitializing
+    val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
     val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventNameOrNull
     val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // XXFORMS_SUBMIT
@@ -302,7 +302,7 @@ object SubmissionParameters {
         new XPathContext(
           namespaceMapping   = staticSubmission.namespaceMapping,
           variableToValueMap = bindingContext.getInScopeVariables,
-          functionLibrary    = containingDocument.getFunctionLibrary,
+          functionLibrary    = containingDocument.functionLibrary,
           functionContext    = model.getContextStack.getFunctionContext(dynamicSubmission.getEffectiveId),
           baseURI            = null,
           locationData       = staticSubmission.locationData

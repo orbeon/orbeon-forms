@@ -228,7 +228,7 @@ public class XFormsUtils {
                             valueAttribute,
                             container.getNamespaceMappings(childElement),
                             contextStack.getCurrentBindingContext().getInScopeVariables(),
-                            container.getContainingDocument().getFunctionLibrary(),
+                            container.getContainingDocument().functionLibrary(),
                             contextStack.getFunctionContext(sourceEffectiveId),
                             null,
                             (LocationData) childElement.getData(),

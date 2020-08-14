@@ -33,5 +33,5 @@ class XFormsTextareaControl(
 
   // Replacement-based input sanitation
   override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] =
-    Option(containingDocument.getStaticState.sanitizeInput(externalValue))
+    Option(containingDocument.staticState.sanitizeInput(externalValue))
 }

@@ -158,7 +158,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // NOTE: Leave public for unit tests
   // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853.
   def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
-    doc.getStaticOps.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)) match {
+    doc.staticOps.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)) match {
       case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == XFormsId.getEffectiveIdSuffixParts(effectiveId).size - 1 =>
         XFormsId.getRelatedEffectiveId(effectiveId, repeat.iteration.get.staticId)
       case _ =>
@@ -341,7 +341,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         def allowFocusEvent(c: XFormsControl, e: XFormsEvent) =
           c.directlyFocusableControls.nonEmpty && (
             e.isInstanceOf[XFormsFocusEvent] ||
-              e.isInstanceOf[XXFormsBlurEvent] && (doc.getControls.getFocusedControl exists (_ eq c))
+              e.isInstanceOf[XXFormsBlurEvent] && (doc.controls.getFocusedControl exists (_ eq c))
           )
 
         (eventTarget, event) match {
@@ -456,7 +456,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
         // Whether an external event name is explicitly allowed by the configuration.
         def isExplicitlyAllowedExternalEvent = {
-          val externalEventsSet = doc.getStaticState.allowedExternalEvents
+          val externalEventsSet = doc.staticState.allowedExternalEvents
           ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsSet(event.name)
         }
 

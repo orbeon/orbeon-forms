@@ -448,7 +448,7 @@ class PathMapXPathDependencies(
           val maxDependentModelDepth =
             if (allDependentModelsPrefixedIdsIt.nonEmpty)
               allDependentModelsPrefixedIdsIt map { modelPrefixedId =>
-                containingDocument.getStaticOps.getControlAnalysis(modelPrefixedId).ancestorRepeatsAcrossParts.size
+                containingDocument.staticOps.getControlAnalysis(modelPrefixedId).ancestorRepeatsAcrossParts.size
               } max
             else
               0

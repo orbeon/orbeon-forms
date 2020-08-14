@@ -30,7 +30,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
@@ -107,7 +107,7 @@ object XFormsServer {
 
           withElement(localName = "action", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
 
-            val controls = containingDocument.getControls
+            val controls = containingDocument.controls
 
             // Output new controls values and associated information
             withElement(localName = "control-values", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
@@ -116,13 +116,13 @@ object XFormsServer {
                   // All events
                   // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                   val currentControlTree = controls.getCurrentControlTree
-                  val initialControlTree = initialContainingDocument.getControls.getCurrentControlTree
+                  val initialControlTree = initialContainingDocument.controls.getCurrentControlTree
                   // Make sure all xxf:dynamic will send full updates during control comparison
                   // Usually, xxf:dynamic records structural changes at each update. Here, we don't really
                   // know whether there were any, so we safely force structural changes. This ensures that the
                   // client will have all the necessary markup, and also prevents the comparator from choking when
                   // comparing incompatible trees.
-                  for (e <- containingDocument.getStaticOps.controlsByName("dynamic"))
+                  for (e <- containingDocument.staticOps.controlsByName("dynamic"))
                     containingDocument.addControlStructuralChange(e.prefixedId)
 
                   diffControls(
@@ -148,7 +148,7 @@ object XFormsServer {
             // Add repeat hierarchy update if needed
             // https://github.com/orbeon/orbeon-forms/issues/2891
             repeatHierarchyOpt foreach { repeatHierarchy =>
-              val newRepeatHierarchy = containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
+              val newRepeatHierarchy = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
               if (repeatHierarchy != newRepeatHierarchy) {
                 element(
                   localName = "repeat-hierarchy",
@@ -202,7 +202,7 @@ object XFormsServer {
 
             // Output focus instruction
             locally {
-              val afterFocusedControlOpt = containingDocument.getControls.getFocusedControl
+              val afterFocusedControlOpt = containingDocument.controls.getFocusedControl
 
               // The focus as known by the client, as far as we know: either the focus sent by the client in the
               // current request, or the focus information we kept since the previous request.
@@ -219,7 +219,7 @@ object XFormsServer {
                 case (Some(beforeFocusEffectiveId), None) =>
                   // Focus removed: notify the client only if the control still exists AND is visible
                   // See https://github.com/orbeon/orbeon-forms/issues/4113
-                  if (containingDocument.getControls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => ! Focus.isHidden(c)))
+                  if (containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => ! Focus.isHidden(c)))
                     outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
                 case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt =>
                   // There is a focused control and it is different from the focus as known by the client
@@ -569,7 +569,7 @@ class XFormsServer extends ProcessorImpl {
         case Some(containingDocument) =>
 
           val ignoreSequenceNumber   = ! isAjaxRequest
-          val expectedSequenceNumber = containingDocument.getSequence
+          val expectedSequenceNumber = containingDocument.sequence
 
           if (ignoreSequenceNumber || (parameters.sequenceOpt contains expectedSequenceNumber)) {
             // We are good: process request and produce new sequence number
@@ -591,11 +591,11 @@ class XFormsServer extends ProcessorImpl {
               // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In
               // most cases should get files here only in noscript mode, but there is a chance in script mode in
               // a 2-pass submission that some files could make it here as well.
-              val beforeFocusedControlIdOpt = containingDocument.getControls.getFocusedControl map (_.effectiveId)
+              val beforeFocusedControlIdOpt = containingDocument.controls.getFocusedControl map (_.effectiveId)
 
               val beforeRepeatHierarchyOpt =
-                containingDocument.getStaticOps.controlsByName("dynamic").nonEmpty option
-                  containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
+                containingDocument.staticOps.controlsByName("dynamic").nonEmpty option
+                  containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
 
               // Run events if any
               val eventsFindingsOpt = {
@@ -722,15 +722,14 @@ class XFormsServer extends ProcessorImpl {
             // This is a request for the previous response
             // Whatever happens when replaying, keep the document around so return a value
             Try {
-              assert(containingDocument.getLastAjaxResponse ne null)
+              assert(containingDocument.lastAjaxResponse.isDefined)
 
               val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
 
               LifecycleLogger.eventAssumingRequest("xforms", "replay response", List("uuid" -> parameters.uuid))
               withDebug("replaying previous Ajax response") {
                 try {
-                  // Write last response
-                  containingDocument.getLastAjaxResponse.replay(xmlReceiver)
+                  containingDocument.lastAjaxResponse foreach (_.replay(xmlReceiver))
                   debugResults(List("success" -> "true"))
                 } finally {
                   debugResults(List("success" -> "false"))

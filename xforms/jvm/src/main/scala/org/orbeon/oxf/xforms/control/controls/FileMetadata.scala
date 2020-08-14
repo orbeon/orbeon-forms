@@ -181,7 +181,7 @@ object FileMetadata {
   def progress(metadata: FileMetadata): Option[UploadProgress] =
     UploaderServer.getUploadProgress(
       NetUtils.getExternalContext.getRequest,
-      metadata.containingDocument.getUUID,
+      metadata.containingDocument.uuid,
       metadata.getEffectiveId
     ) filter
       (_.fieldName == metadata.getEffectiveId)

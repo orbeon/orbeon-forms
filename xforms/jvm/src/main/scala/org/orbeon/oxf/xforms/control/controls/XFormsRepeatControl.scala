@@ -193,7 +193,7 @@ class XFormsRepeatControl(
     // 3. Insert node into destination
     XFormsInsertAction.doInsert(
       /* containingDocument                = */ containingDocument,
-      /* indentedLogger                    = */ containingDocument.getControls.indentedLogger,
+      /* indentedLogger                    = */ containingDocument.controls.indentedLogger,
       /* positionAttribute                 = */ destinationBeforeAfter,
       /* collectionToBeUpdated             = */ destinationItemsCopy,
       /* insertContextNodeInfo             = */ null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
@@ -238,7 +238,7 @@ class XFormsRepeatControl(
 
     // NOTE: The following assumes the nodesets have changed
 
-    val controls = containingDocument.getControls
+    val controls = containingDocument.controls
 
     // Get current (new) nodeset
     val newRepeatItems     = bindingContext.nodeset.asScala
@@ -558,14 +558,14 @@ object XFormsRepeatControl {
   // Find the initial repeat indexes for the given doc
   def initialIndexes(doc: XFormsContainingDocument): m.LinkedHashMap[String, Int] =
     findIndexes(
-      doc.getControls.getCurrentControlTree,
-      doc.getStaticOps.repeats,
+      doc.controls.getCurrentControlTree,
+      doc.staticOps.repeats,
       _.initialLocal.asInstanceOf[XFormsRepeatControlLocal].index
     )
 
   // Find the current repeat indexes for the given doc
   def currentIndexes(doc: XFormsContainingDocument): m.LinkedHashMap[String, Int] =
-    findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getIndex)
+    findIndexes(doc.controls.getCurrentControlTree, doc.staticOps.repeats, _.getIndex)
 
   // Find the current repeat indexes for the given doc, as a string
   def currentNamespacedIndexesString(doc: XFormsContainingDocument): String = {
@@ -583,7 +583,7 @@ object XFormsRepeatControl {
   // This might be the same as the given control if it is within the repeat indexes chain, or another control if not
   def findControlFollowIndexes(control: XFormsControl): Option[XFormsControl] = {
     val doc  = control.containingDocument
-    val tree = doc.getControls.getCurrentControlTree
+    val tree = doc.controls.getCurrentControlTree
 
     val ancestorRepeatsFromRoot = control.staticControl.ancestorRepeatsAcrossParts.reverse
 
@@ -599,7 +599,7 @@ object XFormsRepeatControl {
   // Return all the controls with the same prefixed id as the control specified
   def findAllRepeatedControls(control: XFormsControl): Iterator[XFormsControl] = {
     val doc  = control.containingDocument
-    val tree = doc.getControls.getCurrentControlTree
+    val tree = doc.controls.getCurrentControlTree
 
     val controlPrefixedId = control.prefixedId
 

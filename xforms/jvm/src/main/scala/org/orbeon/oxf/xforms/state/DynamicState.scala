@@ -13,20 +13,21 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import collection.JavaConverters._
-import sbinary.Operations._
-import XFormsOperations._
-import XFormsProtocols._
-import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
-import org.orbeon.oxf.xforms._
-import control.Controls.ControlsIterator
 import org.orbeon.dom
-import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
+import org.orbeon.oxf.xforms.state.XFormsOperations._
+import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
+import sbinary.Operations._
+
+import scala.collection.JavaConverters._
 
 // Immutable representation of the dynamic state
 case class DynamicState(
@@ -56,17 +57,6 @@ case class DynamicState(
   def decodeInstances              = fromByteSeq[List[InstanceState]](instances)
   def decodeControls               = fromByteSeq[List[ControlState]](controls)
   def decodeDelayedEvents          = fromByteSeq[List[DelayedEvent]](delayedEvents)
-
-  // For Java callers
-  def decodeRequestPathJava        = requestPath.orNull
-  def decodeContainerTypeJava      = containerType.orNull
-  def decodeContainerNamespaceJava = containerNamespace.orNull
-  def decodePathMatchersJava       = decodePathMatchers.asJava
-  def decodeFocusedControlJava     = focusedControl.orNull
-  def decodePendingUploadsJava     = decodePendingUploads.asJava
-  def decodeLastAjaxResponseJava   = decodeLastAjaxResponse.orNull
-  def decodeInstancesJava          = decodeInstances.asJava
-  def decodeControlsJava           = decodeControls.asJava
 
   def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
 
@@ -167,27 +157,27 @@ case class DynamicState(
     document
   }
 
-  private def debug(): Unit = {
-    val bytes = toByteSeq(this)
-    println("  size: " + bytes.size)
-    println("   versionedPathMatchers: " + pathMatchers.size)
-    println("   pendingUploads: " + pendingUploads.size)
-    println("   instances: " + instances.size)
-    println("   controls: " + controls.size)
-    println("   lastAjaxResponse: " + lastAjaxResponse.size)
-
-    val decodedParts = Array(
-      decodePathMatchersJava.toArray,
-      decodeFocusedControlJava,
-      decodePendingUploadsJava,
-      decodeControlsJava,
-      decodeInstancesJava.toArray,
-      decodeLastAjaxResponseJava
-    )
-
-    val deserialized = fromByteSeq[DynamicState](bytes)
-    assert(this == deserialized)
-  }
+//  private def debug(): Unit = {
+//    val bytes = toByteSeq(this)
+//    println("  size: " + bytes.size)
+//    println("   versionedPathMatchers: " + pathMatchers.size)
+//    println("   pendingUploads: " + pendingUploads.size)
+//    println("   instances: " + instances.size)
+//    println("   controls: " + controls.size)
+//    println("   lastAjaxResponse: " + lastAjaxResponse.size)
+//
+//    val decodedParts = Array(
+//      decodePathMatchers.asJava.toArray,
+//      decodeFocusedControlJava,
+//      decodePendingUploadsJava,
+//      decodeControlsJava,
+//      decodeInstancesJava.toArray,
+//      decodeLastAjaxResponseJava
+//    )
+//
+//    val deserialized = fromByteSeq[DynamicState](bytes)
+//    assert(this == deserialized)
+//  }
 }
 
 // Minimal immutable representation of a serialized control
@@ -224,7 +214,7 @@ object DynamicState {
 
   // Create a DynamicState from a document
   def apply(document: XFormsContainingDocument): DynamicState =
-    apply(document, document.getControls.getCurrentControlTree.rootOpt)
+    apply(document, document.controls.getCurrentControlTree.rootOpt)
 
   // Create a DynamicState from a control
   def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {
@@ -263,8 +253,8 @@ object DynamicState {
     // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
     //    be something to experiment with.
     DynamicState(
-      uuid                = document.getUUID,
-      sequence            = document.getSequence,
+      uuid                = document.uuid,
+      sequence            = document.sequence,
       deploymentType      = Option(document.getDeploymentType) map (_.toString),
       requestMethod       = Option(document.getRequestMethod),
       requestContextPath  = Option(document.getRequestContextPath),
@@ -274,9 +264,9 @@ object DynamicState {
       containerType       = Option(document.getContainerType),
       containerNamespace  = Option(document.getContainerNamespace),
       pathMatchers        = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
-      focusedControl      = document.getControls.getFocusedControl map (_.getEffectiveId),
-      pendingUploads      = toByteSeq(document.getPendingUploads.asScala.toSet),
-      lastAjaxResponse    = toByteSeq(Option(document.getLastAjaxResponse)),
+      focusedControl      = document.controls.getFocusedControl map (_.getEffectiveId),
+      pendingUploads      = toByteSeq(document.getPendingUploads),
+      lastAjaxResponse    = toByteSeq(document.lastAjaxResponse),
       instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
       controls            = toByteSeq(controlsToSerialize),
       initialClientScript = document.initialClientScript,

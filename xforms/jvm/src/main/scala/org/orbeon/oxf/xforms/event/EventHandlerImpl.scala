@@ -363,10 +363,10 @@ object EventHandlerImpl extends Logging {
 
         val zeroOrOneControl =
           for {
-            controls           <- Option(containingDocument.getControls).toList
+            controls           <- Option(containingDocument.controls).toList
             effectiveControlId <-
               Controls.resolveControlsEffectiveIds(
-                containingDocument.getStaticOps,
+                containingDocument.staticOps,
                 controls.getCurrentControlTree,
                 targetObject.getEffectiveId,
                 handler.staticId,

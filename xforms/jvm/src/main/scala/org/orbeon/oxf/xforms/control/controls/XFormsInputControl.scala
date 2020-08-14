@@ -86,7 +86,7 @@ class XFormsInputControl(
     // formatted value
     format foreach { _ =>
       markExternalValueDirty()
-      containingDocument.getControls.markDirtySinceLastRequest(false)
+      containingDocument.controls.markDirtySinceLastRequest(false)
     }
 
     // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
@@ -101,7 +101,7 @@ class XFormsInputControl(
         case "boolean"       => normalizeBooleanString(externalValue)
         case "string" | null =>
           // Replacement-based input sanitation for string type only
-          containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
+          containingDocument.staticState.sanitizeInput(unformatTransform(externalValue))
         case _ =>
           unformatTransform(externalValue)
       }

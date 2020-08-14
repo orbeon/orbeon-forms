@@ -78,30 +78,30 @@ class XHTMLHeadHandler(
         )
       }
 
-    val ops = containingDocument.getStaticOps
+    val ops = containingDocument.staticOps
 
     val (baselineScripts, baselineStyles) = ops.baselineResources
     val (scripts, styles)                 = ops.bindingResources
 
     // Stylesheets
 
-    outputCSSResources(xhtmlPrefix, isMinimal, containingDocument.getStaticState.assets, styles, baselineStyles)
+    outputCSSResources(xhtmlPrefix, isMinimal, containingDocument.staticState.assets, styles, baselineStyles)
 
     // Scripts
     locally {
 
       // Linked JavaScript resources
-      outputJavaScriptResources(xhtmlPrefix, isMinimal, containingDocument.getStaticState.assets, scripts, baselineScripts)
+      outputJavaScriptResources(xhtmlPrefix, isMinimal, containingDocument.staticState.assets, scripts, baselineScripts)
 
       if (! containingDocument.isServeInlineResources) {
 
         // Static resources
-        if (containingDocument.getStaticOps.uniqueJsScripts.nonEmpty)
+        if (containingDocument.staticOps.uniqueJsScripts.nonEmpty)
           element(
             localName = "script",
             prefix    = xhtmlPrefix,
             uri       = XHTML_NAMESPACE_URI,
-            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.getStaticState.digest + ".js") :: StandaloneScriptBaseAtts)
+            atts      = ("src" -> (XFormsAssetServer.FormStaticResourcesPath + containingDocument.staticState.digest + ".js") :: StandaloneScriptBaseAtts)
           )
 
         // Dynamic resources
@@ -109,7 +109,7 @@ class XHTMLHeadHandler(
           localName = "script",
           prefix    = xhtmlPrefix,
           uri       = XHTML_NAMESPACE_URI,
-          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.getUUID + ".js") :: StandaloneScriptBaseAtts)
+          atts      = ("src" -> (XFormsAssetServer.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
         )
 
       } else {
@@ -120,7 +120,7 @@ class XHTMLHeadHandler(
           }
 
         // Scripts known statically
-        val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
+        val uniqueClientScripts = containingDocument.staticOps.uniqueJsScripts
 
         if (uniqueClientScripts.nonEmpty) {
           val sb = new StringBuilder
@@ -144,7 +144,7 @@ class XHTMLHeadHandler(
           buildJavaScriptInitialData(
             containingDocument   = containingDocument,
             rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-            controlsToInitialize = containingDocument.getControls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
+            controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
           )
         ) foreach
           writeContent

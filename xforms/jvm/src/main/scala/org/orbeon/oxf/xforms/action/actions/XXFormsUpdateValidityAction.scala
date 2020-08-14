@@ -57,7 +57,7 @@ object XXFormsUpdateValidityAction {
           // This is important as we don't have a guarantee that other changes will cause a refresh
           if (first) {
             val doc = initialControl.containingDocument
-            doc.getControls.cloneInitialStateIfNeeded()
+            doc.controls.cloneInitialStateIfNeeded()
             doc.requireRefresh()
             first = false
           }

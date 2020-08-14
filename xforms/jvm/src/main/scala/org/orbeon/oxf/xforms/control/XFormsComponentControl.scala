@@ -322,7 +322,7 @@ class XFormsComponentControl(
     if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
 
       if (update) {
-        containingDocument.getControls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
+        containingDocument.controls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
         clearChildren()
         destroyNestedContainer()
       }

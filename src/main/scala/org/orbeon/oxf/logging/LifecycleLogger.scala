@@ -14,8 +14,8 @@
 package org.orbeon.oxf.logging
 
 import java.util.concurrent.atomic.AtomicInteger
-import javax.servlet.http.{HttpServletRequest, HttpSession}
 
+import javax.servlet.http.{HttpServletRequest, HttpSession}
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.http.HttpMethod
@@ -135,10 +135,6 @@ object LifecycleLogger {
       event(req, source, s"end: $message", endParams)
     }
   }
-
-  def eventAssumingRequestJava(source: String, message: String, params: Array[String]): Unit =
-    try eventAssumingRequest(source, message, arrayToParams(params))
-    catch { case NonFatal(t) => logInternalError(t) }
 
   def eventAssumingRequest(source: String, message: String, params: Seq[(String, String)]): Unit =
     try event(NetUtils.getExternalContext.getRequest, source, message, params)

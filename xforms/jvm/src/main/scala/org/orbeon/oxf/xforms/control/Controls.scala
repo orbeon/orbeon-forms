@@ -38,7 +38,7 @@ object Controls {
   ): Option[XFormsControl] = {
 
     val bindingContext = containingDocument.getContextStack.resetBindingContext()
-    val rootControl    = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
+    val rootControl    = containingDocument.staticState.topLevelPart.getTopLevelControls.head
 
     buildTree(
       controlIndex,
@@ -193,14 +193,14 @@ object Controls {
   ): List[XFormsControl] = {
 
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceControlEffectiveId)
-    val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
+    val scope            = containingDocument.staticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
 
     for {
-      controls           <- Option(containingDocument.getControls).toList
+      controls           <- Option(containingDocument.controls).toList
       effectiveControlId <-
         resolveControlsEffectiveIds(
-          containingDocument.getStaticOps,
+          containingDocument.staticOps,
           controls.getCurrentControlTree,
           sourceControlEffectiveId,
           targetPrefixedId,
@@ -302,7 +302,7 @@ object Controls {
 
   // Update the container's and all its descendants' bindings
   def updateBindings(control: XFormsContainerControl): BindingUpdater = {
-    val xpathDependencies = control.containingDocument.getXPathDependencies
+    val xpathDependencies = control.containingDocument.xpathDependencies
     xpathDependencies.bindingUpdateStart()
 
     val startBindingContext =
@@ -322,7 +322,7 @@ object Controls {
     val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
     visitAllControls(containingDocument, updater)
 
-    containingDocument.getControls.getCurrentControlTree.rootOpt foreach
+    containingDocument.controls.getCurrentControlTree.rootOpt foreach
       logTreeIfNeeded("after full tree update")
 
     updater
@@ -337,7 +337,7 @@ object Controls {
 
     // Start with initial context
     private var bindingContext = startBindingContext
-    private val xpathDependencies = containingDocument.getXPathDependencies
+    private val xpathDependencies = containingDocument.xpathDependencies
 
     private var level = 0
     private var relevanceChangeLevel = -1
@@ -480,7 +480,7 @@ object Controls {
   // Visit all the controls
   // 2018-01-04: 1 use left
   def visitAllControls(containingDocument: XFormsContainingDocument, listener: XFormsControlVisitorListener): Unit =
-    visitSiblings(listener, containingDocument.getControls.getCurrentControlTree.children)
+    visitSiblings(listener, containingDocument.controls.getCurrentControlTree.children)
 
   // Iterator over the given control and its descendants
   class ControlsIterator(
@@ -537,10 +537,6 @@ object Controls {
   def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: => T): T =
     instancesControlsToRestore.withValue((instancesControls, topLevel))(body)
 
-  // Evaluate the body with InstancesControls in scope (Java callers)
-  def withDynamicStateToRestoreJava(instancesControls: InstancesControls, runnable: Runnable): Unit =
-    withDynamicStateToRestore(instancesControls, topLevel = true)(runnable.run())
-
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value
   def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState map (_._1)
@@ -595,5 +591,5 @@ object Controls {
   // Log a subtree of controls as XML
   private def logTreeIfNeeded(message: String)(control: XFormsControl): Unit =
     if (XFormsProperties.getDebugLogging.contains("control-tree"))
-      control.containingDocument.getControls.indentedLogger.logDebug(message, control.toXMLString)
+      control.containingDocument.controls.indentedLogger.logDebug(message, control.toXMLString)
 }

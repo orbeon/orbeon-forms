@@ -81,7 +81,7 @@ object SubmissionHeaders {
             avtCombine,
             xblContainer.getNamespaceMappings(headerElement),
             contextStack.getCurrentBindingContext.getInScopeVariables,
-            xblContainer.getContainingDocument.getFunctionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
+            xblContainer.getContainingDocument.functionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
             null,
             headerElement.getData.asInstanceOf[LocationData],
             xblContainer.getContainingDocument.getRequestStats.getReporter)

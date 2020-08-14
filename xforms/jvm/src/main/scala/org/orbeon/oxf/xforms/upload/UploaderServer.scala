@@ -167,7 +167,7 @@ object UploaderServer {
 
   def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
     request.sessionOpt foreach {
-      _.removeAttribute(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
+      _.removeAttribute(getProgressSessionKey(control.containingDocument.uuid, control.getEffectiveId))
     }
 
   // Public for tests

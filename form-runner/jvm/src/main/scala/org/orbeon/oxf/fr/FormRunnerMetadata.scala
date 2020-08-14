@@ -199,7 +199,7 @@ object FormRunnerMetadata {
 
     val doc = XFormsAPI.inScopeContainingDocument
 
-    val controls = doc.getControls.getCurrentControlTree.effectiveIdsToControls
+    val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap
@@ -297,7 +297,7 @@ object FormRunnerMetadata {
 
   def gatherRelevantControls(doc: XFormsContainingDocument): List[ControlDetails] = {
 
-    val controls = doc.getControls.getCurrentControlTree.effectiveIdsToControls
+    val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap

@@ -167,7 +167,7 @@ public class XFormsSubmissionUtils {
      * @param currentInstance       instance containing the nodes to check
      */
     public static void annotateBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        for (XFormsUploadControl currentUploadControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
+        for (XFormsUploadControl currentUploadControl : containingDocument.controls().getCurrentControlTree().getUploadControlsJava()) {
             if (currentUploadControl.isRelevant()) {
                 final scala.Option<NodeInfo> controlBoundNodeOpt = currentUploadControl.boundNodeOpt();
                 if (controlBoundNodeOpt.isDefined()) {

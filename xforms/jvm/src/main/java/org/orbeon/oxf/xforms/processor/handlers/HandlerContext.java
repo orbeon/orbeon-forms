@@ -77,7 +77,7 @@ public class HandlerContext {
 
         // Top-level part is containing document
         this.partAnalysisStack = new Stack<>();
-        this.partAnalysisStack.push(containingDocument.getStaticState().topLevelPart());
+        this.partAnalysisStack.push(containingDocument.staticState().topLevelPart());
     }
 
     public void pushPartAnalysis(PartAnalysis partAnalysis) {

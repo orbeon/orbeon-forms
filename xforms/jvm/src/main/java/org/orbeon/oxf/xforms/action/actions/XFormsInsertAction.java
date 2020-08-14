@@ -240,7 +240,7 @@ public class XFormsInsertAction extends XFormsAction {
             requireDefaultValues                                               &&
             modifiedInstanceOrNull != null                                     &&
             modifiedInstanceOrNull.model().staticModel().hasDefaultValueBind() &&
-            containingDocument.getXPathDependencies().hasAnyCalculationBind(
+            containingDocument.xpathDependencies().hasAnyCalculationBind(
                 modifiedInstanceOrNull.model().staticModel(),
                 modifiedInstanceOrNull.getPrefixedId()
             );

@@ -52,12 +52,6 @@ object XFormsAPI {
     }
   }
 
-  // For Java callers
-  def withContainingDocumentJava(containingDocument: XFormsContainingDocument, runnable: Runnable): Unit =
-    withContainingDocument(containingDocument) {
-      runnable.run()
-    }
-
   // Every block of action must be run within this
   def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: => T): T = {
     containingDocumentDyn.withValue(containingDocument) {

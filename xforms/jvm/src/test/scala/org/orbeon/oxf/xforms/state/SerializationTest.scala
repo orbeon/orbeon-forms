@@ -136,7 +136,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:html>
 
 
-      assert(doc.getStaticState.template.isEmpty)
+      assert(doc.staticState.template.isEmpty)
     }
 
     // Template stored in the static state because of full updates
@@ -157,7 +157,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
           </xh:body>
         </xh:html>
 
-      assert(doc.getStaticState.template.isDefined)
+      assert(doc.staticState.template.isDefined)
     }
   }
 
@@ -166,10 +166,10 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     Assume.assumeTrue(Version.isPE)
 
     val doc = this setupDocument simpleDoc
-    val staticStateXML = doc.getStaticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
+    val staticStateXML = doc.staticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
 
     // Serialize/deserialize
-    val serialized = doc.getStaticState.encodedState
+    val serialized = doc.staticState.encodedState
     val restored = XFormsStaticStateImpl.restore(None, serialized, forceEncryption = false)
     val restoredXML = restored.staticStateDocument.xmlDocument
 

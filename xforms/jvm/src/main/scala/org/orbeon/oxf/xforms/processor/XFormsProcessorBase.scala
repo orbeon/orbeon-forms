@@ -117,6 +117,15 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       Option(pipelineContext.getAttribute("orbeon.cache.test.initialize-xforms-document").asInstanceOf[jl.Boolean]) forall
         (_.booleanValue)
 
+    val uriResolver =
+      new XFormsURIResolver(
+        selfProcessor,
+        processorOutput,
+        pipelineContext,
+        InputAnnotatedDocument,
+        XMLParsing.ParserConfiguration.PLAIN
+      )
+
     // Read and try to cache the complete XForms+XHTML document with annotations
     val (stage2CacheableState, containingDocumentFromReadOpt) = {
 
@@ -143,21 +152,12 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
               // Create containing document and initialize XForms engine
               // NOTE: Create document here so we can do appropriate analysis of caching dependencies
-              val uriResolver =
-                new XFormsURIResolver(
-                  selfProcessor,
-                  processorOutput,
-                  pipelineContext,
-                  InputAnnotatedDocument,
-                  XMLParsing.ParserConfiguration.PLAIN
-                )
-
               val containingDocument =
-                new XFormsContainingDocument(
-                  staticState,
-                  uriResolver,
-                  PipelineResponse.getResponse(xmlReceiver, externalContext),
-                  initializeXFormsDocument
+                XFormsContainingDocument(
+                  staticState    = staticState,
+                  uriResolver    = uriResolver.some,
+                  response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
+                  mustInitialize = initializeXFormsDocument
                 )
 
               collectDependencies(containingDocument, cachingLogger) foreach {
@@ -184,7 +184,8 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
         containingDocumentFromReadOpt match {
           case None =>
 
-            // In this case, we found the static state digest and more in the cache, but we must now create a new XFormsContainingDocument from this information
+            // In this case, we found the static state digest and more in the cache, but we must now create a new
+            // `XFormsContainingDocument` from this information
             cacheTracer.digestAndTemplateStatus(Option(stage2CacheableState.staticStateDigest))
 
             val staticState =
@@ -214,20 +215,11 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   staticState
               }
 
-            val uriResolver =
-              new XFormsURIResolver(
-                selfProcessor,
-                processorOutput,
-                pipelineContext,
-                InputAnnotatedDocument,
-                XMLParsing.ParserConfiguration.PLAIN
-              )
-
-              new XFormsContainingDocument(
-                staticState,
-                uriResolver,
-                PipelineResponse.getResponse(xmlReceiver, externalContext),
-                initializeXFormsDocument
+              XFormsContainingDocument(
+                staticState    = staticState,
+                uriResolver    = uriResolver.some,
+                response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
+                mustInitialize = initializeXFormsDocument
               )
           case Some(containingDocument) =>
             cacheTracer.digestAndTemplateStatus(None)
@@ -279,7 +271,7 @@ private object XFormsProcessorBase {
     val instanceDependencies = {
       // Add static instance source dependencies for top-level models
       // TODO: check all models/instances
-      val topLevelPart = containingDocument.getStaticState.topLevelPart
+      val topLevelPart = containingDocument.staticState.topLevelPart
       for {
         model                 <- topLevelPart.getModelsForScope(topLevelPart.startScope).iterator
         (_, instance)         <- model.instances
@@ -314,7 +306,7 @@ private object XFormsProcessorBase {
       }
 
     val xblBindingDependencies =
-      for (include <- containingDocument.getStaticState.topLevelPart.metadata.bindingIncludes)
+      for (include <- containingDocument.staticState.topLevelPart.metadata.bindingIncludes)
         yield ("oxf:" + include, None)
 
     instanceDependencies ++ xmlSchemaDependencies ++ xblBindingDependencies

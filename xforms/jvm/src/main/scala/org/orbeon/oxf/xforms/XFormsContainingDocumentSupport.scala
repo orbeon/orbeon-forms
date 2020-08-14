@@ -17,10 +17,11 @@ import java.util.concurrent.Callable
 import java.util.concurrent.locks.Lock
 import java.{util => ju}
 
+import cats.syntax.option._
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
-import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -39,15 +40,14 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget, XFormsEvents}
+import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
 
@@ -55,8 +55,6 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
-
-import cats.syntax.option._
 
 object XFormsContainingDocumentSupport {
 
@@ -118,7 +116,7 @@ object XFormsContainingDocumentSupport {
   }
 }
 
-abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
+abstract class XFormsContainingDocumentSupport
   extends XBLContainer(
     _effectiveId         = Constants.DocumentId,
     prefixedId           = Constants.DocumentId,
@@ -256,8 +254,8 @@ trait ContainingDocumentTransientState {
 
 trait ContainingDocumentUpload {
 
-  def getControls    : XFormsControls
-  def getStaticState : XFormsStaticState
+  def controls       : XFormsControls
+  def staticState    : XFormsStaticState
   def defaultModel   : Option[XFormsModel]
   def getRequestStats: RequestStats
 
@@ -267,7 +265,7 @@ trait ContainingDocumentUpload {
   // bound node instead.
   // See also https://github.com/orbeon/orbeon-forms/issues/3721.
   private def customMipForControl(controlEffectiveId: String, mipName: String) =
-    getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
+    controls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
       CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
       (_.boundNodeOpt) flatMap (InstanceData.findCustomMip(_, mipName))
 
@@ -293,11 +291,11 @@ trait ContainingDocumentUpload {
             throw new AssertionError("can only evaluate dynamic properties if a model is present")
         }
 
-      getStaticState.uploadMaxSizeAggregateExpression map evaluateAsLong map (0L max)
+      staticState.uploadMaxSizeAggregateExpression map evaluateAsLong map (0L max)
     }
 
-    def uploadMaxSizeProperty          = getStaticState.uploadMaxSize
-    def uploadMaxSizeAggregateProperty = getStaticState.uploadMaxSizeAggregate
+    def uploadMaxSizeProperty          = staticState.uploadMaxSize
+    def uploadMaxSizeAggregateProperty = staticState.uploadMaxSizeAggregate
   }
 
   def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
@@ -309,7 +307,7 @@ trait ContainingDocumentUpload {
           AllowedMediatypes.unapply
 
       def fromFormSetting =
-        getStaticState.staticStringProperty(UPLOAD_MEDIATYPES_PROPERTY).trimAllToOpt flatMap
+        staticState.staticStringProperty(UPLOAD_MEDIATYPES_PROPERTY).trimAllToOpt flatMap
           AllowedMediatypes.unapply
 
       fromCommonConstraint orElse
@@ -370,12 +368,12 @@ trait ContainingDocumentEvent {
 
 trait ContainingDocumentProperties {
 
-  def getStaticState: XFormsStaticState
+  def staticState: XFormsStaticState
   def defaultModel: Option[XFormsModel]
   def getRequestStats: RequestStats
 
   def disableUpdates: Boolean
-  def isInitializing: Boolean
+  def initializing: Boolean
 
   // Whether the document supports updates
   private lazy val _supportUpdates = ! (disableUpdates || isNoUpdates)
@@ -387,7 +385,7 @@ trait ContainingDocumentProperties {
     case NOSCRIPT_PROPERTY            => false
     case ENCRYPT_ITEM_VALUES_PROPERTY => encodeItemValues
     case ORDER_PROPERTY               => lhhacOrder
-    case _                            => getStaticState.propertyMaybeAsExpression(propertyName).left.get
+    case _                            => staticState.propertyMaybeAsExpression(propertyName).left.get
   }
 
   private object Memo {
@@ -396,18 +394,18 @@ trait ContainingDocumentProperties {
     private def memo[T](name: String, get: => T) =
       cache.getOrElseUpdate(name, get).asInstanceOf[T]
 
-    def staticStringProperty (name: String) = memo(name, getStaticState.staticStringProperty(name))
-    def staticBooleanProperty(name: String) = memo(name, getStaticState.staticBooleanProperty(name))
-    def staticIntProperty    (name: String) = memo(name, getStaticState.staticIntProperty(name))
+    def staticStringProperty (name: String) = memo(name, staticState.staticStringProperty(name))
+    def staticBooleanProperty(name: String) = memo(name, staticState.staticBooleanProperty(name))
+    def staticIntProperty    (name: String) = memo(name, staticState.staticIntProperty(name))
 
     def staticBooleanProperty[T](name: String, pred: T => Boolean) =
-      memo(name, pred(getStaticState.staticProperty(name).asInstanceOf[T]))
+      memo(name, pred(staticState.staticProperty(name).asInstanceOf[T]))
 
     def dynamicProperty[T](name: String, convert: String => T) =
       memo[T](
         name,
         convert(
-          getStaticState.propertyMaybeAsExpression(name) match {
+          staticState.propertyMaybeAsExpression(name) match {
             case Left(value) => value.toString
             case Right(expr) => evaluateStringPropertyAVT(expr)
           }
@@ -474,12 +472,12 @@ trait ContainingDocumentProperties {
       NO_UPDATES,
       _.toBoolean
     )
-
-  def isNoUpdatesStatic =
-    getStaticState.propertyMaybeAsExpression(NO_UPDATES) match {
-      case Left(value) => value.toString == "true"
-      case _ => false
-    }
+//
+//  def isNoUpdatesStatic =
+//    getStaticState.propertyMaybeAsExpression(NO_UPDATES) match {
+//      case Left(value) => value.toString == "true"
+//      case _ => false
+//    }
 
   // Static properties
   def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)
@@ -535,7 +533,7 @@ trait ContainingDocumentLogging {
     loggersMap.getOrElseUpdate(loggingCategory,
       new IndentedLogger(
         XFormsServer.logger,
-        XFormsServer.logger.isDebugEnabled && getDebugLogging.contains(loggingCategory),
+        XFormsServer.logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(loggingCategory),
         indentation
       )
     )
@@ -554,7 +552,7 @@ trait ContainingDocumentRequestStats {
 
 trait ContainingDocumentRequest {
 
-  def getStaticState : XFormsStaticState
+  def staticState : XFormsStaticState
 
   private var _deploymentType             : DeploymentType = null
   private var _requestMethod              : HttpMethod = null
@@ -582,7 +580,7 @@ trait ContainingDocumentRequest {
 
   def isPortletContainer         = _containerType == "portlet"
   def isEmbedded                 = _isEmbedded
-  def isServeInlineResources     = getStaticState.isInlineResources || _isPortletContainerOrRemote
+  def isServeInlineResources     = staticState.isInlineResources || _isPortletContainerOrRemote
 
   private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
     Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
@@ -655,12 +653,12 @@ trait ContainingDocumentRequest {
         _deploymentType             = (dynamicState.deploymentType map DeploymentType.withNameInsensitive orNull)
         _requestMethod              = dynamicState.requestMethod.orNull
         _requestContextPath         = dynamicState.requestContextPath.orNull
-        _requestPath                = dynamicState.decodeRequestPathJava
+        _requestPath                = dynamicState.requestPath.orNull
         _requestHeaders             = dynamicState.requestHeaders.toMap
         _isEmbedded                 = isEmbeddedFromHeaders(_requestHeaders)
         _requestParameters          = dynamicState.requestParameters.toMap
-        _containerType              = dynamicState.decodeContainerTypeJava
-        _containerNamespace         = dynamicState.decodeContainerNamespaceJava
+        _containerType              = dynamicState.containerType.orNull
+        _containerNamespace         = dynamicState.containerNamespace.orNull
         _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
       case None =>
         // Use information from the request
@@ -669,7 +667,7 @@ trait ContainingDocumentRequest {
     }
 
   protected def restorePathMatchers(dynamicState: DynamicState): Unit =
-    _versionedPathMatchers = dynamicState.decodePathMatchersJava
+    _versionedPathMatchers = dynamicState.decodePathMatchers.asJava
 }
 
 trait ContainingDocumentDelayedEvents {
@@ -813,7 +811,7 @@ trait ContainingDocumentClientState {
         ScriptBuilder.buildJavaScriptInitialData(
           containingDocument   = this,
           rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
+          controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
         )
       )
 
@@ -830,14 +828,14 @@ trait ContainingDocumentCacheable extends Cacheable {
   self: XFormsContainingDocument =>
 
   def added(): Unit =
-    XFormsStateManager.onAddedToCache(getUUID)
+    XFormsStateManager.onAddedToCache(uuid)
 
   // WARNING: This can be called while another threads owns this document lock
   def removed(): Unit =
-    XFormsStateManager.onRemovedFromCache(getUUID)
+    XFormsStateManager.onRemovedFromCache(uuid)
 
   // Return lock or `null` in case session just expired
-  def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(getUUID)
+  def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(uuid)
 
   // Called when cache expires this document from the document cache.
   // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains

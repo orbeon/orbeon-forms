@@ -90,7 +90,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     * @return delay in ms, or -1 is not applicable
     */
   def getHeartbeatDelay(containingDocument: XFormsContainingDocument, externalContext: ExternalContext): Long =
-    if (containingDocument.getStaticState.isClientStateHandling || ! containingDocument.isSessionHeartbeat) {
+    if (containingDocument.staticState.isClientStateHandling || ! containingDocument.isSessionHeartbeat) {
       -1L
     } else {
       // 80% of session expiration time, in ms
@@ -107,7 +107,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     disableDocumentCache : Boolean
   ): Unit =
     if (! containingDocument.isNoUpdates) {
-      addDocumentToSession(containingDocument.getUUID)
+      addDocumentToSession(containingDocument.uuid)
       cacheOrStore(containingDocument, isInitialState = true, disableDocumentCache = disableDocumentCache)
     }
 
@@ -129,9 +129,9 @@ object XFormsStateManager extends XFormsStateLifecycle {
   // only if no thread is dealing with this document.
   // Remove session listener for cache
   def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit = {
-    removeUuidFromSession(containingDocument.getUUID)
+    removeUuidFromSession(containingDocument.uuid)
     // Store document state
-    if (containingDocument.getStaticState.isServerStateHandling)
+    if (containingDocument.staticState.isServerStateHandling)
       storeDocumentState(containingDocument, isInitialState = false)
   }
 
@@ -197,7 +197,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
       // Don't re-add document to the cache
       Logger.logDebug(LogType, "Not keeping document in cache following error.")
       // Remove all information about this document from the session
-      val uuid = containingDocument.getUUID
+      val uuid = containingDocument.uuid
       removeUuidFromSession(uuid)
       removeSessionDocument(uuid)
     }
@@ -216,7 +216,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
       // we can't know that the property is set to false before trying.
 
       def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument) =
-        ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.getSequence))
+        ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.sequence))
 
       XFormsDocumentCache.take(parameters.uuid) match {
         case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  =>
@@ -238,12 +238,12 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
   // Return the static state string to send to the client in the HTML page.
   def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String] =
-    containingDocument.getStaticState.isClientStateHandling option
-      containingDocument.getStaticState.encodedState
+    containingDocument.staticState.isClientStateHandling option
+      containingDocument.staticState.encodedState
 
   // Return the dynamic state string to send to the client in the HTML page.
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] =
-    containingDocument.getStaticState.isClientStateHandling option
+    containingDocument.staticState.isClientStateHandling option
       DynamicState.encodeDocumentToString(containingDocument, XFormsProperties.isGZIPState, isForceEncryption = true)
 
   // Update the document's change sequence.
@@ -256,7 +256,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
     // Tell the document to update its state
     if (! ignoreSequence)
-      containingDocument.updateChangeSequence()
+      containingDocument.incrementSequence()
   }
 
   // Cache the document and/or store its current state.
@@ -283,14 +283,14 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     // Create document
     val documentFromStore =
-      new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document =>
-        (isServerState && document.getStaticState.isServerStateHandling) ||
-          document.getStaticState.isClientStateHandling
+      XFormsContainingDocument(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
+        (isServerState && document.staticState.isServerStateHandling) ||
+          document.staticState.isClientStateHandling
       }
 
     // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
     // possible right now.
-    documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
+    documentFromStore.controls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
       XFormsAPI.withContainingDocument(documentFromStore) {
         documentFromStore.withOutermostActionHandler {
           Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
@@ -381,12 +381,12 @@ object XFormsStateManager extends XFormsStateLifecycle {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)
-        if ((isInitialState || ReplicationEnabled) && containingDocument.getStaticState.isServerStateHandling) {
+        if ((isInitialState || ReplicationEnabled) && containingDocument.staticState.isServerStateHandling) {
           // Also store document state (used by browser soft reload, browser back, `<xf:reset>` and replication)
           Logger.logDebug(LogType, "Storing initial document state.")
           storeDocumentState(containingDocument, isInitialState)
         }
-      } else if (containingDocument.getStaticState.isServerStateHandling) {
+      } else if (containingDocument.staticState.isServerStateHandling) {
         // Directly store the document state
         Logger.logDebug(LogType, "Document cache disabled. Storing initial document state.")
         storeDocumentState(containingDocument, isInitialState)
@@ -406,7 +406,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
       getOrCreateUuidListInSession(NetUtils.getSession(ForceSessionCreation)).add(uuid)
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
-      require(containingDocument.getStaticState.isServerStateHandling)
+      require(containingDocument.staticState.isServerStateHandling)
       EhcacheStateStore.storeDocumentState(
         containingDocument,
         NetUtils.getExternalContext.getRequest.getSession(ForceSessionCreation),

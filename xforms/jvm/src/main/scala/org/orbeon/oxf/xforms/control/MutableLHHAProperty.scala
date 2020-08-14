@@ -102,13 +102,13 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   }
 
   protected def requireUpdate =
-    control.containingDocument.getXPathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, control.effectiveId)
+    control.containingDocument.xpathDependencies.requireLHHAUpdate(control.staticControl, lhhaType, control.effectiveId)
 
   protected def notifyCompute() =
-    control.containingDocument.getXPathDependencies.notifyComputeLHHA()
+    control.containingDocument.xpathDependencies.notifyComputeLHHA()
 
   protected def notifyOptimized() =
-    control.containingDocument.getXPathDependencies.notifyOptimizeLHHA()
+    control.containingDocument.xpathDependencies.notifyOptimizeLHHA()
 
   override def copy: MutableLHHAProperty =
     super.copy.asInstanceOf[MutableLHHAProperty]

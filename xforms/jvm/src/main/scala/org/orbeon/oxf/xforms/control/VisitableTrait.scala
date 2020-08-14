@@ -35,7 +35,7 @@ trait VisitableTrait extends XFormsControl {
       // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
       // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy
       // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
-      containingDocument.getControls.cloneInitialStateIfNeeded()
+      containingDocument.controls.cloneInitialStateIfNeeded()
 
       // There is no dependency handling with the xxf:visited() function. So instead of requiring callers to do this,
       // as was the case at some point, we require an RR.
@@ -88,7 +88,7 @@ trait VisitableTrait extends XFormsControl {
         visited = true
       case _: XXFormsBlurEvent =>
         // The client dispatches `xxforms-blur` when focus goes away from all XForms controls.
-        if (containingDocument.getControls.getFocusedControl exists (_ eq this)) {
+        if (containingDocument.controls.getFocusedControl exists (_ eq this)) {
           // See https://github.com/orbeon/orbeon-forms/issues/3508 and https://github.com/orbeon/orbeon-forms/issues/3611
           visited = true
           Focus.removeFocus(containingDocument)

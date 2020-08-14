@@ -20,5 +20,5 @@ import org.orbeon.scaxon.Implicits._
 
 class XXFormsDocumentId extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext) =
-    getContainingDocument(xpathContext).getUUID
+    getContainingDocument(xpathContext).uuid
 }

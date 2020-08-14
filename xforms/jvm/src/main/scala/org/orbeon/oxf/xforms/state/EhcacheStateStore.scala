@@ -30,21 +30,21 @@ object EhcacheStateStore {
     isInitialState : Boolean
   ): Unit = {
 
-    assert(document.getStaticState.isServerStateHandling)
+    assert(document.staticState.isServerStateHandling)
 
     if (! isInitialState)
-      LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" -> document.getUUID))
+      LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" -> document.uuid))
 
-    val documentUUID = document.getUUID
+    val documentUUID = document.uuid
 
     withDebug("storing document state", List(
       "document UUID"             -> documentUUID,
       "store size before storing" -> getCurrentSize.toString,
       "replication"               -> XFormsProperties.isReplication.toString
     )) {
-      val staticStateDigest = document.getStaticState.digest
+      val staticStateDigest = document.staticState.digest
       val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
-      val sequence          = document.getSequence
+      val sequence          = document.sequence
 
       def addOrReplaceOne(key: String, value: java.io.Serializable): Unit =
         Caches.stateCache.put(new EhElement(key, value, sequence))
@@ -53,7 +53,7 @@ object EhcacheStateStore {
       addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
       // Static and dynamic states
-      addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
+      addOrReplaceOne(staticStateDigest, document.staticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
       addOrReplaceOne(dynamicStateKey, DynamicState(document))
     }
   }

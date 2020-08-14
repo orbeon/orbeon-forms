@@ -104,8 +104,8 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     val ops = new StaticStateGlobalOps(staticState.topLevelPart)
 
-    Mockito.when(mockDocument.getStaticOps).thenReturn(ops)
-    Mockito.when(mockDocument.getControls).thenReturn(mockControls)
+    Mockito.when(mockDocument.staticOps).thenReturn(ops)
+    Mockito.when(mockDocument.controls).thenReturn(mockControls)
     Mockito.when(mockDocument.getIndentedLogger(Matchers.anyString)).thenReturn(staticState.getIndentedLogger)
 
     Mockito.when(mockControls.indentedLogger).thenReturn(staticState.getIndentedLogger)

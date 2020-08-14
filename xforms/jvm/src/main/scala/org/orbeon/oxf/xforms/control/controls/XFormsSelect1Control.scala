@@ -90,9 +90,9 @@ class XFormsSelect1Control(
       if (staticControl.isNorefresh)
         // Items are not automatically refreshed and stored globally
         // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
-        containingDocument.getControls.getConstantItems(getPrefixedId) getOrElse {
+        containingDocument.controls.getConstantItems(getPrefixedId) getOrElse {
           val newItemset = ItemsetSupport.evaluateItemset(selfControl)
-          containingDocument.getControls.setConstantItems(getPrefixedId, newItemset)
+          containingDocument.controls.setConstantItems(getPrefixedId, newItemset)
           newItemset
         }
       else

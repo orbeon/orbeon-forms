@@ -134,7 +134,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     xblChanges.clear()
     bindChanges.clear()
 
-    if (create && ! containingDocument.isInitializing)
+    if (create && ! containingDocument.initializing)
       containingDocument.addControlStructuralChange(prefixedId)
 
     // Outer instance
@@ -149,7 +149,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     //val dynamicState = DynamicState(this)
 
     // Remove children controls if any
-    val tree = containingDocument.getControls.getCurrentControlTree
+    val tree = containingDocument.controls.getCurrentControlTree
     if (getSize > 0) {
       // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
       //tree.dispatchDestructionEventsForRemovedContainer(this, false)
@@ -161,7 +161,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       // Remove container and associated models
       container.destroy()
       // Remove part and associated scopes
-      containingDocument.getStaticOps.removePart(partAnalysis)
+      containingDocument.staticOps.removePart(partAnalysis)
       // Remove listeners we added to the outer instance (better do this or we will badly leak)
       // WARNING: Make sure outerListener is the exact same object passed to addListener. There can be a
       // conversion from a function to a listener, in which case identity won't be preserved!
@@ -293,7 +293,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   private def processXBLUpdates(): Unit = {
 
-    val tree = containingDocument.getControls.getCurrentControlTree
+    val tree = containingDocument.controls.getCurrentControlTree
 
     for ((prefixedId, elemInSource) <- groupChanges(xblChanges)) {
       tree.findControl(prefixedId) match { // TODO: should use effective id if in repeat and process all
@@ -344,8 +344,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
     val newScope = new Scope(Some(getResolutionScope ensuring (_ ne null)), getPrefixedId)
-    val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.getStaticState, parent, doc, newScope)
-    containingDocument.getStaticOps.addPart(newPart)
+    val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.staticState, parent, doc, newScope)
+    containingDocument.staticOps.addPart(newPart)
 
     (template, newPart)
   }
@@ -435,7 +435,7 @@ object XXFormsDynamicControl {
     componentControl.destroyNestedContainer()
 
     // Remove dynamic controls
-    doc.getControls.getCurrentControlTree.deindexSubtree(componentControl, includeCurrent = false)
+    doc.controls.getCurrentControlTree.deindexSubtree(componentControl, includeCurrent = false)
     componentControl.clearChildren()
   }
 
@@ -445,7 +445,7 @@ object XXFormsDynamicControl {
     val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
 
     templateTreeOpt foreach { templateTree =>
-      doc.getControls.getCurrentControlTree.createAndInitializeDynamicSubTree(
+      doc.controls.getCurrentControlTree.createAndInitializeDynamicSubTree(
         container        = componentControl.nestedContainerOpt getOrElse (throw new IllegalStateException),
         containerControl = componentControl,
         elementAnalysis  = templateTree,

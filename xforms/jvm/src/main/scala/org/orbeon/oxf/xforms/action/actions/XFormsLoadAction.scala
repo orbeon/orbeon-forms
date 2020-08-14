@@ -204,7 +204,7 @@ object XFormsLoadAction {
               if (! containingDocument.isEmbedded)
                 false
               else
-                containingDocument.isInitializing
+                containingDocument.initializing
             } else {
               // Portlet container
               // NOTE: As of 2016-03-17, the initialization case will fail and the portlet will throw an exception.

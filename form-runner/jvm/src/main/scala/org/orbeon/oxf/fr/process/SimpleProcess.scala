@@ -44,11 +44,11 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
   override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
 
-  def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.getUUID
+  def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.uuid
 
   // All XPath runs in the context of the main form instance's root element
   def xpathContext = formInstance.rootElement
-  def xpathFunctionLibrary = inScopeContainingDocumentOpt map (_.getFunctionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
+  def xpathFunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
   def xpathFunctionContext = XPath.functionContext.orNull
 
   // NOTE: Clear the PDF/TIFF URLs *before* the process, because if we clear it after, it will be already cleared

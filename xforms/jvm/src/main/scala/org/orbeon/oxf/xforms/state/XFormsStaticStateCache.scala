@@ -29,9 +29,6 @@ object XFormsStaticStateCache {
   def storeDocument(staticState: XFormsStaticState): Unit =
     cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
 
-  def getDocumentJava(digest: String): XFormsStaticState =
-    findDocument(digest) map (_._1) orNull
-
   def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
     cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) =>
       o.asInstanceOf[XFormsStaticState] -> ProcessorImpl.findLastModified(validity)

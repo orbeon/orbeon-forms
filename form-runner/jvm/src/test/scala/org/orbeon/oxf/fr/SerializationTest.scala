@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, ResourceManagerTestBase}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -52,12 +52,12 @@ class SerializationTest
         assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
 
         val serializedState = XFormsState(
-          staticStateDigest = Option(doc.getStaticState.digest),
-          staticState       = Option(doc.getStaticState.encodedState),
+          staticStateDigest = Option(doc.staticState.digest),
+          staticState       = Option(doc.staticState.encodedState),
           dynamicState      = Some(DynamicState(doc))
         )
 
-        val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
+        val restoredDoc = XFormsContainingDocument(serializedState, disableUpdates = false, forceEncryption = false)(Loggers.getIndentedLogger("state"))
 
         assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
       }
@@ -111,12 +111,12 @@ class SerializationTest
         assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
 
         val serializedState = XFormsState(
-          staticStateDigest = Option(doc.getStaticState.digest),
-          staticState       = Option(doc.getStaticState.encodedState),
+          staticStateDigest = Option(doc.staticState.digest),
+          staticState       = Option(doc.staticState.encodedState),
           dynamicState      = Some(DynamicState(doc))
         )
 
-        val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
+        val restoredDoc = XFormsContainingDocument(serializedState, disableUpdates = false, forceEncryption = false)(Loggers.getIndentedLogger("state"))
 
         for (id <- List("my-foo", "my-bar", "my-number"))
           assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)

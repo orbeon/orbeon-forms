@@ -279,7 +279,7 @@ class ControlsComparator(
       }
 
   private def getMark(control: XFormsControl): Option[SAXStore#Mark] =
-    document.getStaticOps.getMark(control.getPrefixedId)
+    document.staticOps.getMark(control.getPrefixedId)
 
   private def getMarkOrThrow(control: XFormsControl): SAXStore#Mark =
     getMark(control).ensuring(_.isDefined, "missing mark").get

@@ -33,7 +33,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     super.addChild(control)
 
     if (parent eq null) // ne null when child of xxf:dynamic
-      containingDocument.getControls.getCurrentControlTree.setRoot(this)
+      containingDocument.controls.getCurrentControlTree.setRoot(this)
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {

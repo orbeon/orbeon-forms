@@ -196,7 +196,7 @@ object XFormsEvent {
     if (XFormsId.hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
       // There is a suffix so compute
       val ancestorRepeats =
-        e.containingDocument.getStaticOps.getAncestorRepeatIds(XFormsId.getPrefixedId(e.targetObject.getEffectiveId))
+        e.containingDocument.staticOps.getAncestorRepeatIds(XFormsId.getPrefixedId(e.targetObject.getEffectiveId))
 
       Some(ancestorRepeats map XFormsId.getStaticIdFromId)
     } else

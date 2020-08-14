@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.util.{List => JList}
-
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
@@ -264,14 +262,14 @@ trait RefreshSupport {
   //
   // TODO: We might want to implement some code to detect excessive loops/recursion
   def synchronizeAndRefresh(): Unit =
-    if (! containingDocument.getControls.isInRefresh) // see https://github.com/orbeon/orbeon-forms/issues/1550
-      while (needRebuildRecalculateRevalidate || containingDocument.getControls.isRequireRefresh) {
+    if (! containingDocument.controls.isInRefresh) // see https://github.com/orbeon/orbeon-forms/issues/1550
+      while (needRebuildRecalculateRevalidate || containingDocument.controls.isRequireRefresh) {
 
         while (needRebuildRecalculateRevalidate)
           rebuildRecalculateRevalidateIfNeeded()
 
-        if (containingDocument.getControls.isRequireRefresh)
-          containingDocument.getControls.doRefresh()
+        if (containingDocument.controls.isRequireRefresh)
+          containingDocument.controls.doRefresh()
       }
 
   def needRebuildRecalculateRevalidate: Boolean =
@@ -285,7 +283,7 @@ trait RefreshSupport {
 
   def requireRefresh(): Unit = {
     // Note that we don't recurse into children container as for now refresh is global
-    val controls = containingDocument.getControls
+    val controls = containingDocument.controls
     if (controls.isInitialized)
       // Controls exist, otherwise there is no point in doing anything controls-related
       controls.requireRefresh()
@@ -407,7 +405,7 @@ trait ContainerResolver {
     // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853. Unclear. For `xxf:dynamic`, `self.prefixedId`
     // is the prefixed id of the `xxf:dynamic` in the outer scope. So we can't just use `getPartAnalysis`. Use parent
     // part if any?
-    val bindingIdOpt = containingDocument.getStaticOps.getBinding(self.prefixedId) map (_.bindingId)
+    val bindingIdOpt = containingDocument.staticOps.getBinding(self.prefixedId) map (_.bindingId)
     if (bindingIdOpt.contains(staticOrAbsoluteId))
       return containingDocument.findControlByEffectiveId(effectiveId).toList
 
@@ -495,7 +493,7 @@ trait ContainerResolver {
 
   def findFirstControlEffectiveId: Option[String] =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
-    getChildrenControls(containingDocument.getControls).headOption map (_.getEffectiveId)
+    getChildrenControls(containingDocument.controls).headOption map (_.getEffectiveId)
 
   def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
     associatedControlOpt match {

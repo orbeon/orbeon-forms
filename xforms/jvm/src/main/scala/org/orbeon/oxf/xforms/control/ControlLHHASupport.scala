@@ -134,7 +134,7 @@ object LHHASupport {
   // Whether a given control has an associated xf:label element.
   // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853.
   def hasLabel(containingDocument: XFormsContainingDocument, prefixedId: String) =
-    containingDocument.getStaticOps.hasLHHA(prefixedId, LHHA.Label)
+    containingDocument.staticOps.hasLHHA(prefixedId, LHHA.Label)
 
   // Gather all active alerts for the given control following a selection algorithm
   //

@@ -302,7 +302,7 @@ object XFormsModelSubmissionBase {
       })
 
       if (elementsToAnnotate.nonEmpty) {
-        val controls = xfcd.getControls.getCurrentControlTree.effectiveIdsToControls
+        val controls = xfcd.controls.getCurrentControlTree.effectiveIdsToControls
 
         val relevantLevels = elementsToAnnotate.keySet
 

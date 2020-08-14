@@ -77,7 +77,7 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
       </xh:html>
 
     // Test hierarchy string
-    assert(document.getStaticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
+    assert(document.staticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
 
     val repeatAncestors = Map(
       "department" -> Seq(),
@@ -91,16 +91,16 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
       (name, ancestors) <- repeatAncestors
       id = "repeat-" + name
     } yield
-      assert(document.getStaticOps.getAncestorRepeatIds(id) === ancestors)
+      assert(document.staticOps.getAncestorRepeatIds(id) === ancestors)
 
     // Test ancestors of other controls and actions
     for {
       id <- Seq("my-output", "action1", "action2")
     } yield
-      assert(document.getStaticOps.getAncestorRepeatIds(id) === Seq("repeat-employee", "repeat-department"))
+      assert(document.staticOps.getAncestorRepeatIds(id) === Seq("repeat-employee", "repeat-department"))
 
     // Test closest common ancestor
-    assert(document.getStaticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office") === Some("repeat-department"))
+    assert(document.staticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office") === Some("repeat-department"))
 
     // TODO: test combination of ancestors for all controls
     // TODO: test with ancestor parts

@@ -59,7 +59,7 @@ object XFormsToggleAction {
     // NOTE: The logic below doesn't handle showing ancestor `xxf:xforms11-switch="true"` cases yet.
     if (caseControl.getSwitch.isRelevant) { // the `xf:switch` and consequently all ancestors are relevant
 
-      val focusedBeforeOpt = doc.getControls.getFocusedControl
+      val focusedBeforeOpt = doc.controls.getFocusedControl
 
       val ancestorOrSelfHiddenCasesIt = Focus.ancestorOrSelfHiddenCases(caseControl)
       val requireFocusUpdate          = ancestorOrSelfHiddenCasesIt.nonEmpty

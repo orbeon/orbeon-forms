@@ -484,7 +484,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val analyzed = CommonConstraint.analyzeKnownConstraint(
         expression,
         ctx.formBuilderModel.getOrElse(throw new IllegalStateException).staticModel.namespaceMapping,
-        inScopeContainingDocument.getFunctionLibrary
+        inScopeContainingDocument.functionLibrary
       )
 
       <validation

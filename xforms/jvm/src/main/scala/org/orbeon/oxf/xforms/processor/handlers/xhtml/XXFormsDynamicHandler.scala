@@ -53,7 +53,7 @@ class XXFormsDynamicHandler(
       case control: XXFormsDynamicControl =>
         // Output new scripts upon update if any
         // NOTE: Not implemented as of 2016-01-18.
-        if (! containingDocument.isInitializing && control.newScripts.nonEmpty && containingDocument.isServeInlineResources) {
+        if (! containingDocument.initializing && control.newScripts.nonEmpty && containingDocument.isServeInlineResources) {
           implicit val helper = new XMLReceiverHelper(contentHandler)
           helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
           // NOTE: As of 2018-05-03, this is still not functional, so there is no impact

@@ -187,12 +187,12 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val sourceEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId)
     val sourcePrefixedId  = XFormsId.getPrefixedId(sourceEffectiveId)
-    val scope             = doc.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
+    val scope             = doc.staticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId  = scope.prefixedIdForStaticId(controlId(targetControlName))
 
     val (ancestorRepeatPrefixedIdOpt, commonIndexesLeafToRoot, remainingRepeatPrefixedIdsLeafToRoot) =
       Controls.getStaticRepeatDetails(
-        ops               = doc .getStaticOps,
+        ops               = doc .staticOps,
         sourceEffectiveId = sourceEffectiveId,
         targetPrefixedId  = targetPrefixedId
       )
@@ -204,7 +204,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         ancestorRepeatPrefixedIdOpt match {
           case Some(ancestorRepeatPrefixedId) =>
 
-            val tree = doc.getControls.getCurrentControlTree
+            val tree = doc.controls.getCurrentControlTree
 
             val repeat =
               tree.findRepeatControl(ancestorRepeatPrefixedId + Controls.buildSuffix(commonIndexesLeafToRoot.tail.reverse)) getOrElse

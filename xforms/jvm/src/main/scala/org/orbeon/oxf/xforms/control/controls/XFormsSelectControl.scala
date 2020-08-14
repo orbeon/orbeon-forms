@@ -92,7 +92,7 @@ class XFormsSelectControl(
 
   override def markDirtyImpl(): Unit = {
     super.markDirtyImpl()
-    if (! isExternalValueDirty && containingDocument.getXPathDependencies.requireItemsetUpdate(staticControl, effectiveId)) {
+    if (! isExternalValueDirty && containingDocument.xpathDependencies.requireItemsetUpdate(staticControl, effectiveId)) {
       // If the itemset has changed but the value has not changed, the external value might still need to be
       // re-evaluated.
       markExternalValueDirty()

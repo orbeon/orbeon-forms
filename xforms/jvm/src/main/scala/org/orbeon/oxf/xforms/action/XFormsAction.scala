@@ -139,7 +139,7 @@ object XFormsAction {
                   xpathString        = valueExpr,
                   namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                  functionLibrary    = actionInterpreter.containingDocument.getFunctionLibrary,
+                  functionLibrary    = actionInterpreter.containingDocument.functionLibrary,
                   functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
                   baseURI            = null,
                   locationData       = element.getData.asInstanceOf[LocationData],

@@ -258,7 +258,7 @@ trait ValidationBindOps extends Logging {
             isOptionalAndEmpty || XPath.isXPath2ExpressionOrValueTemplate(
               nodeValue,
               namespaceMapping,
-              containingDocument.getFunctionLibrary,
+              containingDocument.functionLibrary,
               typeLocalname == "XPath2ValueTemplate"
             )
           } else {

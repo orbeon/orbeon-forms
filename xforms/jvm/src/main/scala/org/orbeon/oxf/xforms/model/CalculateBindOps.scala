@@ -113,7 +113,7 @@ trait CalculateBindOps {
   private object Private {
 
     // Whether this is the first recalculate for the associated XForms model
-    var isFirstCalculate = model.containingDocument.isInitializing
+    var isFirstCalculate = model.containingDocument.initializing
 
     def evaluateAndSetCustomMIPs(
       bindNode  : BindNode,

@@ -115,7 +115,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
-        final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isEmbeddedClient;
+        final boolean doMultipartPOST = containingDocument.staticOps().hasControlByName("upload") || isEmbeddedClient;
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getNamespacedFormId(containingDocument),
@@ -129,7 +129,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         {
             // Only for 2-pass submission
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", Constants.UuidFieldName(), "value", containingDocument.getUUID()
+                    "type", "hidden", "name", Constants.UuidFieldName(), "value", containingDocument.uuid()
             });
 
             // NOTE: we don't need $sequence here as HTML form posts are either:
@@ -352,7 +352,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public void end() throws SAXException {
 
         // Add global top-level XBL markup
-        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().iterator();
+        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.staticOps().getGlobals().iterator();
         while (i.hasNext())
             XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController(), i.next().templateTree());
 

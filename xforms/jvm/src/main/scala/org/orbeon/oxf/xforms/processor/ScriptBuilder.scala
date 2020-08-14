@@ -89,7 +89,7 @@ object ScriptBuilder {
   ): Option[String] = {
 
     // Gather all static properties that need to be sent to the client
-    val staticProperties = containingDocument.getStaticState.clientNonDefaultProperties
+    val staticProperties = containingDocument.staticState.clientNonDefaultProperties
 
     val dynamicProperties = {
 
@@ -103,7 +103,7 @@ object ScriptBuilder {
       // Help events are dynamic because they depend on whether the xforms-help event is used
       // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
       def helpOpt = dynamicProperty(
-        containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
+        containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
         HELP_HANDLER_PROPERTY,
         true
       )
@@ -181,9 +181,9 @@ object ScriptBuilder {
 
     val jsonString =
       rpc.Initializations(
-        uuid                   = containingDocument.getUUID,
+        uuid                   = containingDocument.uuid,
         namespacedFormId       = XFormsUtils.getNamespacedFormId(containingDocument),
-        repeatTree             = containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
+        repeatTree             = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
         repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
         xformsServerPath       = rewriteResource("/xforms-server"),
         xformsServerUploadPath = rewriteResource("/xforms-server/upload"),
@@ -196,7 +196,7 @@ object ScriptBuilder {
         listeners =
           (
             for {
-              handler  <- containingDocument.getStaticOps.keyboardHandlers
+              handler  <- containingDocument.staticOps.keyboardHandlers
               observer <- handler.observersPrefixedIds
               keyText  <- handler.keyText
             } yield
@@ -225,12 +225,12 @@ object ScriptBuilder {
   def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val errorsToShow      = containingDocument.getServerErrors
-    val focusElementIdOpt = containingDocument.getControls.getFocusedControl map (_.getEffectiveId)
+    val focusElementIdOpt = containingDocument.controls.getFocusedControl map (_.getEffectiveId)
     val messagesToRun     = containingDocument.getMessagesToRun filter (_.level == "modal")
 
     val dialogsToOpen =
       for {
-        dialogControl <- containingDocument.getControls.getCurrentControlTree.getDialogControls
+        dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
         if dialogControl.isDialogVisible
       } yield
         dialogControl

@@ -103,7 +103,7 @@ object ErrorSummary {
     val prefixedId  = XFormsId.getPrefixedId(effectiveId)
 
     val repeatsFromLeaf =
-      inScopeContainingDocument.getStaticOps.getAncestorRepeats(prefixedId)
+      inScopeContainingDocument.staticOps.getAncestorRepeats(prefixedId)
 
     val iterations =
       XFormsId.getEffectiveIdSuffixParts(effectiveId)
@@ -113,7 +113,7 @@ object ErrorSummary {
         case (index, iteration) => Iterator(index, iteration)
       }
 
-    repeatsIt ++ Iterator.single(inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get) // argument must be a view control
+    repeatsIt ++ Iterator.single(inScopeContainingDocument.staticOps.getControlPosition(prefixedId).get) // argument must be a view control
   }
 
   //@XPathFunction
@@ -248,7 +248,7 @@ object ErrorSummary {
       val repeatEffectiveId = XFormsId.absoluteIdToEffectiveId(repeatAbsoluteId)
       val repeatPrefixedId  = XFormsId.getPrefixedId(repeatEffectiveId)
 
-      val ancestorRepeats = inScopeContainingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
+      val ancestorRepeats = inScopeContainingDocument.staticOps.getAncestorRepeatIds(prefixedId)
 
       if (ancestorRepeats contains repeatPrefixedId) {
         // Control is a descendant of the repeat so might be impacted

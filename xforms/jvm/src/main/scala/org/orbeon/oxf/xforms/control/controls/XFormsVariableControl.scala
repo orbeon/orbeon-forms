@@ -70,7 +70,7 @@ class XFormsVariableControl(
 
     if (relevant) {
       // Evaluate variable value if needed if relevant
-      if ((_value eq null) || containingDocument.getXPathDependencies.requireValueUpdate(staticControl, effectiveId)) {
+      if ((_value eq null) || containingDocument.xpathDependencies.requireValueUpdate(staticControl, effectiveId)) {
         variable.markDirty()
         val contextStack = getContextStack
         contextStack.setBinding(bindingContext)

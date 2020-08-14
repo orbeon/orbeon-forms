@@ -51,12 +51,12 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   def refreshStart(): Unit = {
     Private.requireRefresh = false
     inRefresh = true
-    containingDocument.getXPathDependencies.refreshStart()
+    containingDocument.xpathDependencies.refreshStart()
   }
 
   def refreshDone(): Unit = {
     inRefresh = false
-    containingDocument.getXPathDependencies.refreshDone()
+    containingDocument.xpathDependencies.refreshDone()
   }
 
   // Create the controls, whether upon initial creation of restoration of the controls.
@@ -64,7 +64,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
     assert(! initialized)
 
-    if (containingDocument.getStaticState.topLevelPart.hasControls) {
+    if (containingDocument.staticState.topLevelPart.hasControls) {
 
       // NOTE: We set this first so that the tree is made available during construction to XPath functions
       // like `index()` or `case()`
@@ -86,7 +86,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
     assert(initialized)
 
-    if (containingDocument.getStaticState.topLevelPart.hasControls) {
+    if (containingDocument.staticState.topLevelPart.hasControls) {
 
       // Keep only one control tree
       initialControlTree = currentControlTree
@@ -95,7 +95,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
       markCleanSinceLastRequest()
 
       // Need to make sure that `current eq initial` within controls
-      ControlsIterator(containingDocument.getControls.getCurrentControlTree) foreach (_.resetLocal())
+      ControlsIterator(containingDocument.controls.getCurrentControlTree) foreach (_.resetLocal())
     }
   }
 
@@ -320,7 +320,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
       )
 
     def gatherControlsForRefresh: List[String] =
-      ControlsIterator(containingDocument.getControls.getCurrentControlTree) filter
+      ControlsIterator(containingDocument.controls.getCurrentControlTree) filter
         XFormsControl.controlSupportsRefreshEvents                           map
         (_.effectiveId)                                                      toList
 

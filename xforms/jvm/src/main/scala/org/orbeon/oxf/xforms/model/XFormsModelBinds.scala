@@ -48,7 +48,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
   protected implicit def logger            : IndentedLogger           = model.indentedLogger
   protected implicit def reporter          : XPath.Reporter           = containingDocument.getRequestStats.addXPathStat
 
-  protected val dependencies               : XPathDependencies        = containingDocument.getXPathDependencies
+  protected val dependencies               : XPathDependencies        = containingDocument.xpathDependencies
   protected val staticModel                : Model                    = model.staticModel
 
   // Support for `xxf:evaluate-bind-property` function

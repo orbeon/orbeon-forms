@@ -65,7 +65,7 @@ class XFormsControl(
   require(container ne null)
 
   implicit final val containingDocument: XFormsContainingDocument = container.getContainingDocument
-  implicit final def logger            : IndentedLogger = containingDocument.getControls.indentedLogger
+  implicit final def logger            : IndentedLogger = containingDocument.controls.indentedLogger
 
   final def part: PartAnalysis = container.getPartAnalysis
 

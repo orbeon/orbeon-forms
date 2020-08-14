@@ -84,7 +84,7 @@ object XXFormsInstance {
     def findStatic = {
 
       val containingDocument = startContainer.containingDocument
-      val ops = containingDocument.getStaticOps
+      val ops = containingDocument.staticOps
       val startScope = startContainer.innerScope
 
       val scopes    = Iterator.iterateOpt(startScope)(_.parent)

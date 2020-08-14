@@ -69,7 +69,7 @@ trait ControlLocalSupport {
   final def getLocalForUpdate = {
     if (containingDocument.isHandleDifferences) {
       // Happening during a client request where we need to handle diffs
-      val controls = containingDocument.getControls
+      val controls = containingDocument.controls
       if (controls.getInitialControlTree ne controls.getCurrentControlTree) {
         if (currentLocal ne initialLocal)
           throw new OXFException("currentLocal != initialLocal")

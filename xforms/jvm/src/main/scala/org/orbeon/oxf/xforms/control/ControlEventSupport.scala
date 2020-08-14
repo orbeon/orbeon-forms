@@ -37,7 +37,7 @@ trait ControlEventSupport extends ListenersTrait {
       // there a use case for it? Events can be dispatched via setIndex(), which means that repeats and relevance
       // can change. But is there a better way?
       if (repeatIterationsToModify.nonEmpty) {
-        val controls = containingDocument.getControls
+        val controls = containingDocument.controls
         // Find all repeat iterations and controls again
         for (repeatIterationEffectiveId <- repeatIterationsToModify) {
           val repeatIterationControl =

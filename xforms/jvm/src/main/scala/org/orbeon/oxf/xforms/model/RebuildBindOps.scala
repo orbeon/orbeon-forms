@@ -110,6 +110,6 @@ trait RebuildBindOps {
 
   private object Private {
     var _topLevelBinds          : List[RuntimeBind] = Nil
-    var _isFirstRebuildForModel : Boolean           = model.containingDocument.isInitializing
+    var _isFirstRebuildForModel : Boolean           = model.containingDocument.initializing
   }
 }

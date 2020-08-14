@@ -32,7 +32,7 @@ object XHTMLOutput {
 
     // Register handlers on controller (the other handlers are registered by the body handler)
     locally {
-      val isHTMLDocument = xfcd.getStaticState.isHTMLDocument
+      val isHTMLDocument = xfcd.staticState.isHTMLDocument
 
       import org.orbeon.oxf.xforms.XFormsConstants.{XBL_NAMESPACE_URI, XFORMS_NAMESPACE_URI => XF, XXFORMS_NAMESPACE_URI => XXF}
       import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}

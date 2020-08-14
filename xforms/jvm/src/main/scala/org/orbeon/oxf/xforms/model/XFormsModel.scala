@@ -150,7 +150,7 @@ class XFormsModel(
         // Bubbles: Yes / Cancelable: Yes / Context Info: None
         doRebuild()
       case _: XFormsModelDestructEvent =>
-        containingDocument.getXPathDependencies.modelDestruct(selfModel)
+        containingDocument.xpathDependencies.modelDestruct(selfModel)
       case _: XFormsRecalculateEvent | _: XFormsRevalidateEvent =>
         // 4.3.5 The xforms-revalidate Event
         // 4.3.6 The xforms-recalculate Event
@@ -513,59 +513,60 @@ trait XFormsModelInstances {
     val absoluteURLString = resolveInstanceURL(instance)
 
     val instanceDocument =
-      if (containingDocument.getURIResolver eq null) {
-        // Connect directly if there is no resolver or if the instance is globally cached
-        // NOTE: If there is no resolver, URLs of the form input:* are not allowed
-        assert(! ProcessorImpl.isProcessorInputScheme(absoluteURLString))
+      containingDocument.uriResolver match {
+        case None =>
+          // Connect directly if there is no resolver or if the instance is globally cached
+          // NOTE: If there is no resolver, URLs of the form input:* are not allowed
+          assert(! ProcessorImpl.isProcessorInputScheme(absoluteURLString))
 
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
+          if (indentedLogger.isDebugEnabled)
+            indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
 
-        val absoluteResolvedUrl = new URI(absoluteURLString)
+          val absoluteResolvedUrl = new URI(absoluteURLString)
 
-        implicit val ec: ExternalContext = NetUtils.getExternalContext
+          implicit val ec: ExternalContext = NetUtils.getExternalContext
 
-        val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-          url              = absoluteResolvedUrl,
-          hasCredentials   = instance.credentials.isDefined,
-          customHeaders    = Headers.EmptyHeaders,
-          headersToForward = Connection.headersToForwardFromProperty,
-          cookiesToForward = Nil,
-          getHeader        = containingDocument.headersGetter
-        )
-
-        val connectionResult =
-          Connection(
-            method      = HttpMethod.GET,
-            url         = absoluteResolvedUrl,
-            credentials = instance.credentials,
-            content     = None,
-            headers     = headers,
-            loadState   = true,
-            logBody     = BaseSubmission.isLogBody
-          ).connect(
-            saveState = true
+          val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
+            url              = absoluteResolvedUrl,
+            hasCredentials   = instance.credentials.isDefined,
+            customHeaders    = Headers.EmptyHeaders,
+            headersToForward = Connection.headersToForwardFromProperty,
+            cookiesToForward = Nil,
+            getHeader        = containingDocument.headersGetter
           )
 
-        ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
-          // TODO: Handle validating and XInclude!
-          // Read result as XML
-          // TODO: use submission code?
-          if (! instance.readonly)
-            Left(TransformerUtils.readDom4j(is, connectionResult.url, false, true))
-          else
-            Right(TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
-        }
-      } else {
-        // Optimized case that uses the provided resolver
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString)
+          val connectionResult =
+            Connection(
+              method      = HttpMethod.GET,
+              url         = absoluteResolvedUrl,
+              credentials = instance.credentials,
+              content     = None,
+              headers     = headers,
+              loadState   = true,
+              logBody     = BaseSubmission.isLogBody
+            ).connect(
+              saveState = true
+            )
 
-        // TODO: Handle validating and handleXInclude!
-        if (! instance.readonly)
-          Left(containingDocument.getURIResolver.readAsDom4j(absoluteURLString, instance.credentials.orNull))
-        else
-          Right(containingDocument.getURIResolver.readAsTinyTree(XPath.GlobalConfiguration, absoluteURLString, instance.credentials.orNull))
+          ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
+            // TODO: Handle validating and XInclude!
+            // Read result as XML
+            // TODO: use submission code?
+            if (! instance.readonly)
+              Left(TransformerUtils.readDom4j(is, connectionResult.url, false, true))
+            else
+              Right(TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
+          }
+        case Some(uriResolver) =>
+          // Optimized case that uses the provided resolver
+          if (indentedLogger.isDebugEnabled)
+            indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString)
+
+          // TODO: Handle validating and handleXInclude!
+          if (! instance.readonly)
+            Left(uriResolver.readAsDom4j(absoluteURLString, instance.credentials.orNull))
+          else
+            Right(uriResolver.readAsTinyTree(XPath.GlobalConfiguration, absoluteURLString, instance.credentials.orNull))
       }
 
     indexInstance(

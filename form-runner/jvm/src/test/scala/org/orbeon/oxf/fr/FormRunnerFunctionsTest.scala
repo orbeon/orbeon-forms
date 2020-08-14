@@ -234,13 +234,13 @@ class FormRunnerFunctionsTest
           val doc = inScopeContainingDocument
 
           val controlIds     = 1 to 12 map ("c" +)
-          val controlIndexes = controlIds map doc.getStaticOps.getControlPosition
+          val controlIndexes = controlIds map doc.staticOps.getControlPosition
 
           // Static control position follows source document order
           assert(controlIndexes.sorted === controlIndexes)
 
           val effectiveAbsoluteIds =
-            doc.getControls.getCurrentControlTree.effectiveIdsToControls map
+            doc.controls.getCurrentControlTree.effectiveIdsToControls map
             { case (id, _) => XFormsId.effectiveIdToAbsoluteId(id) } toList
 
           assert(effectiveAbsoluteIds.sortBy(ErrorSummary.controlSearchIndexes)(ErrorSummary.IntIteratorOrdering) === effectiveAbsoluteIds)

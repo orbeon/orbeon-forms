@@ -30,9 +30,16 @@ trait FormRunnerSummary {
       (_.toXML)
 
   //@XPathFunction
-  def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
+  def duplicate(
+    data          : NodeInfo,
+    app           : String,
+    form          : String,
+    fromDocument  : String,
+    toDocument    : String,
+    formVersion   : String,
+    workflowStage : String
+  ): Unit = {
 
-    val someFormVersion           = Some(formVersion) // use the same form version as the data to clone
     val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
     putWithAttachments(
@@ -44,7 +51,8 @@ trait FormRunnerSummary {
       filename           = "data.xml",
       commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",
       forceAttachments   = true,
-      formVersion        = someFormVersion
+      formVersion        = Some(formVersion),
+      workflowStage      = Some(workflowStage)
     )
   }
 }

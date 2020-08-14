@@ -181,6 +181,7 @@ trait Reindex extends FormDefinition {
          |         d.app,
          |         d.form,
          |         d.form_version,
+         |         d.stage,
          |         d.document_id,
          |         d.draft,
          |         $xmlCol
@@ -242,9 +243,10 @@ trait Reindex extends FormDefinition {
               |            app,
               |            form,
               |            form_version,
+              |            stage,
               |            document_id,
               |            draft)
-              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin
 
           useAndClose(connection.prepareStatement(insertIntoCurrentSql)) { ps =>
@@ -261,6 +263,7 @@ trait Reindex extends FormDefinition {
             ps.setString   (position.next(), app)
             ps.setString   (position.next(), form)
             ps.setInt      (position.next(), currentData.getInt("form_version"))
+            ps.setString   (position.next(), currentData.getString("stage"))
             ps.setString   (position.next(), currentData.getString("document_id"))
             ps.setString   (position.next(), currentData.getString("draft"))
             ps.executeUpdate()

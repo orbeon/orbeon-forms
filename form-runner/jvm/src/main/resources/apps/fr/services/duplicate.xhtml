@@ -81,7 +81,8 @@
                             fr:form-name(),
                             $requested-document-id,
                             instance('fr-response'),
-                            event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value
+                            event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value,
+                            event('response-headers')[lower-case(name) = 'orbeon-workflow-stage']/value
                         )
                     </xf:action>
                     <xf:send submission="send-result"/>

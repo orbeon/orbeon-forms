@@ -18,7 +18,7 @@ sealed trait StageHeader
 object StageHeader {
 
   case object Unspecified                extends StageHeader
-  case class  Specific   (stage: String) extends StageHeader
+  case class  Specific    (name: String) extends StageHeader
 
   val HeaderName      = "Orbeon-Workflow-Stage"
   val HeaderNameLower = HeaderName.toLowerCase

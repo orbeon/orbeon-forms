@@ -35,11 +35,11 @@ import scala.util.control.NonFatal
  * This processor handles XForms initialization and produces an XHTML document which is a
  * translation from the source XForms + XHTML.
  */
-abstract class XFormsToSomething extends ProcessorImpl {
+abstract class XFormsProcessorBase extends ProcessorImpl {
 
   selfProcessor =>
 
-  import XFormsToSomething._
+  import XFormsProcessorBase._
 
   protected def produceOutput(
     pipelineContext    : PipelineContext,
@@ -252,7 +252,7 @@ abstract class XFormsToSomething extends ProcessorImpl {
   }
 }
 
-private object XFormsToSomething {
+private object XFormsProcessorBase {
 
   val InputAnnotatedDocument = "annotated-document"
   val OutputDocument         = "document"

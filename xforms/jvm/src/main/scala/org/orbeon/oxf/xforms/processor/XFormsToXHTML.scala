@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml._
  * This processor handles XForms initialization and produces an XHTML document which is a
  * translation from the source XForms + XHTML.
  */
-class XFormsToXHTML extends XFormsToSomething {
+class XFormsToXHTML extends XFormsProcessorBase {
 
   import org.orbeon.oxf.xforms.processor.XFormsToXHTML._
 

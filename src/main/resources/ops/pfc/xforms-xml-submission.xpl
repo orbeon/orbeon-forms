@@ -49,8 +49,6 @@
                         )
                     ) or
                         /*/container-type = 'portlet'
-                ) and (
-                    /*/parameters/parameter[name = '$server-events']
                 )">
             <!-- Process submission -->
             <p:processor name="oxf:pipeline">

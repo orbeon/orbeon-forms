@@ -294,6 +294,11 @@
                                             <attribute name="id">
                                                 <data type="string"/>
                                             </attribute>
+                                            <optional>
+                                                <element name="xxf:destroy">
+                                                    <data type="string"/>
+                                                </element>
+                                            </optional>
                                             <element name="xxf:value">
                                                 <data type="string"/>
                                             </element>
@@ -324,37 +329,13 @@
                                 </zeroOrMore>
                             </element>
                         </optional>
-                        <!-- Allow for zero or more in case there are multiple delays -->
-                        <zeroOrMore>
-                            <element name="xxf:server-events">
-                                <!-- Optional delay after which the client must send the event -->
+                        <optional>
+                            <element name="xxf:poll">
                                 <optional>
                                     <attribute name="delay"/>
                                 </optional>
-                                <!-- If discardable="true", the client can discard the event if another Ajax request is sent before the delay expires -->
-                                <optional>
-                                    <attribute name="discardable">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="show-progress">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                    <optional>
-                                        <attribute name="progress-message"/>
-                                    </optional>
-                                </optional>
-                                <!-- Encoded server event(s) -->
-                                <data type="string"/>
                             </element>
-                        </zeroOrMore>
+                        </optional>
                         <zeroOrMore>
                             <element name="xxf:message">
                                 <attribute name="level"/>

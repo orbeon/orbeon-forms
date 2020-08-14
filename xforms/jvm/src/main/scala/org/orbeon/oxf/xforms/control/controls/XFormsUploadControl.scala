@@ -19,10 +19,10 @@ import java.net.{URI, URLEncoder}
 import org.orbeon.dom.Element
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, PathUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -31,12 +31,9 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.helpers.AttributesImpl
-import shapeless.syntax.typeable._
 
 import scala.util.control.NonFatal
 
@@ -145,7 +142,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
           case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
             someNewValueUri
           case Some(newValueUri) =>
-            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `${newValueUri}`")
+            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `$newValueUri`")
           case None =>
             None
         }
@@ -225,7 +222,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     added
   }
 
-  override def findAriaByControlEffectiveId =
+  override def findAriaByControlEffectiveId: Option[String] =
     Some(
       XFormsUtils.namespaceId(
         containingDocument,
@@ -325,9 +322,6 @@ object XFormsUploadControl {
     PathUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
   }
 
-  // For Java callers
-  def getParameterOrNull(url: String, name: String): String = PathUtils.getFirstQueryParameter(url, name).orNull
-
   // Get the MAC from the URL
   def getMAC(url: String): Option[String] = PathUtils.getFirstQueryParameter(url, "mac")
 
@@ -338,52 +332,6 @@ object XFormsUploadControl {
       case None      => false
     }
 
-  /**
-   * Handle a construct of the form:
-   *
-   * <xxf:files>
-   *   <parameter>
-   *     <name>xforms-element-27</name>
-   *     <filename>my-filename.jpg</filename>
-   *     <content-type>image/jpeg</content-type>
-   *     <content-length>33204</content-length>
-   *     <value xmlns:request="http://orbeon.org/oxf/xml/request-private" xsi:type="xs:anyURI">file:/temp/upload_432dfead_11f1a9836128000_00000107.tmp</value>
-   *   </parameter>
-   *   <parameter>
-   *     ...
-   *   </parameter>
-   * </xxf:files>
-   */
-  def handleSubmittedFiles(containingDocument: XFormsContainingDocument, filesElement: Element): Unit =
-    for {
-      (name, value, filename, mediatype, size) <- iterateFileElement(filesElement)
-      // In case of `xf:repeat`, the name of the template will not match an existing control.
-      // In addition, only set value on forControl control if specified.
-      control       <- containingDocument.findControlByEffectiveId(name)
-      uploadControl <- control.narrowTo[XFormsUploadControl]
-    } locally {
-      uploadControl.handleUploadedFile(value, filename, mediatype, size)
-    }
-
-  // Check if an <xxf:files> element actually contains file uploads to process
-  def hasSubmittedFiles(filesElement: Element): Boolean =
-    iterateFileElement(filesElement).nonEmpty
-
-  private def iterateFileElement(filesElement: Element) =
-    for {
-      parameterElement <- Option(filesElement).toIterator flatMap Dom4j.elements
-
-      // Extract all parameters
-      name      <- parameterElement.elementOpt("name")                     flatMap (_.getText.trimAllToOpt)
-      value     <- parameterElement.elementOpt("value")                    flatMap (_.getText.trimAllToOpt)
-
-      // TODO: Ideally: `Option[Filename]`, `Option[ContentType]`, `Option[FileSize]`.
-      filename  = parameterElement.elementOpt("filename")                 flatMap (_.getText.trimAllToOpt) getOrElse ""
-      mediatype = parameterElement.elementOpt(Headers.ContentTypeLower)   flatMap (_.getText.trimAllToOpt) getOrElse ""
-      size      = parameterElement.elementOpt(Headers.ContentLengthLower) flatMap (_.getText.trimAllToOpt) getOrElse ""
-
-      // A file was selected in the UI (the file may be empty)
-      if size != "0" || filename != ""
-    } yield
-      (name, value, filename, mediatype, size)
+  // For Java callers
+  def getParameterOrNull(url: String, name: String): String = PathUtils.getFirstQueryParameter(url, name).orNull
 }

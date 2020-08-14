@@ -139,6 +139,16 @@ object InitSupport {
     }
 
   @JSExport
+  def destroyJavaScriptControlsFromSerialized(initData: String): Unit =
+    decode[List[rpc.Control]](initData) match {
+      case Left(_)  =>
+        // TODO: error
+        None
+      case Right(controls) =>
+        destroyJavaScriptControls(controls)
+    }
+
+  @JSExport
   def processRepeatHierarchyUpdateForm(formId: String, repeatTreeString: String): Unit = {
 
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
@@ -184,7 +194,6 @@ object InitSupport {
         }
 
       val uuidInput        = getTwoPassSubmissionField(formElem, UuidFieldName)
-      val serverEventInput = getTwoPassSubmissionField(formElem, ServerEventsFieldName)
 
       val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
         processRepeatHierarchy(initializations.repeatTree)
@@ -201,7 +210,6 @@ object InitSupport {
           uuid                          = uuid,
           elem                          = formElem,
           uuidInput                     = uuidInput,
-          serverEventInput              = serverEventInput,
           ns                            = formId.substring(0, formId.indexOf(Constants.FormClass)),
           xformsServerPath              = initializations.xformsServerPath,
           xformsServerUploadPath        = initializations.xformsServerUploadPath,
@@ -215,12 +223,11 @@ object InitSupport {
 
       // TODO: We set those here, but we could set them just before submission instead.
       uuidInput.value        = uuid
-      serverEventInput.value = ""
 
       initializeJavaScriptControls(initializations.controls)
       initializeKeyListeners(initializations.listeners, formElem)
 
-      dispatchInitialServerEvents(initializations.events, formId)
+      dispatchInitialServerEvents(initializations.pollEvent, formId)
 
       // Register events that bubble on document for all browsers
       // TODO: Move away from YUI even listeners.
@@ -385,6 +392,19 @@ object InitSupport {
         }
       }
 
+    def destroyJavaScriptControls(controls: List[rpc.Control]): Unit =
+      controls foreach { case rpc.Control(id, _) =>
+        Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
+          if (XBL.isComponent(control)) {
+            for {
+              instance <- Option(XBL.instanceForControl(control))
+            } locally {
+              instance.destroy()
+            }
+          }
+        }
+      }
+
     def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
@@ -430,14 +450,11 @@ object InitSupport {
         }
       }
 
-    def dispatchInitialServerEvents(events: List[rpc.ServerEvent], formId: String): Unit =
-      events foreach { case rpc.ServerEvent(delay, discardable, showProgress, encodedEvent) =>
-        AjaxClient.createDelayedServerEvent(
-          encodedEvent = encodedEvent,
-          delay        = delay.toDouble,
-          showProgress = showProgress,
-          discardable  = discardable,
-          formId       = formId
+    def dispatchInitialServerEvents(events: Option[rpc.PollEvent], formId: String): Unit =
+      events foreach { case rpc.PollEvent(delay) =>
+        AjaxClient.createDelayedPollEvent(
+          delay  = delay.toDouble,
+          formId = formId
         )
       }
   }

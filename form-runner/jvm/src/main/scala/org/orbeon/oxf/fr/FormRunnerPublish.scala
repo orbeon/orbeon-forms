@@ -57,7 +57,8 @@ trait FormRunnerPublish {
         forceAttachments  = forceAttachments,
         username          = username.trimAllToOpt,
         password          = password.trimAllToOpt,
-        formVersion       = formVersion.trimAllToOpt
+        formVersion       = formVersion.trimAllToOpt,
+        workflowStage     = None
       )
 
     MapFunctions.createValue(

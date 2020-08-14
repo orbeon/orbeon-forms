@@ -677,6 +677,15 @@
                 if="exists($operations-header)"
                 context="instance('fr-authorized-operations')"
                 origin="xf:attribute('from-persistence', $operations-header/string())"/>
+            <!-- Save value of the Orbeon-Workflow-Stage header -->
+            <xf:setvalue
+                ref="instance('fr-document-metadata')/@workflow-stage"
+                value="
+                    let
+                        $header          := event('response-headers')[lower-case(name) = 'orbeon-workflow-stage']/value,
+                        $stage-value     := if (empty($header)) then '' else $header/string()
+                    return
+                        $stage-value"/>
             <!-- Save value of date headers -->
             <xf:insert
                 context="instance('fr-document-metadata')"
@@ -795,7 +804,7 @@
 
     <!-- Metadata associated with a GET of the document -->
     <xf:instance id="fr-document-metadata">
-        <metadata/>
+        <metadata workflow-stage=""/>
     </xf:instance>
 
     <xf:instance id="fr-persistence-instance">

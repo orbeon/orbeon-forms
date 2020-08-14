@@ -796,7 +796,7 @@
             <publish-error>There was an error during form publishing.</publish-error>
             <latest-published-version>Latest published version</latest-published-version>
             <create-new-version-item>create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -956,6 +956,10 @@
                 <label>Request Body</label>
                 <hint>XML data (can be a SOAP envelope)</hint>
             </request-body>
+            <is-binary-response>
+                <label>Service Response has Binary Content</label>
+                <hint>Check this if the response is used to set an attachment control value</hint>
+            </is-binary-response>
             <response>
                 <label>Response</label>
             </response>
@@ -1136,6 +1140,10 @@
                 <label>Value XPath expression</label>
                 <hint>Relative to choice node</hint>
             </item-value>
+            <item-hint>
+                <label>Hint XPath expression</label>
+                <hint>Relative to choice node</hint>
+            </item-hint>
             <is-last-page>
                 <label>Is last page XPath expression</label>
             </is-last-page>
@@ -1239,8 +1247,8 @@
             <delete-column>Are you sure you want to delete the current column?</delete-column>
             <delete-row>Are you sure you want to delete the current row?</delete-row>
             <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
-            <delete-service>Are you sure you want to delete service</delete-service>
-            <delete-action>Are you sure you want to delete action</delete-action>
+            <delete-service>Are you sure you want to delete service "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Are you sure you want to delete action "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
             <new-metadata-output>Please provide an application and form name to identify your form. You can easily change those later.</new-metadata-output>
@@ -2057,7 +2065,7 @@
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <latest-published-version>Dernière version publiée</latest-published-version>
             <create-new-version-item>créer une nouvelle définition de formulaire avec numéro de version {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>remplacer la définition de formulaire avec numéro de version {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>remplacer la définition de formulaire avec numéro de version {0,number,integer} ({1,choice,0#non disponible|1#disponible})</overwrite-version-item>
             <create-new-version-help>
                 VEUILLEZ NOTER: Publier cette définition de formulaire va créer une nouvelle version dans la base de
                 données. Les données existantes dans la base de donnée seront visualisées et éditées avec la ou les
@@ -2218,6 +2226,10 @@
                 <label>Corps de la requête</label>
                 <hint>Document XML (peut être une enveloppe SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label>La réponse du service a un contenu binaire</label>
+                <hint>Sélectionner si la réponse est utilisée comme valeur d'un fichier joint</hint>
+            </is-binary-response>
             <response>
                 <label>Réponse</label>
             </response>
@@ -2398,6 +2410,10 @@
                 <label>Expression XPath de la valeur</label>
                 <hint>Relative au nœud du choix</hint>
             </item-value>
+            <item-hint>
+                <label>Expression XPath de la suggestion</label>
+                <hint>Relative au nœud du choix</hint>
+            </item-hint>
             <is-last-page>
                 <label>Expression XPath indiquant s'il s'agit de la dernière page</label>
             </is-last-page>
@@ -2501,8 +2517,8 @@
             <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante ?</delete-column>
             <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante ?</delete-row>
             <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
-            <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
-            <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
+            <delete-service>Etes-vous sûr de vouloir supprimer le service "{0}" ?{1,choice,0# Aucune action ne l'utilise.|1# 1 action l''''utilise.|1&lt; {1,number,integer} actions l''''utilisent.}</delete-service>
+            <delete-action>Etes-vous sûr de vouloir supprimer l''action "{0}" ?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire. Vous pourrez les changer plus tard.</new-metadata-output>
@@ -3302,7 +3318,7 @@
             <publish-error>Det oppsto en feil ved publisering.</publish-error>
             <latest-published-version todo="true">Latest published version</latest-published-version>
             <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help todo="true">
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -3462,6 +3478,10 @@
                 <label>Forespørselens body</label>
                 <hint>XML-data (kan være en SOAP-konvolutt)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Respons</label>
             </response>
@@ -3670,6 +3690,10 @@
                 <label>Verdi</label>
                 <hint todo="true">[XPath expression relative to an item node]</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -3773,8 +3797,8 @@
             <delete-column>Er du sikker på at du ønsker å slette denne kolonnen?</delete-column>
             <delete-row>Er du sikker på at du ønsker å slette denne raden?</delete-row>
             <delete-resources>Er du sikker på at du ønsker å slette alle ressursene for språket</delete-resources>
-            <delete-service>Er du sikker på at du ønsker å slette sørvisen</delete-service>
-            <delete-action>Er du sikker på at du ønsker å slette handlingen</delete-action>
+            <delete-service todo="true">Er du sikker på at du ønsker å slette sørvisen "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Er du sikker på at du ønsker å slette handlingen "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere).</new-metadata-output>
@@ -4573,7 +4597,7 @@
             <publish-error>При публикации формы произошла ошибка.</publish-error>
             <latest-published-version todo="true">Latest published version</latest-published-version>
             <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help todo="true">
                 PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
                 database. Data which already exists in the database will still be viewed and edited with the previous
@@ -4733,6 +4757,10 @@
                 <label>Тело запроса</label>
                 <hint>Данные XML (может быть SOAP-обертка)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Ответ</label>
             </response>
@@ -4941,6 +4969,10 @@
                 <label>Значение</label>
                 <hint>Выражение XPath, возвращает значение.</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -5044,8 +5076,8 @@
             <delete-column>Вы уверены, что хотите удалить текущий столбец?</delete-column>
             <delete-row>Вы уверены, что хотите удалить текущую строку?</delete-row>
             <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
-            <delete-service>Вы уверены, что хотите удалить сервис?</delete-service>
-            <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
+            <delete-service todo="true">Вы уверены, что хотите удалить сервис "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Вы уверены, что хотите удалить действие "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
@@ -5845,7 +5877,7 @@
             <publish-error>Si è verificato un errore durante la pubblicazione del modulo.</publish-error>
             <latest-published-version>Ultima versione pubblicata</latest-published-version>
             <create-new-version-item>Crea una nuova definizione di modulo con il numero di versione {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>Sovrascrivi la definizione del modulo attuale con il numero di versione {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item>Sovrascrivi la definizione del modulo attuale con il numero di versione {0,number,integer} ({1,choice,0#non disponibile|1#disponibile})</overwrite-version-item>
             <create-new-version-help>
                 NOTA: La pubblicazione di questa definizione di modulo creerà una nuova versione della definizione del modulo nel database. I dati che esistono già nel database potranno ancora essere visualizzati e modificati con le versioni precedenti di questa definizione del modulo che sono associati con tali dati. La nuova versione della definizione del modulo verrà utilizzata per creare nuovi dati.
             </create-new-version-help>
@@ -5997,6 +6029,10 @@
                 <label>Corpo della richiesta</label>
                 <hint>Dati XML (puo essere un involucro SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Risposta</label>
             </response>
@@ -6205,6 +6241,10 @@
                 <label>Valore</label>
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -6308,8 +6348,8 @@
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
             <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
             <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
-            <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
-            <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
+            <delete-service todo="true">Sei sicuro di voler cancellare il servizio "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Sei sicuro di voler cancellare l''azione "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
             <metadata-edit-title>metadati del modulo</metadata-edit-title>
             <new-metadata-output>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo (è possibile cambiarli più tardi).</new-metadata-output>
@@ -7109,7 +7149,7 @@
             <publish-error>Beim Veröffentlichen des Formulars ist ein Fehler aufgetreten.</publish-error>
             <latest-published-version>Letzte veröffentlichte Version</latest-published-version>
             <create-new-version-item>Erstelle eine neue Formulardefinition mit der Versionsnummer {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">Überschreibe die aktuelle Formulardefinition mit Versionsnummer {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 BITTE BEACHTEN SIE: Die Veröffentlichung dieser Formulardefinition erstellt eine neue Version der Formulardefiniton in der Datenbank. Daten, die sich bereits in der Datenbank befinden 		können noch in den vorherigen Versionen der Formulardefintion angezeigt und bearbeitet werden, welche mit ihnen verknüpft ist. Die neue Version der Formulardefinition wird verwendet, um 			neue Daten zu erstellen.
             </create-new-version-help>
@@ -7262,6 +7302,10 @@
                 <label>Hauptteil der Anfrage</label>
                 <hint>XML-Daten (kann ein SOAP-Umschlag sein)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Antwort</label>
             </response>
@@ -7470,6 +7514,10 @@
                 <label>Wert</label>
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label>Letzte Seite erreicht XPath-Ausdruck</label>
             </is-last-page>
@@ -7573,8 +7621,8 @@
             <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
             <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
             <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
-            <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
-            <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
+            <delete-service todo="true">Sind Sie sicher, dass Sie Dienst "{0}" löschen wollen?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action>Sind Sie sicher, dass Sie Aktion "{0}" löschen wollen?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
             <metadata-edit-title>Formularmetadaten</metadata-edit-title>
             <new-metadata-output>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden (Sie können sie auch später ändern).</new-metadata-output>
@@ -8376,7 +8424,7 @@
             <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
             <latest-published-version>Viimeisin julkaistu versio</latest-published-version>
             <create-new-version-item>luo uusi lomakemäärittely versionumerolla {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">korvaa nykyinen lomakemäärittely versionumerolla {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 HUOMAA: Tämän lomakemäärittelyn julkaiseminen luo uuden lomakemäärittelyversion tietokantaan. Tietoja, jotka jo ovat tietokannassa voidaan yhä tarkastella ja editoida niillä edellisillä lomakemäärittelyversioilla, jotka liittyvät tietoihin. Uutta lomakemäärittelyversiota käytetään uusien tietojen luomiseen.
             </create-new-version-help>
@@ -8529,6 +8577,10 @@
                 <label>Ohjelmakoodin pyyntö</label>
                 <hint>XML-data (voi olla SOAP-kuori)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Vastaus</label>
             </response>
@@ -8737,6 +8789,10 @@
                 <label>Arvo</label>
                 <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -8840,8 +8896,8 @@
             <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
             <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
             <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
-            <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
-            <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
+            <delete-service todo="true">Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
             <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
             <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin).</new-metadata-output>
@@ -9640,7 +9696,7 @@
             <publish-error>Hubo un error durante la publicación.</publish-error>
             <latest-published-version>Última versión publicada</latest-published-version>
             <create-new-version-item>crear una nueva versión con número de versión {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>sobre escribir la definición actual con número de versión {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">sobre escribir la definición actual con número de versión {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 NOTA: Al publicar esta definición del formulario se creará una nueva versión en la base de datos. Los datos de los formularios existentes en la base de datos serán vistos y editados en sus versiones correspondientes. Esta nueva versión se usará para crear los nuevos formularios.
             </create-new-version-help>
@@ -9793,6 +9849,10 @@
                 <label>Cuerpo de la Solicitud</label>
                 <hint>Datos XML (pueder ser un "SOAP envelope")</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Respuesta</label>
             </response>
@@ -10001,6 +10061,10 @@
                 <label>Valor</label>
                 <hint>Expresión XPath relativa al nodo-item</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -10104,8 +10168,8 @@
             <delete-column>Está seguro de eliminar la Columna actual?</delete-column>
             <delete-row>Está seguro de eliminar la Fila actual?</delete-row>
             <delete-resources>Está seguro de eliminar todos los recursos para los idiomas</delete-resources>
-            <delete-service>Está seguro de eliminar el Servicio?</delete-service>
-            <delete-action>Está seguro de eliminar la Acción?</delete-action>
+            <delete-service todo="true">Está seguro de eliminar el Servicio "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Está seguro de eliminar la Acción "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>
             <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
             <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario (se pueden ingresar más adelante).</new-metadata-output>
@@ -10905,7 +10969,7 @@
             <publish-error>Er is een fout opgetreden tijdens het publiceren.</publish-error>
             <latest-published-version>Laatst gepubliceerde versie</latest-published-version>
             <create-new-version-item>maak een nieuwe formdefinitie met versienummer {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>overschrijf de huidige formdefinitie met versienummer {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">overschrijf de huidige formdefinitie met versienummer {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 MERK OP: Publiceren van deze formdefinitie maakt een nieuwe versie van de formdefinitie in de database.
                 Bestaande gegevens in de database kunnen nog wel met de vorige versies van deze formdefinitie waaraan
@@ -11065,6 +11129,10 @@
                 <label>Request body</label>
                 <hint>XML data (kan een SOAP envelope zijn)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Response</label>
             </response>
@@ -11245,6 +11313,10 @@
                 <label>Waarde XPath expressie</label>
                 <hint>Relatief aan gekozen node</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -11348,8 +11420,8 @@
             <delete-column>Weet u zeker dat u de huidige kolom wilt verwijderen?</delete-column>
             <delete-row>Weet u zeker dat u de huidige rij wilt verwijderen?</delete-row>
             <delete-resources>Weet u zeker dat u alle resources voor de taal wilt verwijderen</delete-resources>
-            <delete-service>Weet u zeker dat u de service wilt verwijderen</delete-service>
-            <delete-action>Weet u zeker dat u de actie wilt verwijderen</delete-action>
+            <delete-service todo="true">Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
             <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
             <metadata-edit-title>Form metagegevens</metadata-edit-title>
             <new-metadata-output>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form (u kunt deze later nog wijzigen).</new-metadata-output>
@@ -12149,7 +12221,7 @@
             <publish-error>Ocorreu um erro na publicação.</publish-error>
             <latest-published-version>Última versão publicada</latest-published-version>
             <create-new-version-item>criar uma nova definição de formulário com número de versão {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>substituir a definição de formulário actual pela versão com número {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">substituir a definição de formulário actual pela versão com número {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
                 ATENÇÃO: A publicação desta definição do formulário irá criar uma nova versão da definição do formulário na
                 base de dados. Os dados já existentes na base de dados continuarão a ser visualizados e editados com as versões anteriores
@@ -12308,6 +12380,10 @@
                 <label>Corpo do Pedido</label>
                 <hint>dados XML (pode ser um envelope SOAP)</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Resposta</label>
             </response>
@@ -12516,6 +12592,10 @@
                 <label>Valor</label>
                 <hint>Expressão XPath relativa a um item de um nodo</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -12619,8 +12699,8 @@
             <delete-column>Tem a certeza que deseja remover a coluna actual?</delete-column>
             <delete-row>Tem a certeza que deseja remover a linha actual?</delete-row>
             <delete-resources>Tem a certeza que deseja remover a todos os recursos para esta língua</delete-resources>
-            <delete-service>Tem a certeza que deseja remover o serviço</delete-service>
-            <delete-action>Tem a certeza que deseja remover a acção</delete-action>
+            <delete-service todo="true">Tem a certeza que deseja remover o serviço "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Tem a certeza que deseja remover a acção "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nenhum controlo será apagado|1#1 controlo será apagado|1&lt;{0,number,integer} controlos serão apagados} .</controls-will-be-deleted>
             <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
             <new-metadata-output>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário(ambos podem ser alterados posteriormente).</new-metadata-output>
@@ -13420,7 +13500,7 @@
             <publish-error>Ett fel inträffade under publiceringen.</publish-error>
             <latest-published-version>Senast publicerade version</latest-published-version>
             <create-new-version-item>skapa ett nytt formulär med version {0,number,integer}</create-new-version-item>
-            <overwrite-version-item>ersätt existerande formulär med version {0,number,integer}</overwrite-version-item>
+            <overwrite-version-item todo="true">ersätt existerande formulär med version {0,number,integer} ({1,choice,0#unavailable|1#available})</overwrite-version-item>
             <create-new-version-help>
 	        OBS: Publicering av detta formulär skapar en ny version av formulärdefinitionen i
 		databasen. Ifyllda formulär som redan finns i databasen visas och redigeras med de tidigare
@@ -13580,6 +13660,10 @@
                 <label>Anrop</label>
                 <hint>XML-data, troligen SOAP envelope</hint>
             </request-body>
+            <is-binary-response>
+                <label todo="true">[Service Response has Binary Content]</label>
+                <hint todo="true">[Check this if the response is used to set an attachment control value]</hint>
+            </is-binary-response>
             <response>
                 <label>Svar</label>
             </response>
@@ -13788,6 +13872,10 @@
                 <label>Värde</label>
                 <hint>XPath-uttryck relativt en nod</hint>
             </item-value>
+            <item-hint>
+                <label todo="true">[Hint XPath expression]</label>
+                <hint todo="true">[Relative to choice node]</hint>
+            </item-hint>
             <is-last-page>
                 <label todo="true">[Is last page XPath expression]</label>
             </is-last-page>
@@ -13891,8 +13979,8 @@
             <delete-column>Bekräfta att du vill ta bort denna kolumn</delete-column>
             <delete-row>Bekräfta att du vill ta bort denna rad</delete-row>
             <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
-            <delete-service>Bekräfta att du vill ta bort denna tjänst</delete-service>
-            <delete-action>Bekräfta att du vill ta bort detta kommando</delete-action>
+            <delete-service todo="true">Bekräfta att du vill ta bort denna tjänst "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
+            <delete-action todo="true">Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
             <metadata-edit-title>Metadata</metadata-edit-title>
             <new-metadata-output>Var god definiera namn på område och formulär. De kommer att användas för att identifiera formuläret (men går även att ändra senare).</new-metadata-output>

@@ -31,7 +31,7 @@ trait ControlLHHASupport {
   // NOTE: var because of cloning
   private[ControlLHHASupport] var lhhaArray = new Array[LHHAProperty](LHHA.size)
 
-  // XBL Container in which dynamic LHHA elements like xf:output and AVTs evaluate
+  // XBL Container in which dynamic LHHA elements like `xf:output` and AVTs evaluate
   def lhhaContainer = container
 
   def markLHHADirty(): Unit =

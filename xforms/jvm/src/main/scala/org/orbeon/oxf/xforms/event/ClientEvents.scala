@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events._
@@ -36,6 +35,7 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.xforms.{EventNames, XFormsId}
+
 import scala.collection.compat._
 
 // Process events sent by the client, including sorting, filtering, and security
@@ -72,14 +72,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     else
       Nil
 
-  def extractServerEventsElements(rootElement: Element): List[Element] =
-    Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME).to(List)
-
   // Entry point called by the server: process a sequence of incoming client events.
   def processEvents(
-    doc                  : XFormsContainingDocument,
-    clientEvents         : List[LocalEvent],
-    serverEventsElements : List[Element]
+    doc          : XFormsContainingDocument,
+    clientEvents : List[LocalEvent]
   ): EventsFindings = {
 
     val allClientAndServerEvents = {
@@ -89,16 +85,11 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         Dom4j.elements(EncodeDecode.decodeXML(text, true).getRootElement, XXFORMS_EVENT_QNAME) map
           (LocalEvent(_, trusted = true)) toList
 
-      // All global server events
-      val globalServerEvents = serverEventsElements flatMap (e => decodeServerEvents(e.getStringValue))
-
       // Gather all events including decoding action server events
-      globalServerEvents ++ (
-        clientEvents flatMap {
-          case event if event.name == EventNames.XXFormsServerEvents => decodeServerEvents(event.serverEventsValue)
-          case event                                                 => List(event)
-        }
-      )
+      clientEvents flatMap {
+        case event if event.name == EventNames.XXFormsServerEvents => decodeServerEvents(event.serverEventsValue)
+        case event                                                 => List(event)
+      }
     }
 
     def filterEvents(events: List[LocalEvent]) = events filter {

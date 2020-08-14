@@ -132,6 +132,10 @@
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
             <xf:value value="."/>
         </xf:header>
+        <xf:header ref="event('workflow-stage')[xxf:non-blank()]">
+            <xf:name>Orbeon-Workflow-Stage</xf:name>
+            <xf:value value="."/>
+        </xf:header>
     </xf:submission>
 
     <!-- Submission to create/update an attachment -->

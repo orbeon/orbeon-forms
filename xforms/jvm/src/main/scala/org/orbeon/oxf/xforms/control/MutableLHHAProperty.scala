@@ -118,15 +118,18 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   // Evaluate the value of a LHHA related to this control
   // Can return null
   protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] = {
-    val contextStack = control.getContextStack
-
-    val lhhaElement = lhhaAnalysis.element
 
     val result =
       if (lhhaAnalysis.isLocal) {
+
+        val contextStack = control.getContextStack
+
+        val lhhaElement = lhhaAnalysis.element
+
         // LHHA is direct child of control, evaluate within context
         contextStack.setBinding(control.bindingContext)
         contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
+
         val result = Option(
           XFormsUtils.getElementValue(
             control.lhhaContainer,
@@ -150,26 +153,26 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
     result
   }
 
-  private def findAncestorContextControl(contextStaticId: String, lhhaStaticId: String): XFormsControl = {
-
-    // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
-    val lhhaScope = control.getResolutionScope
-    val lhhaPrefixedId = lhhaScope.prefixedIdForStaticId(lhhaStaticId)
-
-    // Assume that LHHA element is within same repeat iteration as its related control
-    val contextPrefixedId = XFormsId.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId)
-    val contextEffectiveId = contextPrefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(control.effectiveId)
-
-    var ancestorObject = control.container.getContainingDocument.getObjectByEffectiveId(contextEffectiveId)
-    while (ancestorObject.isInstanceOf[XFormsControl]) {
-      val ancestorControl = ancestorObject.asInstanceOf[XFormsControl]
-      if (ancestorControl.getResolutionScope == lhhaScope) {
-        // Found ancestor in right scope
-        return ancestorControl
-      }
-      ancestorObject = ancestorControl.parent
-    }
-
-    null
-  }
+//  private def findAncestorContextControl(contextStaticId: String, lhhaStaticId: String): XFormsControl = {
+//
+//    // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
+//    val lhhaScope = control.getResolutionScope
+//    val lhhaPrefixedId = lhhaScope.prefixedIdForStaticId(lhhaStaticId)
+//
+//    // Assume that LHHA element is within same repeat iteration as its related control
+//    val contextPrefixedId = XFormsId.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId)
+//    val contextEffectiveId = contextPrefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(control.effectiveId)
+//
+//    var ancestorObject = control.container.getContainingDocument.getObjectByEffectiveId(contextEffectiveId)
+//    while (ancestorObject.isInstanceOf[XFormsControl]) {
+//      val ancestorControl = ancestorObject.asInstanceOf[XFormsControl]
+//      if (ancestorControl.getResolutionScope == lhhaScope) {
+//        // Found ancestor in right scope
+//        return ancestorControl
+//      }
+//      ancestorObject = ancestorControl.parent
+//    }
+//
+//    null
+//  }
 }

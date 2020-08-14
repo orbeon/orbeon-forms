@@ -45,20 +45,7 @@
                 <xxf:dynamic-state>
                     <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
                 </xxf:dynamic-state>
-                <!-- Only include files and omit all other parameters -->
-                <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
-                <xsl:if test="$files">
-                    <xxf:files>
-                        <xsl:copy-of select="$files"/>
-                    </xxf:files>
-                </xsl:if>
                 <xxf:action/>
-                <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
-                <xsl:if test="not($server-events = '')">
-                    <xxf:server-events>
-                        <xsl:value-of select="$server-events"/>
-                    </xxf:server-events>
-                </xsl:if>
             </xxf:event-request>
         </p:input>
         <p:output name="data" id="xml-request"/>

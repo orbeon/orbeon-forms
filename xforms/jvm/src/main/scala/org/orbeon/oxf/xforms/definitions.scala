@@ -13,14 +13,11 @@
  */
 package org.orbeon.oxf.xforms
 
-import enumeratum.{Enum, EnumEntry}
 import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.submission.UrlType
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
-import org.orbeon.xforms.rpc
 
 sealed trait XXBLScope extends EnumEntry with Lowercase
 object XXBLScope extends Enum[XXBLScope] {
@@ -49,8 +46,8 @@ trait XFormsObject {
 // Lifecycle of an XForms document from the point of view of requests/responses
 trait XFormsDocumentLifecycle {
   def afterInitialResponse(): Unit
-  def beforeExternalEvents(response: ExternalContext.Response): Unit
-  def afterExternalEvents(): Unit
+  def beforeExternalEvents(response: ExternalContext.Response, isAjaxRequest: Boolean): Unit
+  def afterExternalEvents(isAjaxRequest: Boolean): Unit
   def afterUpdateResponse(): Unit
 }
 
@@ -73,54 +70,13 @@ case class Load(
 ) {
   def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
 }
+
 case class DelayedEvent(
   eventName         : String,
   targetEffectiveId : String,
   bubbles           : Boolean,
   cancelable        : Boolean,
-  time              : Long,
-  discardable       : Boolean, // whether the client can discard the event past the delay (see AjaxServer.js)
-  showProgress      : Boolean  // whether to show the progress indicator when submitting the event
-) {
-
-  private def asEncodedDocument: String = {
-
-    import org.orbeon.oxf.xml.Dom4j._
-
-    XFormsUtils.encodeXML(
-      <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-        <xxf:event
-          name={eventName}
-          source-control-id={targetEffectiveId}
-          bubbles={bubbles.toString}
-          cancelable={cancelable.toString}/>
-      </xxf:events>,
-      false
-    )
-  }
-
-  def writeAsSAX(currentTime: Long)(implicit receiver: XMLReceiver): Unit = {
-
-    import XMLReceiverSupport._
-
-    element(
-      localName = XXFORMS_SERVER_EVENTS_QNAME.localName,
-      prefix    = XXFORMS_SHORT_PREFIX,
-      uri       = XXFORMS_NAMESPACE_URI,
-      atts      = List(
-        "delay"         -> (time - currentTime).toString,
-        "discardable"   -> discardable.toString,
-        "show-progress" -> showProgress.toString
-      ),
-      text      = asEncodedDocument
-    )
-  }
-
-  def toServerEvent(currentTime: Long): rpc.ServerEvent =
-    rpc.ServerEvent(
-      delay        = time - currentTime,
-      discardable  = discardable,
-      showProgress = showProgress,
-      encodedEvent = asEncodedDocument
-    )
-}
+  time              : Option[Long],
+  showProgress      : Boolean,       // whether to show the progress indicator when submitting the event
+  browserTarget     : Option[String] // optional browser target for submit events
+)

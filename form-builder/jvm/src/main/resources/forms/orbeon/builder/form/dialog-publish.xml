@@ -16,6 +16,7 @@
     xmlns:xf  = "http://www.w3.org/2002/xforms"
     xmlns:xs  = "http://www.w3.org/2001/XMLSchema"
     xmlns:xxf = "http://orbeon.org/oxf/xml/xforms"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:fr  = "http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf = "java:org.orbeon.oxf.fr.FormRunner"
 
@@ -111,7 +112,15 @@
                                     </xf:item>
                                     <!-- All existing versions sorted from newest to oldest -->
                                     <xf:itemset ref="$versions">
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, xs:integer(.))"/>
+                                        <xf:label
+                                            value="
+                                                xxf:format-message(
+                                                    $form-resources/dialog-publish/overwrite-version-item,
+                                                    (
+                                                        xs:integer(.),
+                                                        if (@available = 'true') then 1 else 0
+                                                    )
+                                                )"/>
                                         <xf:value value="."/>
                                     </xf:itemset>
 
@@ -286,12 +295,22 @@
                 origin="
                     for $v in
                         xxf:sort(
-                            event('versions'),
-                            .,
+                            event('all-versions'),
+                            array:get(., 1),
                             'number',
                             'descending'
                         )
-                    return xf:element('version', $v)"/>
+                    return
+                        xf:element(
+                            'version',
+                            (
+                                xf:attribute(
+                                    'available',
+                                    array:get($v, 2)
+                                ),
+                                array:get($v, 1)
+                            )
+                        )"/>
         </xf:action>
 
         <!-- Clean-up upon close -->

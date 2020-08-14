@@ -19,6 +19,7 @@ import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.DelayedEvent;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -58,8 +59,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     private final XFormsModel model;
 
-    private SubmissionParameters activeSubmissionParameters = null;
-
     // All the submission types in the order they must be checked
     private final Submission[] submissions;
 
@@ -85,14 +84,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     public Element getSubmissionElement() {
         return staticSubmission.element();
-    }
-
-    public SubmissionParameters getActiveSubmissionParameters() {
-        return activeSubmissionParameters;
-    }
-
-    public void clearActiveSubmissionParameters() {
-        activeSubmissionParameters = null;
     }
 
     public String getId() {
@@ -163,10 +154,10 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
                 // issue a warning
                 {
-                    final Option<XFormsModelSubmission> existingSubmission = containingDocument.getClientActiveSubmissionFirstPass();
-                    if (p.isDeferredSubmission() && existingSubmission.isDefined()) {
+                    final Option<DelayedEvent> twoPassParams = containingDocument.findTwoPassSubmitEvent();
+                    if (p.isDeferredSubmission() && twoPassParams.isDefined()) {
                         indentedLogger.logWarning("", "another submission requiring a second pass already exists",
-                                "existing submission", existingSubmission.get().getEffectiveId(),
+                                "existing submission", twoPassParams.get().targetEffectiveId(),
                                 "new submission", this.getEffectiveId());
                         return;
                     }
@@ -212,7 +203,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 /* ***** Handle deferred submission ********************************************************************* */
 
-
                 // Deferred submission: end of the first pass
                 if (p.isDeferredSubmissionFirstPass()) {
 
@@ -229,8 +219,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         );
                     }
 
-                    this.activeSubmissionParameters = p;
-                    containingDocument.setActiveSubmissionFirstPass(this);
+                    containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters.apply(getEffectiveId(), p));
                     return;
                 }
 

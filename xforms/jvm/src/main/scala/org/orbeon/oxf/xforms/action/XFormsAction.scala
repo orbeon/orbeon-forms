@@ -110,7 +110,7 @@ object XFormsAction {
     val tuples =
       for {
         element <- Dom4j.elements(actionElement)
-        if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // xf:property since XForms 2.0
+        if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // `xf:property` since XForms 2.0
 
         // Get and check attributes
         name =

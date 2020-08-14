@@ -44,8 +44,8 @@
 
     <taskdef resource="proguard/ant/task.properties">
         <classpath>
-            <pathelement location="lib_ant/proguard-6.1.1.jar"/>
-            <pathelement location="lib_ant/proguard-annotations-6.1.1.jar"/>
+            <pathelement location="lib_ant/proguard-6.2.2.jar"/>
+            <pathelement location="lib_ant/proguard-annotations-6.2.2.jar"/>
         </classpath>
     </taskdef>
 
@@ -183,6 +183,22 @@
             -keep public class org.apache.commons.logging.impl.Jdk14Logger {
                 public *;
             }
+            <!-- https://github.com/orbeon/orbeon-forms/issues/4604 -->
+            -keep public enum org.apache.http.client.utils.URIUtils$** {
+                **[] $VALUES;
+                public *;
+            }
+
+            <!-- https://www.guardsquare.com/en/products/proguard/manual/examples#serializable -->
+            -keepnames class * implements java.io.Serializable
+
+            -keepclassmembers class * implements java.io.Serializable {
+                private static final java.io.ObjectStreamField[] serialPersistentFields;
+                private void writeObject(java.io.ObjectOutputStream);
+                private void readObject(java.io.ObjectInputStream);
+                java.lang.Object writeReplace();
+                java.lang.Object readResolve();
+            }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-embedding.jar">
             <zipfileset src="${temp.jar}"/>
@@ -235,6 +251,22 @@
             }
             -keep public class org.apache.commons.logging.impl.Jdk14Logger {
                 public *;
+            }
+            <!-- https://github.com/orbeon/orbeon-forms/issues/4604 -->
+            -keep public enum org.apache.http.client.utils.URIUtils$** {
+                **[] $VALUES;
+                public *;
+            }
+
+            <!-- https://www.guardsquare.com/en/products/proguard/manual/examples#serializable -->
+            -keepnames class * implements java.io.Serializable
+
+            -keepclassmembers class * implements java.io.Serializable {
+                private static final java.io.ObjectStreamField[] serialPersistentFields;
+                private void writeObject(java.io.ObjectOutputStream);
+                private void readObject(java.io.ObjectInputStream);
+                java.lang.Object writeReplace();
+                java.lang.Object readResolve();
             }
         </proguard>
         <jarjar jarfile="build/lib/orbeon-proxy-portlet.jar">

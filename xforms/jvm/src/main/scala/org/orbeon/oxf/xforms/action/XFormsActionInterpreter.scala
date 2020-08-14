@@ -50,7 +50,7 @@ class XFormsActionInterpreter(
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
 
   def getNamespaceMappings(actionElement: Element): NamespaceMapping =
-    container.getNamespaceMappings(actionElement)
+    container.getPartAnalysis.getNamespaceMapping(getActionScope(actionElement), getActionStaticId(actionElement))
 
   // Return the source against which id resolutions are made for the given action element.
   def getSourceEffectiveId(actionElement: Element): String =

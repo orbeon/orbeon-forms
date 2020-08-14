@@ -315,7 +315,7 @@
                     ref="$parameters/form-version"
                     value="
                         if (empty($requested-version)) then
-                            (: Pick latest version :)
+                            (: Pick latest available version :)
                             max(event('versions'))
                         else
                             (: Should be a NOP since the parameter is already stored :)

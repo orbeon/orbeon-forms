@@ -196,8 +196,10 @@ object ControlLabelHintTextEditor {
         // Event handlers
         textfield.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit {
           // End edit when users press enter
-          if (e.which == 13)
+          if (e.which == 13) {
+            e.preventDefault()
             resourceEditorEndEdit()
+          }
         })
         checkbox.on("click.orbeon.builder.lht-editor", () => asUnit {
           // When checkbox clicked, set focus back on the text field, where it was before

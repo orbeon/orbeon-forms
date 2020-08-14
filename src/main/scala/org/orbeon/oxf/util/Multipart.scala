@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.io.OutputStream
+import java.{util => ju}
 
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload._
@@ -23,13 +24,15 @@ import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
+import shapeless.syntax.typeable._
 
+import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
 
@@ -70,17 +73,19 @@ object Multipart {
 
   import Private._
 
+  type UploadItem = String Either FileItem
+
   // Initially we set this to `MultipartStream.DEFAULT_BUFSIZE`.
   // But one user had an issue with a very large header causing errors. So we are making this larger now.
   // https://github.com/orbeon/orbeon-forms/issues/4579
   val DefaultBufferSize = 3 * 4096
 
   // Return fully successful requests only
-  def getParameterMapMultipart(
+  def getParameterMapMultipartJava(
     pipelineContext : PipelineContext,
     request         : Request,
     headerEncoding  : String
-  ): Map[String, Array[AnyRef]] = {
+  ): ju.Map[String, Array[AnyRef]] = {
 
     val uploadContext = new UploadContext {
       val getContentType       = request.getContentType
@@ -98,11 +103,12 @@ object Multipart {
       case (nameValues, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListener {
-          def contextDestroyed(success: Boolean) = quietlyDeleteFileItems(nameValues)
-        })
+        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValues))
 
-        combineValues[String, AnyRef, Array](nameValues).toMap
+        val foldedValues =
+          nameValues map { case (k, v) => k -> v.fold(identity, identity) }
+
+        combineValues[String, AnyRef, Array](foldedValues).toMap.asJava
       case (nameValues, Some(t)) =>
         quietlyDeleteFileItems(nameValues)
         throw t
@@ -121,7 +127,7 @@ object Multipart {
     maxSize        : MaximumSize,
     headerEncoding : String,
     maxMemorySize  : Int
-  ): (List[(String, AnyRef)], Option[Throwable]) = {
+  ): (List[(String, UploadItem)], Option[Throwable]) = {
 
     require(uploadContext ne null)
     require(headerEncoding ne null)
@@ -142,7 +148,7 @@ object Multipart {
     // Parse the request and add file information
     useAndClose(uploadContext.getInputStream) { _ =>
       // This contains all completed values up to the point of failure if any
-      val result = m.ListBuffer[(String, AnyRef)]()
+      val result = m.ListBuffer[(String, UploadItem)]()
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
         val itemIterator = asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
@@ -167,11 +173,12 @@ object Multipart {
     )
 
   // Delete all items which are of type `FileItem`
-  def quietlyDeleteFileItems(nameValues: List[(String, AnyRef)]): Unit = (
-    nameValues
-    collect { case (_, fileItem: FileItem) => fileItem }
-    foreach (fileItem => runQuietly(fileItem.delete()))
-  )
+  def quietlyDeleteFileItems(nameValues: List[(String, UploadItem)]): Unit =
+    nameValues collect {
+      case (_, Right(fileItem)) => fileItem
+    } foreach {
+      fileItem => runQuietly(fileItem.delete())
+    }
 
   private object Private {
 
@@ -184,7 +191,7 @@ object Multipart {
       servletFileUpload : ServletFileUpload,
       fis               : FileItemStream,
       lifecycleOpt      : Option[MultipartLifecycle]
-    ): (String, AnyRef) = { // String | FileItem
+    ): (String, UploadItem) = {
 
       val fieldName = fis.getFieldName
 
@@ -196,18 +203,19 @@ object Multipart {
         // by the limiter on the incoming outer input stream.
         val value = Streams.asString(fis.openStream, StandardParameterEncoding)
         lifecycleOpt foreach (_.fieldReceived(fieldName, value))
-        fieldName -> value
+        fieldName -> Left(value)
       } else {
 
         try {
 
           val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName).asInstanceOf[DiskFileItem]
+
           try {
 
             // Browsers (at least Chrome and Firefox) don't seem to want to put a `Content-Length` per part :(
             for {
               fisHeaders     <- Option(fis.getHeaders) // `getHeaders` can be null
-              headersSupport <- collectByErasedType[FileItemHeadersSupport](fileItem)
+              headersSupport <- fileItem.cast[FileItemHeadersSupport]
             } locally {
               headersSupport.setHeaders(fisHeaders)
             }
@@ -242,14 +250,14 @@ object Multipart {
               }
             )
           } catch {
-            // Clean-up FileItem right away in case of failure
+            // Clean-up `FileItem` right away in case of failure
             case NonFatal(t) =>
               runQuietly(fileItem.delete())
               throw t
           }
 
           lifecycleOpt foreach (_.fileItemState(UploadState.Completed(fileItem))) // can throw `FileScanException`
-          fieldName -> fileItem
+          fieldName -> Right(fileItem)
         } catch {
           case NonFatal(t) =>
             lifecycleOpt foreach (_.fileItemState(
@@ -267,7 +275,7 @@ object Multipart {
       }
     }
 
-    def asScalaIterator(i: FileItemIterator) = new Iterator[FileItemStream] {
+    def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
       def hasNext = i.hasNext
       def next()  = i.next()
       override def toString = "Iterator wrapping FileItemIterator" // super.toString is dangerous when running in a debugger

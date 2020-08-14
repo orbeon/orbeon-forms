@@ -17,7 +17,6 @@ package org.orbeon.xforms
 object Constants {
 
   val UuidFieldName                     = "$uuid"
-  val ServerEventsFieldName             = "$server-events"
 
   val RepeatSeparator                   = "\u2299" // ⊙ CIRCLED DOT OPERATOR
   val RepeatIndexSeparator              = "-"      // - (just has to not be a digit)

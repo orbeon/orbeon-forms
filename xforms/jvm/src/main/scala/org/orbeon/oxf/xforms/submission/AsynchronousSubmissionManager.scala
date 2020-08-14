@@ -15,16 +15,16 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent._
+
 import javax.enterprise.concurrent.ManagedExecutorService
 import javax.naming.{InitialContext, NamingException}
-
 import org.orbeon.oxf.externalcontext.{AsyncRequest, LocalExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.xforms.EventNames
 
 /**
   * Handle asynchronous submissions.
@@ -49,12 +49,11 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
   def addClientDelayEventIfNeeded(): Unit =
     if (hasPendingAsynchronousSubmissions)
       containingDocument.addDelayedEvent(
-        eventName         = XFormsEvents.XXFORMS_POLL,
+        eventName         = EventNames.XXFormsPoll,
         targetEffectiveId = containingDocument.getEffectiveId,
         bubbles           = false,
         cancelable        = false,
         time              = System.currentTimeMillis + containingDocument.getSubmissionPollDelay,
-        discardable       = true,
         showProgress      = false, // could get from submission, but default must be `false`
         allowDuplicates   = false  // no need for duplicates
       )
@@ -258,5 +257,4 @@ private object AsynchronousSubmissionManager {
     def writeExternal(out: ObjectOutput) = ()
     def readExternal(in: ObjectInput)    = ()
   }
-
 }

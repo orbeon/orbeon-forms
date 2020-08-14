@@ -39,12 +39,12 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget, XFormsEvents}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
 import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -55,6 +55,8 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
+
+import cats.syntax.option._
 
 object XFormsContainingDocumentSupport {
 
@@ -144,6 +146,8 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
 
 trait ContainingDocumentTransientState {
 
+  self: XBLContainer with ContainingDocumentDelayedEvents =>
+
   import CollectionUtils._
 
   def getShowMaxRecoverableErrors: Int
@@ -153,7 +157,6 @@ trait ContainingDocumentTransientState {
 
     var byName                   : Map[String, Any] = Map.empty[String, Any]
 
-    var activeSubmissionFirstPass: Option[XFormsModelSubmission] = None
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
 
@@ -169,9 +172,6 @@ trait ContainingDocumentTransientState {
 
   private var transientState: TransientState = new TransientState
 
-  private def throwConflict(locationData: LocationData): Nothing =
-    throw new ValidationException("Unable to run a two-pass submission and `xf:load` within a same action sequence.", locationData)
-
   def setTransientState[T](name: String, value: T): Unit =
     transientState.byName += name -> value
 
@@ -181,23 +181,8 @@ trait ContainingDocumentTransientState {
   def removeTransientState(name: String): Unit =
     transientState.byName -= name
 
-  def clearTransientState(): Unit = {
-    transientState.activeSubmissionFirstPass foreach (_.clearActiveSubmissionParameters())
+  def clearTransientState(): Unit =
     transientState = new TransientState
-  }
-
-  def setActiveSubmissionFirstPass(submission: XFormsModelSubmission): Unit = {
-
-    transientState.activeSubmissionFirstPass foreach
-      (_ => throw new ValidationException("There is already an active submission.", submission.getLocationData))
-
-    if (transientState.nonJavaScriptLoadsToRun.nonEmpty)
-      throwConflict(submission.getLocationData)
-
-    transientState.activeSubmissionFirstPass = Some(submission)
-  }
-
-  def getClientActiveSubmissionFirstPass: Option[XFormsModelSubmission] = transientState.activeSubmissionFirstPass
 
   def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
     transientState.scriptsToRun :+= Right(scriptInvocation)
@@ -205,9 +190,9 @@ trait ContainingDocumentTransientState {
   def getScriptsToRun: i.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
-    transientState.activeSubmissionFirstPass match {
-      case Some(s) =>
-        throwConflict(s.getLocationData)
+    findTwoPassSubmitEvent match {
+      case Some(_) =>
+        throw new OXFException("Unable to run a two-pass submission and `xf:load` within a same action sequence.")
       case None =>
         if (load.isJavaScript)
           transientState.scriptsToRun :+= Left(load)
@@ -693,6 +678,24 @@ trait ContainingDocumentDelayedEvents {
 
   private val _delayedEvents = m.ListBuffer[DelayedEvent]()
 
+  def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
+    _delayedEvents += DelayedEvent(
+      eventName         = XFormsEvents.XXFORMS_SUBMIT,
+      targetEffectiveId = p.submissionEffectiveId,
+      bubbles           = true,
+      cancelable        = false,
+      time              = None,
+      showProgress      = p.showProgress,
+      browserTarget     = p.target
+    )
+
+  def findTwoPassSubmitEvent: Option[DelayedEvent] =
+    _delayedEvents find (_.eventName == XFormsEvents.XXFORMS_SUBMIT)
+
+  // This excludes events where `time == None`, which means it doesn't return the `xxforms-submit` event.
+  def findEarliestPendingDelayedEvent: Option[DelayedEvent] =
+    _delayedEvents.filter(_.time.nonEmpty).sortBy(_.time).headOption
+
   // Schedule an event for delayed execution, following `xf:dispatch/@delay` semantics
   def addDelayedEvent(
     eventName         : String,
@@ -700,33 +703,32 @@ trait ContainingDocumentDelayedEvents {
     bubbles           : Boolean,
     cancelable        : Boolean,
     time              : Long,
-    discardable       : Boolean,
     showProgress      : Boolean,
-    allowDuplicates   : Boolean
+    allowDuplicates   : Boolean // 2020-07-24: used by `xf:dispatch` and `false` for `xxforms-poll`
   ): Unit = {
 
+    // For `xxforms-poll`, we *could* attempt to preserve the earlier time. But currently,
+    // `addClientDelayEventIfNeeded()` for async submissions always uses a newer time at
+    // each call.
     def isDuplicate(e: DelayedEvent) =
       e.eventName == eventName && e.targetEffectiveId == targetEffectiveId
 
     if (allowDuplicates || ! (_delayedEvents exists isDuplicate))
       _delayedEvents += DelayedEvent(
-        eventName,
-        targetEffectiveId,
-        bubbles,
-        cancelable,
-        time,
-        discardable,
-        showProgress
+        eventName         = eventName,
+        targetEffectiveId = targetEffectiveId,
+        bubbles           = bubbles,
+        cancelable        = cancelable,
+        time              = time.some,
+        showProgress      = showProgress,
+        browserTarget     = None
       )
   }
 
   def delayedEvents: List[DelayedEvent] =
     _delayedEvents.toList
 
-  def clearAllDelayedEvents(): Unit =
-    _delayedEvents.clear()
-
-  def processDueDelayedEvents(): Unit = {
+  def processDueDelayedEvents(onlyEventsWithNoTime: Boolean): Unit = {
 
     @tailrec
     def processRemainingBatchesRecursively(): Unit = {
@@ -734,7 +736,11 @@ trait ContainingDocumentDelayedEvents {
       // Get a fresh time for every batch because processing a batch can take time
       val currentTime = System.currentTimeMillis()
 
-      val (dueEvents, futureEvents) = delayedEvents partition (_.time <= currentTime)
+      val (dueEvents, futureEvents) =
+        if (onlyEventsWithNoTime)
+          delayedEvents partition (_.time.isEmpty)
+        else
+          delayedEvents partition (_.time exists (_ <= currentTime))
 
       if (dueEvents.nonEmpty) {
 
@@ -744,8 +750,8 @@ trait ContainingDocumentDelayedEvents {
         dueEvents foreach { dueEvent =>
 
           withOutermostActionHandler {
-            self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
-              case eventTarget: XFormsEventTarget =>
+            self.findObjectByEffectiveId(dueEvent.targetEffectiveId) match {
+              case Some(eventTarget: XFormsEventTarget) =>
                 ClientEvents.processEvent(
                   self.containingDocument,
                   XFormsEventFactory.createEvent(
@@ -776,6 +782,9 @@ trait ContainingDocumentDelayedEvents {
 
     processRemainingBatchesRecursively()
   }
+
+  protected def restoreDelayedEvents(dynamicState: DynamicState): Unit =
+    _delayedEvents ++= dynamicState.decodeDelayedEvents
 }
 
 trait ContainingDocumentClientState {
@@ -804,7 +813,7 @@ trait ContainingDocumentClientState {
         ScriptBuilder.buildJavaScriptInitialData(
           containingDocument   = this,
           rewriteResource      = response.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
-          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map ScriptBuilder.gatherJavaScriptInitializations getOrElse Nil
+          controlsToInitialize = getControls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
         )
       )
 
@@ -821,11 +830,11 @@ trait ContainingDocumentCacheable extends Cacheable {
   self: XFormsContainingDocument =>
 
   def added(): Unit =
-    XFormsStateManager.instance.onAddedToCache(getUUID)
+    XFormsStateManager.onAddedToCache(getUUID)
 
   // WARNING: This can be called while another threads owns this document lock
   def removed(): Unit =
-    XFormsStateManager.instance.onRemovedFromCache(getUUID)
+    XFormsStateManager.onRemovedFromCache(getUUID)
 
   // Return lock or `null` in case session just expired
   def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(getUUID)
@@ -835,5 +844,5 @@ trait ContainingDocumentCacheable extends Cacheable {
   // the lock on the document first and will not evict us if we have the lock. This means that this will be called
   // only if no thread is dealing with this document.
   def evicted(): Unit =
-    XFormsStateManager.instance.onEvictedFromCache(self)
+    XFormsStateManager.onEvictedFromCache(self)
 }

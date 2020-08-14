@@ -28,33 +28,34 @@
             <!-- Read data upon dialog open -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
 
-                <xf:var name="submission-name" value="event('submission-name')"/>
-                <xf:var name="form"            value="xxf:binding('fb-dialog-http-services')"/>
-                <xf:var name="model"           value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xf:var name="submission-name-opt" value="event('submission-name')"/>
+                <xf:var name="form"                value="xxf:binding('fb-dialog-http-services')"/>
+                <xf:var name="model"               value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
 
                 <!-- Clear instance entirely -->
                 <xf:setvalue iterate="$i//*[not(*)]" ref="."/>
 
-                <xf:setvalue ref="$request/is-soap"       value="false()"/>
-                <xf:setvalue ref="$request/is-auth"       value="false()"/>
-                <xf:setvalue ref="$request/method"        value="instance('fb-submission-template')/@method"/>
-                <xf:setvalue ref="$request/serialization" value="instance('fb-submission-template')/@serialization"/>
+                <xf:setvalue ref="$request/method"             value="instance('fb-submission-template')/@method"/>
+                <xf:setvalue ref="$request/serialization"      value="instance('fb-submission-template')/@serialization"/>
+                <xf:setvalue ref="$request/is-soap"            value="false()"/>
+                <xf:setvalue ref="$request/is-auth"            value="false()"/>
                 <xf:delete   ref="$request/params/param"/>
+                <xf:setvalue ref="$request/is-binary-response" value="false()"/>
                 <xf:delete   ref="$response/headers/header"/>
 
                 <!-- Copy parameters if any -->
-                <xf:action if="exists($submission-name)">
+                <xf:action if="exists($submission-name-opt)">
 
-                    <xf:setvalue ref="$i/name"         value="$submission-name"/>
-                    <xf:setvalue ref="$i/initial-name" value="$submission-name"/>
+                    <xf:setvalue ref="$i/name"         value="$submission-name-opt"/>
+                    <xf:setvalue ref="$i/initial-name" value="$submission-name-opt"/>
 
                     <xf:var
                         name="submission"
-                        value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
+                        value="$model/fb:submission[@id = concat($submission-name-opt, '-submission')]"/>
 
                     <xf:var
                         name="instance-body-string"
-                        value="$model/fb:instance[@id = concat($submission-name, '-instance')]/*"/>
+                        value="$model/fb:instance[@id = concat($submission-name-opt, '-instance')]/*"/>
 
                     <xf:var
                         name="local-has-request-body"
@@ -116,9 +117,10 @@
                         ref="$request/soap-action"
                         value="xxf:trim(tokenize($soap-action, '=')[2])"/>
 
-                    <xf:setvalue ref="$request/is-auth"  value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
-                    <xf:setvalue ref="$request/username" value="$submission/@xxf:username"/>
-                    <xf:setvalue ref="$request/password" value="$submission/@xxf:password"/>
+                    <xf:setvalue ref="$request/is-auth"            value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
+                    <xf:setvalue ref="$request/username"           value="$submission/@xxf:username"/>
+                    <xf:setvalue ref="$request/password"           value="$submission/@xxf:password"/>
+                    <xf:setvalue ref="$request/is-binary-response" value="$submission/@replace = 'xxf:binary'"/>
 
                 </xf:action>
 
@@ -200,23 +202,89 @@
             <xbl:handler event="DOMActivate" if="valid($i)" observer="fb-service-save">
 
                 <xf:action if="instance('modified') = true()">
-                    <!-- Actual id of the submission and instance -->
-                    <xf:var name="submission-id" value="$i/submission-id"/>
-                    <xf:var name="instance-id"   value="$i/instance-id"/>
+
+                    <xf:var
+                        name="existing-submission-id-opt"
+                        value="for $n in $i/initial-name[xxf:non-blank()] return concat($n, '-submission')"/>
+                    <xf:var
+                        name="existing-instance-id-opt"
+                        value="for $n in $i/initial-name[xxf:non-blank()] return concat($n, '-instance')"/>
+
+                    <xf:var
+                        name="new-submission-id"
+                        value="concat($i/name, '-submission')"/>
+                    <xf:var
+                        name="new-instance-id"
+                        value="concat($i/name, '-instance')"/>
+
+                    <xf:var
+                        name="existing-submission-opt"
+                        value="$model/fb:submission[@id = $existing-submission-id-opt]"/>
+                    <xf:var
+                        name="existing-instance-opt"
+                        value="$model/fb:instance[@id = $existing-instance-id-opt]"/>
 
                     <!-- Insert new submission if needed -->
-                    <xf:action if="not(exists($model/fb:submission[@id = $submission-id]))">
-                        <xf:insert context="$model" ref="xf:* | fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
-                        <xf:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
+                    <xf:action if="empty($existing-submission-opt)">
+                        <xf:insert
+                            context="$model"
+                            ref="
+                                (
+                                    fb:submission[last()], (: after existing services :)
+                                    *[last()]              (: or after everything :)
+                                )[1]"
+                            origin="instance('fb-submission-template')"/>
+                        <xf:setvalue
+                            ref="$model/fb:submission[last()]/@id"
+                            value="$new-submission-id"/>
                     </xf:action>
 
+                    <!-- Rename if needed -->
+                    <xf:action if="exists($existing-submission-id-opt) and $existing-submission-id-opt != $new-submission-id">
+
+                        <!-- Rename submission and instance ids -->
+                        <xf:setvalue
+                            ref="$existing-submission-opt/@id"
+                            value="$new-submission-id"/>
+                        <xf:setvalue
+                            ref="$existing-instance-opt/@id"
+                            value="$new-instance-id"/>
+
+                        <xf:var name="form"  value="xxf:binding('fb-dialog-http-services')"/>
+                        <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+
+                        <!-- Rename legacy service calls -->
+                        <xf:setvalue
+                            iterate="
+                                $model/fb:action[
+                                    ends-with(@id, '-binding')
+                                ]//xf:send/@submission[
+                                    . = $existing-submission-id-opt
+                                ]"
+                            ref="."
+                            value="$new-submission-id"/>
+
+                        <!-- Rename new action syntax service calls -->
+                        <xf:setvalue
+                            iterate="
+                                $model/fr:action//fr:service-call/@service[
+                                    . = $i/initial-name
+                                ]"
+                            ref="."
+                            value="$i/name"/>
+
+                    </xf:action>
+
+                    <xf:var
+                        name="submission"
+                        value="$model/fb:submission[@id = $new-submission-id]"/>
+
                     <!-- Set submission properties -->
-                    <xf:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
                     <xf:action context="$submission">
-                        <xf:setvalue ref="@method" value="$request/method"/>
+                        <xf:setvalue ref="@method"        value="$request/method"/>
                         <xf:setvalue ref="@serialization" value="$request/serialization"/>
-                        <xf:setvalue ref="@resource" value="$request/resource"/>
-                        <xf:setvalue ref="@mediatype" value="$request/mediatype"/>
+                        <xf:setvalue ref="@resource"      value="$request/resource"/>
+                        <xf:setvalue ref="@mediatype"     value="$request/mediatype"/>
 
                         <xf:var name="is-auth" value="string($request/is-auth) = 'true'"/>
                         <xf:action if="$is-auth">
@@ -231,17 +299,35 @@
                             <xf:delete context="." ref="@xxf:username"/>
                             <xf:delete context="." ref="@xxf:password"/>
                         </xf:action>
+
+                        <xf:var name="is-binary-response" value="string($request/is-binary-response) = 'true'"/>
+                        <xf:action if="$is-binary-response">
+                            <xf:insert
+                                context="."
+                                origin="xf:attribute('replace', 'xxf:binary')"/>
+                        </xf:action>
+                        <xf:action if="not($is-binary-response)">
+                            <xf:delete context="." ref="@replace"/>
+                        </xf:action>
                     </xf:action>
 
                     <!-- Insert new instance just before submission if needed -->
-                    <xf:action if="not(exists($model/fb:instance[@id = $instance-id]))">
-                        <xf:insert ref="$submission" position="before" origin="instance('fb-instance-template')"/>
-                        <!-- Don't reuse $submission because it might be out of date due to the insertion before! -->
-                        <xf:setvalue ref="$model/fb:submission[@id = $submission-id]/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
+                    <xf:action if="empty($existing-instance-opt)">
+                        <xf:insert
+                            ref="$submission"
+                            position="before"
+                            origin="instance('fb-instance-template')"/>
+                        <xf:setvalue
+                            ref="$submission/preceding-sibling::fb:instance[1]/@id"
+                            value="$new-instance-id"/>
                     </xf:action>
 
+                    <xf:var
+                        name="instance"
+                        value="$model/fb:instance[@id = $new-instance-id]"/>
+
                     <!-- Set instance document -->
-                    <xf:action context="$model/fb:instance[@id = $instance-id]">
+                    <xf:action context="$instance">
                         <xf:action if="not($has-request-body)">
                             <xf:var
                                 name="body"
@@ -283,13 +369,19 @@
             <!-- Delete service with confirmation -->
             <xbl:handler event="DOMActivate" observer="fb-service-delete-trigger">
                 <xf:dispatch name="fb-request-delete-http-service" target="fb-dialog-http-services">
-                    <xf:property name="service-name" value="$i/name"/>
+                    <xf:property name="service-name" value="$i/initial-name/string()"/>
                 </xf:dispatch>
             </xbl:handler>
 
             <xbl:handler event="fb-confirm-delete-http-service" phase="target">
-                <xf:delete ref="$model/(fb:submission[@id = $i/submission-id], fb:instance[@id = $i/instance-id])"/>
-                <xxf:hide dialog="dialog"/>
+                <xf:delete
+                    ref="
+                        $model/(
+                            fb:submission[@id = concat($i/initial-name, '-submission')],
+                            fb:instance  [@id = concat($i/initial-name, '-instance')]
+                        )"/>
+                <xxf:hide
+                    dialog="dialog"/>
             </xbl:handler>
 
         </xbl:handlers>
@@ -297,20 +389,17 @@
 
             <xf:model id="model">
 
-                <xf:var name="form"            value="xxf:binding('fb-dialog-http-services')"/>
-                <xf:var name="model"           value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+                <xf:var name="form"  value="xxf:binding('fb-dialog-http-services')"/>
+                <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <submission>
                         <name/>
                         <initial-name/>
-                        <submission-id/>
-                        <instance-id/>
                         <request>
                             <method/>
                             <serialization/>
                             <resource/>
-                            <!--<replace/>-->
                             <is-soap>false</is-soap>
                             <soap-action/>
                             <is-auth>false</is-auth>
@@ -319,6 +408,7 @@
                             <mediatype/>
                             <body/>
                             <params/>
+                            <is-binary-response>false</is-binary-response>
                         </request>
                         <response>
                             <error-type/>
@@ -359,25 +449,18 @@
                         required="true()"
                         xxf:whitespace="trim"
                         constraint="
-                            (
-                                . != '' and
-                                . = ../initial-name
-                            ) or not(
-                                ../submission-id  = $model/fb:submission/@id or
-                                ../instance-id    = $model/fb:instance/@id
-                            )"
-                        readonly="xxf:non-blank(../initial-name)"/>
-
-                    <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
-                    <xf:bind ref="instance-id"   calculate="concat(../name, '-instance')"/>
+                            . = ../initial-name or not(
+                                concat(., '-submission') = $model/fb:submission/@id or
+                                concat(., '-instance')   = $model/fb:instance/@id
+                            )"/>
 
                     <xf:bind ref="request">
 
-                        <!-- TODO: validate as XPath 2 XVT -->
                         <xf:bind
                             ref="resource"
                             required="true()"
                             xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"
                             constraint="
                                 (: https://github.com/orbeon/orbeon-forms/issues/3577 :)
                                 (: https://github.com/orbeon/orbeon-forms/issues/3720 :)
@@ -436,6 +519,10 @@
                             ref="params/param/@name"
                             type="xs:NCName"
                             required="true()"/>
+                        <xf:bind
+                            ref="is-binary"
+                            type="xs:boolean"
+                        />
                     </xf:bind>
 
                     <xf:bind ref="response">
@@ -443,7 +530,7 @@
                         <xf:bind ref="body"       readonly="true()"/>
                     </xf:bind>
 
-                    <xf:bind ref="delete-trigger"    relevant="xxf:non-blank(../initial-name)"/>
+                    <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
                 </xf:bind>
 
                 <!-- Template for inserting a submission -->
@@ -639,17 +726,11 @@
 
                             <fr:grid>
                                 <xh:tr>
-                                    <xh:td>
-                                        <fr:checkbox-input ref="$request/is-soap">
-                                            <xf:label ref="$resources/dialog-http-services/soap-submission/label"/>
-                                            <xf:hint ref="$resources/dialog-http-services/soap-submission/hint"/>
+                                    <xh:td colspan="2">
+                                        <fr:checkbox-input ref="$request/is-binary-response">
+                                            <xf:label ref="$resources/dialog-http-services/is-binary-response/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/is-binary-response/hint"/>
                                         </fr:checkbox-input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input ref="$request/soap-action" incremental="true">
-                                            <xf:label ref="$resources/dialog-http-services/soap-action/label"/>
-                                            <xf:hint ref="$resources/dialog-http-services/soap-action/hint"/>
-                                        </xf:input>
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
@@ -668,6 +749,20 @@
                                             <xf:label ref="$resources/dialog-http-services/password/label"/>
                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                         </xf:secret>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:checkbox-input ref="$request/is-soap">
+                                            <xf:label ref="$resources/dialog-http-services/soap-submission/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-submission/hint"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$request/soap-action" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/soap-action/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-action/hint"/>
+                                        </xf:input>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

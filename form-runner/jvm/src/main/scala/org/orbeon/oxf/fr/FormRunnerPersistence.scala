@@ -439,7 +439,8 @@ trait FormRunnerPersistence {
     forceAttachments  : Boolean,
     username          : Option[String] = None,
     password          : Option[String] = None,
-    formVersion       : Option[String] = None
+    formVersion       : Option[String] = None,
+    workflowStage     : Option[String] = None
   ): (Seq[String], Seq[String], Int) = {
 
     val migratedData = migrate(data)
@@ -476,12 +477,13 @@ trait FormRunnerPersistence {
 
     def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
-        "holder"       -> Some(migratedData.rootElement),
-        "resource"     -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
-        "username"     -> username,
-        "password"     -> password,
-        "form-version" -> formVersion)
-      )
+        "holder"         -> Some(migratedData.rootElement),
+        "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
+        "username"       -> username,
+        "password"       -> password,
+        "form-version"   -> formVersion,
+        "workflow-stage" -> workflowStage
+      ))
 
     // First process attachments
     saveAllAttachments()

@@ -73,13 +73,13 @@ object RelationalUtils extends Logging {
     NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource") getOrElse
       (throw new OXFException("Missing `orbeon-datasource` header"))
 
-  private def getDataSource(name: String) =
+  private def getDataSource(name: String): DataSource =
     withDebug(s"getting datasource `$name`") {
       val jdbcContext: Context = InitialContext.doLookup("java:comp/env/jdbc")
       jdbcContext.lookup(name).asInstanceOf[DataSource]
     }
 
-  def getConnection(dataSource: DataSource) =
+  def getConnection(dataSource: DataSource): Connection =
     withDebug("getting connection and setting auto commit to `false`") {
       val connection = dataSource.getConnection
       try {

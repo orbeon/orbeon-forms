@@ -385,7 +385,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
-                    <xh:a id="my-new-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button" href="#">My label</xh:a>
+                    <xh:button id="my-new-minimal-trigger≡≡c⊙1" title="My hint" class="btn-link">My label</xh:button>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
@@ -395,7 +395,7 @@
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-modal-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
-                    <xh:a id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" tabindex="0" role="button" href="#">My label</xh:a>
+                    <xh:button id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" class="btn-link">My label</xh:button>
                     <xh:span class="xforms-help">My help</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>

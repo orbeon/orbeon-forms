@@ -52,24 +52,25 @@ object Number {
       val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
       val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
-      var visibleInputElem: html.Input = null
+      var visibleInputElemOpt: Option[html.Input] = None
 
       override def init(): Unit = {
 
         scribe.debug("init")
 
-        companion.visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
+        val visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
+        companion.visibleInputElemOpt = Some(visibleInputElem)
 
         // Switch the input type after cleaning up the value for edition
-        $(companion.visibleInputElem).on(s"${EventNames.TouchStart}$ListenerSuffix ${EventNames.FocusIn}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${EventNames.TouchStart}$ListenerSuffix ${EventNames.FocusIn}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
             // Don't set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state =>
-              if (companion.visibleInputElem.value != state.editValue)
-                companion.visibleInputElem.value = state.editValue
+              if (visibleInputElem.value != state.editValue)
+                visibleInputElem.value = state.editValue
             }
 
             setInputTypeIfNeeded("number")
@@ -77,7 +78,7 @@ object Number {
         }: js.ThisFunction)
 
         // Restore input type, send the value to the server, and updates value after server response
-        $(companion.visibleInputElem).on(s"${EventNames.FocusOut}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${EventNames.FocusOut}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
@@ -107,7 +108,7 @@ object Number {
           }
         }: js.ThisFunction)
 
-        $(companion.visibleInputElem).on(s"${EventNames.KeyPress}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${EventNames.KeyPress}$ListenerSuffix", {
           (_: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
@@ -126,8 +127,13 @@ object Number {
       }
 
       override def destroy(): Unit = {
-        $(companion.visibleInputElem).off()
-        companion.visibleInputElem = null
+
+        scribe.debug("destroy")
+
+        visibleInputElemOpt foreach { visibleInputElem =>
+          $(visibleInputElem).off()
+          companion.visibleInputElemOpt = None
+        }
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
@@ -150,7 +156,7 @@ object Number {
 
       override def xformsFocus(): Unit = {
         scribe.debug(s"xformsFocus")
-        companion.visibleInputElem.focus()
+        companion.visibleInputElemOpt foreach (_.focus())
       }
 
       private object Private {
@@ -161,32 +167,37 @@ object Number {
           ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
         def updateReadonly(readonly: Boolean): Unit =
-          if (readonly)
-            companion.visibleInputElem.setAttribute("readonly", "readonly")
-          else
-            companion.visibleInputElem.removeAttribute("readonly")
-
-        def updateStateAndSendValueToServer(): Unit =
-          stateOpt foreach { state =>
-
-            val visibleInputElemValue = companion.visibleInputElem.value
-
-            val stateUpdated =
-              updateStateAndSendValueToServerIfNeeded(
-                newState       = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue),
-                valueFromState = _.editValue
-              )
-
-            if (! stateUpdated)
-              updateVisibleValue()
+          visibleInputElemOpt foreach { visibleInputElem =>
+            if (readonly)
+              visibleInputElem.setAttribute("readonly", "readonly")
+            else
+              visibleInputElem.removeAttribute("readonly")
           }
 
-        def updateVisibleValue(): Unit = {
+        def updateStateAndSendValueToServer(): Unit =
+          visibleInputElemOpt foreach { visibleInputElem =>
+            stateOpt foreach { state =>
 
-          val hasFocus = companion.visibleInputElem eq dom.document.activeElement
+              val visibleInputElemValue = visibleInputElem.value
+
+              val stateUpdated =
+                updateStateAndSendValueToServerIfNeeded(
+                  newState       = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue),
+                  valueFromState = _.editValue
+                )
+
+              if (! stateUpdated)
+                updateVisibleValue()
+            }
+          }
+
+        def updateVisibleValue(): Unit =
+          companion.visibleInputElemOpt foreach { visibleInputElem =>
+
+          val hasFocus = visibleInputElem eq dom.document.activeElement
 
           stateOpt foreach { state =>
-            companion.visibleInputElem.value =
+            visibleInputElem.value =
               if (hasFocus)
                 state.editValue
               else
@@ -208,7 +219,9 @@ object Number {
           if (changeType) {
             // With Firefox, changing the type synchronously interferes with the focus
             timers.setTimeout(0.millis) {
-              $(companion.visibleInputElem).attr("type", typeValue)
+              visibleInputElemOpt foreach { visibleInputElem =>
+                $(visibleInputElem).attr("type", typeValue)
+              }
             }
           }
         }

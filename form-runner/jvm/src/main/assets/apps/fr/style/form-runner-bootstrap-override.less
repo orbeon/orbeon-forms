@@ -190,18 +190,18 @@ body.orbeon {
     .pagination ul > li {
         &> .xforms-trigger { cursor: pointer }
         &> .xforms-trigger.xforms-readonly { cursor: auto; }
-        a { text-decoration: none; }
+        .btn-link { text-decoration: none; }
 
         // NOTE: Updated for Bootstrap 2.3.2
-        >a, >span {
+        >.btn-link, >span {
             padding: 8px 12px;
         }
 
         // Reset rules that can be applied by external Bootstrap .pagination a rule
-        span a {
+        span .btn-link {
             padding: 0;
             border: none;
-            line-height: @baseLineHeight;
+            line-height: normal;
         }
     }
 
@@ -300,37 +300,40 @@ body.orbeon {
 
     // Copy Bootstrap rules but add span between li and a
     // Make links block level
-    .nav > li > span > a {
+    .nav > li > span > .btn-link {
       display: block;
     }
-    .nav > li > span > a:hover {
+    .nav > li > span > .btn-link:hover {
       text-decoration: none;
       background-color: @grayLighter;
     }
 
-    .nav-list > li > span > a,
+    .nav-list {
+      padding: 0;
+    }
+    .nav-list > li > span > .btn-link,
     .nav-list .nav-header {
-      margin-left:  -15px;
-      margin-right: -15px;
+      width: 100%;
+      text-align: left;
       margin-bottom: 1px; // so that when 2 highlighted .nav-headers are on top of each other there is some space between them
       text-shadow: 0 1px 0 rgba(255,255,255,.5);
     }
-    .nav-list > li > span > a {
-      padding: 3px 15px;
+    .nav-list > li > span > .btn-link {
+      padding: 6px 15px;
     }
-    .nav-list > .active > span > a,
-    .nav-list > .active > span > a:hover {
+    .nav-list > .active > span > .btn-link,
+    .nav-list > .active > span > .btn-link:hover {
       color: @white;
       text-shadow: 0 -1px 0 rgba(0,0,0,.2);
       background-color: @linkColor;
     }
 
     // Gray out text
-    .nav > .disabled > span > a {
+    .nav > .disabled > span > .btn-link {
       color: @grayLight;
     }
     // Nuke hover effects
-    .nav > .disabled > span > a:hover {
+    .nav > .disabled > span > .btn-link:hover {
       text-decoration: none;
       background-color: transparent;
       cursor: default;
@@ -344,7 +347,8 @@ body.orbeon {
         z-index: 2000; // because YUI dialogs are > 1000
 
         // <a> nested one more level
-        > li > span > a {
+        > li > span > a,
+        > li > span > .btn-link {
             display: block;
             padding: 3px 20px;
             clear: both;
@@ -355,12 +359,16 @@ body.orbeon {
             text-decoration: none;
         }
 
-        a {
+        a,
+        .btn-link {
             text-decoration: none;
+            width: 100%;
+            text-align: left;
         }
 
         // Restore regular icons for disabled menu items (they are opacified instead, see .opacity() above)
-        > li.disabled > a:hover > [class^="icon-"] {
+        > li.disabled > a:hover > [class^="icon-"],
+        > li.disabled > .btn-link:hover > [class^="icon-"] {
             background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings.png);
         }
     }
@@ -368,8 +376,11 @@ body.orbeon {
     // Hover state
     // -----------
     .dropdown-menu > li > span > a:hover,
+    .dropdown-menu > li > span > .btn-link:hover,
     .dropdown-menu > li > span > a:focus,
-    .dropdown-submenu:hover > a {
+    .dropdown-menu > li > span > .btn-link:focus,
+    .dropdown-submenu:hover > a,
+    .dropdown-submenu:hover > .btn-link {
       text-decoration: none;
       color: @dropdownLinkColorHover;
       background-color: @dropdownLinkBackgroundHover;
@@ -379,7 +390,9 @@ body.orbeon {
     // Active state
     // ------------
     .dropdown-menu > .active > span > a,
-    .dropdown-menu > .active > span > a:hover {
+    .dropdown-menu > .active > span > .btn-link,
+    .dropdown-menu > .active > span > a:hover,
+    .dropdown-menu > .active > span > .btn-link:hover {
       color: @dropdownLinkColorHover;
       text-decoration: none;
       outline: 0;
@@ -391,11 +404,14 @@ body.orbeon {
     // --------------
     // Gray out text and ensure the hover state remains gray
     .dropdown-menu > .disabled > span > a,
-    .dropdown-menu > .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > .btn-link,
+    .dropdown-menu > .disabled > span > a:hover,
+    .dropdown-menu > .disabled > span > .btn-link:hover {
       color: @grayLight;
     }
     // Nuke hover effects
-    .dropdown-menu > .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > a:hover,
+    .dropdown-menu > .disabled > span > .btn-link:hover {
       text-decoration: none;
       background-color: transparent;
       background-image: none;

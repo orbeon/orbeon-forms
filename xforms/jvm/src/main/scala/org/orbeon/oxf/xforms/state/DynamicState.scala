@@ -46,7 +46,8 @@ case class DynamicState(
   lastAjaxResponse    : Seq[Byte],
   instances           : Seq[Byte],
   controls            : Seq[Byte],
-  initialClientScript : Option[String]
+  initialClientScript : Option[String],
+  delayedEvents       : Seq[Byte]
 ) {
   // Decode individual bits
   def decodePathMatchers           = fromByteSeq[List[PathMatcher]](pathMatchers)
@@ -54,6 +55,7 @@ case class DynamicState(
   def decodeLastAjaxResponse       = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
   def decodeInstances              = fromByteSeq[List[InstanceState]](instances)
   def decodeControls               = fromByteSeq[List[ControlState]](controls)
+  def decodeDelayedEvents          = fromByteSeq[List[DelayedEvent]](delayedEvents)
 
   // For Java callers
   def decodeRequestPathJava        = requestPath.orNull
@@ -277,7 +279,8 @@ object DynamicState {
       lastAjaxResponse    = toByteSeq(Option(document.getLastAjaxResponse)),
       instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
       controls            = toByteSeq(controlsToSerialize),
-      initialClientScript = document.initialClientScript
+      initialClientScript = document.initialClientScript,
+      delayedEvents       = toByteSeq(document.delayedEvents),
     )
   }
 

@@ -21,12 +21,12 @@ import org.orbeon.oxf.util.NetUtils
 case class DataPart(isDraft: Boolean, documentId: String, stage: Option[String])
 
 case class Request(
-  provider : Provider,
-  app      : String,
-  form     : String,
-  version  : Version,
-  filename : Option[String],
-  dataPart : Option[DataPart]
+  provider      : Provider,
+  app           : String,
+  form          : String,
+  version       : Version,
+  filename      : Option[String],
+  dataPart      : Option[DataPart]
 ) extends RequestCommon {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined
@@ -46,9 +46,10 @@ trait RequestResponse extends Common {
   def httpRequest = NetUtils.getExternalContext.getRequest
   def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
 
-  def requestUsername : Option[String] = headerValue(Headers.OrbeonUsernameLower)
-  def requestGroup: Option[String]     = headerValue(Headers.OrbeonGroupLower)
-  def requestFlatView                  = headerValue("orbeon-create-flat-view").contains("true")
+  def requestUsername      : Option[String] = headerValue(Headers.OrbeonUsernameLower)
+  def requestGroup         : Option[String] = headerValue(Headers.OrbeonGroupLower)
+  def requestFlatView      : Boolean        = headerValue("orbeon-create-flat-view").contains("true")
+  def requestWorkflowStage : Option[String] = headerValue(StageHeader.HeaderNameLower)
 
   val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
   val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
@@ -74,7 +75,7 @@ trait RequestResponse extends Common {
         Request(Provider.withName(provider), app, form, version, file, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
         val file = if (filename == "data.xml") None else Some(filename)
-        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = headerValue(StageHeader.HeaderNameLower))
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
         Request(Provider.withName(provider), app, form, version, file, Some(dataPart))
     }
   }

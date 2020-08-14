@@ -29,6 +29,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 
 import scala.util.Try
 
@@ -256,9 +257,12 @@ trait FormRunnerBaseOps {
 
   private def documentMetadataDate(name: String): Option[Long] =
     documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+  private def documentMetadataWorkflowStageAtt: NodeInfo = documentMetadataInstance.rootElement.att(Names.WorkflowStage).head
 
-  def documentCreatedDate: Option[Long] = documentMetadataDate(Headers.Created)
-  def documentModifiedDate: Option[Long] = documentMetadataDate(Headers.LastModified)
+  def documentCreatedDate: Option[Long]     = documentMetadataDate(Headers.Created)
+  def documentModifiedDate: Option[Long]    = documentMetadataDate(Headers.LastModified)
+  def documentWorkflowStage: Option[String] = documentMetadataWorkflowStageAtt.stringValue.trimAllToOpt
+  def documentWorkflowStage(workflowStage: Option[String]) = XFormsAPI.setvalue(documentMetadataWorkflowStageAtt, workflowStage.getOrElse(""))
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
@@ -333,7 +337,11 @@ trait FormRunnerBaseOps {
   // Display an error message
   //@XPathFunction
   def errorMessage(message: String): Unit =
-    dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" -> Some(message)))
+    dispatch(
+      name       = "fr-show",
+      targetId   = "fr-error-dialog",
+      properties = Map("message" -> Some(message))
+    )
 
   def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
 

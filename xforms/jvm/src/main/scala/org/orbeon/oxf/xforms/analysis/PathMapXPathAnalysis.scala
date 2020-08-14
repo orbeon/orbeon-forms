@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 import java.io.ByteArrayOutputStream
-import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.io.CharsetNames
@@ -34,8 +33,7 @@ import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.JavaConverters._
-import scala.collection.mutable.{LinkedHashSet, Stack}
+import scala.collection.mutable.LinkedHashSet
 import scala.util.control.NonFatal
 import scala.xml._
 
@@ -254,7 +252,8 @@ object PathMapXPathAnalysis {
 
           // Process the pathmap to extract paths and other information useful for handling dependencies.
           def processPaths(): Boolean = {
-            val stack = new Stack[Expression]
+
+            var stack = List[Expression]()
 
             def createInstancePath(node: PathMap.PathMapNode): String Either Option[InstancePath] = {
 
@@ -304,10 +303,10 @@ object PathMapXPathAnalysis {
 
               // Process children nodes if any
               for (arc <- node.getArcs) {
-                stack.push(arc.getStep)
+                stack ::= arc.getStep
                 if (! processNode(arc.getTarget, node.isAtomized))
                   return false // we can't deal with this path so stop here
-                stack.pop()
+                stack = stack.tail
               }
 
               // We managed to deal with this path
@@ -315,10 +314,10 @@ object PathMapXPathAnalysis {
             }
 
             for (root <- pathmap.getPathMapRoots) {
-              stack.push(root.getRootExpression)
+              stack ::= root.getRootExpression
               if (! processNode(root))
                 return false
-              stack.pop()
+              stack = stack.tail
             }
             true
           }
@@ -469,7 +468,7 @@ object PathMapXPathAnalysis {
     // Utility class to hold node and ark as otherwise we can't go back to the node from an arc
     class NodeArc(val node: PathMap.PathMapNode, val arc: PathMap.PathMapArc)
 
-    val stack = new Stack[NodeArc]
+    var stack = List[NodeArc]()
 
     // Return true if we moved an arc
     def reduceAncestorAxis(node: PathMap.PathMapNode): Boolean = {
@@ -495,7 +494,7 @@ object PathMapXPathAnalysis {
 
       def ancestorsWithFingerprint(nodeName: Int): Seq[PathMapArc] = {
         for {
-          nodeArc <- stack.elems.tail   // go from parent to root
+          nodeArc <- stack.tail   // go from parent to root
           e = nodeArc.arc.getStep
           if e.getAxis == Axis.CHILD && e.getNodeTest.getFingerprint == nodeName
         } yield nodeArc.arc
@@ -526,7 +525,7 @@ object PathMapXPathAnalysis {
           case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
             // Parent axis
               if (stack.nonEmpty) {
-              val parentNodeArc = stack.top
+              val parentNodeArc = stack.head
               moveArc(newNodeArc, parentNodeArc.node)
               return true
             } else {
@@ -534,7 +533,7 @@ object PathMapXPathAnalysis {
             }
           case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
             // Simplify preceding-sibling::foobar / following-sibling::foobar
-            val parentNodeArc = stack.top
+            val parentNodeArc = stack.head
               if (stack.size > 2) {
               val grandparentNodeArc = stack.tail.head
 
@@ -551,10 +550,10 @@ object PathMapXPathAnalysis {
           case _ => // NOP
         }
 
-        stack.push(newNodeArc)
+        stack ::= newNodeArc
         if (reduceAncestorAxis(arc.getTarget))
           return true
-        stack.pop()
+        stack = stack.tail
       }
 
       // We did not find a match
@@ -564,8 +563,8 @@ object PathMapXPathAnalysis {
     for (root <- pathmap.getPathMapRoots) {
       // Apply as long as we find matches
       while (reduceAncestorAxis(root))
-        stack.clear()
-      stack.clear()
+        stack = Nil
+      stack = Nil
     }
     true
   }

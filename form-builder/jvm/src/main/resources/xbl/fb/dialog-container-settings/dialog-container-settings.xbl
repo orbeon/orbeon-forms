@@ -572,15 +572,13 @@
                                     <xh:td>
                                         <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
-                                            <xf:alert ref="$resources/dialog-container-settings/visibility/alert"/>
-                                            <xf:hint  ref="$resources/dialog-container-settings/visibility/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
                                         <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
-                                            <xf:alert ref="$resources/dialog-container-settings/readonly/alert"/>
-                                            <xf:hint  ref="$resources/dialog-container-settings/readonly/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>

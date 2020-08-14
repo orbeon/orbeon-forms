@@ -23,6 +23,7 @@ import xbl.Scope
 trait PartStaticAnalysisOps {
 
   def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping
+  def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping
 
   def getModel(prefixedId: String): Model
   def getDefaultModelForScope(scope: Scope): Option[Model]

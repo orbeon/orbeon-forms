@@ -168,7 +168,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
                 // End deferred behavior
                 endOutermostActionHandler();
 
-                processDueDelayedEvents();
+                processDueDelayedEvents(false);
             }
         });
     }
@@ -243,6 +243,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         restorePathMatchers(dynamicState);
 
         // Restore other encoded objects
+        restoreDelayedEvents(dynamicState);
         this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
         this.lastAjaxResponse = dynamicState.decodeLastAjaxResponseJava();
 
@@ -392,8 +393,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         assert response == null;
         assert uriResolver == null;
 
-        this.clearAllDelayedEvents();
-
         clearRequestStats();
         clearTransientState();
 
@@ -441,26 +440,29 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
      *
      * @param response          ExternalContext.Response for xf:submission[@replace = 'all'], or null
      */
-    public void beforeExternalEvents(ExternalContext.Response response) {
+    public void beforeExternalEvents(ExternalContext.Response response, boolean isAjaxRequest) {
 
-        // Tell dependencies
         xpathDependencies.beforeUpdateResponse();
-
-        // Remember OutputStream
         this.response = response;
 
-        // Process completed asynchronous submissions if any
-        processCompletedAsynchronousSubmissions(false, false);
+        if (isAjaxRequest) {
+            processCompletedAsynchronousSubmissions(false, false);
+            processDueDelayedEvents(false);
+        } else {
+            processDueDelayedEvents(true);
+        }
     }
 
     /**
      * End a sequence of external events.
      *
      */
-    public void afterExternalEvents() {
+    public void afterExternalEvents(boolean isAjaxRequest) {
 
-        processCompletedAsynchronousSubmissions(false, true);
-        processDueDelayedEvents();
+        if (isAjaxRequest) {
+            processCompletedAsynchronousSubmissions(false, true);
+            processDueDelayedEvents(false);
+        }
 
         this.response = null;
     }

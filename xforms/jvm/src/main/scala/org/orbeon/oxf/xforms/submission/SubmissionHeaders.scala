@@ -55,7 +55,7 @@ object SubmissionHeaders {
           contextStack.pushBinding(element, sourceEffectiveId, scope)
           val result =
             XFormsUtils.getElementValue(
-              xblContainer.getContainingDocument,
+              xblContainer,
               contextStack,
               sourceEffectiveId,
               element,
@@ -79,7 +79,7 @@ object SubmissionHeaders {
             contextStack.getCurrentBindingContext.nodeset,
             contextStack.getCurrentBindingContext.position,
             avtCombine,
-            xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
+            xblContainer.getNamespaceMappings(headerElement),
             contextStack.getCurrentBindingContext.getInScopeVariables,
             xblContainer.getContainingDocument.getFunctionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
             null,

@@ -91,17 +91,17 @@ class PartAnalysisImpl(
    * as the mapping is considered transient and not sharable among pages.
    */
   def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping = {
-    val id = XFormsUtils.getElementId(element)
 
-    require(id ne null)
-
+    val id = XFormsUtils.getElementId(element) ensuring (_ ne null)
     val prefixedId = if (prefix ne null) prefix + id else id
 
-    metadata.getNamespaceMapping(prefixedId) getOrElse {
-      // NOTE: We hope to get rid of this case at some point as all mappings should be in the metadata (put an assert)
-      getIndentedLogger.logDebug("", "namespace mappings not cached", "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element))
-      NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(element))
-    }
+    metadata.getNamespaceMapping(prefixedId) getOrElse
+      (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${Dom4jUtils.elementToDebugString(element)}`"))
+  }
+
+  def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping = {
+    metadata.getNamespaceMapping(scope.prefixedIdForStaticId(id)) getOrElse
+      (throw new IllegalStateException(s"namespace mappings not cached for scope `$scope` on element with id `$id`"))
   }
 
   // Builder that produces an ElementAnalysis for a known incoming Element

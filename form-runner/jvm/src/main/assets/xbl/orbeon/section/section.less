@@ -17,15 +17,9 @@
 
         display: block;
 
-        padding-top: 20px;   // Spacing between section, so the new section doesn't start right after the previous grid
-        padding-bottom: 4px; // In Form Builder, when sections are collapsed, some spacing is helpful
-
-        &:first-of-type {
-            padding-top: 0;
-        }
-        &:last-of-type {
-            padding-bottom: 0;
-        }
+        // Spacing between section, so the new section doesn't start right after the previous grid
+        padding-bottom: 20px;
+        &:last-of-type { padding-bottom: 0; }
 
         h2, h3, h4, h5, h6 {
             &.fr-section-title {
@@ -88,11 +82,11 @@
                 vertical-align: top;            // Avoid space at the bottom (http://stackoverflow.com/q/36146704/5295)
 
                 // <a> is collapsible section, <output> for non-collapsible
-                a, .xforms-output-output {
+                .btn-link, .xforms-output-output {
                     display: table-cell;        // So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
                 }
-                a {
+                .btn-link {
                     text-decoration: none;
                     color: @frHeaderColor;      // Don't use the default styling for anchors
                 }

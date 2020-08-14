@@ -47,10 +47,6 @@ object Page {
   def getForm(namespacedFormId: String): Form =
     formsByNamespacedFormId.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
 
-  @JSExport
-  def updateServerEventsInput(formId: String, serverEventsValue: String): Unit =
-    getForm(formId).serverEventInput.value = if (serverEventsValue ne null) serverEventsValue else ""
-
   // Handle the case where the id is already prefixed. As of 2019-01-09 this can be a problem only
   // for one caller of this API. Short namespaces are removed as of Orbeon Forms 2019.2 so the potential
   // for conflict is lowered.

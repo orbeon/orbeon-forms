@@ -23,15 +23,15 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.ui.Select
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually._
-import org.scalatestplus.selenium.WebBrowser
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time._
+import org.scalatestplus.selenium.WebBrowser
 
 import scala.collection.JavaConverters._
 

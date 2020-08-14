@@ -80,16 +80,19 @@ class ControlsComparator(
                 def replay(r: XMLReceiver) =
                   element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" -> c.getId))(r)
 
-                processFullUpdateForContent(c, replay)
+                processFullUpdateForContent(c, None, replay)
                 true
               } else
                 false
             case c: XFormsSwitchControl =>
               val otherSwitchControlOpt = control1Opt.asInstanceOf[Option[XFormsSwitchControl]]
               if (c.staticControl.hasFullUpdate && c.getSelectedCaseEffectiveId != c.getOtherSelectedCaseEffectiveId(otherSwitchControlOpt)) {
+
+                val prevSelectedCaseOpt = otherSwitchControlOpt flatMap (_.selectedCaseIfRelevantOpt)
+
                 c.selectedCaseIfRelevantOpt match {
-                  case Some(selectedCase) => processFullUpdateForContent(c, getMarkOrThrow(selectedCase).replay)
-                  case None               => processFullUpdateForContent(c, _ => ())
+                  case Some(selectedCase) => processFullUpdateForContent(c, prevSelectedCaseOpt, getMarkOrThrow(selectedCase).replay)
+                  case None               => processFullUpdateForContent(c, prevSelectedCaseOpt, _ => ())
                 }
                 true
               } else
@@ -105,7 +108,7 @@ class ControlsComparator(
             case c: XFormsComponentControl =>
               if (c.hasStructuralChange) {
                 assert(fullUpdateBuffer.isEmpty, "XBL full update within full update is not supported")
-                processFullUpdateForContent(c, getMarkOrThrow(c).replay)
+                processFullUpdateForContent(c, None, getMarkOrThrow(c).replay)
                 true
               } else
                 false
@@ -128,7 +131,7 @@ class ControlsComparator(
                     case c                    => c
                   }
 
-                processFullUpdateForContent(controlAdjustedForSwitch, mark.replay)
+                processFullUpdateForContent(controlAdjustedForSwitch, None, mark.replay)
               }
               true
             case _ =>
@@ -314,7 +317,7 @@ class ControlsComparator(
 
               if (control1Opt.isDefined)
                 for (newIteration <- children2.view(size1, size2))
-                  processFullUpdateForContent(newIteration, receiver => mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+                  processFullUpdateForContent(newIteration, None, receiver => mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
               else
                 diffChildren(Nil, children2.view(size1, size2), fullUpdateBuffer) // test mode
 
@@ -329,7 +332,7 @@ class ControlsComparator(
             // NOTE: `control1Opt` must be defined, otherwise we would be in a new iteration.
             // See https://github.com/orbeon/orbeon-forms/issues/4035
             if (componentControl2.staticControl.hasLazyBinding && control1Opt.exists(_.isRelevant != componentControl2.isRelevant))
-              processFullUpdateForContent(componentControl2, getMarkOrThrow(componentControl2).replay)
+              processFullUpdateForContent(componentControl2, None, getMarkOrThrow(componentControl2).replay)
             else
               diffChildren(children1, children2, fullUpdateBuffer)
 
@@ -343,9 +346,10 @@ class ControlsComparator(
   }
 
   private def processFullUpdateForContent(
-    control  : XFormsControl,
-    replay   : XMLReceiver => Unit)(implicit
-    receiver : XMLReceiver
+    control           : XFormsControl,
+    previousControlOpt: Option[XFormsControl],
+    replay            : XMLReceiver => Unit)(implicit
+    receiver          : XMLReceiver
   ): Unit = {
 
     val repeatIterationControlOpt = control.narrowTo[XFormsRepeatIterationControl]
@@ -429,12 +433,33 @@ class ControlsComparator(
       atts   = List("id" -> namespaceId(document, control.effectiveId))
     ) {
 
-      // Setup everything and replay
+      def outputInitOrDestroy(control: XFormsControl, isInit: Boolean): Unit = {
+        val controlsToInitialize = ScriptBuilder.gatherJavaScriptInitializations(control, isInit)
+        if (controlsToInitialize.nonEmpty) {
+
+          import io.circe.generic.auto._
+          import io.circe.syntax._
+
+          val controls =
+            controlsToInitialize map { case (id, value) => rpc.Control(namespaceId(document, id), value) }
+
+          element(
+            if (isInit) "init" else "destroy",
+            prefix = "xxf",
+            uri    = XXFORMS_NAMESPACE_URI,
+            text   = controls.asJson.noSpaces
+          )
+        }
+      }
+
+      previousControlOpt foreach (outputInitOrDestroy(_, isInit = false))
+
       withElement(
         "value",
         prefix = "xxf",
         uri    = XXFORMS_NAMESPACE_URI
       ) {
+        // Setup everything and replay
         val controller = setupController
         setupOutputPipeline(controller)
 
@@ -449,22 +474,7 @@ class ControlsComparator(
         controller.endDocument()
       }
 
-      val controlsToInitialize = ScriptBuilder.gatherJavaScriptInitializations(control)
-      if (controlsToInitialize.nonEmpty) {
-
-        import io.circe.generic.auto._
-        import io.circe.syntax._
-
-        val controls =
-          controlsToInitialize map { case (id, value) => rpc.Control(namespaceId(document, id), value) }
-
-        element(
-          "init",
-          prefix = "xxf",
-          uri    = XXFORMS_NAMESPACE_URI,
-          text   = controls.asJson.noSpaces
-        )
-      }
+      outputInitOrDestroy(control, isInit = true)
     }
   }
 

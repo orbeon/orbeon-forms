@@ -252,7 +252,7 @@ public class XFormsContextStack {
             bindingElement.attributeValue(XFormsConstants.MODEL_QNAME()),
             bindingElement.attributeValue(XFormsConstants.BIND_QNAME()),
             bindingElement,
-            container.getNamespaceMappings(bindingElement),
+            container.partAnalysis().getNamespaceMapping(scope, bindingElement.attributeValue(XFormsConstants.ID_QNAME())),
             sourceEffectiveId,
             scope,
             handleNonFatal

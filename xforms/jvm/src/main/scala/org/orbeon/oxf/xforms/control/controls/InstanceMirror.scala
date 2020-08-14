@@ -131,9 +131,9 @@ object InstanceMirror {
         val element = instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
         val instanceId = XFormsUtils.getElementId(element) ensuring (_ ne null)
 
-        def namespaces = {
+        val namespaces = {
           val partAnalysis = container.partAnalysis
-          partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, unsafeUnwrapElement(instanceWrapper))
+          partAnalysis.getNamespaceMapping(partAnalysis.startScope, instanceWrapper.id)
         }
 
         InstanceDetails(instanceId, instanceWrapper, namespaces)

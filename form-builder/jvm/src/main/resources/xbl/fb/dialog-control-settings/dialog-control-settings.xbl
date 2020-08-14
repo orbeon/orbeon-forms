@@ -1220,14 +1220,14 @@
                                         <xf:textarea ref="calculate">
                                             <xf:label ref="$resources/dialog-control-settings/calculate/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/calculate/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-settings/calculate/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/calculate/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
                                         <xf:textarea ref="default">
                                             <xf:label ref="$resources/dialog-control-settings/default/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/default/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-settings/default/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/default/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
@@ -1235,15 +1235,13 @@
                                     <xh:td>
                                         <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
-                                            <xf:alert ref="$resources/dialog-control-settings/visibility/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-settings/visibility/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
                                         <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
-                                            <xf:alert ref="$resources/dialog-control-settings/readonly/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-settings/readonly/hint" appearance="minimal"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>

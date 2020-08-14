@@ -40,7 +40,7 @@ class UploaderProcessor extends ProcessorImpl {
               // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
               // handle more than one here.
               val files = nameValues collect {
-                case (name, fileItem: FileItem) if fileItem.getName.nonAllBlank =>
+                case (name, Right(fileItem)) if fileItem.getName.nonAllBlank =>
 
                   // Get size before renaming below
                   val size = fileItem.getSize
@@ -78,7 +78,7 @@ class UploaderProcessor extends ProcessorImpl {
               val response =
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                   <xxf:action>
-                    <xxf:server-events delay="0">{
+                    <xxf:server-events>{
                       EncodeDecode.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
                     }</xxf:server-events>
                   </xxf:action>

@@ -34,7 +34,7 @@ object Provider extends Enum[Provider] {
   case object MySQL      extends Provider
   case object PostgreSQL extends Provider
 
-  def xmlCol(provider: Provider, tableName: String) =
+  def xmlCol(provider: Provider, tableName: String): String =
     provider match {
       case PostgreSQL => s"$tableName.xml as xml"
       case _          => s"$tableName.xml xml"

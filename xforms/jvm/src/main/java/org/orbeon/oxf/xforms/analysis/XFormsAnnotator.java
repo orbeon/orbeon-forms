@@ -89,7 +89,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * @param metadata              metadata to gather
      */
     public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata, boolean isTopLevel) {
-        super(templateReceiver, extractorReceiver, metadata);
+        super(templateReceiver, extractorReceiver, metadata, isTopLevel);
 
         this.metadata      = metadata;
         this.isGenerateIds = true;
@@ -101,7 +101,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
      * This constructor just computes the namespace mappings and AVT elements and gathers id information.
      */
     public XFormsAnnotator(Metadata metadata) {
-        super(null, null, metadata);
+        super(null, null, metadata, true);
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.metadata      = metadata;
@@ -350,7 +350,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         }
 
         // Check for preserved content
-        if (!inPreserve) {
+        if (! inPreserve) {
             if (inXForms) {
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other xf: check for labels, xf:instance, and xs:schema

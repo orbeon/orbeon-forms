@@ -251,7 +251,7 @@ class Portlet2ExternalContext(
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] =
       if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
-        Multipart.getParameterMapMultipart(pipelineContext, getRequest, ExternalContext.StandardFormCharacterEncoding).asJava
+        Multipart.getParameterMapMultipartJava(pipelineContext, getRequest, ExternalContext.StandardFormCharacterEncoding)
       } else {
         portletRequest match {
           case rr: ResourceRequest =>

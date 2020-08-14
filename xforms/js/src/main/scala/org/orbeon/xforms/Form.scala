@@ -23,9 +23,8 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 
 class Form(
   val uuid                          : String,
-  val elem                          : html.Element,
+  val elem                          : html.Form,
   val uuidInput                     : html.Input,
-  val serverEventInput              : html.Input,
   val ns                            : String,
   val xformsServerPath              : String,
   val xformsServerUploadPath        : String,
@@ -39,8 +38,9 @@ class Form(
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
 
-  lazy val errorPanel = ErrorPanel.initializeErrorPanel(elem.asInstanceOf[html.Form]) getOrElse
-        (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
+  lazy val errorPanel: js.Object =
+    ErrorPanel.initializeErrorPanel(elem) getOrElse
+      (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
   var isFormDataSafe: Boolean = false

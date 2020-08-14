@@ -395,6 +395,8 @@
                 <xf:property name="data-migration"                value="()"/>
                 <xf:property name="rendered-page-orientation"     value="()"/>
                 <xf:property name="rendered-page-size"            value="()"/>
+                <xf:property name="relevant"                      value="()"/>
+                <xf:property name="readonly"                      value="()"/>
                 <xf:property name="html-page-layout"              value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
                 <xf:property name="email"                         value="()"/>
@@ -428,6 +430,8 @@
                 <xf:property name="data-migration"                value="()"/>
                 <xf:property name="rendered-page-orientation"     value="()"/>
                 <xf:property name="rendered-page-size"            value="()"/>
+                <xf:property name="relevant"                      value="()"/>
+                <xf:property name="readonly"                      value="()"/>
                 <xf:property name="html-page-layout"              value="()"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
                 <xf:property name="email"                         value="()"/>

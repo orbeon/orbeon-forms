@@ -279,18 +279,21 @@ public class RequestGenerator extends ProcessorImpl {
         // Only a reference to the file is output (xs:anyURI)
         final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
         final String resultUri;
-        if (!fileItem.isInMemory()) {
-            // File must exist on disk since isInMemory() returns false
-            final File file = diskFileItem.getStoreLocation();
-            resultUri = file.toURI().toString();
-        } else {
-            // File does not exist on disk, must convert
-            // NOTE: Conversion occurs every time this method is called. Not optimal.
-            try {
+
+        try {
+            if (! fileItem.isInMemory()) {
+                // File must exist on disk since isInMemory() returns false
+                final File file = diskFileItem.getStoreLocation();
+                if (! file.exists())
+                    file.createNewFile(); // https://github.com/orbeon/orbeon-forms/issues/4466
+                resultUri = file.toURI().toString();
+            } else {
+                // File does not exist on disk, must convert
+                // NOTE: Conversion occurs every time this method is called. Not optimal.
                 resultUri = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), scope, logger);
-            } catch (IOException e) {
-                throw new OXFException(e);
             }
+        } catch (IOException e) {
+            throw new OXFException(e);
         }
 
         return resultUri;

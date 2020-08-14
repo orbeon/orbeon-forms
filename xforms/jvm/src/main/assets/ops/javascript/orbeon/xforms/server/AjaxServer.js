@@ -909,17 +909,23 @@
                         }
 
                         function handleInnerHtml(elem) {
-
-                            var innerHTML = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
-                            var initElem  = childrenWithLocalName(elem, 'init')[0];
-                            var initValue = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
-                            var controlId = ORBEON.util.Dom.getAttribute(elem, "id");
+initElem
+                            var innerHTML    = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
+                            var initElem     = childrenWithLocalName(elem, 'init')[0];
+                            var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
+                            var destroyElem  = childrenWithLocalName(elem, 'destroy')[0];
+                            var destroyValue = _.isUndefined(destroyElem) ? null : ORBEON.util.Dom.getStringValue(destroyElem);
+                            var controlId    = ORBEON.util.Dom.getAttribute(elem, "id");
 
                             var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(controlId);
 
                             function endsWith(text, suffix) {
                               var index = text.lastIndexOf(suffix);
                               return index !== -1 && index + suffix.length === text.length;
+                            }
+
+                            if (destroyValue) {
+                                ORBEON.xforms.InitSupport.destroyJavaScriptControlsFromSerialized(destroyValue);
                             }
 
                             if (endsWith(prefixedId, "~iteration")) {
@@ -994,7 +1000,6 @@
                                 }
                             }
 
-                            // Handle initializations
                             if (initValue) {
                                 ORBEON.xforms.InitSupport.initializeJavaScriptControlsFromSerialized(initValue);
                             }
@@ -1098,8 +1103,6 @@
 
                     function handleOtherActions(actionElement) {
 
-                        var serverEventsValue = null;
-
                         _.each(actionElement.childNodes, function(childNode) {
                             switch (ORBEON.util.Utils.getLocalName(childNode)) {
 
@@ -1186,24 +1189,22 @@
                                     break;
                                 }
 
-                                // Server events
+                                // 2020-07-21: Only for upload response
                                 case "server-events": {
                                     var serverEventsElement = childNode;
-                                    var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
-                                    var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
-                                    showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
-                                    var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
-                                    discardable = ! YAHOO.lang.isNull(discardable) && discardable == "true";
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                    if (delay == null) {
-                                        // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of
-                                        // server-events in the $server-events form field, which will be submitted to the server by POSTing the form.
-                                        serverEventsValue = serverEvents;
-                                    } else {
-                                        // Case where we need to send those events to the server with a regular Ajax request
-                                        // after the given delay.
-                                        AjaxServer.createDelayedServerEvent(serverEvents, parseInt(delay), showProgress, discardable, formID);
-                                    }
+
+                                    AjaxServer.createDelayedServerEvent(serverEvents, 0, true, false, formID);
+
+                                    break;
+                                }
+
+                                case "poll": {
+                                    var pollElement = childNode;
+                                    var delayOrNull = ORBEON.util.Dom.getAttribute(pollElement, "delay");
+
+                                    AjaxServer.createDelayedPollEvent(_.isNull(delayOrNull) ? undefined : parseInt(delayOrNull), formID);
+
                                     break;
                                 }
 
@@ -1214,8 +1215,6 @@
                                     var replace      = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
-
-                                    ORBEON.xforms.Page.updateServerEventsInput(formID, serverEventsValue);
 
                                     // Increment and send sequence number
                                     var requestForm = document.getElementById(formID);

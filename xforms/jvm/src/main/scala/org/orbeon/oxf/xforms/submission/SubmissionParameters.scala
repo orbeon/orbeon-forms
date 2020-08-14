@@ -16,6 +16,26 @@ import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
 
+
+// Subset of `SubmissionParameters`
+case class TwoPassSubmissionParameters(
+  submissionEffectiveId  : String,
+  showProgress           : Boolean,
+  target                 : Option[String],
+  isResponseResourceType : Boolean
+)
+
+object TwoPassSubmissionParameters {
+
+  def apply(submissionEffectiveId: String, p: SubmissionParameters): TwoPassSubmissionParameters =
+    TwoPassSubmissionParameters(
+      submissionEffectiveId  = submissionEffectiveId,
+      showProgress           = p.xxfShowProgress,
+      target                 = p.xxfTargetOpt,
+      isResponseResourceType = p.resolvedIsResponseResourceType
+    )
+}
+
 case class SubmissionParameters(
   refContext                     : RefContext,
   replaceType                    : ReplaceType,

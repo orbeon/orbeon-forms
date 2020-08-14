@@ -15,11 +15,12 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.2.0"
+val ScalatTestVersion             = "3.2.1"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
+val ShapelessVersion              = "2.3.3"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -38,7 +39,7 @@ val HttpComponentsVersion         = "4.5.12"
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.7"
 val FlyingSaucerVersion           = "9.1.20"
-val TinkVersion                   = "1.3.0"
+val TinkVersion                   = "1.4.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.2"
 
@@ -51,6 +52,7 @@ val LiferayPortalKernelVersion    = "5.3.0"
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
+  "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
   "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
@@ -58,7 +60,7 @@ val CoreLibraryDependencies = Seq(
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "joda-time"                   %  "joda-time"                      % "2.10.6",
   "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.10",
+  "org.apache.commons"          %  "commons-lang3"                  % "3.11",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.14",
@@ -69,7 +71,7 @@ val CoreLibraryDependencies = Seq(
   "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.6",  // 1.5.1
+  "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
   "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
@@ -93,10 +95,10 @@ val CoreLibraryDependencies = Seq(
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
-  "com.google.guava"            % "guava"                           % "13.0.1"          % Test,
+  "com.google.guava"            % "guava"                           % "29.0-jre"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.21"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.14" % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.20"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.15" % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
@@ -313,8 +315,8 @@ lazy val commonSettings = Seq(
     "-language:implicitConversions",
     "-language:higherKinds",
     "-language:existentials",
-    // Consider the following flags
     "-deprecation"
+    // Consider the following flags
 //    "-feature",
 //    "-unchecked",
 //    "-Xfatal-warnings",

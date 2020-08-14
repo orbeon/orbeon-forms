@@ -75,6 +75,7 @@ trait FormRunnerActions {
     "result-dialog"          -> tryShowResultDialog,
     "captcha"                -> tryCaptcha,
     "set-data-status"        -> trySetDataStatus,
+    "set-workflow-stage"     -> trySetWorkflowStage,
     "wizard-update-validity" -> tryUpdateCurrentWizardPageValidity,
     "new-to-edit"            -> tryNewToEdit
   )
@@ -170,7 +171,8 @@ trait FormRunnerActions {
         filename          = "data.xml",
         commonQueryString = s"valid=$dataValid&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,
         forceAttachments  = false,
-        formVersion       = Some(formVersion.toString)
+        formVersion       = Some(formVersion.toString),
+        workflowStage     = FormRunner.documentWorkflowStage
       )
 
       // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
@@ -226,6 +228,13 @@ trait FormRunnerActions {
 
     (saveStatus ++ autoSaveStatus) foreach
       (setvalue(_, if (isSafe) DataStatus.Clean.entryName else DataStatus.Dirty.entryName))
+  }
+
+  def trySetWorkflowStage(params: ActionParams): Try[Any] = Try {
+    val name = paramByNameOrDefault(params, "name").map(evaluateValueTemplate)
+    FormRunner.documentWorkflowStage(name)
+    // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
+    recalculate(FormModel)
   }
 
   private def messageFromResourceOrParam(params: ActionParams) = {

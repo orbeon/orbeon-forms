@@ -20,6 +20,7 @@ import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
+import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
@@ -80,15 +81,26 @@ object FormBuilderXPathApi {
   }
 
   // Get the normalized value of a computed MIP for the given control name and computed MIP name
+  // If `controlName` is `null`, try the top-level bind (`fr-form-binds`).
   //@XPathFunction
   def readDenormalizedCalculatedMip(controlName: String, mipName: String): String = {
 
     implicit val ctx = FormBuilderDocContext()
 
+    def findBind =
+      if (controlName ne null)
+        FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+      else
+        FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, FormBinds)
+
     val resultOpt =
       for {
         mip      <- Model.AllComputedMipsByName.get(mipName)
-        bindElem <- FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+        bindElem <-
+          if (controlName ne null)
+            FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+          else
+            FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, FormBinds)
       } yield
         FormBuilder.readDenormalizedCalculatedMip(bindElem, mip)
 
@@ -104,7 +116,7 @@ object FormBuilderXPathApi {
       for {
         mip <- Model.AllComputedMipsByName.get(mipName)
       } yield
-        FormBuilder.writeAndNormalizeMip(controlName, mip, mipValue)
+        FormBuilder.writeAndNormalizeMip(Option(controlName), mip, mipValue)
 
     resultOpt getOrElse (throw new IllegalArgumentException)
   }

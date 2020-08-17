@@ -13,20 +13,23 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.dom.QName
-import org.junit.Test
 import org.mockito.{Matchers, Mockito}
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.dom.QName
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
-import org.scalatestplus.junit.AssertionsForJUnit
+import org.scalatest.funspec.AnyFunSpecLike
 import org.xml.sax.helpers.AttributesImpl
 
-class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class XFormsControlsTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike {
 
   // Mock just what's needed to make XFormsInputControl as used below happy
   private def getContainingDocument(id: String): XFormsContainingDocument = {
+
     val doc = Mockito.mock(classOf[XFormsContainingDocument])
     Mockito.when(doc.getContainingDocument).thenReturn(doc)
 
@@ -41,7 +44,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     doc
   }
 
-  @Test def testDiffCustomMIPsChanges(): Unit = {
+  describe("Diff custom MIPs changes ") {
     val attributes = new AttributesImpl
     val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override val customMIPs = Map(
@@ -52,9 +55,6 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
       )
     }
     val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
-
-//            setBindingContext(new BindingContext())
-
       override val customMIPs = Map(
         // leave as is
         "name1" -> "value1",
@@ -66,10 +66,12 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
       )
     }
     XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, Some(control1), control2)
-    assert("-name2-value2 -name3-value3 +name3-newvalue3" === attributes.getValue("class"))
+    it ("must report the correct attribute changes") {
+      assert("-name2-value2 -name3-value3 +name3-newvalue3" === attributes.getValue("class"))
+    }
   }
 
-  @Test def testDiffCustomMIPsNew(): Unit = {
+  describe("Diff new custom MIPs") {
     val attributes = new AttributesImpl
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override val customMIPs = Map(
@@ -80,10 +82,12 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
       )
     }
     XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, None, control2)
-    assert("+name1-value1 +name2-value2 +name3-value3 +name4-value4" === attributes.getValue("class"))
+    it ("must report the correct attribute changes") {
+      assert("+name1-value1 +name2-value2 +name3-value3 +name4-value4" === attributes.getValue("class"))
+    }
   }
 
-  @Test def testDiffClassAVT(): Unit = {
+  describe("Diff class AVT changes") {
     val attributes = new AttributesImpl
     val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override def extensionAttributeValue(attributeName: QName) = Some("foo bar gaga")
@@ -92,18 +96,21 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
       override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, Some(control1), control2)
-    assert("-foo -gaga +toto" === attributes.getValue("class"))
+    it ("must report the correct attribute changes") {
+      assert("-foo -gaga +toto" === attributes.getValue("class"))
+    }
   }
 
-  @Test def testDiffClassAVTNew(): Unit = {
+  describe("Diff new class AVT") {
     val attributes = new AttributesImpl
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, None, control2)
-    assert("foo bar" === attributes.getValue("class"))
+    it ("must report the correct attribute changes") {
+      assert("foo bar" === attributes.getValue("class"))
+    }
   }
-
 
   // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!
 //    @Test

@@ -25,10 +25,7 @@ object PipelineResponse {
   /*
    * Create a response that writes to the receiver.
    *
-   * As of 2011-08-09 this response is used with replace="all" by:
-   *
-   * - RequestDispatcherSubmission and LocalPortletSubmission
-   * - AllReplacer
+   * As of 2020-08-14: this response is used with `replace="all"` by `AllReplacer`.
    *
    * This can be used upon form initialization, or during the 2nd pass of a 2-pass submission.
    */

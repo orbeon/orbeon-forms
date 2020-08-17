@@ -121,11 +121,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     public void performDefaultAction(XFormsEvent event) {
         final String eventName = event.name();
 
-        if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
+        if (XFormsEvents.XFORMS_SUBMIT().equals(eventName) || XFormsEvents.XXFORMS_SUBMIT().equals(eventName)) {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             doSubmit(event);
-        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
+        } else if (XFormsEvents.XXFORMS_ACTION_ERROR().equals(eventName)) {
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
             XFormsError.handleNonFatalActionError(this, ev.throwable());
         }
@@ -648,7 +648,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     // Only allow xxforms-submit from client
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_SUBMIT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_SUBMIT());
     }
 
     public boolean allowExternalEvent(String eventName) {

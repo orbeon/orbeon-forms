@@ -64,8 +64,7 @@ class XFormsContainingDocument(
   override def partAnalysis: PartAnalysis = staticState.topLevelPart
 
   // Aggregate other things
-  private var _controls: XFormsControls = null
-  def controls: XFormsControls = _controls
+  val controls: XFormsControls = new XFormsControls(this)
 
   private var asynchronousSubmissionManager: AsynchronousSubmissionManager = null
 
@@ -101,12 +100,12 @@ class XFormsContainingDocument(
   def isHandleDifferences: Boolean = ! initializing && supportUpdates
 
   def getControlByEffectiveId(effectiveId: String): XFormsControl =
-    _controls.getObjectByEffectiveId(effectiveId)
+    controls.getObjectByEffectiveId(effectiveId)
 
   def findControlByEffectiveId(effectiveId: String): Option[XFormsControl] =
     Option(getControlByEffectiveId(effectiveId))
 
-  def isDirtySinceLastRequest: Boolean = _controls.isDirtySinceLastRequest
+  def isDirtySinceLastRequest: Boolean = controls.isDirtySinceLastRequest
 
   def initialize(
     uriResolver : Option[XFormsURIResolver],
@@ -119,7 +118,7 @@ class XFormsContainingDocument(
       this._response     = response
       this._initializing = true
 
-      createControlsAndModels()
+      addAllModels()
 
       // Group all `xforms-model-construct-done` and `xforms-ready` events within a single outermost action handler in
       // order to optimize events. Perform deferred updates only for `xforms-ready`.
@@ -148,19 +147,20 @@ class XFormsContainingDocument(
 
     XFormsAPI.withContainingDocument(this) {
       Controls.withDynamicStateToRestore(dynamicState.decodeInstancesControls) {
+
         // Restore models state
-        createControlsAndModels()
+        addAllModels()
 
         // Restore top-level models state, including instances
         restoreModelsState(deferRRR = false)
 
         // Restore controls state
         // Store serialized control state for retrieval later
-        _controls.createControlTree(Controls.restoringControls)
+        controls.createControlTree(Controls.restoringControls)
 
         // Once the control tree is rebuilt, restore focus if needed
         dynamicState.focusedControl foreach { focusedControl =>
-          _controls.setFocusedControl(_controls.getCurrentControlTree.findControl(focusedControl))
+          controls.setFocusedControl(controls.getCurrentControlTree.findControl(focusedControl))
         }
       }
     }
@@ -245,7 +245,7 @@ class XFormsContainingDocument(
       clearInitialClientScript()
 
     clearClientState()
-    _controls.afterUpdateResponse()
+    controls.afterUpdateResponse()
     xpathDependencies.afterUpdateResponse()
   }
 
@@ -273,11 +273,6 @@ class XFormsContainingDocument(
     }
   }
 
-  private def createControlsAndModels(): Unit = {
-    addAllModels()
-    _controls = new XFormsControls(this)
-  }
-
   override def initializeNestedControls(): Unit = {
     // Call-back from super class models initialization
 
@@ -287,7 +282,7 @@ class XFormsContainingDocument(
     rebuildRecalculateRevalidateIfNeeded()
 
     // Initialize controls
-    _controls.createControlTree(None)
+    controls.createControlTree(None)
   }
 
   override def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =

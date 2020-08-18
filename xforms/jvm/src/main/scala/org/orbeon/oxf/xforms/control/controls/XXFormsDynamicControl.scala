@@ -415,7 +415,7 @@ object XXFormsDynamicControl {
           id         = ancestor.id
           if id.nonEmpty
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          _          <- partAnalysis.xblBindings.getBinding(prefixedId)
+          _          <- partAnalysis.getBinding(prefixedId)
           if ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId -> unsafeUnwrapElement(ancestor)

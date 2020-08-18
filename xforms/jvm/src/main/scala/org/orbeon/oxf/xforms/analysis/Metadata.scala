@@ -49,6 +49,7 @@ object Metadata {
   def apply(idGenerator: IdGenerator = new IdGenerator, isTopLevelPart: Boolean = true): Metadata =
     new Metadata(idGenerator, isTopLevelPart)
 
+  // For restoring
   def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
 
     // Restore generator with last id

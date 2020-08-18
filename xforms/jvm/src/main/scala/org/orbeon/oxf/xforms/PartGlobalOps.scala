@@ -15,15 +15,13 @@ package org.orbeon.oxf.xforms
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global}
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId
-
-import scala.collection.JavaConverters._
 
 trait PartGlobalOps {
 
@@ -47,7 +45,7 @@ trait PartGlobalOps {
 
   // XBL
   def getBinding(prefixedId: String): Option[ConcreteBinding]
-  def getGlobals: collection.Seq[XBLBindings#Global]
+  def getGlobals: collection.Seq[Global]
   def allBindingsMaybeDuplicates: Iterable[AbstractBinding]
 
   // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)

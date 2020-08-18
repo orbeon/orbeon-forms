@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindingBuilder}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
@@ -251,7 +251,8 @@ trait ModelBinds {
 
   private def annotateSubTree(rawElement: Element) = {
     val annotatedTree =
-      part.xblBindings.annotateSubtree1(
+      XBLBindingBuilder.annotateSubtree(
+        selfModel.part,
         None,
         Dom4jUtils.createDocumentCopyParentNamespaces(rawElement),
         scope,
@@ -259,7 +260,8 @@ trait ModelBinds {
         XXBLScope.Inner,
         containerScope,
         hasFullUpdate = false,
-        ignoreRoot = false)
+        ignoreRoot = false
+      )
 
     annotatedTree
   }

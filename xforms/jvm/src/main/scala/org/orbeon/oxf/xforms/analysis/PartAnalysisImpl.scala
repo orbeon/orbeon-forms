@@ -104,7 +104,7 @@ class PartAnalysisImpl(
       (throw new IllegalStateException(s"namespace mappings not cached for scope `$scope` on element with id `$id`"))
   }
 
-  // Builder that produces an ElementAnalysis for a known incoming Element
+  // Builder that produces an `ElementAnalysis` for a known incoming Element
   def build(
     parent         : ElementAnalysis,
     preceding      : Option[ElementAnalysis],
@@ -151,7 +151,7 @@ class PartAnalysisImpl(
     elementAnalysisOpt
   }
 
-  // Analyze a subtree of controls
+  // Analyze a subtree of controls (for `xxf:dynamic`)
   def analyzeSubtree(container: ChildrenBuilderTrait): Unit = {
 
     implicit val logger = getIndentedLogger
@@ -206,7 +206,7 @@ class PartAnalysisImpl(
       val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder = build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
       rootControlAnalysis.build(buildGatherLHHAAndHandlers)
 
-      // Issues with xxbl:global
+      // Issues with `xxbl:global`
       //
       // 1. It's unclear what should happen with nested parts if they have globals. Without the condition below,
       //    globals can be duplicated, once per part. This can cause issues in Form Builder for example, where a
@@ -219,7 +219,7 @@ class PartAnalysisImpl(
       if (isTopLevel) {
         val globalsOptions =
           for {
-            global        <- xblBindings.allGlobals
+            global        <- allGlobals
             globalElement <- global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
@@ -231,8 +231,8 @@ class PartAnalysisImpl(
 
         // Add globals to the root analysis
         rootControlAnalysis.addChildren(globalsOptions.iterator.flatten)
-      } else if (xblBindings.allGlobals.nonEmpty)
-        warn(s"There are ${xblBindings.allGlobals.size} xxbl:global in a child part. Those won't be processed.")
+      } else if (allGlobals.nonEmpty)
+        warn(s"There are ${allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 
       // Attach LHHA
       for (lhha <- lhhas)

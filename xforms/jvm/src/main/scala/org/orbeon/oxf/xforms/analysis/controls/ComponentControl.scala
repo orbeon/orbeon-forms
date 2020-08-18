@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope, XBLBindingBuilder}
 
 class ComponentControl(
   staticStateContext : StaticStateContext,
@@ -24,7 +24,7 @@ class ComponentControl(
     part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
 
   // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
-  private var _concreteBindingOpt: Option[ConcreteBinding] = None//part.xblBindings.getBinding(prefixedId)
+  private var _concreteBindingOpt: Option[ConcreteBinding] = None//part.getBinding(prefixedId)
 
   def bindingOpt      : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! part.isTopLevel)
   def bindingOrThrow  : ConcreteBinding         = _concreteBindingOpt getOrElse (throw new IllegalStateException)
@@ -36,10 +36,23 @@ class ComponentControl(
 
     assert(_concreteBindingOpt.isEmpty)
 
-    _concreteBindingOpt =
-      part.xblBindings.createConcreteBindingFromElem(abstractBinding, elemInSource, prefixedId, locationData, containerScope) |!> { newBinding =>
-        part.xblBindings.addBinding(prefixedId, newBinding)
+    XBLBindingBuilder.createConcreteBindingFromElem(
+      part,
+      abstractBinding,
+      elemInSource,
+      prefixedId,
+      containerScope
+    ) foreach { case (newBinding, globalOpt) =>
+
+      globalOpt foreach { global =>
+        part.abstractBindingsWithGlobals += abstractBinding
+        part.allGlobals += global
       }
+
+      part.addBinding(prefixedId, newBinding)
+
+      _concreteBindingOpt = newBinding.some
+    }
   }
 
   // Remove the component's binding
@@ -52,7 +65,7 @@ class ComponentControl(
       part.deindexTree(this, self = false)
 
       part.deregisterScope(binding.innerScope)
-      part.xblBindings.removeBinding(prefixedId)
+      part.removeBinding(prefixedId)
 
       _concreteBindingOpt = None
     }

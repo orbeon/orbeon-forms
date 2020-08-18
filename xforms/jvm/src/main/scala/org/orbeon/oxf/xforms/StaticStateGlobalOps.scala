@@ -73,7 +73,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
   def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
-  def getBinding(prefixedId: String) = findInPartsOpt(_.xblBindings.getBinding(prefixedId))
+  def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
 
   def repeats = collectInPartsReverse(_.repeats)
   def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts

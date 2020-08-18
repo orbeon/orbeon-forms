@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
@@ -97,7 +98,7 @@ trait PartControlsAnalysis extends TransientState {
   def getControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId) orNull
 
-  def controlElement(prefixedId: String) =
+  def controlElement(prefixedId: String): Option[NodeInfo] =
     findControlAnalysis(prefixedId) map (control => staticStateDocument.documentWrapper.wrap(control.element))
 
   def hasAttributeControl(prefixedForAttribute: String) =
@@ -136,7 +137,7 @@ trait PartControlsAnalysis extends TransientState {
 
   def getTopLevelControlElements: ju.List[Element] =
     Seq(controlTypes("root").values.head.element) ++
-      (xblBindings.allGlobals map (_.compactShadowTree.getRootElement)) asJava
+      (allGlobals map (_.compactShadowTree.getRootElement)) asJava
 
   def hasControls = getTopLevelControlElements.size > 0
 

@@ -58,7 +58,7 @@ object XBLTransformer {
     * NOTE: This mutates shadowTreeDocument.
     */
   def transform(
-    partAnalysis          : PartAnalysisImpl,
+    partAnalysis          : PartAnalysisImpl, // for `XblSupport`
     xblSupport            : Option[XBLSupport],
     shadowTreeDocument    : Document,
     boundElement          : Element,

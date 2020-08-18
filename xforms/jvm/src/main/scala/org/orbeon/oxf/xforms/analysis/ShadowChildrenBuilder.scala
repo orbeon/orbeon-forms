@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
 import org.orbeon.oxf.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindingBuilder}
 import org.orbeon.oxf.xml.Dom4j
 
 trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
@@ -45,7 +45,8 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         }
 
       // Children elements have not been annotated earlier (because they are nested within the bound element)
-      part.xblBindings.annotateSubtreeByElement(
+      XBLBindingBuilder.annotateSubtreeByElement(
+        part,
         element,            // bound element
         child,              // child tree to annotate
         innerScope,         // handler's inner scope is the same as the component's

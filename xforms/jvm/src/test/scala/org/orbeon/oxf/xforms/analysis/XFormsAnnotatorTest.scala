@@ -16,9 +16,8 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
-import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsStaticStateImpl, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.VirtualNode
@@ -143,9 +142,8 @@ class XFormsAnnotatorTest
 
   describe("Annotator `xxf:attribute` handling") {
 
-    val metadata = Metadata.apply(new IdGenerator(1), isTopLevelPart = true)
-
-    val annotatedDoc = new XBLBindings(new IndentedLogger(XFormsServer.logger), null, metadata).annotateShadowTree(xmlDoc, "")
+    val metadata     = Metadata.apply(new IdGenerator(1), isTopLevelPart = true)
+    val annotatedDoc = XBLBindingBuilder.annotateShadowTree(metadata, xmlDoc, "")
     val docWrapper   = new DocumentWrapper(annotatedDoc, null, XPath.GlobalConfiguration)
 
     val elemNames = List(

@@ -21,13 +21,13 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.Global;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.xforms.Constants;
 import org.xml.sax.Attributes;
@@ -352,7 +352,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public void end() throws SAXException {
 
         // Add global top-level XBL markup
-        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.staticOps().getGlobals().iterator();
+        final scala.collection.Iterator<Global> i = containingDocument.staticOps().getGlobals().iterator();
         while (i.hasNext())
             XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController(), i.next().templateTree());
 

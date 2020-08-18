@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
@@ -76,7 +77,8 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 
     // First annotate tree
     val annotatedTree =
-      model.part.xblBindings.annotateSubtree1(
+      XBLBindingBuilder.annotateSubtree(
+        model.part,
         None,
         Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
         model.scope,
@@ -84,7 +86,8 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
         XXBLScope.Inner,
         model.containerScope,
         hasFullUpdate = false,
-        ignoreRoot = false)
+        ignoreRoot = false
+      )
 
     // Add new bind to parent
     bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)

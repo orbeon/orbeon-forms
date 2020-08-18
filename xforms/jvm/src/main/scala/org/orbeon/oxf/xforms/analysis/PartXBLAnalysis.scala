@@ -13,21 +13,44 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.{ConcreteBinding, Scope, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope}
+import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.{Constants, XFormsId}
 
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
+
+case class Global(templateTree: SAXStore, compactShadowTree: Document)
 
 trait PartXBLAnalysis extends TransientState {
 
   self: PartAnalysisImpl =>
 
-  val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
+  // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
+  // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
+  // all XBL components. They would then have to be properly scoped.
+  metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
+
+  private val concreteBindings    = mutable.HashMap[String, ConcreteBinding]()
+  val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
+  val allGlobals                  = mutable.ArrayBuffer[Global]()
+
+  // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:
+  // - deindex prefixed ids => Scope
+  // - remove models associated with scope
+  // - remove control analysis
+  // - deindex scope id => Scope
+  //def removeScope(scope: Scope) = ???
+
+  def addBinding(controlPrefixedId: String, binding: ConcreteBinding) : Unit                    = concreteBindings += controlPrefixedId -> binding
+  def getBinding(controlPrefixedId: String)                           : Option[ConcreteBinding] = concreteBindings.get(controlPrefixedId)
+  def removeBinding(controlPrefixedId: String)                        : Unit                    = concreteBindings -= controlPrefixedId
+  // NOTE: Can't update abstractBindings, allScripts, allStyles, allGlobals without checking all again, so for now
+  // leave that untouched.
 
   private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
   private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
@@ -71,7 +94,7 @@ trait PartXBLAnalysis extends TransientState {
   def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit =
     if (prefixedIdToXBLScopeMap.contains(prefixedId)) {
       if (! ignoreIfPresent)
-        throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
+        throw new OXFException(s"Duplicate id found for prefixed id `$prefixedId`")
     } else {
       scope += staticId -> prefixedId
       prefixedIdToXBLScopeMap += prefixedId -> scope
@@ -82,7 +105,7 @@ trait PartXBLAnalysis extends TransientState {
     control match {
       case component: ComponentControl =>
         component.bindingOpt foreach { binding =>
-          xblBindings.removeBinding(component.prefixedId)
+          removeBinding(component.prefixedId)
           deregisterScope(binding.innerScope)
         }
       case attribute: AttributeControl =>
@@ -109,9 +132,6 @@ trait PartXBLAnalysis extends TransientState {
   def scopeForPrefixedId(prefixedId: String) =
     prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
-  def getBinding(prefixedId: String) =
-    xblBindings.getBinding(prefixedId)
-
   def allBindingsMaybeDuplicates =
     metadata.allBindingsMaybeDuplicates
 
@@ -119,7 +139,7 @@ trait PartXBLAnalysis extends TransientState {
   def searchResolutionScopeByPrefixedId(prefixedId: String) =
     ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
 
-  def getGlobals = xblBindings.allGlobals
+  def getGlobals = allGlobals
 
   def clearShadowTree(existingComponent: ComponentControl): Unit = {
     assert(! isTopLevel)
@@ -142,6 +162,6 @@ trait PartXBLAnalysis extends TransientState {
 
   override def freeTransientState() = {
     super.freeTransientState()
-    xblBindings.freeTransientState()
+    metadata.commitBindingIndex()
   }
 }

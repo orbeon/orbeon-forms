@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
-import org.orbeon.oxf.xforms.event.EventHandler
 import java.util.{List => JList}
 
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
+import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.xbl.Scope
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
@@ -48,7 +48,6 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
   def staticState: XFormsStaticState
 
   def metadata: Metadata
-  def xblBindings: XBLBindings
 
   def dumpAnalysis()
 

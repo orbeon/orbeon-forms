@@ -11,30 +11,21 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.Index;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.oxf.xforms.function.Index
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.value.Int64Value
 
 /**
  * xxf:index() function. Behaves like the standard XForms index() function, except the repeat id is optional. When
  * it is not specified, the function returns the id of the closest enclosing repeat.
  */
-public class XXFormsIndex extends Index {
+class XXFormsIndex extends Index {
 
-    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
-
-        final Expression repeatIdExpression = (argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : repeatIdExpression.evaluateAsString(xpathContext).toString();
-
-        if (repeatId == null) {
-            // Find closest enclosing id
-            return findIndexForRepeatId(xpathContext, bindingContext().enclosingRepeatId());
-        } else {
-            return super.evaluateItem(xpathContext);
-        }
+  override def evaluateItem(xpathContext: XPathContext): Int64Value =
+    stringArgumentOpt(0)(xpathContext) match {
+      case Some(repeatId) => findIndexForRepeatId(repeatId)
+      case None           => findIndexForRepeatId(bindingContext.enclosingRepeatId)
     }
 }

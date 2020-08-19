@@ -36,7 +36,40 @@ import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 
 object XFormsExtractor {
+
   val LastIdQName = QName("last-id")
+
+  // TODO: Keeping this static list is not ideal
+  private val AllowedXXFormsElements =
+    Set(
+      "dialog",
+      "var",
+      "variable",
+      "sequence",
+      "value",
+      "attribute",
+      "text",
+      "context",
+      "size", //xf:upload/xxf:size
+      "dynamic",
+      "param",
+      "body"
+    )
+
+  private val AllowedEXFormElements =
+    Set(
+      "variable"
+    )
+
+  private val AllowedXBLElements =
+    Set(
+      "xbl",
+      "binding",
+      "handlers",
+      "handler", // just for the case of top-level `<xbl:handler>`
+      "implementation",
+      "template"
+    )
 }
 
 /**
@@ -98,6 +131,8 @@ class XFormsExtractor(
      with XMLReceiverUnneededEvents
      with ExtractorProperties
      with ExtractorOutput {
+
+  import XFormsExtractor._
 
   require(baseURI ne null)
 

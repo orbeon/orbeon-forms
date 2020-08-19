@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.xforms.{EventNames, Namespaces}
 
 // Constants useful for the XForms engine.
@@ -27,40 +27,7 @@ import org.orbeon.xforms.{EventNames, Namespaces}
 //
 object XFormsConstants {
 
-  val SeparateDeploymentTypeJava = DeploymentType.Separate
   val StandaloneDeploymentTypeJava = DeploymentType.Standalone
-
-  // TODO: Keeping this static list is not ideal
-  val AllowedXXFormsElements =
-    Set(
-      "dialog",
-      "var",
-      "variable",
-      "sequence",
-      "value",
-      "attribute",
-      "text",
-      "context",
-      "size", //xf:upload/xxf:size
-      "dynamic",
-      "param",
-      "body"
-    )
-
-  val AllowedEXFormElements =
-    Set(
-      "variable"
-    )
-
-  val AllowedXBLElements =
-    Set(
-      "xbl",
-      "binding",
-      "handlers",
-      "handler", // just for the case of top-level `<xbl:handler>`
-      "implementation",
-      "template"
-    )
 
   val LHHAElements =
     Set(
@@ -374,7 +341,7 @@ object XFormsConstants {
   val XFORMS_STRING_QNAME = QName("string", XFORMS_NAMESPACE)
   val XFORMS_BASE64BINARY_QNAME = QName("base64Binary", XFORMS_NAMESPACE)
 
-  val XS_STRING_EXPLODED_QNAME = XMLConstants.XS_STRING_QNAME.clarkName
+  val XS_STRING_EXPLODED_QNAME = XS_STRING_QNAME.clarkName
   val XFORMS_STRING_EXPLODED_QNAME = XFORMS_STRING_QNAME.clarkName
 
   val XXFORMS_EVENT_MODE_QNAME = QName("events-mode", XXFORMS_NAMESPACE)

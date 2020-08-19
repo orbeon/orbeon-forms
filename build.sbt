@@ -644,6 +644,7 @@ lazy val xformsJVM = xforms.jvm
     commonJVM,
     core % "test->test;compile->compile"
   )
+  .dependsOn(xformsCommon.jvm)
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
   .settings(commonScalaJvmSettings)
@@ -660,8 +661,9 @@ lazy val xformsJVM = xforms.jvm
     (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in xformsJS).value.data, XFormsResourcesPathInWar)
   )
 
-lazy val xformsJS: Project = xforms.js
+lazy val xformsJS = xforms.js
   .dependsOn(commonJS % "test->test;compile->compile")
+  .dependsOn(xformsCommon.js)
   .settings(commonScalaJsSettings)
   .settings(
 
@@ -693,6 +695,21 @@ lazy val xformsJS: Project = xforms.js
       XFormsResourcesPathInWar
     )
   )
+
+lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-common"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-common"
+  )
+
+lazy val xformsCommonJVM = xformsCommon.jvm
+  .dependsOn(commonJVM)
+  .dependsOn(dom.jvm)
+
+lazy val xformsCommonJS = xformsCommon.js
+  .dependsOn(commonJS)
+  .dependsOn(dom.js)
+  .settings(commonScalaJsSettings)
 
 lazy val fileScanExample = (project in file("file-scan-example"))
   .dependsOn(xformsJVM)

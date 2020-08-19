@@ -133,10 +133,10 @@ private object ServletRequestWrapper {
   def newEmptyInputStream = new ByteArrayInputStream(Array[Byte]())
   def newEmptyReader      = new BufferedReader(new StringReader(""))
 
-  def newEmptyServletInputStream = {
+  def newEmptyServletInputStream: ServletInputStream = {
     val is = newEmptyInputStream
     new ServletInputStream {
-      def read() = is.read()
+      def read(): Int = is.read()
       def isFinished: Boolean = true
       def isReady: Boolean = false
       def setReadListener(readListener: ReadListener): Unit = ()

@@ -129,7 +129,7 @@ trait PartXBLAnalysis extends TransientState {
     scopesById.get(scopeId).orNull
   }
 
-  def scopeForPrefixedId(prefixedId: String) =
+  def scopeForPrefixedId(prefixedId: String): Scope =
     prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
   def allBindingsMaybeDuplicates =

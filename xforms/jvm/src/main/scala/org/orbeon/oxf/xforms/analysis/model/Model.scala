@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import java.util
-
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XXBLScope

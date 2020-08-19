@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.dom.Document
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.{OXFException, Version}
@@ -48,7 +48,7 @@ class XFormsStaticStateImpl(
   val digest              : String,
   val startScope          : Scope,
   metadata                : Metadata,
-  val template            : Option[AnnotatedTemplate],
+  val template            : Option[AnnotatedTemplate], // for tests only?
   val staticStateDocument : StaticStateDocument
 ) extends XFormsStaticState {
 
@@ -242,7 +242,7 @@ object XFormsStaticStateImpl {
   }
 
   // Create analyzed static state for the given static state document.
-  // Used by XFormsToXHTML.
+  // Used by `XFormsToXHTML`.
   def createFromStaticStateBits(staticStateBits: StaticStateBits): XFormsStaticStateImpl = {
 
     val startScope = new Scope(None, "")
@@ -259,7 +259,7 @@ object XFormsStaticStateImpl {
   }
 
   // Create analyzed static state for the given XForms document.
-  // Used by unit tests.
+  // Used by tests.
   def createFromDocument(formDocument: Document): XFormsStaticState = {
 
     val startScope = new Scope(None, "")
@@ -343,7 +343,7 @@ object XFormsStaticStateImpl {
     protected override def rewriteId(id: String) = prefix + id
   }
 
-  // Used by xxf:dynamic and unit tests.
+  // Used by `xxf:dynamic` and tests.
   private def createFromDocument[T](
     formDocument : Document,
     startScope   : Scope,
@@ -407,7 +407,7 @@ object XFormsStaticStateImpl {
     val documentWrapper = new DocumentWrapper(xmlDocument, null, XPath.GlobalConfiguration)
 
     // Pointers to nested elements
-    def rootControl = staticStateElement.element("root")
+    def rootControl: Element = staticStateElement.element("root")
     def xblElements = rootControl.elements(XBL_XBL_QNAME).asScala
 
     // TODO: if staticStateDocument contains XHTML document, get controls and models from there?

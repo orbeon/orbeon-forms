@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, 
 
 object columnFilterPart {
 
-  def apply(request: Request) =
+  def apply(request: Request): StatementPart =
     if (! request.columns.exists(_.filterType != FilterType.None))
         NilPart
     else

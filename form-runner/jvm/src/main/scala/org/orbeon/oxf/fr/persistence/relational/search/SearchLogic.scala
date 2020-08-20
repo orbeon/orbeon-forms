@@ -165,6 +165,7 @@ trait SearchLogic extends SearchRequest {
                   created          = documentsResultSet.getTimestamp              ("created"),
                   lastModifiedTime = documentsResultSet.getTimestamp              ("last_modified_time"),
                   lastModifiedBy   = documentsResultSet.getString                 ("last_modified_by"),
+                  workflowStage    = Option(documentsResultSet.getString          ("stage")),
                   username         = Option(documentsResultSet.getString          ("username")),
                   groupname        = Option(documentsResultSet.getString          ("groupname")),
                   organizationId   = RelationalUtils.getIntOpt(documentsResultSet, "organization_id")

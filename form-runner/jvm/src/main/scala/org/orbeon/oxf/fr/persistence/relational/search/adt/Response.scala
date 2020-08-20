@@ -21,6 +21,7 @@ case class DocumentMetaData(
   created          : Timestamp,
   lastModifiedTime : Timestamp,
   lastModifiedBy   : String,
+  workflowStage    : Option[String],
   username         : Option[String],
   groupname        : Option[String],
   organizationId   : Option[Int]

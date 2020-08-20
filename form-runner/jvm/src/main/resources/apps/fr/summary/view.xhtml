@@ -777,8 +777,9 @@
 
                     <xf:group ref="instance('fr-summary-instance')" xxf:update="full">
 
-                        <xf:var name="show-created"       value="xxf:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
-                        <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
+                        <xf:var name="show-created"        value="xxf:property(string-join(('oxf.fr.summary.show-created'       , $app, $form), '.'))"/>
+                        <xf:var name="show-last-modified"  value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' , $app, $form), '.'))"/>
+                        <xf:var name="show-workflow-stage" value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
@@ -796,6 +797,9 @@
                                         <xh:col/>
                                     </xf:group>
                                     <xf:group ref="''[$show-last-modified]">
+                                        <xh:col/>
+                                    </xf:group>
+                                    <xf:group ref="''[$show-workflow-stage]">
                                         <xh:col/>
                                     </xf:group>
                                     <!-- Empty column if no summary fields looks nicer -->
@@ -819,6 +823,11 @@
                                         <xf:group ref="''[$show-last-modified]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
+                                            </xh:th>
+                                        </xf:group>
+                                        <xf:group ref="''[$show-workflow-stage]">
+                                            <xh:th>
+                                                <xf:output value="$fr-resources/summary/titles/workflow-stage"/>
                                             </xh:th>
                                         </xf:group>
                                         <xf:group ref="''[empty($detail-positions)]">
@@ -942,6 +951,18 @@
                                                         </xf:group>
                                                         <xf:group ref=".[$edit-view = '']">
                                                             <xf:output value="$last-modified"/>
+                                                        </xf:group>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-workflow-stage]">
+                                                    <xh:td class="fr-td">
+                                                        <xf:group ref=".[$edit-view != '']">
+                                                            <xh:a href="{$current-document-href}">
+                                                                <xf:output value="$document/@workflow-stage"/>
+                                                            </xh:a>
+                                                        </xf:group>
+                                                        <xf:group ref=".[$edit-view = '']">
+                                                            <xf:output value="$document/@workflow-stage"/>
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>

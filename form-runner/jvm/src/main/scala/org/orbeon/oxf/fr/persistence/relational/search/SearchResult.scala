@@ -34,11 +34,12 @@ trait SearchResult extends SearchRequest {
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created       ={DateTime.print(doc.metadata.created.getTime)}
-            last-modified ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
-            name          ={doc.metadata.documentId}
-            draft         ={doc.metadata.draft.toString}
-            operations    ={doc.operations.mkString(" ")}>{
+            created        ={DateTime.print(doc.metadata.created.getTime)}
+            last-modified  ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
+            workflow-stage ={doc.metadata.workflowStage.map(xml.Text(_))}
+            name           ={doc.metadata.documentId}
+            draft          ={doc.metadata.draft.toString}
+            operations     ={doc.operations.mkString(" ")}>{
 
             <details>{
               request.columns.map { requestColumn =>

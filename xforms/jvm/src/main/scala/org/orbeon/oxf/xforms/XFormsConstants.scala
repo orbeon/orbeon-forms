@@ -265,14 +265,6 @@ object XFormsConstants {
   val XXFORMS_MODAL_QNAME = QName("modal", XXFORMS_NAMESPACE)
 
   val LEVEL_QNAME = QName("level")
-  val XFORMS_MODAL_LEVEL_QNAME = QName("modal")
-  val XFORMS_MODELESS_LEVEL_QNAME = QName("modeless")
-  val XFORMS_EPHEMERAL_LEVEL_QNAME = QName("ephemeral")
-
-  val XXFORMS_LOG_DEBUG_LEVEL_QNAME = QName("log-debug", XXFORMS_NAMESPACE)
-  val XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME = QName("log-info", XXFORMS_NAMESPACE)
-  val XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME = QName("log-warn", XXFORMS_NAMESPACE)
-  val XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME = QName("log-error", XXFORMS_NAMESPACE)
 
   // This appearance is designed to be used internally when a text/html mediatype is encountered on <textarea>
   val XXFORMS_RICH_TEXT_APPEARANCE_QNAME = QName("richtext", XXFORMS_NAMESPACE)

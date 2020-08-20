@@ -181,7 +181,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                                 $translated
                         "/>
                     <xh:input type="text" placeholder="{$placeholder}" id="input"/>
-                    <xh:span class="add-on">
+                    <xh:span class="add-on" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>
                 </xh:div>

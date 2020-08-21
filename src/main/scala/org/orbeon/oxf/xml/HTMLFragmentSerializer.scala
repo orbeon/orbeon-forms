@@ -18,6 +18,7 @@ import java.io.Writer
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
 import org.xml.sax.Attributes
@@ -33,7 +34,7 @@ object HTMLFragmentSerializer {
       Properties.instance.getPropertySet(
         QName(
           "html-converter",
-          XMLConstants.OXF_PROCESSORS_NAMESPACE
+          XPLConstants.OXF_PROCESSORS_NAMESPACE
         )
       ).getQName(
         TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,

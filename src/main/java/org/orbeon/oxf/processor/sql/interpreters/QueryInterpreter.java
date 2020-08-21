@@ -18,6 +18,7 @@ import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
@@ -118,7 +119,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     if (isGetColumn) {
                         // Generic getter
                         final String xmlType = GetterInterpreter.getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), getInterpreterContext().getPropertySet(), attributes.getValue("type"), getInterpreterContext().getPrefixesMap(), columnType);
-                        if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
+                        if (Dom4jUtils.qNameToExplodedQName(XPLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
                             if (columnType == Types.CLOB) {
                                 value = rs.getClob(columnName);
                             } else if (columnType == Types.BLOB) {
@@ -329,7 +330,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                     boolean doSetNull = parameter.getNullIf() != null
                                             && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull());
 
-                                    if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME()).equals(xmlType) || Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
+                                    if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME()).equals(xmlType) || Dom4jUtils.qNameToExplodedQName(XPLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
                                         // Set a string or XML Fragment
 
                                         // List of Clobs, strings or nodes
@@ -351,7 +352,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (objectValue instanceof Clob || objectValue instanceof Blob || objectValue instanceof String) {
                                                     // Leave unchanged
                                                     value = objectValue;
-                                                } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
+                                                } else if (Dom4jUtils.qNameToExplodedQName(XPLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
                                                     // Case of XML Fragment
                                                     // Get an Element or a String
                                                     if (objectValue instanceof Element)

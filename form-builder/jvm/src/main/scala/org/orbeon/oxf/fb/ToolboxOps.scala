@@ -25,6 +25,7 @@ import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.pipeline.Transform
+import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -705,7 +706,7 @@ object ToolboxOps {
                 0L
               )
             ),
-            XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME
+            XPLConstants.UNSAFE_XSLT_PROCESSOR_QNAME
           ),
           null,
           XPath.GlobalConfiguration

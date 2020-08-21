@@ -25,11 +25,11 @@ import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.FunctionSupportJava;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -103,7 +103,7 @@ public class CallXPL extends FunctionSupportJava {
             // Create processor definition and processor
             Processor processor;
             {
-                ProcessorDefinition processorDefinition = new ProcessorDefinition(QName.apply("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE()));
+                ProcessorDefinition processorDefinition = new ProcessorDefinition(QName.apply("pipeline", XPLConstants.OXF_PROCESSORS_NAMESPACE()));
                 {
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 

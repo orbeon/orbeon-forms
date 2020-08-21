@@ -25,6 +25,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
+import org.orbeon.oxf.processor.XPLConstants.{NULL_SERIALIZER_PROCESSOR_QNAME, OXF_PROCESSORS_NAMESPACE}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.pipeline.ast._
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}

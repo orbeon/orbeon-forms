@@ -16,13 +16,15 @@ package org.orbeon.oxf.processor.pipeline.choose;
 import org.apache.commons.collections.CollectionUtils;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.AbstractProcessor;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.xml.NamespaceMapping;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xml.NamespaceMapping;
 
 import java.util.*;
 
@@ -173,7 +175,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             final Set idsToConvert = (Set) idsWithNoRef.get(0);
             for (Iterator i = idsToConvert.iterator(); i.hasNext();) {
                 final String id = (String) i.next();
-                final ASTProcessorCall identityConnector = new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME());
+                final ASTProcessorCall identityConnector = new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME());
                 {
                     identityConnector.addInput(new ASTInput("data", new ASTHrefId(new ASTOutput(null, id))));
                     final ASTParam outParam = new ASTParam(ASTParam.OUTPUT, id);

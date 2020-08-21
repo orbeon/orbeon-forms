@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.impl;
 
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -27,7 +26,6 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.InspectingXMLReceiver;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -275,9 +273,9 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
 
         // Handle debug
         if (getDebugMessage() != null || (getInput() != null && getInput().getDebugMessage() != null)) {
-            ProcessorFactory debugProcessorFactory = ProcessorFactoryRegistry.lookup(XMLConstants.DEBUG_PROCESSOR_QNAME());
+            ProcessorFactory debugProcessorFactory = ProcessorFactoryRegistry.lookup(XPLConstants.DEBUG_PROCESSOR_QNAME());
             if (debugProcessorFactory == null)
-                throw new OXFException("Cannot find debug processor factory for QName: " + XMLConstants.DEBUG_PROCESSOR_QNAME());
+                throw new OXFException("Cannot find debug processor factory for QName: " + XPLConstants.DEBUG_PROCESSOR_QNAME());
 
             for (int i = 0; i < 2; i++) {
                 String debugMessage = i == 0 ? getDebugMessage() :

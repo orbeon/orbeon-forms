@@ -15,7 +15,7 @@ package org.orbeon.oxf.pipeline
 
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
-import org.orbeon.oxf.processor.DOMSerializer
+import org.orbeon.oxf.processor.{DOMSerializer, XPLConstants}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, PipelineReader}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
@@ -78,7 +78,7 @@ object Transform {
     if (isXSLT) {
       // Consider the document to be an XSLT transformation and run it
       // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
-      transformDocument(doc, None, XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME)
+      transformDocument(doc, None, XPLConstants.UNSAFE_XSLT_PROCESSOR_QNAME)
     } else {
       // Return unmodified XBL document
       doc.doc

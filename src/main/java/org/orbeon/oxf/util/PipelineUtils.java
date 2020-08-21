@@ -16,17 +16,19 @@ package org.orbeon.oxf.util;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
 
 public class PipelineUtils {
 
     private static void configDOMGenerator(final DOMGenerator dm) {
         dm.setId("N/A");
-        dm.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME());
+        dm.setName(XPLConstants.DOM_GENERATOR_PROCESSOR_QNAME());
     }
 
     public static void connect(Processor producer, String outputName, Processor consumer, String inputName) {

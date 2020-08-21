@@ -15,7 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -33,7 +33,7 @@ trait BaseOps extends Logging {
 
   // Find the top-level form model of the form being edited
   def getFormModel: XFormsModel =
-    inScopeContainingDocument.getObjectByEffectiveId(s"$DynamicControlId${COMPONENT_SEPARATOR}fr-form-model")
+    inScopeContainingDocument.getObjectByEffectiveId(s"$DynamicControlId${ComponentSeparator}fr-form-model")
       .asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
   def findTemplateRoot(repeatName: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =

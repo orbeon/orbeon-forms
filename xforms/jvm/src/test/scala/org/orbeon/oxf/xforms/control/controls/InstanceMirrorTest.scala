@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
@@ -209,7 +209,7 @@ class InstanceMirrorTest
         var updates = 0
 
         val OuterModelId  = "model"
-        val NestedModelId = "my-gaga" + COMPONENT_SEPARATOR + "gaga-model"
+        val NestedModelId = "my-gaga" + ComponentSeparator + "gaga-model"
 
         // First update outer instance and check inner instance, then do the reverse
         for ((targetPrefixedId, mirroredInstance) <- List(OuterModelId -> innerInstance, NestedModelId -> outerInstance))
@@ -269,7 +269,7 @@ class InstanceMirrorTest
           </xh:html>
 
         val PositionInputId = "position-input"
-        val GagaInputId     = "my-gaga" + COMPONENT_SEPARATOR + "gaga-input"
+        val GagaInputId     = "my-gaga" + ComponentSeparator + "gaga-input"
 
         // Initial values
         assert("42" === getControlValue(GagaInputId))

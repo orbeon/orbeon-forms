@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time._
@@ -100,7 +100,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   //
   // NOTE: This doesn't handle repeat iterations yet.
   def clientId(id: String) = {
-    val withPrefix = COMPONENT_SEPARATOR + id
+    val withPrefix = ComponentSeparator + id
     // NOTE: XPath 1 doesn't have ends-with()
     xpath(s"//*[@id = '$id' or contains(@id, '$withPrefix') and @id = concat(substring-before(@id, '$withPrefix'), '$withPrefix')]").element.attribute("id").get
   }

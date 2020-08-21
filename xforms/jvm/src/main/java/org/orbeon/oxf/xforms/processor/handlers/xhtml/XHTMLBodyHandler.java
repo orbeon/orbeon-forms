@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsError;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.Global;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
@@ -76,7 +73,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         final String requestPath = containingDocument.getRequestPath();
         final String xformsSubmissionPath;
         {
-            if (! containingDocument.getDeploymentType().equals(XFormsConstants.StandaloneDeploymentTypeJava())
+            if (! containingDocument.getDeploymentType().equals(XFormsContainingDocumentSupport.StandaloneDeploymentTypeJava())
                     || containingDocument.isPortletContainer() || isEmbeddedClient) {
                 // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath = XFormsConstants.XFORMS_SERVER_SUBMIT();

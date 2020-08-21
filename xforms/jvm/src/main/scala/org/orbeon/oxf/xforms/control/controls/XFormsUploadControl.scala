@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.helpers.AttributesImpl
 
@@ -226,7 +227,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     Some(
       XFormsUtils.namespaceId(
         containingDocument,
-        XFormsId.appendToEffectiveId(getEffectiveId, COMPONENT_SEPARATOR + "xforms-input")
+        XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")
       )
     )
 

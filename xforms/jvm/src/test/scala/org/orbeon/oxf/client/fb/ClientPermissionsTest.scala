@@ -13,19 +13,17 @@
  */
 package org.orbeon.oxf.client.fb
 
-import org.scalatestplus.junit.AssertionsForJUnit
-import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
+import org.orbeon.oxf.client.FormBuilderOps
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.Constants.RepeatSeparatorString
+import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientPermissionsTest extends AssertionsForJUnit with FormBuilderOps {
 
-  private val RepeatSeparator = "" + REPEAT_SEPARATOR
-
   private def permissionSelector(selector: String): CssSelectorQuery = cssSelector(s".fb-permissions-dialog $selector")
-  private def role(line: Int): CssSelectorQuery = permissionSelector(s".fb-role-name[id $$= '${RepeatSeparator + line}'] input")
-  private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fb-$crud-permission[id $$= '${RepeatSeparator + line}'] input")
+  private def role(line: Int): CssSelectorQuery = permissionSelector(s".fb-role-name[id $$= '${RepeatSeparatorString + line}'] input")
+  private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fb-$crud-permission[id $$= '${RepeatSeparatorString + line}'] input")
 
   private val OpenPermissions  = cssSelector("#fb-permissions-button button")
   private val HasPermissions   = permissionSelector(".fb-has-permissions input")

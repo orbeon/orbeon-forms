@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xforms.PartAnalysis;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -28,6 +27,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xforms.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import scala.Tuple2;
@@ -230,7 +230,7 @@ public class HandlerContext {
 
     public void pushComponentContext(String prefixedId) {
 
-        final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR();
+        final String newIdPrefix = prefixedId + Constants.ComponentSeparator();
 
         if (componentContextStack == null)
             componentContextStack = new Stack<>();
@@ -276,8 +276,8 @@ public class HandlerContext {
 
         // Create postfix depending on whether we are appending to an existing postfix or not
         final String newIdPostfix = (currentIdPostfix.length() == 0)
-                ? "" + XFormsConstants.REPEAT_SEPARATOR() + iteration
-                : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR() + iteration;
+                ? Constants.RepeatSeparatorString() + iteration
+                : currentIdPostfix + Constants.RepeatIndexSeparatorString() + iteration;
 
         if (repeatContextStack == null)
             repeatContextStack = new Stack<>();

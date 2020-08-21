@@ -21,8 +21,8 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
-
 import org.scalatestplus.junit.AssertionsForJUnit
 
 object XFormsStaticStateTest {
@@ -375,7 +375,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     if (iterations.isEmpty)
       prefixedId
     else
-      prefixedId + XFormsConstants.REPEAT_SEPARATOR + (iterations mkString XFormsConstants.REPEAT_INDEX_SEPARATOR_STRING)
+      prefixedId + RepeatSeparatorString + (iterations mkString RepeatIndexSeparatorString)
   }
 
   @Test def repeatedModels(): Unit = {

@@ -18,10 +18,17 @@ object Constants {
 
   val UuidFieldName                     = "$uuid"
 
-  val RepeatSeparator                   = "\u2299" // ⊙ CIRCLED DOT OPERATOR
-  val RepeatIndexSeparator              = "-"      // - (just has to not be a digit)
+  val RepeatSeparator                   = '\u2299' // ⊙ CIRCLED DOT OPERATOR
+  val RepeatSeparatorString    : String = RepeatSeparator.toString
+
+  val RepeatIndexSeparator              = '-'      // - (just has to not be a digit)
+  val RepeatIndexSeparatorString: String = RepeatIndexSeparator.toString
+
   val ComponentSeparator       : Char   = '\u2261' // ≡ IDENTICAL TO
   val ComponentSeparatorString : String = ComponentSeparator.toString
+
+  val LhhacSeparator           : String = ComponentSeparatorString + ComponentSeparatorString
+
   val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
 
   val YuiSkinSamClass                   = "yui-skin-sam"

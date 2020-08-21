@@ -44,10 +44,10 @@ object ServerAPI {
         Option(dom.document.getElementById(s"repeat-begin-$id")) // e.g. with `xxforms-nodeset-changed`
 
       def fromDelimiter =
-        id.lastIndexOfOpt(RepeatSeparator) flatMap { lastRepeatSeparatorIndex =>
+        id.lastIndexOfOpt(RepeatSeparatorString) flatMap { lastRepeatSeparatorIndex =>
 
           val separatorPosition =
-            id.lastIndexOfOpt(RepeatIndexSeparator) map (lastRepeatSeparatorIndex max) getOrElse lastRepeatSeparatorIndex
+            id.lastIndexOfOpt(RepeatIndexSeparatorString) map (lastRepeatSeparatorIndex max) getOrElse lastRepeatSeparatorIndex
 
           Option(
             Utils.findRepeatDelimiter(

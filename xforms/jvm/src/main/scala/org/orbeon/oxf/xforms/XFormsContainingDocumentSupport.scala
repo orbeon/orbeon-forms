@@ -59,6 +59,8 @@ import scala.reflect.ClassTag
 
 object XFormsContainingDocumentSupport {
 
+  val StandaloneDeploymentTypeJava = DeploymentType.Standalone
+
   def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): T = {
     withLock(RequestParameters(uuid, None, None, None), timeout) {
       case Some(containingDocument) =>

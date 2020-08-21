@@ -17,11 +17,11 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
@@ -171,12 +171,12 @@ object Dispatch extends Logging {
     // - foo$bar.1-2 and Array(4, 5, 6) => foo$bar.4-5-6
     // - foo$bar.1-2 and Array() => foo$bar
     def replaceIdSuffix(prefixedOrEffectiveId: String , parts: Array[Int]): String = {
-      val prefixedId = prefixedOrEffectiveId split REPEAT_SEPARATOR head
+      val prefixedId = prefixedOrEffectiveId split RepeatSeparator head
 
       if (parts.length == 0)
         prefixedId
       else
-        prefixedId + REPEAT_SEPARATOR + (parts mkString REPEAT_INDEX_SEPARATOR_STRING)
+        prefixedId + RepeatSeparatorString + (parts mkString RepeatIndexSeparatorString)
     }
 
     // Append space-separated suffix indexes to existing indexes

@@ -41,6 +41,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString, RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
@@ -753,7 +754,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
   def buildFormBuilderControlEffectiveId(staticId: String)(implicit ctx: FormBuilderDocContext): Option[String] =
-    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) map (DynamicControlId + ComponentSeparator + buildControlEffectiveId(_))
 
   // Set the control's items for all languages
   def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
@@ -800,10 +801,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val containerIds = ancestorContainers map (_.id)
     val repeatDepth  = ancestorContainers count isRepeat
 
-    def suffix = 1 to repeatDepth map (_ => 1) mkString REPEAT_INDEX_SEPARATOR_STRING
-    val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
+    def suffix = 1 to repeatDepth map (_ => 1) mkString RepeatIndexSeparatorString
+    val prefixedId = containerIds :+ staticId mkString ComponentSeparatorString
 
-    prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
+    prefixedId + (if (repeatDepth == 0) "" else RepeatSeparatorString + suffix)
   }
 
   def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {

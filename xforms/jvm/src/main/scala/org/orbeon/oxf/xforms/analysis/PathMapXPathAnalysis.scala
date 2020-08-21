@@ -31,6 +31,7 @@ import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
@@ -409,7 +410,7 @@ object PathMapXPathAnalysis {
                   // absolute id. However, it is unlikely that literal absolute ids will be passed, so
                   // this is probably not a big deal.
                   partAnalysis.findInstancePrefixedId(scope, originalInstanceId).orNull // can return `None`
-                else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
+                else if (originalInstanceId.indexOf(ComponentSeparator) != -1)
                   // HACK: datatable e.g. uses instance(prefixedId)!
                   originalInstanceId // TODO: warn: could be a non-existing instance id
                 else

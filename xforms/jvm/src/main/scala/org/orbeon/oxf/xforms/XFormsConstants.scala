@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.xforms.{DeploymentType, EventNames, Namespaces}
+import org.orbeon.xforms.{EventNames, Namespaces}
 
 // Constants useful for the XForms engine.
 //
@@ -26,8 +25,6 @@ import org.orbeon.xforms.{DeploymentType, EventNames, Namespaces}
 // - see also `Namespaces`
 //
 object XFormsConstants {
-
-  val StandaloneDeploymentTypeJava = DeploymentType.Standalone
 
   val LHHAElements =
     Set(
@@ -43,7 +40,7 @@ object XFormsConstants {
   val XFORMS_NAMESPACE = Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI)
   val XFORMS_NAMESPACE_SHORT = Namespace(XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI)
 
-  val XXFORMS_PREFIX = "xxforms"
+  val XXFORMS_PREFIX = "xxforms" // TODO: remove
   val XXFORMS_SHORT_PREFIX = "xxf"
   val XXFORMS_NAMESPACE_URI = Namespaces.XXF
   val XXFORMS_NAMESPACE = Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI)
@@ -333,22 +330,20 @@ object XFormsConstants {
   val XFORMS_STRING_QNAME = QName("string", XFORMS_NAMESPACE)
   val XFORMS_BASE64BINARY_QNAME = QName("base64Binary", XFORMS_NAMESPACE)
 
-  val XS_STRING_EXPLODED_QNAME = XS_STRING_QNAME.clarkName
+  val XS_STRING_EXPLODED_QNAME = {
+
+    // NOTE: Copied from `XMLConstants` for now as we don't yet have a common place for it. Maybe `xml-common` subproject?
+    val XSD_PREFIX = "xs"
+    val XSD_URI = "http://www.w3.org/2001/XMLSchema"
+    val XSD_NAMESPACE = Namespace(XSD_PREFIX, XSD_URI)
+    val XS_STRING_QNAME = QName("string", XSD_NAMESPACE)
+
+    XS_STRING_QNAME.clarkName
+  }
   val XFORMS_STRING_EXPLODED_QNAME = XFORMS_STRING_QNAME.clarkName
 
   val XXFORMS_EVENT_MODE_QNAME = QName("events-mode", XXFORMS_NAMESPACE)
   val XXFORMS_VALIDATION_MODE_QNAME = QName("validation-mode", XXFORMS_NAMESPACE)
-
-  // TODO: Remove once callers use shared `xforms.Constants`
-  val COMPONENT_SEPARATOR = '\u2261' // ≡ IDENTICAL TO
-  val REPEAT_SEPARATOR = '\u2299' // ⊙ CIRCLED DOT OPERATOR
-  val REPEAT_INDEX_SEPARATOR = '-' // - (just has to not be a digit)
-
-  val REPEAT_INDEX_SEPARATOR_STRING = "" + REPEAT_INDEX_SEPARATOR
-
-  val XF_COMPONENT_SEPARATOR_STRING = "" + COMPONENT_SEPARATOR
-  // Use "$$" to minimize chances of conflict with user-defined ids
-  val LHHAC_SEPARATOR = "" + COMPONENT_SEPARATOR + COMPONENT_SEPARATOR
 
   val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"
 

@@ -20,7 +20,6 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, RepeatIterationControl}
@@ -33,6 +32,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -617,7 +617,7 @@ object XFormsRepeatControl {
 
           for {
             index <- Iterator.from(1).take(repeatControl.getSize)
-            i     <- search(tail, suffix + (if (suffix.isEmpty) "" else REPEAT_INDEX_SEPARATOR) + index)
+            i     <- search(tail, suffix + (if (suffix.isEmpty) "" else RepeatIndexSeparatorString) + index)
           } yield
             i
       }
@@ -646,8 +646,8 @@ object XFormsRepeatControl {
     }
 
   private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
-    repeats map (repeat => indexes(repeat.prefixedId)) mkString REPEAT_INDEX_SEPARATOR_STRING
+    repeats map (repeat => indexes(repeat.prefixedId)) mkString RepeatIndexSeparatorString
 
   private def addSuffix(prefixedId: String, suffix: String) =
-    prefixedId + (if (suffix.length > 0) REPEAT_SEPARATOR + suffix else "")
+    prefixedId + (if (suffix.length > 0) RepeatSeparatorString + suffix else "")
 }

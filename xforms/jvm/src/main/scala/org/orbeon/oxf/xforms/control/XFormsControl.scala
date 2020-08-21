@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 
@@ -108,7 +109,7 @@ class XFormsControl(
     if (staticControl.isWithinRepeat) {
       val parentEffectiveId = parent.getEffectiveId
       val parentSuffix = XFormsId.getEffectiveIdSuffix(parentEffectiveId)
-      effectiveId = XFormsId.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
+      effectiveId = XFormsId.getPrefixedId(effectiveId) + RepeatSeparatorString + parentSuffix
       if (_childrenActions.nonEmpty)
         for (actionControl <- _childrenActions)
           actionControl.updateEffectiveId()

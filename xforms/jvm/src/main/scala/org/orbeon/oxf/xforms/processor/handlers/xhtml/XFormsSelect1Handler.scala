@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
+import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -40,7 +41,7 @@ object XFormsSelect1Handler {
   def getItemId(effectiveId: String, itemIndex: Int): String =
     XFormsId.appendToEffectiveId(
       effectiveId = effectiveId,
-      ending      = XFormsConstants.XF_COMPONENT_SEPARATOR_STRING + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex.toString
+      ending      = ComponentSeparatorString + ComponentSeparator + "e" + itemIndex.toString
     )
 
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`

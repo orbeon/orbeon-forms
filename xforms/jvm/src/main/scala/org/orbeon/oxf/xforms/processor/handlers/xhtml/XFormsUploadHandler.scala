@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.out
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.xml.sax._
 
@@ -128,6 +129,6 @@ class XFormsUploadHandler(
   override def getForEffectiveId(effectiveId: String) =
     XFormsUtils.namespaceId(
       containingDocument,
-      XFormsId.appendToEffectiveId(getEffectiveId, COMPONENT_SEPARATOR + "xforms-input")
+      XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")
     )
 }

@@ -13,16 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import java.util
-
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
@@ -126,7 +124,7 @@ object Controls {
       if (idSuffix.isEmpty)
         staticElement.prefixedId
       else
-        staticElement.prefixedId + REPEAT_SEPARATOR + (idSuffix mkString REPEAT_INDEX_SEPARATOR_STRING)
+        staticElement.prefixedId + RepeatSeparatorString + (idSuffix mkString RepeatIndexSeparatorString)
 
     // Instantiate the control
     // TODO LATER: controls must take ElementAnalysis, not Element
@@ -271,7 +269,7 @@ object Controls {
     if (iterations.isEmpty)
       ""
     else
-      iterations.reverse map (_.toString) mkString (REPEAT_SEPARATOR.toString, REPEAT_INDEX_SEPARATOR_STRING, "")
+      iterations.reverse map (_.toString) mkString (RepeatSeparatorString, RepeatIndexSeparatorString, "")
 
   def getStaticRepeatDetails(
     ops               : StaticStateGlobalOps,

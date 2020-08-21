@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.processor.handlers._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.Constants.RepeatSeparator
 import org.orbeon.xforms.rpc
 import shapeless.syntax.typeable._
 
@@ -479,7 +480,7 @@ class ControlsComparator(
   }
 
   private def repeatDetails(id: String) =
-    id.indexOf(REPEAT_SEPARATOR) match {
+    id.indexOf(RepeatSeparator) match {
       case -1    => (id, "")
       case index => (id.substring(0, index), id.substring(index + 1))
     }

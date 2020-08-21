@@ -177,7 +177,7 @@ object XFormsId {
       iterationPrefixedId + Constants.RepeatSeparator + iterationIndex
     } else {
       // E.g. foobar.3-7 => foobar~iteration.3-7-2
-      iterationPrefixedId + parentSuffix + Constants.RepeatIndexSeparator + iterationIndex
+      iterationPrefixedId + parentSuffix + Constants.RepeatIndexSeparatorString + iterationIndex
     }
   }
 
@@ -194,7 +194,7 @@ object XFormsId {
 
     val suffixIndex = effectiveId.indexOf(Constants.RepeatSeparator)
     if (suffixIndex != -1) {
-      val stringResult = effectiveId.substring(suffixIndex + 1).splitTo[Array](Constants.RepeatIndexSeparator)
+      val stringResult = effectiveId.substring(suffixIndex + 1).splitTo[Array](Constants.RepeatIndexSeparatorString)
       val result = new Array[Int](stringResult.length)
       var i = 0
       while (i < stringResult.length) {
@@ -212,7 +212,7 @@ object XFormsId {
     if (iterations.length == 0)
       prefixedId
     else
-      prefixedId + Constants.RepeatSeparator + (iterations mkString Constants.RepeatIndexSeparator)
+      prefixedId + Constants.RepeatSeparator + (iterations mkString Constants.RepeatIndexSeparatorString)
 
   /**
     * Compute an effective id based on an existing effective id and a static id. E.g.:

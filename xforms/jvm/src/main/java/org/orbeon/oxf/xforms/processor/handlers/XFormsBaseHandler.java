@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.xforms.Constants;
 import org.orbeon.xforms.XFormsId;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -142,7 +141,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     public static String getLHHACId(XFormsContainingDocument containingDocument, String controlEffectiveId, String suffix) {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
-        return XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR() + suffix));
+        return XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, Constants.LhhacSeparator() + suffix));
     }
 
     protected static Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames, HandlerContext xformsHandlerContext) {

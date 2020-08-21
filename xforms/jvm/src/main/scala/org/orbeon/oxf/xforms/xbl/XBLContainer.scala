@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
@@ -65,7 +66,7 @@ class XBLContainer(
   ) = this(
       associatedControl.getEffectiveId,
       XFormsId.getPrefixedId(associatedControl.getEffectiveId),
-      XFormsId.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
+      XFormsId.getPrefixedId(associatedControl.getEffectiveId) + ComponentSeparator,
       Some(parentXBLContainer ensuring (_ ne null)),
       Some(associatedControl  ensuring (_ ne null)),
       innerScope

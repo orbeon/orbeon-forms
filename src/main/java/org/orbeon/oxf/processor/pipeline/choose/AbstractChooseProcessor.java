@@ -173,7 +173,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             final Set idsToConvert = (Set) idsWithNoRef.get(0);
             for (Iterator i = idsToConvert.iterator(); i.hasNext();) {
                 final String id = (String) i.next();
-                final ASTProcessorCall identityConnector = new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME);
+                final ASTProcessorCall identityConnector = new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME());
                 {
                     identityConnector.addInput(new ASTInput("data", new ASTHrefId(new ASTOutput(null, id))));
                     final ASTParam outParam = new ASTParam(ASTParam.OUTPUT, id);

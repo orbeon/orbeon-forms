@@ -415,9 +415,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
-                final String urlType = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
-                final String portletMode = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
-                final String windowState = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
+                final String urlType = atts.getValue(XMLConstants.OPS_FORMATTING_URI(), "url-type");
+                final String portletMode = atts.getValue(XMLConstants.OPS_FORMATTING_URI(), "portlet-mode");
+                final String windowState = atts.getValue(XMLConstants.OPS_FORMATTING_URI(), "window-state");
 
                 final String newHref;
                 if (urlType == null || "render".equals(urlType)) {
@@ -656,9 +656,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * </ul>
          */
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
-        	fObjectParent.add(Boolean.valueOf(OBJECT_ELT.equals(lnam) && XMLConstants.XHTML_NAMESPACE_URI.equals(ns)));
+        	fObjectParent.add(Boolean.valueOf(OBJECT_ELT.equals(lnam) && XMLConstants.XHTML_NAMESPACE_URI().equals(ns)));
 
-            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI(), NOREWRITE_ATT);
             final String noRewriteValue = atts.getValue(noRewriteIndex);
             State ret = null;
             flushCharacters();
@@ -674,7 +674,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             if ("true".equals(noRewriteValue)) {
                 final State stt = new NoRewriteState(this, xmlReceiver, response, scriptDepth, rewriteURI);
                 ret = stt.startElement(ns, lnam, qnam, atts);
-            } else if (XMLConstants.OPS_FORMATTING_URI.equals(ns) && "rewrite".equals(lnam)) {
+            } else if (XMLConstants.OPS_FORMATTING_URI().equals(ns) && "rewrite".equals(lnam)) {
                 final String typ = atts.getValue("", "type");
                 final String url = atts.getValue("", "url");
                 if (url != null) {
@@ -814,7 +814,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
 
-            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI(), NOREWRITE_ATT);
             final String noRewriteValue = atts.getValue(noRewriteIndex);
             final State ret;
 

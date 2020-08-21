@@ -26,7 +26,7 @@ public class PipelineUtils {
 
     private static void configDOMGenerator(final DOMGenerator dm) {
         dm.setId("N/A");
-        dm.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME);
+        dm.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME());
     }
 
     public static void connect(Processor producer, String outputName, Processor consumer, String inputName) {

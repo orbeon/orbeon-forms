@@ -69,7 +69,7 @@ public class XFormsSubmissionUtils {
                             final String localName = element.getName();
                             final QName nodeType = InstanceData.getType(element);
 
-                            if (XMLConstants.XS_ANYURI_QNAME.equals(nodeType)) {
+                            if (XMLConstants.XS_ANYURI_QNAME().equals(nodeType)) {
                                 // Interpret value as xs:anyURI
 
                                 if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
@@ -83,7 +83,7 @@ public class XFormsSubmissionUtils {
                                     multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8())));
                                 }
 
-                            } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
+                            } else if (XMLConstants.XS_BASE64BINARY_QNAME().equals(nodeType)) {
                                 // Interpret value as xs:base64Binary
 
                                 if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {

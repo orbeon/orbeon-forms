@@ -395,7 +395,7 @@ public class XFormsUtils {
             // Collect xml:base values
             Element currentElement = element;
             do {
-                final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME);
+                final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME());
                 if (xmlBaseAttribute != null)
                     xmlBaseValues.add(xmlBaseAttribute);
                 currentElement = currentElement.getParent();
@@ -431,7 +431,7 @@ public class XFormsUtils {
     public static boolean resolveUrlNorewrite(Element element) {
         Element currentElement = element;
         do {
-            final String urlNorewriteAttribute = currentElement.attributeValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME);
+            final String urlNorewriteAttribute = currentElement.attributeValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME());
             // Return the first ancestor value found
             if (urlNorewriteAttribute != null)
                 return "true".equals(urlNorewriteAttribute);

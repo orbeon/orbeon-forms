@@ -63,15 +63,15 @@ public class ContentHandlerOutputStream extends OutputStream {
         if (doStartEndDocument && ! documentStarted) {
             // Start document
             AttributesImpl attributes = new AttributesImpl();
-            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName());
+            attributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME().qualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType);
             if (statusCode != null)
                 attributes.addAttribute("", "status-code", "status-code", "CDATA", statusCode);
 
             contentHandler.startDocument();
-            contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-            contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+            contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+            contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX(), XMLConstants.XSD_URI());
             contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
 
             documentStarted = true;
@@ -83,8 +83,8 @@ public class ContentHandlerOutputStream extends OutputStream {
             try {
                 // End document
                 contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-                contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
-                contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX());
+                contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX());
                 contentHandler.endDocument();
             } catch (SAXException e) {
                 throw new OXFException(e);

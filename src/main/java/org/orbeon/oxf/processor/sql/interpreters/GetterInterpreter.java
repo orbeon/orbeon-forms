@@ -98,7 +98,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 final int columnType = metadata.getColumnType(columnIndex);
 
                 final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnType);
-                if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
                     // XML fragment requested
                     String columnTypeName = metadata.getColumnTypeName(columnIndex);
                     if (columnType == Types.CLOB) {
@@ -528,9 +528,9 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         } else if (prefixesMap.get(typePrefix) == null) {
             // LEGACY BEHAVIOR: use implicit prefixes
             if (typePrefix.equals("xs"))
-                typeURI = XMLConstants.XSD_URI;
+                typeURI = XMLConstants.XSD_URI();
             else if (typePrefix.equals("oxf"))
-                typeURI = XMLConstants.OPS_TYPES_URI;
+                typeURI = XMLConstants.OPS_TYPES_URI();
             else
                 throw new ValidationException("Invalid type prefix for type:" + typeAttribute, new LocationData(locator));
         } else {

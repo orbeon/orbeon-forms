@@ -134,7 +134,7 @@ public class TypedNodeWrapper extends org.orbeon.dom.saxon.NodeWrapper {
             // For type annotation purposes, xforms:integer is translated into xs:integer. This is because XPath has no
             // knowledge of the XForms union types.
             if (uri.equals(XFormsConstants.XFORMS_NAMESPACE_URI()) && Model.jXFormsVariationTypeNames().contains(localname))
-                uri = XMLConstants.XSD_URI;
+                uri = XMLConstants.XSD_URI();
 
             final int requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname);
             if (requestedTypeFingerprint == -1) {

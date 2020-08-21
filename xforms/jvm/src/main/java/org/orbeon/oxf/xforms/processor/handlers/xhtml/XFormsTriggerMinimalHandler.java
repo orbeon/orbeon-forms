@@ -50,12 +50,12 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         // xhtml:button
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
-        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, spanQName, htmlAnchorAttributes);
+        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI(), ENCLOSING_ELEMENT_NAME, spanQName, htmlAnchorAttributes);
         {
             final String labelValue = getTriggerLabel(triggerControl);
             final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
             outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, scala.Option.apply(triggerControl.getLocationData()), xmlReceiver);
         }
-        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, spanQName);
+        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI(), ENCLOSING_ELEMENT_NAME, spanQName);
     }
 }

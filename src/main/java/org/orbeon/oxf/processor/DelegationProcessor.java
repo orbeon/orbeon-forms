@@ -338,18 +338,18 @@ public class DelegationProcessor extends ProcessorImpl {
                                             final org.orbeon.dom.Element parameterElement = (org.orbeon.dom.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             // TODO: should pass true?
-                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME, false);
+                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME(), false);
 
-                                            if (type == null || XMLConstants.XS_STRING_QNAME.equals(type)) {
+                                            if (type == null || XMLConstants.XS_STRING_QNAME().equals(type)) {
                                                 parameterTypes.add(String.class);
                                                 parameterValues.add(parameterValue);
-                                            } else if (XMLConstants.XS_DOUBLE_QNAME.equals(type)) {
+                                            } else if (XMLConstants.XS_DOUBLE_QNAME().equals(type)) {
                                                 parameterTypes.add(Double.TYPE);
                                                 parameterValues.add(new Double(parameterValue));
-                                            } else if (XMLConstants.XS_BOOLEAN_QNAME.equals(type)) {
+                                            } else if (XMLConstants.XS_BOOLEAN_QNAME().equals(type)) {
                                                 parameterTypes.add(Boolean.TYPE);
                                                 parameterValues.add(new Boolean(parameterValue));
-                                            } else if (XMLConstants.XS_INTEGER_QNAME.equals(type)) {
+                                            } else if (XMLConstants.XS_INTEGER_QNAME().equals(type)) {
                                                 parameterTypes.add(Integer.TYPE);
                                                 parameterValues.add(new Integer(parameterValue));
                                             }

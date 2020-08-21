@@ -71,24 +71,24 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes(), classes.toString(), effectiveDialogId));
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName, getIdClassXHTMLAttributes(attributes(), classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
         reusableAttributes.clear();
         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "hd xxforms-dialog-head");
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName, reusableAttributes);
 
         final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel() : null;
         if (labelValue != null) {
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
         }
 
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName);
 
         // Child xhtml:div for body
         reusableAttributes.clear();
         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "bd xxforms-dialog-body");
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName, reusableAttributes);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "div", divQName);
     }
 }

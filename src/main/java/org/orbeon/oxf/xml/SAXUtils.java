@@ -182,12 +182,12 @@ public class SAXUtils {
 
     public static void streamNullDocument(ContentHandler contentHandler) throws SAXException {
         contentHandler.startDocument();
-        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
         final AttributesImpl attributes = new AttributesImpl();
-        attributes.addAttribute(XMLConstants.XSI_URI, "nil", "xsi:nil", "CDATA", "true");
+        attributes.addAttribute(XMLConstants.XSI_URI(), "nil", "xsi:nil", "CDATA", "true");
         contentHandler.startElement("", "null", "null", attributes);
         contentHandler.endElement("", "null", "null");
-        contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+        contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX());
         contentHandler.endDocument();
     }
 

@@ -84,14 +84,14 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
                 try {
                     // Start document
                     final AttributesImpl attributes = new AttributesImpl();
-                    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.qualifiedName());
+                    attributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME().qualifiedName());
                     if (contentType != null)
                         attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType + "; charset=" + encoding);
 
                     // Start document
                     xmlReceiver.startDocument();
-                    xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                    xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX(), XMLConstants.XSD_URI());
                     xmlReceiver.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
 
                     // Write content

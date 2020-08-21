@@ -52,12 +52,12 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             final String divQName    = XMLUtils.buildQName(xhtmlPrefix, divName);
 
             final AttributesImpl backgroundAttributes = getBackgroundAttributes(getEffectiveId(), rangeControl);
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), divName, divQName, backgroundAttributes);
             {
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, getThumbAttributes());
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), divName, divQName, getThumbAttributes());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), divName, divQName);
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), divName, divQName);
         }
     }
 

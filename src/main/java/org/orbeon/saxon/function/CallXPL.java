@@ -103,7 +103,7 @@ public class CallXPL extends FunctionSupportJava {
             // Create processor definition and processor
             Processor processor;
             {
-                ProcessorDefinition processorDefinition = new ProcessorDefinition(QName.apply("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
+                ProcessorDefinition processorDefinition = new ProcessorDefinition(QName.apply("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE()));
                 {
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 

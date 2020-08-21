@@ -147,11 +147,11 @@ public class StreamInterceptor {
                         // Do not generate start and end document events
                         final XMLReceiver forwardingXMLReceiver = new EmbeddedDocumentXMLReceiver(xmlReceiver);
                         reader.setContentHandler(forwardingXMLReceiver);
-                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, forwardingXMLReceiver);
+                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER(), forwardingXMLReceiver);
                     } else {
                         // Generate a complete document
                         reader.setContentHandler(xmlReceiver);
-                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);
+                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER(), xmlReceiver);
                     }
 
                     reader.parse(inputSource);

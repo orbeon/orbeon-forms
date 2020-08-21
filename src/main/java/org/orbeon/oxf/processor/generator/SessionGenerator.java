@@ -83,7 +83,7 @@ public class SessionGenerator extends ProcessorImpl {
         ch.startDocument();
 
         AttributesImpl attr = new AttributesImpl();
-        attr.addAttribute(XMLConstants.XSI_URI, XMLConstants.XSI_NIL_ATTRIBUTE, XMLConstants.XSI_PREFIX + ":" + XMLConstants.XSI_NIL_ATTRIBUTE, "CDATA", "true");
+        attr.addAttribute(XMLConstants.XSI_URI(), XMLConstants.XSI_NIL_ATTRIBUTE(), XMLConstants.XSI_PREFIX() + ":" + XMLConstants.XSI_NIL_ATTRIBUTE(), "CDATA", "true");
 
         ch.startElement("", key, key, attr);
         ch.endElement("", key, key);

@@ -282,7 +282,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                         boolean elementWithAVTHasBeenOutput = false;
                         for (int i = 0; i < attributesCount; i++) {
                             final String currentAttributeURI = attributes.getURI(i);
-                            if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                            if ("".equals(currentAttributeURI) || XMLConstants.XML_URI().equals(currentAttributeURI)) {
                                 // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                                 final String attributeValue = attributes.getValue(i);
                                 if (XFormsUtils.maybeAVT(attributeValue)) {
@@ -317,9 +317,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                                     // These extra attributes can be used alongside src/href attributes
                                     if ("src".equals(attributeName) || "href".equals(attributeName)) {
-                                        final String urlType = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
-                                        final String portletMode = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
-                                        final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
+                                        final String urlType = attributes.getValue(XMLConstants.OPS_FORMATTING_URI(), "url-type");
+                                        final String portletMode = attributes.getValue(XMLConstants.OPS_FORMATTING_URI(), "portlet-mode");
+                                        final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI(), "window-state");
 
                                         if (urlType != null)
                                             newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA, urlType);
@@ -361,7 +361,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                         inPreserve = true;
                         preserveLevel = level;
                     }
-                } else if ("schema".equals(localname) && XMLConstants.XSD_URI.equals(uri)) {       // xs:schema
+                } else if ("schema".equals(localname) && XMLConstants.XSD_URI().equals(uri)) {       // xs:schema
                     inPreserve = true;
                     preserveLevel = level;
 
@@ -476,7 +476,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         if (attributesCount > 0) {
             for (int i = 0; i < attributesCount; i++) {
                 final String currentAttributeURI = attributes.getURI(i);
-                if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
+                if ("".equals(currentAttributeURI) || XMLConstants.XML_URI().equals(currentAttributeURI)) {
                     // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                     final String attributeValue = attributes.getValue(i);
                     if (XFormsUtils.maybeAVT(attributeValue)) {

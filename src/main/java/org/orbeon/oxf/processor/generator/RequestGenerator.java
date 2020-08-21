@@ -124,15 +124,15 @@ public class RequestGenerator extends ProcessorImpl {
                                     final FileItem fileItem = (FileItem) ((Object[]) getRequest(pipelineContext).getParameterMap().get(parameterName))[parameterPosition];
 
                                     final AttributesImpl newAttributes = new AttributesImpl();
-                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                                    newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName(): XMLConstants.XS_ANYURI_QNAME.qualifiedName());
+                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX(), XMLConstants.XSD_URI());
+                                    newAttributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA",
+                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME().qualifiedName(): XMLConstants.XS_ANYURI_QNAME().qualifiedName());
                                     super.startElement("", "value", "value", newAttributes);
                                     writeFileItem(pipelineContext, fileItem, state.isSessionScope, useBase64(pipelineContext, fileItem), getXMLReceiver());
                                     super.endElement("", "value", "value");
-                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX());
+                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX());
                                 }
                             } else if (localname.equals("body") && uri.equals("")) {
                                 // Marker for request body
@@ -163,15 +163,15 @@ public class RequestGenerator extends ProcessorImpl {
                                     }
                                     // Serialize the stream into the body element
                                     final AttributesImpl newAttributes = new AttributesImpl();
-                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                                    newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName(): XMLConstants.XS_ANYURI_QNAME.qualifiedName());
+                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX(), XMLConstants.XSD_URI());
+                                    newAttributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA",
+                                            useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME().qualifiedName(): XMLConstants.XS_ANYURI_QNAME().qualifiedName());
                                     super.startElement(uri, localname, qName, newAttributes);
                                     final String uriOrNull = writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, useBase64(pipelineContext, context.bodyFileItem), getXMLReceiver());
                                     super.endElement(uri, localname, qName);
-                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX());
+                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX());
 
                                     // If the body is available as a URL, store it into the pipeline context.
                                     // This is done so that native code can access the body even if it has been read
@@ -211,7 +211,7 @@ public class RequestGenerator extends ProcessorImpl {
 
                     // Try to find stream-type attribute
                     final QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
-                    if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
+                    if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME()) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME())))
                         throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.qualifiedName());
                     state.requestedStreamType = streamTypeQName;
                     state.isSessionScope = "session".equals(config.getRootElement().attributeValue("stream-scope"));
@@ -242,7 +242,7 @@ public class RequestGenerator extends ProcessorImpl {
         State state = (State) getState(pipelineContext);
 
         return (state.requestedStreamType == null && fileItem.isInMemory())
-                || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME));
+                || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME()));
     }
 
     public static String writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, boolean useBase64, ContentHandler contentHandler) throws SAXException {
@@ -618,13 +618,13 @@ public class RequestGenerator extends ProcessorImpl {
 
     // TODO: Should be a `long`.
     public static int getMaxSizeProperty() {
-        PropertySet propertySet = Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        PropertySet propertySet = Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME());
         Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
         return (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
     }
 
     public static int getMaxMemorySizeProperty() {
-        PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME());
         Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
         return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
     }

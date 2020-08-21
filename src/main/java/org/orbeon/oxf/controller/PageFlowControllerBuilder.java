@@ -21,11 +21,11 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xml.NamespaceMapping;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,8 +48,8 @@ public class PageFlowControllerBuilder {
 
     static {
         final Map<String, String> mapping = new HashMap<String, String>();
-        mapping.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-        mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE_URI);
+        mapping.put(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+        mapping.put(XMLConstants.XSLT_PREFIX(), XMLConstants.XSLT_NAMESPACE_URI());
 
         NAMESPACES_WITH_XSI_AND_XSLT = NamespaceMapping.apply(mapping);
     }
@@ -62,7 +62,7 @@ public class PageFlowControllerBuilder {
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                     // The epilogue did not do the serialization
-                    addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME()) {{
                         Document config = Document.apply("config");
                         Element rootElement = config.getRootElement();
                         rootElement.addElement("version").addText("5.0");
@@ -76,7 +76,7 @@ public class PageFlowControllerBuilder {
             }});
         } else {
             // Send result through epilogue
-            statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+            statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
                 final String url = URLFactory.createURL(controllerContext, epilogueURL).toExternalForm();
 
                 addInput(new ASTInput("config", new ASTHrefURL(url)));
@@ -134,7 +134,7 @@ public class PageFlowControllerBuilder {
         // Handle initial instance
         final ASTOutput defaultSubmission = new ASTOutput("data", "default-submission");
         if (defaultSubmissionAttribute != null) {
-            statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
+            statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME()) {{
                 final String url = URLFactory.createURL(urlBase, defaultSubmissionAttribute).toExternalForm();
 
                 final Document configDocument = Document.apply("config");
@@ -156,7 +156,7 @@ public class PageFlowControllerBuilder {
         }
 
         // Use XML Submission pipeline
-        statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+        statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
             addInput(new ASTInput("config", new ASTHrefURL(XFORMS_XML_SUBMISSION_XPL)));
             if (setvaluesDocument != null) {
                 addInput(new ASTInput("setvalues", setvaluesDocument));
@@ -174,7 +174,7 @@ public class PageFlowControllerBuilder {
         }});
 
         // Make sure the xformed-instance id is used for p:choose
-        statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
+        statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME()) {{
             addInput(new ASTInput("data", new ASTHrefId(xformedInstance)));
         }});
 
@@ -192,17 +192,17 @@ public class PageFlowControllerBuilder {
                 setTest("/bypass[@xsi:nil = 'true']");
                 setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
 
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                     addOutput(new ASTOutput("data", xupdatedInstance));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     final Document config = Document.apply("is-redirect");
                     config.getRootElement().addText("true");
                     addInput(new ASTInput("data", config));
                     addOutput(new ASTOutput("data", isRedirect));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                     addOutput(new ASTOutput("data", actionData));
                 }});
@@ -262,18 +262,18 @@ public class PageFlowControllerBuilder {
 
                         // Force execution of action if no <result> is reading it
                         if (!resultTestsOnActionData) {
-                            addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
+                            addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME()) {{
                                 addInput(new ASTInput("data", new ASTHrefId(internalActionData)));
                             }});
                         }
 
                         // Export internal-action-data as action-data
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(internalActionData)));
                             addOutput(new ASTOutput("data", actionData));
                         }});
                     } else {
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                             addOutput(new ASTOutput("data", actionData));
                         }});
@@ -312,11 +312,11 @@ public class PageFlowControllerBuilder {
 
                             // Continue when all results fail
                             addWhen(new ASTWhen() {{
-                                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                                     addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", "false"))));
                                     addOutput(new ASTOutput("data", isRedirect));
                                 }});
-                                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                                     addInput(new ASTInput("data", new ASTHrefId(xformedInstance)));
                                     addOutput(new ASTOutput("data", xupdatedInstance));
                                 }});
@@ -335,17 +335,17 @@ public class PageFlowControllerBuilder {
             if (!foundActionWithoutWhen[0]) {
                 // Default branch for when all actions fail
                 addWhen(new ASTWhen() {{
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", new ASTHrefId(xformedInstance)));
                         addOutput(new ASTOutput("data", xupdatedInstance));
                     }});
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         final Document config = Document.apply("is-redirect");
                         config.getRootElement().addText("false");
                         addInput(new ASTInput("data", config));
                         addOutput(new ASTOutput("data", isRedirect));
                     }});
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                         addOutput(new ASTOutput("data", actionData));
                     }});
@@ -386,11 +386,11 @@ public class PageFlowControllerBuilder {
                     }});
                 } else if (viewAttribute != null) {
                     // There is no model but there is a view
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addOutput(new ASTOutput("data", modelData));
                     }});
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", new ASTHrefId(xupdatedInstance)));
                         addOutput(new ASTOutput("data", modelInstance));
                     }});
@@ -420,11 +420,11 @@ public class PageFlowControllerBuilder {
                     }});
                 } else {
                     // There is no view, send nothing to epilogue
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                         addOutput(new ASTOutput("data", viewData));
                     }});
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                         addOutput(new ASTOutput("data", viewInstance));
                     }});
@@ -433,20 +433,20 @@ public class PageFlowControllerBuilder {
                 if (modelAttribute != null && viewAttribute == null) {
                     // With XForms NG we want lazy evaluation of the instance, so we should not force a
                     // read on the instance. We just connect the output.
-                    addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelInstance)));
                     }});
                 }
 
                 if (modelAttribute == null && viewAttribute == null) {
                     // Send out epilogue model data as a null document
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                         addOutput(new ASTOutput("data", epilogueModelData));
                     }});
                 } else {
                     // Send out epilogue model data as produced by the model or used by the view
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addOutput(new ASTOutput("data", epilogueModelData));
                     }});
@@ -458,22 +458,22 @@ public class PageFlowControllerBuilder {
 
                 // With XForms NG we want lazy evaluation of the instance, so we should not force a
                 // read on the instance. We just connect the output.
-                addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", new ASTHrefId(xupdatedInstance)));
                 }});
                 // Just connect the output
-                addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", new ASTHrefId(actionData)));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                     addOutput(new ASTOutput("data", viewData));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                     addOutput(new ASTOutput("data", epilogueModelData));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
                     addOutput(new ASTOutput("data", viewInstance));
                 }});
@@ -538,7 +538,7 @@ public class PageFlowControllerBuilder {
                 if (isTransformedInstance) {
                     parametersOutput = new ASTOutput(null, "parameters");
                     // Pass parameters only if needed
-                    when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
+                    when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NullDocument()));
                         addOutput(new ASTOutput("data", parametersOutput));
@@ -548,18 +548,18 @@ public class PageFlowControllerBuilder {
                 }
                 // Handle path info
                 final ASTOutput forwardPathInfoOutput = new ASTOutput(null, "forward-path-info");
-                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("path-info", forwardPathInfo))));
                     addOutput(new ASTOutput("data", forwardPathInfoOutput));
                 }});
                 // Handle server-side redirect and exit portal redirect
                 final ASTOutput isServerSideRedirectOutput = new ASTOutput(null, "is-server-side-redirect");
-                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("server-side", Boolean.toString(doServerSideRedirect)))));
                     addOutput(new ASTOutput("data", isServerSideRedirectOutput));
                 }});
                 final ASTOutput isRedirectExitPortal = new ASTOutput(null, "is-redirect-exit-portal");
-                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("exit-portal", Boolean.toString(doRedirectExitPortal)))));
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
@@ -573,7 +573,7 @@ public class PageFlowControllerBuilder {
                             new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
                     redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
 
-                    when.addStatement(new ASTProcessorCall(XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME) {{
+                    when.addStatement(new ASTProcessorCall(XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("config", new ASTHrefURL(REVERSE_SETVALUES_XSL)));
                         addInput(new ASTInput("data", redirectDataAggregate));
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
@@ -590,7 +590,7 @@ public class PageFlowControllerBuilder {
                     redirectURLData = redirectDataAggregate;
                 }
                 // Execute the redirect
-                when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
+                when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
                     final String[] locationParams =
                             new String[] { "result page id", resultPageId  };
@@ -601,13 +601,13 @@ public class PageFlowControllerBuilder {
         }
 
         // Signal if we did a redirect
-        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
             addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", Boolean.toString(resultPageId != null)))));
             addOutput(new ASTOutput("data", redirect));
         }});
 
         // Export XUpdated instance from this branch
-        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
             addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
             addOutput(new ASTOutput("data", xupdatedInstance));
         }});
@@ -638,7 +638,7 @@ public class PageFlowControllerBuilder {
                 final ASTOutput rewroteStepURL = new ASTOutput(null, "rewrote-step-url");
                 addStatement(new ASTChoose(new ASTHrefId(stepURLInput)) {{
                     addWhen(new ASTWhen("contains(/config/url, '${')") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.XSLT_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.XSLT_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefAggregate("root",
                                     new ASTHrefId(stepURLInput), new ASTHrefId(matcherInput))));
                             addInput(new ASTInput("config", new ASTHrefURL(REWRITE_XSL)));
@@ -646,7 +646,7 @@ public class PageFlowControllerBuilder {
                         }});
                     }});
                     addWhen(new ASTWhen() {{
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(stepURLInput)));
                             addOutput(new ASTOutput("data", rewroteStepURL));
                         }});
@@ -657,13 +657,13 @@ public class PageFlowControllerBuilder {
                 {
                     // Read file to "execute"
                     final ASTOutput content = new ASTOutput("data", "content");
-                    addStatement(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("config", new ASTHrefId(rewroteStepURL)));
                         addOutput(content);
                     }});
 
                     // Insert XInclude processor to process content with XInclude
-                    addStatement(new ASTProcessorCall(XMLConstants.XINCLUDE_PROCESSOR_QNAME) {{
+                    addStatement(new ASTProcessorCall(XMLConstants.XINCLUDE_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("config", new ASTHrefId(content)));
                         addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                         addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
@@ -683,7 +683,7 @@ public class PageFlowControllerBuilder {
                             addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                                 "and count(/*/*[local-name() = 'param' and @type = 'output' and @name = 'data']) = 0") {{
                                 // The XPL has not data output
-                                addStatement(new ASTProcessorCall(XMLConstants.ERROR_PROCESSOR_QNAME) {{
+                                addStatement(new ASTProcessorCall(XMLConstants.ERROR_PROCESSOR_QNAME()) {{
                                     final Document errorDocument = Document.apply("error");
                                     errorDocument.getRootElement().addText("XPL view must have a 'data' output");
                                     addInput(new ASTInput("config", errorDocument));
@@ -699,7 +699,7 @@ public class PageFlowControllerBuilder {
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'data'] " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'instance']") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
@@ -714,7 +714,7 @@ public class PageFlowControllerBuilder {
                     // XPL file with only data output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'data']") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
@@ -722,7 +722,7 @@ public class PageFlowControllerBuilder {
                             final ASTOutput datOut = new ASTOutput( "data", resultData );
                             addOutput( datOut );
                         }});
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
                             final ASTOutput datOut = new ASTOutput( "data", resultInstance );
                             addOutput( datOut );
@@ -732,7 +732,7 @@ public class PageFlowControllerBuilder {
                     // XPL file with only instance output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'instance']") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
@@ -740,7 +740,7 @@ public class PageFlowControllerBuilder {
                             final ASTOutput instOut = new ASTOutput( "instance", resultInstance );
                             addOutput( instOut );
                         }});
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
                             addOutput( resDatOut );
@@ -749,19 +749,19 @@ public class PageFlowControllerBuilder {
 
                     // XPL file with no output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline'") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
                         }});
                         // Simply bypass data and instance channels
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
                             addOutput( resDatOut );
                         }});
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
                             addOutput( resInstOut );
@@ -770,16 +770,16 @@ public class PageFlowControllerBuilder {
 
                     // PFC file (should only work as model)
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/controller'") {{
-                        addStatement(new ASTProcessorCall(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("controller", new ASTHrefId(contentXIncluded)));
                         }});
                         // Simply bypass data and instance channels
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
                             addOutput( resDatOut );
                         }});
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
                             addOutput( resInstOut );
@@ -791,7 +791,7 @@ public class PageFlowControllerBuilder {
                         setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
 
                         // Copy the instance as is
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
                             addOutput( resInstOut );
@@ -828,11 +828,11 @@ public class PageFlowControllerBuilder {
                                 // XSLT 1.0: There is no xsl:version = '2.0' attribute (therefore the namespace of the
                                 //           root element is xsl as per the condition above) and the version attribute
                                 //           is exactly '1.0'
-                                addXSLTWhen("not(/*/@xsl:version = '2.0') and /*/@version = '1.0'", XMLConstants.PFC_XSLT10_PROCESSOR_QNAME);
+                                addXSLTWhen("not(/*/@xsl:version = '2.0') and /*/@version = '1.0'", XMLConstants.PFC_XSLT10_PROCESSOR_QNAME());
 
                                 // XSLT 2.0: There is an xsl:version = '2.0' attribute or the namespace or the root
                                 //           element is xsl and the version is different from '1.0'
-                                addXSLTWhen(null, XMLConstants.PFC_XSLT20_PROCESSOR_QNAME);
+                                addXSLTWhen(null, XMLConstants.PFC_XSLT20_PROCESSOR_QNAME());
                         }});
                     }});
 
@@ -840,14 +840,14 @@ public class PageFlowControllerBuilder {
                     addWhen(new ASTWhen() {{
 
                         // Copy the instance as is
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
                             final ASTOutput resInstOut = new ASTOutput("data", resultInstance);
                             addOutput(resInstOut);
                         }});
 
                         // Copy the data as is
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                             addInput(new ASTInput("data", new ASTHrefId(contentXIncluded)));
                             final ASTOutput resDatOut = new ASTOutput("data", resultData);
                             addOutput(resDatOut);
@@ -865,11 +865,11 @@ public class PageFlowControllerBuilder {
                 }});
 
                 // Connect results
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", new ASTHrefId(resultData)));
                     addOutput(new ASTOutput("data", dataOutput));
                 }});
-                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME()) {{
                     addInput(new ASTInput("data", new ASTHrefId(resultInstance)));
                     final ASTOutput resDatOut = new ASTOutput( "data", instanceOutput );
                     addOutput( resDatOut );

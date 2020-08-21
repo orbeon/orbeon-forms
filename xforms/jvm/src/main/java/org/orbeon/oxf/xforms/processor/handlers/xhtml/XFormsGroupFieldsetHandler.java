@@ -61,13 +61,13 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
             // Output xhtml:legend with label content
             final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, reusableAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "legend", legendQName, reusableAttributes);
             {
                 final String labelValue = getLabelValue(groupControl);
                 if (StringUtils.isNotEmpty(labelValue))
                     contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "legend", legendQName);
         }
     }
 

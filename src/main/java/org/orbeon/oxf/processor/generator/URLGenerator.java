@@ -1047,7 +1047,7 @@ public class URLGenerator extends ProcessorImpl {
             try {
                 final XMLReader reader = XMLParsing.newXMLReader(parserConfiguration);
                 reader.setContentHandler(xmlReceiver);
-                reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);
+                reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER(), xmlReceiver);
                 final InputSource inputSource;
                 if (getExternalEncoding() != null) {
                     // The encoding is set externally, either force by the user, or set by the connection

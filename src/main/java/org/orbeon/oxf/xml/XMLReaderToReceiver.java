@@ -18,7 +18,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 public abstract class XMLReaderToReceiver implements XMLReader {
-    
+
     private static final DefaultHandler IMMUTABLE_DEFAULT_HANDLER = new DefaultHandler();
 
     private ContentHandler contentHandler = IMMUTABLE_DEFAULT_HANDLER;
@@ -94,7 +94,7 @@ public abstract class XMLReaderToReceiver implements XMLReader {
     public void setProperty(String name, Object value) throws SAXNotSupportedException {
 
         // We allow setting these properties
-        if (name.equals(XMLConstants.SAX_LEXICAL_HANDLER) && value instanceof LexicalHandler) {
+        if (name.equals(XMLConstants.SAX_LEXICAL_HANDLER()) && value instanceof LexicalHandler) {
             this.lexicalHandler = (LexicalHandler) value;
             return;
         }
@@ -115,7 +115,7 @@ public abstract class XMLReaderToReceiver implements XMLReader {
 
     public Object getProperty(String name) {
 
-        if (name.equals(XMLConstants.SAX_LEXICAL_HANDLER)) {
+        if (name.equals(XMLConstants.SAX_LEXICAL_HANDLER())) {
             return lexicalHandler;
         }
 

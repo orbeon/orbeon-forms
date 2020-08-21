@@ -314,7 +314,7 @@ public class XMLParsing {
             final XMLReader xmlReader = newSAXParser(parserConfiguration).getXMLReader();
             xmlReader.setContentHandler(xmlReceiver);
             if (handleLexical)
-                xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);
+                xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER(), xmlReceiver);
 
             xmlReader.setEntityResolver(ENTITY_RESOLVER);
             xmlReader.setErrorHandler(ERROR_HANDLER);

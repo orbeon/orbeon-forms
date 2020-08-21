@@ -795,7 +795,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     setFunctionLibrary(new FunctionLibrary() {
                         public Expression bind(StructuredQName functionName, Expression[] staticArgs, StaticContext env) throws XPathException {
 
-                            if ((XMLConstants.XPATH_FUNCTIONS_NAMESPACE_URI.equals(functionName.getNamespaceURI()) || "".equals(functionName.getNamespaceURI()))
+                            if ((XMLConstants.XPATH_FUNCTIONS_NAMESPACE_URI().equals(functionName.getNamespaceURI()) || "".equals(functionName.getNamespaceURI()))
                                     && ("doc".equals(functionName.getLocalName()) || "document".equals(functionName.getLocalName()))
                                     && (staticArgs != null && staticArgs.length > 0)) {
 

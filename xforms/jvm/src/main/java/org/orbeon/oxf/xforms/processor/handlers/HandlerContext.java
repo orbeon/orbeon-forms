@@ -125,11 +125,11 @@ public class HandlerContext {
     }
 
     public String findXHTMLPrefix() {
-        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.XHTML_NAMESPACE_URI);
+        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.XHTML_NAMESPACE_URI());
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.XHTML_NAMESPACE_URI.equals(controller.namespaceContext().getURI(""))) {
+        if (XMLConstants.XHTML_NAMESPACE_URI().equals(controller.namespaceContext().getURI(""))) {
             return "";
         }
 
@@ -139,11 +139,11 @@ public class HandlerContext {
     }
 
     private String findFormattingPrefix() {
-        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.OPS_FORMATTING_URI);
+        final String prefix = controller.namespaceContext().getPrefix(XMLConstants.OPS_FORMATTING_URI());
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.OPS_FORMATTING_URI.equals(controller.namespaceContext().getURI(""))) {
+        if (XMLConstants.OPS_FORMATTING_URI().equals(controller.namespaceContext().getURI(""))) {
             return "";
         }
 
@@ -166,7 +166,7 @@ public class HandlerContext {
 
         // Start mapping if needed
         if (isNewPrefix)
-            getController().getOutput().startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
+            getController().getOutput().startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI());
 
         return formattingPrefix;
     }

@@ -125,7 +125,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
         // Copy attributes in the xhtml namespace to no namespace
         for (int i = 0; i < elementAttributes.getLength(); i++) {
-            if (XMLConstants.XHTML_NAMESPACE_URI.equals(elementAttributes.getURI(i))) {
+            if (XMLConstants.XHTML_NAMESPACE_URI().equals(elementAttributes.getURI(i))) {
                 final String name = elementAttributes.getLocalName(i);
                 if (!"class".equals(name)) {
                     reusableAttributes.addAttribute("", name, name, XMLReceiverHelper.CDATA, elementAttributes.getValue(i));

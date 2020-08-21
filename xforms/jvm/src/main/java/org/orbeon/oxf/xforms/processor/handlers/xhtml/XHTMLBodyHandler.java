@@ -116,7 +116,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
         final boolean doMultipartPOST = containingDocument.staticOps().hasControlByName("upload") || isEmbeddedClient;
-        helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
+        helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI(), "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getNamespacedFormId(containingDocument),
                 // Regular classes
@@ -128,7 +128,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         {
             // Only for 2-pass submission
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI(), "input", new String[] {
                     "type", "hidden", "name", Constants.UuidFieldName(), "value", containingDocument.uuid()
             });
 
@@ -142,14 +142,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             final Option<String> clientEncodedStaticStateOpt =
                     XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
             if (clientEncodedStaticStateOpt.isDefined()) {
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI(), "input", new String[] {
                     "type", "hidden", "name", "$static-state", "value", clientEncodedStaticStateOpt.get()
                 });
             }
             final Option<String> clientEncodedDynamicStateOpt =
                     XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
             if (clientEncodedDynamicStateOpt.isDefined()) {
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI(), "input", new String[] {
                     "type", "hidden", "name", "$dynamic-state", "value", clientEncodedDynamicStateOpt.get()
                 });
             }

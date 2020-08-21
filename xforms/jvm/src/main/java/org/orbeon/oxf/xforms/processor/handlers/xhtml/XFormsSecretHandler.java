@@ -65,19 +65,19 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 handleAriaAttributes(secretControl.isRequired(), secretControl.isValid(), containerAttributes);
 
                 // Output element
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "input", inputQName, containerAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "input", inputQName);
             } else {
                 // Output static read-only value
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI(), "span", spanQName, containerAttributes);
 
                 final Option<String> value = secretControl.getFormattedValue();
                 if (value.isDefined())
                     contentHandler.characters(value.get().toCharArray(), 0, value.get().length());
 
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI(), "span", spanQName);
             }
         }
     }

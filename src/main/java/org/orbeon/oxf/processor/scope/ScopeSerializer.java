@@ -48,7 +48,7 @@ public class ScopeSerializer extends ScopeProcessorBase {
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                         super.startElement(uri, localname, qName, attributes);
                         if (root) {
-                            isNull = uri.equals("") && localname.equals("null") && "true".equals(attributes.getValue(XMLConstants.XSI_URI, "nil"));
+                            isNull = uri.equals("") && localname.equals("null") && "true".equals(attributes.getValue(XMLConstants.XSI_URI(), "nil"));
                             root = false;
                         }
                     }

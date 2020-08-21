@@ -73,14 +73,14 @@ public abstract class TextConverterBase extends ConverterBase {
                 try {
                     // Start document
                     final AttributesImpl attributes = new AttributesImpl();
-                    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.qualifiedName());
+                    attributes.addAttribute(XMLConstants.XSI_URI(), "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME().qualifiedName());
                     if (contentType != null)
                         attributes.addAttribute("", Headers.ContentTypeLower(), Headers.ContentTypeLower(), "CDATA", contentType + "; charset=" + encoding);
 
                     // Start document
                     xmlReceiver.startDocument();
-                    xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                    xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX(), XMLConstants.XSI_URI());
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX(), XMLConstants.XSD_URI());
                     xmlReceiver.startElement("", BinaryTextSupport.TextDocumentElementName(), BinaryTextSupport.TextDocumentElementName(), attributes);
 
                     // Create OutputStream that converts to Base64

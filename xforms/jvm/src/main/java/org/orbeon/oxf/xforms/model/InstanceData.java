@@ -341,7 +341,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         if (node instanceof Element) {
             // Check for xsi:type attribute
             final Element element = (Element) node;
-            return Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false); // TODO: should pass true?
+            return Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME(), false); // TODO: should pass true?
         }
 
         return null;

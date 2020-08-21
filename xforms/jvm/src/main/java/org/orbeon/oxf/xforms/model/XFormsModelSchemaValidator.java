@@ -106,7 +106,7 @@ public class XFormsModelSchemaValidator {
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
-        for (final Element schemaElement: modelElement.elements(XMLConstants.XML_SCHEMA_QNAME)) {
+        for (final Element schemaElement: modelElement.elements(XMLConstants.XML_SCHEMA_QNAME())) {
 
             if (schemaElements == null)
                 schemaElements = new ArrayList<Element>();
@@ -312,7 +312,7 @@ public class XFormsModelSchemaValidator {
         // lax processing. However, it is not clear whether we should apply lax processing in this case or not. Maybe if
         // an xsi:type is specified and not found, the element should just be invalid.
         // TODO: should pass true?
-        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false);
+        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME(), false);
         if (xsiType != null) {
             // Honor xsi:type
             elementURI = xsiType.namespace().uri();

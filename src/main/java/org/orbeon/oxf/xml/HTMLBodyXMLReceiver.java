@@ -71,7 +71,7 @@ public class HTMLBodyXMLReceiver extends ForwardingXMLReceiver {
             } else
                 newAttributes = attributes;
 
-            super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, newAttributes);
+            super.startElement(XMLConstants.XHTML_NAMESPACE_URI(), localname, xhtmlQName, newAttributes);
         }
 
         level++;
@@ -85,7 +85,7 @@ public class HTMLBodyXMLReceiver extends ForwardingXMLReceiver {
             inBody = false;
         } else if (inBody && level > 1) {
             final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-            super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
+            super.endElement(XMLConstants.XHTML_NAMESPACE_URI(), localname, xhtmlQName);
         }
     }
 

@@ -17,7 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.xforms.submission.UrlType
+import org.orbeon.xforms.UrlType
 
 sealed trait XXBLScope extends EnumEntry with Lowercase
 object XXBLScope extends Enum[XXBLScope] {

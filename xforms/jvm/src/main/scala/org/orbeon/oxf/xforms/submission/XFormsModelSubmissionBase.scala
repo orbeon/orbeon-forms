@@ -31,11 +31,11 @@ import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFor
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.xforms.RelevanceHandling
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-
 import scala.collection.compat._
 
 abstract class XFormsModelSubmissionBase

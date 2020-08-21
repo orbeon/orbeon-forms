@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.xforms.RelevanceHandling;
 import org.orbeon.xforms.XFormsId;
 import scala.Option;
 

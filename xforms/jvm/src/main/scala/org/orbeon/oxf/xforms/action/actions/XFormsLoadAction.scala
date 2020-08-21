@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.submission.UrlType
+import org.orbeon.xforms.UrlType
 import org.orbeon.oxf.xforms.{Load, XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 

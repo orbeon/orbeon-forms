@@ -17,9 +17,10 @@ import org.junit.Test
 import org.orbeon.dom.{Document => JDocument}
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.submission.{RelevanceHandling, XFormsModelSubmissionBase}
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.xforms.RelevanceHandling
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 

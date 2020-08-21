@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
+import org.orbeon.xforms.UrlType
 
 /**
   * Client-side GET all submission. It stores the resulting location directly into the containing document.

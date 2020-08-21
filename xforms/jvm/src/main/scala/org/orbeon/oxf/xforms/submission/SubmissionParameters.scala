@@ -8,11 +8,11 @@ import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
-import org.orbeon.oxf.xforms.submission.RelevanceHandling.{Keep, Remove}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.{RelevanceHandling, UrlType}
 
 import scala.collection.JavaConverters._
 
@@ -142,9 +142,9 @@ object SubmissionParameters {
     def withNameAdjustForTrueAndFalse(name: String): RelevanceHandling =
       RelevanceHandling.withNameLowercaseOnlyOption(name) getOrElse {
         if (name == "false")
-          Keep
+          RelevanceHandling.Keep
         else
-          Remove
+          RelevanceHandling.Remove
       }
 
     // Use `nonrelevant` first and then `relevant` for backward compatibility

@@ -18,6 +18,7 @@ import java.util.concurrent.Callable
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
+import org.orbeon.xforms.UrlType
 
 trait SubmissionProcess {
   def process(request: ExternalContext.Request, response: ExternalContext.Response)

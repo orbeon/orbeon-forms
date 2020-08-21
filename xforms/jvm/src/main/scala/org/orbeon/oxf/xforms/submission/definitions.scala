@@ -39,31 +39,9 @@ object ReplaceType extends Enum[ReplaceType] {
   def isReplaceBinary  (replaceType: ReplaceType) = replaceType == Binary
 }
 
-sealed trait RelevanceHandling extends EnumEntry
-
-object RelevanceHandling extends Enum[RelevanceHandling] {
-
-  val values = findValues
-
-  case object Keep   extends RelevanceHandling
-  case object Remove extends RelevanceHandling
-  case object Empty  extends RelevanceHandling
-}
-
 case class RefContext(
   refNodeInfo                  : NodeInfo,
   refInstanceOpt               : Option[XFormsInstance],
   submissionElementContextItem : Item,
   xpathContext                 : XPathContext
 )
-
-sealed trait UrlType extends EnumEntry
-
-object UrlType extends Enum[UrlType] {
-
-  val values = findValues
-
-  case object Action   extends UrlType
-  case object Render   extends UrlType
-  case object Resource extends UrlType
-}

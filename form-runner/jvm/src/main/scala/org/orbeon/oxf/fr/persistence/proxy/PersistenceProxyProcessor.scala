@@ -38,8 +38,8 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.submission.RelevanceHandling
-import org.orbeon.oxf.xforms.submission.RelevanceHandling._
+import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.RelevanceHandling._
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._

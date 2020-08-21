@@ -13,20 +13,19 @@
  */
 package org.orbeon
 
-import org.scalajs.dom
+import org.scalajs
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 package object liferay {
 
   @js.native
-  trait LiferayWindow extends dom.Window {
+  trait LiferayWindow extends scalajs.dom.Window {
     def Liferay: js.UndefOr[Liferay] = js.native
   }
 
-  implicit def windowToLiferayWindow(window: dom.Window): LiferayWindow =
+  implicit def windowToLiferayWindow(window: scalajs.dom.Window): LiferayWindow =
     window.asInstanceOf[LiferayWindow]
 
   @js.native
@@ -54,6 +53,6 @@ package object liferay {
 
   object LiferaySupport {
     def extendSession(): Unit =
-      dom.window.Liferay.toOption foreach (_.extendSession())
+      scalajs.dom.window.Liferay.toOption foreach (_.extendSession())
   }
 }

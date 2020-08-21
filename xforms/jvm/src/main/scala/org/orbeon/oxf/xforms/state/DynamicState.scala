@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{DelayedEvent, XFormsId}
 import sbinary.Operations._
 
 import scala.collection.JavaConverters._

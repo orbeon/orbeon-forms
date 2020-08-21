@@ -35,8 +35,8 @@ import org.orbeon.xforms.RelevanceHandling
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
 
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait

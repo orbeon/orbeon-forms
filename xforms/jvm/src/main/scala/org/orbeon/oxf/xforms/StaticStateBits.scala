@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.analysis.{IdGenerator, Metadata, XFormsAnnotator, X
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.xforms.XXBLScope
 
 
 class StaticStateBits(

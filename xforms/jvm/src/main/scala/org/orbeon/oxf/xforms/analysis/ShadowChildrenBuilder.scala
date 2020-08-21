@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
-import org.orbeon.oxf.xforms.XXBLScope
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindingBuilder}

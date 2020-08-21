@@ -20,10 +20,10 @@ import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.WhitelistObjectInputStream
-import org.orbeon.oxf.xforms.DelayedEvent
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
+import org.orbeon.xforms.DelayedEvent
 import sbinary.Operations._
 import sbinary._
 

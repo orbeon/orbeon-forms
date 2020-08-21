@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
 import org.xml.sax.Attributes
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.xforms.XXBLScope
 
 import scala.collection.JavaConverters._
 

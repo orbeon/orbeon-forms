@@ -13,7 +13,9 @@
   */
 package org.orbeon.xforms
 
+import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.dom
 
 
 sealed trait RelevanceHandling extends EnumEntry
@@ -38,3 +40,60 @@ object UrlType extends Enum[UrlType] {
   case object Render   extends UrlType
   case object Resource extends UrlType
 }
+
+sealed trait XXBLScope extends EnumEntry with Lowercase
+object XXBLScope extends Enum[XXBLScope] {
+
+  val values = findValues
+
+  case object Inner extends  XXBLScope
+  case object Outer extends  XXBLScope
+}
+
+sealed trait DeploymentType extends EnumEntry with Lowercase
+object DeploymentType extends Enum[DeploymentType] {
+
+  val values = findValues
+
+  case object Separate    extends  DeploymentType
+  case object Integrated  extends  DeploymentType
+  case object Standalone  extends  DeploymentType
+}
+
+// Lifecycle of an XForms document from the point of view of requests/responses
+trait XFormsDocumentLifecycle[Response] {
+  def afterInitialResponse(): Unit
+  def beforeExternalEvents(response: Response, isAjaxRequest: Boolean): Unit
+  def afterExternalEvents(isAjaxRequest: Boolean): Unit
+  def afterUpdateResponse(): Unit
+}
+
+case class ErrorInfo(
+  element : dom.Element,
+  message : String
+)
+
+case class Message(
+  message : String,
+  level   : String
+)
+
+case class Load(
+  resource       : String,
+  target         : Option[String],
+  urlType        : UrlType,
+  isReplace      : Boolean,
+  isShowProgress : Boolean
+) {
+  def isJavaScript: Boolean = resource.trim.startsWith("javascript:")
+}
+
+case class DelayedEvent(
+  eventName         : String,
+  targetEffectiveId : String,
+  bubbles           : Boolean,
+  cancelable        : Boolean,
+  time              : Option[Long],
+  showProgress      : Boolean,       // whether to show the progress indicator when submitting the event
+  browserTarget     : Option[String] // optional browser target for submit events
+)

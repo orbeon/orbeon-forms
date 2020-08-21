@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.sxpath.XPathExpression
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
 

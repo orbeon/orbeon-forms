@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.WhitespaceMatching
-import org.orbeon.oxf.xforms.XXBLScope
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
 import org.orbeon.oxf.xml.{JXQName, _}

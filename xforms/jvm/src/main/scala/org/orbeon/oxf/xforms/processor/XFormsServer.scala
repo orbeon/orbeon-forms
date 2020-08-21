@@ -43,6 +43,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.xforms.{DelayedEvent, Load, Message}
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}

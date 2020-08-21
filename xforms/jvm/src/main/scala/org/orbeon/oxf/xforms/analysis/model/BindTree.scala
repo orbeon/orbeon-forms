@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
-import org.orbeon.oxf.xforms.XXBLScope
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLReceiverHelper

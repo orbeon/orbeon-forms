@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.xforms.{EventNames, Namespaces}
+import org.orbeon.xforms.{DeploymentType, EventNames, Namespaces}
 
 // Constants useful for the XForms engine.
 //

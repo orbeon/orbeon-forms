@@ -23,6 +23,7 @@ import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -48,7 +49,7 @@ import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms._
 import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
@@ -134,7 +135,7 @@ abstract class XFormsContainingDocumentSupport
     with ContainingDocumentRequest
     with ContainingDocumentDelayedEvents
     with ContainingDocumentClientState
-    with XFormsDocumentLifecycle
+    with XFormsDocumentLifecycle[ExternalContext.Response]
     with ContainingDocumentCacheable
     with XFormsObject {
 

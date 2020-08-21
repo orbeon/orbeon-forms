@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XXBLScope
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}

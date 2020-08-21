@@ -340,6 +340,6 @@ trait Reindex extends FormDefinition {
   private val FbNamespaceMapping = NamespaceMapping(Map(
     "xh" -> XMLConstants.XHTML_NAMESPACE_URI,
     "xf" -> XFormsConstants.XFORMS_NAMESPACE_URI
-  ).asJava)
+  ))
 
 }

@@ -37,7 +37,7 @@ case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
 //
 object NamespaceMapping {
 
-  var EmptyMapping = apply(Map.empty[String, String])
+  val EmptyMapping: NamespaceMapping = apply(Map.empty[String, String])
 
   def apply(mapping: Map[String, String]): NamespaceMapping =
     NamespaceMapping(mapping.hashCode.toString, mapping)

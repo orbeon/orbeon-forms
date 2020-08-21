@@ -424,5 +424,6 @@ object XFormsValueControl {
         XXFORMS_PREFIX       -> XXFORMS_NAMESPACE_URI,
         XXFORMS_SHORT_PREFIX -> XXFORMS_NAMESPACE_URI,
         EXFORMS_PREFIX       -> EXFORMS_NAMESPACE_URI
-      ).asJava)
+      )
+    )
 }

@@ -23,7 +23,7 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
+import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
@@ -34,6 +34,7 @@ import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
+import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.{InputSource, XMLReader}
 
 import scala.util.Try

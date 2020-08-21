@@ -29,7 +29,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.dom.saxon.DocumentWrapper;

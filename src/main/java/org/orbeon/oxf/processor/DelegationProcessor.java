@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.xml.NamespaceMapping;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
 

@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, URLRewriterUtil
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._

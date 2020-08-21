@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLNames._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
+import org.orbeon.xml.NamespaceMapping
 import org.xml.sax._
 
 import scala.collection.JavaConverters._

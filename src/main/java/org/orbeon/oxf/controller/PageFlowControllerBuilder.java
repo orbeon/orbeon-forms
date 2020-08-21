@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;

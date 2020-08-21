@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om
 
 object XFormsContextStackSupport {

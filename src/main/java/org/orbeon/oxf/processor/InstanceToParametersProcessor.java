@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EncodeDecode;
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;

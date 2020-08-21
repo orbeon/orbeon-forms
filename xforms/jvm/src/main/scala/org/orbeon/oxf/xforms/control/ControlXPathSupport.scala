@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 
 import scala.collection.JavaConverters._

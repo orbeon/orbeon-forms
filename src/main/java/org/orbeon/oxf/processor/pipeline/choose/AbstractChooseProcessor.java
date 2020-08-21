@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;

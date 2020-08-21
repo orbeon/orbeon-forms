@@ -15,19 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import java.sql.{Connection, PreparedStatement}
 
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
 import org.orbeon.scaxon.SimplePath._
-
-import scala.collection.JavaConverters._
+import org.orbeon.xml.NamespaceMapping
 
 trait Reindex extends FormDefinition {
 

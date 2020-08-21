@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.util.{Map => JMap}
 
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl._
-import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
+import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

@@ -22,13 +22,14 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, XMLParsing}
+import org.orbeon.oxf.xml.{XMLConstants, XMLParsing}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, ValidationFailure}
 import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
 
 import scala.collection.{mutable => m}

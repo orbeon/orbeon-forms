@@ -27,8 +27,9 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
-import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{SAXStore, XMLReceiverHelper}
 import org.orbeon.xforms.Constants
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}

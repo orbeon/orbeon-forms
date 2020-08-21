@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.{mutable => m}

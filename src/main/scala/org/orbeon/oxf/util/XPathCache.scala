@@ -19,7 +19,7 @@ import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibraryList

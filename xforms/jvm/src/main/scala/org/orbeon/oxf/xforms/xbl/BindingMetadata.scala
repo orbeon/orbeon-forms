@@ -21,7 +21,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._

@@ -15,7 +15,7 @@ package org.orbeon.scaxon
 
 import org.orbeon.oxf.util.XPath.{FunctionContext, Reporter}
 import org.orbeon.oxf.util.XPathCache.{evaluate, evaluateAsAvt, evaluateSingleKeepItems}
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 

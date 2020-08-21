@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import analysis.ElementAnalysis
 import analysis.model.Model
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import xbl.Scope
 
 // Operations on a part that are used during static analysis

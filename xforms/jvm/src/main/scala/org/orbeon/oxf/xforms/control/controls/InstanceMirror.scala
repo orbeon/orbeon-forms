@@ -27,12 +27,13 @@ import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
+import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node._
 
 // Logic to mirror mutations between an outer and an inner instance

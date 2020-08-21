@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.orbeon.xml.NamespaceMapping;
 
 /**
  * XMLReceiver that:

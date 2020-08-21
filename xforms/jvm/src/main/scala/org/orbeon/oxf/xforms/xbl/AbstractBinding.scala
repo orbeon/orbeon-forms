@@ -29,10 +29,12 @@ import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
+import org.orbeon.xml.NamespaceMapping
 import scala.collection.compat._
+
 
 trait IndexableBinding {
   def selectors        : List[Selector]

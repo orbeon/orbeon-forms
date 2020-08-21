@@ -23,10 +23,11 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable

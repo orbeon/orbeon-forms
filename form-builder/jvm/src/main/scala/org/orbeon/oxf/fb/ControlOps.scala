@@ -34,7 +34,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.NodeInfo
@@ -42,6 +42,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
 import scala.collection.mutable

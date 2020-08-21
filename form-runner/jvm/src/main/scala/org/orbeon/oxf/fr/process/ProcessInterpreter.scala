@@ -25,12 +25,13 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.{util => u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XPath._
+import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
 import scala.collection.Seq

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.xml.NamespaceMapping;
 
 import java.util.ArrayList;
 import java.util.List;

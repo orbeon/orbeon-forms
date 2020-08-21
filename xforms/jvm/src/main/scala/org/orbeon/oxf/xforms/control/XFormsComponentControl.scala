@@ -29,10 +29,11 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, VirtualNode}
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.JavaConverters._

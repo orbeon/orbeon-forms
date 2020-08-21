@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._

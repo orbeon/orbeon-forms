@@ -21,9 +21,10 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.collection.compat._

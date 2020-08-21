@@ -26,8 +26,9 @@ import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._

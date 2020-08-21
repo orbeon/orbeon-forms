@@ -12,6 +12,7 @@ import org.orbeon.saxon.om.{NamespaceResolver, StructuredQName}
 import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext}
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{QNameValue, SequenceType}
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 

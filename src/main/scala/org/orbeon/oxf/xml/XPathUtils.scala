@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.{dom4j => _}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.collection.compat._

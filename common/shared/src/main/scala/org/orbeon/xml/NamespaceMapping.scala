@@ -11,7 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.xml
+package org.orbeon.xml
 
 import java.{util => ju}
 

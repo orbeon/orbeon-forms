@@ -17,7 +17,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XPath._
 

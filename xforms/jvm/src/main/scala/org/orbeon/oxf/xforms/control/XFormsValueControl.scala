@@ -28,9 +28,10 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._

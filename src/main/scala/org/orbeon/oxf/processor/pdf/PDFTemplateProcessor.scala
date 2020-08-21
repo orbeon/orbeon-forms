@@ -36,7 +36,7 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOu
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}

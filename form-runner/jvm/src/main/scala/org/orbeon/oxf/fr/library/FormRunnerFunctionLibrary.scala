@@ -133,7 +133,7 @@ private object FormRunnerFunctions {
     "document-id"                 -> (() => FormRunnerParams().document.orNull),
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata.orNull),
     "lang"                        -> (() => FormRunner.currentLang),
-    "workflow-stage"              -> (() => FormRunner.documentWorkflowStage.orNull),
+    "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage.orNull),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
     "relevant-form-values-string" -> (() => FormRunnerMetadata.findAllControlsWithValues(html = false)),

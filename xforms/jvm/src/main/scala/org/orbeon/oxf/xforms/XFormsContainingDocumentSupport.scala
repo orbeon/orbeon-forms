@@ -475,12 +475,6 @@ trait ContainingDocumentProperties {
       NO_UPDATES,
       _.toBoolean
     )
-//
-//  def isNoUpdatesStatic =
-//    getStaticState.propertyMaybeAsExpression(NO_UPDATES) match {
-//      case Left(value) => value.toString == "true"
-//      case _ => false
-//    }
 
   // Static properties
   def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)

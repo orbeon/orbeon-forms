@@ -17,7 +17,7 @@ import java.{lang => jl, util => ju}
 
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._

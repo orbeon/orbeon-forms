@@ -19,7 +19,7 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl

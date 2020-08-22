@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
+import org.orbeon.xforms.XFormsConstants
 import org.xml.sax.Attributes
 
 abstract class XFormsGroupHandler(

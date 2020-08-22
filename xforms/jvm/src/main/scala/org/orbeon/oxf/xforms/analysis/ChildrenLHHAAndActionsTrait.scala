@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import controls.LHHA
 import org.orbeon.oxf.xforms.action.XFormsActions
-import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
+import org.orbeon.xforms.XFormsConstants.FOR_QNAME
 
 trait ChildrenLHHAAndActionsTrait extends ChildrenBuilderTrait {
 

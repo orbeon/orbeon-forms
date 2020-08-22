@@ -21,13 +21,13 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 

@@ -15,11 +15,12 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.xforms.XFormsConstants
 
 import scala.util.{Failure, Success, Try}
 

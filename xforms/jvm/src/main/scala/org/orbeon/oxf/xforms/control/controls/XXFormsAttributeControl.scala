@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl

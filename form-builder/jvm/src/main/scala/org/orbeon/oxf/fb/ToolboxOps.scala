@@ -29,7 +29,6 @@ import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -39,6 +38,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsConstants
 
 import scala.collection.compat._
 import scala.collection.mutable

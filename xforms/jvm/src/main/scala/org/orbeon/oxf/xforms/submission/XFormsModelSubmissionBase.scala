@@ -19,7 +19,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel

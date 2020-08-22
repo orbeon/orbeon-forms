@@ -19,9 +19,9 @@ import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 
 import scala.collection.{mutable => m}
 

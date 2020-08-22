@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.xforms.XFormsConstants;
 import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;

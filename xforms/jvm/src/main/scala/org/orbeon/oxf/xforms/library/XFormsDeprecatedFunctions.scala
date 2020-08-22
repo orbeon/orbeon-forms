@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xforms.function._
 import org.orbeon.saxon.om.NamespaceConstant
+import org.orbeon.xforms.XFormsConstants
 
 /**
  * XForms functions that are deprecated or not relevant with XPath 2.0.

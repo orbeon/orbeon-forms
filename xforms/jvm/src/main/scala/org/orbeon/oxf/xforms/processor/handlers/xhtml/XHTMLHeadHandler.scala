@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.XFormsConstants
 import org.xml.sax.Attributes
 
 // Handler for `<xh:head>`

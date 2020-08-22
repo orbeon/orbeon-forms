@@ -15,10 +15,9 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom._
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.scalatest.funspec.AnyFunSpec
 import org.orbeon.oxf.xml.Dom4j._
-import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.{RelevanceHandling, XFormsConstants}
 
 class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
 

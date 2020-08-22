@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms.control.controls
 
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.xforms.{BindingContext, XFormsConstants}
+import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 /**

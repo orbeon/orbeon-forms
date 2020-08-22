@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.Implicits
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._

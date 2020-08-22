@@ -21,11 +21,11 @@ import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, S
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsConstants
 import org.orbeon.xml.NamespaceMapping
 
 trait Reindex extends FormDefinition {

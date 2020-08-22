@@ -17,9 +17,10 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, XPathAnalysis}
+import org.orbeon.xforms.XFormsConstants
+
 import scala.collection.compat._
 
 sealed trait LHHA extends EnumEntry with Lowercase

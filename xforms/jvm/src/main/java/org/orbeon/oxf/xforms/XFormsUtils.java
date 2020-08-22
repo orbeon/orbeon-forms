@@ -38,6 +38,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
+import org.orbeon.xforms.XFormsConstants;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 

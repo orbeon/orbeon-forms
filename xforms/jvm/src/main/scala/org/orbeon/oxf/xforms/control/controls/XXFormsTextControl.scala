@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.xforms.XFormsConstants
 import org.xml.sax.helpers.AttributesImpl
 
 /**

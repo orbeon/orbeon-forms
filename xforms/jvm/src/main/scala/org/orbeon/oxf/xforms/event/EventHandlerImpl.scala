@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.{IndentedLogger, Logging, Modifier}
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._

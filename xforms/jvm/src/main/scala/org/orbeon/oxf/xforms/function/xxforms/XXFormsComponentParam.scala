@@ -15,14 +15,13 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 import shapeless.syntax.typeable._
 
 class XXFormsComponentParam extends XFormsFunction {

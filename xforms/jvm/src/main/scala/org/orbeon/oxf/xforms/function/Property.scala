@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function
 
 import java.{util => ju}
 
-import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
+import org.orbeon.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}

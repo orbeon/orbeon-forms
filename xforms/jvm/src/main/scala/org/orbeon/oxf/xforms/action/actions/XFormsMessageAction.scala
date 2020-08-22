@@ -16,10 +16,11 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_SHORT
+import org.orbeon.xforms.XFormsConstants.XXFORMS_NAMESPACE_SHORT
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.xforms.XFormsConstants
 
 /**
  * 10.12 The message Element

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2007 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,10 +11,10 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms
+package org.orbeon.xforms
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.xforms.{EventNames, Namespaces}
+
 
 // Constants useful for the XForms engine.
 //
@@ -185,7 +185,7 @@ object XFormsConstants {
   val XXFORMS_ROWS_QNAME = QName("rows", XXFORMS_NAMESPACE)
   val XXFORMS_GROUP_QNAME = QName("group", XXFORMS_NAMESPACE)
   val XXFORMS_ELEMENT_QNAME = QName("element", XXFORMS_NAMESPACE)
-  val XXFORMS_EXTERNAL_EVENTS_QNAME = QName(XFormsProperties.EXTERNAL_EVENTS_PROPERTY, XXFORMS_NAMESPACE)
+  val XXFORMS_EXTERNAL_EVENTS_QNAME = QName("external-events", XXFORMS_NAMESPACE)
 
   val CONSTRAINT_LEVEL_ATTRIBUTE_NAME = "level"
   val RELEVANT_ATTRIBUTE_NAME = "relevant"
@@ -253,7 +253,7 @@ object XFormsConstants {
 
   val XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME = "external-events"
 
-  val ENCRYPT_ITEM_VALUES = QName(XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY, XXFORMS_NAMESPACE)
+  val ENCRYPT_ITEM_VALUES = QName("encrypt-item-values", XXFORMS_NAMESPACE)
   val XFORMS_FULL_APPEARANCE_QNAME = QName("full")
   val XFORMS_COMPACT_APPEARANCE_QNAME = QName("compact")
   val XFORMS_MINIMAL_APPEARANCE_QNAME = QName("minimal")
@@ -294,7 +294,7 @@ object XFormsConstants {
   val XXFORMS_CACHE_QNAME = QName("cache", XXFORMS_NAMESPACE)
   val XXFORMS_TIME_TO_LIVE_QNAME = QName("ttl", XXFORMS_NAMESPACE)
   val XXFORMS_VALIDATION_QNAME = QName("validation", XXFORMS_NAMESPACE)
-  val XXFORMS_EXPOSE_XPATH_TYPES_QNAME = QName(XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY, XXFORMS_NAMESPACE)
+  val XXFORMS_EXPOSE_XPATH_TYPES_QNAME = QName("expose-xpath-types", XXFORMS_NAMESPACE)
   val XXFORMS_EXCLUDE_RESULT_PREFIXES = QName("exclude-result-prefixes", XXFORMS_NAMESPACE)
   val XXFORMS_CUSTOM_MIPS_QNAME = QName("custom-mips", XXFORMS_NAMESPACE)
   val XXFORMS_RELEVANT_ATTRIBUTE_QNAME = QName("relevant-attribute", XXFORMS_NAMESPACE_SHORT)

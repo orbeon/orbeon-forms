@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI => XF}
+import org.orbeon.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI => XF}
 import org.orbeon.scaxon.SimplePath.Test
+import org.orbeon.xforms.XFormsConstants
 
 object XMLNames {
 

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;

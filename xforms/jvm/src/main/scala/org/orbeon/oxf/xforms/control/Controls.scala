@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesContro
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 
 import scala.collection.JavaConverters._
 import scala.collection.compat._

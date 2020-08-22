@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._

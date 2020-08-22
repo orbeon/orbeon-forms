@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.trans.XPathException
+import org.orbeon.xforms.XFormsConstants
 
 import scala.xml.Elem
 import scala.collection.compat._

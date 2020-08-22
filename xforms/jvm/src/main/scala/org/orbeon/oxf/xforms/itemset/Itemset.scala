@@ -16,13 +16,14 @@ package org.orbeon.oxf.xforms.itemset
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport.isSelected
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.saxon.{Configuration, om}
+import org.orbeon.xforms.XFormsConstants
 import org.xml.sax.SAXException
 
 

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait

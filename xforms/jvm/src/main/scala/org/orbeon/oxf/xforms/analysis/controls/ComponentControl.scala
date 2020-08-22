@@ -2,9 +2,9 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import cats.syntax.option._
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope, XBLBindingBuilder}
+import org.orbeon.xforms.XFormsConstants
 
 class ComponentControl(
   staticStateContext : StaticStateContext,

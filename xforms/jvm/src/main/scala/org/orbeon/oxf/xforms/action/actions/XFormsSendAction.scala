@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
+import org.orbeon.xforms.XFormsConstants
 
 /**
  * 10.1.10 The send Element

@@ -16,7 +16,7 @@ package org.orbeon.dom.saxon;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.QName;
-import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xml.XMLConstants;

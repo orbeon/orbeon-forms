@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsConstants
 
 
 sealed trait ItemNode extends ItemContainer with ItemNodeImpl {

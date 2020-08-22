@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import java.{util => ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
+import org.orbeon.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}

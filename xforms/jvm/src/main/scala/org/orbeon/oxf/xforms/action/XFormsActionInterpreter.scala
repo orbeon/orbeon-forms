@@ -31,7 +31,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsConstants, XFormsId}
 
 import scala.collection.JavaConverters._
 import scala.util.control.{Breaks, NonFatal}

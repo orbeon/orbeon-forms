@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsConstants
 
 trait SelectAppearanceTrait extends AppearanceTrait {
 

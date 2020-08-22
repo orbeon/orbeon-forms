@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{Logging, XPath}
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model.{Constraint, Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -29,6 +28,7 @@ import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.xforms.XFormsConstants
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
 

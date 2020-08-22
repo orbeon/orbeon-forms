@@ -19,9 +19,10 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.XFormsConstants
 import org.xml.sax.Attributes
 
 /**

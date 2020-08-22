@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsConstants.SUBMISSION_QNAME
+import org.orbeon.xforms.XFormsConstants.SUBMISSION_QNAME
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.XFormsEvent

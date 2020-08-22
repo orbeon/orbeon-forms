@@ -27,7 +27,8 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.{Loggers, XFormsConstants, XFormsContainingDocument, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
+import org.orbeon.xforms.XFormsConstants
 
 import scala.collection.JavaConverters._
 

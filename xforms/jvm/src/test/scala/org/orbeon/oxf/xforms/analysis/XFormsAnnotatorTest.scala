@@ -18,10 +18,11 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsStaticStateImpl, XFormsUtils}
+import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.XFormsConstants
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.JavaConverters._

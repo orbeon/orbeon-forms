@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -24,9 +23,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target
 import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
@@ -98,7 +98,7 @@ abstract class ElementAnalysis(
       case Some(preceding) if preceding.scope == selfElement.scope => Some(preceding)
       case Some(preceding) => findPreceding(preceding)
       case None => element.parent match {
-        case Some(parent: Model) =>
+        case Some(_: Model) =>
           None // models are not allowed to see outside variables for now (could lift this restriction later)
         case Some(parent) => findPreceding(parent)
         case _ => None
@@ -452,17 +452,17 @@ object ElementAnalysis {
       }
     }
 
-  abstract class IteratorBase(start: ElementAnalysis) extends Iterator[ElementAnalysis] {
+  abstract class IteratorBase(
+    start    : Option[ElementAnalysis],
+    nextElem : ElementAnalysis => Option[ElementAnalysis]
+  ) extends Iterator[ElementAnalysis] {
 
-    def initialNext: Option[ElementAnalysis]
-    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis]
-
-    private[this] var theNext = initialNext
+    private[this] var theNext = start
 
     def hasNext: Boolean = theNext.isDefined
     def next(): ElementAnalysis = {
       val newResult = theNext.get
-      theNext = subsequentNext(newResult)
+      theNext = nextElem(newResult)
       newResult
     }
   }
@@ -470,26 +470,20 @@ object ElementAnalysis {
   /**
    * Return an iterator over all the element's ancestors.
    */
-  def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext: Option[ElementAnalysis] = start.parent
-    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.parent
-  }
+  def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
+    new IteratorBase(start.parent, _.parent) {}
 
   /**
    * Iterator over the element and all its ancestors.
    */
-  def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext: Option[ElementAnalysis] = Option(start)
-    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.parent
-  }
+  def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
+    new IteratorBase(Option(start), _.parent) {}
 
   /**
    * Iterator over the element's preceding siblings.
    */
-  def precedingSiblingIterator(start: ElementAnalysis): Iterator[ElementAnalysis] = new IteratorBase(start) {
-    def initialNext: Option[ElementAnalysis] = start.preceding
-    def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis] = e.preceding
-  }
+  def precedingSiblingIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
+    new IteratorBase(start.preceding, _.preceding) {}
 
   /**
    * Return a list of ancestors in the same scope from leaf to root.

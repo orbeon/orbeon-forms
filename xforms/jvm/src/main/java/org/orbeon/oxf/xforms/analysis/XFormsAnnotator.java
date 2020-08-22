@@ -15,17 +15,18 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.orbeon.xml.NamespaceMapping;
 
 /**
  * XMLReceiver that:
@@ -356,7 +357,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other xf: check for labels, xf:instance, and xs:schema
                 if (stackElement.isXForms()) {
-                    inLHHA = XFormsConstants.LHHAElements().contains(localname); // labels, etc. may contain XHTML
+                    inLHHA = LHHA.NamesSet().contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA || "instance".equals(localname)) {                                  // xf:instance
                         inPreserve = true;
                         preserveLevel = level;
@@ -370,7 +371,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // At the top-level: check for labels and xbl:xbl
                 final boolean isXBLXBL = stackElement.isXBL() && "xbl".equals(localname);
                 if (stackElement.isXForms()) {
-                    inLHHA = XFormsConstants.LHHAElements().contains(localname); // labels, etc. may contain XHTML
+                    inLHHA = LHHA.NamesSet().contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA) {
                         inPreserve = true;
                         preserveLevel = level;

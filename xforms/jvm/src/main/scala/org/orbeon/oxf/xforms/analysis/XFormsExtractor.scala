@@ -23,6 +23,7 @@ import org.orbeon.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -377,7 +378,7 @@ class XFormsExtractor(
 
       // Preserve as is the content of labels, etc., instances, and schemas
       if (! inLHHA) {
-        if (LHHAElements(localname) && isXForms) { // LHHA may contain XHTML
+        if (LHHA.NamesSet(localname) && isXForms) { // LHHA may contain XHTML
           inLHHA                       = true
           preserveOrLHHAOrForeignLevel = level
         } else if (

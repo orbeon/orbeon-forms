@@ -26,14 +26,6 @@ import org.orbeon.dom.{Namespace, QName}
 //
 object XFormsConstants {
 
-  val LHHAElements =
-    Set(
-      "label",
-      "hint",
-      "help",
-      "alert"
-    )
-
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
   val XFORMS_NAMESPACE_URI = Namespaces.XF

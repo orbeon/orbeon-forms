@@ -15,8 +15,8 @@ package org.orbeon.xforms
 
 
 object Namespaces {
-  val XF = "http://www.w3.org/2002/xforms"
-  val XXF = "http://orbeon.org/oxf/xml/xforms"
-  val XBL = "http://www.w3.org/ns/xbl"
+  val XF   = "http://www.w3.org/2002/xforms"
+  val XXF  = "http://orbeon.org/oxf/xml/xforms"
+  val XBL  = "http://www.w3.org/ns/xbl"
   val XXBL = "http://orbeon.org/oxf/xml/xbl"
 }

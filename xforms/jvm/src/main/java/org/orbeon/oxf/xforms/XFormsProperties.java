@@ -24,8 +24,6 @@ import java.util.Set;
 
 public class XFormsProperties {
 
-    public static final String[] EMPTY_STRING_ARRAY = new String[]{};
-
     public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
 
     // Document properties
@@ -111,7 +109,6 @@ public class XFormsProperties {
 
     public static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
     public static final String REVISIT_HANDLING_RESTORE_VALUE = "restore";
-    public static final String REVISIT_HANDLING_RELOAD_VALUE = "reload";
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
     public static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";

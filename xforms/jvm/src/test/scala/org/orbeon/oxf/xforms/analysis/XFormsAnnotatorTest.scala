@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.JavaConverters._
@@ -173,7 +173,7 @@ class XFormsAnnotatorTest
         val resultElement = result collectFirst { case v: VirtualNode => unsafeUnwrapElement(v) }
 
         assert(resultElement exists (XFormsUtils.getElementId(_).nonAllBlank))
-        assert(resultElement exists (_.attributeValue(XFormsConstants.NAME_QNAME) == attName))
+        assert(resultElement exists (_.attributeValue(XFormsNames.NAME_QNAME) == attName))
       }
   }
 }

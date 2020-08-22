@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHA

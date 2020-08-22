@@ -37,7 +37,7 @@ import org.orbeon.saxon.om.AxisIterator;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,13 +59,13 @@ public class XFormsInsertAction extends XFormsAction {
 
         final String atAttribute = actionElement.attributeValue("at");
         final String originAttribute = actionElement.attributeValue("origin");
-        final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME());
+        final String contextAttribute = actionElement.attributeValue(XFormsNames.CONTEXT_QNAME());
 
         // Extension: allow position to be an AVT
         final String resolvedPositionAttribute = actionInterpreter.resolveAVT(actionElement, "position");
 
         // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
-        final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME()));
+        final boolean setRequireDefaultValues = "true".equals(actionInterpreter.resolveAVT(actionElement, XFormsNames.XXFORMS_DEFAULTS_QNAME()));
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {

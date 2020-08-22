@@ -18,7 +18,7 @@ import java.{util => ju}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.Dispatch

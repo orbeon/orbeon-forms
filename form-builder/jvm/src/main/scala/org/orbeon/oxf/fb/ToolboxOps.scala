@@ -38,7 +38,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat._
 import scala.collection.mutable
@@ -145,7 +145,7 @@ object ToolboxOps {
 
           // Make sure there is a @bind instead of a @ref on the control
           delete(newControlElem /@ "ref")
-          ensureAttribute(newControlElem, XFormsConstants.BIND_QNAME.localName, bind.id)
+          ensureAttribute(newControlElem, XFormsNames.BIND_QNAME.localName, bind.id)
 
           // Set bind attributes if any
           insert(into = bind, origin = findBindAttributesTemplate(binding))
@@ -943,7 +943,7 @@ object ToolboxOps {
 
     val xcvBinds = xcvElem / XcvEntry.Bind.entryName / *
 
-    if (newContainerElem.hasAtt(XFormsConstants.BIND_QNAME.localName)) {
+    if (newContainerElem.hasAtt(XFormsNames.BIND_QNAME.localName)) {
       // Insert the bind element for the container and descendants
       val tmpBind = ensureBinds(findContainerNamesForModel(newContainerElem, includeSelf = true))
       insert(after = tmpBind, origin = xcvBinds)

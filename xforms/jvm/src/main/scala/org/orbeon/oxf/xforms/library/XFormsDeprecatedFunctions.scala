@@ -19,14 +19,14 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xforms.function._
 import org.orbeon.saxon.om.NamespaceConstant
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 /**
  * XForms functions that are deprecated or not relevant with XPath 2.0.
  */
 trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
 
-  Namespace(Seq(NamespaceConstant.FN, XFormsConstants.XFORMS_NAMESPACE_URI)) {
+  Namespace(Seq(NamespaceConstant.FN, XFormsNames.XFORMS_NAMESPACE_URI)) {
 
     Fun("local-date", classOf[LocalDate], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
@@ -74,7 +74,7 @@ trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
     )
   }
 
-  Namespace(XFormsConstants.XFORMS_NAMESPACE_URI) {
+  Namespace(XFormsNames.XFORMS_NAMESPACE_URI) {
 
     Fun("if", classOf[If], op = 0, min = 3, STRING, EXACTLY_ONE,
       Arg(BOOLEAN, EXACTLY_ONE),

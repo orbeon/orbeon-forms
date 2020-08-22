@@ -49,7 +49,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.ErrorInfo;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
@@ -100,7 +100,7 @@ public class XFormsModelSchemaValidator {
         this.indentedLogger = indentedLogger;
 
         // Check for external schemas
-        final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME());
+        final String schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME());
         if (schemaAttribute != null)
             this.schemaURIs = org.apache.commons.lang3.StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
 

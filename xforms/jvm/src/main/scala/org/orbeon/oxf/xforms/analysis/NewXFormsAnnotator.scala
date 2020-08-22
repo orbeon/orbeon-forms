@@ -17,7 +17,7 @@ import org.orbeon.scaxon.SAXMachine
 import org.orbeon.scaxon.SAXEvents._
 import javax.xml.namespace.QName
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml.XMLReceiver
 

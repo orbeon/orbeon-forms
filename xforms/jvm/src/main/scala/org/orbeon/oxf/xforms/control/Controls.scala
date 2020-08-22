@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesContro
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.collection.JavaConverters._
 import scala.collection.compat._
@@ -375,7 +375,7 @@ object Controls {
       def mustReEvaluateBinding =
         (relevanceChangeLevel != -1 && level > relevanceChangeLevel)   ||
         xpathDependencies.requireBindingUpdate(control.staticControl, control.effectiveId) ||
-        (control.staticControl.element.attribute(XFormsConstants.MODEL_QNAME) ne null)
+        (control.staticControl.element.attribute(XFormsNames.MODEL_QNAME) ne null)
 
       // Only update the binding if needed
       if (mustReEvaluateBinding) {

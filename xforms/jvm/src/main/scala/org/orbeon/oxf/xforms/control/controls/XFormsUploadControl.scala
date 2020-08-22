@@ -21,7 +21,7 @@ import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, PathUtils, SecureUtils}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.function.Last
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType._

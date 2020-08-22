@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -45,7 +45,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         htmlAnchorAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "btn-link");
 
         // Output xxf:* extension attributes
-        triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());
+        triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsNames.XXFORMS_NAMESPACE_URI());
 
         // xhtml:button
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();

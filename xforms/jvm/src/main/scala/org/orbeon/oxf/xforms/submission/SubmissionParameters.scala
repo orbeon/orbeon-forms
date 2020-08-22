@@ -5,7 +5,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._

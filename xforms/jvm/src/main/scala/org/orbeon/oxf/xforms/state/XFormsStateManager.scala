@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.JavaConverters._
 
@@ -74,7 +74,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
   }
 
   def getRequestUUID(request: Document): String = {
-    val uuidElement = request.getRootElement.element(XFormsConstants.XXFORMS_UUID_QNAME)
+    val uuidElement = request.getRootElement.element(XFormsNames.XXFORMS_UUID_QNAME)
     assert(uuidElement != null)
     uuidElement.getTextTrim.trimAllToNull
   }

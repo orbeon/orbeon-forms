@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat._
 
@@ -50,7 +50,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     )
 
   def isLegacyUnrepeatedGrid(node: NodeInfo): Boolean =
-    IsGrid(node) && ! node.hasAtt(XFormsConstants.BIND_QNAME)
+    IsGrid(node) && ! node.hasAtt(XFormsNames.BIND_QNAME)
 
   //@XPathFunction
   def isRepeat(node: NodeInfo): Boolean =
@@ -143,7 +143,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     for {
       control       <- findControlByName(inDoc, controlName)
       if controlRequiresNestedIterationElement(control)
-      bind          <- control attValueOpt XFormsConstants.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
+      bind          <- control attValueOpt XFormsNames.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
       iterationBind <- bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)

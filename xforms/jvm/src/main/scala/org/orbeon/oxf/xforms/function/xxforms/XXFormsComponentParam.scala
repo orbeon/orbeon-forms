@@ -21,7 +21,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 import shapeless.syntax.typeable._
 
 class XXFormsComponentParam extends XFormsFunction {
@@ -59,7 +59,7 @@ class XXFormsComponentParam extends XFormsFunction {
 
 object XXFormsComponentParam {
 
-  val XblLocalName = XFormsConstants.XBL_XBL_QNAME.localName
+  val XblLocalName = XFormsNames.XBL_XBL_QNAME.localName
 
   def findSourceComponent(xformsFunctionContext: XFormsFunction.Context): Option[XFormsComponentControl] = {
 

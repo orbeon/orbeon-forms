@@ -37,7 +37,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.collection.compat._
 
@@ -614,7 +614,7 @@ object FormBuilderXPathApi {
       findVirtualNameAndAppearance(
         searchElemName    = originalControlElem.uriQualifiedName,
         searchDatatype    = originalDatatype,
-        searchAppearances = originalControlElem attTokens XFormsConstants.APPEARANCE_QNAME,
+        searchAppearances = originalControlElem attTokens XFormsNames.APPEARANCE_QNAME,
         descriptors       = descriptors
       )
 

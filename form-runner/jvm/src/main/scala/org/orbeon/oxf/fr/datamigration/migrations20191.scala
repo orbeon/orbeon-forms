@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.datamigration.MigrationSupport._
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._

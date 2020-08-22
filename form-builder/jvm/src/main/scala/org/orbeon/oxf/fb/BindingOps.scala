@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.xforms.XFormsConstants.APPEARANCE_QNAME
+import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.TransformerUtils

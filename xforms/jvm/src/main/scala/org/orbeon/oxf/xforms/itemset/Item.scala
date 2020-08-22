@@ -18,7 +18,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 
 sealed trait ItemNode extends ItemContainer with ItemNodeImpl {
@@ -60,7 +60,7 @@ sealed trait ItemNodeImpl {
     label.javaScriptValue(locationData)
 
   def classAttribute: Option[String] =
-    attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
+    attributes find (_._1 == XFormsNames.CLASS_QNAME) map (_._2)
 }
 
 sealed trait ItemLeafImpl {

@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 /**
@@ -112,10 +112,10 @@ class XFormsRepeatIterationControl(
       atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
 
       // Relevance
-      atts.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
+      atts.addAttribute("", XFormsNames.RELEVANT_ATTRIBUTE_NAME, XFormsNames.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
       atts.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
 
-      ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", atts)
+      ch.element("xxf", XFormsNames.XXFORMS_NAMESPACE_URI, "repeat-iteration", atts)
     }
     // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
   }

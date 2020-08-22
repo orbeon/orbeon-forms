@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._

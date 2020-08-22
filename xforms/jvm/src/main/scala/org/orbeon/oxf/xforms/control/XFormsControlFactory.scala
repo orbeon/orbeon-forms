@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom._
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, ValueTrait}

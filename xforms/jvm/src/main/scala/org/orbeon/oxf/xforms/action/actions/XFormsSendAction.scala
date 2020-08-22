@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 /**
  * 10.1.10 The send Element
@@ -32,7 +32,7 @@ class XFormsSendAction extends XFormsAction {
     val actionElement = actionContext.element
 
     // Find submission object
-    val submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME)
+    val submissionId = actionElement.attributeValue(XFormsNames.SUBMISSION_QNAME)
     if (submissionId == null)
       throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 

@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
-import org.orbeon.xforms.XFormsConstants.APPEARANCE_QNAME
+import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo

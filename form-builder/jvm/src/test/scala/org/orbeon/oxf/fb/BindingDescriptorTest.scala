@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants._

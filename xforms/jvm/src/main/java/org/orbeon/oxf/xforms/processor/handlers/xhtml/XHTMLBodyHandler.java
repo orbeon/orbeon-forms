@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.xforms.Constants;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -80,7 +80,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             if (! containingDocument.getDeploymentType().equals(XFormsContainingDocumentSupport.StandaloneDeploymentTypeJava())
                     || containingDocument.isPortletContainer() || isEmbeddedClient) {
                 // Integrated or separate deployment mode or portlet
-                xformsSubmissionPath = XFormsConstants.XFORMS_SERVER_SUBMIT();
+                xformsSubmissionPath = XFormsNames.XFORMS_SERVER_SUBMIT();
             } else {
                 // Plain deployment mode: submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that
                 xformsSubmissionPath = requestPath;
@@ -247,106 +247,106 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         });
 
         // xf:input
-        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "input", ANY_MATCHER);
+        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "input", ANY_MATCHER);
 
         // xf:output
-        controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "output",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME()));
-        controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "output",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME()));
-        controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "output", new Matcher() {
+        controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "output",
+                new AppearanceMatcher(XFormsNames.XXFORMS_TEXT_APPEARANCE_QNAME()));
+        controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "output",
+                new AppearanceMatcher(XFormsNames.XXFORMS_DOWNLOAD_APPEARANCE_QNAME()));
+        controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "output", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
                 return mediatypeValue != null && mediatypeValue.startsWith("image/");
             }
         });
-        controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "output", new Matcher() {
+        controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "output", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
                 return mediatypeValue != null && mediatypeValue.equals("text/html");
             }
         });
-        controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "output", ANY_MATCHER);
+        controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "output", ANY_MATCHER);
 
         // xf:trigger
-        final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME());
-        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "trigger", triggerSubmitMinimalMatcher);
-        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "trigger", ANY_MATCHER);
+        final Matcher triggerSubmitMinimalMatcher = new AppearanceMatcher(XFormsNames.XFORMS_MINIMAL_APPEARANCE_QNAME());
+        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "trigger", triggerSubmitMinimalMatcher);
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "trigger", ANY_MATCHER);
 
         // xf:submit
-        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "submit", triggerSubmitMinimalMatcher);
-        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "submit", ANY_MATCHER);
+        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "submit", triggerSubmitMinimalMatcher);
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "submit", ANY_MATCHER);
 
         // xf:group
-        controller.registerHandler(TransparentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "group",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
+        controller.registerHandler(TransparentHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "group",
+                new AppearanceMatcher(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
 
-        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "group", new Matcher() {
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "group", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME().localName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName().equals(appearanceAttributeValue);
+                final String appearanceAttributeValue = attributes.getValue(XFormsNames.APPEARANCE_QNAME().localName());
+                return XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName().equals(appearanceAttributeValue);
             }
         });
 
-        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "group",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME()) {
+        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "group",
+                new AppearanceMatcher(XFormsNames.XXFORMS_FIELDSET_APPEARANCE_QNAME()) {
                     public boolean doesMatch(Attributes attributes, Object handlerContext) {
                         return super.doesMatch(attributes, handlerContext) || LHHASupport.hasLabel(containingDocument, getPrefixedId(attributes, handlerContext));
                     }
                 });
 
-        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "group", ANY_MATCHER);
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "group", ANY_MATCHER);
 
         // xf:switch
         // NOTE: We use the same handlers for switch as we do for group
-        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "switch", new Matcher() {
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "switch", new Matcher() {
             public boolean doesMatch(Attributes attributes, Object handlerContext) {
                 // XFormsAnnotator adds this appearance if needed
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
-                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME().localName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName().equals(appearanceAttributeValue);
+                final String appearanceAttributeValue = attributes.getValue(XFormsNames.APPEARANCE_QNAME().localName());
+                return XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME().qualifiedName().equals(appearanceAttributeValue);
             }
         });
-        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "switch", ANY_MATCHER);
-        controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "case", ANY_MATCHER);
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "switch", ANY_MATCHER);
+        controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "case", ANY_MATCHER);
 
         // xf:repeat
-        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "repeat", ANY_MATCHER);
-        controller.registerHandler(TransparentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "repeat-iteration", ANY_MATCHER);
+        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "repeat", ANY_MATCHER);
+        controller.registerHandler(TransparentHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "repeat-iteration", ANY_MATCHER);
 
         // xf:secret
-        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "secret", ANY_MATCHER);
+        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "secret", ANY_MATCHER);
 
         // xf:upload
-        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "upload", ANY_MATCHER);
+        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "upload", ANY_MATCHER);
 
         // xf:range
-        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "range", ANY_MATCHER);
+        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "range", ANY_MATCHER);
 
         // Other controls
-        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "textarea", ANY_MATCHER);
-        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI(), "dialog", ANY_MATCHER);
+        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "textarea", ANY_MATCHER);
+        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsNames.XXFORMS_NAMESPACE_URI(), "dialog", ANY_MATCHER);
 
         // xf:select and xf:select1
-        controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "select",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
-        controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "select1",
-                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
-        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "select", ANY_MATCHER);
-        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "select1", ANY_MATCHER);
+        controller.registerHandler(NullHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "select",
+                new AppearanceMatcher(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
+        controller.registerHandler(NullHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "select1",
+                new AppearanceMatcher(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME()));
+        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "select", ANY_MATCHER);
+        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "select1", ANY_MATCHER);
 
         // Add handlers for LHHA elements
-        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "label", ANY_MATCHER);
-        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "help", ANY_MATCHER);
-        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "hint", ANY_MATCHER);
-        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI(), "alert", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "label", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "help", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "hint", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsNames.XFORMS_NAMESPACE_URI(), "alert", ANY_MATCHER);
 
         // xxf:dynamic
-        controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI(), "dynamic", ANY_MATCHER);
+        controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsNames.XXFORMS_NAMESPACE_URI(), "dynamic", ANY_MATCHER);
     }
 
     @Override

@@ -17,9 +17,9 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, XPathAnalysis}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat._
 
@@ -102,7 +102,7 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     }
 
   val beforeAfterTokensOpt: Option[(List[String], List[String])] =
-    element.attributeValueOpt(XFormsConstants.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
+    element.attributeValueOpt(XFormsNames.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
 
   // analyzeXPath(): this is done as part of control analysis, see:
   // https://github.com/orbeon/orbeon-forms/issues/2185

@@ -4,7 +4,7 @@ import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope, XBLBindingBuilder}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 class ComponentControl(
   staticStateContext : StaticStateContext,
@@ -18,7 +18,7 @@ class ComponentControl(
 
   val hasLazyBinding: Boolean =
     ! part.isTopLevel &&
-      element.attributeValueOpt(XFormsConstants.XXFORMS_UPDATE_QNAME).contains(XFormsConstants.XFORMS_FULL_UPDATE)
+      element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
   val abstractBinding: AbstractBinding =
     part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)

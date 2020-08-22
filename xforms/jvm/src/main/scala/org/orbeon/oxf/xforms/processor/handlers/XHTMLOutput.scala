@@ -34,7 +34,7 @@ object XHTMLOutput {
     locally {
       val isHTMLDocument = xfcd.staticState.isHTMLDocument
 
-      import org.orbeon.xforms.XFormsConstants.{XBL_NAMESPACE_URI, XFORMS_NAMESPACE_URI => XF, XXFORMS_NAMESPACE_URI => XXF}
+      import org.orbeon.xforms.XFormsNames.{XBL_NAMESPACE_URI, XFORMS_NAMESPACE_URI => XF, XXFORMS_NAMESPACE_URI => XXF}
       import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
 
       if (isHTMLDocument) {

@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.Implicits
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.util.control.NonFatal
 import scala.collection.JavaConverters._
@@ -346,7 +346,7 @@ object ItemsetSupport {
             // - the context item is missing
             //
             private def getCopyValue(copyElem: Element): Option[List[om.Item]] =
-              copyElem.attributeValueOpt(XFormsConstants.REF_QNAME) flatMap { refAtt =>
+              copyElem.attributeValueOpt(XFormsNames.REF_QNAME) flatMap { refAtt =>
 
                 val sourceEffectiveId = getElementEffectiveId(copyElem)
 

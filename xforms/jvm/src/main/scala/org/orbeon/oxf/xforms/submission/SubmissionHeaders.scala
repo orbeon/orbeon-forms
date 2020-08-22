@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -37,7 +37,7 @@ object SubmissionHeaders {
 
     val fullPrefix = xblContainer.getFullPrefix
 
-    val headerElements = enclosingElement.elements(XFormsConstants.XFORMS_HEADER_QNAME)
+    val headerElements = enclosingElement.elements(XFormsNames.XFORMS_HEADER_QNAME)
     if (headerElements.asScala.nonEmpty) {
 
       val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
@@ -70,8 +70,8 @@ object SubmissionHeaders {
         }
 
         // Evaluate header name and value
-        val headerName  = getElementValue(XFormsConstants.XFORMS_NAME_QNAME)
-        val headerValue = getElementValue(XFormsConstants.XFORMS_VALUE_QNAME)
+        val headerName  = getElementValue(XFormsNames.XFORMS_NAME_QNAME)
+        val headerValue = getElementValue(XFormsNames.XFORMS_VALUE_QNAME)
 
         // Evaluate combine attribute as AVT
         val combine = {

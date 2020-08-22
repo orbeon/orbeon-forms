@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 
 trait Reindex extends FormDefinition {
@@ -339,7 +339,7 @@ trait Reindex extends FormDefinition {
   // Prefixes used in Form Builder; prefixes in other documents, for now, are not supported
   private val FbNamespaceMapping = NamespaceMapping(Map(
     "xh" -> XMLConstants.XHTML_NAMESPACE_URI,
-    "xf" -> XFormsConstants.XFORMS_NAMESPACE_URI
+    "xf" -> XFormsNames.XFORMS_NAMESPACE_URI
   ))
 
 }

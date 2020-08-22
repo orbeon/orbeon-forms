@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import shapeless.syntax.typeable._
 
 //
@@ -176,7 +176,7 @@ object XMLOutput extends XMLReceiverSupport {
   def applyMatchers(c: XFormsControl)(implicit xmlReceiver: XMLReceiver): Unit = c match {
     case _: XFormsVariableControl | _: XXFormsAttributeControl | _: XFormsActionControl =>
       // Skip control and its descendants
-    case c: XFormsGroupControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) =>
+    case c: XFormsGroupControl if c.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME) =>
       // Skip control but process descendants
       matchContainer(c, xmlReceiver)
     case _ =>

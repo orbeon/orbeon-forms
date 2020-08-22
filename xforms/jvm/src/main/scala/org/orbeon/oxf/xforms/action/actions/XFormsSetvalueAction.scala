@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.util.{Failure, Success, Try}
 
@@ -37,7 +37,7 @@ class XFormsSetvalueAction extends XFormsAction {
 
     implicit val containingDocument: XFormsContainingDocument = actionInterpreter.containingDocument
 
-    val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
+    val valueExpression = Option(actionElement.attributeValue(XFormsNames.VALUE_QNAME))
 
     // Determine value to set
     def evaluateValueToSet =

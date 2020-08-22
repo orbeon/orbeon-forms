@@ -17,7 +17,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.test.XMLSupport
 import org.scalatest.funspec.AnyFunSpec
 import org.orbeon.oxf.xml.Dom4j._
-import org.orbeon.xforms.{RelevanceHandling, XFormsConstants}
+import org.orbeon.xforms.{RelevanceHandling, XFormsNames}
 
 class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
 
@@ -82,8 +82,8 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
           </form>
       )
 
-    val XFRelevantQName  = QName("relevant", XFormsConstants.XFORMS_NAMESPACE_SHORT)
-    val XXFRelevantQName = QName("relevant", XFormsConstants.XXFORMS_NAMESPACE_SHORT)
+    val XFRelevantQName  = QName("relevant", XFormsNames.XFORMS_NAMESPACE_SHORT)
+    val XXFRelevantQName = QName("relevant", XFormsNames.XXFORMS_NAMESPACE_SHORT)
 
     for (relevanceHandling <- RelevanceHandling.values)
       it(s"must annotate and keep existing annotation when needed with $relevanceHandling") {

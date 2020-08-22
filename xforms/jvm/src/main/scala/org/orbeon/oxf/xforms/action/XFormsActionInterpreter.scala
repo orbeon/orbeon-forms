@@ -31,7 +31,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.collection.JavaConverters._
 import scala.util.control.{Breaks, NonFatal}
@@ -68,7 +68,7 @@ class XFormsActionInterpreter(
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
   def mustHonorDeferredUpdateFlags(actionElement: Element): Boolean =
     actionXPathContext.getCurrentBindingContext.singleItemOpt.isEmpty ||
-      resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
+      resolveAVT(actionElement, XFormsNames.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
 
   def runAction(staticAction: ActionTrait): Unit =
     try {
@@ -361,7 +361,7 @@ class XFormsActionInterpreter(
   // Find an effective object based on either the xxf:repeat-indexes attribute, or on the current repeat indexes.
   def resolveObject(actionElement: Element, targetStaticOrAbsoluteId: String): XFormsObject = {
     container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject =>
-      resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
+      resolveAVT(actionElement, XFormsNames.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
         case None =>
           // Most common case
           resolvedObject

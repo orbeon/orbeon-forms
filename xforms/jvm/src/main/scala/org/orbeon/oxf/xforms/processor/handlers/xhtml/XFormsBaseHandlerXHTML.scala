@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandl
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -209,7 +209,7 @@ abstract class XFormsBaseHandlerXHTML (
           // Possible AVT
           if (control ne null) {
             // Ask the control if possible
-            control.extensionAttributeValue(XFormsConstants.CLASS_QNAME)
+            control.extensionAttributeValue(XFormsNames.CLASS_QNAME)
           } else {
             // Otherwise we can't compute it
             None
@@ -230,7 +230,7 @@ abstract class XFormsBaseHandlerXHTML (
     isExternal               : Boolean
   ): Unit = {
 
-    val isInternal = lhhaAnalysis.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME)
+    val isInternal = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
     val staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element)
 
     if (

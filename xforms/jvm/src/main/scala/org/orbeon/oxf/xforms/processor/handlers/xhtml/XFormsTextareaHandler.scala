@@ -28,7 +28,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
 /**
@@ -65,7 +65,7 @@ class XFormsTextareaHandler(
 
       // Output all extension attributes
       // Output xxf:* extension attributes
-      textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
+      textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlTextareaAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
 
       if (isXFormsReadonlyButNotStaticReadonly(textareaControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(htmlTextareaAttributes)

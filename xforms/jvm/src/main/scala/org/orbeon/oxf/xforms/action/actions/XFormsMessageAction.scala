@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.xforms.XFormsConstants.XXFORMS_NAMESPACE_SHORT
+import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_SHORT
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 /**
  * 10.12 The message Element
@@ -64,8 +64,8 @@ class XFormsMessageAction extends XFormsAction {
     val containingDocument = actionContext.containingDocument
 
     val levelQName =
-      actionContext.element.attributeValueOpt(XFormsConstants.LEVEL_QNAME) match {
-        case Some(_) => Dom4jUtils.extractAttributeValueQName(actionContext.element, XFormsConstants.LEVEL_QNAME)
+      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) match {
+        case Some(_) => Dom4jUtils.extractAttributeValueQName(actionContext.element, XFormsNames.LEVEL_QNAME)
         case None    => ModalQName // "The default is "modal" if the attribute is not specified."
       }
 

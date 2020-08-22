@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.collection.{mutable => m}
 
@@ -65,7 +65,7 @@ class SimpleElementAnalysis(
    */
   private def findContainingModel =
     // Check for local @model attribute
-    element.attributeValue(XFormsConstants.MODEL_QNAME) match {
+    element.attributeValue(XFormsNames.MODEL_QNAME) match {
       case localModelStaticId: String =>
         // Get model prefixed id and verify it belongs to this scope
         val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)

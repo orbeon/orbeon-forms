@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
@@ -134,10 +134,10 @@ abstract class ElementAnalysis(
   val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
 
   // Element attributes: @context, @ref, @bind, @value
-  val context: Option[String] = element.attributeValueOpt(XFormsConstants.CONTEXT_QNAME)
+  val context: Option[String] = element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
   val ref    : Option[String] = ElementAnalysis.getBindingExpression(element)
-  val bind   : Option[String] = element.attributeValueOpt(XFormsConstants.BIND_QNAME)
-  val value  : Option[String] = element.attributeValueOpt(XFormsConstants.VALUE_QNAME)
+  val bind   : Option[String] = element.attributeValueOpt(XFormsNames.BIND_QNAME)
+  val value  : Option[String] = element.attributeValueOpt(XFormsNames.VALUE_QNAME)
 
   // Other
   def hasBinding: Boolean = ref.isDefined || bind.isDefined
@@ -519,8 +519,8 @@ object ElementAnalysis {
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.
    */
   def getBindingExpression(element: Element): Option[String] =
-    element.attributeValueOpt(XFormsConstants.REF_QNAME) orElse
-      element.attributeValueOpt(XFormsConstants.NODESET_QNAME)
+    element.attributeValueOpt(XFormsNames.REF_QNAME) orElse
+      element.attributeValueOpt(XFormsNames.NODESET_QNAME)
 
   def createLocationData(element: Element): ExtendedLocationData =
       element.getData match {

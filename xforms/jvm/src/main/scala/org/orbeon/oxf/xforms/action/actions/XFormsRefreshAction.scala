@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 /**
  * 10.1.6 The refresh Element
@@ -34,7 +34,7 @@ class XFormsRefreshAction extends XFormsAction {
       case Some(model) =>
         XFormsRefreshAction.refresh(model)
       case None =>
-        val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
+        val modelId = context.element.attributeValue(XFormsNames.MODEL_QNAME)
         throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
     }
   }

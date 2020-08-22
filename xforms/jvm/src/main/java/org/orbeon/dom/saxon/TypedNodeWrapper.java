@@ -16,7 +16,7 @@ package org.orbeon.dom.saxon;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.QName;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -133,7 +133,7 @@ public class TypedNodeWrapper extends org.orbeon.dom.saxon.NodeWrapper {
 
             // For type annotation purposes, xforms:integer is translated into xs:integer. This is because XPath has no
             // knowledge of the XForms union types.
-            if (uri.equals(XFormsConstants.XFORMS_NAMESPACE_URI()) && Model.jXFormsVariationTypeNames().contains(localname))
+            if (uri.equals(XFormsNames.XFORMS_NAMESPACE_URI()) && Model.jXFormsVariationTypeNames().contains(localname))
                 uri = XMLConstants.XSD_URI();
 
             final int requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname);

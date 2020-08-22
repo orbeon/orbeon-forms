@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
 // Handler for `<xh:head>`
@@ -50,7 +50,7 @@ class XHTMLHeadHandler(
     // Register control handlers on controller
     xformsHandlerContext.getController.registerHandler(
       classOf[XXFormsTextHandler].getName,
-      XFormsConstants.XXFORMS_NAMESPACE_URI,
+      XFormsNames.XXFORMS_NAMESPACE_URI,
       "text",
       XHTMLBodyHandler.ANY_MATCHER
     )

@@ -38,7 +38,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -216,7 +216,7 @@ public class XFormsUtils {
         // Try to get value attribute
         // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
         {
-            final String valueAttribute = childElement.attributeValue(XFormsConstants.VALUE_QNAME());
+            final String valueAttribute = childElement.attributeValue(XFormsNames.VALUE_QNAME());
             final boolean hasValueAttribute = valueAttribute != null;
             if (hasValueAttribute) {
                 final List<Item> currentNodeset = currentBindingContext.nodeset();
@@ -603,7 +603,7 @@ public class XFormsUtils {
         private boolean lastIsStart = false;
 
         public void startElement(Element element) {
-            if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME())) {
+            if (element.getQName().equals(XFormsNames.XFORMS_OUTPUT_QNAME())) {
                 // This is an xf:output nested among other markup
 
                 final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, null) {
@@ -710,7 +710,7 @@ public class XFormsUtils {
 
         public void endElement(Element element) {
             final String elementName = element.getName();
-            if ((!lastIsStart || !isVoidElement(elementName)) && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME())) {
+            if ((!lastIsStart || !isVoidElement(elementName)) && !element.getQName().equals(XFormsNames.XFORMS_OUTPUT_QNAME())) {
                 // This is a regular element, just serialize the end tag to no namespace
                 // UNLESS the element was just opened. This means we output <br>, not <br></br>, etc.
                 sb.append("</");
@@ -755,6 +755,6 @@ public class XFormsUtils {
      * @return          id or null
      */
     public static String getElementId(Element element) {
-        return element.attributeValue(XFormsConstants.ID_QNAME());
+        return element.attributeValue(XFormsNames.ID_QNAME());
     }
 }

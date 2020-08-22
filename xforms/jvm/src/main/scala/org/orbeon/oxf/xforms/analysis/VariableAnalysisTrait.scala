@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import controls.ViewTrait
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.common.ValidationException
 
 /**

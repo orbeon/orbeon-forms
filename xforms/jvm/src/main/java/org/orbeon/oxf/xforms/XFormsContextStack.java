@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.model.RuntimeBind;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -247,13 +247,13 @@ public class XFormsContextStack {
     public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
         // TODO: move away from element and use static analysis information
         pushBinding(
-            bindingElement.attributeValue(XFormsConstants.REF_QNAME()),
-            bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME()),
-            bindingElement.attributeValue(XFormsConstants.NODESET_QNAME()),
-            bindingElement.attributeValue(XFormsConstants.MODEL_QNAME()),
-            bindingElement.attributeValue(XFormsConstants.BIND_QNAME()),
+            bindingElement.attributeValue(XFormsNames.REF_QNAME()),
+            bindingElement.attributeValue(XFormsNames.CONTEXT_QNAME()),
+            bindingElement.attributeValue(XFormsNames.NODESET_QNAME()),
+            bindingElement.attributeValue(XFormsNames.MODEL_QNAME()),
+            bindingElement.attributeValue(XFormsNames.BIND_QNAME()),
             bindingElement,
-            container.partAnalysis().getNamespaceMapping(scope, bindingElement.attributeValue(XFormsConstants.ID_QNAME())),
+            container.partAnalysis().getNamespaceMapping(scope, bindingElement.attributeValue(XFormsNames.ID_QNAME())),
             sourceEffectiveId,
             scope,
             handleNonFatal

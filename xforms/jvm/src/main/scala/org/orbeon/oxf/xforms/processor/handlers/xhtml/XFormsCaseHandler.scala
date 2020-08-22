@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
 /**
@@ -150,7 +150,7 @@ class XFormsCaseHandler(
                   "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
                 )
             },
-            XFormsControl.appearances(elementAnalysis.parent.get)(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
+            XFormsControl.appearances(elementAnalysis.parent.get)(XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
           )
 
         newOutputInterceptor.setAddedClasses(controlClasses)

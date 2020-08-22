@@ -386,7 +386,7 @@ class FormBuilderFunctionsTest
   describe("Analyze known constraint") {
 
     import CommonConstraint.analyzeKnownConstraint
-    import org.orbeon.xforms.XFormsConstants._
+    import org.orbeon.xforms.XFormsNames._
     import org.orbeon.oxf.xml.XMLConstants._
 
     val Library = XFormsFunctionLibrary
@@ -506,7 +506,7 @@ class FormBuilderFunctionsTest
 
     import org.orbeon.oxf.fb.XMLNames._
     import org.orbeon.oxf.fr.XMLNames._
-    import org.orbeon.xforms.XFormsConstants._
+    import org.orbeon.xforms.XFormsNames._
 
     describe("Variable and LHHA references") {
       withActionAndFBDoc(FormulasDoc) { implicit ctx =>

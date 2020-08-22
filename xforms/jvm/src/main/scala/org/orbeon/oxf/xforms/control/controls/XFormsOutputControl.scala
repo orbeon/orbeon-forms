@@ -18,7 +18,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, NetUtils}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel

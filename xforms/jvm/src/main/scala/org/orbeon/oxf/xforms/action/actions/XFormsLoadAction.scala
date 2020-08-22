@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.xforms.{Load, UrlType, XFormsConstants}
+import org.orbeon.xforms.{Load, UrlType, XFormsNames}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 
@@ -41,8 +41,8 @@ class XFormsLoadAction extends XFormsAction {
 
     // NOTE: Will also be none if the XPath context item is missing (which is not great).
     val targetOpt =
-      actionElem.attributeValueOpt(XFormsConstants.TARGET_QNAME)         orElse
-      actionElem.attributeValueOpt(XFormsConstants.XXFORMS_TARGET_QNAME) flatMap
+      actionElem.attributeValueOpt(XFormsNames.TARGET_QNAME)         orElse
+      actionElem.attributeValueOpt(XFormsNames.XXFORMS_TARGET_QNAME) flatMap
       (v => Option(interpreter.resolveAVTProvideValue(actionElem, v)))
 
     val urlType =
@@ -51,7 +51,7 @@ class XFormsLoadAction extends XFormsAction {
       UrlType.Render
 
     val urlNorewrite   = XFormsUtils.resolveUrlNorewrite(actionElem)
-    val isShowProgress = interpreter.resolveAVT(actionElem, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+    val isShowProgress = interpreter.resolveAVT(actionElem, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
 
     // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
 
@@ -73,7 +73,7 @@ class XFormsLoadAction extends XFormsAction {
           mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
         )
       case None =>
-        actionElem.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) match {
+        actionElem.attributeValueOpt(XFormsNames.RESOURCE_QNAME) match {
           case Some(resourceAttValue) =>
 
             Option(interpreter.resolveAVTProvideValue(actionElem, resourceAttValue)) match {

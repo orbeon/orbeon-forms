@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.xml.Elem
 import scala.collection.compat._
@@ -170,12 +170,12 @@ object XFormsError {
 
   // Insert server errors into the Ajax response
   def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit = {
-    withElement(localName = "errors", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
+    withElement(localName = "errors", prefix = "xxf", uri = XFormsNames.XXFORMS_NAMESPACE_URI) {
       for (error <- errors)
         element(
           localName = "error",
           prefix    = "xxf",
-          uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+          uri       = XFormsNames.XXFORMS_NAMESPACE_URI,
           atts      = ServerError.getDetailsAsList(error),
           text      = error.message
         )

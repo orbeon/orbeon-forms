@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 /**
  * 10.1.1 The action Element
@@ -41,7 +41,7 @@ class XFormsActionAction extends XFormsAction {
     def hasClientRepresentation(observer: XFormsEventTarget) =
       observer match {
         case _: XFormsVariableControl => false
-        case c: XFormsControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) => false
+        case c: XFormsControl if c.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME) => false
         case _ => true
       }
 

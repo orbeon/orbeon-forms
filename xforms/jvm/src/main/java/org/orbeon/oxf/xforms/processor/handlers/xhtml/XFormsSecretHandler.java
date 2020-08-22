@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.orbeon.xforms.XFormsConstants;
+import org.orbeon.xforms.XFormsNames;
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
@@ -57,7 +57,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
                 // Output all extension attributes
                 // Output xxf:* extension attributes
-                secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI());
+                secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsNames.XXFORMS_NAMESPACE_URI());
 
                 if (isXFormsReadonlyButNotStaticReadonly(secretControl))
                     outputReadonlyAttribute(reusableAttributes);

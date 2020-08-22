@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
 
@@ -172,8 +172,8 @@ trait ValidationBindOps extends Logging {
       // XForms namespace qualifier if the namespace context has the XForms namespace as the default
       // namespace."
       val isBuiltInSchemaType  = XMLConstants.XSD_URI == typeNamespaceURI
-      val isBuiltInXFormsType  = XFormsConstants.XFORMS_NAMESPACE_URI == typeNamespaceURI
-      val isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI == typeNamespaceURI
+      val isBuiltInXFormsType  = XFormsNames.XFORMS_NAMESPACE_URI == typeNamespaceURI
+      val isBuiltInXXFormsType = XFormsNames.XXFORMS_NAMESPACE_URI == typeNamespaceURI
 
       // TODO: Check what XForms event must be dispatched.
       def throwError() =

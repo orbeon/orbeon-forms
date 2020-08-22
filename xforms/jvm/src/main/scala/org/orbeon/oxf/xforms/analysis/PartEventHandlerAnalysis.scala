@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl}
 import org.orbeon.oxf.xml.Dom4j

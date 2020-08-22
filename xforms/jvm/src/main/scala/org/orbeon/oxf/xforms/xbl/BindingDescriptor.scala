@@ -18,7 +18,7 @@ import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsConstants.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
+import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.XMLConstants

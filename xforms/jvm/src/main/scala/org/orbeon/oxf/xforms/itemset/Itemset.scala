@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.saxon.{Configuration, om}
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.SAXException
 
 
@@ -226,7 +226,7 @@ object Itemset {
   def getAttributeName(name: QName): String =
     if (name.namespace == Namespace.EmptyNamespace)
       name.localName
-    else if (name.namespace == XFormsConstants.XXFORMS_NAMESPACE)
+    else if (name.namespace == XFormsNames.XXFORMS_NAMESPACE)
       "xxforms-" + name.localName
     else
       throw new IllegalStateException("Invalid attribute on item: " + name.localName)

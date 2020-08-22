@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString}
-import org.orbeon.xforms.{XFormsConstants, XFormsId}
+import org.orbeon.xforms.{XFormsNames, XFormsId}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -271,7 +271,7 @@ object XFormsSelect1Handler {
   private def addItemAttributes(item: ItemNode, spanAttributes: AttributesImpl): Unit =
     for {
       (attQName, attValue) <- item.attributes
-      if attQName != XFormsConstants.CLASS_QNAME // `class` is handled separately
+      if attQName != XFormsNames.CLASS_QNAME // `class` is handled separately
       attributeName = Itemset.getAttributeName(attQName)
     } locally {
       spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attValue)
@@ -388,7 +388,7 @@ class XFormsSelect1Handler(
       handleAriaByAtts(containerAttributes)
 
       if (control ne null)
-        control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
+        control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
 
       if (isXFormsReadonlyButNotStaticReadonly(control))
         outputDisabledAttribute(containerAttributes)

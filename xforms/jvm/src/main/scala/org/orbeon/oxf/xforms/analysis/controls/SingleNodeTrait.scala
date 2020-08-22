@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.xforms.XFormsConstants.XXFORMS_VALIDATION_MODE_QNAME
+import org.orbeon.xforms.XFormsNames.XXFORMS_VALIDATION_MODE_QNAME
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

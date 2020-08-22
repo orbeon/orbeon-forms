@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.xforms.XFormsConstants._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames
 
 trait SelectAppearanceTrait extends AppearanceTrait {
 
@@ -27,7 +27,7 @@ trait SelectAppearanceTrait extends AppearanceTrait {
     // Ideally we would like to do this but we can't, see:
     // https://issues.scala-lang.org/browse/SI-1938?focusedCommentId=55131#comment-55131
     // val initialAppearances = super.appearances
-    val initialAppearances = attQNameSet(element, XFormsConstants.APPEARANCE_QNAME, namespaceMapping) - XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME
+    val initialAppearances = attQNameSet(element, XFormsNames.APPEARANCE_QNAME, namespaceMapping) - XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME
     val size = initialAppearances.size
 
     initialAppearances match {

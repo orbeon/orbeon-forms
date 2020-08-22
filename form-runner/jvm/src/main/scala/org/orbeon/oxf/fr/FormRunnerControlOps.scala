@@ -24,7 +24,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
-import org.orbeon.xforms.XFormsConstants
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat._
 
@@ -279,7 +279,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     for {
       control                              <- controlElems
       if predicate(control)
-      bindId                               <- control.attValueOpt(XFormsConstants.BIND_QNAME).toList
+      bindId                               <- control.attValueOpt(XFormsNames.BIND_QNAME).toList
       controlName                          <- controlNameFromIdOpt(bindId).toList
       BindPathHolders(bind, path, holders) <- findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
       resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)

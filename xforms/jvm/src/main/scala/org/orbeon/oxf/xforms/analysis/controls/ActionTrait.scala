@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 

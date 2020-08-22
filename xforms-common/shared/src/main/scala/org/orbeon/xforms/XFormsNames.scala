@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import org.orbeon.dom.{Namespace, QName}
 
 
-// Constants useful for the XForms engine.
+// Names useful for the XForms engine.
 //
 // 2019-11-14 TODO:
 //
@@ -24,7 +24,7 @@ import org.orbeon.dom.{Namespace, QName}
 // - some of these must be enumerations (maybe in definitions.scala)
 // - see also `Namespaces`
 //
-object XFormsConstants {
+object XFormsNames {
 
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
@@ -337,16 +337,18 @@ object XFormsConstants {
   val XXFORMS_EVENT_MODE_QNAME = QName("events-mode", XXFORMS_NAMESPACE)
   val XXFORMS_VALIDATION_MODE_QNAME = QName("validation-mode", XXFORMS_NAMESPACE)
 
-  val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"
-
-  val DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif"
-  val DUMMY_SCRIPT_URI = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK" // empty self-calling function
-  val CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png"
-
   val STATIC_STATE_PROPERTIES_QNAME = QName("properties")
 
   val SELECTED_QNAME = QName("selected")
   val CASEREF_QNAME = QName("caseref")
 
   val XXFORMS_MULTIPLE_QNAME = QName("multiple", XXFORMS_NAMESPACE)
+
+  // TODO: Move.
+  val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"
+
+  // TODO: Move to handlers
+  val DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif"
+  val DUMMY_SCRIPT_URI = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK" // empty self-calling function
+  val CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png"
 }

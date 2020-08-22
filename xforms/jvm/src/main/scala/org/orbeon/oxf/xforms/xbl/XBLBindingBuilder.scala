@@ -17,7 +17,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
-import org.orbeon.xforms.XFormsConstants._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._

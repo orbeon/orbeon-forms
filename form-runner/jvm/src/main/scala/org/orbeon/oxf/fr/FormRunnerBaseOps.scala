@@ -262,7 +262,7 @@ trait FormRunnerBaseOps {
   def documentCreatedDate: Option[Long]     = documentMetadataDate(Headers.Created)
   def documentModifiedDate: Option[Long]    = documentMetadataDate(Headers.LastModified)
   def documentWorkflowStage: Option[String] = documentMetadataWorkflowStageAtt.stringValue.trimAllToOpt
-  def documentWorkflowStage(workflowStage: Option[String]) = XFormsAPI.setvalue(documentMetadataWorkflowStageAtt, workflowStage.getOrElse(""))
+  def documentWorkflowStage_=(workflowStage: Option[String]) = XFormsAPI.setvalue(documentMetadataWorkflowStageAtt, workflowStage.getOrElse(""))
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)

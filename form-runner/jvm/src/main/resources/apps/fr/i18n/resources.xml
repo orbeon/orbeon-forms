@@ -171,6 +171,7 @@
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <created>Created</created>
                 <last-modified>Modified</last-modified>
+                <workflow-stage>Workflow stage</workflow-stage>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
@@ -646,6 +647,7 @@
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <created>Création</created>
                 <last-modified>Modification</last-modified>
+                <workflow-stage>Étape du workflow</workflow-stage>
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
@@ -1113,6 +1115,7 @@
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <created>Creado</created>
                 <last-modified>Modificación</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
@@ -1576,6 +1579,7 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Opprettet</created>
                 <last-modified>Sist endret</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
                 <toc>Innholdsfortegnelse</toc>
@@ -2036,6 +2040,7 @@
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Дата создания</created>
                 <last-modified>Дата изменения</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>
@@ -2501,6 +2506,7 @@
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <created>Creato</created>
                 <last-modified>Modificato</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
                 <toc>Tabella dei contenuti</toc>
@@ -2973,6 +2979,7 @@
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
                 <created>Erstellt</created>
                 <last-modified>Änderungsdatum</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Ausgewählt</selected>
                 <refresh>Diese Operation wird die Seite aktualisieren</refresh>
                 <toc>Inhaltstabelle</toc>
@@ -3445,6 +3452,7 @@
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
                 <created>Luotu</created>
                 <last-modified>Viimeksi muokattu</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Valittu</selected>
                 <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
                 <toc>Sisällysluettelo</toc>
@@ -3917,6 +3925,7 @@
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
                 <created>Skapad</created>
                 <last-modified>Ändrad</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Vald</selected>
                 <refresh>Uppdatera sidan</refresh>
                 <toc>Innehållsförteckning</toc>
@@ -4389,6 +4398,7 @@
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
                 <created>Aangemaakt</created>
                 <last-modified>Bewerkt</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Geselecteerd</selected>
                 <refresh>Deze bewerking zal de pagina doen verversen</refresh>
                 <toc>Inhoudsopgave</toc>
@@ -4860,6 +4870,7 @@
                 <delete-confirmation>Deseja apagar</delete-confirmation>
                 <created>Criado</created>
                 <last-modified>Modificado</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Seleccionado</selected>
                 <refresh>Esta operação irá refrescar a página</refresh>
                 <toc>Tablea de Conteúdos</toc>
@@ -5325,6 +5336,7 @@
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
                 <created>Oprettet</created>
                 <last-modified>Senest ændret</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Valgt</selected>
                 <refresh>Dette indlæser siden igen</refresh>
                 <toc>Indholdsfortegnelse</toc>
@@ -5790,6 +5802,7 @@
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
                 <created>Utworzony</created>
                 <last-modified>Zmodyfikowany</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <selected>Wybrany</selected>
                 <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
                 <toc>Spis treści</toc>

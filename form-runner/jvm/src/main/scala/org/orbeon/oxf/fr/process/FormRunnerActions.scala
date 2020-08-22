@@ -232,7 +232,7 @@ trait FormRunnerActions {
 
   def trySetWorkflowStage(params: ActionParams): Try[Any] = Try {
     val name = paramByNameOrDefault(params, "name").map(evaluateValueTemplate)
-    FormRunner.documentWorkflowStage(name)
+    FormRunner.documentWorkflowStage = name
     // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
     recalculate(FormModel)
   }

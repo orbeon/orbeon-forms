@@ -58,6 +58,7 @@ private class DateCompanion extends XBLCompanionWithState {
       inputEl.attr("type", "date")
       inputEl.on("change", () => onDateSelectedUpdateStateAndSendValueToServer())
     } else {
+
       // Initialize bootstrap-datepicker
       val options              = new DatePickerOptions
       options.autoclose        = true
@@ -68,8 +69,10 @@ private class DateCompanion extends XBLCompanionWithState {
       options.language         = Language.getLang()
       options.container        = ".orbeon"
       datePicker = inputEl.parent().datepicker(options)
+
       // Register listeners
-      inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) => onKeypress(e))
+      containerElem.querySelector(".add-on").addEventListener(EventNames.KeyDown, onIconKeypress)
+      inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) => onInputKeypress(e))
       inputEl.on(EventNames.Change,   ()                     => onInputChangeUpdateDatePicker())
       datePicker.onChangeDate(        ()                     => onDateSelectedUpdateStateAndSendValueToServer())
       datePicker.onHide(              ()                     => { inputEl.focus() }) // Set focus back on field when done with the picker
@@ -171,8 +174,9 @@ private class DateCompanion extends XBLCompanionWithState {
         case None       => datePicker.clearDates()
       }
 
-    def onKeypress(e: JQueryEventObject): Unit =
+    def onInputKeypress(e: JQueryEventObject): Unit =
       if (Set(10, 13)(e.which)) {
+        e.preventDefault()
         onDateSelectedUpdateStateAndSendValueToServer()
         AjaxClient.fireEvent(
           AjaxEvent(
@@ -180,6 +184,12 @@ private class DateCompanion extends XBLCompanionWithState {
             targetId  = containerElem.id
           )
         )
+      }
+
+    def onIconKeypress(event: dom.KeyboardEvent): Unit =
+      if (event.key == " " || event.key == "Enter") {
+        event.preventDefault()
+        datePicker.showDatepicker()
       }
   }
 }
@@ -220,6 +230,7 @@ private object DatePickerFacade {
     def setDate(date: js.Date)              : Unit              = datePicker.datepicker("setDate", date)
     def clearDates()                        : Unit              = datePicker.datepicker("clearDates", Nil)
     def update()                            : Unit              = datePicker.datepicker("update")
+    def showDatepicker()                    : Unit              = datePicker.datepicker("show")
     def options                             : DatePickerOptions = datePicker.data("datepicker").o.asInstanceOf[DatePickerOptions]
   }
 }

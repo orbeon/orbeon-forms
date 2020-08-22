@@ -288,16 +288,19 @@ body.orbeon { background-color: @frBackground }
         .xforms-required {
             &.xforms-label, .xforms-label {
                 &:before {
-                    content: '* ';
-                    vertical-align: middle;                   // So the star doesn't show too high relative to the text of the label
-                    font-size: 150%;                          // Default size isn't visible enough
+                    font-family    : FontAwesome;
+                    content        : "\f005";
+                    vertical-align : super;         // So the star doesn't show too high relative to the text of the label
+                    line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
+                    font-size      : 60%;           // Font Awesome star is large
+                    margin-right   : 1ch;
                 }
             }
         }
 
         .xforms-required.xforms-empty {
             .xforms-label:before {
-                color: @error;                            // Error-red when empty
+                color: @error;                      // Error-red when empty
             }
         }
     }

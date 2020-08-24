@@ -590,7 +590,7 @@ lazy val formBuilderJVM = formBuilder.jvm
   )
 
 
-lazy val formBuilderJS: Project = formBuilder.js
+lazy val formBuilderJS = formBuilder.js
   .dependsOn(
     commonJS,
     xformsJS % "test->test;compile->compile",
@@ -708,6 +708,23 @@ lazy val xformsCommonJVM = xformsCommon.jvm
 
 lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(commonJS)
+  .dependsOn(dom.js)
+  .settings(commonScalaJsSettings)
+
+lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-runtime"
+  )
+
+lazy val xformsRuntimeJVM = xformsRuntime.jvm
+  .dependsOn(
+    commonJVM,
+    core % "test->test;compile->compile"
+  )
+
+lazy val xformsRuntimeJS = xformsRuntime.js
+  .dependsOn(commonJS % "test->test;compile->compile")
   .dependsOn(dom.js)
   .settings(commonScalaJsSettings)
 

@@ -19,11 +19,9 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
-import org.orbeon.xforms.xbl.Scope
-
-import scala.collection.JavaConverters._
 
 trait BindingMetadata extends Logging {
 
@@ -101,6 +99,7 @@ trait BindingMetadata extends Logging {
     }
   }
 
+  // Used by `XFormsAnnotator`
   def findBindingForElement(uri: String, localname: String, atts: Attributes): Option[IndexableBinding] =
     _xblIndex flatMap { index =>
 
@@ -120,16 +119,18 @@ trait BindingMetadata extends Logging {
     bindingOpt
   }
 
+  // Used by `XFormsAnnotator`
   def mapBindingToElement(controlPrefixedId: String, binding: IndexableBinding): Unit = {
     bindingsByControlPrefixedId += controlPrefixedId -> binding
     binding.path foreach (bindingsPaths += _)
     maxLastModified = maxLastModified max binding.lastModified
   }
 
+  // Used by `XFormsExtractor`
   def prefixedIdHasBinding(prefixedId: String): Boolean =
     bindingsByControlPrefixedId.contains(prefixedId)
 
-  // NOTE: Used for hooking up fr:xforms-inspector.
+  // Used for hooking up `fr:xforms-inspector` by `XFormsAnnotator`
   def isByNameBindingInUse(uri: String, localname: String): Boolean = {
 
     val someURI = Some(uri)

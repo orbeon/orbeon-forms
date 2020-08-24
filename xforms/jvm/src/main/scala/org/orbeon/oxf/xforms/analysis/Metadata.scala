@@ -38,7 +38,7 @@ import scala.collection.mutable
  * Split into traits for modularity.
  */
 class Metadata(
-  val idGenerator    : IdGenerator,
+  val idGenerator    : IdGenerator, // used by `XFormsAnnotator`
   val isTopLevelPart : Boolean
 ) extends NamespaceMappings
      with BindingMetadata

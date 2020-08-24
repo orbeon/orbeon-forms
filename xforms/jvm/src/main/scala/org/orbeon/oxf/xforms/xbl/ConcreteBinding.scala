@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.xforms.xbl.Scope
+
 
 // NOTE: 2018-02-23: This is only created if the `AbstractBinding` has a template. Wondering if we should support components with
 // no templates (or creating an empty template in that case) so that we don't have to special-case bindings without templates.

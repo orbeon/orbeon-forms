@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.{XMLReceiverHelper, Dom4j}
 import scala.collection.compat._
 

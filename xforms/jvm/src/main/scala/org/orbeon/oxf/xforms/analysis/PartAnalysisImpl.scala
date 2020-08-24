@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, RootControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
 import org.orbeon.oxf.xml.{SAXStore, XMLReceiverHelper}

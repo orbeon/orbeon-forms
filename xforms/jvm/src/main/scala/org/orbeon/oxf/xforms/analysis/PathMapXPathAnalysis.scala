@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.orbeon.saxon.Configuration

@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationCont
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.xforms.{EventNames, XFormsId}
 

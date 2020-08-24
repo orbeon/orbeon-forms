@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
@@ -33,6 +33,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.model.XFormsModel;
-import org.orbeon.oxf.xforms.xbl.Scope;
+import org.orbeon.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;

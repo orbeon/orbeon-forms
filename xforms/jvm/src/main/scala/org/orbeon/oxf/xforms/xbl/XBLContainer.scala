@@ -29,6 +29,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}

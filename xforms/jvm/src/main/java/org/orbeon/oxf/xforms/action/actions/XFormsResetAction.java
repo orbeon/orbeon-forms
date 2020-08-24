@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsResetEvent;
-import org.orbeon.oxf.xforms.xbl.Scope;
+import org.orbeon.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 import scala.Option;
 

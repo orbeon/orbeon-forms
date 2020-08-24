@@ -3,8 +3,10 @@ package org.orbeon.oxf.xforms.analysis.controls
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope, XBLBindingBuilder}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, XBLBindingBuilder}
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsNames
+
 
 class ComponentControl(
   staticStateContext : StaticStateContext,

@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants
 
 class Submission(

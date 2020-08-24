@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 
 class RepeatControl(
   staticStateContext : StaticStateContext,

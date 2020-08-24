@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.model.DataModel
 

@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 

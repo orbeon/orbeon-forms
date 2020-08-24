@@ -11,7 +11,7 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.xbl
+package org.orbeon.xforms.xbl
 
 import collection.mutable
 import org.orbeon.xforms.Constants.ComponentSeparator

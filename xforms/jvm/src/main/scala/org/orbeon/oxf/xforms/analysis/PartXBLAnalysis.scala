@@ -17,9 +17,10 @@ import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, Scope}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.{Constants, XFormsId}
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.compat._
 import scala.collection.mutable

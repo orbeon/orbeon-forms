@@ -30,13 +30,14 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.util.control.NonFatal

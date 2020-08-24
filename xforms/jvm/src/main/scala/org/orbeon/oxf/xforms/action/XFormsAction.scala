@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.Item

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type => SaxonType}
@@ -37,6 +37,7 @@ import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node.ELEMENT_NODE
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 import scala.collection.generic.Growable

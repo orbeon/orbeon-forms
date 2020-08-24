@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.util
-
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
 import org.orbeon.dom.Element
@@ -23,6 +21,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 

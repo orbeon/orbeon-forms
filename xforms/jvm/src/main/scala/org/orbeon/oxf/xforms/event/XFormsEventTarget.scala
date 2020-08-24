@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xforms.XFormsObject

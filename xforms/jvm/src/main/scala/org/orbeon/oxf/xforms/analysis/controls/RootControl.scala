@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, LangRef}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._

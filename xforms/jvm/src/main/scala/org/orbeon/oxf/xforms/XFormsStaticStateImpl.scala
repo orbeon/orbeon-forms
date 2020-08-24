@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLSupport}
+import org.orbeon.oxf.xforms.xbl.XBLSupport
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.sxpath.XPathExpression
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes

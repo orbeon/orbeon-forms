@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
-import org.orbeon.oxf.xforms.xbl.Scope;
+import org.orbeon.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 public class XXFormsJoinSubmissions extends XFormsAction {

@@ -19,25 +19,23 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
-import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value.Whitespace
-import org.orbeon.scaxon.Implicits
-import org.orbeon.xforms.{XFormsNames, XFormsId}
-
-import scala.util.control.NonFatal
-import scala.collection.JavaConverters._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
+import scala.util.control.NonFatal
 
 
 object ItemsetSupport {

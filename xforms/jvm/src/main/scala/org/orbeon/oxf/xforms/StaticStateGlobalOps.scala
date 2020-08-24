@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLAssets}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i}

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.util.Modifier
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 

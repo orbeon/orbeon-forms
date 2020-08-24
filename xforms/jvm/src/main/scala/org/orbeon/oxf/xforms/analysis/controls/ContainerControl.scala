@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsNames
 
 class ContainerControl(

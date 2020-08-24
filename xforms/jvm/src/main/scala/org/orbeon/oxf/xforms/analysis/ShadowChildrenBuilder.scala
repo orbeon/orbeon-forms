@@ -18,8 +18,10 @@ import org.orbeon.xforms.XFormsNames.FOR_QNAME
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindingBuilder}
+import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.xforms.xbl.Scope
+
 
 trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
 

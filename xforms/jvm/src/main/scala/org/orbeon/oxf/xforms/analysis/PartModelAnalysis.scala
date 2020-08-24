@@ -18,7 +18,7 @@ import java.{util => ju}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary

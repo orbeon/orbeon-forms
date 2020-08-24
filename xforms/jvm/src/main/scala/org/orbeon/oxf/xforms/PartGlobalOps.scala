@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.xbl.Scope
 
 trait PartGlobalOps {
 

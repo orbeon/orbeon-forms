@@ -26,26 +26,19 @@ import org.orbeon.xforms.Constants.ComponentSeparator
  */
 class Scope(val parent: Option[Scope], val scopeId: String) {
 
-  assert(parent.isDefined && scopeId.nonEmpty || parent.isEmpty && scopeId.isEmpty)
+  require(parent.isDefined && scopeId.nonEmpty || parent.isEmpty && scopeId.isEmpty)
 
   private val idMap = mutable.HashMap[String, String]()
-  val fullPrefix = if (isTopLevelScope) "" else scopeId + ComponentSeparator
+  val fullPrefix: String = if (isTopLevelScope) "" else scopeId + ComponentSeparator
 
-  def isTopLevelScope = scopeId.length == 0
-
-  // Return the prefixed id of the given control static id within this scope, null if not found
-  def prefixedIdForStaticId(staticId: String) =
-    idMap.get(staticId).orNull
-
-  def prefixedIdForStaticIdOpt(staticId: String) =
-    idMap.get(staticId)
-
-  def contains(staticId: String) = idMap.contains(staticId)
+  def isTopLevelScope                           : Boolean        = scopeId.length == 0
+  def prefixedIdForStaticId(staticId: String)   : String         = idMap.get(staticId).orNull
+  def prefixedIdForStaticIdOpt(staticId: String): Option[String] = idMap.get(staticId)
+  def contains(staticId: String)                : Boolean        = idMap.contains(staticId)
 
   // Add a static id -> prefixed id mapping
-  def += (kv: (String, String)) = kv match {
+  def += (kv: (String, String)): Unit = kv match {
     case (staticId, prefixedId) =>
-      // Index static id => prefixed id by scope
       idMap += staticId -> prefixedId
   }
 
@@ -54,12 +47,12 @@ class Scope(val parent: Option[Scope], val scopeId: String) {
     idMap -= staticId
 
   // Equality is defined purely based on the scope id
-  override def hashCode = scopeId.hashCode
+  override def hashCode: Int = scopeId.hashCode
 
-  override def equals(that: Any) = that match {
+  override def equals(that: Any): Boolean = that match {
     case thatScope: Scope => scopeId == thatScope.scopeId
     case _ => false
   }
 
-  override def toString = "Scope(" + scopeId + ")"
+  override def toString: String = "Scope(" + scopeId + ")"
 }

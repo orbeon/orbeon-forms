@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action
 
 import java.util.{List => JList}
 
+import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
@@ -119,7 +120,7 @@ object XFormsAPI {
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
       val action = actionInterpreterDyn.value
-      val doc    = action map (_.containingDocument) orElse containingDocumentDyn.value
+      val docOpt    = action map (_.containingDocument) orElse containingDocumentDyn.value
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
@@ -128,18 +129,18 @@ object XFormsAPI {
           ("after", after)
 
       XFormsInsertAction.doInsert(
-        doc.orNull,
-        action map (_.indentedLogger) orNull,
-        positionAttribute,
-        collectionToUpdate.asJava,
-        into.headOption.orNull,
-        origin.asJava.asInstanceOf[JList[Item]], // dirty cast for Java, safe if doInsert() doesn't modify the list
-        collectionToUpdate.size,
-        true, // doClone
-        doDispatch,
-        requireDefaultValues,
-        searchForInstance,
-        removeInstanceDataFromClonedNodes
+        containingDocument                = docOpt,
+        indentedLogger                    = action map (_.indentedLogger) orNull,
+        positionAttribute                 = positionAttribute,
+        collectionToBeUpdated             = collectionToUpdate.asJava,
+        insertContextNodeInfo             = into.headOption.orNull,
+        originItems                       = origin.asJava.asInstanceOf[JList[Item]].some, // dirty cast for Java, safe if doInsert() doesn't modify the list
+        insertionIndex                    = collectionToUpdate.size,
+        doClone                           = true, // doClone
+        doDispatch                        = doDispatch,
+        requireDefaultValues              = requireDefaultValues,
+        searchForInstance                 = searchForInstance,
+        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil

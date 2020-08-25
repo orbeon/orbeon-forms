@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import java.util.Collections
 
+import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
@@ -25,6 +26,7 @@ import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps,
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
+
 
 /**
   * Handle replace="instance".
@@ -283,18 +285,18 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // This will also mark a structural change
           // FIXME: Replace logic should use doReplace and xxforms-replace event
           XFormsInsertAction.doInsert(
-            containingDocument,
-            detailsLogger,
-            "before",
-            Collections.singletonList(destinationNodeInfo),
-            destinationNodeInfo.getParent,
-            Collections.singletonList(newDocumentRootElement),
-            1,
-            false,
-            true,
-            applyDefaults,
-            true,
-            true
+            containingDocument                = containingDocument.some,
+            indentedLogger                    = detailsLogger,
+            positionAttribute                 = "before",
+            collectionToBeUpdated             = Collections.singletonList(destinationNodeInfo),
+            insertContextNodeInfo             = destinationNodeInfo.getParent,
+            originItems                       = Collections.singletonList(newDocumentRootElement).some,
+            insertionIndex                    = 1,
+            doClone                           = false,
+            doDispatch                        = true,
+            requireDefaultValues              = applyDefaults,
+            searchForInstance                 = true,
+            removeInstanceDataFromClonedNodes = true
           )
 
           // Perform the deletion of the selected node

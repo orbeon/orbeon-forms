@@ -106,13 +106,13 @@ class PartAnalysisImpl(
   }
 
   // Builder that produces an `ElementAnalysis` for a known incoming Element
-  def build(
+  private def build(
     parent         : ElementAnalysis,
     preceding      : Option[ElementAnalysis],
     controlElement : Element,
     containerScope : Scope,
     index          : ElementAnalysis => Unit
-  ): Option[ElementAnalysis] = {
+  ): ElementAnalysis = {
 
     assert(containerScope ne null)
 
@@ -136,20 +136,17 @@ class PartAnalysisImpl(
         scope          = scopeForPrefixedId(controlPrefixedId)
       )
 
-    // Throw if the element is unknown (we could also just warn?)
-    if (elementAnalysisOpt.isEmpty)
-      throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
-
-    elementAnalysisOpt foreach {
-      case componentControl: ComponentControl if ! componentControl.hasLazyBinding =>
+    elementAnalysisOpt  match {
+      case Some(componentControl: ComponentControl) if ! componentControl.hasLazyBinding =>
         componentControl.setConcreteBinding(controlElement)
-      case _ =>
+        index(componentControl)
+        componentControl
+      case Some(elementAnalysis) =>
+        index(elementAnalysis)
+        elementAnalysis
+      case None =>
+        throw new ValidationException(s"Unknown control: `${controlElement.getQualifiedName}`", locationData)
     }
-
-    // 3. Index new control
-    elementAnalysisOpt foreach index
-
-    elementAnalysisOpt
   }
 
   // Analyze a subtree of controls (for `xxf:dynamic`)
@@ -204,7 +201,9 @@ class PartAnalysisImpl(
       indexNewControl(rootControlAnalysis, lhhas, eventHandlers, models, attributes)
 
       // Gather controls
-      val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder = build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
+      val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder =
+        build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
+
       rootControlAnalysis.build(buildGatherLHHAAndHandlers)
 
       // Issues with `xxbl:global`
@@ -223,7 +222,7 @@ class PartAnalysisImpl(
             global        <- allGlobals
             globalElement <- global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
           } yield
-            buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
+            buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) match {
               case childrenBuilder: ChildrenBuilderTrait =>
                 childrenBuilder.build(buildGatherLHHAAndHandlers)
                 childrenBuilder
@@ -231,7 +230,7 @@ class PartAnalysisImpl(
             }
 
         // Add globals to the root analysis
-        rootControlAnalysis.addChildren(globalsOptions.iterator.flatten)
+        rootControlAnalysis.addChildren(globalsOptions)
       } else if (allGlobals.nonEmpty)
         warn(s"There are ${allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 

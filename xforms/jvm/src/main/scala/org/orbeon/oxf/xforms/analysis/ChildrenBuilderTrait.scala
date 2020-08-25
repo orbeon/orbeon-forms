@@ -20,7 +20,7 @@ import scala.collection.compat._
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
 
-  type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => Option[ElementAnalysis]
+  type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => ElementAnalysis
 
   def findRelevantChildrenElements: Seq[(Element, Scope)] = findAllChildrenElements
 
@@ -66,22 +66,18 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
       var preceding: Option[ElementAnalysis] = None
 
       // Build and collect the children
-      val childrenOptions =
-        for ((childElement, childContainerScope) <- findRelevantChildrenElements)
-          yield builder(this, preceding, childElement, childContainerScope) collect {
-            // The element has children
-            case newControl: ChildrenBuilderTrait =>
-              newControl.build(builder)
-              preceding = Some(newControl)
-              newControl
-            // The element does not have children
-            case newControl =>
-              preceding = Some(newControl)
-              newControl
-          }
-
-      // Return the direct children built
-      childrenOptions.flatten
+      for ((childElement, childContainerScope) <- findRelevantChildrenElements)
+        yield builder(this, preceding, childElement, childContainerScope) match {
+          // The element has children
+          case newControl: ChildrenBuilderTrait =>
+            newControl.build(builder)
+            preceding = Some(newControl)
+            newControl
+          // The element does not have children
+          case newControl =>
+            preceding = Some(newControl)
+            newControl
+        }
     }
 
     // Build direct children

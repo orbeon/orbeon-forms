@@ -13,9 +13,7 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.xbl
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
-import org.orbeon.xforms.facade.Init
 
 // Scala.js starting point for XForms
 object XFormsApp extends App {
@@ -23,7 +21,7 @@ object XFormsApp extends App {
   // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
   def onOrbeonApiLoaded(): Unit = {
     Upload
-    xbl.Date
+    org.orbeon.xbl.Date
   }
 
   def onPageContainsFormsMarkup(): Unit = {

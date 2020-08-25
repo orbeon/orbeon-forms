@@ -9,7 +9,7 @@ val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
-val ScalaJsDomVersion             = "0.9.8"
+val ScalaJsDomVersion             = "1.1.0"
 val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"

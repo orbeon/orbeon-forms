@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.util
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.util.CoreUtils._
 
+import scala.collection.compat._
 import scala.collection.{AbstractIterator, IterableLike, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
-import scala.collection.compat._
 
 object CollectionUtils {
 
@@ -146,22 +148,27 @@ object CollectionUtils {
     }
   }
 
-  sealed trait InsertPosition
-  case object InsertBefore extends InsertPosition
-  case object InsertAfter  extends InsertPosition
+  sealed trait InsertPosition extends EnumEntry with Lowercase
+  object InsertPosition extends Enum[InsertPosition] {
+
+    val values = findValues
+
+    case object Before extends InsertPosition
+    case object After  extends InsertPosition
+  }
 
   implicit class VectorOps[T](private val values: Vector[T]) extends AnyVal {
 
     def insertAt(index: Int, value: T, position: InsertPosition): Vector[T] =
       position match {
-        case InsertBefore => (values.take(index)     :+ value) ++ values.drop(index)
-        case InsertAfter  => (values.take(index + 1) :+ value) ++ values.drop(index + 1)
+        case InsertPosition.Before => (values.take(index)     :+ value) ++ values.drop(index)
+        case InsertPosition.After  => (values.take(index + 1) :+ value) ++ values.drop(index + 1)
       }
 
     def insertAt(index: Int, newValues: Iterable[T], position: InsertPosition): Vector[T] =
       position match {
-        case InsertBefore => values.take(index)     ++ newValues ++ values.drop(index)
-        case InsertAfter  => values.take(index + 1) ++ newValues ++ values.drop(index + 1)
+        case InsertPosition.Before => values.take(index)     ++ newValues ++ values.drop(index)
+        case InsertPosition.After  => values.take(index + 1) ++ newValues ++ values.drop(index + 1)
       }
 
     def removeAt(index: Int): Vector[T] =

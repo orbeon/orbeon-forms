@@ -15,9 +15,11 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.{util => ju}
 
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
@@ -31,8 +33,9 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
+import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -144,69 +147,67 @@ class XFormsRepeatControl(
 
     require(dndStart.size == 1 && dndEnd.size == 1, "DnD over repeat boundaries not supported yet")
 
-    // Find source information
-    val sourceItems               = bindingContext.nodeset.asScala
-    val sourceItemsSize           = sourceItems.size
-    val requestedSourceIndex      = dndStart.last.toInt
-    val requestedDestinationIndex = dndEnd.last.toInt
+    val sourceNodes = bindingContext.nodeset.asScala.toList.narrowTo[List[NodeInfo]] getOrElse
+      (throw new IllegalArgumentException("DnD can only apply to nodes"))
 
-    require(
-      requestedSourceIndex >= 1 && requestedSourceIndex <= sourceItemsSize,
-      s"Out of range DnD start iteration: $requestedSourceIndex"
-    )
+    NonEmptyList.fromList(sourceNodes) match {
+      case Some(sourceItems) =>
 
-    require(
-      requestedDestinationIndex >= 1 && requestedDestinationIndex <= sourceItemsSize,
-      s"Out of range DnD end iteration: $requestedDestinationIndex"
-    )
+        // Find source information
+        val sourceItemsSize           = sourceItems.size
+        val requestedSourceIndex      = dndStart.last.toInt
+        val requestedDestinationIndex = dndEnd.last.toInt
 
-    val destinationItemsCopy = new ju.ArrayList[Item](sourceItems.asJava)
-
-    require(requestedSourceIndex != requestedDestinationIndex, "`dnd-start` must be different from `dnd-end`")
-
-    val deletedNodeInfo = {
-      val deletionDescriptors =
-        XFormsDeleteAction.doDelete(
-          containingDocumentOpt = containingDocument.some,
-          collectionToUpdate    = sourceItems,
-          deleteIndexOpt        = Some(requestedSourceIndex),
-          doDispatch            = false // don't dispatch event because one call to updateRepeatNodeset() is enough
+        require(
+          requestedSourceIndex >= 1 && requestedSourceIndex <= sourceItemsSize,
+          s"Out of range DnD start iteration: $requestedSourceIndex"
         )
-      deletionDescriptors.head.nodeInfo // above deletes exactly one node
+
+        require(
+          requestedDestinationIndex >= 1 && requestedDestinationIndex <= sourceItemsSize,
+          s"Out of range DnD end iteration: $requestedDestinationIndex"
+        )
+
+        require(requestedSourceIndex != requestedDestinationIndex, "`dnd-start` must be different from `dnd-end`")
+
+        val deletedNodeInfo = {
+          val deletionDescriptors =
+            XFormsDeleteAction.doDelete(
+              containingDocumentOpt = containingDocument.some,
+              collectionToUpdate    = sourceNodes,
+              deleteIndexOpt        = requestedSourceIndex.some,
+              doDispatch            = false // don't dispatch event because one call to `updateRepeatNodeset()` is enough
+            )
+          deletionDescriptors.head.nodeInfo // above deletes exactly one node
+        }
+
+        // Below we still try to use `before` when we can so that handles better the case of a repeat over
+        // a hierarchy of nodes where children come after containers.
+        val (insertLocationNode, insertPosition) =
+          if (requestedDestinationIndex < requestedSourceIndex)
+            (sourceNodes(requestedDestinationIndex - 1), InsertPosition.Before)
+          else if (requestedDestinationIndex == sourceItemsSize)
+            (sourceNodes.last, InsertPosition.After)
+          else // requestedDestinationIndex > requestedSourceIndex
+            (sourceNodes(requestedDestinationIndex), InsertPosition.Before)
+
+        // 3. Insert node into destination
+        XFormsInsertAction.doInsert(
+          containingDocumentOpt             = containingDocument.some,
+          insertPosition                    = insertPosition,
+          insertLocation                    = Left(NonEmptyList(insertLocationNode, Nil), 1),
+          originItemsOpt                    = List(deletedNodeInfo).some,
+          doClone                           = false, // do not clone the node as we know the node it is ready for insertion
+          doDispatch                        = true,
+          requireDefaultValues              = false,
+          searchForInstance                 = true,
+          removeInstanceDataFromClonedNodes = true
+        )
+
+        // TODO: should dispatch xxforms-move instead of xforms-insert?
+      case None =>
+        throw new IllegalArgumentException("DnD can't apply to empty repeat")
     }
-
-    // This removes from our copy of the nodeset, not from the control's nodeset, which must not be
-    // touched until control bindings are updated.
-    destinationItemsCopy.remove(requestedSourceIndex - 1)
-
-    // Below we still try to use `before` when we can so that handles better the case of a repeat over
-    // a hierarchy of nodes where children come after containers.
-    val (actualDestinationIndex, destinationBeforeAfter) = {
-      if (requestedDestinationIndex < requestedSourceIndex)
-        (requestedDestinationIndex, "before")                // insertion point is before or on (degenerate case) deleted node
-      else if (requestedDestinationIndex == sourceItemsSize) // must become last element of collection
-        (requestedDestinationIndex - 1, "after")
-      else
-        (requestedDestinationIndex, "before")                // insertion point is after deleted node
-    }
-
-    // 3. Insert node into destination
-    XFormsInsertAction.doInsert(
-      containingDocument                = containingDocument.some,
-      indentedLogger                    = containingDocument.controls.indentedLogger,
-      positionAttribute                 = destinationBeforeAfter,
-      collectionToBeUpdated             = destinationItemsCopy,
-      insertContextNodeInfo             = null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
-      originItems                       = List(deletedNodeInfo: Item).asJava.some,
-      insertionIndex                    = actualDestinationIndex,
-      doClone                           = false, // do not clone the node as we know the node it is ready for insertion
-      doDispatch                        = true,
-      requireDefaultValues              = false,
-      searchForInstance                 = true,
-      removeInstanceDataFromClonedNodes = true
-    )
-
-    // TODO: should dispatch xxforms-move instead of xforms-insert?
   }
 
   // Push binding but ignore non-relevant iterations

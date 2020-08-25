@@ -35,6 +35,8 @@ trait Node extends Cloneable {
   def getDocument: Document
   def setDocument(document: Document): Unit
 
+  def documentOpt: Option[Document] = Option(getDocument)
+
   def getName: String
   def getText: String
   def setText(text: String): Unit

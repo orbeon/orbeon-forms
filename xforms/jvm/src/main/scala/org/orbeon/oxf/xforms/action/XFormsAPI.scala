@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action
 
 import java.util.{List => JList}
 
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
@@ -120,27 +121,28 @@ object XFormsAPI {
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
       val action = actionInterpreterDyn.value
-      val docOpt    = action map (_.containingDocument) orElse containingDocumentDyn.value
+      val docOpt = action map (_.containingDocument) orElse containingDocumentDyn.value
 
       val (positionAttribute, collectionToUpdate) =
         if (before.nonEmpty)
-          ("before", before)
+          (InsertPosition.Before, before)
         else
-          ("after", after)
+          (InsertPosition.After, after)
+
+      val insertLocation =
+        NonEmptyList.fromList(collectionToUpdate.toList).map(_ -> collectionToUpdate.size).toLeft(into.headOption.get) // xxx get
 
       XFormsInsertAction.doInsert(
-        containingDocument                = docOpt,
-        indentedLogger                    = action map (_.indentedLogger) orNull,
-        positionAttribute                 = positionAttribute,
-        collectionToBeUpdated             = collectionToUpdate.asJava,
-        insertContextNodeInfo             = into.headOption.orNull,
-        originItems                       = origin.asJava.asInstanceOf[JList[Item]].some, // dirty cast for Java, safe if doInsert() doesn't modify the list
-        insertionIndex                    = collectionToUpdate.size,
-        doClone                           = true, // doClone
+        containingDocumentOpt             = docOpt,
+        insertPosition                    = positionAttribute,
+        insertLocation                    = insertLocation,
+        originItemsOpt                    = origin.some,
+        doClone                           = true,
         doDispatch                        = doDispatch,
         requireDefaultValues              = requireDefaultValues,
         searchForInstance                 = searchForInstance,
-        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes
+        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes)(
+        indentedLogger                    = action map (_.indentedLogger) orNull,
       ).asInstanceOf[JList[T]].asScala
     } else
       Nil

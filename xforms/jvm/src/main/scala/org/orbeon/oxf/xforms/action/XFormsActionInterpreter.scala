@@ -292,26 +292,6 @@ class XFormsActionInterpreter(
       reporter           = containingDocument.getRequestStats.getReporter
     )
 
-  // TODO: Pass `DynamicActionContext`.
-  def evaluateKeepItemsJava(
-    actionElement   : Element,
-    nodeset         : ju.List[Item],
-    position        : Int,
-    xpathExpression : String
-  ): ju.List[Item] =
-    XPathCache.evaluateKeepItemsJava(
-      contextItems       = nodeset,
-      contextPosition    = position,
-      xpathString        = xpathExpression,
-      namespaceMapping   = getNamespaceMappings(actionElement),
-      variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
-      functionLibrary    = containingDocument.functionLibrary,
-      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
-      baseURI            = null,
-      locationData       = actionElement.getData.asInstanceOf[LocationData],
-      reporter           = containingDocument.getRequestStats.getReporter
-    )
-
   // Resolve a value which may be an AVT.
   // Return the resolved attribute value, null if the value is null or if the XPath context item is missing.
   // TODO: Pass `DynamicActionContext`.

@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.util.Collections
-
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
 import org.orbeon.oxf.json.Converter
+import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
@@ -283,15 +283,12 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // Insert before the target node, so that the position of the inserted node
           // wrt its parent does not change after the target node is removed
           // This will also mark a structural change
-          // FIXME: Replace logic should use doReplace and xxforms-replace event
+          // FIXME: Replace logic should use `doReplace` and `xxforms-replace` event
           XFormsInsertAction.doInsert(
-            containingDocument                = containingDocument.some,
-            indentedLogger                    = detailsLogger,
-            positionAttribute                 = "before",
-            collectionToBeUpdated             = Collections.singletonList(destinationNodeInfo),
-            insertContextNodeInfo             = destinationNodeInfo.getParent,
-            originItems                       = Collections.singletonList(newDocumentRootElement).some,
-            insertionIndex                    = 1,
+            containingDocumentOpt             = containingDocument.some,
+            insertPosition                    = InsertPosition.Before,
+            insertLocation                    = Left(NonEmptyList(destinationNodeInfo, Nil) -> 1),
+            originItemsOpt                    = List(newDocumentRootElement).some,
             doClone                           = false,
             doDispatch                        = true,
             requireDefaultValues              = applyDefaults,

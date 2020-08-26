@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.model.InstanceData;
+import org.orbeon.oxf.xforms.model.InstanceData$;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
@@ -72,7 +73,7 @@ public class XFormsSubmissionUtils {
                             if (XMLConstants.XS_ANYURI_QNAME().equals(nodeType)) {
                                 // Interpret value as xs:anyURI
 
-                                if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
+                                if (InstanceData$.MODULE$.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:anyURI
                                     // Don't close the stream here, as it will get read later when the MultipartEntity
                                     // we create here is written to an output stream
@@ -86,7 +87,7 @@ public class XFormsSubmissionUtils {
                             } else if (XMLConstants.XS_BASE64BINARY_QNAME().equals(nodeType)) {
                                 // Interpret value as xs:base64Binary
 
-                                if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
+                                if (InstanceData$.MODULE$.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:base64Binary
                                     addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, null);
                                 } else {
@@ -147,12 +148,12 @@ public class XFormsSubmissionUtils {
         // URL metadata was added 2012-05-29.
 
         // Get mediatype, first via xf:upload control, or, if not found, try URL metadata
-        String mediatype = InstanceData.getTransientAnnotation(element, "xxforms-mediatype");
+        String mediatype = InstanceData$.MODULE$.getTransientAnnotation(element, "xxforms-mediatype");
         if (mediatype == null && url != null)
             mediatype = XFormsUploadControl.getParameterOrNull(url, "mediatype");
 
         // Get filename, first via xf:upload control, or, if not found, try URL metadata
-        String filename = InstanceData.getTransientAnnotation(element, "xxforms-filename");
+        String filename = InstanceData$.MODULE$.getTransientAnnotation(element, "xxforms-filename");
         if (filename == null && url != null)
             filename = XFormsUploadControl.getParameterOrNull(url, "filename");
 
@@ -178,11 +179,11 @@ public class XFormsSubmissionUtils {
                         // will be removed during the next recalculate.
                         final String fileName = currentUploadControl.boundFilename();
                         if (fileName != null) {
-                            InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
+                            InstanceData$.MODULE$.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
                         }
                         final String mediatype = currentUploadControl.boundFileMediatype();
                         if (mediatype != null) {
-                            InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
+                            InstanceData$.MODULE$.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
                         }
                     }
                 }

@@ -124,7 +124,7 @@ case class BindingContext(
     // Scope model variables at the bottom if needed
     if (scopeModelVariables)
       modelOpt foreach { model =>
-        for ((name, value) <- model.getTopLevelVariables.asScala)
+        for ((name, value) <- model.getTopLevelVariables)
           if (! tempVariablesMap.containsKey(name))
             tempVariablesMap.put(name, value)
       }

@@ -198,8 +198,7 @@ trait ModelContainer {
     for (model <- models)
       Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()))
 
-  def defaultModel    = _models.headOption
-  def getDefaultModel = _models.headOption.orNull
+  def defaultModel: Option[XFormsModel] = _models.headOption
 
   // Get a list of all the relevant models in this container and all sub-containers
   def allModels: Iterator[XFormsModel] =
@@ -207,8 +206,6 @@ trait ModelContainer {
       models.iterator ++ (childrenXBLContainers flatMap (_.allModels))
     else
       Iterator.empty
-
-  def getAllModelsJava = allModels.toList.asJava
 
   def searchContainedModelsInScope(sourceEffectiveId: String, staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] = {
 

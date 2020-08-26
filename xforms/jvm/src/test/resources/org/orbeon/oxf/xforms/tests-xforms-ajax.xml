@@ -588,7 +588,7 @@
         <output name="response">
             <xxf:errors>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error1" (Non-numeric year component)</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding: element='&lt;xf:action ev:event="DOMActivate" bind="non-existing-bind" id="xf-8"/&gt;'): Reference to non-existing bind id: non-existing-bind</xxf:error>
+                <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding: element='&lt;xf:action ev:event="DOMActivate" bind="non-existing-bind" id="xf-8"/&gt;'): Reference to non-existing bind id: `non-existing-bind`</xxf:error>
                 <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xf:dispatch element.</xxf:error>
                 <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on disallowed node</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>

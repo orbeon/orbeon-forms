@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.model
 import java.net.URI
 import java.{util => ju}
 
+import cats.syntax.option._
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -38,7 +39,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
 
@@ -260,25 +261,24 @@ trait XFormsModelVariables {
 
   selfModel: XFormsModel =>
 
-  private var topLevelVariables: ju.Map[String, ValueRepresentation] =
-    new ju.LinkedHashMap[String, ValueRepresentation]
-  def getTopLevelVariables: ju.Map[String, ValueRepresentation] = topLevelVariables
+  private var topLevelVariables: Map[String, ValueRepresentation] = Map.empty
+  def getTopLevelVariables: Map[String, ValueRepresentation] = topLevelVariables
 
   private val contextStack: XFormsContextStack = new XFormsContextStack(container)
   def getContextStack: XFormsContextStack = contextStack
 
   def getVariable(variableName: String): SequenceIterator =
-    Value.asIterator(topLevelVariables.get(variableName))
+    Value.asIterator(topLevelVariables.get(variableName).orNull)
 
   def unsafeGetVariableAsNodeInfo(variableName: String): NodeInfo =
     getVariable(variableName).next().asInstanceOf[NodeInfo]
 
-  def setTopLevelVariables(topLevelVariables: ju.Map[String, ValueRepresentation]): Unit =
+  def setTopLevelVariables(topLevelVariables: Map[String, ValueRepresentation]): Unit =
     selfModel.topLevelVariables = topLevelVariables
 
   // Temporarily initialize the evaluation context to an empty context, so that handlers upon `xforms-model-construct` can work
   private var defaultEvaluationContext: BindingContext =
-    XFormsContextStack.defaultContext(null, container, selfModel)
+    XFormsContextStack.defaultContext(null, container, selfModel.some)
 
   def getDefaultEvaluationContext: BindingContext = defaultEvaluationContext
 
@@ -286,7 +286,7 @@ trait XFormsModelVariables {
   def resetAndEvaluateVariables(): Unit = {
     // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
     // Reset context to this model, including evaluating the model variables
-    contextStack.resetBindingContext(selfModel)
+    contextStack.resetBindingContext(selfModel.some)
     // Remember context and variables
     defaultEvaluationContext = contextStack.getCurrentBindingContext
   }

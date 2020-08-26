@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms
 import java.util
 import java.util.Collections
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{XPath, XPathCache}
@@ -32,39 +33,25 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.SAXException
 
-import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 
 /**
  * Handle a stack of XPath evaluation context information. This is used by controls (with one stack rooted at each
  * XBLContainer), models, and actions.
  *
- * TODO: This has to go, and instead we will just use BindingContext.
+ * TODO: This has to go, and instead we will just use `BindingContext`.
  */
 object XFormsContextStack {
 
-  /**
-   * Return an empty context for the given model (which can be null).
-   */
-  def defaultContext(parentBindingContext: BindingContext, container: XBLContainer, model: XFormsModel): BindingContext = {
-    val defaultContext = DefaultContext
-    new BindingContext(parentBindingContext, Option(model), null, defaultContext, defaultContext.size, null, true, null, if (model != null) model.getLocationData
-    else null, false, null, container.innerScope
-    )
+  private val DummyContext = {
+    val treeBuilder = new TinyBuilder
+    val identity = TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration)
+    identity.setResult(treeBuilder)
+    identity.startDocument()
+    identity.endDocument()
+    treeBuilder.getCurrentRoot
   }
-
-  private val DummyContext =
-    try {
-      val treeBuilder = new TinyBuilder
-      val identity = TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration)
-      identity.setResult(treeBuilder)
-      identity.startDocument()
-      identity.endDocument()
-      treeBuilder.getCurrentRoot
-    } catch {
-      case e: SAXException =>
-        throw new OXFException(e)
-    }
 
   // If there is no XPath context defined at the root (in the case there is no default XForms model/instance
   // available), we should use an empty context. However, currently for non-relevance in particular we must not run
@@ -74,25 +61,49 @@ object XFormsContextStack {
   // depend on the context, as well as prevent evaluations within non-relevant content by other means.
   //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
   private val DefaultContext = Collections.singletonList(DummyContext: Item)
+
+  /**
+   * Return an empty context for the given model.
+   */
+  def defaultContext(
+    parentBindingContext : BindingContext,
+    container            : XBLContainer,
+    modelOpt             : Option[XFormsModel]
+  ): BindingContext =
+    new BindingContext(
+      parent               = parentBindingContext,
+      modelOpt             = modelOpt,
+      bind                 = null,
+      nodeset              = DefaultContext,
+      position             = DefaultContext.size,
+      elementId            = null,
+      newBind              = true,
+      controlElement       = null,
+      _locationData        = modelOpt map (_.getLocationData) orNull,
+      hasOverriddenContext = false,
+      contextItem          = null,
+      scope                = container.innerScope
+    )
 }
 
 class XFormsContextStack {
-  final private val keepLocationData = XFormsProperties.isKeepLocation
 
-  final var container: XBLContainer = null
-  final var containingDocument: XFormsContainingDocument = null
+  private val keepLocationData = XFormsProperties.isKeepLocation
+
+  var container: XBLContainer = null
+  private var containingDocument: XFormsContainingDocument = null
 
   private var parentBindingContext: BindingContext = null
   private var head: BindingContext = null
 
-  // Constructor for XFormsModel and XBLContainer
+  // Constructor for `XFormsModel` and `XBLContainer`
   def this(container: XBLContainer) {
     this()
     this.container = container
     this.containingDocument = container.getContainingDocument
   }
 
-  // Constructor for XFormsModelAction and XFormsActionInterpreter
+  // Constructor for `XFormsModelAction` and `XFormsActionInterpreter`
   def this(container: XBLContainer, parentBindingContext: BindingContext) {
     this()
     this.container = container
@@ -107,7 +118,21 @@ class XFormsContextStack {
     pushCopy(this.head)
 
   private def pushCopy(parent: BindingContext): BindingContext = {
-    this.head = new BindingContext(parent, parent.modelOpt, parent.bind, parent.nodeset, parent.position, parent.elementId, false, parent.controlElement, parent.locationData, false, parent.contextItem, parent.scope)
+    this.head =
+      new BindingContext(
+        parent               = parent,
+        modelOpt             = parent.modelOpt,
+        bind                 = parent.bind,
+        nodeset              = parent.nodeset,
+        position             = parent.position,
+        elementId            = parent.elementId,
+        newBind              = false,
+        controlElement       = parent.controlElement,
+        _locationData        = parent.locationData,
+        hasOverriddenContext = false,
+        contextItem          = parent.contextItem,
+        scope                = parent.scope
+      )
     this.head
   }
 
@@ -131,62 +156,70 @@ class XFormsContextStack {
    * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
    */
   def resetBindingContext(): BindingContext = {
-    // Reset to default model (can be null)
-    resetBindingContext(container.getDefaultModel)
+    resetBindingContext(container.defaultModel)
     this.head
   }
 
   /**
    * Reset the binding context to the root of the given model's first instance.
    */
-  def resetBindingContext(model: XFormsModel) {
-    if (model != null && model.getDefaultInstance != null) {
-      // Push the default context if there is a model with an instance
-      val defaultNode = model.getDefaultInstance.rootElement
-      val defaultNodeset = Collections.singletonList(defaultNode: Item)
-      this.head =
-        new BindingContext(
-          parent                    = parentBindingContext,
-          modelOpt                  = Option(model),
-          bind                      = null,
-          nodeset                   = defaultNodeset,
-          position                  = 1,
-          elementId                 = null,
-          newBind                   = true,
-          controlElement            = null,
-          _locationData             = model.getDefaultInstance.getLocationData,
-          hasOverriddenContext      = false,
-          contextItem               = defaultNode,
-          scope                     = container.innerScope
-        )
-    } else {
-      // Push empty context
-      this.head = XFormsContextStack.defaultContext(parentBindingContext, container, model)
+  def resetBindingContext(modelOpt: Option[XFormsModel]): Unit = {
+
+    val defaultInstanceOpt = modelOpt flatMap (_.defaultInstanceOpt)
+
+    (modelOpt, defaultInstanceOpt) match {
+      case (Some(model), Some(defaultInstance)) =>
+        // Push the default context if there is a model with an instance
+        val defaultNode = defaultInstance.rootElement
+        val defaultNodeset = Collections.singletonList(defaultNode: Item)
+        this.head =
+          new BindingContext(
+            parent               = parentBindingContext,
+            modelOpt             = Option(model),
+            bind                 = null,
+            nodeset              = defaultNodeset,
+            position             = 1,
+            elementId            = null,
+            newBind              = true,
+            controlElement       = null,
+            _locationData        = defaultInstance.getLocationData,
+            hasOverriddenContext = false,
+            contextItem          = defaultNode,
+            scope                = container.innerScope
+          )
+      case _ =>
+        // Push empty context
+        this.head = XFormsContextStack.defaultContext(parentBindingContext, container, modelOpt)
     }
+
     // Add model variables for default model
-    if (model != null)
+    modelOpt foreach { model =>
       model.setTopLevelVariables(evaluateModelVariables(model))
+    }
   }
 
   // NOTE: This only scopes top-level model variables, but not binds-as-variables.
-  private def evaluateModelVariables(model: XFormsModel): util.Map[String, ValueRepresentation] = {
+  private def evaluateModelVariables(model: XFormsModel): Map[String, ValueRepresentation] = {
     // TODO: Check dirty flag to prevent needless re-evaluation
     // All variables in the model are in scope for the nested binds and actions.
-    val variables = model.staticModel.jVariablesSeq
-    if (! variables.isEmpty) {
+    val variables = model.staticModel.variablesSeq
+    if (variables.nonEmpty) {
 
-      val variableInfos = new util.HashMap[String, ValueRepresentation]
-      for (variable <- variables.asScala)
-        variableInfos.put(variable.name, scopeVariable(variable, model.getEffectiveId, handleNonFatal = true).value)
+      val variableInfos =
+        variables map { variable =>
+          variable.name -> scopeVariable(variable, model.getEffectiveId, handleNonFatal = true).value
+        } toMap
 
       val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-      if (indentedLogger.isDebugEnabled) indentedLogger.logDebug("", "evaluated model variables", "count", Integer.toString(variableInfos.size))
-      // Remove extra bindings added and set all variables on the current binding context so that things are cleaner
+      if (indentedLogger.isDebugEnabled)
+        indentedLogger.logDebug("", "evaluated model variables", "count", variableInfos.size.toString)
+
       for (_ <- 0 until variableInfos.size)
         popBinding()
+
       variableInfos
     } else
-      Collections.emptyMap[String, ValueRepresentation]
+      Map.empty
   }
 
   def scopeVariable(
@@ -246,16 +279,16 @@ class XFormsContextStack {
   // TODO: move away from element and use static analysis information
   def pushBinding(bindingElement: Element, sourceEffectiveId: String, scope: Scope, handleNonFatal: Boolean): Unit =
     pushBinding(
-      bindingElement.attributeValue(XFormsNames.REF_QNAME),
-      bindingElement.attributeValue(XFormsNames.CONTEXT_QNAME),
-      bindingElement.attributeValue(XFormsNames.NODESET_QNAME),
-      bindingElement.attributeValue(XFormsNames.MODEL_QNAME),
-      bindingElement.attributeValue(XFormsNames.BIND_QNAME),
-      bindingElement,
-      container.partAnalysis.getNamespaceMapping(scope, bindingElement.attributeValue(XFormsNames.ID_QNAME)),
-      sourceEffectiveId,
-      scope,
-      handleNonFatal
+      ref                            = bindingElement.attributeValue(XFormsNames.REF_QNAME),
+      context                        = bindingElement.attributeValue(XFormsNames.CONTEXT_QNAME),
+      nodeset                        = bindingElement.attributeValue(XFormsNames.NODESET_QNAME),
+      modelId                        = bindingElement.attributeValue(XFormsNames.MODEL_QNAME),
+      bindId                         = bindingElement.attributeValue(XFormsNames.BIND_QNAME),
+      bindingElement                 = bindingElement,
+      bindingElementNamespaceMapping = container.partAnalysis.getNamespaceMapping(scope, bindingElement.attributeValue(XFormsNames.ID_QNAME)),
+      sourceEffectiveId              = sourceEffectiveId,
+      scope                          = scope,
+      handleNonFatal                 = handleNonFatal
     )
 
   private def getBindingContext(scope: Scope): BindingContext = {
@@ -289,7 +322,8 @@ class XFormsContextStack {
       else
         null
 
-    try { // Handle scope
+    try {
+      // Handle scope
       // The new binding evaluates against a base binding context which must be in the same scope
       val baseBindingContext = getBindingContext(scope)
       // Handle model
@@ -297,20 +331,22 @@ class XFormsContextStack {
       var isNewModel = false
       if (modelId != null) {
         val resolutionScopeContainer = container.findScopeRoot(scope)
-        val o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, Option(null))
-        if (!o.isInstanceOf[XFormsModel]) { // Invalid model id
-          // NOTE: We used to dispatch xforms-binding-exception, but we want to be able to recover
-          if (!handleNonFatal) throw new ValidationException("Reference to non-existing model id: " + modelId, locationData)
-          // Default to not changing the model
-          newModelOpt = baseBindingContext.modelOpt
-          isNewModel = false
-        } else {
-          newModelOpt = Option(o.asInstanceOf[XFormsModel])
-          // Don't say it's a new model unless it has really changed
-          isNewModel =
-            baseBindingContext.modelOpt.isEmpty && newModelOpt.nonEmpty   ||
-              baseBindingContext.modelOpt.nonEmpty && newModelOpt.isEmpty ||
-              (baseBindingContext.modelOpt.nonEmpty && newModelOpt.nonEmpty && (baseBindingContext.modelOpt.get ne newModelOpt.get))
+        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, Option(null)) match {
+          case model: XFormsModel =>
+            newModelOpt = model.some
+            // Don't say it's a new model unless it has really changed
+            isNewModel =
+              baseBindingContext.modelOpt.isEmpty && newModelOpt.nonEmpty   ||
+                baseBindingContext.modelOpt.nonEmpty && newModelOpt.isEmpty ||
+                (baseBindingContext.modelOpt.nonEmpty && newModelOpt.nonEmpty && (baseBindingContext.modelOpt.get ne newModelOpt.get))
+          case _ =>
+            // Invalid model id
+            // NOTE: We used to dispatch `xforms-binding-exception`, but we want to be able to recover
+            if (! handleNonFatal)
+              throw new ValidationException("Reference to non-existing model id: " + modelId, locationData)
+            // Default to not changing the model
+            newModelOpt = baseBindingContext.modelOpt
+            isNewModel = false
         }
       } else {
         newModelOpt = baseBindingContext.modelOpt
@@ -328,50 +364,75 @@ class XFormsContextStack {
         // Resolve the bind id to a nodeset
         // NOTE: For now, only the top-level models in a resolution scope are considered
         val resolutionScopeContainer = container.findScopeRoot(scope)
-        val o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.singleItemOpt)
-
-        if (o == null && resolutionScopeContainer.containsBind(bindId)) {
-          // The bind attribute was valid for this scope, but no runtime object was found for the bind
-          // This can happen e.g. if a nested bind is within a bind with an empty nodeset
-          bind = null
-          newNodeset = java.util.Collections.emptyList[Item]
-          hasOverriddenContext = false
-          contextItem = null
-          isNewBind = true
-          newPosition = 0
-        } else if (!o.isInstanceOf[RuntimeBind]) { // The bind attribute did not resolve to a bind
-          if (!handleNonFatal)
-            throw new ValidationException("Reference to non-existing bind id: " + bindId, locationData)
-          // Default to an empty binding
-          bind = null
-          newNodeset = java.util.Collections.emptyList[Item]
-          hasOverriddenContext = false
-          contextItem = null
-          isNewBind = true
-          newPosition = 0
-        } else {
-          bind = o.asInstanceOf[RuntimeBind]
-          newNodeset = bind.items
-          hasOverriddenContext = false
-          contextItem = baseBindingContext.getSingleItem
-          isNewBind = true
-          newPosition = Math.min(newNodeset.size, 1)
+        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.singleItemOpt) match {
+          case runtimeBind: RuntimeBind =>
+            bind = runtimeBind
+            newNodeset = bind.items
+            hasOverriddenContext = false
+            contextItem = baseBindingContext.getSingleItem
+            isNewBind = true
+            newPosition = Math.min(newNodeset.size, 1)
+          case null if resolutionScopeContainer.containsBind(bindId) =>
+            // The bind attribute was valid for this scope, but no runtime object was found for the bind
+            // This can happen e.g. if a nested bind is within a bind with an empty nodeset
+            bind = null
+            newNodeset = java.util.Collections.emptyList[Item]
+            hasOverriddenContext = false
+            contextItem = null
+            isNewBind = true
+            newPosition = 0
+          case _ =>
+            // The bind attribute did not resolve to a bind
+            if (! handleNonFatal)
+              throw new ValidationException(s"Reference to non-existing bind id: `$bindId`", locationData)
+            // Default to an empty binding
+            bind = null
+            newNodeset = java.util.Collections.emptyList[Item]
+            hasOverriddenContext = false
+            contextItem = null
+            isNewBind = true
+            newPosition = 0
         }
       } else if (ref != null || nodeset != null) {
         bind = null
-        // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
         var evaluationContextBinding: BindingContext = null
         if (context != null) {
           // Push model and context
-          pushTemporaryContext(this.head, baseBindingContext, baseBindingContext.getSingleItem) // provide context information for the context() function
-          pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal)
+          pushTemporaryContext(
+            parent      = this.head,
+            base        = baseBindingContext,
+            contextItem = baseBindingContext.getSingleItem // provide context information for the `context()` function
+          )
+          pushBinding(
+            ref                            = null,
+            context                        = null,
+            nodeset                        = context,
+            modelId                        = modelId,
+            bindId                         = null,
+            bindingElement                 = null,
+            bindingElementNamespaceMapping = bindingElementNamespaceMapping,
+            sourceEffectiveId              = sourceEffectiveId,
+            scope                          = scope,
+            handleNonFatal                 = handleNonFatal
+          )
           hasOverriddenContext = true
           val newBindingContext = this.head
           contextItem = newBindingContext.getSingleItem
           evaluationContextBinding = newBindingContext
         } else if (isNewModel) {
           // Push model only
-          pushBinding(null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal)
+          pushBinding(
+            ref                            = null,
+            context                        = null,
+            nodeset                        = null,
+            modelId                        = modelId,
+            bindId                         = null,
+            bindingElement                 = null,
+            bindingElementNamespaceMapping = bindingElementNamespaceMapping,
+            sourceEffectiveId              = sourceEffectiveId,
+            scope                          = scope,
+            handleNonFatal                 = handleNonFatal
+          )
           hasOverriddenContext = false
           val newBindingContext = this.head
           contextItem = newBindingContext.getSingleItem
@@ -503,7 +564,18 @@ class XFormsContextStack {
       } else if (context != null) {
         bind = null
         // Only the context has changed, and possibly the model
-        pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal)
+        pushBinding(
+          ref                            = null,
+          context                        = null,
+          nodeset                        = context,
+          modelId                        = modelId,
+          bindId                         = null,
+          bindingElement                 = null,
+          bindingElementNamespaceMapping = bindingElementNamespaceMapping,
+          sourceEffectiveId              = sourceEffectiveId,
+          scope                          = scope,
+          handleNonFatal                 = handleNonFatal
+        )
         newNodeset = this.head.nodeset
         newPosition = this.head.position
         isNewBind = false
@@ -532,26 +604,33 @@ class XFormsContextStack {
 
       this.head =
         new BindingContext(
-          this.head,
-          newModelOpt,
-          bind,
-          newNodeset,
-          newPosition,
-          bindingElementId,
-          isNewBind,
-          bindingElement,
-          locationData,
-          hasOverriddenContext,
-          contextItem,
-          scope
+          parent               = this.head,
+          modelOpt             = newModelOpt,
+          bind                 = bind,
+          nodeset              = newNodeset,
+          position             = newPosition,
+          elementId            = bindingElementId,
+          newBind              = isNewBind,
+          controlElement       = bindingElement,
+          _locationData        = locationData,
+          hasOverriddenContext = hasOverriddenContext,
+          contextItem          = contextItem,
+          scope                = scope
         )
     } catch {
-      case e: Exception =>
+      case NonFatal(t) =>
         if (bindingElement != null)
-          throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression", bindingElement))
+          throw OrbeonLocationException.wrapException(
+            t,
+            new ExtendedLocationData(
+              locationData,
+              "evaluating binding expression",
+              bindingElement
+            )
+          )
         else
           throw OrbeonLocationException.wrapException(
-            e,
+            t,
             new ExtendedLocationData(
               locationData, "" + "evaluating binding expression",
               bindingElement,
@@ -566,18 +645,18 @@ class XFormsContextStack {
 
   private def updateBindingWithContextItem(parent: BindingContext, base: BindingContext, contextItem: Item) =
     new BindingContext(
-      parent,
-      base.modelOpt,
-      null,
-      base.nodeset,
-      base.position,
-      base.elementId,
-      false,
-      base.controlElement,
-      base.locationData,
-      false,
-      contextItem,
-      base.scope
+      parent               = parent,
+      modelOpt             = base.modelOpt,
+      bind                 = null,
+      nodeset              = base.nodeset,
+      position             = base.position,
+      elementId            = base.elementId,
+      newBind              = false,
+      controlElement       = base.controlElement,
+      _locationData        = base.locationData,
+      hasOverriddenContext = false,
+      contextItem          = contextItem,
+      scope                = base.scope
     )
 
   /**
@@ -597,18 +676,18 @@ class XFormsContextStack {
 
     this.head =
       new BindingContext(
-        currentBindingContext,
-        currentBindingContext.modelOpt,
-        null,
-        currentNodeset,
-        currentPosition,
-        currentBindingContext.elementId,
-        true,
-        null,
-        currentBindingContext.locationData,
-        false,
-        newContextItem,
-        currentBindingContext.scope
+        parent               = currentBindingContext,
+        modelOpt             = currentBindingContext.modelOpt,
+        bind                 = null,
+        nodeset              = currentNodeset,
+        position             = currentPosition,
+        elementId            = currentBindingContext.elementId,
+        newBind              = true,
+        controlElement       = null,
+        _locationData        = currentBindingContext.locationData,
+        hasOverriddenContext = false,
+        contextItem          = newContextItem,
+        scope                = currentBindingContext.scope
       )
     this.head
   }

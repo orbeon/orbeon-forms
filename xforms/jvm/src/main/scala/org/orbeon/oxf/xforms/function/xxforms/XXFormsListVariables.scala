@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.{EmptyIterator, ListIterator}
+import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 
 class XXFormsListVariables extends XFormsFunction {
 
-  override def iterate(xpathContext: XPathContext) = {
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     implicit val ctx = xpathContext
 
@@ -32,13 +32,12 @@ class XXFormsListVariables extends XFormsFunction {
     XFormsFunction.context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
       case model: XFormsModel =>
         val variables = model.getTopLevelVariables
-
-        if (variables.size() > 0)
-          new ListIterator(variables.asScala.map { case (name, _) => stringToStringValue(name) }.toList.asJava)
+        if (variables.nonEmpty)
+          new ListIterator(variables.map { case (name, _) => stringToStringValue(name) }.toList.asJava)
         else
           EmptyIterator.getInstance
-
-      case _ => EmptyIterator.getInstance
+      case _ =>
+        EmptyIterator.getInstance
     }
   }
 }

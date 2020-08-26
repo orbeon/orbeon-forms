@@ -179,8 +179,6 @@ trait ModelVariables {
       analysis
   }
 
-  def jVariablesSeq = variablesSeq.asJava
-
   val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
   def analyzeVariablesXPath(): Unit =

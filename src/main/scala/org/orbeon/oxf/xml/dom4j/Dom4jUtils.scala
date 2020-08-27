@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.dom4j
 
 import java.io.{InputStream, Reader, StringReader}
-import java.{lang => jl, util => ju}
+import java.{util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
@@ -90,66 +90,12 @@ object Dom4jUtils {
 
   def makeSystemId(e: Element): String =
     Option(e.getData.asInstanceOf[LocationData]) flatMap
-      (d => Option(d.file))                       getOrElse
+      (d => Option(d.file))                      getOrElse
       DOMGenerator.DefaultContext
 
-  /**
-    * Go over the Node and its children and make sure that there are no two contiguous text nodes so as to ensure that
-    * XPath expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
-    *
-    * "As much character data as possible is grouped into each text node: a text node never has an immediately
-    * following or preceding sibling that is a text node."
-    *
-    * dom4j Text and CDATA nodes are combined together.
-    *
-    * @param nodeToNormalize Node hierarchy to normalize
-    * @return the input node, normalized
-    */
-  def normalizeTextNodes(nodeToNormalize: Node): Node = {
-
-    val nodesToDetach = new ju.ArrayList[Node]
-
-    nodeToNormalize.accept(
-      new VisitorSupport {
-        override def visit(elem: Element) {
-          val children = elem.content
-          var previousNode: Node = null
-          var sb: jl.StringBuilder = null
-          for (currentNode <- children.iterator.asScala) {
-            if (previousNode ne null) {
-              previousNode match {
-                case previousNodeText: Text if currentNode.isInstanceOf[Text] =>
-                  if (sb eq null)
-                    sb = new jl.StringBuilder(previousNodeText.getText)
-                  sb.append(currentNode.getText)
-                  nodesToDetach.add(currentNode)
-                case _: Text =>
-                  // Update node if needed
-                  if (sb ne null)
-                    previousNode.setText(sb.toString)
-                  previousNode = currentNode
-                  sb = null
-                case _ =>
-                  previousNode = currentNode
-                  sb = null
-              }
-            } else {
-              previousNode = currentNode
-              sb = null
-            }
-          }
-          if ((previousNode ne null) && (sb ne null))
-            previousNode.setText(sb.toString)
-        }
-      }
-    )
-
-    // Detach nodes only in the end so as to not confuse the acceptor above
-    for (currentNode <- nodesToDetach.asScala)
-      currentNode.detach()
-
-    nodeToNormalize
-  }
+  // 1 Java caller
+  def normalizeTextNodesJava(nodeToNormalize: Node): Node =
+    nodeToNormalize.normalizeTextNodes
 
   /*
    * Saxon's error handler is expensive for the service it provides so we just use our

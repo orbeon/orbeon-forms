@@ -50,7 +50,7 @@ class Instance(
   scope
 ) with InstanceMetadata with Logging {
 
-  def partExposeXPathTypes = part.isExposeXPathTypes
+  def partExposeXPathTypes: Boolean = part.isExposeXPathTypes
 
   override def extendedLocationData =
     new ExtendedLocationData(
@@ -254,13 +254,13 @@ object Instance {
   def wrapDocument(document: Document, exposeXPathTypes: Boolean): DocumentWrapper =
     if (exposeXPathTypes)
       new TypedDocumentWrapper(
-        Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document],
+        document.normalizeTextNodes,
         null,
         XPath.GlobalConfiguration
       )
     else
       new DocumentWrapper(
-        Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document],
+        document.normalizeTextNodes,
         null,
         XPath.GlobalConfiguration
       )

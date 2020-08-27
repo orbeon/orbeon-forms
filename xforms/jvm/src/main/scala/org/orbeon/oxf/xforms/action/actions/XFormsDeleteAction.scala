@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
@@ -247,7 +246,7 @@ object XFormsDeleteAction extends Logging {
     contentToUpdate.remove(indexInContentToUpdate)
 
     if (mustNormalize)
-      Dom4jUtils.normalizeTextNodes(parentElement)
+      parentElement.normalizeTextNodes
 
     Some(DeletionDescriptor(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate))
   }

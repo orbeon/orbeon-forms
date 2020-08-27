@@ -4,15 +4,72 @@ import org.orbeon.dom.io.{OutputFormat, XMLWriter}
 import org.orbeon.dom.tree.{AbstractNode, WithParent}
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 
+import scala.jdk.CollectionConverters._
+
+import java.{util => ju, lang => jl}
+
 object Node {
 
-  implicit class NodeOps(private val n: Node) extends AnyVal {
+  implicit class NodeOps[N <: Node](private val n: N) extends AnyVal {
 
     def serializeToString(format: OutputFormat = XMLWriter.DefaultFormat): String =
       IOUtils.useAndClose(new StringBuilderWriter) { writer =>
         new XMLWriter(writer, format).write(n)
         writer.result
       }
+
+    /**
+      * Go over the `Node` and its children and make sure that there are no two contiguous text nodes so as to ensure that
+      * XPath expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
+      *
+      * "As much character data as possible is grouped into each text node: a text node never has an immediately
+      * following or preceding sibling that is a text node."
+      */
+    def normalizeTextNodes: N = {
+
+      val nodesToDetach = new ju.ArrayList[Node]
+
+      n.accept(
+        new VisitorSupport {
+          override def visit(elem: Element) {
+            val children = elem.content
+            var previousNode: Node = null
+            var sb: jl.StringBuilder = null
+            for (currentNode <- children.iterator.asScala) {
+              if (previousNode ne null) {
+                previousNode match {
+                  case previousNodeText: Text if currentNode.isInstanceOf[Text] =>
+                    if (sb eq null)
+                      sb = new jl.StringBuilder(previousNodeText.getText)
+                    sb.append(currentNode.getText)
+                    nodesToDetach.add(currentNode)
+                  case _: Text =>
+                    // Update node if needed
+                    if (sb ne null)
+                      previousNode.setText(sb.toString)
+                    previousNode = currentNode
+                    sb = null
+                  case _ =>
+                    previousNode = currentNode
+                    sb = null
+                }
+              } else {
+                previousNode = currentNode
+                sb = null
+              }
+            }
+            if ((previousNode ne null) && (sb ne null))
+              previousNode.setText(sb.toString)
+          }
+        }
+      )
+
+      // Detach nodes only in the end so as to not confuse the acceptor above
+      for (currentNode <- nodesToDetach.asScala)
+        currentNode.detach()
+
+      n
+    }
   }
 
   def nodeTypeName(node: Node): String = node match {

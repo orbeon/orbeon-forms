@@ -258,7 +258,7 @@ object XFormsInsertAction {
                     }
 
                   if (nodesToInsert exists(_.isInstanceOf[Text]))
-                    Dom4jUtils.normalizeTextNodes(parentNode)
+                    parentNode.normalizeTextNodes
 
                   insertedNodes
                 }
@@ -277,7 +277,7 @@ object XFormsInsertAction {
 
           // Normalize text nodes if needed to respect XPath 1.0 constraint
           if (clonedNodes exists(_.isInstanceOf[Text]))
-            Dom4jUtils.normalizeTextNodes(insertLocationNode)
+            insertLocationNode.normalizeTextNodes
 
           (insertLocationIndexWithinParentBeforeUpdate, insertedNodes, "into")
       }

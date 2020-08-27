@@ -52,8 +52,8 @@ object Dom4j {
   def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document): Boolean = {
     val normalizeText = StringUtils.trimAllToEmpty _
     compareTwoNodes(
-      left          = normalizeTextNodes(createCopy(left.getRootElement)),
-      right         = normalizeTextNodes(createCopy(right.getRootElement)))(
+      left          = createCopy(left.getRootElement).normalizeTextNodes,
+      right         = createCopy(right.getRootElement).normalizeTextNodes)(
       normalizeText = normalizeText
     )
   }
@@ -66,7 +66,7 @@ object Dom4j {
 
   def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element): Boolean = {
     val normalizeText = (c: String) => Whitespace.collapseWhitespace(c).toString
-    compareTwoNodes(normalizeTextNodes(createCopy(left)), normalizeTextNodes(createCopy(right)))(normalizeText)
+    compareTwoNodes(createCopy(left).normalizeTextNodes, createCopy(right).normalizeTextNodes)(normalizeText)
   }
 
   // Only keep the nodes we care about

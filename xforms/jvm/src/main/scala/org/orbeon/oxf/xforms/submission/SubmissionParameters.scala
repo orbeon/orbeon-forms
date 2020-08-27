@@ -295,7 +295,7 @@ object SubmissionParameters {
     val bindingContext = contextStack.getCurrentBindingContext
 
     RefContext(
-      refNodeInfo                  = bindingContext.getSingleItem.asInstanceOf[NodeInfo],
+      refNodeInfo                  = bindingContext.getSingleItemOrNull.asInstanceOf[NodeInfo],
       refInstanceOpt               = bindingContext.instance, // `None` if the document submitted is not part of an instance
       submissionElementContextItem = bindingContext.contextItem,
       xpathContext =

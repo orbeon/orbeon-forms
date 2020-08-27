@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.{withBinding, withIteration}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -43,9 +44,9 @@ object SubmissionHeaders {
       val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
 
       // Handle a single header element
-      def handleHeaderElement(headerElement: Element) = {
+      def handleHeaderElement(headerElement: Element): Unit = {
 
-        def getElementValue(name: QName) = {
+        def getElementValue(name: QName): Option[String] = {
           val element = headerElement.element(name)
           if (element eq null)
             throw new OXFException(s"Missing <${name.qualifiedName}> child element of <header> element")
@@ -53,25 +54,22 @@ object SubmissionHeaders {
           val scope =
             xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
 
-          contextStack.pushBinding(element, sourceEffectiveId, scope)
-          val result =
+          withBinding(element, sourceEffectiveId, scope) { _ =>
             XFormsUtils.getElementValue(
               xblContainer,
               contextStack,
               sourceEffectiveId,
               element,
-              false,
-              false,
+              acceptHTML = false,
+              defaultHTML = false,
               null
             )
-          contextStack.popBinding
-
-          result
+          }(contextStack)
         }
 
         // Evaluate header name and value
-        val headerName  = getElementValue(XFormsNames.XFORMS_NAME_QNAME)
-        val headerValue = getElementValue(XFormsNames.XFORMS_VALUE_QNAME)
+        val headerNameOpt  = getElementValue(XFormsNames.XFORMS_NAME_QNAME)
+        val headerValueOpt = getElementValue(XFormsNames.XFORMS_VALUE_QNAME)
 
         // Evaluate combine attribute as AVT
         val combine = {
@@ -93,15 +91,20 @@ object SubmissionHeaders {
           result
         }
 
-        // Array of existing values (an empty Array if none)
-        def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
+        (headerNameOpt, headerValueOpt) match {
+          case (Some(headerName), Some(headerValue)) =>
 
-        // Append/prepend/replace
-        headerNameValues += headerName -> (combine match {
-          case "append"  => existingHeaderValues :+ headerValue
-          case "prepend" => headerValue +: existingHeaderValues
-          case _         => List(headerValue)
-        })
+            // List of existing values (can be empty)
+            def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
+
+            // Append/prepend/replace
+            headerNameValues += headerName -> (combine match {
+              case "append"  => existingHeaderValues :+ headerValue
+              case "prepend" => headerValue +: existingHeaderValues
+              case _         => List(headerValue)
+            })
+          case _ =>
+        }
       }
 
       // Process all nested <header> elements
@@ -114,12 +117,12 @@ object SubmissionHeaders {
         if (contextStack.getCurrentBindingContext.newBind) {
           // There is a binding so a possible iteration
           for (position <- 1 to contextStack.getCurrentBindingContext.nodeset.size) {
-            contextStack.pushIteration(position)
-            handleHeaderElement(headerElement)
-            contextStack.popBinding()
+            withIteration(position) { _ =>
+              handleHeaderElement(headerElement)
+            }(contextStack)
           }
         } else {
-          // No binding, this is single header
+          // No binding, this is a single header
           handleHeaderElement(headerElement)
         }
 

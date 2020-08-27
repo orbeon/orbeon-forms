@@ -190,7 +190,7 @@ object FileMetadata {
     val contextStack = m.getContextStack
     contextStack.setBinding(m.bindingContext)
     contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))
-    DataModel.getValue(contextStack.getCurrentBindingContext.getSingleItem)
+    DataModel.getValue(contextStack.getCurrentBindingContext.getSingleItemOrNull)
   }
 
   // Format a string containing a number of bytes to a human-readable string

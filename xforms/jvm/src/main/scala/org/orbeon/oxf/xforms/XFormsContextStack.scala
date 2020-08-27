@@ -369,7 +369,7 @@ class XFormsContextStack {
             bind = runtimeBind
             newNodeset = bind.items
             hasOverriddenContext = false
-            contextItem = baseBindingContext.getSingleItem
+            contextItem = baseBindingContext.getSingleItemOrNull
             isNewBind = true
             newPosition = Math.min(newNodeset.size, 1)
           case null if resolutionScopeContainer.containsBind(bindId) =>
@@ -401,7 +401,7 @@ class XFormsContextStack {
           pushTemporaryContext(
             parent      = this.head,
             base        = baseBindingContext,
-            contextItem = baseBindingContext.getSingleItem // provide context information for the `context()` function
+            contextItem = baseBindingContext.getSingleItemOrNull // provide context information for the `context()` function
           )
           pushBinding(
             ref                            = null,
@@ -417,7 +417,7 @@ class XFormsContextStack {
           )
           hasOverriddenContext = true
           val newBindingContext = this.head
-          contextItem = newBindingContext.getSingleItem
+          contextItem = newBindingContext.getSingleItemOrNull
           evaluationContextBinding = newBindingContext
         } else if (isNewModel) {
           // Push model only
@@ -435,11 +435,11 @@ class XFormsContextStack {
           )
           hasOverriddenContext = false
           val newBindingContext = this.head
-          contextItem = newBindingContext.getSingleItem
+          contextItem = newBindingContext.getSingleItemOrNull
           evaluationContextBinding = newBindingContext
         } else {
           hasOverriddenContext = false
-          contextItem = baseBindingContext.getSingleItem
+          contextItem = baseBindingContext.getSingleItemOrNull
           evaluationContextBinding = baseBindingContext
         }
         //                    if (false) {
@@ -503,7 +503,7 @@ class XFormsContextStack {
           val functionContext =
             getFunctionContext(
               sourceEffectiveId,
-              updateBindingWithContextItem(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItem)
+              updateBindingWithContextItem(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItemOrNull)
             )
 
           val result =
@@ -559,7 +559,7 @@ class XFormsContextStack {
           newPosition = 1
         }
         hasOverriddenContext = false
-        contextItem = baseBindingContext.getSingleItem
+        contextItem = baseBindingContext.getSingleItemOrNull
         isNewBind = false
       } else if (context != null) {
         bind = null
@@ -580,7 +580,7 @@ class XFormsContextStack {
         newPosition = this.head.position
         isNewBind = false
         hasOverriddenContext = true
-        contextItem = this.head.getSingleItem
+        contextItem = this.head.getSingleItemOrNull
         popBinding()
       } else {
         // No change to anything
@@ -593,7 +593,7 @@ class XFormsContextStack {
         //   <xf:action ev:event="xforms-value-changed" if="context() = 'foobar'">
         // In this case, you expect context() to be updated as follows.
         hasOverriddenContext = false
-        contextItem = baseBindingContext.getSingleItem
+        contextItem = baseBindingContext.getSingleItemOrNull
       }
       // Push new context
       val bindingElementId =

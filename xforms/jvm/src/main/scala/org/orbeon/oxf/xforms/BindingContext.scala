@@ -100,7 +100,8 @@ case class BindingContext(
   def singleNodeOpt: Option[NodeInfo] =
     singleItemOpt collect { case node: NodeInfo => node }
 
-  def getSingleItem: Item =
+  // TODO: remove
+  def getSingleItemOrNull: Item =
     singleItemOpt.orNull
 
   def getInScopeVariables: ju.Map[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
@@ -221,7 +222,7 @@ case class BindingContext(
       binding.isRepeatIterationBindingContext && binding.parent.elementId == contextId
 
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if matchesContainer(binding) || matchesRepeat(binding) => binding.getSingleItem
+      case binding if matchesContainer(binding) || matchesRepeat(binding) => binding.getSingleItemOrNull
     } getOrElse {
       throw new ValidationException(s"No enclosing container XForms control found for id $contextId", locationData)
     }

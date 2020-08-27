@@ -57,7 +57,7 @@ class XFormsLoadAction extends XFormsAction {
 
     val bindingContext = interpreter.actionXPathContext.getCurrentBindingContext
 
-    bindingContext.newBind option bindingContext.getSingleItem match {
+    bindingContext.newBind option bindingContext.getSingleItemOrNull match {
       case Some(null) =>
       // NOP if no URI obtained (2019-03-12 asked WG for confirmation)
       case Some(item) =>

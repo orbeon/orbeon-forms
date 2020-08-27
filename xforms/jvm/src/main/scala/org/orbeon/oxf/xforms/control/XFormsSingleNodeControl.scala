@@ -119,7 +119,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // Set bound item, only considering actual bindings (with @bind, @ref or @nodeset)
     val bc = bindingContext
     if (bc.newBind)
-      this._boundItem = bc.getSingleItem
+      this._boundItem = bc.getSingleItemOrNull
 
     // Get MIPs
     this._boundItem match {
@@ -263,7 +263,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       return false
 
     val bc = bindingContext
-    val currentItem = bc.getSingleItem
+    val currentItem = bc.getSingleItemOrNull
     if (bc.newBind) {
       // There is a binding
 

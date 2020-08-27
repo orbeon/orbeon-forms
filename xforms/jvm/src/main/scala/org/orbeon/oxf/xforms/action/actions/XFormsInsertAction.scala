@@ -495,7 +495,7 @@ class XFormsInsertAction extends XFormsAction {
           debug("xf:insert: overridden context is an empty nodeset or not a nodeset, terminating")
           return
         case None =>
-          contextStack.getCurrentBindingContext.getSingleItem
+          contextStack.getCurrentBindingContext.getSingleItemOrNull
       }
 
 

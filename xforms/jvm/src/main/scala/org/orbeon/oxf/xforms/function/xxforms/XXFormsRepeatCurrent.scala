@@ -28,7 +28,7 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 
   override def evaluateItem(xpathContext: XPathContext) = {
     implicit val ctx = xpathContext
-    bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItem
+    bindingContext.enclosingRepeatIterationBindingContext(stringArgumentOpt(0)).getSingleItemOrNull
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {

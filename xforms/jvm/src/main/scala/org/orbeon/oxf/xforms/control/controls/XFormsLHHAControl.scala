@@ -48,16 +48,14 @@ class XFormsLHHAControl(
   override def computeValue: String = {
 
     def fromDynamicContent =
-      Option(
-        XFormsUtils.getElementValue(
-          lhhaContainer,
-          getContextStack |!> (_.setBinding(bindingContext)),
-          effectiveId,
-          staticControl.element,
-          true,
-          staticControl.defaultToHTML,
-          Array[Boolean](false)
-        )
+      XFormsUtils.getElementValue(
+        lhhaContainer,
+        getContextStack |!> (_.setBinding(bindingContext)),
+        effectiveId,
+        staticControl.element,
+        acceptHTML = true,
+        defaultHTML = staticControl.defaultToHTML,
+        Array[Boolean](false)
       )
 
     staticControl.staticValue orElse fromDynamicContent getOrElse ""

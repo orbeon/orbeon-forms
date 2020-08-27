@@ -17,6 +17,7 @@ import java.io.StringReader
 import java.net.{URI, URISyntaxException}
 import java.{lang => jl, util => ju}
 
+import cats.implicits.catsSyntaxOptionId
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.{Result, TransformerException}
 import org.apache.commons.lang3.StringUtils
@@ -24,6 +25,7 @@ import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
@@ -170,32 +172,34 @@ object XFormsUtils {
     acceptHTML        : Boolean,
     defaultHTML       : Boolean,
     containsHTML      : Array[Boolean]
-  ): String = {
-    if (containsHTML != null)
+  ): Option[String] = {
+
+    if (containsHTML ne null)
       containsHTML(0) = defaultHTML
-    val currentBindingContext = contextStack.getCurrentBindingContext
-    // "the order of precedence is: single node binding attributes, linking attributes, inline text."
-    // Try to get single node binding
-    val hasSingleNodeBinding = currentBindingContext.newBind
-    if (hasSingleNodeBinding) {
-      val boundItem = currentBindingContext.getSingleItem
-      val tempResult = DataModel.getValue(boundItem)
-      if (tempResult != null)
-        return if (acceptHTML && containsHTML == null) tempResult.escapeXmlMinimal else tempResult
-      else {
-        // There is a single-node binding but it doesn't point to an acceptable item
-        return null
+
+    def maybeEscapeValue(value: String): String =
+      value match {
+        case v if acceptHTML && containsHTML == null => v.escapeXmlMinimal
+        case v => v
       }
-    }
+
+    val currentBindingContext = contextStack.getCurrentBindingContext
+
+    // Try to get single node binding
+    def fromBinding: Option[Option[String]] =
+      currentBindingContext.newBind option {
+        currentBindingContext.singleItemOpt map DataModel.getValue map maybeEscapeValue
+      }
+
     // Try to get value attribute
     // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
-    childElement.attributeValueOpt(XFormsNames.VALUE_QNAME) foreach { valueAttribute =>
-      return {
+    def fromValueAtt: Option[Option[String]]  =
+      childElement.attributeValueOpt(XFormsNames.VALUE_QNAME) map { valueAttribute =>
         val currentNodeset = currentBindingContext.nodeset
         if (! currentNodeset.isEmpty) {
-          val tempResult =
+          val stringResultOpt =
             try
-              XPathCache.evaluateAsString(
+              XPathCache.evaluateAsStringOpt(
                 contextItems       = currentNodeset,
                 contextPosition    = currentBindingContext.position,
                 xpathString        = valueAttribute,
@@ -210,33 +214,35 @@ object XFormsUtils {
             catch {
               case NonFatal(t) =>
                 XFormsError.handleNonFatalXPathError(container, t)
-                ""
+                "".some
             }
-          if (acceptHTML && containsHTML == null) tempResult.escapeXmlMinimal else tempResult
+
+          stringResultOpt map maybeEscapeValue
         } else
           // There is a value attribute but the evaluation context is empty
-          null
+          None
       }
-    }
-    // NOTE: Linking attribute is deprecated in XForms 1.1 and we no longer support it.
-    val sb = new jl.StringBuilder(20)
-    Dom4jUtils.visitSubtree(
-      childElement,
-      new XFormsUtils.LHHAElementVisitorListener(
-        container         = container,
-        contextStack      = contextStack,
-        sourceEffectiveId = sourceEffectiveId,
-        acceptHTML        = acceptHTML,
-        defaultHTML       = defaultHTML,
-        containsHTML      = containsHTML,
-        sb                = sb,
-        childElement      = childElement
+
+    def fromNestedContent: Option[String] = {
+      val sb = new jl.StringBuilder(20)
+      Dom4jUtils.visitSubtree(
+        childElement,
+        new XFormsUtils.LHHAElementVisitorListener(
+          container         = container,
+          contextStack      = contextStack,
+          sourceEffectiveId = sourceEffectiveId,
+          acceptHTML        = acceptHTML,
+          defaultHTML       = defaultHTML,
+          containsHTML      = containsHTML,
+          sb                = sb,
+          childElement      = childElement
+        )
       )
-    )
-    if (acceptHTML && containsHTML != null && !containsHTML(0))
-      sb.toString.unescapeXmlMinimal
-    else
-      sb.toString
+
+      maybeEscapeValue(sb.toString).some
+    }
+
+    fromBinding orElse fromValueAtt getOrElse fromNestedContent
   }
 
   def resolveRenderURL(

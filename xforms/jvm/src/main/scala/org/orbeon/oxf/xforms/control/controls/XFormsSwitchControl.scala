@@ -141,19 +141,17 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     // FIXME: The expression is evaluated in the context of xf:switch, when in fact it should be evaluated in the
     // context of the xf:case, including variables and FunctionContext.
     def fromExpression(c: CaseControl) = c.valueExpression flatMap { expr =>
-      Option(
-        XPathCache.evaluateAsString(
-          contextItems       = bindingContext.nodeset,
-          contextPosition    = bindingContext.position,
-          xpathString        = expr,
-          namespaceMapping   = c.namespaceMapping,
-          variableToValueMap = bindingContext.getInScopeVariables,
-          functionLibrary    = containingDocument.functionLibrary,
-          functionContext    = newFunctionContext,
-          baseURI            = null,
-          locationData       = c.locationData,
-          reporter           = containingDocument.getRequestStats.getReporter
-        )
+      XPathCache.evaluateAsStringOpt(
+        contextItems       = bindingContext.nodeset,
+        contextPosition    = bindingContext.position,
+        xpathString        = expr,
+        namespaceMapping   = c.namespaceMapping,
+        variableToValueMap = bindingContext.getInScopeVariables,
+        functionLibrary    = containingDocument.functionLibrary,
+        functionContext    = newFunctionContext,
+        baseURI            = null,
+        locationData       = c.locationData,
+        reporter           = containingDocument.getRequestStats.getReporter
       )
     }
 

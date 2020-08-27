@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
@@ -117,41 +118,32 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
 
   // Evaluate the value of a LHHA related to this control
   // Can return null
-  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] = {
+  protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] =
+    if (lhhaAnalysis.isLocal) {
 
-    val result =
-      if (lhhaAnalysis.isLocal) {
+      implicit val contextStack = control.getContextStack
 
-        val contextStack = control.getContextStack
+      val lhhaElement = lhhaAnalysis.element
 
-        val lhhaElement = lhhaAnalysis.element
-
-        // LHHA is direct child of control, evaluate within context
-        contextStack.setBinding(control.bindingContext)
-        contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
-
-        val result = Option(
-          XFormsUtils.getElementValue(
-            control.lhhaContainer,
-            contextStack,
-            control.effectiveId,
-            lhhaElement,
-            supportsHTML,
-            lhhaAnalysis.defaultToHTML,
-            Array[Boolean](false)
-          )
+      // LHHA is direct child of control, evaluate within context
+      contextStack.setBinding(control.bindingContext)
+      withBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope) { _ =>
+        XFormsUtils.getElementValue(
+          control.lhhaContainer,
+          contextStack,
+          control.effectiveId,
+          lhhaElement,
+          supportsHTML,
+          lhhaAnalysis.defaultToHTML,
+          Array[Boolean](false)
         )
-        contextStack.popBinding()
-        result
-      } else {
-        // LHHA is somewhere else. We resolve the control and ask for its value.
-        Controls.resolveControlsById(control.containingDocument, control.effectiveId, lhhaAnalysis.staticId, followIndexes = true).headOption collect {
-          case control: XFormsLHHAControl => control.getValue
-        }
       }
-
-    result
-  }
+    } else {
+      // LHHA is somewhere else. We resolve the control and ask for its value.
+      Controls.resolveControlsById(control.containingDocument, control.effectiveId, lhhaAnalysis.staticId, followIndexes = true).headOption collect {
+        case control: XFormsLHHAControl => control.getValue
+      }
+    }
 
 //  private def findAncestorContextControl(contextStaticId: String, lhhaStaticId: String): XFormsControl = {
 //

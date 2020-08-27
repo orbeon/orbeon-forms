@@ -492,7 +492,32 @@ object XPathCache {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): String = {
+  ): String =
+    evaluateAsStringOpt(
+      contextItems,
+      contextPosition,
+      xpathString,
+      namespaceMapping,
+      variableToValueMap,
+      functionLibrary,
+      functionContext,
+      baseURI,
+      locationData,
+      reporter
+    ).orNull
+
+  def evaluateAsStringOpt(
+    contextItems       : JList[Item],
+    contextPosition    : Int,
+    xpathString        : String,
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : JMap[String, ValueRepresentation],
+    functionLibrary    : FunctionLibrary,
+    functionContext    : FunctionContext,
+    baseURI            : String,
+    locationData       : LocationData,
+    reporter           : Reporter
+  ): Option[String] = {
 
     val xpathExpression =
       getXPathExpression(
@@ -509,7 +534,7 @@ object XPathCache {
       )
 
     withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-      Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull
+      Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString)
     }
   }
 

@@ -71,16 +71,14 @@ class XFormsMessageAction extends XFormsAction {
 
     // Get message value
     val messageValue =
-      Option(
-        XFormsUtils.getElementValue(
-          actionContext.interpreter.container,
-          actionContext.interpreter.actionXPathContext,
-          actionContext.interpreter.getSourceEffectiveId(actionContext.element),
-          actionContext.element,
-          false,
-          false,
-          null
-        )
+      XFormsUtils.getElementValue(
+        actionContext.interpreter.container,
+        actionContext.interpreter.actionXPathContext,
+        actionContext.interpreter.getSourceEffectiveId(actionContext.element),
+        actionContext.element,
+        acceptHTML = false,
+        defaultHTML = false,
+        null
       ) getOrElse ""
 
     ExtensionLevels.get(levelQName) match {

@@ -253,24 +253,19 @@ class XFormsActionInterpreter(
     nodeset         : ju.List[Item],
     position        : Int,
     xpathExpression : String
-  ): String = {
-    // @ref points to something
-    val result =
-      XPathCache.evaluateAsString(
-        contextItems       = nodeset,
-        contextPosition    = position,
-        xpathString        = xpathExpression,
-        namespaceMapping   = getNamespaceMappings(actionElement),
-        variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
-        functionLibrary    = containingDocument.functionLibrary,
-        functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
-        baseURI            = null,
-        locationData       = actionElement.getData.asInstanceOf[LocationData],
-        reporter           = containingDocument.getRequestStats.getReporter
-      )
-
-    if (result ne null) result else ""
-  }
+  ): String =
+    XPathCache.evaluateAsStringOpt(
+      contextItems       = nodeset,
+      contextPosition    = position,
+      xpathString        = xpathExpression,
+      namespaceMapping   = getNamespaceMappings(actionElement),
+      variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
+      functionLibrary    = containingDocument.functionLibrary,
+      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+      baseURI            = null,
+      locationData       = actionElement.getData.asInstanceOf[LocationData],
+      reporter           = containingDocument.getRequestStats.getReporter
+    ) getOrElse ""
 
   // TODO: Pass `DynamicActionContext`.
   def evaluateKeepItems(

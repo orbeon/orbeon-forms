@@ -99,19 +99,17 @@ trait ControlXPathSupport {
       // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
       // Reason is that XPath functions might use the context stack to get the current model, etc.
       try
-        Option(
-          XPathCache.evaluateAsString(
-            contextItems.asJava,
-            contextPosition,
-            xpathString,
-            namespaceMapping,
-            variableToValueMap,
-            containingDocument.functionLibrary,
-            functionContext,
-            null,
-            getLocationData,
-            containingDocument.getRequestStats.addXPathStat
-          )
+        XPathCache.evaluateAsStringOpt(
+          contextItems.asJava,
+          contextPosition,
+          xpathString,
+          namespaceMapping,
+          variableToValueMap,
+          containingDocument.functionLibrary,
+          functionContext,
+          null,
+          getLocationData,
+          containingDocument.getRequestStats.addXPathStat
         )
       catch {
         case NonFatal(t) =>

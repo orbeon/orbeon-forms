@@ -468,14 +468,14 @@ object ItemsetSupport {
     val contextStack = container.getContextStack
     withBinding(childElement, sourceEffectiveId, scope) { _ =>
       val containsHTML = Array[Boolean](false)
-      Option(XFormsUtils.getElementValue(
+      XFormsUtils.getElementValue(
         container,
         contextStack,
         sourceEffectiveId,
         childElement,
         acceptHTML,
         defaultHTML,
-        containsHTML)
+        containsHTML
       ) -> containsHTML.head
     }(contextStack)
   }

@@ -28,7 +28,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
@@ -108,7 +108,7 @@ abstract class ProcessorTestBase(
               actualDoc         = serializer.runGetDocument(pipelineContext)
             } yield {
               // NOTE: We could make the comparison more configurable, for example to not collapse white space
-              if (Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
+              if (Comparator.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
                 SuccessTestResult
               else
                 FailedTestResult(doc, actualDoc)

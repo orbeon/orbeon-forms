@@ -20,7 +20,8 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.scalatestplus.junit.AssertionsForJUnit
 
@@ -39,7 +40,7 @@ trait XMLSupport extends AssertionsForJUnit {
 
   def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument): Unit = {
 
-    val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
+    val result = Comparator.compareDocumentsIgnoreNamespacesInScope(left, right)
 
     // Produce a nicer message
     if (! result) {
@@ -53,7 +54,7 @@ trait XMLSupport extends AssertionsForJUnit {
 
   def assertXMLElementsIgnoreNamespacesInScopeCollapse(left: JElement, right: JElement): Unit = {
 
-    val result = Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
+    val result = Comparator.compareElementsIgnoreNamespacesInScopeCollapse(left, right)
 
     // Produce a nicer message
     if (! result) {

@@ -1,32 +1,31 @@
-/**
- *  Copyright (C) 2007 Orbeon, Inc.
- *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
- *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-package org.orbeon.oxf.xml
+package org.orbeon.oxf.xml.dom
 
 import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
-import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils.createCopy
 import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
 
-object Dom4j {
+/**
+ * Copyright (C) 2007 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+object Comparator {
 
   /**
-   * Compare two dom4j documents.
+   * Compare two DOM documents.
    *
    * This comparison:
    *
@@ -35,7 +34,6 @@ object Dom4j {
    * - ignores resulting blank text nodes
    * - trims non-blank text nodes before comparing them
    * - ignores namespace nodes (not because they don't matter, but they are hard to handle)
-   * - ignores entity nodes (we shouldn't have any and we don't know how to compare them with dom4j anyway)
    * - compares qualified names by checking namespace URIs and local names, but ignores prefixes
    * - ignores the relative order of an element's attributes
    *
@@ -44,14 +42,13 @@ object Dom4j {
    * slightly different namespace layout. It is not clear, for the purpose of unit tests, whether we can realistically
    * compare namespace nodes in a much better way, without some kind of schema information.
    */
-  def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document): Boolean = {
-    val normalizeText = StringUtils.trimAllToEmpty _
+  def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document): Boolean =
     compareTwoNodes(
-      left          = createCopy(left.getRootElement).normalizeTextNodes,
-      right         = createCopy(right.getRootElement).normalizeTextNodes)(
-      normalizeText = normalizeText
+      left = createCopy(left.getRootElement).normalizeTextNodes,
+      right = createCopy(right.getRootElement).normalizeTextNodes
+    )(
+      normalizeText = _.trimAllToEmpty
     )
-  }
 
   /**
    * Same as compareDocumentsIgnoreNamespacesInScope but collapse white space when comparing text.
@@ -66,13 +63,12 @@ object Dom4j {
 
   // Only keep the nodes we care about
   private def filterOut(l: Seq[Node]) = l collect {
-    case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
+    case n@(_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
     case t: Text if t.getText.nonAllBlank => t
   }
 
   private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String => String) =
-    left.lengthCompare(right.size) == 0 && (left.zip(right) forall
-      { case (n1, n2) => compareTwoNodes(n1, n2)(normalizeText) })
+    left.lengthCompare(right.size) == 0 && (left.zip(right) forall { case (n1, n2) => compareTwoNodes(n1, n2)(normalizeText) })
 
   private def compareTwoNodes(left: Node, right: Node)(normalizeText: String => String): Boolean =
     (left, right) match {
@@ -144,36 +140,4 @@ object Dom4j {
 
     parseValues(p1.getText) == parseValues(p2.getText)
   }
-
-  // Ensure that a path to an element exists by creating missing elements if needed
-  def ensurePath(root: Element, path: Seq[QName]): Element = {
-
-    @tailrec def insertIfNeeded(parent: Element, qNames: Iterator[QName]): Element =
-      if (qNames.hasNext) {
-        val qName = qNames.next()
-        val existing = parent.elements(qName)
-
-        val existingOrNew =
-          existing.headOption getOrElse {
-            val newElement = Element(qName)
-            parent.add(newElement)
-            newElement
-          }
-
-        insertIfNeeded(existingOrNew, qNames)
-      } else
-        parent
-
-    insertIfNeeded(root, path.iterator)
-  }
-
-  def visitSubtree(container: Element, process: Element => Boolean): Unit =
-    for (childNode <- container.content.toList) {
-      childNode match {
-        case e: Element =>
-          if (process(e))
-            visitSubtree(e, process)
-        case _ =>
-      }
-    }
 }

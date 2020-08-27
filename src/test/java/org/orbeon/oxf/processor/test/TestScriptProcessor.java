@@ -18,14 +18,14 @@ import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.Dom4j;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom.Comparator;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -168,7 +168,7 @@ public class TestScriptProcessor extends ProcessorImpl {
                 final Document actualDocument = executionContext.outputProcessor.readInputAsOrbeonDom(pipelineContext, outputName);
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
-                if (!Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
+                if (! Comparator.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
                     throw new OXFException("Assertion failed: output '" + outputName + "' got '" + Dom4jUtils.domToCompactStringJava(actualDocument)
                         +  " ', but expected '" + Dom4jUtils.domToCompactStringJava(expectedDocument) + "'.");
 

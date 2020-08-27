@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 
-public class Dom4jUtilsTest extends TestCase {
+public class ComparatorUtilsTest extends TestCase {
     @Test
     public void testDomToString() {
 

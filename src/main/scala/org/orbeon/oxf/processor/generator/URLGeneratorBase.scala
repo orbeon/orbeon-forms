@@ -17,7 +17,7 @@ import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom.Comparator
 
 import scala.collection.JavaConverters._
 import scala.collection.compat._

@@ -20,7 +20,8 @@ import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.{Dom4j, TransformerUtils, XMLReceiver}
+import org.orbeon.oxf.xml.dom.Support
+import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
@@ -108,7 +109,7 @@ object ResourcesPatcher {
       lang                          <- findConcreteLanguages(langOrWildcard)
       rootForLang                   <- resourceElemsForLang(lang)
     } locally {
-      val elem = Dom4j.ensurePath(rootForLang, path map dom.QName.apply)
+      val elem = Support.ensurePath(rootForLang, path map dom.QName.apply)
       elem.attributeOpt("todo") foreach elem.remove
       elem.setText(value)
     }

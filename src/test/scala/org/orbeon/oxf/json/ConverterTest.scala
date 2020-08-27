@@ -25,7 +25,8 @@ package org.orbeon.oxf.json
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.NumberUtils._
 import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.oxf.xml.{Dom4j, SAXStore, TransformerUtils}
+import org.orbeon.oxf.xml.dom.Comparator
+import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.NodeConversions._
@@ -177,7 +178,7 @@ object ConverterTest {
   /*@XPathFunctions*/ def expectedXmlStrings: List[DocumentInfo] = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
 
   /*@XPathFunctions*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Boolean =
-    Dom4j.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+    Comparator.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 }
 
 class ConverterTest extends AnyFunSpecLike with XMLSupport {

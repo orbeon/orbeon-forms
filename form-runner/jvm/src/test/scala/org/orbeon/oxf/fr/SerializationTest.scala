@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
 class SerializationTest
@@ -45,7 +45,7 @@ class SerializationTest
               <xf:label>Number</xf:label>
             </fr:number>
           </xh:body>
-        </xh:html>
+        </xh:html>.toDocument
 
       withXFormsDocument(xhtml) { doc =>
 
@@ -104,7 +104,7 @@ class SerializationTest
               </fr:foo>
             </fr:bar>
           </xh:body>
-        </xh:html>
+        </xh:html>.toDocument
 
       withXFormsDocument(xhtml) { doc =>
 

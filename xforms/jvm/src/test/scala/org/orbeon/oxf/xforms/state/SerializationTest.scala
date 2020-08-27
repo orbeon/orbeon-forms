@@ -14,14 +14,13 @@
 package org.orbeon.oxf.xforms.state
 
 import org.junit.{Assume, Test}
-import org.orbeon.dom.Document
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.Attributes
 
@@ -30,29 +29,29 @@ import scala.collection.JavaConverters._
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
   // NOTE: For #1890, place and use lang AVTs, see https://github.com/orbeon/orbeon-forms/issues/1890
-  val simpleDoc: Document =
-    <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         lang="{xxf:instance('fr-language-instance')}"
-         xml:lang="{xxf:instance('fr-language-instance')}"
-         xxf:xpath-analysis="true">
-      <xh:head>
-        <xh:title><xf:output value="xxf:lang()"/></xh:title>
-        <xf:model>
-          <xf:instance id="instance">
-            <value>0</value>
-          </xf:instance>
-          <xf:instance id="fr-language-instance">
-            <value>en</value>
-          </xf:instance>
-        </xf:model>
-      </xh:head>
-      <xh:body>
-        <xf:input id="input" ref="instance()"/>
-        <xf:trigger id="trigger"><xf:label/></xf:trigger>
-      </xh:body>
-    </xh:html>
+  val simpleDoc =
+      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+           xmlns:xh="http://www.w3.org/1999/xhtml"
+           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+           lang="{xxf:instance('fr-language-instance')}"
+           xml:lang="{xxf:instance('fr-language-instance')}"
+           xxf:xpath-analysis="true">
+        <xh:head>
+          <xh:title><xf:output value="xxf:lang()"/></xh:title>
+          <xf:model>
+            <xf:instance id="instance">
+              <value>0</value>
+            </xf:instance>
+            <xf:instance id="fr-language-instance">
+              <value>en</value>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <xf:input id="input" ref="instance()"/>
+          <xf:trigger id="trigger"><xf:label/></xf:trigger>
+        </xh:body>
+      </xh:html>.toDocument
 
   @Test def saxStore(): Unit = {
 
@@ -84,16 +83,17 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
 
     // All expected documents
-    val expectedDocs = Seq[Document](
-      <xf:instance id="instance" xmlns:xf="http://www.w3.org/2002/xforms">
-        <value>0</value>
-      </xf:instance>,
-      <xf:instance id="fr-language-instance" xmlns:xf="http://www.w3.org/2002/xforms">
-        <value>en</value>
-      </xf:instance>,
-      <xf:input id="input" ref="instance()" xmlns:xf="http://www.w3.org/2002/xforms"/>,
-      <xf:trigger id="trigger" xmlns:xf="http://www.w3.org/2002/xforms"><xf:label/></xf:trigger>
-    )
+    val expectedDocs =
+      List(
+        <xf:instance id="instance" xmlns:xf="http://www.w3.org/2002/xforms">
+          <value>0</value>
+        </xf:instance>.toDocument,
+        <xf:instance id="fr-language-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+          <value>en</value>
+        </xf:instance>.toDocument,
+        <xf:input id="input" ref="instance()" xmlns:xf="http://www.w3.org/2002/xforms"/>.toDocument,
+        <xf:trigger id="trigger" xmlns:xf="http://www.w3.org/2002/xforms"><xf:label/></xf:trigger>.toDocument
+      )
 
     // All actual documents
     val actualDocs =
@@ -133,8 +133,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
               </xf:instance>
             </xf:model>
           </xh:head>
-        </xh:html>
-
+        </xh:html>.toDocument
 
       assert(doc.staticState.template.isEmpty)
     }
@@ -155,7 +154,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
           <xh:body>
             <xf:group xxf:update="full"/>
           </xh:body>
-        </xh:html>
+        </xh:html>.toDocument
 
       assert(doc.staticState.template.isDefined)
     }

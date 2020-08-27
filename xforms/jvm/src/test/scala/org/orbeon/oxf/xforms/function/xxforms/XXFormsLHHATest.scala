@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatestplus.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.dom.Converter._
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -60,7 +60,7 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
           <xf:output id="hint" ref="instance('results')/@hint"/>
           <xf:output id="alert" ref="instance('results')/@alert"/>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     // NOTE: Make the control invalid so that the alert message is not empty
     for (lhha <- Seq("label", "help", "hint", "alert"))

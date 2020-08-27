@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.Try
@@ -157,59 +157,53 @@ class VersionTest
     val Expectations = List(
       (
         "document contains the signature of some random value hopefully forever lost",
-        elemToDocument(
-          <signed-data>
-            <data>
-              <license>
-                <licensor>Orbeon, Inc.</licensor>
-                <licensee>Wile E. Coyote</licensee>
-                <organization>Acme, Corp.</organization>
-                <email>info@orbeon.com</email>
-                <issued>2013-04-01</issued>
-                <expiration/>
-              </license>
-            </data>
-            <signature>MCwCFDp6Ee9MYRjJnBcDA4RS2SjPjJ8PAhQ1zYrSudg9e7ZheQlnPGDSDiFiKQ==</signature>
-          </signed-data>
-        ),
+        <signed-data>
+          <data>
+            <license>
+              <licensor>Orbeon, Inc.</licensor>
+              <licensee>Wile E. Coyote</licensee>
+              <organization>Acme, Corp.</organization>
+              <email>info@orbeon.com</email>
+              <issued>2013-04-01</issued>
+              <expiration/>
+            </license>
+          </data>
+          <signature>MCwCFDp6Ee9MYRjJnBcDA4RS2SjPjJ8PAhQ1zYrSudg9e7ZheQlnPGDSDiFiKQ==</signature>
+        </signed-data>.toDocument,
         classOf[SignatureException]
       ),
       (
         "document contains empty signature",
-        elemToDocument(
-          <signed-data>
-            <data>
-              <license>
-                <licensor>Orbeon, Inc.</licensor>
-                <licensee>Wile E. Coyote</licensee>
-                <organization>Acme, Corp.</organization>
-                <email>info@orbeon.com</email>
-                <issued>2013-04-01</issued>
-                <expiration/>
-              </license>
-            </data>
-            <signature/>
-          </signed-data>
-        ),
+        <signed-data>
+          <data>
+            <license>
+              <licensor>Orbeon, Inc.</licensor>
+              <licensee>Wile E. Coyote</licensee>
+              <organization>Acme, Corp.</organization>
+              <email>info@orbeon.com</email>
+              <issued>2013-04-01</issued>
+              <expiration/>
+            </license>
+          </data>
+          <signature/>
+        </signed-data>.toDocument,
         classOf[SignatureException]
       ),
       (
         "document contains signature not in Base64",
-        elemToDocument(
-          <signed-data>
-            <data>
-              <license>
-                <licensor>Orbeon, Inc.</licensor>
-                <licensee>Wile E. Coyote</licensee>
-                <organization>Acme, Corp.</organization>
-                <email>info@orbeon.com</email>
-                <issued>2013-04-01</issued>
-                <expiration/>
-              </license>
-            </data>
-            <signature>FUNKY STUFF</signature>
-          </signed-data>
-        ),
+        <signed-data>
+          <data>
+            <license>
+              <licensor>Orbeon, Inc.</licensor>
+              <licensee>Wile E. Coyote</licensee>
+              <organization>Acme, Corp.</organization>
+              <email>info@orbeon.com</email>
+              <issued>2013-04-01</issued>
+              <expiration/>
+            </license>
+          </data>
+          <signature>FUNKY STUFF</signature>
+        </signed-data>.toDocument,
         classOf[SchemaValidationException]
       )
     )
@@ -232,7 +226,7 @@ class VersionTest
 
   describe("License is for old version") {
 
-    val license: Document =
+    val license =
       <signed-data>
         <data>
           <license>
@@ -250,7 +244,7 @@ class VersionTest
           </license>
         </data>
         <signature>MCwCFCHbcWqtslECGXPIUuO6jcEfq0GSAhRU/X9TceCC36jTpkh7oHAHU/7vnw==</signature>
-      </signed-data>
+      </signed-data>.toDocument
 
     it("must succeed") {
       assert(tryLicenseInfo(license).get.isBadVersion)
@@ -260,7 +254,7 @@ class VersionTest
   describe("Build after subscription end") {
 
     // License has subscription ending way in the past
-    val license: Document =
+    val license =
       <signed-data>
         <data>
           <license>
@@ -278,7 +272,7 @@ class VersionTest
           </license>
         </data>
         <signature>MCwCFANERfNHS+vLMFZGftW9Fa0TDUi3AhRYoUMYU0g/BfIgbmWo8LA4vRgK3Q==</signature>
-      </signed-data>
+      </signed-data>.toDocument
 
     it("must succeed") {
       assert(currentBuildIsSnapshot || tryLicenseInfo(license).get.isBuildAfterSubscriptionEnd)
@@ -287,7 +281,7 @@ class VersionTest
 
   describe("License is expired") {
 
-    val license: Document =
+    val license =
       <signed-data>
         <data>
           <license>
@@ -305,7 +299,7 @@ class VersionTest
           </license>
         </data>
         <signature>MCwCFEp9uGxNm2b+61mxKpgBnjxDUmE+AhRcV3FrqBjPGbDPM1kId2R0AGC/FQ==</signature>
-      </signed-data>
+      </signed-data>.toDocument
 
     it("must succeed") {
       assert(tryLicenseInfo(license).get.isExpired)

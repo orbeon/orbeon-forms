@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.{Document => JDocument}
+import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import org.scalatest.funspec.AnyFunSpecLike
@@ -167,65 +167,65 @@ class FormRunnerFunctionsTest
 
   describe("Error Summary sorting") {
 
-    def source: JDocument =
-      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-        <xh:head>
-          <xf:model>
-            <xf:instance>
-              <data>
-                <c1/>
-                <c2/>
-                <c3>
-                  <c4/>
-                  <c5/>
-                  <c6>
-                    <c7/>
-                    <c8/>
-                  </c6>
-                  <c6>
-                    <c7/>
-                    <c8/>
-                  </c6>
-                  <c9/>
-                  <c10/>
-                </c3>
-                <c3>
-                  <c4/>
-                  <c5/>
-                  <c6>
-                    <c7/>
-                    <c8/>
-                  </c6>
-                  <c6>
-                    <c7/>
-                    <c8/>
-                  </c6>
-                  <c9/>
-                  <c10/>
-                </c3>
-                <c11/>
-                <c12/>
-              </data>
-            </xf:instance>
-          </xf:model>
-        </xh:head>
-        <xh:body>
-          <xf:input id="c1" ref="c1"/>
-          <xf:input id="c2" ref="c2"/>
-          <xf:repeat id="c3" ref="c3">
-            <xf:input id="c4" ref="c4"/>
-            <xf:input id="c5" ref="c5"/>
-            <xf:repeat id="c6" ref="c6">
-              <xf:input id="c7" ref="c7"/>
-              <xf:input id="c8" ref="c8"/>
+    def source: dom.Document =
+        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+          <xh:head>
+            <xf:model>
+              <xf:instance>
+                <data>
+                  <c1/>
+                  <c2/>
+                  <c3>
+                    <c4/>
+                    <c5/>
+                    <c6>
+                      <c7/>
+                      <c8/>
+                    </c6>
+                    <c6>
+                      <c7/>
+                      <c8/>
+                    </c6>
+                    <c9/>
+                    <c10/>
+                  </c3>
+                  <c3>
+                    <c4/>
+                    <c5/>
+                    <c6>
+                      <c7/>
+                      <c8/>
+                    </c6>
+                    <c6>
+                      <c7/>
+                      <c8/>
+                    </c6>
+                    <c9/>
+                    <c10/>
+                  </c3>
+                  <c11/>
+                  <c12/>
+                </data>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xf:input id="c1" ref="c1"/>
+            <xf:input id="c2" ref="c2"/>
+            <xf:repeat id="c3" ref="c3">
+              <xf:input id="c4" ref="c4"/>
+              <xf:input id="c5" ref="c5"/>
+              <xf:repeat id="c6" ref="c6">
+                <xf:input id="c7" ref="c7"/>
+                <xf:input id="c8" ref="c8"/>
+              </xf:repeat>
+              <xf:input id="c9" ref="c9"/>
+              <xf:input id="c10" ref="c10"/>
             </xf:repeat>
-            <xf:input id="c9" ref="c9"/>
-            <xf:input id="c10" ref="c10"/>
-          </xf:repeat>
-          <xf:input id="c11" ref="c11"/>
-          <xf:input id="c12" ref="c12"/>
-        </xh:body>
-      </xh:html>
+            <xf:input id="c11" ref="c11"/>
+            <xf:input id="c12" ref="c12"/>
+          </xh:body>
+        </xh:html>.toDocument
 
     it("must order the controls in document order") {
       withTestExternalContext { _ =>

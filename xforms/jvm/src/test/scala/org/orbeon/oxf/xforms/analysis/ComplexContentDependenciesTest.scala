@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.junit._
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
-import org.junit._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -48,7 +48,7 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
           <xf:output id="output1" value="xxf:serialize(instance(), instance('serialization'))"/>
           <xf:output id="output2" value="saxon:serialize(instance(), instance('serialization'))"/>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     assert(getControlValue("input") === "complex")
     assert(getControlValue("output1") === "<div><p>This is <b>complex</b> content.</p></div>")
@@ -81,7 +81,7 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
           <xf:input id="input" ref="first"/>
           <xf:output id="output" value="instance()"/>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     assert(getControlValue("input") === "Teddy")
     assert(getControlValue("output") === "TeddyBear")

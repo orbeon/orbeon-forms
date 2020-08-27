@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatestplus.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.oxf.xforms.control.Controls
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.dom.Converter._
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -74,7 +73,7 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 
           <xf:repeat ref="department" id="repeat-building"/>
         </body>
-      </xh:html>
+      </xh:html>.toDocument
 
     // Test hierarchy string
     assert(document.staticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")

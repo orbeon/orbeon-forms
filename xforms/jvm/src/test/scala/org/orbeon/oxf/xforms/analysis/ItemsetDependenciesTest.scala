@@ -14,11 +14,11 @@
 
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.common.Version
-import org.scalatestplus.junit.AssertionsForJUnit
-import org.orbeon.oxf.test.DocumentTestBase
 import org.junit.{Assume, Test}
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.dom.Converter._
+import org.scalatestplus.junit.AssertionsForJUnit
 
 class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -64,7 +64,7 @@ class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
             </xf:item>
           </xf:select1>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     assert(getControlExternalValue("checkbox") === "1")
     assert(getControlExternalValue("value-selection") === "1")

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.event.ClientEvents
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
@@ -52,7 +52,7 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
             </xf:repeat>
           </xf:repeat>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     assert("my-outer-repeat"               === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat"))
     assert("my-outer-repeat~iteration⊙2"   === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat⊙2"))

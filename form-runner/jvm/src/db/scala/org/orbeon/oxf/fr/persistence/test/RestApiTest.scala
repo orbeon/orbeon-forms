@@ -29,7 +29,6 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatestplus.junit.AssertionsForJUnit
 

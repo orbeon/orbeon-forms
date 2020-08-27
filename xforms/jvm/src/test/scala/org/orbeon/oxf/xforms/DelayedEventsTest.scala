@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
 class DelayedEventsTest
@@ -68,7 +68,7 @@ class DelayedEventsTest
             <xh:body>
               <xf:output id="my-output" value="."/>
             </xh:body>
-          </xh:html>
+          </xh:html>.toDocument
 
         withContainingDocument(doc) {
           assert("event1 event2" === getControlValue("my-output"))
@@ -115,7 +115,7 @@ class DelayedEventsTest
               </xf:select1>
               <xf:input id="my-input" ref="value2[../value1 != 'cat']"/>
             </xh:body>
-          </xh:html>
+          </xh:html>.toDocument
 
         withContainingDocument(doc) {
 

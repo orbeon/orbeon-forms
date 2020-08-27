@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.dom.Document
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.helpers.AttributesImpl
 
@@ -26,7 +26,7 @@ import scala.collection.mutable
 class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
   def newPropertySet = {
-    val properties: Document =
+    val properties =
       <properties xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon">
           http://orbeon.org/oxf/xml/form-runner
@@ -37,7 +37,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
         <property as="xs:string"  name="oxf.xforms.resources.baseline">
           fr:bar fr:baz
         </property>
-      </properties>
+      </properties>.toDocument
 
     PropertyStore.parse(properties).getGlobalPropertySet
   }
@@ -46,7 +46,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
     var propertySet = newPropertySet
 
-    val FooXBL: Document =
+    val FooXBL =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/foo/foo.js"/>
         <xbl:binding id="fr-foo" element="fr|foo, [appearance ~= foo]">
@@ -55,10 +55,10 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           </xbl:resources>
           <xbl:template/>
         </xbl:binding>
-      </xbl:xbl>
+      </xbl:xbl>.toDocument
 
-    val BarXBL: Document =
-      <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    val BarXBL =
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/bar/bar.js"/>
         <xbl:binding id="fr-bar" element="fr|bar, fr|bar[appearance ~= bar]">
           <xbl:resources>
@@ -66,9 +66,9 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           </xbl:resources>
           <xbl:template/>
         </xbl:binding>
-      </xbl:xbl>
+      </xbl:xbl>.toDocument
 
-    val BazXBL: Document =
+    val BazXBL =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/baz/baz.js"/>
         <xbl:binding id="fr-baz" element="fr|baz, fr|toto[mediatype = 'text/html']">
@@ -77,7 +77,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           </xbl:resources>
           <xbl:template/>
         </xbl:binding>
-      </xbl:xbl>
+      </xbl:xbl>.toDocument
 
     val GagaXBL: Document =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -88,7 +88,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           </xbl:resources>
           <xbl:template/>
         </xbl:binding>
-      </xbl:xbl>
+      </xbl:xbl>.toDocument
 
     val Docs = Map(
       "/xbl/orbeon/foo/foo.xbl"   -> FooXBL,

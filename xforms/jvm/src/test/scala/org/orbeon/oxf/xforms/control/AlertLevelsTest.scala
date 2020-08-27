@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
-import org.orbeon.dom.{Document => JDocument}
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.xforms.RelevanceHandling
 
@@ -107,25 +106,25 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(Set.empty))
 
       locally {
-        val expected: JDocument =
+        val expected =
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
             <my-section>
               <number>1001</number>
               <text xxf:warning="&lt;ul&gt;&lt;li&gt;Should be shorter than 10 characters&lt;/li&gt;&lt;li&gt;Should not start with a lowercase letter&lt;/li&gt;&lt;/ul&gt;">this is a little bit too long and starts with a lowercase letter!</text>
             </my-section>
-          </form>
+          </form>.toDocument
 
         assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("warning")))
       }
 
       locally {
-        val expected: JDocument =
+        val expected =
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
             <my-section>
               <number xxf:info="Nice, greater than 1000!">1001</number>
               <text>this is a little bit too long and starts with a lowercase letter!</text>
             </my-section>
-          </form>
+          </form>.toDocument
 
         assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("info")))
       }
@@ -133,13 +132,13 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       locally {
         setControlValue(TextControlId, "This is a little bit too long!")
 
-        val expected: JDocument =
+        val expected =
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
             <my-section>
               <number xxf:info="Nice, greater than 1000!">1001</number>
               <text xxf:warning="Should be shorter than 10 characters">This is a little bit too long!</text>
             </my-section>
-          </form>
+          </form>.toDocument
 
         assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("warning", "info")))
       }

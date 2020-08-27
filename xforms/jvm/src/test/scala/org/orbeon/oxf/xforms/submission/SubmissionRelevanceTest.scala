@@ -15,29 +15,29 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom._
 import org.orbeon.oxf.test.XMLSupport
-import org.scalatest.funspec.AnyFunSpec
-import org.orbeon.oxf.xml.Dom4j._
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xforms.{RelevanceHandling, XFormsNames}
+import org.scalatest.funspec.AnyFunSpec
 
 class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
 
   describe("Submission relevance options") {
 
     def newDoc: Document =
-      <form xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-        <e1 xf:relevant="false">e1</e1>
-        <e2 xxf:relevant="false"/>
-        <e3 xf:relevant="true"/>
-        <e4 xxf:relevant="true"/>
-        <e5>
-          <e5-iteration xf:relevant="false">
-            <e6 xf:relevant="true">e61</e6>
-          </e5-iteration>
-          <e5-iteration>
-            <e6 xf:relevant="false">e62</e6>
-          </e5-iteration>
-        </e5>
-      </form>
+        <form xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <e1 xf:relevant="false">e1</e1>
+          <e2 xxf:relevant="false"/>
+          <e3 xf:relevant="true"/>
+          <e4 xxf:relevant="true"/>
+          <e5>
+            <e5-iteration xf:relevant="false">
+              <e6 xf:relevant="true">e61</e6>
+            </e5-iteration>
+            <e5-iteration>
+              <e6 xf:relevant="false">e62</e6>
+            </e5-iteration>
+          </e5>
+        </form>.toDocument
 
     val expected: Map[RelevanceHandling, Document] =
       Map(
@@ -55,7 +55,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
                 <e6 xxf:relevant="false">e62</e6>
               </e5-iteration>
             </e5>
-          </form>,
+          </form>.toDocument,
         RelevanceHandling.Remove ->
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
             <e2/>
@@ -64,7 +64,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
             <e5>
               <e5-iteration/>
             </e5>
-          </form>,
+          </form>.toDocument,
         RelevanceHandling.Empty ->
           <form xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
             <e1 xxf:relevant="false"/>
@@ -79,7 +79,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
                 <e6 xxf:relevant="false"/>
               </e5-iteration>
             </e5>
-          </form>
+          </form>.toDocument
       )
 
     val XFRelevantQName  = QName("relevant", XFormsNames.XFORMS_NAMESPACE_SHORT)

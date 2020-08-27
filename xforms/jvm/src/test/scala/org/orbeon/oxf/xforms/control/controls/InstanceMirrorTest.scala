@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.scalatest.funspec.AnyFunSpecLike
 
 class InstanceMirrorTest
@@ -71,7 +71,7 @@ class InstanceMirrorTest
               </xf:model>
             </xh:head>
             <xh:body/>
-          </xh:html>
+          </xh:html>.toDocument
 
         implicit val logger: IndentedLogger = document.indentedLogger
 
@@ -187,7 +187,7 @@ class InstanceMirrorTest
             <xh:body>
               <fr:gaga id="my-gaga" ref="instance()"/>
             </xh:body>
-          </xh:html>
+          </xh:html>.toDocument
 
         val outerInstance = document.findInstanceInDescendantOrSelf("outer-instance").get
         val innerInstance = document.findInstanceInDescendantOrSelf("gaga-instance").get
@@ -266,7 +266,7 @@ class InstanceMirrorTest
                 <fr:gaga id="my-gaga"/>
               </xf:group>
             </xh:body>
-          </xh:html>
+          </xh:html>.toDocument
 
         val PositionInputId = "position-input"
         val GagaInputId     = "my-gaga" + ComponentSeparator + "gaga-input"

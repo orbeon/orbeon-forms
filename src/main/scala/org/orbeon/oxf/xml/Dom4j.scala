@@ -18,12 +18,10 @@ import java.{lang => jl, util => ju}
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
-import scala.xml.{Elem, XML}
 
 object Dom4j {
 
@@ -178,14 +176,4 @@ object Dom4j {
         case _ =>
       }
     }
-
-
-  // TODO: should ideally not got go through serialization/deserialization
-  implicit def elemToDocument(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
-  implicit def elemToElement(e: Elem): Element   = Dom4jUtils.readDom4j(e.toString).getRootElement
-  implicit def elementToElem(e: Element): Elem   = XML.loadString(e.serializeToString())
-
-  // TODO: There is probably a better way to write these conversions
-  implicit def scalaElemSeqToDom4jElementSeq(seq: Iterable[Elem]): Seq[Element] = seq map elemToElement toList
-  implicit def dom4jElementSeqToScalaElemSeq(seq: Iterable[Element]): Seq[Elem] = seq map elementToElem toList
 }

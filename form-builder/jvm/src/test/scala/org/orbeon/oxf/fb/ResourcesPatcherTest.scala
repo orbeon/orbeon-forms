@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.dom._
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.{AppForm, ResourcesPatcher}
-import org.orbeon.oxf.properties.{Properties, PropertySet, PropertyStore}
+import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
-import org.orbeon.oxf.util.CoreUtils._
+
 
 // NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
 class ResourcesPatcherTest
@@ -40,7 +40,7 @@ class ResourcesPatcherTest
     it(s"must patch resources as expected") {
 
       val propertySet = {
-        val properties: Document =
+        val properties =
           <properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
             <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.buttons.existing" value="Existing"/>
             <property as="xs:string"  name="oxf.fr.resource.*.*.fr.detail.buttons.existing" value="Existant"/>
@@ -50,12 +50,12 @@ class ResourcesPatcherTest
             <property as="xs:string"  name="oxf.fr.resource.*.*.de.detail.labels.missing"   value="Vermisst"/>
             <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.buttons.acme"      value="Acme Existing"/>
             <property as="xs:string"  name="oxf.fr.resource.*.*.*.detail.labels.acme"       value="Acme Missing"/>
-          </properties>
+          </properties>.toDocument
 
         PropertyStore.parse(properties).getGlobalPropertySet
       }
 
-      def newDoc: Document =
+      def newDoc =
         <resources>
           <resource xml:lang="en">
             <buttons>
@@ -69,9 +69,9 @@ class ResourcesPatcherTest
               <acme>OVERRIDE ME</acme>
             </buttons>
           </resource>
-        </resources>
+        </resources>.toDocument
 
-      val expected: Document =
+      val expected =
         <resources>
           <resource xml:lang="en">
             <buttons>
@@ -97,7 +97,7 @@ class ResourcesPatcherTest
               </labels>
             </detail>
           </resource>
-        </resources>
+        </resources>.toDocument
 
       val initial = newDoc
 
@@ -186,7 +186,7 @@ class ResourcesPatcherTest
   describe("Untranslated resources") {
     it(s"must bracket as needed") {
 
-      def newDoc: Document =
+      def newDoc =
         <resources>
           <resource xml:lang="en">
             <authentication>
@@ -220,9 +220,9 @@ class ResourcesPatcherTest
               </login>
             </authentication>
           </resource>
-        </resources>
+        </resources>.toDocument
 
-      val expected: Document =
+      val expected =
         <resources>
           <resource xml:lang="en">
             <authentication>
@@ -256,7 +256,7 @@ class ResourcesPatcherTest
               </login>
             </authentication>
           </resource>
-        </resources>
+        </resources>.toDocument
 
       val initial = newDoc
 

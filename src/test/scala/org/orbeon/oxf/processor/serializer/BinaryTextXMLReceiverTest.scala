@@ -16,11 +16,10 @@ package org.orbeon.oxf.processor.serializer
 import java.io.ByteArrayOutputStream
 
 import org.junit.Test
-import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 
 // As of 2012-07-05, this tests a minimal subset of BinaryTextXMLReceiver only. We should test more combinations of
@@ -31,11 +30,11 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
 
     val (response, receiver) = responseWithReceiver
 
-    val document: Document =
+    val document =
       <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xsi:type="xs:base64Binary"/>
+        xsi:type="xs:base64Binary"/>.toDocument
 
     TransformerUtils.writeDom4j(document, receiver)
 
@@ -46,12 +45,12 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
     for (contentType <- Seq("text/html; charset=utf-16", "text/html", "image/png")) {
       val (response, receiver) = responseWithReceiver
 
-      val document: Document =
+      val document =
         <document
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xsi:type="xs:base64Binary"
-          content-type={contentType}/>
+          content-type={contentType}/>.toDocument
 
       TransformerUtils.writeDom4j(document, receiver)
 

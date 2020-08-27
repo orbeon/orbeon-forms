@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.common.Version
 import org.junit._
-import org.scalatestplus.junit._
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
+import org.scalatestplus.junit._
 
 class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -151,7 +151,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         <xh:body>
           <xf:input id="input" ref="instance()"/>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     // Test all combinations of MIPs
     for {

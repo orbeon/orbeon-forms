@@ -14,10 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
-import org.orbeon.dom.Document
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.xml.Dom4j._
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatestplus.junit.AssertionsForJUnit
 
@@ -29,7 +28,7 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
 
     val (_, metadataOpt) = RequestReader.dataAndMetadataAsString(is, metadata = true)
 
-    val expected: Document =
+    val expected =
       <metadata>
         <title xml:lang="en">ACME Order Form</title>
         <title xml:lang="fr">Formulaire de commande ACME</title>
@@ -43,7 +42,7 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
           <permission operations="create"/>
         </permissions>
         <available>false</available>
-      </metadata>
+      </metadata>.toDocument
 
     assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map Dom4jUtils.readDom4j get)
   }

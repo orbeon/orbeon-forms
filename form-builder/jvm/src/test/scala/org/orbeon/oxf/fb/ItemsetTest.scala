@@ -16,8 +16,8 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -44,7 +44,7 @@ class ItemsetTest
             FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToDom4j
 
           for ((expected, actual) <- expectedItems.zipAll(actualItems, null, null))
-            assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
+            assertXMLDocumentsIgnoreNamespacesInScope(expected.toDocument, actual)
         }
 
         // Read itemsets
@@ -212,7 +212,7 @@ class ItemsetTest
               }
             }</resources>
           val actualResources = resourceForNewControl()
-          assertXMLDocumentsIgnoreNamespacesInScope(actualResources, expectedResources)
+          assertXMLDocumentsIgnoreNamespacesInScope(actualResources.toDocument, expectedResources.toDocument)
         }
 
         // Editing a form in English; English placeholders are added

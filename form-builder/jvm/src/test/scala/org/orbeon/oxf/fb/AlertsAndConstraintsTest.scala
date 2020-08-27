@@ -17,7 +17,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -25,6 +25,8 @@ import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.{xml => sx}
+
+
 class AlertsAndConstraintsTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -176,7 +178,7 @@ class AlertsAndConstraintsTest
                   <alert>Alert for fr</alert>
                 </control-1>
               </resource>
-            </resources>
+            </resources>.toDocument
 
           assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
         }
@@ -218,7 +220,7 @@ class AlertsAndConstraintsTest
                   <alert>Alert for fr</alert>
                 </control-1>
               </resource>
-            </resources>
+            </resources>.toDocument
 
           assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
         }
@@ -552,7 +554,7 @@ class AlertsAndConstraintsTest
   private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 
     left zip right foreach {
-      case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
+      case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(l.toDocument, TransformerUtils.tinyTreeToDom4j(r))
     }
 
     assert(left.size === right.size)

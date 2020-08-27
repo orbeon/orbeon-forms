@@ -22,8 +22,8 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -225,7 +225,7 @@ class FormBuilderFunctionsTest
           val explanationResourceHolder = FormBuilder.resourcesRoot.child("resource").child(*).last
           val actual   = <holder> { explanationResourceHolder.child(*) map nodeInfoToElem } </holder>
           val expected = <holder><text/></holder>
-          assertXMLDocumentsIgnoreNamespacesInScope(actual, expected)
+          assertXMLDocumentsIgnoreNamespacesInScope(actual.toDocument, expected.toDocument)
         }
 
         // Check that the <fr:text ref=""> points to the corresponding <text> resource
@@ -342,7 +342,7 @@ class FormBuilderFunctionsTest
                 <xf:input id="control-1-control" bind="control-1-bind"/>
               </xf:group>
             </xh:body>
-          </xh:html>
+          </xh:html>.toDocument
 
         withContainingDocument(doc) {
           val section1 = doc.getControlByEffectiveId("section-1-section")
@@ -386,8 +386,8 @@ class FormBuilderFunctionsTest
   describe("Analyze known constraint") {
 
     import CommonConstraint.analyzeKnownConstraint
-    import org.orbeon.xforms.XFormsNames._
     import org.orbeon.oxf.xml.XMLConstants._
+    import org.orbeon.xforms.XFormsNames._
 
     val Library = XFormsFunctionLibrary
 

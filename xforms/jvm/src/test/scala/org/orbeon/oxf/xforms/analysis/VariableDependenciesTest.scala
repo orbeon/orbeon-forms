@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.junit._
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
-import org.junit._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -50,7 +50,7 @@ class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit 
             <xf:label ref="$lang"/>
           </xf:output>
         </xh:body>
-      </xh:html>
+      </xh:html>.toDocument
 
     assert(getControl("my-output").getLabel === "Name")
 

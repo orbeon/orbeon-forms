@@ -24,7 +24,9 @@ import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
-import org.orbeon.oxf.util.{MarkupUtils, NetUtils, URLRewriterUtils, XPathCache}
+import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
+import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttributeControl}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceData}
@@ -35,7 +37,7 @@ import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo, VirtualNode}
 import org.orbeon.xforms.XFormsNames
 import org.w3c.dom
 import org.xml.sax.InputSource
-import XFormsContextStackSupport._
+
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
@@ -139,7 +141,7 @@ object XFormsUtils {
     if (acceptHTML && containsHTML != null && !containsHTML(0)) {
       // We went through the subtree and did not find any HTML
       // If the caller supports the information, return a non-escaped string so we can optimize output later
-      MarkupUtils.unescapeXmlMinimal(sb.toString)
+      sb.toString.unescapeXmlMinimal
     } else {
       // We found some HTML, just return it
       sb.toString
@@ -179,7 +181,7 @@ object XFormsUtils {
       val boundItem = currentBindingContext.getSingleItem
       val tempResult = DataModel.getValue(boundItem)
       if (tempResult != null)
-        return if (acceptHTML && containsHTML == null) MarkupUtils.escapeXmlMinimal(tempResult) else tempResult
+        return if (acceptHTML && containsHTML == null) tempResult.escapeXmlMinimal else tempResult
       else {
         // There is a single-node binding but it doesn't point to an acceptable item
         return null
@@ -210,7 +212,7 @@ object XFormsUtils {
                 XFormsError.handleNonFatalXPathError(container, t)
                 ""
             }
-          if (acceptHTML && containsHTML == null) MarkupUtils.escapeXmlMinimal(tempResult) else tempResult
+          if (acceptHTML && containsHTML == null) tempResult.escapeXmlMinimal else tempResult
         } else
           // There is a value attribute but the evaluation context is empty
           null
@@ -232,7 +234,7 @@ object XFormsUtils {
       )
     )
     if (acceptHTML && containsHTML != null && !containsHTML(0))
-      MarkupUtils.unescapeXmlMinimal(sb.toString)
+      sb.toString.unescapeXmlMinimal
     else
       sb.toString
   }
@@ -599,7 +601,7 @@ object XFormsUtils {
           sb.append(outputControl.getExternalValue())
         }
         else { // Mediatype is not HTML so we don't escape
-          sb.append(MarkupUtils.escapeXmlMinimal(outputControl.getExternalValue()))
+          sb.append(outputControl.getExternalValue().escapeXmlMinimal)
         }
         else if (isHTMLMediatype) { // HTML is not allowed here, better tell the user
           throw new OXFException("HTML not allowed within element: " + childElement.getName)
@@ -645,7 +647,7 @@ object XFormsUtils {
               sb.append(' ')
               sb.append(currentAttributeName)
               sb.append("=\"")
-              if (resolvedValue != null) sb.append(MarkupUtils.escapeXmlMinimal(resolvedValue))
+              if (resolvedValue != null) sb.append(resolvedValue.escapeXmlMinimal)
               sb.append('"')
             }
           }
@@ -668,7 +670,7 @@ object XFormsUtils {
     }
 
     override def text(text: Text) {
-      sb.append(if (acceptHTML) MarkupUtils.escapeXmlMinimal(text.getStringValue)
+      sb.append(if (acceptHTML) text.getStringValue.escapeXmlMinimal
       else text.getStringValue
       )
       lastIsStart = false

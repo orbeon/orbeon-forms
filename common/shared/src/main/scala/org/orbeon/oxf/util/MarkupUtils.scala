@@ -29,9 +29,6 @@ object MarkupUtils {
   @JSExport // AjaxServer.js, remove when possible
   def normalizeSerializedHtml(s: String): String = s.normalizeSerializedHtml
 
-  // Java callers, remove when possible
-  def unescapeXmlMinimal(s: String): String = s.unescapeXmlMinimal
-
   implicit class MarkupStringOps(private val s: String) extends AnyVal {
 
     def escapeXmlMinimal: String =

@@ -105,7 +105,7 @@ object AjaxRequest {
 
           indent(3)
           requestDocumentString.append(s"""<xxf:property name="${key.escapeXmlForAttribute}">""")
-          requestDocumentString.append(stringValue.escapeXmlMinimal.removeInvalidXmlCharacters)
+          requestDocumentString.append(stringValue.escapeXmlMinimal.filterOutInvalidXmlCharacters)
           requestDocumentString.append("</xxf:property>")
           newLine()
         }

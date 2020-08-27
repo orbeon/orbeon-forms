@@ -56,7 +56,7 @@ object MarkupUtils {
         "&quot;"
       )
 
-    def removeInvalidXmlCharacters: String =
+    def filterOutInvalidXmlCharacters: String =
       RemoveDisallowedXmlCharactersRegex.pattern.matcher(s).replaceAll("")
 
     def unescapeXmlMinimal: String =

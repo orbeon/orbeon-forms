@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import java.util.{List => JList}
 import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
@@ -24,7 +23,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 import scala.xml.{Elem, XML}
 
 object Dom4j {
@@ -77,14 +75,6 @@ object Dom4j {
   private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String => String) =
     left.lengthCompare(right.size) == 0 && (left.zip(right) forall
       { case (n1, n2) => compareTwoNodes(n1, n2)(normalizeText) })
-
-  private implicit def dom4jListToNodeSeq(l: JList[_]): Seq[Node] = l.asInstanceOf[JList[Node]].asScala
-
-  // An ordering for attributes, which takes into account the namespace URI and the local name
-  private implicit object AttributeOrdering extends Ordering[Attribute] {
-    def compare(x: Attribute, y: Attribute): Int =
-      x.getQName.uriQualifiedName compare y.getQName.uriQualifiedName
-  }
 
   private def compareTwoNodes(left: Node, right: Node)(normalizeText: String => String): Boolean =
     (left, right) match {

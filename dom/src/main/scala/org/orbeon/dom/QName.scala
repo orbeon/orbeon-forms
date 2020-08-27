@@ -79,6 +79,17 @@ object QName {
         if (! namespace.prefix.isEmpty) namespace.prefix + ":" + localName else localName
     )
   }
+
+  // Compare first by namespace URI then by local name
+  implicit object QNameOrdering extends Ordering[QName] {
+    def compare(x: QName, y: QName): Int = {
+      val nsOrder = x.namespace.uri compareTo y.namespace.uri
+      if (nsOrder != 0)
+        nsOrder
+      else
+        x.localName compareTo y.localName
+    }
+  }
 }
 
 //

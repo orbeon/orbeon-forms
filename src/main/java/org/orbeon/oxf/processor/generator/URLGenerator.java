@@ -421,7 +421,7 @@ public class URLGenerator extends ProcessorImpl {
                             }
 
                             final List<String> readHeaders = new LinkedList<String>();
-                            for (Object o : configElement.elements("read-header")) {
+                            for (Object o : configElement.jElements("read-header")) {
                                 final Element el = (Element) o;
                                 readHeaders.add(el.getStringValue());
                             }

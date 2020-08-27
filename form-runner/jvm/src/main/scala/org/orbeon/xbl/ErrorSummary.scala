@@ -391,7 +391,7 @@ object ErrorSummary {
 
       // We work with the underlying DOM here
       val newElemForSorting  = unsafeUnwrapElement(newErrorElem)
-      val rootElemDomContent = unsafeUnwrapElement(rootElem).content.asScala
+      val rootElemDomContent = unsafeUnwrapElement(rootElem).content
 
       import BinarySearching._
 

@@ -622,7 +622,7 @@ object XFormsUtils {
         if (containsHTML != null) containsHTML(0) = true
         sb.append('<')
         sb.append(element.getName)
-        val attributes = element.attributes
+        val attributes = element.jAttributes
         if (attributes.size > 0) {
           for (attribute <- attributes.asScala) {
             val currentAttribute = attribute.asInstanceOf[Attribute]

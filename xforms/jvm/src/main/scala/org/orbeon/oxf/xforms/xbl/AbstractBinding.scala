@@ -128,7 +128,7 @@ case class AbstractBinding(
   val constantInstances: Map[(Int, Int), DocumentInfo] = (
     for {
       (m, mi) <- modelElements.zipWithIndex
-      (i, ii) <- Dom4j.elements(m, XFORMS_INSTANCE_QNAME).zipWithIndex
+      (i, ii) <- m.elements(XFORMS_INSTANCE_QNAME).zipWithIndex
       im      = new ThrowawayInstance(i)
       if im.readonly && im.useInlineContent
     } yield
@@ -142,9 +142,9 @@ case class AbstractBinding(
     (e => Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
 
   private def templateRootOption = templateElementOpt map { e =>
-    if (e.elements.size != 1)
+    if (e.jElements.size != 1)
       throw new OXFException("xxbl:transform requires a single child element.")
-    e.elements.get(0)
+    e.jElements.get(0)
   }
 
   private lazy val transformConfig =
@@ -200,22 +200,22 @@ object AbstractBinding {
 
     val styles =
       for {
-        resourcesElement <- Dom4j.elements(bindingElem, XBL_RESOURCES_QNAME)
-        styleElement     <- Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
+        resourcesElement <- bindingElem.elements(XBL_RESOURCES_QNAME)
+        styleElement     <- resourcesElement.elements(XBL_STYLE_QNAME)
       } yield
         HeadElement(styleElement)
 
     val handlers =
       for {
         handlersElement <- Option(bindingElem.element(XBL_HANDLERS_QNAME)).toSeq
-        handlerElement  <- Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
+        handlerElement  <- handlersElement.elements(XBL_HANDLER_QNAME)
       } yield
         handlerElement
 
     val modelElements =
       for {
         implementationElement <- Option(bindingElem.element(XBL_IMPLEMENTATION_QNAME)).toSeq
-        modelElement          <- Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
+        modelElement          <- implementationElement.elements(XFORMS_MODEL_QNAME)
       } yield
         modelElement
 

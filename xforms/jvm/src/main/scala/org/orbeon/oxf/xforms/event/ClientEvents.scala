@@ -61,14 +61,14 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     val bubbles           = attributeValue("bubbles")    != "false" // default is true
     val cancelable        = attributeValue("cancelable") != "false" // default is true
 
-    lazy val properties   = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e => (e.attributeValue("name"), Some(e.getText)) } toMap
+    lazy val properties   = element.elements(XXFORMS_PROPERTY_QNAME) map { e => (e.attributeValue("name"), Some(e.getText)) } toMap
     lazy val valueOpt     = properties.get("value").flatten
     lazy val serverEventsValue = properties.get("value").flatten getOrElse element.getText // global vs. inline server events don't have the same format
   }
 
   def extractLocalEvents(actionElement: Element): List[LocalEvent] =
     if (actionElement ne null)
-      Dom4j.elements(actionElement, XXFORMS_EVENT_QNAME) map (LocalEvent(_, trusted = false)) toList
+      actionElement.elements(XXFORMS_EVENT_QNAME) map (LocalEvent(_, trusted = false)) toList
     else
       Nil
 
@@ -82,7 +82,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Decode encrypted server events
       def decodeServerEvents(text: String) =
-        Dom4j.elements(EncodeDecode.decodeXML(text, true).getRootElement, XXFORMS_EVENT_QNAME) map
+        EncodeDecode.decodeXML(text, true).getRootElement.elements(XXFORMS_EVENT_QNAME) map
           (LocalEvent(_, trusted = true)) toList
 
       // Gather all events including decoding action server events

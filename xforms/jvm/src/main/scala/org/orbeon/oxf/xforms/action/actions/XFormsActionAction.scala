@@ -83,7 +83,7 @@ class XFormsActionAction extends XFormsAction {
 
         // Iterate over child actions
         var variablesCount = 0
-        for (childActionElement <- Dom4j.elements(actionElement)) {
+        for (childActionElement <- actionElement.elements) {
 
           val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 

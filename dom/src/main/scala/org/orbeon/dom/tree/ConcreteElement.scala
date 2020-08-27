@@ -37,7 +37,7 @@ class ConcreteElement(var qname: QName)
   private var _internalContent  = new ju.ArrayList[Node](DefaultContentListSize)
   protected def internalContent = _internalContent
 
-  def content = new ContentListFacade[Node](this, internalContent)
+  def jContent = new ContentListFacade[Node](this, internalContent)
 
   /**
    * Stores the parent branch of this node which is either a Document if this
@@ -191,7 +191,7 @@ class ConcreteElement(var qname: QName)
     null
   }
 
-  def elements: ju.List[Element] = {
+  def jElements: ju.List[Element] = {
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
@@ -208,7 +208,7 @@ class ConcreteElement(var qname: QName)
     ju.Collections.unmodifiableList(answer)
   }
 
-  def elements(name: String): ju.List[Element] = {
+  def jElements(name: String): ju.List[Element] = {
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
@@ -227,7 +227,7 @@ class ConcreteElement(var qname: QName)
     ju.Collections.unmodifiableList(answer)
   }
 
-  def elements(qName: QName): ju.List[Element] = {
+  def jElements(qName: QName): ju.List[Element] = {
     val list = internalContent
     val answer = new ju.ArrayList[Element]()
     val size = list.size
@@ -247,18 +247,18 @@ class ConcreteElement(var qname: QName)
   }
 
   def elements(name: String, namespace: Namespace): ju.List[Element] = {
-    elements(QName(name, namespace))
+    jElements(QName(name, namespace))
   }
 
   //  FIXME: These all make copies of the content. But some callers rely on this to prevent concurrent changes.
-  def elementIterator(): ju.Iterator[Element] = elements.iterator()
-  def elementIterator(name: String): ju.Iterator[Element] = elements(name).iterator()
+  def jElementIterator(): ju.Iterator[Element] = jElements.iterator()
+  def jElementIterator(name: String): ju.Iterator[Element] = jElements(name).iterator()
 
-  def attributes: ju.List[Attribute] = {
+  def jAttributes: ju.List[Attribute] = {
     new ContentListFacade[Attribute](this, _attributes)
   }
 
-  def attributeIterator: ju.Iterator[Attribute] = _attributes.iterator()
+  def jAttributeIterator: ju.Iterator[Attribute] = _attributes.iterator()
 
   def attribute(index: Int): Attribute = _attributes.get(index)
   def attributeCount: Int = _attributes.size

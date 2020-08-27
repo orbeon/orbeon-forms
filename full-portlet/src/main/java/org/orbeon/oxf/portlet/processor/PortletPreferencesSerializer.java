@@ -49,11 +49,11 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
         final Document document = readInputAsOrbeonDom(pipelineContext, INPUT_DATA);
 
         boolean modified = false;
-        for (Iterator i = document.getRootElement().elements().iterator(); i.hasNext();) {
+        for (Iterator i = document.getRootElement().jElements().iterator(); i.hasNext();) {
             final Element currentElement = (Element) i.next();
             final String currentName = currentElement.element("name").getStringValue();
 
-            final List valueElements = currentElement.elements("value");
+            final List valueElements = currentElement.jElements("value");
             if (valueElements.size() > 0) {
                 // There are some values, extract them...
                 final String[] currentValuesArray = new String[valueElements.size()];

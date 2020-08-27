@@ -28,9 +28,9 @@ object URLGeneratorBase {
 
     val headerPairs =
       for {
-        headerElem  <- Dom4j.elements(configElement, "header")
+        headerElem  <- configElement.elements("header")
         headerName  = headerElem.element("name").getStringValue
-        valueElem   <- headerElem.elements("value").asScala
+        valueElem   <- headerElem.elements("value")
         headerValue = valueElem.getStringValue
       } yield
         headerName -> headerValue

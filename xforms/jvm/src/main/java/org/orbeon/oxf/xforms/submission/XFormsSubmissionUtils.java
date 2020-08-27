@@ -61,7 +61,7 @@ public class XFormsSubmissionUtils {
                     // Only care about elements
 
                     // Only consider leaves i.e. elements without children elements
-                    final List children = element.elements();
+                    final List children = element.jElements();
                     if (children == null || children.size() == 0) {
 
                         final String value = element.getText();

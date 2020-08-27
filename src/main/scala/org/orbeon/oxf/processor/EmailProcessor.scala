@@ -164,7 +164,7 @@ class EmailProcessor extends ProcessorImpl {
     }
 
     def addRecipients(elementName: String, recipientType: RecipientType) =
-      for (element <- messageElement.elements(elementName).asScala) {
+      for (element <- messageElement.jElements(elementName).asScala) {
         val addresses = createAddresses(element)
         message.addRecipients(recipientType, addresses)
       }
@@ -195,7 +195,7 @@ class EmailProcessor extends ProcessorImpl {
     addRecipients("bcc", Message.RecipientType.BCC)
 
     // Set headers if any
-    for (headerElement <- messageElement.elements("header").asScala) {
+    for (headerElement <- messageElement.jElements("header").asScala) {
       val headerName  = headerElement.element("name").getTextTrim  // required
       val headerValue = headerElement.element("value").getTextTrim // required
 
@@ -232,7 +232,7 @@ class EmailProcessor extends ProcessorImpl {
     def handleBody(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, bodyElement: Element): Unit = {
 
       // Find out if there are embedded parts
-      val parts = bodyElement.elementIterator("part")
+      val parts = bodyElement.jElementIterator("part")
       val multipartOption =
         if (bodyElement.getName == "body") {
           val bodyMultipart = bodyElement.attributeValueOpt("mime-multipart")
@@ -292,16 +292,16 @@ class EmailProcessor extends ProcessorImpl {
             val needsRootElement   = mediatype == ContentTypes.XhtmlContentType
             val mayHaveRootElement = mediatype == ContentTypes.HtmlContentType
 
-            if (needsRootElement && partOrBodyElement.elements.size != 1)
+            if (needsRootElement && partOrBodyElement.jElements.size != 1)
               throw new ValidationException(
                 s"The `<body>` or `<part>` element must contain exactly one element for ${ContentTypes.XhtmlContentType}",
                 partOrBodyElement.getData.asInstanceOf[LocationData]
               )
 
-            val hasRootElement = needsRootElement || mayHaveRootElement && ! partOrBodyElement.elements.isEmpty
+            val hasRootElement = needsRootElement || mayHaveRootElement && ! partOrBodyElement.jElements.isEmpty
 
             // Create Document and convert it into a String
-            val rootElement = if (hasRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
+            val rootElement = if (hasRootElement) partOrBodyElement.jElements.get(0) else partOrBodyElement
             val partDocument = dom.Document()
             partDocument.setRootElement(rootElement.deepCopy.asInstanceOf[Element])
             Right(handleInlinePartContent(partDocument, mediatype, hasRootElement))

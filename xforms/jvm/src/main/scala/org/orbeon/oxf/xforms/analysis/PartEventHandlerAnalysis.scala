@@ -89,11 +89,11 @@ trait PartEventHandlerAnalysis {
         throw new NotImplementedError(s"""`runat="server"` is not supported""")
 
       val params =
-        Dom4j.elements(elem, XFORMS_PARAM_QNAME) map (p => p.attributeValue("name") -> p.attributeValue("value"))
+        elem.elements(XFORMS_PARAM_QNAME) map (p => p.attributeValue("name") -> p.attributeValue("value"))
 
       val body =
         if (params.nonEmpty)
-          Dom4j.elements(elem, XFORMS_BODY_QNAME).headOption map (_.getStringValue) getOrElse ""
+          elem.elements(XFORMS_BODY_QNAME).headOption map (_.getStringValue) getOrElse ""
         else
           elem.getStringValue
 

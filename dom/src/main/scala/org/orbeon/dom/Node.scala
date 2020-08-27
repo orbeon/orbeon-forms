@@ -32,10 +32,9 @@ object Node {
       n.accept(
         new VisitorSupport {
           override def visit(elem: Element) {
-            val children = elem.content
             var previousNode: Node = null
             var sb: jl.StringBuilder = null
-            for (currentNode <- children.iterator.asScala) {
+            for (currentNode <- elem.nodeIterator) {
               if (previousNode ne null) {
                 previousNode match {
                   case previousNodeText: Text if currentNode.isInstanceOf[Text] =>

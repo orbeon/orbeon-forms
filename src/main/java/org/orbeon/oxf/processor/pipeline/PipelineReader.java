@@ -111,7 +111,7 @@ public class PipelineReader extends ProcessorImpl {
     private static List<ASTStatement> readStatements(Element containerElement) {
 
         List<ASTStatement> result = new ArrayList<ASTStatement>();
-        for (Iterator i = containerElement.elementIterator(); i.hasNext();) {
+        for (Iterator i = containerElement.jElementIterator(); i.hasNext();) {
             final Element element = (Element) i.next();
             if (element.getName().equals("processor")) {
                 // Processor
@@ -121,7 +121,7 @@ public class PipelineReader extends ProcessorImpl {
                     processorCall.setId(element.attributeValue("id"));
 
                     // Inputs/outputs
-                    for (Iterator j = element.elementIterator(); j.hasNext();) {
+                    for (Iterator j = element.jElementIterator(); j.hasNext();) {
                         final Element inputOutputElement = (Element) j.next();
 
                         // Read common attributes
@@ -132,7 +132,7 @@ public class PipelineReader extends ProcessorImpl {
                                 inputOutput.setSchemaHref(inputOutputElement.attributeValue("schema-href"));
                                 inputOutput.setSchemaUri(inputOutputElement.attributeValue("schema-uri"));
                                 inputOutput.setDebug(inputOutputElement.attributeValue("debug"));
-                                Iterator childrenIterator = inputOutputElement.elementIterator();
+                                Iterator childrenIterator = inputOutputElement.jElementIterator();
                                 if(childrenIterator.hasNext())
                                     inputOutput.setContent((Element) childrenIterator.next());
                             }
@@ -181,7 +181,7 @@ public class PipelineReader extends ProcessorImpl {
                     choose.setSchemaUri(element.attributeValue("schema-uri"));
                     choose.setDebug(element.attributeValue("debug"));
 
-                    for (Iterator j = element.elementIterator(); j.hasNext();) {
+                    for (Iterator j = element.jElementIterator(); j.hasNext();) {
                         final Element whenElement = (Element) j.next();
                         ASTWhen when = new ASTWhen(); {
                             choose.addWhen(when);

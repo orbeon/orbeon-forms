@@ -220,7 +220,7 @@ class PartAnalysisImpl(
         val globalsOptions =
           for {
             global        <- allGlobals
-            globalElement <- global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
+            globalElement <- global.compactShadowTree.getRootElement.jElements.asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) match {
               case childrenBuilder: ChildrenBuilderTrait =>

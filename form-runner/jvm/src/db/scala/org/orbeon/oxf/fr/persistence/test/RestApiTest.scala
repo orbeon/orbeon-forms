@@ -395,8 +395,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val doc = Dom4jUtils.readDom4j(new ByteArrayInputStream(bytes))
 
         for {
-          formElem             <- Dom4j.elements(doc.getRootElement, "form")
-          lastModifiedTimeElem <- Dom4j.elements(formElem, "last-modified-time")
+          formElem             <- doc.getRootElement.elements("form")
+          lastModifiedTimeElem <- formElem.elements("last-modified-time")
         } locally {
           lastModifiedTimeElem.detach()
         }

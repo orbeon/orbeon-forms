@@ -411,7 +411,7 @@ object InstanceMirror {
                     XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
 
                   // If we can identify the position
-                  val content = newParentElement.content
+                  val content = newParentElement.jContent
                   if (content.size > removedNodeIndex) {
                     content.get(removedNodeIndex) match {
                       case newElement: Element if newElement.getQName == removedElement.getQName =>
@@ -427,7 +427,7 @@ object InstanceMirror {
             case TEXT_NODE | PROCESSING_INSTRUCTION_NODE | COMMENT_NODE =>
               withNewParent {
                 case newParentElement: Element =>
-                  val content = newParentElement.content
+                  val content = newParentElement.jContent
                   if (content.size > removedNodeIndex)
                     (Some(content.get(removedNodeIndex)), Stop)
                   else

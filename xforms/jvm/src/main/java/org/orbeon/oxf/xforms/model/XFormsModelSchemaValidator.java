@@ -106,7 +106,7 @@ public class XFormsModelSchemaValidator {
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
-        for (final Element schemaElement: modelElement.elements(XMLConstants.XML_SCHEMA_QNAME())) {
+        for (final Element schemaElement: modelElement.jElements(XMLConstants.XML_SCHEMA_QNAME())) {
 
             if (schemaElements == null)
                 schemaElements = new ArrayList<Element>();
@@ -192,7 +192,7 @@ public class XFormsModelSchemaValidator {
             final String uri = element.getNamespaceURI();
             final String name = element.getName();
             final String qName = element.getQualifiedName();
-            final List attributesList = element.attributes();
+            final List attributesList = element.jAttributes();
             final AttributesImpl attributes = new AttributesImpl();
 
             for (Object anAttributesList: attributesList) {
@@ -360,7 +360,7 @@ public class XFormsModelSchemaValidator {
                 if (false) {
                     // TODO: find out way of validating an attribute only
                     // TODO: should we also look at schema.attributeGroups?
-                    final List attributesList = element.attributes();
+                    final List attributesList = element.jAttributes();
                     for (final Iterator iterator = attributesList.iterator(); iterator.hasNext();)   {
                         final Attribute attribute = (Attribute) iterator.next();
                         final String attributeURI = attribute.getNamespaceURI();
@@ -408,7 +408,7 @@ public class XFormsModelSchemaValidator {
                 }
 
                 // Validate children elements
-                for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
+                for (final Iterator iterator = element.jElementIterator(); iterator.hasNext();) {
                     final Element childElement = (Element) iterator.next();
                     isValid &= validateElementLax(childElement);
                 }
@@ -474,7 +474,7 @@ public class XFormsModelSchemaValidator {
         final int stringCareLevel = acceptor.getStringCareLevel();
 
         // Validate children elements
-        for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {
+        for (final Iterator iterator = element.jElementIterator(); iterator.hasNext();) {
             final Element childElement = (Element) iterator.next();
             final boolean isChildElementValid = validateElement(childElement, acceptor, icc, isReportErrors);
             if (!isChildElementValid) {

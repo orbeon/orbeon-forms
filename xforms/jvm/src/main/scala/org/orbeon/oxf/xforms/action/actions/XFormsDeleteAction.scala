@@ -228,11 +228,11 @@ object XFormsDeleteAction extends Logging {
 
     val (contentToUpdate, mustNormalize) =
       if (nodeToRemove.isInstanceOf[Attribute]) {
-        (parentElement.attributes, false)
+        (parentElement.jAttributes, false)
       } else if (parentElement ne null) {
-        (parentElement.content, true)
+        (parentElement.jContent, true)
       } else if ((nodeToRemove.getDocument ne null) && (nodeToRemove eq nodeToRemove.getDocument.getRootElement)) {
-        (nodeToRemove.getDocument.content, false)
+        (nodeToRemove.getDocument.jContent, false)
       } else if (nodeToRemove.isInstanceOf[Document]) {
         debugAllowNull("ignoring attempt to delete document node")
         return None

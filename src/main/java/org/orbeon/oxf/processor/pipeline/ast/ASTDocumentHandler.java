@@ -152,7 +152,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public boolean startWhen(ASTWhen when) {
-        if (currentElement.elements().isEmpty()) {
+        if (currentElement.jElements().isEmpty()) {
             currentElement.addAttribute("href", (String) href.pop());
         }
         if (when.getTest() == null) {

@@ -25,7 +25,6 @@ import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.xml.{Elem, XML}
 
 object Dom4j {
@@ -93,7 +92,7 @@ object Dom4j {
         compareTwoNodeSeqs(filterOut(d1.content), filterOut(d2.content))(normalizeText)
       case (e1: Element, e2: Element) =>
         e1.getQName == e2.getQName &&
-          compareTwoNodeSeqs(e1.attributes.asScala.sorted, e2.attributes.asScala.sorted)(normalizeText) && // sort attributes
+          compareTwoNodeSeqs(e1.attributes.sorted, e2.attributes.sorted)(normalizeText) && // sort attributes
           compareTwoNodeSeqs(filterOut(e1.content), filterOut(e2.content))(normalizeText)
       case (a1: Attribute, a2: Attribute) =>
         a1.getQName == a2.getQName &&
@@ -158,37 +157,13 @@ object Dom4j {
     parseValues(p1.getText) == parseValues(p2.getText)
   }
 
-  // Return an element's directly nested elements
-  def elements(e: Element): Seq[Element] = e.elements.asScala
-
-  // Return an element's directly nested elements with the given name
-  def elements(e: Element, qName: QName): Seq[Element] = e.elements(qName).asScala
-  def elements(e: Element, name: String): Seq[Element] = e.elements(name).asScala
-
-  // Return the element's content as a mutable buffer
-  def content(e: Element): mutable.Buffer[Node] = e.content.asScala
-
-  // Return an element's attributes
-  def attributes(e: Element): Seq[Attribute] = e.attributes.asScala
-
-  // Ordering on QName, comparing first by namespace URI then by local name
-  implicit object QNameOrdering extends Ordering[QName] {
-    def compare(x: QName, y: QName): Int = {
-      val nsOrder = x.namespace.uri compareTo y.namespace.uri
-      if (nsOrder != 0)
-        nsOrder
-      else
-        x.localName compareTo y.localName
-    }
-  }
-
   // Ensure that a path to an element exists by creating missing elements if needed
   def ensurePath(root: Element, path: Seq[QName]): Element = {
 
     @tailrec def insertIfNeeded(parent: Element, qNames: Iterator[QName]): Element =
       if (qNames.hasNext) {
         val qName = qNames.next()
-        val existing = Dom4j.elements(parent, qName)
+        val existing = parent.elements(qName)
 
         val existingOrNew =
           existing.headOption getOrElse {
@@ -204,8 +179,8 @@ object Dom4j {
     insertIfNeeded(root, path.iterator)
   }
 
-  def visitSubtree(container: Element, process: Element => Boolean): Unit = {
-    for (childNode <- new java.util.ArrayList(container.content).asScala) {
+  def visitSubtree(container: Element, process: Element => Boolean): Unit =
+    for (childNode <- container.content.toList) {
       childNode match {
         case e: Element =>
           if (process(e))
@@ -213,7 +188,6 @@ object Dom4j {
         case _ =>
       }
     }
-  }
 
 
   // TODO: should ideally not got go through serialization/deserialization

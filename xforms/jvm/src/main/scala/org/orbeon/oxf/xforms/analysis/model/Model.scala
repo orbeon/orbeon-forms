@@ -156,7 +156,7 @@ trait ModelVariables {
   val inScopeVariables = Map.empty[String, VariableTrait]
 
   // Get *:variable/*:var elements
-  private val variableElements = Dom4j.elements(self.element) filter (e => ControlAnalysisFactory.isVariable(e.getQName)) asJava
+  private val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName)) asJava
 
   // Handle variables
   val variablesSeq: Seq[VariableAnalysisTrait] = {
@@ -244,7 +244,7 @@ trait ModelBinds {
     }
   }
 
-  private var bindTree = new LazyConstant(new BindTree(selfModel, Dom4j.elements(selfModel.element, XFORMS_BIND_QNAME), isCustomMIP))
+  private var bindTree = new LazyConstant(new BindTree(selfModel, selfModel.element.elements(XFORMS_BIND_QNAME), isCustomMIP))
 
   private def annotateSubTree(rawElement: Element) = {
     val annotatedTree =
@@ -271,7 +271,7 @@ trait ModelBinds {
     bindTree = new LazyConstant(
       new BindTree(
         selfModel,
-        Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement),
+        rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement),
         isCustomMIP
       )
     )

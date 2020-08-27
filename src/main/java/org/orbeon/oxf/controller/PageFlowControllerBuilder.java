@@ -92,7 +92,7 @@ public class PageFlowControllerBuilder {
     }
 
     public static Document getSetValuesDocument(final Element pageElement) {
-        final List setValueElements = pageElement.elements("setvalue");
+        final List setValueElements = pageElement.jElements("setvalue");
         final Document setvaluesDocument;
         if (!setValueElements.isEmpty()) {
             // Create document with setvalues
@@ -130,7 +130,7 @@ public class PageFlowControllerBuilder {
         final Document setvaluesDocument = getSetValuesDocument(pageElement);
 
         // Get actions
-        final List actionElements = pageElement.elements("action");
+        final List actionElements = pageElement.jElements("action");
 
         // Handle initial instance
         final ASTOutput defaultSubmission = new ASTOutput("data", "default-submission");
@@ -242,7 +242,7 @@ public class PageFlowControllerBuilder {
                             // Must have an action, in the first place
                             actionAttribute != null &&
                                     // More than one <result>: so at least the first one must have a "when"
-                                    actionElement.elements("result").size() > 1;
+                                    actionElement.jElements("result").size() > 1;
 
                     final ASTOutput internalActionData = actionAttribute == null ? null :
                             new ASTOutput(null, "internal-action-data-" + actionNumber[0]);
@@ -280,12 +280,12 @@ public class PageFlowControllerBuilder {
                         }});
                     }
 
-                    if (actionElement.elements("result").size() > 0 && internalActionData != null) {
+                    if (actionElement.jElements("result").size() > 0 && internalActionData != null) {
                         // At least one result testing on action
 
                         // Test based on action
                         addStatement(new ASTChoose(new ASTHrefId(internalActionData)) {{
-                            for (Object o: actionElement.elements("result")) {
+                            for (Object o: actionElement.jElements("result")) {
                                 final Element resultElement = (Element) o;
                                 final String resultWhenAttribute; {
                                     // NOTE: Prior to 2012-06-27, the XSD schema would put a default value of true()
@@ -496,12 +496,12 @@ public class PageFlowControllerBuilder {
         // Create resulting instance
         final ASTOutput internalXUpdatedInstance;
         final boolean isTransformedInstance;
-        if (resultElement != null && resultElement.attribute("transform") != null && !resultElement.elements().isEmpty()) {
+        if (resultElement != null && resultElement.attribute("transform") != null && !resultElement.jElements().isEmpty()) {
             // Generic transform mechanism
             internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
             isTransformedInstance = true;
 
-            final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement.elements().get(0));
+            final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement.jElements().get(0));
             final QName transformQName = Dom4jUtils.extractAttributeValueQName(resultElement, "transform");
 
             // Run transform

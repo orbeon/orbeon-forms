@@ -162,15 +162,15 @@ class StaticBind(
     // For a while we supported <xf:validation>
     def fromNestedElementsLegacy =
       for {
-        e           <- Dom4j.elements(element, XFORMS_VALIDATION_QNAME)
+        e           <- element.elements(XFORMS_VALIDATION_QNAME)
         value       <- Option(e.attributeValue(TYPE_QNAME))
       } yield
         new TypeMIP(getElementId(e), value)
 
     def fromNestedElement =
       for {
-        e           <- Dom4j.elements(element, XFORMS_TYPE_QNAME) // <xf:type>
-        value       <- e.getText.trimAllToOpt                     // text literal (doesn't support @value)
+        e           <- element.elements(XFORMS_TYPE_QNAME) // `<xf:type>`
+        value       <- e.getText.trimAllToOpt              // text literal (doesn't support `@value`)
       } yield
         new TypeMIP(getElementId(e), value)
 
@@ -196,17 +196,17 @@ class StaticBind(
       for (value <- Option(element.attributeValue(name)).toList)
       yield (staticId, value, ErrorLevel)
 
-    // For a while we supported <xf:validation>
+    // For a while we supported `<xf:validation>`
     def fromNestedElementLegacy(name: QName) =
       for {
-        e     <- Dom4j.elements(element, XFORMS_VALIDATION_QNAME).toList
+        e     <- element.elements(XFORMS_VALIDATION_QNAME).toList
         value <- Option(e.attributeValue(name))
       } yield
         (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
 
     def fromNestedElement(name: QName) =
       for {
-        e     <- Dom4j.elements(element, name).toList
+        e     <- element.elements(name).toList
         value <- Option(e.attributeValue(VALUE_QNAME))
       } yield
         (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
@@ -230,7 +230,7 @@ class StaticBind(
 
     def attributeCustomMIP =
       for {
-        att           <- Dom4j.attributes(element).iterator
+        att           <- element.attributes.iterator
         if bindTree.isCustomMIP(att.getQName)
         value         = att.getValue
         customMIPName = buildInternalCustomMIPName(att.getQName)
@@ -280,13 +280,13 @@ class StaticBind(
 
   def iterateNestedIds: Iterator[String] =
     for {
-      elem <- Dom4j.elements(element).iterator
+      elem <- element.elements.iterator
       id   <- Option(XFormsUtils.getElementId(elem))
     } yield
       id
 
   // Create children binds
-  private var _children: Seq[StaticBind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now
+  private var _children: Seq[StaticBind] = element.elements(XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now
   def children: Seq[StaticBind] = _children
 
   // Globally remember if we have seen these categories of binds

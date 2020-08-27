@@ -140,7 +140,7 @@ public class Properties {
                     // Read updated properties document
                     final Document document = domSerializer.runGetDocument(pipelineContext);
 
-                    if (document == null || document.content() == null || document.content().size() == 0) {
+                    if (document == null || document.content().isEmpty()) {
                         throw new OXFException("Failure to initialize Orbeon Forms properties");
                     }
 

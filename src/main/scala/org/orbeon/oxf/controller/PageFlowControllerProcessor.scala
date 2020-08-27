@@ -270,7 +270,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val epilogueURL =
       Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
 
-    val topLevelElements = Dom4j.elements(configRoot)
+    val topLevelElements = configRoot.elements
 
      // Prepend a synthetic page for submissions if configured
     val syntheticRoutes: List[RouteElement] =

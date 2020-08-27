@@ -219,7 +219,7 @@ object XFormsInsertAction {
                 } else {
                   // Other node types
                   val parentNode      = insertLocationNode.getParent
-                  val siblingElements = parentNode.content
+                  val siblingElements = parentNode.jContent
                   val actualIndex     = siblingElements.indexOf(insertLocationNode)
 
                   // Prepare insertion of new element
@@ -418,7 +418,7 @@ object XFormsInsertAction {
               None
             case _ =>
               // Add other node to element
-              insertContextElement.content.add(
+              insertContextElement.jContent.add(
                 otherNodeIndex,
                 clonedNode
               )

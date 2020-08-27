@@ -239,7 +239,7 @@ class LHHAAnalysis(
                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
             } else if (hostLanguageAVTs) {
               for {
-                attribute <- Dom4j.attributes(element)
+                attribute <- element.attributes
                 attributeValue = attribute.getValue
                 if XFormsUtils.maybeAVT(attributeValue)
               } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet

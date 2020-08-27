@@ -153,6 +153,8 @@ object Dom4jUtils {
     * is legal in XML 1.1). Technically, this cleanup is incorrect at the DOM
     * and SAX level, so this should be used only in rare occasions, when
     * serializing certain documents to XML 1.0.
+    *
+    * 2020-08-27: 1 legacy Java caller.
     */
   def adjustNamespaces(document: Document, xml11: Boolean): Document = {
 
@@ -282,6 +284,8 @@ object Dom4jUtils {
 
   /**
     * Decode a String containing an exploded QName (also known as a "Clark name") into a QName.
+    *
+    * 2020-08-27: 1 caller.
     */
   def explodedQNameToQName(qName: String): QName = {
 
@@ -436,14 +440,14 @@ object Dom4jUtils {
   def visitSubtree(container: Element, visitorListener: VisitorListener, mutable: Boolean): Unit = {
 
     // If the source tree can mutate, copy the list first, otherwise dom4j might throw exceptions
-    val content =
+    val immutableContent =
       if (mutable)
-        new ju.ArrayList[Node](container.content)
+        List(container.content)
       else
         container.content
 
     // Iterate over the content
-    for (childNode <- content.asScala) {
+    for (childNode <- immutableContent) {
       childNode match {
         case childElem: Element =>
           visitorListener.startElement(childElem)
@@ -463,7 +467,7 @@ object Dom4jUtils {
     sb.append(element.getQualifiedName)
 
     // Attributes if any
-    for (currentAtt <- element.attributeIterator.asScala) {
+    for (currentAtt <- element.attributeIterator) {
       sb.append(' ')
       sb.append(currentAtt.getQualifiedName)
       sb.append("=\"")
@@ -471,7 +475,7 @@ object Dom4jUtils {
       sb.append('\"')
     }
 
-    val isEmptyElement = element.elements.isEmpty && element.getText.length == 0
+    val isEmptyElement = element.jElements.isEmpty && element.getText.length == 0
     if (isEmptyElement) {
       // Close empty element
       sb.append("/>")
@@ -499,7 +503,7 @@ object Dom4jUtils {
     */
   def getSAXAttributes(element: Element): AttributesImpl = {
     val result = new AttributesImpl
-    for (att <- element.attributeIterator.asScala) {
+    for (att <- element.attributeIterator) {
       result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
     }
     result

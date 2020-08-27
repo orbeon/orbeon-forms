@@ -38,7 +38,7 @@ object SubmissionHeaders {
 
     val fullPrefix = xblContainer.getFullPrefix
 
-    val headerElements = enclosingElement.elements(XFormsNames.XFORMS_HEADER_QNAME)
+    val headerElements = enclosingElement.jElements(XFormsNames.XFORMS_HEADER_QNAME)
     if (headerElements.asScala.nonEmpty) {
 
       val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)

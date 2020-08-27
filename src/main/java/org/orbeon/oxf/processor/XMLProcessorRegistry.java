@@ -131,7 +131,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                         final ProcessorInput processorConfigInput = getInputByName(INPUT_CONFIG);
                                         final Object processorConfigValidity = getInputValidity(ctxt, processorConfigInput);
                                         // We must have some XML in the <input> tag
-                                        final Element childElement = (Element) inputElement.elements().get(0);
+                                        final Element childElement = (Element) inputElement.jElements().get(0);
                                         final String sid = Dom4jUtils.makeSystemId(childElement);
                                         final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
                                                 (childElement, "input from registry", processorConfigValidity, sid);

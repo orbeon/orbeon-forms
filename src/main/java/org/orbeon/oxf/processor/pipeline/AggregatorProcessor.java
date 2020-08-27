@@ -61,7 +61,7 @@ public class AggregatorProcessor extends ProcessorImpl {
                         rootPrefix = rootQName.substring(0, columnPosition);
                         rootLocalName = rootQName.substring(columnPosition + 1);
                         String tempNamespaceURI = null;
-                        for (Iterator i = config.elements("namespace").iterator(); i.hasNext();) {
+                        for (Iterator i = config.jElements("namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
                             if (namespaceElement.attributeValue("prefix").equals(rootPrefix)) {
                                 tempNamespaceURI = namespaceElement.attributeValue("uri");

@@ -220,7 +220,7 @@ object SubmissionParameters {
         )                                                                           && // can't let SOAP requests be handled by the browser
         staticSubmission.avtXxfUsernameOpt.isEmpty                                  && // can't optimize if there are authentication credentials
         staticSubmission.avtXxfTargetOpt.isEmpty                                    && // can't optimize if there is a target
-        staticSubmission.element.elements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
+        staticSubmission.element.jElements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
 
     // TODO: use static for headers
     // In "Ajax portlet" mode, there is no deferred submission process

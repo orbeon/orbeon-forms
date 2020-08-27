@@ -44,7 +44,7 @@ class Document extends AbstractBranch {
     _internalContent
   }
 
-  def content = internalContent
+  def jContent = internalContent
 
   override def deepCopy: Node = {
     val document = super.deepCopy.asInstanceOf[Document]
@@ -78,7 +78,7 @@ class Document extends AbstractBranch {
           s"The Node already has an existing document: $document"
         )
       }
-      content.add(node)
+      jContent.add(node)
       childAdded(node)
     }
   }
@@ -93,7 +93,7 @@ class Document extends AbstractBranch {
           s"The Node already has an existing document: $document"
         )
       }
-      content.add(index, node)
+      jContent.add(index, node)
       childAdded(node)
     }
   }
@@ -102,7 +102,7 @@ class Document extends AbstractBranch {
     if (node == _rootElement) {
       _rootElement = null
     }
-    if (content.remove(node)) {
+    if (jContent.remove(node)) {
       childRemoved(node)
       return true
     }
@@ -114,11 +114,7 @@ class Document extends AbstractBranch {
 
   def accept(visitor: Visitor): Unit = {
     visitor.visit(this)
-    val iter = content.iterator()
-    while (iter.hasNext) {
-      val node = iter.next()
-      node.accept(visitor)
-    }
+    content.iterator foreach (_.accept(visitor))
   }
 
   def normalize(): Unit =

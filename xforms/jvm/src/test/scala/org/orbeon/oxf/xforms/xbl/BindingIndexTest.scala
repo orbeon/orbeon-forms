@@ -94,13 +94,13 @@ class BindingIndexTest extends AnyFunSpec {
     val encapsulated =
       s"""<root $namespacesString>$xmlElem</root>"""
 
-    Dom4j.elements(Dom4jUtils.readDom4j(encapsulated).getRootElement).head
+    Dom4jUtils.readDom4j(encapsulated).getRootElement.elements.head
   }
 
   def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {
 
     val elem = parseXMLElemWithNamespaces(xmlElem)
-    val atts = Dom4j.attributes(elem) map (a => a.getQName -> a.getValue)
+    val atts = elem.attributes map (a => a.getQName -> a.getValue)
 
     val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
 

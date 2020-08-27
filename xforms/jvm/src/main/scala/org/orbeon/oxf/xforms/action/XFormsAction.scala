@@ -109,7 +109,7 @@ object XFormsAction {
     // Iterate over context information if any
     val tuples =
       for {
-        element <- Dom4j.elements(actionElement)
+        element <- actionElement.elements
         if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // `xf:property` since XForms 2.0
 
         // Get and check attributes

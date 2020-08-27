@@ -463,7 +463,7 @@ public class DelegationProcessor extends ProcessorImpl {
     private List<ServiceDefinition> readServices(Document interfaceDocument) {
 
         List<ServiceDefinition> services = new java.util.ArrayList<ServiceDefinition>();
-        for (java.util.Iterator i = interfaceDocument.getRootElement().elements("service").iterator(); i.hasNext();) {
+        for (java.util.Iterator i = interfaceDocument.getRootElement().jElements("service").iterator(); i.hasNext();) {
             Element serviceElement = (Element) i.next();
 
             // Create Service Definition

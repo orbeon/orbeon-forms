@@ -164,7 +164,7 @@ trait InstanceMetadata {
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
 
   // Inline root element if any
-  private val root = Dom4j.elements(element) headOption
+  private val root = element.elements headOption
   private def hasInlineContent = root.isDefined
 
   // Create inline instance document if any
@@ -175,7 +175,7 @@ trait InstanceMetadata {
     extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
 
   // Don't allow more than one child element
-  if (Dom4j.elements(element).size > 1)
+  if (element.elements.size > 1)
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
   private def getAttributeEncode(qName: QName): Option[String] =

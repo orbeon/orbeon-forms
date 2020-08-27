@@ -2,6 +2,8 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
+import scala.jdk.CollectionConverters._
+
 /**
  * `Branch` interface defines the common behaviour for Nodes which
  * can contain child nodes (content) such as XML elements and documents. This
@@ -24,12 +26,14 @@ trait Branch extends Node {
    * `Branch` so that changes to the list are reflected in the
    * branch and vice versa.
    */
-  def content: ju.List[Node]
+  def jContent: ju.List[Node]
+  def content: Seq[Node] = jContent.asScala
 
   /**
    * Returns an iterator through the content nodes of this branch
    */
-  def nodeIterator: ju.Iterator[Node]
+  def jNodeIterator: ju.Iterator[Node]
+  def nodeIterator: Iterator[Node] = jNodeIterator.asScala
 
   /**
    * Appends the content of the given branch to this branch instance. This

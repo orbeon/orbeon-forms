@@ -153,7 +153,7 @@ abstract class ElementAnalysis(
   final lazy val extensionAttributes =
     Map() ++ (
       CommonExtensionAttributes ++
-      (element.attributeIterator.asScala collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
+      (element.attributeIterator collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
       allowedExtensionAttributes map (qName => (qName, element.attributeValue(qName))) filter (_._2 ne null)
     )
 

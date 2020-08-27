@@ -107,7 +107,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         )
 
       // Add substitution fonts for Acrobat fields
-      for (element <- configRoot.elements("substitution-font").asScala) {
+      for (element <- configRoot.elements("substitution-font")) {
         val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), CharsetNames.Utf8)
         val embed            = element.attributeValue("embed") == "true"
 
@@ -142,7 +142,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           variables   = variables
         )
 
-        handleElements(pageContext, configRoot.elements.asScala)
+        handleElements(pageContext, configRoot.jElements.asScala)
       }
 
       // no document.close() ?
@@ -195,7 +195,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           fontFamily      = context.resolveString("font-family", context.fontFamily),
           fontSize        = context.resolveFloat("font-size",    0f, context.fontSize))
 
-      handleElements(newGroupContext, newGroupContext.element.elements.asScala)
+      handleElements(newGroupContext, newGroupContext.element.jElements.asScala)
     }
   }
 
@@ -215,7 +215,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         offsetY         = context.offsetY + (iterationIndex - 1) * offsetIncrementY
       )
 
-      handleElements(iterationContext, context.element.elements.asScala)
+      handleElements(iterationContext, context.element.jElements.asScala)
     }
   }
 

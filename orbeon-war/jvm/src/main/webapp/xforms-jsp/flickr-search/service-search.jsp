@@ -39,7 +39,7 @@
     final Element photosElement = flickrResponse.getRootElement().element("photos");
 %>
 <photos>
-<%  for (Iterator photoIterator = photosElement.elementIterator(); photoIterator.hasNext();) {
+<%  for (Iterator photoIterator = photosElement.jElementIterator(); photoIterator.hasNext();) {
         final Element photo = (Element) photoIterator.next();
         final String photoURL = "https://static.flickr.com/" + photo.attributeValue("server") + "/" + photo.attributeValue("id")
             + "_" + photo.attributeValue("secret") + "_s.jpg";

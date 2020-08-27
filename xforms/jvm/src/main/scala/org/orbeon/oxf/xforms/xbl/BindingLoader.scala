@@ -379,11 +379,11 @@ trait BindingLoader extends Logging {
 
     // Extract xbl:xbl/xbl:script
     // TODO: should do this differently, in order to include only the scripts and resources actually used
-    val scriptElements = Dom4j.elements(xblElement, XBL_SCRIPT_QNAME) map XBLAssets.HeadElement.apply
+    val scriptElements = xblElement.elements(XBL_SCRIPT_QNAME) map XBLAssets.HeadElement.apply
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement <- Dom4j.elements(xblElement, XBL_BINDING_QNAME).to(List)
+      bindingElement <- xblElement.elements(XBL_BINDING_QNAME).to(List)
       _              <- Option(bindingElement.attributeValue(ELEMENT_QNAME))
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)

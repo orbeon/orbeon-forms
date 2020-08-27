@@ -61,8 +61,8 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     dsa.initVerify(pubKey);
 
                     final Document data = readInputAsOrbeonDom(context, INPUT_DATA);
-                    final Element dataElement = data.getRootElement().elements("data").get(0);
-                    final Node sigDataNode =  dataElement.elements().get(0);
+                    final Element dataElement = data.getRootElement().jElements("data").get(0);
+                    final Node sigDataNode =  dataElement.jElements().get(0);
                     final String sig = StringUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();

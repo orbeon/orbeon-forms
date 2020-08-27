@@ -2,6 +2,8 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
+import scala.jdk.CollectionConverters._
+
 /**
  * `Element` interface defines an XML element. An element can have
  * declared namespaces, attributes, child nodes and textual content.
@@ -88,10 +90,12 @@ trait Element extends Branch {
    * `Element` so that changes to the list are reflected in the
    * element and vice versa.
    */
-  def attributes: ju.List[Attribute]
+  def jAttributes: ju.List[Attribute]
+  def attributes: Seq[Attribute] = jAttributes.asScala
 
   def attributeCount: Int
-  def attributeIterator: ju.Iterator[Attribute]
+  def jAttributeIterator: ju.Iterator[Attribute]
+  def attributeIterator: Iterator[Attribute] = jAttributeIterator.asScala
 
   /**
    * @return the attribute at the specified index where index <= 0 and
@@ -151,32 +155,37 @@ trait Element extends Branch {
    * Returns the elements contained in this element. If this element does not
    * contain any elements then this method returns an empty list.
    */
-  def elements: ju.List[Element]
+  def jElements: ju.List[Element]
+  def elements: Seq[Element] = jElements.asScala
 
   /**
    * Returns the elements contained in this element with the given local name
    * and any namespace. If no elements are found then this method returns an
    * empty list.
    */
-  def elements(name: String): ju.List[Element]
+  def jElements(name: String): ju.List[Element]
+  def elements(name: String): Seq[Element] = jElements(name).asScala
 
   /**
    * Returns the elements contained in this element with the given fully
    * qualified name. If no elements are found then this method returns an
    * empty list.
    */
-  def elements(qName: QName): ju.List[Element]
+  def jElements(qName: QName): ju.List[Element]
+  def elements(qName: QName): Seq[Element] = jElements(qName).asScala
 
   /**
    * Returns an iterator over all this elements child elements.
    */
-  def elementIterator(): ju.Iterator[Element]
+  def jElementIterator: ju.Iterator[Element]
+  def elementIterator(): Iterator[Element] = jElementIterator.asScala
 
   /**
    * Returns an iterator over the elements contained in this element which
    * match the given local name and any namespace.
    */
-  def elementIterator(name: String): ju.Iterator[Element]
+  def jElementIterator(name: String): ju.Iterator[Element]
+  def elementIterator(name: String): Iterator[Element] = jElementIterator(name).asScala
 
   /**
    * @return true if this element is the root element of a document and this

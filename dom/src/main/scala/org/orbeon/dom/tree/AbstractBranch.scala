@@ -106,7 +106,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
     }
 
   def nodeCount: Int = internalContent.size
-  def nodeIterator: ju.Iterator[Node] = internalContent.iterator
+  def jNodeIterator: ju.Iterator[Node] = internalContent.iterator
 
   protected def addNode(node: Node): Unit
   protected def addNode(index: Int, node: Node): Unit

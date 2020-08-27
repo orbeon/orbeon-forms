@@ -72,7 +72,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                                 if (url != null) {
                                     processorDefinition.addInput(name, url);
                                 } else {
-                                    final Iterator it = inputElement.elementIterator();
+                                    final Iterator it = inputElement.jElementIterator();
                                     if (it.hasNext()) {
                                         final Element srcElt = (Element) it.next();
                                         final Element elt = (Element) srcElt.deepCopy();

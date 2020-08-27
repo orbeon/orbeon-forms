@@ -435,8 +435,8 @@ object XFormsModelSubmissionBase {
         if (isLocallyNonRelevant(e)) {
           List(e)
         } else {
-          e.attributes.asScala.filter(isLocallyNonRelevant) ++:
-            e.elements.asScala.to(List).flatMap(processElement)
+          e.jAttributes.asScala.filter(isLocallyNonRelevant) ++:
+            e.jElements.asScala.to(List).flatMap(processElement)
         }
 
       processElement(doc.getRootElement) foreach (_.detach())
@@ -453,12 +453,12 @@ object XFormsModelSubmissionBase {
         val elemNonRelevant = parentNonRelevant || isLocallyNonRelevant(e)
 
         // NOTE: Make sure not to blank attributes corresponding to annotations if present!
-        e.attributeIterator.asScala                                                          filter
+        e.attributeIterator                                                                   filter
           (a => ! attsToPreserve(a.getQName) && (elemNonRelevant || isLocallyNonRelevant(a))) foreach
           (_.setValue(""))
 
         if (e.containsElement)
-          e.elements.asScala foreach (processElement(_, elemNonRelevant))
+          e.jElements.asScala foreach (processElement(_, elemNonRelevant))
         else if (elemNonRelevant)
           e.setText("")
       }
@@ -478,7 +478,7 @@ object XFormsModelSubmissionBase {
           removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
         } else {
           e.removeAttribute(relevantAnnotationAttQName)
-          e.elements.asScala foreach processElem
+          e.jElements.asScala foreach processElem
         }
 
       processElem(doc.getRootElement)
@@ -488,13 +488,13 @@ object XFormsModelSubmissionBase {
 
       def processElem(e: Element): Unit = {
         e.removeAttribute(attQname)
-        e.elements.asScala foreach processElem
+        e.jElements.asScala foreach processElem
       }
 
       if (includeSelf)
         processElem(startElem)
       else
-        startElem.elements.asScala foreach processElem
+        startElem.jElements.asScala foreach processElem
     }
 
     def findFirstElementOrAttributeWith(startNode: Node, check: Node => Boolean): Option[Node] = {

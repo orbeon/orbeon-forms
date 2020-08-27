@@ -254,7 +254,7 @@ object XBLBindingBuilder {
           annotatedModels,
           templateTree,
           compactShadowTree,
-          boundElement.attributes.asScala map { att => att.getQName -> att.getValue } toMap
+          boundElement.jAttributes.asScala map { att => att.getQName -> att.getValue } toMap
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl

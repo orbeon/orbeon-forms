@@ -58,12 +58,12 @@ object InstanceDataOps {
 
     adjustedNode match {
       case elem: Element =>
-        val childrenElems = Dom4j.elements(elem)
+        val childrenElems = elem.elements
 
         updateInstanceData(elem, childrenElems.nonEmpty)
 
-        Dom4j.attributes(elem) foreach (setDataRecursively(_, updateInstanceData))
-        childrenElems          foreach (setDataRecursively(_, updateInstanceData))
+        elem.attributes foreach (setDataRecursively(_, updateInstanceData))
+        childrenElems   foreach (setDataRecursively(_, updateInstanceData))
       case attribute: Attribute =>
         updateInstanceData(attribute, false)
       case _ =>

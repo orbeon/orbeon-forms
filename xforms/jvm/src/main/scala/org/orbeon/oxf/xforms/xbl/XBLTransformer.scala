@@ -127,7 +127,7 @@ object XBLTransformer {
             // All bound node content must be copied over (except nested handlers if requested)
 
             val clonedContent = new ju.ArrayList[Node]
-            for (node <- Dom4j.content(boundElement)) {
+            for (node <- boundElement.content) {
               node match {
                 case _: Namespace =>
                   // don't copy over namespace nodes
@@ -171,7 +171,7 @@ object XBLTransformer {
               // Clone all the element's children if any
               // See: http://www.w3.org/TR/xbl/#the-content
               contentToInsert = new ju.ArrayList[Node](currentElem.nodeCount)
-              for (currentElement <- Dom4j.elements(currentElem)) {
+              for (currentElement <- currentElem.elements) {
                 if (! mustFilterOut(currentElement))
                   contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
               }
@@ -180,7 +180,7 @@ object XBLTransformer {
 
           // Insert content if any
           if ((contentToInsert ne null) && ! contentToInsert.isEmpty) {
-            val parentContent = currentElem.getParent.content
+            val parentContent = currentElem.getParent.jContent
             val elementIndex = parentContent.indexOf(currentElem)
             parentContent.addAll(elementIndex, contentToInsert)
           }
@@ -316,7 +316,7 @@ object XBLTransformer {
 
       // Check for AVTs
       if (supportAVTs) {
-        for (att <- Dom4j.attributes(currentElem)) {
+        for (att <- currentElem.attributes) {
           val attValue = att.getValue
           if (XFormsUtils.maybeAVT(attValue)) {
             val newValue = XPathCache.evaluateAsAvt(

@@ -42,7 +42,7 @@ object SubmissionUtils {
     document.accept(
       new VisitorSupport {
         override def visit(element: Element): Unit =
-          if (element.elements.isEmpty)
+          if (element.jElements.isEmpty)
             builder += element.getName -> element.getText
       }
     )

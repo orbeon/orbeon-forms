@@ -411,7 +411,7 @@ object XFormsStaticStateImpl {
 
     // Pointers to nested elements
     def rootControl: Element = staticStateElement.element("root")
-    def xblElements = rootControl.elements(XBL_XBL_QNAME).asScala
+    def xblElements = rootControl.jElements(XBL_XBL_QNAME).asScala
 
     // TODO: if staticStateDocument contains XHTML document, get controls and models from there?
 
@@ -431,7 +431,7 @@ object XFormsStaticStateImpl {
     // NOTE: XFormsExtractor takes care of propagating only non-default properties
     val nonDefaultProperties: Map[String, (String, Boolean)] = {
       for {
-        element       <- Dom4j.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
+        element       <- staticStateElement.elements(STATIC_STATE_PROPERTIES_QNAME)
         propertyName  = element.attributeValue("name")
         propertyValue = element.attributeValue("value")
         isInline      = element.attributeValue("inline") == true.toString

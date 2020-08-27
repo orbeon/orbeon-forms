@@ -307,14 +307,14 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                     // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
                     // TODO: This logic is also duplicated in this file.
                     final Document document = (Document) parent.node;
-                    final List<Node> content = document.content();
+                    final List<Node> content = document.jContent();
                     if (content.size() == 0 && document.getRootElement() != null)
                         children = Collections.<Node>singletonList(document.getRootElement());
                     else
                         children = content;
                 } else {
                     // Beware: content() contains Namespace nodes (which is broken)!
-                    children = ((Element) parent.node).content();
+                    children = ((Element) parent.node).jContent();
                 }
                 int ix = 0;
                 for (ListIterator iterator = children.listIterator(); iterator.hasNext(); ) {
@@ -453,7 +453,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     public String getAttributeValue(int fingerprint) {
         if (node instanceof Element) {
-            Iterator list = ((Element) node).attributes().iterator();
+            Iterator list = ((Element) node).jAttributes().iterator();
             NamePool pool = docWrapper.getNamePool();
             while (list.hasNext()) {
                 Attribute att = (Attribute) list.next();
@@ -480,7 +480,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             return true;
         } else if (node instanceof Element) {
             // Beware: content() contains Namespace nodes (which is broken)!
-            List<Node> content = ((Element) node).content();
+            List<Node> content = ((Element) node).jContent();
             for (int i = 0; i < content.size(); i++) {
                 if (!(content.get(i) instanceof Namespace)) {
                     return true;
@@ -532,7 +532,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
         AttributeEnumeration(NodeWrapper start) {
             this.start = start;
-            atts = ((Element) start.node).attributes().iterator();
+            atts = ((Element) start.node).jAttributes().iterator();
         }
 
         public void advance() {
@@ -638,13 +638,13 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
                 // TODO: This logic is also duplicated in this file.
                 final Document document = (Document) commonParent.node;
-                final List<Node> content = document.content();
+                final List<Node> content = document.jContent();
                 if (content.size() == 0 && document.getRootElement() != null)
                     children = Collections.<Node>singletonList(document.getRootElement()).listIterator();
                 else
                     children = content.listIterator();
             } else {
-                children = ((Element) commonParent.node).content().listIterator();
+                children = ((Element) commonParent.node).jContent().listIterator();
             }
 
             if (downwards) {

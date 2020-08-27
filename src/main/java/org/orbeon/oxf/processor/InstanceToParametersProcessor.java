@@ -82,7 +82,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
 
                     // Mark all nodes referenced by XPath expressions
                     final Set<Object> markedNodes = new HashSet<Object>();
-                    for (Iterator i = filterElement.elements().iterator(); i.hasNext();) {
+                    for (Iterator i = filterElement.jElements().iterator(); i.hasNext();) {
                         final Element paramElement   = (Element) i.next();
                         final Attribute refAttribute = paramElement.attribute("ref");
                         final String excludeRef      = refAttribute.getValue();
@@ -104,7 +104,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     instance.accept(new VisitorSupport() {
                         public void visit(Element node) {
                             super.visit(node);
-                            if (node.elements().size() == 0 && !markedNodes.contains(node))
+                            if (node.jElements().size() == 0 && !markedNodes.contains(node))
                                 allMarked[0] = false;
                         }
 

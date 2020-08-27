@@ -67,12 +67,12 @@ public class XPathProcessor extends ProcessorImpl {
 
                         // Get declared namespaces
                         final Map<String, String> namespaces = new HashMap<String, String>();
-                        for (Iterator i = config.getRootElement().elements("namespace").iterator(); i.hasNext();) {
+                        for (Iterator i = config.getRootElement().jElements("namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-                        return new Config(NamespaceMapping.apply(namespaces), config.getRootElement().elements("xpath").get(0).getStringValue());
+                        return new Config(NamespaceMapping.apply(namespaces), config.getRootElement().jElements("xpath").get(0).getStringValue());
                     }
                 });
 

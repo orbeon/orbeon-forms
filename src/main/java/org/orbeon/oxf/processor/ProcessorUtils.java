@@ -69,7 +69,7 @@ public class ProcessorUtils {
             String name = XPathUtils.selectStringValue(inputElement, "@name");
             if (XPathUtils.selectStringValue(inputElement, "@href") == null) {
                 // Case of embedded XML
-                Element originalElement = (Element) ((Element) inputElement).elementIterator().next();
+                Element originalElement = (Element) ((Element) inputElement).jElementIterator().next();
                 if (originalElement == null)
                     throw new OXFException("Input content is mandatory");
                 Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
@@ -107,7 +107,7 @@ public class ProcessorUtils {
         final Document result;
         if (urlString == null) {
             // Case of embedded XML
-            final Element originalElement = (Element) ((Element) element).elementIterator().next();
+            final Element originalElement = (Element) ((Element) element).jElementIterator().next();
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);

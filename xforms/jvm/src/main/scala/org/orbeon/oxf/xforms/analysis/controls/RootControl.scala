@@ -42,7 +42,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     // placed by XFormsExtractor.
     def fromChildElements = {
 
-      val firstChildXMLLang = Dom4j.elements(element) collectFirst {
+      val firstChildXMLLang = element.elements collectFirst {
         case e if e.attribute(XML_LANG_QNAME) ne null => e.attributeValue(XML_LANG_QNAME)
       }
 

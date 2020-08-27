@@ -408,7 +408,7 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private void markDescendants(Element element) {
-        for (Iterator i = element.elementIterator(); i.hasNext();) {
+        for (Iterator i = element.jElementIterator(); i.hasNext();) {
             Element e = (Element) i.next();
             if (e.attribute(MARK_ATTRIBUTE) == null)
                 e.addAttribute(MARK_ATTRIBUTE, MARK_ATTRIBUTE_VALUE);
@@ -423,7 +423,7 @@ public class RequestGenerator extends ProcessorImpl {
         } else {
             element.remove(attribute);
             final List<Element> elementsToRemove = new ArrayList<Element>();
-            for (Iterator i = element.elementIterator(); i.hasNext();) {
+            for (Iterator i = element.jElementIterator(); i.hasNext();) {
                 final Element e = (Element) i.next();
                 attribute = e.attribute(MARK_ATTRIBUTE);
                 if (attribute == null)

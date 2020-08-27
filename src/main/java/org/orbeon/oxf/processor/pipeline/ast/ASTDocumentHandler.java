@@ -26,7 +26,7 @@ public class ASTDocumentHandler implements ASTHandler {
     private Stack href;
 
     public boolean startPipeline(ASTPipeline pipeline) {
-        currentElement = DocumentFactory.createElement(QName.apply("config", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = Element.apply(QName.apply("config", PipelineProcessor.PIPELINE_NAMESPACE));
         document.setRootElement(currentElement);
         return true;
     }

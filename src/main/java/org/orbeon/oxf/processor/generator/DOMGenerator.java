@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.ValidationException;

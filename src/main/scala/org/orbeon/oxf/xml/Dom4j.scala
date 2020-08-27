@@ -167,7 +167,7 @@ object Dom4j {
 
         val existingOrNew =
           existing.headOption getOrElse {
-            val newElement = DocumentFactory.createElement(qName)
+            val newElement = Element(qName)
             parent.add(newElement)
             newElement
           }

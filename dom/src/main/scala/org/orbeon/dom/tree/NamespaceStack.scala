@@ -2,7 +2,7 @@ package org.orbeon.dom.tree
 
 import java.{util => ju}
 
-import org.orbeon.dom.{DocumentFactory, Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 
 /**
  * NamespaceStack implements a stack of namespaces and optionally maintains a

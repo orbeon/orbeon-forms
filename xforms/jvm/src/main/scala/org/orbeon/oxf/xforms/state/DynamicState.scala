@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.dom
-import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.xforms._
@@ -107,7 +107,7 @@ case class DynamicState(
 
         // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
         def instanceToXML(instanceState: InstanceState): Element = {
-          val instanceElement = DocumentFactory.createElement("instance")
+          val instanceElement = dom.Element("instance")
 
           def att(name: String,  value: String): Unit = instanceElement.addAttribute(name, value)
 

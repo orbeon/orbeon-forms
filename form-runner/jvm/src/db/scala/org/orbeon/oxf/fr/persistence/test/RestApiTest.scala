@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream
 
 import org.junit.Test
 import org.orbeon.dom
-import org.orbeon.dom.{Document, DocumentFactory, Text}
+import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
@@ -29,7 +29,6 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -333,9 +332,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         for (i <- 0 until size)
           charArray(i) = Random.nextPrintableChar()
 
-        val text    = Text(new String(charArray))
-        val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
-        val xmlBody = dom.Document(element)                 |> HttpCall.XML
+        val text    = dom.Text(new String(charArray))
+        val element = dom.Element("gaga")   |!> (_.add(text))
+        val xmlBody = dom.Document(element) |> HttpCall.XML
 
         val url = HttpCall.crudURLPrefix(provider) + s"data/$position/data.xml"
 

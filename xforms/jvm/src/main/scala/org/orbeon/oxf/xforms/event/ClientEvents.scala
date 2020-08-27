@@ -16,13 +16,12 @@ package org.orbeon.oxf.xforms.event
 import java.{util => ju}
 
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
@@ -34,9 +33,8 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{EventNames, XFormsId}
-
-import scala.collection.compat._
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -431,9 +429,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       XXFormsUploadDoneEvent.StandardProperties ++
       XXFormsLoadEvent.StandardProperties
 
-    val DummyEvent = List(LocalEvent(DocumentFactory.createElement("dummy"), trusted = false))
-
-    val QuickResponseEventNames = Set(EventNames.XXFormsSessionHeartbeat, EventNames.XXFormsUploadProgress)
+    val DummyEvent = List(LocalEvent(Element("dummy"), trusted = false))
 
     def safelyCreateAndMapEvent(doc: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
 

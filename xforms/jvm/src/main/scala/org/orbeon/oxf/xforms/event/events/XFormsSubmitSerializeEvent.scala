@@ -14,16 +14,13 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.dom
-import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om._
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.saxon.om._
 
 class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {
@@ -49,7 +46,7 @@ private object XFormsSubmitSerializeEvent {
   def createSubmissionBodyElement(containingDocument: XFormsContainingDocument) = {
     val document = dom.Document()
     val docWrapper = new DocumentWrapper(document, null, XPath.GlobalConfiguration)
-    val submissionBodyElement = DocumentFactory.createElement("submission-body")
+    val submissionBodyElement = dom.Element("submission-body")
     document.setRootElement(submissionBodyElement)
     docWrapper.wrap(submissionBodyElement)
   }

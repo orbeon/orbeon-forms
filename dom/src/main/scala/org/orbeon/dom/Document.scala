@@ -2,7 +2,6 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
-import org.orbeon.dom.DocumentFactory.createElement
 import org.orbeon.dom.tree.AbstractBranch
 
 object Document {
@@ -11,7 +10,7 @@ object Document {
     new Document
 
   def apply(rootElementName: String): Document =
-    apply(createElement(QName(rootElementName)))
+    apply(Element(QName(rootElementName)))
 
   def apply(rootElement: Element): Document = {
     val newDoc = new Document

@@ -14,7 +14,7 @@
 package org.orbeon.dom.saxon
 
 import org.orbeon.dom
-import org.orbeon.dom.{DocumentFactory, Namespace, Text}
+import org.orbeon.dom.Namespace
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.SiblingCountingNode
 import org.scalatest.funspec.AnyFunSpec
@@ -35,17 +35,17 @@ class NodeWrapperTest extends AnyFunSpec {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val text1  = Text("before")                                |!> rootElem.add
-    val child1 = DocumentFactory.createElement("elem1")        |!> rootElem.add
-    val text2  = Text("between")                               |!> rootElem.add
-    val child2 = DocumentFactory.createElement("elem2")        |!> rootElem.add
-    val text3  = Text("after")                                 |!> rootElem.add
+    val text1  = dom.Text("before")                                |!> rootElem.add
+    val child1 = dom.Element("elem1")                              |!> rootElem.add
+    val text2  = dom.Text("between")                               |!> rootElem.add
+    val child2 = dom.Element("elem2")                              |!> rootElem.add
+    val text3  = dom.Text("after")                                 |!> rootElem.add
 
-    val att1   = DocumentFactory.createAttribute("att1", "v1") |!> child1.add
-    val att2   = DocumentFactory.createAttribute("att2", "v2") |!> child1.add
+    val att1   = dom.Attribute("att1", "v1") |!> child1.add
+    val att2   = dom.Attribute("att2", "v2") |!> child1.add
 
-    val att3   = DocumentFactory.createAttribute("att3", "v3") |!> child2.add
-    val att4   = DocumentFactory.createAttribute("att4", "v4") |!> child2.add
+    val att3   = dom.Attribute("att3", "v3") |!> child2.add
+    val att4   = dom.Attribute("att4", "v4") |!> child2.add
 
     val expected = List(
       (doc     , 0),

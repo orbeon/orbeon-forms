@@ -311,7 +311,7 @@ class ConcreteElement(var qname: QName)
           val attributeLocalName = attributes.getLocalName(0)
           val attributeValue = attributes.getValue(0)
           val attributeQName = namespaceStack.getAttributeQName(attributeURI, attributeLocalName, name)
-          add(DocumentFactory.createAttribute(attributeQName, attributeValue))
+          add(Attribute(attributeQName, attributeValue))
         }
       } else {
         val list = _attributes
@@ -325,7 +325,7 @@ class ConcreteElement(var qname: QName)
             val attributeLocalName = attributes.getLocalName(i)
             val attributeValue = attributes.getValue(i)
             val attributeQName = namespaceStack.getAttributeQName(attributeURI, attributeLocalName, attributeName)
-            val attribute = DocumentFactory.createAttribute(attributeQName, attributeValue)
+            val attribute = Attribute(attributeQName, attributeValue)
             list.add(attribute)
             childAdded(attribute)
           }
@@ -405,7 +405,7 @@ class ConcreteElement(var qname: QName)
   def addAttribute(name: String, value: String): Element = {
     val att = attribute(name)
     if (att eq null) {
-      add(DocumentFactory.createAttribute(name, value))
+      add(Attribute(name, value))
     } else {
       att.setValue(value)
     }
@@ -415,7 +415,7 @@ class ConcreteElement(var qname: QName)
   def addAttribute(qName: QName, value: String): Element = {
     val att = attribute(qName)
     if (att eq null) {
-      add(DocumentFactory.createAttribute(qName, value))
+      add(Attribute(qName, value))
     } else {
       att.setValue(value)
     }
@@ -449,10 +449,9 @@ class ConcreteElement(var qname: QName)
     }
     val node =
       if (namespace ne null) {
-        val qname = QName(localName, namespace)
-        DocumentFactory.createElement(qname)
+        Element(QName(localName, namespace))
       } else {
-        DocumentFactory.createElement(name)
+        Element(name)
       }
     addNewNode(node)
     node
@@ -657,7 +656,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def createCopy: Element = {
-    val clone = DocumentFactory.createElement(getQName)
+    val clone = Element(getQName)
     appendAttributes(this, clone)
     clone.appendContent(this)
     clone.setData(getData)

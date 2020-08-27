@@ -31,12 +31,11 @@ import org.orbeon.oxf.processor.pipeline.ast._
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.ResourceNotFoundException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
-import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 
@@ -628,7 +627,7 @@ object PageFlowControllerProcessor {
   def att(e: Element, name: String) = e.attributeValueOpt(name)
   def idAtt(e: Element) = att(e, "id")
 
-  // @path-info for backward compatibility
+  // `@path-info` for backward compatibility
   def getPath(e: Element) = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
 
   // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
@@ -640,4 +639,7 @@ object PageFlowControllerProcessor {
       path,
       glob = ! RegexpQNames(Option(extractAttributeValueQName(e, MatcherProperty)) getOrElse default)
     )
+
+  def createElementWithText(name: String, text: String): Element =
+    Element(name) |!> (_.setText(text))
 }

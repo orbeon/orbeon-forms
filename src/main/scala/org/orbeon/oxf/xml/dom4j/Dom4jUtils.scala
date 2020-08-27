@@ -33,7 +33,7 @@ object Dom4jUtils {
     // NOTE: This should be an immutable document, but we don't have support for this yet.
     val NullDocument: Document = {
       val d = Document()
-      val nullElement = DocumentFactory.createElement("null")
+      val nullElement = Element("null")
       nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true")
       d.setRootElement(nullElement)
       d

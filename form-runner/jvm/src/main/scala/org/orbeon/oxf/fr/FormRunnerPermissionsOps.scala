@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom
-import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
@@ -29,7 +28,6 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
-import scala.collection.compat._
 
 trait FormRunnerPermissionsOps {
 
@@ -185,7 +183,7 @@ trait FormRunnerPermissionsOps {
 
       // If kept, rewrite <form> to add operations="…" attribute
       keepForm list {
-        val newFormEl      = wrapper.wrap(DocumentFactory.createElement("form"))
+        val newFormEl      = wrapper.wrap(dom.Element("form"))
         val operationsAttr = NodeInfoFactory.attributeInfo("operations", operations mkString " ")
         val newFormContent = operationsAttr +: formEl.child(*)
 
@@ -197,7 +195,7 @@ trait FormRunnerPermissionsOps {
   }
 
   def orbeonRolesFromCurrentRequest: Set[String] =
-    NetUtils.getExternalContext.getRequest.credentials.to(List).flatMap(_.roles).map(_.roleName).to(Set)
+    NetUtils.getExternalContext.getRequest.credentials.toList.flatMap(_.roles).map(_.roleName).toSet
 
   //@XPathFunction
   def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =

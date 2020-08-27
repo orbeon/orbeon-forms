@@ -53,13 +53,13 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   }
 
   def addElement(name: String): Element = {
-    val node = DocumentFactory.createElement(name)
+    val node = Element(name)
     add(node)
     node
   }
 
   def addElement(qname: QName): Element = {
-    val node = DocumentFactory.createElement(qname)
+    val node = Element(qname)
     add(node)
     node
   }

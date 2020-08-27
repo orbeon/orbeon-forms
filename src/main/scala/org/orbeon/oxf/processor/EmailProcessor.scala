@@ -23,14 +23,14 @@ import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom
-import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.dom.{Document, Element}
+import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, StringBuilderWriter}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.EmailProcessor._
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._

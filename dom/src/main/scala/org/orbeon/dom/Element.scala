@@ -2,6 +2,8 @@ package org.orbeon.dom
 
 import java.{util => ju}
 
+import org.orbeon.dom.tree.ConcreteElement
+
 import scala.jdk.CollectionConverters._
 
 /**
@@ -198,4 +200,9 @@ trait Element extends Branch {
    * parent, and getParent() on the clone will return null.
    */
   def createCopy: Element
+}
+
+object Element {
+  def apply(qName: QName): Element = new ConcreteElement(qName)
+  def apply(name: String): Element = Element(QName(name))
 }

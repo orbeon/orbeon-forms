@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.controller;
 
-import org.orbeon.dom.*;
+import org.orbeon.dom.Attribute;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -314,7 +317,7 @@ public class PageFlowControllerBuilder {
                             // Continue when all results fail
                             addWhen(new ASTWhen() {{
                                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", "false"))));
+                                    addInput(new ASTInput("data", Document.apply(PageFlowControllerProcessor.createElementWithText("is-redirect", "false"))));
                                     addOutput(new ASTOutput("data", isRedirect));
                                 }});
                                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
@@ -550,18 +553,18 @@ public class PageFlowControllerBuilder {
                 // Handle path info
                 final ASTOutput forwardPathInfoOutput = new ASTOutput(null, "forward-path-info");
                 when.addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("path-info", forwardPathInfo))));
+                    addInput(new ASTInput("data", Document.apply(PageFlowControllerProcessor.createElementWithText("path-info", forwardPathInfo))));
                     addOutput(new ASTOutput("data", forwardPathInfoOutput));
                 }});
                 // Handle server-side redirect and exit portal redirect
                 final ASTOutput isServerSideRedirectOutput = new ASTOutput(null, "is-server-side-redirect");
                 when.addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("server-side", Boolean.toString(doServerSideRedirect)))));
+                    addInput(new ASTInput("data", Document.apply(PageFlowControllerProcessor.createElementWithText("server-side", Boolean.toString(doServerSideRedirect)))));
                     addOutput(new ASTOutput("data", isServerSideRedirectOutput));
                 }});
                 final ASTOutput isRedirectExitPortal = new ASTOutput(null, "is-redirect-exit-portal");
                 when.addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("exit-portal", Boolean.toString(doRedirectExitPortal)))));
+                    addInput(new ASTInput("data", Document.apply(PageFlowControllerProcessor.createElementWithText("exit-portal", Boolean.toString(doRedirectExitPortal)))));
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
                 // Aggregate redirect-url config
@@ -603,7 +606,7 @@ public class PageFlowControllerBuilder {
 
         // Signal if we did a redirect
         when.addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-            addInput(new ASTInput("data", Document.apply(DocumentFactory.createElementWithText("is-redirect", Boolean.toString(resultPageId != null)))));
+            addInput(new ASTInput("data", Document.apply(PageFlowControllerProcessor.createElementWithText("is-redirect", Boolean.toString(resultPageId != null)))));
             addOutput(new ASTOutput("data", redirect));
         }});
 

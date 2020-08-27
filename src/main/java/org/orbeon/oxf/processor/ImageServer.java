@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
-import org.orbeon.dom.DocumentFactory;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.exception.OrbeonFormatter;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.SoftCacheImpl;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
@@ -33,7 +33,6 @@ import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -48,8 +47,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * ImageServer directly serves or converts to its "data" output images from URLs while performing

@@ -483,7 +483,7 @@ object XFormsUtils {
       case vn: VirtualNode => vn.getUnderlyingNode.asInstanceOf[Node]
       case _ =>
         if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
-          DocumentFactory.createAttribute(QName.apply(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
+          Attribute(QName(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
         else
           TransformerUtils.tinyTreeToDom4j(if (nodeInfo.getParent.isInstanceOf[DocumentInfo]) nodeInfo.getParent
         else

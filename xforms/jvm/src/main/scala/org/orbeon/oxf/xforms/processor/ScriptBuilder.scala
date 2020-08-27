@@ -16,10 +16,11 @@ package org.orbeon.oxf.xforms.processor
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils.{RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSION_NUMBER_PROPERTY, getApplicationResourceVersion}
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
+import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
@@ -32,7 +33,7 @@ import scala.collection.mutable.ListBuffer
 object ScriptBuilder {
 
   def quoteString(s: String) =
-    s""""${escapeJavaScript(s)}""""
+    s""""${s.escapeJavaScript}""""
 
   def escapeJavaScriptInsideScript (js: String): String =
     // Method from https://stackoverflow.com/a/23983448/5295
@@ -257,7 +258,7 @@ object ScriptBuilder {
 
         // javascript: loads
         for (load <- javascriptLoads) {
-          val body = escapeJavaScript(load.resource.substring("javascript:".size))
+          val body = load.resource.substring("javascript:".size).escapeJavaScript
           sb append s"""(function(){$body})();"""
         }
 
@@ -265,7 +266,7 @@ object ScriptBuilder {
 
         // Initial modal xf:message to run if present
         if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m => s""""${escapeJavaScript(m.message)}"""")
+          val quotedMessages = messagesToRun map (m => s""""${m.message.escapeJavaScript}"""")
           quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
         }
 
@@ -291,7 +292,7 @@ object ScriptBuilder {
         if (errorsToShow.nonEmpty) {
 
           val title   = "Non-fatal error"
-          val details = XFormsUtils.escapeJavaScript(ServerError.errorsAsHTMLElem(errorsToShow).toString)
+          val details = ServerError.errorsAsHTMLElem(errorsToShow).toString.escapeJavaScript
           val formId  = XFormsUtils.getNamespacedFormId(containingDocument)
 
           sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""

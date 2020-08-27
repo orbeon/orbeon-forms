@@ -20,7 +20,6 @@ import java.{lang => jl, util => ju}
 import cats.implicits.catsSyntaxOptionId
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.{Result, TransformerException}
-import org.apache.commons.lang3.StringUtils
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -40,6 +39,8 @@ import org.orbeon.xforms.XFormsNames
 import org.w3c.dom
 import org.xml.sax.InputSource
 
+import org.orbeon.oxf.util.StringUtils._
+
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
@@ -48,18 +49,19 @@ object XFormsUtils {
   // Used by tests
   //@XPathFunction
   def encodeXMLAsDOM(node: org.w3c.dom.Node): String =
-    try EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState, true, false)
-  catch {
-    case e: TransformerException =>
-      throw new OXFException(e)
-  }
+    try
+      EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState, true, false)
+    catch {
+      case e: TransformerException =>
+        throw new OXFException(e)
+    }
 
-  private val TAGSOUP_HTML_SCHEMA = new HTMLSchema
+  private val TagSoupHtmlSchema = new HTMLSchema
 
   private def htmlStringToResult(value: String, locationData: LocationData, result: Result): Unit = {
     try {
       val xmlReader = new org.ccil.cowan.tagsoup.Parser
-      xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TAGSOUP_HTML_SCHEMA)
+      xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TagSoupHtmlSchema)
       xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
       val identity = TransformerUtils.getIdentityTransformerHandler
       identity.setResult(result)
@@ -68,8 +70,8 @@ object XFormsUtils {
       inputSource.setCharacterStream(new StringReader(value))
       xmlReader.parse(inputSource)
     } catch {
-      case _: Exception =>
-        throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData)
+      case NonFatal(_) =>
+        throw new ValidationException(s"Cannot parse value as text/html for value: `$value`", locationData)
     }
     //			r.setFeature(Parser.CDATAElementsFeature, false);
     //			r.setFeature(Parser.namespacesFeature, false);
@@ -107,7 +109,7 @@ object XFormsUtils {
   //        }
   //    }
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit = {
-    if (StringUtils.isNotBlank(value)) {
+    if (value.nonAllBlank) {
       // don't parse blank values
       val htmlDocument = htmlStringToDocumentTagSoup(value, locationData)
       // Stream fragment to the output
@@ -681,15 +683,6 @@ object XFormsUtils {
       )
       lastIsStart = false
     }
-  }
-
-  def escapeJavaScript(value: String): String = {
-    var v = value
-    v = StringUtils.replace(v, "\\", "\\\\")
-    v = StringUtils.replace(v, "\"", "\\\"")
-    v = StringUtils.replace(v, "\n", "\\n")
-    v = StringUtils.replace(v, "\t", "\\t")
-    v
   }
 
   def maybeAVT(attributeValue: String): Boolean =

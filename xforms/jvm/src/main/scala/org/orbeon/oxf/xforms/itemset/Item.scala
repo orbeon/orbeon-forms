@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
@@ -90,7 +90,7 @@ sealed trait ItemLeafImpl {
       }
 
   def javaScriptValue(encode: Boolean): String =
-    escapeJavaScript(externalValue(encode))
+    externalValue(encode).escapeJavaScript
 
   def javaScriptHelp(locationData: LocationData): Option[String] =
     help map (_.javaScriptValue(locationData))

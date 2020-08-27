@@ -73,6 +73,25 @@ object MarkupUtils {
 
     def normalizeSerializedHtml: String =
       CrRegex.replaceAllIn(s, "")
+
+    def escapeJavaScript: String =
+      replace(
+        replace(
+          replace(
+            replace(
+              s,
+              "\\",
+              "\\\\"
+            ),
+            "\"",
+            "\\\""
+          ),
+          "\n",
+          "\\n"
+        ),
+        "\t",
+        "\\t"
+      )
   }
 
   private val CrRegex = """\r""".r

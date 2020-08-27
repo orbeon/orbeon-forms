@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, streamHTMLFragment}
+import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -38,7 +38,7 @@ case class LHHAValue(label: String, isHTML: Boolean) {
       label.escapeXmlMinimal
 
   def javaScriptValue(locationData: LocationData): String =
-    escapeJavaScript(htmlValue(locationData))
+    htmlValue(locationData).escapeJavaScript
 }
 
 object LHHAValue {

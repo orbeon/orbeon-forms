@@ -18,8 +18,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.webapp.{SessionFacade, UserRolesFacade}
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
@@ -110,7 +110,7 @@ object FormRunnerAuth {
       val headerAsJSONStrings =
         headers map {
           case (name, values) =>
-            val valuesAsString = values.map(XFormsUtils.escapeJavaScript).mkString("""["""", """", """", """"]""")
+            val valuesAsString = values.map(_.escapeJavaScript).mkString("""["""", """", """", """"]""")
             s""""$name": $valuesAsString"""
         }
 

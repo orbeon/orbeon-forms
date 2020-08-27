@@ -29,9 +29,9 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, Proces
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -43,6 +43,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{DelayedEvent, Load, Message}
 
 import scala.util.control.NonFatal
@@ -155,7 +156,7 @@ object XFormsServer {
                   localName = "repeat-hierarchy",
                   prefix    = XXFORMS_SHORT_PREFIX,
                   uri       = XXFORMS_NAMESPACE_URI,
-                  text      = XFormsUtils.escapeJavaScript(newRepeatHierarchy)
+                  text      = newRepeatHierarchy.escapeJavaScript
                 )
               }
             }

@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport.isSelected
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
@@ -99,8 +99,8 @@ class Itemset(val multiple: Boolean, val hasCopy: Boolean) extends ItemContainer
             val nameValues =
               for {
                 (name, value) <- attributes
-                escapedName   = XFormsUtils.escapeJavaScript(getAttributeName(name))
-                escapedValue  = XFormsUtils.escapeJavaScript(value)
+                escapedName   = getAttributeName(name).escapeJavaScript
+                escapedValue  = value.escapeJavaScript
               } yield
                 s""""$escapedName":"$escapedValue""""
 

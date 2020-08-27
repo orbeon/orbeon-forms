@@ -821,7 +821,7 @@
     fillDow: function(){
       if (this.o.showWeekDays) {
       var dowCnt = this.o.weekStart,
-        html = '<tr>';
+        html = '<tr class="datepicker-week">';
       if (this.o.calendarWeeks){
         html += '<th class="cw">&#160;</th>';
       }
@@ -832,7 +832,9 @@
         html += '">'+dates[this.o.language].daysMin[(dowCnt++)%7]+'</th>';
 			}
 			html += '</tr>';
-			this.picker.find('.datepicker-days thead').append(html);
+			var thead = this.picker.find('.datepicker-days thead');
+			thead.find('.datepicker-week').detach();
+			thead.append(html);
       }
     },
 
@@ -987,6 +989,7 @@
             .text(this.o.title)
             .css('display', typeof this.o.title === 'string' && this.o.title !== '' ? 'table-cell' : 'none');
       this.updateNavArrows();
+      this.fillDow();
       this.fillMonths();
       var prevMonth = UTCDate(year, month, 0),
         day = prevMonth.getUTCDate();

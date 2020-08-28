@@ -19,7 +19,8 @@ import java.{lang => jl, util => ju}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
@@ -223,7 +224,7 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
       element.getNamespaceURI,
       element.getName,
       element.getQualifiedName,
-      Dom4jUtils.getSAXAttributes(element)
+      element.attributesAsSax
     ) map
       (_.elementHandler)
 

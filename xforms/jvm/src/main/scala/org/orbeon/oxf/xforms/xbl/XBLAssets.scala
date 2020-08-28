@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xforms.AssetPath
 
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
 
 object XBLAssets {
 
@@ -47,7 +46,7 @@ object XBLAssets {
           InlineElement(e.getStringValue)
         case _ =>
           throw new IllegalArgumentException(
-            s"Invalid element passed to HeadElement(): ${Dom4jUtils.elementToDebugString(e)}"
+            s"Invalid element passed to HeadElement(): ${e.toDebugString}"
           )
       }
     }

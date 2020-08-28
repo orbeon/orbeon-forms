@@ -1,6 +1,6 @@
 package org.orbeon.dom
 
-import java.{util => ju}
+import java.{util => ju, lang => jl}
 
 import org.orbeon.dom.tree.ConcreteElement
 
@@ -175,6 +175,36 @@ trait Element extends Branch {
 
   override def deepCopy: Element
   override def createCopy: Element
+
+  def toDebugString: String = {
+
+    // Open start tag
+    val sb = new jl.StringBuilder("<")
+    sb.append(getQualifiedName)
+
+    // Attributes if any
+    for (currentAtt <- attributeIterator) {
+      sb.append(' ')
+      sb.append(currentAtt.toDebugString)
+    }
+
+    val isEmptyElement = elements.isEmpty && getText.isEmpty
+    if (isEmptyElement) {
+      // Close empty element
+      sb.append("/>")
+    } else {
+      // Close start tag
+      sb.append('>')
+      sb.append("[...]")
+
+      // Close element with end tag
+      sb.append("</")
+      sb.append(getQualifiedName)
+      sb.append('>')
+    }
+
+    sb.toString
+  }
 }
 
 object Element {

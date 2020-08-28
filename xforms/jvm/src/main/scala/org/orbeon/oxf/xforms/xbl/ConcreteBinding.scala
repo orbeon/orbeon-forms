@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
@@ -33,7 +32,7 @@ case class ConcreteBinding(
 ) {
   require(
     abstractBinding.bindingId.isDefined,
-    s"missing id on XBL binding for ${Dom4jUtils.elementToDebugString(abstractBinding.bindingElement)}"
+    s"missing id on XBL binding for ${abstractBinding.bindingElement.toDebugString}"
   )
 
   def bindingId = abstractBinding.bindingId.get

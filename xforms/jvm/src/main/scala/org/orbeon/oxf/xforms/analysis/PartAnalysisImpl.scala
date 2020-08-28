@@ -24,11 +24,11 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, RootControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
 import org.orbeon.oxf.xml.{SAXStore, XMLReceiverHelper}
 import org.orbeon.xforms.Constants
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
@@ -97,7 +97,7 @@ class PartAnalysisImpl(
     val prefixedId = if (prefix ne null) prefix + id else id
 
     metadata.getNamespaceMapping(prefixedId) getOrElse
-      (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${Dom4jUtils.elementToDebugString(element)}`"))
+      (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${element.toDebugString}`"))
   }
 
   def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping = {

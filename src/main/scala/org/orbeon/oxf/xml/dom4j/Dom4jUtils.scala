@@ -341,55 +341,6 @@ object Dom4jUtils {
     }
   }
 
-  def elementToDebugString(element: Element): String = {
-
-    // Open start tag
-    val sb = new StringBuilder("<")
-    sb.append(element.getQualifiedName)
-
-    // Attributes if any
-    for (currentAtt <- element.attributeIterator) {
-      sb.append(' ')
-      sb.append(currentAtt.getQualifiedName)
-      sb.append("=\"")
-      sb.append(currentAtt.getValue)
-      sb.append('\"')
-    }
-
-    val isEmptyElement = element.jElements.isEmpty && element.getText.length == 0
-    if (isEmptyElement) {
-      // Close empty element
-      sb.append("/>")
-    } else {
-      // Close start tag
-      sb.append('>')
-      sb.append("[...]")
-
-      // Close element with end tag
-      sb.append("</")
-      sb.append(element.getQualifiedName)
-      sb.append('>')
-    }
-    sb.toString
-  }
-
-  def attributeToDebugString(attribute: Attribute): String =
-    attribute.getQualifiedName + "=\"" + attribute.getValue + '\"'
-
-  /**
-    * Convert dom4j attributes to SAX attributes.
-    *
-    * @param element dom4j Element
-    * @return SAX Attributes
-    */
-  def getSAXAttributes(element: Element): AttributesImpl = {
-    val result = new AttributesImpl
-    for (att <- element.attributeIterator) {
-      result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
-    }
-    result
-  }
-
   def createDocument(debugXML: DebugXML): Document = {
 
     val identity = TransformerUtils.getIdentityTransformerHandler

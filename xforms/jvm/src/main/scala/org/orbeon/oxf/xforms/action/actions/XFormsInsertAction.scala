@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{Axis, Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.xforms.XFormsNames
@@ -245,7 +244,7 @@ object XFormsInsertAction {
                         "skipping insertion of node as sibling in element content",
                         "type", Node.nodeTypeName(node),
                         "node", node match {
-                          case att: Attribute => Dom4jUtils.attributeToDebugString(att)
+                          case att: Attribute => att.toDebugString
                           case _              => node.toString
                         }
                       )

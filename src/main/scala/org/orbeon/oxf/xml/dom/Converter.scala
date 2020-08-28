@@ -13,11 +13,23 @@
  */
 package org.orbeon.oxf.xml.dom
 
+import org.orbeon.dom.Element
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.xml.sax.helpers.AttributesImpl
 
 
 object Converter {
-  implicit class ConverterOps[E](private val e: scala.xml.Elem) extends AnyVal {
+  implicit class ScalaElemConverterOps[E](private val e: scala.xml.Elem) extends AnyVal {
     def toDocument: org.orbeon.dom.Document = Dom4jUtils.readDom4j(e.toString)
+  }
+
+  implicit class DomElemConverterOps[E](private val e: Element) extends AnyVal {
+    def attributesAsSax: AttributesImpl = {
+      val result = new AttributesImpl
+      for (att <- e.attributeIterator)
+        result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
+      result
+    }
   }
 }

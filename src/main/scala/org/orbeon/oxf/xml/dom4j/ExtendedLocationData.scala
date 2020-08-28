@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xml.dom4j
 
 import org.orbeon.dom.Element
-import collection.immutable
+
 import scala.collection.compat._
+import scala.collection.immutable
 
 /**
  * LocationData information with additional information.
@@ -41,7 +42,7 @@ class ExtendedLocationData private (
       Option(locationData) map (_.line) getOrElse -1,
       Option(locationData) map (_.col) getOrElse -1,
       description,
-      (if (element.isDefined) List("element" -> (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
+      (if (element.isDefined) List("element" -> (element map (_.toDebugString) get)) else Nil) ++: params
     )
 
   // For Java callers: with LocationData, description, element and parameters

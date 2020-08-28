@@ -19,7 +19,6 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
@@ -32,6 +31,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.XFormsNames._
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
@@ -377,16 +377,16 @@ object XFormsModelSubmissionBase {
               "",
               "found invalid node",
               "element name",
-              Dom4jUtils.elementToDebugString(e)
+              e.toDebugString
             )
         case a: Attribute =>
           indentedLogger.logDebug(
             "",
             "found invalid attribute",
             "attribute name",
-            Dom4jUtils.attributeToDebugString(a),
+            a.toDebugString,
             "parent element",
-            Dom4jUtils.elementToDebugString(a.getParent)
+            a.getParent.toDebugString
           )
         case _ =>
           throw new IllegalArgumentException

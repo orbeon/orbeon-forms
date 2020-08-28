@@ -17,6 +17,8 @@ trait Attribute extends Node {
   def setValue(value: String): Unit
   def getData: AnyRef
   def setData(data: AnyRef): Unit
+
+  def toDebugString: String = s"""$getQualifiedName="$getValue""""
 }
 
 object Attribute {

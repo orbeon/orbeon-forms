@@ -183,7 +183,7 @@ object AbstractBinding {
   // pipeline inputs and inputs while still allowing caching of the pipeline itself.
   private def createTransformDomGenerator(transform: Element, lastModified: Long): DOMGenerator =
     PipelineUtils.createDOMGenerator(
-      Dom4jUtils.createDocumentCopyParentNamespaces(transform),
+      transform.createDocumentCopyParentNamespaces(detach = false),
       "xbl-transform-config",
       lastModified,
       ProcessorSupport.makeSystemId(transform)
@@ -222,7 +222,7 @@ object AbstractBinding {
         modelElement
 
     val global = Option(bindingElem.element(XXBL_GLOBAL_QNAME)) map
-      (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
+      (_.createDocumentCopyParentNamespaces(detach = true))
 
     val selectors =
       CSSSelectorParser.parseSelectors(bindingElem.attributeValue(ELEMENT_QNAME))

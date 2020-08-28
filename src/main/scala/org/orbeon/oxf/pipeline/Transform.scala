@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.{DOMSerializer, ProcessorSupport, XPLConstants}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, PipelineUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{XMLConstants, XMLParsing}
 import org.orbeon.scaxon.NodeConversions
 
@@ -125,7 +125,7 @@ object Transform {
 
     // Connect the bound element to the processor data input
     val domGeneratorData = PipelineUtils.createDOMGenerator(
-      Dom4jUtils.createDocumentCopyParentNamespaces(elem),
+      elem.createDocumentCopyParentNamespaces(detach = false),
       "xbl-transform-data",
       DOMGenerator.ZeroValidity,
       ProcessorSupport.makeSystemId(elem)

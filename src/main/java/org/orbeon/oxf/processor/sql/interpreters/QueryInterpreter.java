@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -409,13 +410,13 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 // TODO: Check BLOB: should we be able to set a String as a Blob?
                                             } else if (value instanceof String || value instanceof Element) {
                                                 // Make sure we create a Document from the Element if we have one
-                                                Document xmlFragmentDocument = (value instanceof Element) ? Dom4jUtils.createDocumentCopyParentNamespaces((Element) value) : null;
+                                                Document xmlFragmentDocument = (value instanceof Element) ? Extensions.createDocumentCopyParentNamespacesJava((Element) value, false) : null;
 
                                                 // Convert document into an XML String if necessary
                                                 if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Convert Document into a String
                                                     boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false);
-                                                    value = Dom4jUtils.domToStringJava(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11));
+                                                    value = Dom4jUtils.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
                                                 }
                                                 if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Set DOM using native XML type
@@ -429,7 +430,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
                                                         boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false);
-                                                        String stringValue = Dom4jUtils.domToStringJava(Dom4jUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11));
+                                                        String stringValue = Dom4jUtils.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
 
                                                         // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String
 //                                                            org.w3c.dom.Node node = XMLUtils.stringToDOM(stringValue);

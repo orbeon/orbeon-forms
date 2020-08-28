@@ -86,6 +86,7 @@ object Node {
 trait Node extends Cloneable {
 
   def getParent: Element
+  def parentElemOpt: Option[Element] = Option(getParent)
   def setParent(parent: Element): Unit
 
   def getDocument: Document

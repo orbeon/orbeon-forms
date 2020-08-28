@@ -15,17 +15,18 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
-import org.xml.sax.Attributes
-import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
+import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
 
@@ -105,7 +106,7 @@ object XBLBindingBuilder {
     annotateSubtree(
       partAnalysis,
       Some(boundElement),
-      Dom4jUtils.createDocumentCopyParentNamespaces(element, detach = false),
+      element.createDocumentCopyParentNamespaces(detach = false),
       innerScope,
       outerScope,
       startScope,
@@ -183,7 +184,7 @@ object XBLBindingBuilder {
             // If @xxbl:transform is not present, just use a copy of the template element itself
             val shadowTreeDocument =
               abstractBinding.newTransform(boundElement) getOrElse
-                Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
+                templateElement.createDocumentCopyParentNamespaces(detach = false)
 
             // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
             XBLTransformer.transform(
@@ -367,9 +368,8 @@ object XBLBindingBuilder {
       if (Version.isPE) {
         var hasUpdateFull = false
 
-        Dom4jUtils.visitSubtree(
-          shadowTreeDocument.getRootElement,
-          new Dom4jUtils.VisitorListener {
+        shadowTreeDocument.getRootElement.visitDescendants(
+          new VisitorListener {
             def startElement(element: Element): Unit = {
               val xxformsUpdate = element.attributeValue(XXFORMS_UPDATE_QNAME)
               if (XFORMS_FULL_UPDATE == xxformsUpdate)

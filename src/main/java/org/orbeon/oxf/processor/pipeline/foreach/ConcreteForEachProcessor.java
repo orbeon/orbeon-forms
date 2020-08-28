@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
@@ -95,7 +96,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         iterationOutput = forEachBlockProcessor.createOutput(idOrRef);
 
         select = forEachAST.getSelect();
-        namespaceContext = NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode()));
+        namespaceContext = NamespaceMapping.apply(Extensions.getNamespaceContextNoDefaultJava((Element) forEachAST.getNode()));
         if (forEachAST.getRoot() != null) {
             rootQName = forEachAST.getRoot();
             int columnPosition = rootQName.indexOf(':');

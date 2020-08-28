@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model.{Constraint, Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{XMLConstants, XMLParsing}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, ValidationFailure}
 import org.orbeon.saxon.expr.XPathContextMajor
@@ -254,8 +254,8 @@ trait ValidationBindOps extends Logging {
 
           if ((namespaceNodeInfo ne null) && namespaceNodeInfo.getNodeKind == Node.ELEMENT_NODE) {
             // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
-            val namespaceElement = unsafeUnwrapElement(namespaceNodeInfo)
-            val namespaceMapping = NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
+            val namespaceElem    = unsafeUnwrapElement(namespaceNodeInfo)
+            val namespaceMapping = NamespaceMapping(namespaceElem.getNamespaceContextNoDefault)
             isOptionalAndEmpty || XPath.isXPath2ExpressionOrValueTemplate(
               nodeValue,
               namespaceMapping,

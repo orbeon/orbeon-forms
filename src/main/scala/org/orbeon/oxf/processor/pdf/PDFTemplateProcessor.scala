@@ -36,10 +36,11 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOu
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.xml.NamespaceMapping
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -450,7 +451,7 @@ object PDFTemplateProcessor {
         contextSeq.asJava,
         contextPosition,
         xpath,
-        NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+        NamespaceMapping(element.getNamespaceContextNoDefault),
         jVariables,
         functionLibrary,
         null,
@@ -464,7 +465,7 @@ object PDFTemplateProcessor {
         contextSeq.asJava,
         contextPosition,
         xpath,
-        NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+        NamespaceMapping(element.getNamespaceContextNoDefault),
         jVariables,
         functionLibrary,
         null,
@@ -478,7 +479,7 @@ object PDFTemplateProcessor {
         contextSeq.asJava,
         contextPosition,
         xpath,
-        NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+        NamespaceMapping(element.getNamespaceContextNoDefault),
         jVariables,
         functionLibrary,
         null,
@@ -493,7 +494,7 @@ object PDFTemplateProcessor {
           XPathCache.evaluateAsAvt(
             contextItem,
             _,
-            NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
+            NamespaceMapping(element.getNamespaceContextNoDefault),
             jVariables,
             functionLibrary,
             null,

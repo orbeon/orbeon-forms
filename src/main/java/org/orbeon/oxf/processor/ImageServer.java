@@ -35,7 +35,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -467,7 +466,7 @@ public class ImageServer extends ProcessorImpl {
         for (Element element: nodes) {
             rootElement.add(element.createCopy());
         }
-        String digest = NumberUtils.toHexString(Dom4jUtils.getDigest(document));
+        String digest = NumberUtils.toHexString(ProcessorSupport.computeDocumentDigest(document));
 
         // Create file name
         if ("flat".equals(type))

@@ -93,7 +93,7 @@ object XBLTransformer {
         for (node <- nodes.asScala) {
           node match {
             case element: Element =>
-              Dom4jUtils.copyMissingNamespaces(namespaceElemOpt, element)
+              element.copyMissingNamespacesByPrefix(namespaceElemOpt)
               element.addAttribute(attributeQName, attributeValue)
             case _ =>
           }
@@ -134,7 +134,7 @@ object XBLTransformer {
                   // don't copy over namespace nodes
                 case elem: Element =>
                   if (! mustFilterOut(elem))
-                    clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
+                    clonedContent.add(elem.copyAndCopyParentNamespaces)
                 case node =>
                   clonedContent.add(node.createCopy)
               }
@@ -166,7 +166,7 @@ object XBLTransformer {
               for (currentNodeInfo <- elements) {
                 val currentElement = unsafeUnwrapElement(currentNodeInfo)
                 if (! mustFilterOut(currentElement))
-                  contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
+                  contentToInsert.add(currentElement.copyAndCopyParentNamespaces)
               }
             } else {
               // Clone all the element's children if any
@@ -174,7 +174,7 @@ object XBLTransformer {
               contentToInsert = new ju.ArrayList[Node](currentElem.nodeCount)
               for (currentElement <- currentElem.elements) {
                 if (! mustFilterOut(currentElement))
-                  contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
+                  contentToInsert.add(currentElement.copyAndCopyParentNamespaces)
               }
             }
           }

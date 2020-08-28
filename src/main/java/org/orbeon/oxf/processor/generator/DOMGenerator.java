@@ -21,11 +21,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.ProcessorSupport;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -76,7 +76,7 @@ public final class DOMGenerator extends ProcessorImpl {
         }
 
         Source makeDOMSource() {
-            return Dom4jUtils.getDocumentSource(doc);
+            return ProcessorSupport.getDocumentSource(doc);
         }
     }
 

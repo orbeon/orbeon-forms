@@ -15,7 +15,6 @@ package org.orbeon.oxf.pipeline
 
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpSession}
-
 import org.apache.log4j.Logger
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
@@ -31,7 +30,6 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.JavaConverters._
@@ -230,7 +228,7 @@ object InitUtils {
   // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used
   def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String): Option[ProcessorDefinition] =
     map.get(uriNamePropertyPrefix + "name") map { processorName =>
-      val processorDefinition = new ProcessorDefinition(Dom4jUtils.explodedQNameToQName(processorName, "p1"))
+      val processorDefinition = new ProcessorDefinition(ProcessorSupport.explodedQNameToQName(processorName, "p1"))
 
       for ((name, value) <- map)
         if (name.startsWith(inputPropertyPrefix))

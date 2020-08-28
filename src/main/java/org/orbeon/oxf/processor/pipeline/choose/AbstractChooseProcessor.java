@@ -16,13 +16,10 @@ package org.orbeon.oxf.processor.pipeline.choose;
 import org.apache.commons.collections.CollectionUtils;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.AbstractProcessor;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.XPLConstants;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.xml.NamespaceMapping;
 
@@ -167,7 +164,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
                 throw new ValidationException("ASTWhen cannot have both a node and namespaces defined", astWhen.getLocationData());
             }
             branchNamespaces.add(astWhen.getNode() != null
-                    ? NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode()))
+                    ? NamespaceMapping.apply(Extensions.getNamespaceContextNoDefaultJava((Element) astWhen.getNode()))
                     : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to
@@ -179,7 +176,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
                 {
                     identityConnector.addInput(new ASTInput("data", new ASTHrefId(new ASTOutput(null, id))));
                     final ASTParam outParam = new ASTParam(ASTParam.OUTPUT, id);
-                    final LocationData locDat = Dom4jUtils.getLocationData();
+                    final LocationData locDat = ProcessorSupport.getLocationData();
                     final ASTOutput astOut = new ASTOutput("data", outParam);
                     astOut.setLocationData(locDat);
                     identityConnector.addOutput(astOut);

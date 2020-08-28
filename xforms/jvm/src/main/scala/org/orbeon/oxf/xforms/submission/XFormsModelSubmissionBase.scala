@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
@@ -160,7 +161,7 @@ object XFormsModelSubmissionBase {
         // the remainder of the submit process. "
         val copy =
           virtualNode.getUnderlyingNode match {
-            case e: Element => Dom4jUtils.createDocumentCopyParentNamespaces(e)
+            case e: Element => e.createDocumentCopyParentNamespaces(detach = false)
             case n: Node    => Document(n.getDocument.getRootElement.createCopy)
             case _          => throw new IllegalStateException
           }

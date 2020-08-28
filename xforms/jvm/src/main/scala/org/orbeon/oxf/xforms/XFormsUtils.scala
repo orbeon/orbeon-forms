@@ -26,6 +26,7 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
@@ -33,13 +34,12 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttri
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceData}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, LocationDocumentResult}
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo, VirtualNode}
 import org.orbeon.xforms.XFormsNames
 import org.w3c.dom
 import org.xml.sax.InputSource
-
-import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -141,7 +141,10 @@ object XFormsUtils {
     // serialize it, which is not trivial because of the possible interleaved xf:output's. Furthermore, we
     // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
     // serialization.
-    Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(prefix, acceptHTML, containsHTML, sb, childElement))
+    childElement.visitDescendants(
+      new LHHAElementVisitorListener(prefix, acceptHTML, containsHTML, sb, childElement),
+      mutable = false
+    )
     if (acceptHTML && containsHTML != null && !containsHTML(0)) {
       // We went through the subtree and did not find any HTML
       // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -227,8 +230,7 @@ object XFormsUtils {
 
     def fromNestedContent: Option[String] = {
       val sb = new jl.StringBuilder(20)
-      Dom4jUtils.visitSubtree(
-        childElement,
+      childElement.visitDescendants(
         new XFormsUtils.LHHAElementVisitorListener(
           container         = container,
           contextStack      = contextStack,
@@ -238,7 +240,8 @@ object XFormsUtils {
           containsHTML      = containsHTML,
           sb                = sb,
           childElement      = childElement
-        )
+        ),
+        mutable = false
       )
 
       maybeEscapeValue(sb.toString).some
@@ -522,7 +525,7 @@ object XFormsUtils {
     sb                : jl.StringBuilder,
     childElement      : Element,
     hostLanguageAVTs  : Boolean,
-  ) extends Dom4jUtils.VisitorListener {
+  ) extends VisitorListener {
 
     thisLHHAElementVisitorListener =>
 

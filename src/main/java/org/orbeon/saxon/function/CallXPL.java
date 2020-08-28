@@ -27,7 +27,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.FunctionSupportJava;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;
@@ -124,7 +124,7 @@ public class CallXPL extends FunctionSupportJava {
                             else if (inputNode instanceof Element && inputNode.getParent() == null)
                                 inputElement = (Element) inputNode;
                             else if (inputNode instanceof Element)
-                                inputElement = Dom4jUtils.createDocumentCopyParentNamespaces((Element) inputNode).getRootElement();
+                                inputElement = Extensions.createDocumentCopyParentNamespacesJava((Element) inputNode, false).getRootElement();
                             else
                                 throw new OXFException("Input node must be a document or element for input name: " + inputName);
 

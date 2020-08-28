@@ -619,7 +619,7 @@ public class XFormsModelSchemaValidator {
 
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
         // TODO: We create an entirely new dom4j document here because otherwise the transformation picks the whole document
-        TransformerUtils.writeDom4j(Dom4jUtils.createDocumentCopyParentNamespaces(schemaElement), reader);
+        TransformerUtils.writeDom4j(Extensions.createDocumentCopyParentNamespacesJava(schemaElement, false), reader);
 
         return reader.getResult();
     }

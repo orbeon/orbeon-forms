@@ -21,14 +21,15 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.model.InstanceDataOps
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
@@ -233,10 +234,10 @@ object Instance {
           Document(element.createCopy)
         case prefixes if prefixes.nonEmpty =>
           // List of prefixes
-          Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
+          element.createDocumentCopyParentNamespaces(detach = false, prefixesToFilter = prefixes)
         case _ =>
           // No exclusion
-          Dom4jUtils.createDocumentCopyParentNamespaces(element)
+          element.createDocumentCopyParentNamespaces(detach = false)
       }
 
     if (readonly)

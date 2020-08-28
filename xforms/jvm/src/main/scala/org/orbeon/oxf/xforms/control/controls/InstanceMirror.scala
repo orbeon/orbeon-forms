@@ -26,8 +26,8 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent,
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
@@ -35,6 +35,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node._
+
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -161,7 +162,7 @@ object InstanceMirror {
 
     val inScope = ancestors intersect List(referenceNode) nonEmpty
 
-    def namespaces = NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
+    def namespaces = NamespaceMapping(unsafeUnwrapElement(referenceNode).getNamespaceContextNoDefault)
 
     inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNode], namespaces)
   }

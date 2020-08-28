@@ -13,12 +13,25 @@
  */
 package org.orbeon.oxf.xml.dom
 
-import org.orbeon.dom.{Element, Namespace, QName}
+import java.{util => ju}
+
+import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.xml.XMLConstants
+
+import scala.jdk.CollectionConverters._
 
 
 object Extensions {
+
+  trait VisitorListener {
+    def startElement(element: Element): Unit
+    def endElement(element: Element): Unit
+    def text(text: Text): Unit
+  }
+
+  private val XmlNamespaceMap = Map(XMLConstants.XML_PREFIX -> XMLConstants.XML_URI)
 
   implicit class DomElemOps[E](private val e: Element) extends AnyVal {
 
@@ -30,6 +43,70 @@ object Extensions {
 
     def resolveAttValueQName(attName: String, unprefixedIsNoNamespace: Boolean): QName =
       resolveStringQName(e.attributeValue(attName), unprefixedIsNoNamespace)
+
+    def copyMissingNamespacesByPrefix(sourceElem: Option[Element], prefixesToFilter: Set[String] = Set.empty): Element = {
+
+      val srcElemNs  = sourceElem map (_.allInScopeNamespacesAsStrings) getOrElse XmlNamespaceMap
+      val destElemNs = e.allInScopeNamespacesAsStrings
+
+      for ((prefix, uri) <- srcElemNs)
+        if (! destElemNs.contains(prefix) && ! prefixesToFilter.contains(prefix))
+          e.addNamespace(prefix, uri)
+
+      e
+    }
+
+    /**
+      * Return a new document with all parent namespaces copied to the new root element, assuming they are not already
+      * declared on the new root element.
+      *
+      * @param detach  if true the element is detached, otherwise it is deep copied
+      * @return new document
+      */
+    def createDocumentCopyParentNamespaces(detach: Boolean, prefixesToFilter: Set[String] = Set.empty): Document = {
+      val savedParentElemOpt = e.parentElemOpt
+      val document =
+        if (detach)
+          Document(e.detach().asInstanceOf[Element])
+        else
+          Document(e.createCopy)
+      document.getRootElement.copyMissingNamespacesByPrefix(savedParentElemOpt, prefixesToFilter)
+      document
+    }
+
+    def copyAndCopyParentNamespaces: Element =
+      e.createCopy.copyMissingNamespacesByPrefix(e.parentElemOpt)
+
+    def getNamespaceContextNoDefault: Map[String, String] =
+      e.allInScopeNamespacesAsStrings.filterKeys(_ != "")
+
+    /**
+    * Visit the `Element`'s descendants.
+    *
+    * @param visitorListener listener to call back
+    * @param mutable         whether the source tree can mutate while being visited
+    */
+    def visitDescendants(visitorListener: VisitorListener, mutable: Boolean): Unit = {
+
+      // If the source tree can mutate, copy the list first, otherwise the DOM might throw exceptions
+      val immutableContent =
+        if (mutable)
+          List(e.content)
+        else
+          e.content
+
+      // Iterate over the content
+      for (childNode <- immutableContent)
+        childNode match {
+          case childElem: Element =>
+            visitorListener.startElement(childElem)
+            e.visitDescendants(visitorListener, mutable)
+            visitorListener.endElement(childElem)
+          case text: Text => visitorListener.text(text)
+          case _ =>
+          // Ignore as we don't need other node types for now
+        }
+    }
   }
 
   /**
@@ -85,4 +162,17 @@ object Extensions {
 
   def resolveTextValueQNameJava(elem: Element, unprefixedIsNoNamespace: Boolean): QName =
     resolveQName(elem.allInScopeNamespacesAsStrings, elem.getStringValue, unprefixedIsNoNamespace)
+
+  def createDocumentCopyParentNamespacesJava(elem: Element, detach: Boolean): Document =
+    elem.createDocumentCopyParentNamespaces(detach)
+
+  def copyAndCopyParentNamespacesJava(elem: Element): Element =
+    elem.copyAndCopyParentNamespaces
+
+  def getNamespaceContextNoDefaultJava(elem: Element): Map[String, String] =
+    elem.getNamespaceContextNoDefault
+
+  def getNamespaceContextNoDefaultAsJavaMap(elem: Element): ju.Map[String, String] =
+    elem.getNamespaceContextNoDefault.asJava
+
 }

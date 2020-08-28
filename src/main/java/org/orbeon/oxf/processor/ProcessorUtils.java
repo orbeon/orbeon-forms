@@ -25,7 +25,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.URL;
@@ -75,7 +75,7 @@ public class ProcessorUtils {
                 Element originalElement = (Element) ((Element) inputElement).jElementIterator().next();
                 if (originalElement == null)
                     throw new OXFException("Input content is mandatory");
-                Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
+                Element copiedElement = Extensions.copyAndCopyParentNamespacesJava(originalElement);
                 final String sid = ProcessorSupport.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
                     (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
@@ -113,7 +113,7 @@ public class ProcessorUtils {
             final Element originalElement = (Element) ((Element) element).jElementIterator().next();
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
-            Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
+            Element copiedElement = Extensions.copyAndCopyParentNamespacesJava(originalElement);
             result = Document.apply();
             result.add(copiedElement);
         } else {

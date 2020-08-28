@@ -26,7 +26,8 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
@@ -169,9 +170,8 @@ object ItemsetSupport {
         contextStack.setBinding(select1Control.bindingContext)
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
-        Dom4jUtils.visitSubtree(
-          select1Control.element,
-          new Dom4jUtils.VisitorListener {
+        select1Control.element.visitDescendants(
+          new VisitorListener {
 
             private var position: Int = 0
             private var currentContainer: ItemContainer = result
@@ -449,7 +449,8 @@ object ItemsetSupport {
                   stack.size - 1
               }
             }
-          }
+          },
+          mutable = false
         )
 
         contextStack.setBinding(savedBindingContext)

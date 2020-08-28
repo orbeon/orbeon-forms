@@ -19,16 +19,15 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xml.dom.Comparator
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 import scala.annotation.tailrec
 
@@ -221,34 +220,37 @@ class LHHAAnalysis(
         // The subtree can only contain HTML elements interspersed with xf:output. HTML elements may have AVTs.
         var combinedAnalysis: XPathAnalysis = StringAnalysis()
 
-        Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener {
-          val hostLanguageAVTs: Boolean = XFormsProperties.isHostLanguageAVTs
-          def startElement(element: Element): Unit = {
-            if (element.getQName == XFORMS_OUTPUT_QNAME) {
-              // Add dependencies
-              val outputAnalysis =
-                new SimpleElementAnalysis(
-                  staticStateContext = staticStateContext,
-                  element            = element,
-                  parent             = Some(delegateAnalysis),
-                  preceding          = None,
-                  scope              = delegateAnalysis.getChildElementScope(element)
-                ) with ValueTrait with OptionalSingleNode with ViewTrait
-              outputAnalysis.analyzeXPath()
-              if (outputAnalysis.getValueAnalysis.isDefined)
-                combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
-            } else if (hostLanguageAVTs) {
-              for {
-                attribute <- element.attributes
-                attributeValue = attribute.getValue
-                if XFormsUtils.maybeAVT(attributeValue)
-              } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
+        element.visitDescendants(
+          new VisitorListener {
+            val hostLanguageAVTs: Boolean = XFormsProperties.isHostLanguageAVTs
+            def startElement(element: Element): Unit = {
+              if (element.getQName == XFORMS_OUTPUT_QNAME) {
+                // Add dependencies
+                val outputAnalysis =
+                  new SimpleElementAnalysis(
+                    staticStateContext = staticStateContext,
+                    element            = element,
+                    parent             = Some(delegateAnalysis),
+                    preceding          = None,
+                    scope              = delegateAnalysis.getChildElementScope(element)
+                  ) with ValueTrait with OptionalSingleNode with ViewTrait
+                outputAnalysis.analyzeXPath()
+                if (outputAnalysis.getValueAnalysis.isDefined)
+                  combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
+              } else if (hostLanguageAVTs) {
+                for {
+                  attribute <- element.attributes
+                  attributeValue = attribute.getValue
+                  if XFormsUtils.maybeAVT(attributeValue)
+                } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
+              }
             }
-          }
 
-          def endElement(element: Element): Unit = ()
-          def text(text: Text): Unit = ()
-        })
+            def endElement(element: Element): Unit = ()
+            def text(text: Text): Unit = ()
+          },
+          mutable = false
+        )
 
         // Result of all combined analyses
         Some(combinedAnalysis)

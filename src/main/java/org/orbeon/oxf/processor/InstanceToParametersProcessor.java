@@ -23,11 +23,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EncodeDecode;
-import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -92,7 +92,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                                 instanceWrapper.getConfiguration(),
                                 instanceWrapper.wrap(instance),
                                 excludeRef,
-                                NamespaceMapping.apply(Dom4jUtils.getNamespaceContextNoDefault(paramElement)),
+                                NamespaceMapping.apply(Extensions.getNamespaceContextNoDefaultJava(paramElement)),
                                 getLocationData()
                             );
 

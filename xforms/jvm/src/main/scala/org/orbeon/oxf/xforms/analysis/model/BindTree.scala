@@ -14,14 +14,14 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
-import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.XXBLScope
 
-import scala.collection.{mutable => m}
 import scala.collection.compat._
+import scala.collection.{mutable => m}
 
 class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName => Boolean) {
 
@@ -80,7 +80,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
       XBLBindingBuilder.annotateSubtree(
         model.part,
         None,
-        Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
+        rawBindElement.createDocumentCopyParentNamespaces(detach = false),
         model.scope,
         model.scope,
         XXBLScope.Inner,

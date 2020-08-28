@@ -16,7 +16,7 @@ package org.orbeon.oxf.test;
 import junit.framework.TestCase;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 
 
 public class PropertiesTest extends TestCase {
@@ -36,7 +36,7 @@ public class PropertiesTest extends TestCase {
             "</properties>";
 
     protected void setUp() throws Exception {
-        propertyStore = PropertyStore.parse(Dom4jUtils.readDom4j(PROPERTIES));
+        propertyStore = PropertyStore.parse(IOSupport.readDom4j(PROPERTIES));
     }
 
     public void testWildcardMatches() {

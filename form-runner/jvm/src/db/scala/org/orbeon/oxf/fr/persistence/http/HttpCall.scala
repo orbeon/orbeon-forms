@@ -32,8 +32,7 @@ import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger, NetUtils}
-import org.orbeon.oxf.xml.dom.Comparator
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.scalatest.Assertions._
 
 import scala.util.Try
@@ -109,7 +108,7 @@ private[persistence] object HttpCall {
           }
         expectedBody match {
           case HttpCall.XML(expectedDoc) =>
-            val resultDoc  = Dom4jUtils.readDom4j(new ByteArrayInputStream(actualBody))
+            val resultDoc  = IOSupport.readDom4j(new ByteArrayInputStream(actualBody))
             if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
                 resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===

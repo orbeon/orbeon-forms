@@ -17,8 +17,7 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom.Comparator
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpec
 
@@ -94,7 +93,7 @@ class BindingIndexTest extends AnyFunSpec {
     val encapsulated =
       s"""<root $namespacesString>$xmlElem</root>"""
 
-    Dom4jUtils.readDom4j(encapsulated).getRootElement.elements.head
+    IOSupport.readDom4j(encapsulated).getRootElement.elements.head
   }
 
   def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {

@@ -30,7 +30,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -416,7 +416,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Convert Document into a String
                                                     boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false);
-                                                    value = Dom4jUtils.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
+                                                    value = IOSupport.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
                                                 }
                                                 if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                     // Set DOM using native XML type
@@ -430,7 +430,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
                                                         boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false);
-                                                        String stringValue = Dom4jUtils.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
+                                                        String stringValue = IOSupport.domToStringJava(ProcessorSupport.adjustNamespaces(xmlFragmentDocument, serializeXML11));
 
                                                         // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String
 //                                                            org.w3c.dom.Node node = XMLUtils.stringToDOM(stringValue);

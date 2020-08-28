@@ -32,7 +32,6 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 

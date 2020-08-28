@@ -28,9 +28,8 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom.{Extensions, IOSupport}
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._

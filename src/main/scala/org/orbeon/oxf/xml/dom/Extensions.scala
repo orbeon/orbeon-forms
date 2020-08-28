@@ -100,11 +100,10 @@ object Extensions {
         childNode match {
           case childElem: Element =>
             visitorListener.startElement(childElem)
-            e.visitDescendants(visitorListener, mutable)
+            childElem.visitDescendants(visitorListener, mutable)
             visitorListener.endElement(childElem)
           case text: Text => visitorListener.text(text)
-          case _ =>
-          // Ignore as we don't need other node types for now
+          case _ => // Ignore as we don't need other node types for now
         }
     }
   }
@@ -174,5 +173,4 @@ object Extensions {
 
   def getNamespaceContextNoDefaultAsJavaMap(elem: Element): ju.Map[String, String] =
     elem.getNamespaceContextNoDefault.asJava
-
 }

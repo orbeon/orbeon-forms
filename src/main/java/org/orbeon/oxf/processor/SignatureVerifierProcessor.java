@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 
 import java.security.KeyFactory;
@@ -69,7 +69,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final Document sigData = Document.apply();
                     sigData.add(sigDataNode);
 
-                    dsa.update(Dom4jUtils.domToStringJava(sigData).getBytes(CharsetNames.Utf8()));
+                    dsa.update(IOSupport.domToStringJava(sigData).getBytes(CharsetNames.Utf8()));
 
                     // Verify signature and throw in case of failure
                     try {

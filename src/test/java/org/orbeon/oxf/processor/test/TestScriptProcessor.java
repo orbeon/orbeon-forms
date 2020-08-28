@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Comparator;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.io.File;
@@ -169,8 +169,8 @@ public class TestScriptProcessor extends ProcessorImpl {
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
                 if (! Comparator.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
-                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + Dom4jUtils.domToCompactStringJava(actualDocument)
-                        +  " ', but expected '" + Dom4jUtils.domToCompactStringJava(expectedDocument) + "'.");
+                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + IOSupport.domToCompactStringJava(actualDocument)
+                        +  " ', but expected '" + IOSupport.domToCompactStringJava(expectedDocument) + "'.");
 
             } else {
                 throw new IllegalArgumentException("Not implemented yet.");

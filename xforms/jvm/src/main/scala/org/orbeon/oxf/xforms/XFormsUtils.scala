@@ -35,7 +35,8 @@ import org.orbeon.oxf.xforms.model.{DataModel, InstanceData}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, LocationDocumentResult}
+import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.xml.dom4j.{LocationData, LocationDocumentResult}
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo, VirtualNode}
 import org.orbeon.xforms.XFormsNames
 import org.w3c.dom
@@ -421,7 +422,7 @@ object XFormsUtils {
    * @param document     the Document to display
    */
   def logDebugDocument(debugMessage: String, document: Document): Unit =
-    DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToPrettyStringJava(document))
+    DebugProcessor.logger.info(debugMessage + ":\n" + IOSupport.domToPrettyStringJava(document))
 
   /**
    * Prefix an id with the container namespace if needed. If the id is null, return null.

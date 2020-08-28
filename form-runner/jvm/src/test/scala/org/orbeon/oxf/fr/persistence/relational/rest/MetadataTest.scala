@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
 
 class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
@@ -44,6 +44,6 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
         <available>false</available>
       </metadata>.toDocument
 
-    assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map Dom4jUtils.readDom4j get)
+    assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map IOSupport.readDom4j get)
   }
 }

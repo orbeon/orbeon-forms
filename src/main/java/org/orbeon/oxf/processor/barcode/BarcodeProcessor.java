@@ -27,7 +27,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 
@@ -62,7 +62,7 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 
 		try {
 			final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
-			final Configuration cfg = builder.build(new StringInputStream(Dom4jUtils.domToStringJava(configDocument)));
+			final Configuration cfg = builder.build(new StringInputStream(IOSupport.domToStringJava(configDocument)));
 			final BarcodeGenerator gen = BarcodeUtil.getInstance().createBarcodeGenerator(cfg);
 
             // TODO: These parameters (DPI, etc.) should be configurable

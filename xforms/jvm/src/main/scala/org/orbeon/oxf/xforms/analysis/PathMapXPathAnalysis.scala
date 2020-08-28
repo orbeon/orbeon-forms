@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
@@ -668,7 +669,7 @@ object PathMapXPathAnalysis {
       </pathmap>
 
     // Pretty print
-    println(Dom4jUtils.prettyfy(result.toString))
+    println(IOSupport.prettyfy(result.toString))
   }
 
 //    def externalAnalysisExperiment(expression: Expression, pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {

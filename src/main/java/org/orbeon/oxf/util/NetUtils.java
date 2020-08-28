@@ -29,7 +29,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.servlet.http.HttpServletRequest;
@@ -840,7 +840,7 @@ public class NetUtils {
     }
 
     public static void debugLogRequestAsXML(final ExternalContext.Request request) {
-        System.out.println(Dom4jUtils.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
+        System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
     }
 
     public static boolean isSuccessCode(int code) {

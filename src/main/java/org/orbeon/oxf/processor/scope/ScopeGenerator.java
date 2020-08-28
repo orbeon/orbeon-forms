@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -212,7 +212,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     try {
                         Document mappingDocument = readInputAsOrbeonDom(context, input);
                         Mapping mapping = new Mapping();
-                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToStringJava(mappingDocument))));
+                        mapping.loadMapping(new InputSource(new StringReader(IOSupport.domToStringJava(mappingDocument))));
                         return mapping;
                     } catch (Exception e) {
                         throw new OXFException(e);

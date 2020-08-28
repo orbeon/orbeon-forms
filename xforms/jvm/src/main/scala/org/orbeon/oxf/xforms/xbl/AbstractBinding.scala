@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._

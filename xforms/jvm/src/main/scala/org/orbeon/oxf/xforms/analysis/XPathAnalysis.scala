@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.MapSet
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
+import org.orbeon.oxf.xml.dom.IOSupport.DebugXML
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.

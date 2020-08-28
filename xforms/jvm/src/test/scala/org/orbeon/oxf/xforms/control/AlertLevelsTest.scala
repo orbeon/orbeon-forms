@@ -18,7 +18,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.xforms.RelevanceHandling
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {

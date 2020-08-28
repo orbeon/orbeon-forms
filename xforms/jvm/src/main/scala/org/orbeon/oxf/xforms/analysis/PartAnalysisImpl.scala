@@ -24,8 +24,8 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, RootControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
+import org.orbeon.oxf.xml.dom.IOSupport
+import IOSupport.DebugXML
 import org.orbeon.oxf.xml.{SAXStore, XMLReceiverHelper}
 import org.orbeon.xforms.Constants
 import org.orbeon.xforms.xbl.Scope
@@ -273,5 +273,5 @@ class PartAnalysisImpl(
     controlAnalysisMap(startScope.prefixedIdForStaticId(Constants.DocumentId)).toXML(helper)
 
   def dumpAnalysis(): Unit =
-    println(Dom4jUtils.createDocument(this).getRootElement.serializeToString(XMLWriter.PrettyFormat))
+    println(IOSupport.createDocument(this).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 }

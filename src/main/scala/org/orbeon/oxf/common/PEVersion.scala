@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLParsing
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -171,7 +171,7 @@ private object PEVersion {
         val path = System.getProperty("user.home").dropTrailingSlash + "/.orbeon/license.xml"
 
         useAndClose(new FileInputStream(new File(path))) { is =>
-          Dom4jUtils.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
+          IOSupport.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
         }
       }
 
@@ -184,7 +184,7 @@ private object PEVersion {
 
       // Remove blank spaces as that's the way it was signed
       val inputLicenseDocument =
-        Dom4jUtils.readDom4j(rawDocument.getRootElement.serializeToString(XMLWriter.CompactFormat))
+        IOSupport.readDom4j(rawDocument.getRootElement.serializeToString(XMLWriter.CompactFormat))
 
       // Connect pipeline
       val serializer = {

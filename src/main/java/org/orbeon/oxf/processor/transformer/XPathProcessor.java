@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;

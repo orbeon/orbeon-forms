@@ -29,7 +29,7 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Random
@@ -390,7 +390,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       def filterResultBody(bytes: Array[Byte]) = {
 
-        val doc = Dom4jUtils.readDom4j(new ByteArrayInputStream(bytes))
+        val doc = IOSupport.readDom4j(new ByteArrayInputStream(bytes))
 
         for {
           formElem             <- doc.getRootElement.elements("form")

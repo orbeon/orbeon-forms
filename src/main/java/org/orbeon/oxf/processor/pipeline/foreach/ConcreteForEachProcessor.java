@@ -32,7 +32,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.xml.NamespaceMapping;
@@ -73,7 +73,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             if (logger.isDebugEnabled()) {
                 final ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                 astPipeline.walk(astDocumentHandler);
-                logger.debug("Iteration pipeline:\n" + Dom4jUtils.domToStringJava(astDocumentHandler.getDocument()));
+                logger.debug("Iteration pipeline:\n" + IOSupport.domToStringJava(astDocumentHandler.getDocument()));
             }
             forEachBlockProcessor = new PipelineProcessor(astPipeline);
         }

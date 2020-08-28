@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalactic.Equality
 
 private[persistence] object HttpAssert extends XMLSupport {
@@ -68,7 +68,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         // Check body
         body match {
           case HttpCall.XML(expectedDoc) =>
-            val resultDoc = Dom4jUtils.readDom4j(new ByteArrayInputStream(resultBody.get))
+            val resultDoc = IOSupport.readDom4j(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
           case HttpCall.Binary(expectedFile) =>
             assert(resultBody.get === expectedFile)

@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 
 import java.security.KeyFactory;
@@ -60,7 +60,7 @@ public class SignatureProcessor extends ProcessorImpl {
                     xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
 
                     final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
-                    final String dataStr = Dom4jUtils.domToStringJava(data);
+                    final String dataStr = IOSupport.domToStringJava(data);
                     dsa.update(dataStr.getBytes(CharsetNames.Utf8()));
                     final String sig = Base64.encode(dsa.sign(), true);
 

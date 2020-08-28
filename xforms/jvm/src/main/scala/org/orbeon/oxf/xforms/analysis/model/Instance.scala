@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, S
 import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope

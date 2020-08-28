@@ -19,9 +19,8 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.Comparator
+import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.scalatestplus.junit.AssertionsForJUnit
 

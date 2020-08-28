@@ -28,7 +28,8 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
@@ -478,7 +479,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
-      wrapDocument(Dom4jUtils.readDom4j(xmlString), exposeXPathTypes)
+      wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {

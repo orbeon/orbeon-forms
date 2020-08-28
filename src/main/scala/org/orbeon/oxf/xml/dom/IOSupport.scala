@@ -1,26 +1,27 @@
 /**
-  * Copyright (C) 2010 Orbeon, Inc.
-  *
-  * This program is free software; you can redistribute it and/or modify it under the terms of the
-  * GNU Lesser General Public License as published by the Free Software Foundation; either version
-  * 2.1 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  * See the GNU Lesser General Public License for more details.
-  *
-  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  */
-package org.orbeon.oxf.xml.dom4j
+ * Copyright (C) 2007 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.xml.dom
 
 import java.io.{InputStream, Reader, StringReader}
 
-import org.orbeon.dom._
-import org.orbeon.dom.io._
-import org.orbeon.oxf.xml._
+import org.orbeon.dom.Document
+import org.orbeon.dom.io.{SAXReader, XMLWriter}
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, TransformerUtils, XMLParsing, XMLReceiverHelper}
 
-// TODO: move/remove unneeded stuff
-object Dom4jUtils {
+
+object IOSupport {
 
   private def createSAXReader(parserConfiguration: XMLParsing.ParserConfiguration): SAXReader =
     new SAXReader(XMLParsing.newXMLReader(parserConfiguration))
@@ -29,8 +30,8 @@ object Dom4jUtils {
     createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY)
 
   /**
-    * Convert an XML string to a prettified XML string.
-    */
+   * Convert an XML string to a prettified XML string.
+   */
   def prettyfy(xmlString: String): String =
     readDom4j(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
@@ -83,4 +84,5 @@ object Dom4jUtils {
   trait DebugXML {
     def toXML(helper: XMLReceiverHelper): Unit
   }
+
 }

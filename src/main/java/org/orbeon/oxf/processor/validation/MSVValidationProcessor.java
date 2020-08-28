@@ -26,7 +26,7 @@ import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -140,7 +140,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                             }
                                         });
                                         verifierFactory.setFeature(Const.PANIC_MODE_FEATURE, false);
-                                        final InputSource is = new InputSource(new StringReader(Dom4jUtils.domToStringJava(schemaDoc)));
+                                        final InputSource is = new InputSource(new StringReader(IOSupport.domToStringJava(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
                                         // Just a precaution, as the factory is not thread-safe. Does this makes sense?

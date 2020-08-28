@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
@@ -123,7 +123,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                     xqueryBody = xqueryDocument.getRootElement().getStringValue();
                                 } else {
                                     // Content is XQuery embedded into XML
-                                    xqueryBody = Dom4jUtils.domToStringJava(xqueryDocument);
+                                    xqueryBody = IOSupport.domToStringJava(xqueryDocument);
                                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
                                 }

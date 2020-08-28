@@ -17,6 +17,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
+import org.orbeon.oxf.xml.dom.IOSupport;
 
 public class ComparatorUtilsTest extends TestCase {
     @Test
@@ -33,12 +34,12 @@ public class ComparatorUtilsTest extends TestCase {
         rootElement.addText("    ");
 
         // Normal output
-        assertEquals("<div>    <b>bold</b>    </div>", Dom4jUtils.domToStringJava(document));
+        assertEquals("<div>    <b>bold</b>    </div>", IOSupport.domToStringJava(document));
 
         // Formatted output
-        assertEquals("\n<div>\n    <b>bold</b>\n</div>", Dom4jUtils.domToPrettyStringJava(document));
+        assertEquals("\n<div>\n    <b>bold</b>\n</div>", IOSupport.domToPrettyStringJava(document));
 
         // Compact output
-        assertEquals("<div><b>bold</b></div>", Dom4jUtils.domToCompactStringJava(document));
+        assertEquals("<div><b>bold</b></div>", IOSupport.domToCompactStringJava(document));
     }
 }

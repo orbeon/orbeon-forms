@@ -35,7 +35,7 @@ import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
@@ -394,7 +394,7 @@ public class URLGenerator extends ProcessorImpl {
                             // We have the /config/url syntax
                             final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
                             if (url == null) {
-                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToStringJava(configDocument), locationData);
+                                throw new ValidationException("URL generator found null URL for config:\n" + IOSupport.domToStringJava(configDocument), locationData);
                             }
 
                             // Get content-type

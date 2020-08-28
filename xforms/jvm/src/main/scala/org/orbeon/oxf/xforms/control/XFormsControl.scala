@@ -54,7 +54,6 @@ class XFormsControl(
      with ControlExtensionAttributesSupport
      with ControlEventSupport
      with ControlBindingSupport
-     with ControlXMLDumpSupport
      with XFormsEventTarget
      with MaybeFocusableTrait
      with Logging {

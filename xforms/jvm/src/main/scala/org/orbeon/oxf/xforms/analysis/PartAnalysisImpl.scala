@@ -13,21 +13,16 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-
 import org.orbeon.dom.Element
-import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl, LHHAAnalysis, RootControl}
+import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xml.dom.IOSupport
-import IOSupport.DebugXML
-import org.orbeon.oxf.xml.{SAXStore, XMLReceiverHelper}
-import org.orbeon.xforms.Constants
+import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -56,8 +51,7 @@ class PartAnalysisImpl(
    with PartEventHandlerAnalysis
    with PartControlsAnalysis
    with PartXBLAnalysis
-   with Logging
-   with DebugXML {
+   with Logging {
 
   partAnalysis =>
 
@@ -263,15 +257,10 @@ class PartAnalysisImpl(
 
     // Log if needed
     if (XFormsProperties.getDebugLogXPathAnalysis)
-      dumpAnalysis()
+      PartAnalysisDebugSupport.printPartAsXml(this)
 
     // Clean-up to finish initialization
     freeTransientState()
   }
-
-  def toXML(helper: XMLReceiverHelper): Unit =
-    controlAnalysisMap(startScope.prefixedIdForStaticId(Constants.DocumentId)).toXML(helper)
-
-  def dumpAnalysis(): Unit =
-    println(IOSupport.createDocument(this).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 }
+

@@ -90,32 +90,6 @@ class PathMapXPathAnalysis(
       dependentInstances
     )
 
-  def toXML(helper: XMLReceiverHelper): Unit = {
-
-    helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
-
-    def toXML(iterable: Iterable[String], enclosingElementName: String, elementName: String): Unit = {
-      if (iterable.nonEmpty) {
-        helper.startElement(enclosingElementName)
-        for (value <- iterable)
-          helper.element(elementName, PathMapXPathAnalysis.getDisplayPath(value))
-        helper.endElement()
-      }
-    }
-
-    def mapSetToSet(mapSet: MapSet[String, String]) =
-      mapSet map (entry => PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
-
-    toXML(mapSetToSet(valueDependentPaths), "value-dependent", "path")
-    toXML(mapSetToSet(returnablePaths), "returnable", "path")
-
-    toXML(dependentModels, "dependent-models", "model")
-    toXML(dependentInstances, "dependent-instances", "instance")
-    toXML(returnablePaths.map.keys, "returnable-instances", "instance")
-
-    helper.endElement()
-  }
-
   override def freeTransientState(): Unit = pathmap = None
 }
 

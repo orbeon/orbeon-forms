@@ -18,7 +18,6 @@ import java.{util => ju}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.{FormatTrait, StaticLHHASupport, ValueTrait, ViewTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent
@@ -31,10 +30,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
-
-import scala.collection.JavaConverters._
 
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
@@ -227,7 +225,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     externalValue
   }
 
-  final def externalValueOpt = Option(getExternalValue)
+  final def externalValueOpt: Option[String] = Option(getExternalValue)
 
   // Return the external value ready to be inserted into the client after an Ajax response.
   // 2019-09-05: Used only by `xf:output`, `xxf:attribute`, and external LHHA. Otherwise this is the
@@ -378,11 +376,6 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     case xxformsValue: XXFormsValueEvent => storeExternalValue(xxformsValue.value)
     case _ => super.performDefaultAction(event)
   }
-
-  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: => Unit): Unit =
-    super.toXML(helper, attributes) {
-      helper.text(getExternalValue())
-    }
 
   override def writeMIPs(write: (String, String) => Unit): Unit = {
     super.writeMIPs(write)

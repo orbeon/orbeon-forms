@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XXBLScope
 
@@ -146,15 +145,6 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
       _defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Default))
     }
   }
-
-  def bindsToXML(helper: XMLReceiverHelper): Unit =
-    // Output binds information
-    if (topLevelBinds.nonEmpty) {
-      helper.startElement("binds")
-      for (bind <- topLevelBinds)
-        bind.toXML(helper)
-      helper.endElement()
-    }
 
   def freeBindsTransientState(): Unit =
     for (bind <- topLevelBinds)

@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
@@ -24,7 +22,8 @@ import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
@@ -59,7 +58,8 @@ class Model(
 
   val model = Some(this)
 
-  // NOTE: Same code is in SimpleElementAnalysis, which is not optimal -> maybe think about passing the container scope to constructors
+  // NOTE: Same code is in `SimpleElementAnalysis`, which is not optimal -> maybe think about passing the container
+  // scope to constructors
   def containerScope = part.containingScope(prefixedId)
 
   override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
@@ -95,21 +95,6 @@ class Model(
     analyzeBindsXPath()
   }
 
-  override def toXMLAttributes = Seq(
-    "scope"                        -> scope.scopeId,
-    "prefixed-id"                  -> prefixedId,
-    "default-instance-prefixed-id" -> defaultInstancePrefixedId.orNull,
-    "analyzed-binds"               -> figuredAllBindRefAnalysis.toString
-  )
-
-  override def toXMLContent(helper: XMLReceiverHelper): Unit = {
-    super.toXMLContent(helper)
-    variablesToXML(helper)
-    bindsToXML(helper)
-    instancesToXML(helper)
-    handlersToXML(helper)
-  }
-
   override def freeTransientState(): Unit = {
     super.freeTransientState()
     freeVariablesTransientState()
@@ -131,22 +116,6 @@ trait ModelInstances {
   lazy val defaultInstanceStaticId = instances.headOption map (_._1) orNull
   lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
   // TODO: instances on which MIPs depend
-
-  def instancesToXML(helper: XMLReceiverHelper): Unit = {
-    // Output instances information
-    def outputInstanceList(name: String, values: collection.Set[String]): Unit = {
-      if (values.nonEmpty) {
-        helper.startElement(name)
-        for (value <- values)
-          helper.element("instance", value)
-        helper.endElement()
-      }
-    }
-
-    outputInstanceList("bind-instances", bindInstances)
-    outputInstanceList("computed-binds-instances", computedBindExpressionsInstances)
-    outputInstanceList("validation-binds-instances", validationBindInstances)
-  }
 }
 
 trait ModelVariables {
@@ -186,11 +155,6 @@ trait ModelVariables {
     for (variable <- variablesSeq)
       variable.analyzeXPath()
 
-  def variablesToXML(helper: XMLReceiverHelper): Unit =
-    // Output variable information
-    for (variable <- variablesSeq)
-      variable.toXML(helper)
-
   def freeVariablesTransientState(): Unit =
     for (variable <- variablesSeq)
       variable.freeTransientState()
@@ -210,9 +174,6 @@ trait ModelEventHandlers {
 
   // Event handlers, including on submissions and within nested actions
   lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl => e }
-
-  def handlersToXML(helper: XMLReceiverHelper): Unit =
-    eventHandlers foreach (_.toXML(helper))
 }
 
 trait ModelBinds {
@@ -307,7 +268,6 @@ trait ModelBinds {
   def defaultValueOrder                     = bindTree().defaultValueOrder
 
   def analyzeBindsXPath()                   = bindTree().analyzeBindsXPath()
-  def bindsToXML(helper: XMLReceiverHelper) = bindTree().bindsToXML(helper)
   def freeBindsTransientState()             = bindTree().freeBindsTransientState()
 }
 

@@ -17,12 +17,11 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, ValueTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
 import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.xforms.XFormsNames._
@@ -165,6 +164,7 @@ abstract class ElementAnalysis(
   private var _contextAnalyzed = false
   private var bindingAnalysis: Option[XPathAnalysis] = None
   private var _bindingAnalyzed = false
+  def bindingAnalyzed = _bindingAnalyzed
   private var valueAnalysis: Option[XPathAnalysis] = None
   private var _valueAnalyzed = false
   def valueAnalyzed: Boolean = _valueAnalyzed
@@ -194,42 +194,6 @@ abstract class ElementAnalysis(
   def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
 
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
-
-  def toXMLAttributes: Seq[(String, String)] = Seq(
-    "scope"             -> scope.scopeId,
-    "prefixed-id"       -> prefixedId,
-    "model-prefixed-id" -> (model map (_.prefixedId) orNull),
-    "binding"           -> hasBinding.toString,
-    "value"             -> selfElement.isInstanceOf[ValueTrait].toString,
-    "name"              -> element.attributeValue("name")
-  )
-
-  def toXMLContent(helper: XMLReceiverHelper): Unit = {
-    // Control binding and value analysis
-    if (_bindingAnalyzed)
-      getBindingAnalysis match {
-        case Some(bindingAnalysis) if hasBinding => // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
-          helper.startElement("binding")
-          bindingAnalysis.toXML(helper)
-          helper.endElement()
-        case _ => // NOP
-      }
-
-    if (_valueAnalyzed)
-      getValueAnalysis match {
-        case Some(valueAnalysis) =>
-          helper.startElement("value")
-          valueAnalysis.toXML(helper)
-          helper.endElement()
-        case _ => // NOP
-      }
-  }
-
-  final def toXML(helper: XMLReceiverHelper): Unit = {
-    helper.startElement(localName, toXMLAttributes flatMap (t => Seq(t._1, t._2)) toArray)
-    toXMLContent(helper)
-    helper.endElement()
-  }
 
   def freeTransientState(): Unit = {
     if (_contextAnalyzed && getContextAnalysis.isDefined)

@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
@@ -33,9 +32,9 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 
 trait SelectionControlTrait
-extends InputValueControl
-   with SelectAppearanceTrait
-   with ChildrenLHHAItemsetsAndActionsTrait {
+  extends InputValueControl
+     with SelectAppearanceTrait
+     with ChildrenLHHAItemsetsAndActionsTrait {
 
   if (element.attributeValue("selection") == "open")
     throw new ValidationException("Open selection is currently not supported.", locationData)
@@ -215,18 +214,6 @@ extends InputValueControl
     )
 
     Some(combinedAnalysis)
-  }
-
-  override def toXMLContent(helper: XMLReceiverHelper): Unit = {
-    super.toXMLContent(helper)
-    if (_itemsetAnalyzed)
-      getItemsetAnalysis match {
-        case Some(analysis) =>
-          helper.startElement("itemset")
-          analysis.toXML(helper)
-          helper.endElement()
-        case _ => // NOP
-      }
   }
 
   override def freeTransientState(): Unit = {

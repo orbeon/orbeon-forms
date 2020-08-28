@@ -14,13 +14,11 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.MapSet
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom.IOSupport.DebugXML
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
  */
-abstract class XPathAnalysis extends DebugXML  {
+abstract class XPathAnalysis {
 
   val xpathString: String
   val figuredOutDependencies: Boolean
@@ -39,9 +37,7 @@ abstract class XPathAnalysis extends DebugXML  {
   // Convert this analysis into the same analysis, where values have become dependencies
   def makeValuesDependencies: XPathAnalysis
 
-  def toXML(helper: XMLReceiverHelper)
-
-  def freeTransientState() = ()
+  def freeTransientState(): Unit = ()
 }
 
 /**
@@ -62,9 +58,6 @@ object XPathAnalysis {
     val valueDependentPaths = MapSet.empty[String, String]
 
     def makeValuesDependencies = this
-
-    def toXML(helper: XMLReceiverHelper) =
-      helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
   }
 
   // Some kind of combination that makes sense (might not exactly match the combined PathMap)
@@ -72,15 +65,16 @@ object XPathAnalysis {
 }
 
 object NegativeAnalysis {
-  def apply(xpathString: String): XPathAnalysis = new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
-    override def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
-  }
+  def apply(xpathString: String): XPathAnalysis =
+    new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
+      def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+    }
 }
 
 object StringAnalysis {
 
   private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
-    override def combine(other: XPathAnalysis) = other
+    def combine(other: XPathAnalysis) = other
   }
 
   def apply(): XPathAnalysis = ConstantAnalysis

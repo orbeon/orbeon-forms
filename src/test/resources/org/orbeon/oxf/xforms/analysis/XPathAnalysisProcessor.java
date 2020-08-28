@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 /**
  * Simple processor used by unit tests to output XPath analysis information.
@@ -37,6 +36,6 @@ public class XPathAnalysisProcessor extends SimpleProcessor {
         final XFormsStaticState staticState = XFormsStaticStateImpl.createFromDocument(formDocument);
 
         // Output analysis information
-        staticState.toXML(new XMLReceiverHelper(xmlReceiver));
+        staticState.writeAnalysis(xmlReceiver);
     }
 }

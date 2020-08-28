@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.Element
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.XMLReceiverHelper
+
 import scala.collection.compat._
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
@@ -82,10 +82,5 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
     // Build direct children
     _children = buildChildren()
-  }
-
-  override def toXMLContent(helper: XMLReceiverHelper): Unit = {
-    super.toXMLContent(helper)
-    children foreach (_.toXML(helper))
   }
 }

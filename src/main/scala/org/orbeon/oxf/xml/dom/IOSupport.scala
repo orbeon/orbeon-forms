@@ -17,29 +17,21 @@ import java.io.{InputStream, Reader, StringReader}
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.{SAXReader, XMLWriter}
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, TransformerUtils, XMLParsing, XMLReceiverHelper}
+import org.orbeon.oxf.xml.XMLParsing
 
 
 object IOSupport {
 
-  private def createSAXReader(parserConfiguration: XMLParsing.ParserConfiguration): SAXReader =
-    new SAXReader(XMLParsing.newXMLReader(parserConfiguration))
+  import Private._
 
-  private def createSAXReader: SAXReader =
-    createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY)
-
-  /**
-   * Convert an XML string to a prettified XML string.
-   */
   def prettyfy(xmlString: String): String =
     readDom4j(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
-  def domToPrettyStringJava(document: Document): String =
-    document.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+  def domToPrettyStringJava(doc: Document): String =
+    doc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
-  def domToCompactStringJava(document: Document): String =
-    document.getRootElement.serializeToString(XMLWriter.CompactFormat)
+  def domToCompactStringJava(doc: Document): String =
+    doc.getRootElement.serializeToString(XMLWriter.CompactFormat)
 
   def domToStringJava(elem: Document): String =
     elem.getRootElement.serializeToString(XMLWriter.DefaultFormat)
@@ -47,42 +39,24 @@ object IOSupport {
   def readDom4j(reader: Reader): Document =
     createSAXReader.read(reader)
 
-  def readDom4j(reader: Reader, uri: String): Document =
-    createSAXReader.read(reader, uri)
+  def readDom4j(reader: Reader, uriString: String): Document =
+    createSAXReader.read(reader, uriString)
 
-  def readDom4j(xmlString: String): Document = {
-    val stringReader = new StringReader(xmlString)
-    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(stringReader)
+  def readDom4j(xmlString: String): Document =
+    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(new StringReader(xmlString))
+
+  def readDom4j(is: InputStream, uri: String, parserConfiguration: XMLParsing.ParserConfiguration): Document =
+    createSAXReader(parserConfiguration).read(is, uri)
+
+  def readDom4j(is: InputStream): Document =
+    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(is)
+
+  private object Private {
+
+    def createSAXReader(parserConfiguration: XMLParsing.ParserConfiguration): SAXReader =
+      new SAXReader(XMLParsing.newXMLReader(parserConfiguration))
+
+    def createSAXReader: SAXReader =
+      createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY)
   }
-
-  def readDom4j(inputStream: InputStream, uri: String, parserConfiguration: XMLParsing.ParserConfiguration): Document =
-    createSAXReader(parserConfiguration).read(inputStream, uri)
-
-  def readDom4j(inputStream: InputStream): Document =
-    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(inputStream)
-
-  def createDocument(debugXML: DebugXML): Document = {
-
-    val identity = TransformerUtils.getIdentityTransformerHandler
-    val result = new LocationDocumentResult
-    identity.setResult(result)
-
-    val helper = new XMLReceiverHelper(
-      new ForwardingXMLReceiver(identity) {
-        override def startDocument(): Unit = ()
-        override def endDocument(): Unit = ()
-      }
-    )
-
-    identity.startDocument()
-    debugXML.toXML(helper)
-    identity.endDocument()
-
-    result.getDocument
-  }
-
-  trait DebugXML {
-    def toXML(helper: XMLReceiverHelper): Unit
-  }
-
 }

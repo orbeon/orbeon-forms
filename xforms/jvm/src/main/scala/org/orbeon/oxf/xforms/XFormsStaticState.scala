@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLSupport
-import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.functions.FunctionLibrary
 
 trait XFormsStaticState {
@@ -56,6 +56,5 @@ trait XFormsStaticState {
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
   def clientNonDefaultProperties              : Map[String, AnyRef]
 
-  def toXML(helper: XMLReceiverHelper)        : Unit
-  def dumpAnalysis()                          : Unit
+  def writeAnalysis(implicit receiver: XMLReceiver): Unit
 }

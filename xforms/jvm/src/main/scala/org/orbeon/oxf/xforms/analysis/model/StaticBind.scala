@@ -11,8 +11,8 @@ import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util => u}
 import org.orbeon.xforms.XFormsNames._
 
@@ -258,7 +258,7 @@ class StaticBind(
   }
 
   // All XPath MIPs
-  private val allMIPNameToXPathMIP = customMIPNameToXPathMIP ++ mipNameToXPathMIP
+  val allMIPNameToXPathMIP = customMIPNameToXPathMIP ++ mipNameToXPathMIP
 
   // All constraint XPath MIPs grouped by level
   val constraintsByLevel: Map[ValidationLevel, List[XPathMIP]] = {
@@ -396,28 +396,5 @@ class StaticBind(
 
     for (child <- _children)
       child.freeTransientState()
-  }
-
-  override def toXMLAttributes = Seq(
-    "id"      -> staticId,
-    "context" -> context.orNull,
-    "ref"     -> ref.orNull
-  )
-
-  override def toXMLContent(helper: XMLReceiverHelper): Unit = {
-    super.toXMLContent(helper)
-
-    // @ref analysis is handled by superclass
-
-    // MIP analysis
-    for ((_, mips) <- allMIPNameToXPathMIP.to(List).sortBy(_._1); mip <- mips) {
-      helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
-      mip.analysis.toXML(helper)
-      helper.endElement()
-    }
-
-    // Children binds
-    for (child <- _children)
-      child.toXML(helper)
   }
 }

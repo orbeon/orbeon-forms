@@ -66,10 +66,6 @@ class XFormsStaticStateImpl(
   // Analyze top-level part
   topLevelPart.analyze()
 
-  // Delegation to top-level part
-  def dumpAnalysis() = topLevelPart.dumpAnalysis()
-  def toXML(helper: XMLReceiverHelper) = topLevelPart.toXML(helper)
-
   // Properties
   // These are `lazy val`s because they depend on the default model being found, which is done when
   // the `PartAnalysisImpl` is created above. Yes, this is tricky and not ideal.
@@ -207,6 +203,9 @@ class XFormsStaticStateImpl(
       if getPropertyDefinition(propertyName).isPropagateToClient
     } yield
       propertyName -> staticProperty(propertyName)
+
+  def writeAnalysis(implicit receiver: XMLReceiver): Unit =
+    PartAnalysisDebugSupport.writePart(topLevelPart)
 }
 
 object XFormsStaticStateImpl {

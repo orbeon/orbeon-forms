@@ -29,7 +29,7 @@ trait PartControlsAnalysis extends TransientState {
 
   self: PartAnalysisImpl =>
 
-  protected val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
+  val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
   protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
   // Special handling of attributes

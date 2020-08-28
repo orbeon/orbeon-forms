@@ -82,10 +82,4 @@ trait XFormsContainerControl extends VisitableTrait {
       _children.iterator
     else
       Iterator.empty
-
-  override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: => Unit): Unit = {
-    super.toXML(helper, attributes) {
-      children foreach (_.toXML(helper, List.empty)(()))
-    }
-  }
 }

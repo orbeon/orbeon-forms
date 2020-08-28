@@ -49,8 +49,6 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
   def metadata: Metadata
 
-  def dumpAnalysis()
-
   // The element in our parent that created the current part
   def elementInParent: Option[ElementAnalysis] =
     parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // `.init` removes the trailing component separator

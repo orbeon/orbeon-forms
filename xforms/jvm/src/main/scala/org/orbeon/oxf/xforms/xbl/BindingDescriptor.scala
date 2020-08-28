@@ -18,15 +18,14 @@ import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
 import scala.collection.compat._
 
 // CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to
@@ -287,7 +286,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           Some(QName(localname, prefix, ns.mapping(prefix))),
-          datatype.trimAllToOpt map (extractTextValueQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt map (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           None
         )(binding)
     }
@@ -309,7 +308,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           qNameFromElementSelector(typeSelectorOpt, ns),
-          datatype.trimAllToOpt map (extractTextValueQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt map (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
         )(binding)
     }

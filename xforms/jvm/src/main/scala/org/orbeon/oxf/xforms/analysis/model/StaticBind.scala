@@ -6,20 +6,19 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util => u}
+import org.orbeon.xforms.XFormsNames._
 
-import scala.collection.JavaConverters._
+import scala.collection.compat._
 import scala.collection.immutable.List
 import scala.util.Try
-import scala.collection.compat._
 
 // Represent a static <xf:bind> element
 class StaticBind(
@@ -180,7 +179,7 @@ class StaticBind(
 
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) map
-      (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
+      (Extensions.resolveQName(namespaceMapping.mapping, _, unprefixedIsNoNamespace = true))
 
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
     Option(element.attributeValue(XXFORMS_WHITESPACE_QNAME)) map

@@ -20,7 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 
 /**
  * Base class for converters.
@@ -62,7 +62,7 @@ public abstract class ConverterBase extends ProcessorImpl {
                         // Support a QName as method value
                         final Element methodElement = (Element) XPathUtils.selectSingleNode(configElement, "/config/method");
                         if (methodElement != null) {
-                            final QName methodQName = Dom4jUtils.extractTextValueQName(methodElement, true);
+                            final QName methodQName = Extensions.resolveTextValueQNameJava(methodElement, true);
                             config.method = ProcessorSupport.qNameToExplodedQName(methodQName);
                         }
 

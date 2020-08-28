@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
@@ -140,7 +141,7 @@ case class AbstractBinding(
   def supportAVTs        = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
   private def transformQNameOption = templateElementOpt flatMap
-    (e => Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
+    (e => Option(e.resolveAttValueQName(XXBL_TRANSFORM_QNAME, unprefixedIsNoNamespace = true)))
 
   private def templateRootOption = templateElementOpt map { e =>
     if (e.jElements.size != 1)

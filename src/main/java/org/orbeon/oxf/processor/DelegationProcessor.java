@@ -15,25 +15,36 @@ package org.orbeon.oxf.processor;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.message.*;
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.PrefixedQName;
+import org.apache.axis.message.SOAPBodyElement;
+import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.soap.SOAPConstants;
-import org.orbeon.dom.*;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
 import org.orbeon.dom.Text;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.JMSUtils;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPath;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.*;
-import org.orbeon.dom.saxon.DocumentWrapper;
+import org.orbeon.oxf.xml.dom.Extensions;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.xml.NamespaceMapping;
 import org.w3c.dom.Node;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -41,7 +52,10 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -338,7 +352,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                             final org.orbeon.dom.Element parameterElement = (org.orbeon.dom.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             // TODO: should pass true?
-                                            final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME(), false);
+                                            final QName type = Extensions.resolveAttValueQNameJava(parameterElement, XMLConstants.XSI_TYPE_QNAME(), false);
 
                                             if (type == null || XMLConstants.XS_STRING_QNAME().equals(type)) {
                                                 parameterTypes.add(String.class);

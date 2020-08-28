@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xml.RuntimeDependentFunction
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 
@@ -47,7 +47,7 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     // state.
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
 //        final Map namespaceMappings = containingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
-    val attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName, unprefixedIsNoNamespace = true)
+    val attributeQName = Extensions.resolveQName(namespaceMappings, attributeName, unprefixedIsNoNamespace = true)
     event.getAttribute(attributeQName.clarkName)
   }
 

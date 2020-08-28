@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -226,7 +227,7 @@ object XBLTransformer {
           val equalIndex = currentValue.indexOf('=')
           if (equalIndex == -1) {
             // No a=b pair, just a single QName
-            val valueQName = Dom4jUtils.extractTextValueQName(currentElem, currentValue, true)
+            val valueQName = currentElem.resolveStringQName(currentValue, unprefixedIsNoNamespace = true)
             if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
               // This is not xbl:text, copy the attribute
               val attributeValue = boundElement.attributeValue(valueQName)
@@ -240,11 +241,11 @@ object XBLTransformer {
             // a=b pair
             val leftSideQName = {
               val leftSide = currentValue.substring(0, equalIndex)
-              Dom4jUtils.extractTextValueQName(currentElem, leftSide, true)
+              currentElem.resolveStringQName(leftSide, unprefixedIsNoNamespace = true)
             }
             val rightSideQName = {
               val rightSide = currentValue.substring(equalIndex + 1)
-              Dom4jUtils.extractTextValueQName(currentElem, rightSide, true)
+              currentElem.resolveStringQName(rightSide, unprefixedIsNoNamespace = true)
             }
 
             val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI

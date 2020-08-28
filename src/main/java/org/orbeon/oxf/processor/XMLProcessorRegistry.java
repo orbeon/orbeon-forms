@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 
 import java.util.Iterator;
 
@@ -157,7 +157,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
     }
 
     public static QName extractProcessorQName(Element processorElement) {
-        return Dom4jUtils.extractAttributeValueQName(processorElement, "name");
+        return Extensions.resolveAttValueQNameJava(processorElement, "name");
     }
 
     public static String extractProcessorURI(Element processorElement) {

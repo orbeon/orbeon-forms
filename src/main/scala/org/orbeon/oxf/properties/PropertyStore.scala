@@ -22,7 +22,8 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Name10Checker
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -60,7 +61,7 @@ object PropertyStore {
 
       if (propertyElement.attributeValueOpt("as").isDefined) {
 
-        val typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as")
+        val typeQName = propertyElement.resolveAttValueQName("as", unprefixedIsNoNamespace = true)
 
         if (! PropertyStore.SupportedTypes.contains(typeQName))
           throw new ValidationException(s"Invalid `as` attribute: ${typeQName.qualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
@@ -75,7 +76,7 @@ object PropertyStore {
 
         propertyElement.attributeValueOpt("processor-name") match {
           case Some(_) =>
-            val processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name")
+            val processorQName = propertyElement.resolveAttValueQName("processor-name", unprefixedIsNoNamespace = true)
             getProcessorPropertySet(processorQName).setProperty(propertyElement, name, typeQName, value)
           case None =>
             globalPropertySet.setProperty(propertyElement, name, typeQName, value)
@@ -115,7 +116,7 @@ object PropertyStore {
   private def convertDate   (value: String, element: Element) = new ju.Date(DateUtils.parseISODateOrDateTime(value))
 
   private def convertQName(value: String, element: Element): QName =
-    Dom4jUtils.extractAttributeValueQName(element, "value")
+    element.resolveAttValueQName("value", unprefixedIsNoNamespace = true)
 
   private def convertURI(value: String, element: Element): URI =
     try {

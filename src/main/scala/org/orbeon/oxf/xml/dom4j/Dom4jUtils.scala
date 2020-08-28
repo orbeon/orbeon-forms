@@ -18,11 +18,8 @@ import java.{util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.dom.io._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xml._
-import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
 
@@ -87,7 +84,7 @@ object Dom4jUtils {
     * and SAX level, so this should be used only in rare occasions, when
     * serializing certain documents to XML 1.0.
     *
-    * 2020-08-27: 1 legacy Java caller.
+    * 2020-08-27: 2 legacy Java callers in `QueryInterpreter`.
     */
   def adjustNamespaces(document: Document, xml11: Boolean): Document = {
 
@@ -107,81 +104,6 @@ object Dom4jUtils {
     */
   def getNamespaceContextNoDefault(elem: Element): ju.Map[String, String] =
     elem.allInScopeNamespacesAsStrings.filterKeys(_ != "").asJava
-
-  /**
-    * Extract a QName from an Element and an attribute name. The prefix of the QName must be in
-    * scope. Return null if the attribute is not found.
-    */
-  def extractAttributeValueQName(elem: Element, attributeName: String): QName =
-    extractTextValueQName(elem, elem.attributeValue(attributeName), unprefixedIsNoNamespace = true)
-
-  /**
-    * Extract a QName from an Element and an attribute QName. The prefix of the QName must be in
-    * scope. Return null if the attribute is not found.
-    */
-  def extractAttributeValueQName(elem: Element, attributeQName: QName): QName =
-    extractTextValueQName(elem, elem.attributeValue(attributeQName), unprefixedIsNoNamespace = true)
-
-  def extractAttributeValueQName(elem: Element, attributeQName: QName, unprefixedIsNoNamespace: Boolean): QName =
-    extractTextValueQName(elem, elem.attributeValue(attributeQName), unprefixedIsNoNamespace)
-
-  /**
-    * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
-    * Return null if the text is empty.
-    */
-  def extractTextValueQName(elem: Element, unprefixedIsNoNamespace: Boolean): QName =
-    extractTextValueQName(elem, elem.getStringValue, unprefixedIsNoNamespace)
-
-  /**
-    * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
-    * Return null if the text is empty.
-    *
-    * @param elem                 Element containing the attribute
-    * @param qNameString             QName to analyze
-    * @param unprefixedIsNoNamespace if true, an unprefixed value is in no namespace; if false, it is in the default namespace
-    * @return a QName object or null if not found
-    */
-  def extractTextValueQName(elem: Element, qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
-    extractTextValueQName(elem.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace)
-
-  /**
-    * Extract a QName from a string value, given namespace mappings. Return null if the text is empty.
-    *
-    * @param namespaces              prefix -> URI mappings
-    * @param qNameStringOrig             QName to analyze
-    * @param unprefixedIsNoNamespace if true, an unprefixed value is in no namespace; if false, it is in the default namespace
-    * @return a QName object or null if not found
-    */
-  def extractTextValueQName(namespaces: Map[String, String], qNameStringOrig: String, unprefixedIsNoNamespace: Boolean): QName = {
-    if (qNameStringOrig eq null)
-      return null
-
-    val qNameString = StringUtils.trimAllToEmpty(qNameStringOrig)
-
-    if (qNameString.length == 0)
-      return null
-
-    val colonIndex = qNameString.indexOf(':')
-    var prefix: String = null
-    var localName: String  = null
-    var namespaceURI: String  = null
-    if (colonIndex == -1) {
-      prefix = ""
-      localName = qNameString
-      if (unprefixedIsNoNamespace)
-        namespaceURI = ""
-      else {
-        namespaceURI = namespaces.getOrElse(prefix, "")
-      }
-    } else if (colonIndex == 0) {
-      throw new OXFException("Empty prefix for QName: " + qNameString)
-    } else {
-      prefix = qNameString.substring(0, colonIndex)
-      localName = qNameString.substring(colonIndex + 1)
-      namespaceURI = namespaces.getOrElse(prefix, throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
-    }
-    QName(localName, Namespace(prefix, namespaceURI))
-  }
 
   /**
     * Decode a String containing an exploded QName (also known as a "Clark name") into a QName.

@@ -36,7 +36,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 import scala.collection.JavaConverters._
@@ -230,7 +230,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
 
     def controllerPropertyQName(name: String, default: Option[QName]) =
-      Option(extractAttributeValueQName(configRoot, name)) orElse
+      Option(configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true)) orElse
         Option(properties.getQName(name, default.orNull))
 
     val defaultMatcher         = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
@@ -637,7 +637,7 @@ object PageFlowControllerProcessor {
   def compilePattern(e: Element, path: String, default: QName) =
     RegexpMatcher.compilePattern(
       path,
-      glob = ! RegexpQNames(Option(extractAttributeValueQName(e, MatcherProperty)) getOrElse default)
+      glob = ! RegexpQNames(Option(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true)) getOrElse default)
     )
 
   def createElementWithText(name: String, text: String): Element =

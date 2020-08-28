@@ -20,7 +20,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
 
 import scala.collection.JavaConverters._
@@ -231,7 +232,7 @@ object InstanceData {
     }
     node match {
       case elem: Element =>
-        Dom4jUtils.extractAttributeValueQName(elem, XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false) // TODO: should pass true?
+        elem.resolveAttValueQName(XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false) // TODO: should pass true?
       case _ =>
         null
     }

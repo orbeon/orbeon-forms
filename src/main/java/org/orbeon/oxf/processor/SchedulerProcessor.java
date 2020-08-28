@@ -18,17 +18,17 @@ import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.WebAppExternalContext;
+import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
-import org.orbeon.oxf.externalcontext.WebAppExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         {
                             // Use processor QName
                             final Element processorNameElement = startTaskElement.element(QName.apply("processor-name"));
-                            final QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement, true);
+                            final QName processorQName = Extensions.resolveTextValueQNameJava(processorNameElement, true);
                             processorDefinition = new ProcessorDefinition(processorQName);
 
                             for (final Iterator j = XPathUtils.selectNodeIterator(startTaskElement, "input"); j.hasNext();) {

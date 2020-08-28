@@ -35,7 +35,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -211,7 +211,7 @@ public class RequestGenerator extends ProcessorImpl {
                     final Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
                     // Try to find stream-type attribute
-                    final QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
+                    final QName streamTypeQName = Extensions.resolveAttValueQNameJava(config.getRootElement(), "stream-type");
                     if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME()) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME())))
                         throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.qualifiedName());
                     state.requestedStreamType = streamTypeQName;

@@ -18,15 +18,16 @@ import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
@@ -117,7 +118,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                 // Read XQuery into String
                                 final Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
                                 String xqueryBody;
-                                if (XMLConstants.XS_STRING_QNAME().equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME(), false))) {
+                                if (XMLConstants.XS_STRING_QNAME().equals(Extensions.resolveAttValueQNameJava(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME(), false))) {
                                     // Content is text under an XML root element
                                     xqueryBody = xqueryDocument.getRootElement().getStringValue();
                                 } else {

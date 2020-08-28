@@ -58,6 +58,7 @@ import org.orbeon.oxf.xforms.schema.SchemaKey;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -312,7 +313,7 @@ public class XFormsModelSchemaValidator {
         // lax processing. However, it is not clear whether we should apply lax processing in this case or not. Maybe if
         // an xsi:type is specified and not found, the element should just be invalid.
         // TODO: should pass true?
-        final QName xsiType = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME(), false);
+        final QName xsiType = Extensions.resolveAttValueQNameJava(element, XMLConstants.XSI_TYPE_QNAME(), false);
         if (xsiType != null) {
             // Honor xsi:type
             elementURI = xsiType.namespace().uri();

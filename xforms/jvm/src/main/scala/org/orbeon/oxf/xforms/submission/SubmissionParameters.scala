@@ -8,7 +8,8 @@ import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
@@ -103,7 +104,7 @@ object SubmissionParameters {
       )
 
     def filterQualifiedName(s: String) =
-      Dom4jUtils.extractTextValueQName(staticSubmission.element, s, true).localName
+      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true).localName
 
     val resolvedReplace =
       staticSubmission.avtReplaceOpt    flatMap
@@ -116,10 +117,10 @@ object SubmissionParameters {
       val resolvedMethodQName =
         staticSubmission.avtMethod flatMap stringAvtTrimmedOpt getOrElse "get"
 
-      Dom4jUtils.extractTextValueQName(
+      Extensions.resolveQName(
         staticSubmission.namespaceMapping.mapping,
         resolvedMethodQName,
-        true
+        unprefixedIsNoNamespace = true
       ).clarkName
     }
     val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethod)
@@ -166,10 +167,10 @@ object SubmissionParameters {
       if (serialize)
         staticSubmission.avtXxfRelevantAttOpt flatMap
           stringAvtTrimmedOpt                 map (
-            Dom4jUtils.extractTextValueQName(
+            Extensions.resolveQName(
               staticSubmission.namespaceMapping.mapping,
               _,
-              true
+              unprefixedIsNoNamespace = true
             )
           )
       else

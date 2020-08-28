@@ -17,13 +17,13 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.dom.Comparator
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
 
@@ -114,7 +114,7 @@ object XFormsAction {
 
         // Get and check attributes
         name =
-         Option(Dom4jUtils.extractAttributeValueQName(element, NAME_QNAME)) map (_.clarkName) getOrElse
+         Option(element.resolveAttValueQName(NAME_QNAME, unprefixedIsNoNamespace = true)) map (_.clarkName) getOrElse
             (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {

@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.xbl.Scope
 
 class ContainerControl(
   staticStateContext : StaticStateContext,
@@ -29,5 +29,5 @@ class ContainerControl(
      with ViewTrait {
 
   // For <xf:group xxf:element="xh:div">. Can be null.
-  val elementQName: QName = Dom4jUtils.extractAttributeValueQName(element, XFormsNames.XXFORMS_ELEMENT_QNAME)
+  val elementQName: QName = element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)
 }

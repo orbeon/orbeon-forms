@@ -21,16 +21,16 @@ import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl,
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
 import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.control.Breaks
 
@@ -536,5 +536,5 @@ object ElementAnalysis {
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
-    attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
+    attSet(element, qName) map (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
 }

@@ -27,6 +27,7 @@ import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -506,7 +507,7 @@ public class PageFlowControllerBuilder {
             isTransformedInstance = true;
 
             final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement.jElements().get(0));
-            final QName transformQName = Dom4jUtils.extractAttributeValueQName(resultElement, "transform");
+            final QName transformQName = Extensions.resolveAttValueQNameJava(resultElement, "transform");
 
             // Run transform
             final String resultTraceAttribute = resultElement.attributeValue("trace");

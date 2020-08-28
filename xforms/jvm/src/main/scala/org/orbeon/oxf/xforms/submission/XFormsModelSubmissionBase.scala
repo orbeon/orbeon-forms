@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
@@ -170,7 +171,7 @@ object XFormsModelSubmissionBase {
               case Some((name, value)) =>
                 name -> {
                   value.trimAllToOpt map
-                    (Dom4jUtils.extractTextValueQName(namespaceContext, _, true)) getOrElse
+                    (Extensions.resolveQName(namespaceContext, _, unprefixedIsNoNamespace = true)) getOrElse
                     QName(name, XXFORMS_NAMESPACE_SHORT)
                 }
               case None =>

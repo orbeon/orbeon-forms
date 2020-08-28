@@ -18,15 +18,13 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.XMLParsing
+import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.collection.compat._
-import org.orbeon.oxf.util.CollectionUtils._
+import scala.collection.mutable
 
 trait BindingLoader extends Logging {
 
@@ -61,7 +59,7 @@ trait BindingLoader extends Logging {
 
         def propertyQNames(property: Property) =
           property.value.toString.tokenizeToSet map
-            (Dom4jUtils.extractTextValueQName(property.namespaces, _, true))
+            (Extensions.resolveQName(property.namespaces, _, unprefixedIsNoNamespace = true))
 
         def pathsForQNames(qNames: Set[QName]) =
           qNames flatMap { qName =>

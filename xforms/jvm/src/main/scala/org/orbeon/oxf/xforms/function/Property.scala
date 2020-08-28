@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.function
 
 import java.{util => ju}
 
-import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 
 import scala.collection.JavaConverters._
 
@@ -55,7 +55,7 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
         case Left(uriLocal)    => uriLocal
         case Right(namespaces) =>
           val propertyNameString = stringArgument(0)
-          val qName = Dom4jUtils.extractTextValueQName(namespaces, propertyNameString, false)
+          val qName = Extensions.resolveQName(namespaces, propertyNameString, unprefixedIsNoNamespace = false)
           (qName.namespace.uri, qName.localName)
       }
 

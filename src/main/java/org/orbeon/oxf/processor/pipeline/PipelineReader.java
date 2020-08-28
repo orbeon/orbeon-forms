@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
@@ -143,7 +143,7 @@ public class PipelineReader extends ProcessorImpl {
                             ASTInput input = new ASTInput(); {
                                 processorCall.addInput(input);
                                 input.setHref(readHref(inputOutputElement, inputOutputElement.attributeValue("href")));
-                                input.setTransform(Dom4jUtils.extractAttributeValueQName(inputOutputElement, "transform"));
+                                input.setTransform(Extensions.resolveAttValueQNameJava(inputOutputElement, "transform"));
                                 new readCommonAttributes(input);
                             }
                         } else {

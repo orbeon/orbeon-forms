@@ -19,11 +19,12 @@ import org.xml.sax.helpers.AttributesImpl
 
 
 object Converter {
-  implicit class ScalaElemConverterOps[E](private val e: scala.xml.Elem) extends AnyVal {
+
+  implicit class ScalaElemConverterOps(private val e: scala.xml.Elem) extends AnyVal {
     def toDocument: org.orbeon.dom.Document = IOSupport.readDom4j(e.toString)
   }
 
-  implicit class DomElemConverterOps[E](private val e: Element) extends AnyVal {
+  implicit class DomElemConverterOps(private val e: Element) extends AnyVal {
     def attributesAsSax: AttributesImpl = {
       val result = new AttributesImpl
       for (att <- e.attributeIterator)

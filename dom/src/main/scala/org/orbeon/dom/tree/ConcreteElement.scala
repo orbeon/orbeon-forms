@@ -10,6 +10,7 @@ import scala.jdk.CollectionConverters._
 private object ConcreteElement {
 
   val DefaultContentListSize = 2 // ORBEON: default was 5
+  val XmlNamespace = Namespace("xml", "http://www.w3.org/XML/1998/namespace")
 
   def appendAttributes(src: Element, dst: Element): Unit = {
 
@@ -719,8 +720,6 @@ class ConcreteElement(var qname: QName)
     internalContent.iterator().asScala collect {
       case ns: Namespace => ns
     }
-
-  private val XmlNamespace = Namespace("xml", "http://www.w3.org/XML/1998/namespace")
 
   private def allInScopeNamespacesAs[T](map: Namespace => T): Map[String, T] = {
 

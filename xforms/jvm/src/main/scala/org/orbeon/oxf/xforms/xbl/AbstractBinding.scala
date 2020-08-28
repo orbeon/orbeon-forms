@@ -18,20 +18,20 @@ import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.Transform
+import org.orbeon.oxf.processor.ProcessorSupport
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
-import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
@@ -185,7 +185,7 @@ object AbstractBinding {
       Dom4jUtils.createDocumentCopyParentNamespaces(transform),
       "xbl-transform-config",
       lastModified,
-      Dom4jUtils.makeSystemId(transform)
+      ProcessorSupport.makeSystemId(transform)
     )
 
   def fromBindingElement(
@@ -226,7 +226,7 @@ object AbstractBinding {
     val selectors =
       CSSSelectorParser.parseSelectors(bindingElem.attributeValue(ELEMENT_QNAME))
 
-    val bindingNs = NamespaceMapping(Dom4jUtils.getNamespaceContext(bindingElem))
+    val bindingNs = NamespaceMapping(bindingElem.allInScopeNamespacesAsStrings)
 
     val directName =
       selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)

@@ -5,6 +5,8 @@ import java.{lang => jl, util => ju}
 import org.orbeon.dom._
 import org.xml.sax.Attributes
 
+import scala.jdk.CollectionConverters._
+
 private object ConcreteElement {
 
   val DefaultContentListSize = 2 // ORBEON: default was 5
@@ -254,9 +256,8 @@ class ConcreteElement(var qname: QName)
   def jElementIterator(): ju.Iterator[Element] = jElements.iterator()
   def jElementIterator(name: String): ju.Iterator[Element] = jElements(name).iterator()
 
-  def jAttributes: ju.List[Attribute] = {
+  def jAttributes: ju.List[Attribute] =
     new ContentListFacade[Attribute](this, _attributes)
-  }
 
   def jAttributeIterator: ju.Iterator[Attribute] = _attributes.iterator()
 
@@ -469,7 +470,7 @@ class ConcreteElement(var qname: QName)
     this
   }
 
-  override def add(node: Node) = node match {
+  override def add(node: Node): Unit = node match {
     case n: Attribute => add(n)
     case n: Text      => add(n)
     case n: Namespace => add(n)
@@ -714,64 +715,40 @@ class ConcreteElement(var qname: QName)
     null
   }
 
-  def getNamespaceForURI(uri: String): Namespace = {
-    if ((uri eq null) || (uri.length <= 0)) {
-      Namespace.EmptyNamespace
-    } else if (uri == getNamespaceURI) {
-      getNamespace
-    } else {
-      val list = internalContent
-      val size = list.size
-
-      // `for (i <- 0 until size)` is inefficient and shows in the profiler
-      var i = 0
-      while (i < size) {
-        list.get(i) match {
-          case namespace: Namespace =>
-            if (uri == namespace.uri)
-              return namespace
-          case _ =>
-        }
-        i += 1
-      }
-      null
+  def declaredNamespacesIterator: Iterator[Namespace] =
+    internalContent.iterator().asScala collect {
+      case ns: Namespace => ns
     }
+
+  private val XmlNamespace = Namespace("xml", "http://www.w3.org/XML/1998/namespace")
+
+  private def allInScopeNamespacesAs[T](map: Namespace => T): Map[String, T] = {
+
+    var result = Map[String, T]()
+
+    var currentElem: Element = this
+
+    while (currentElem ne null) {
+      for (namespace <- currentElem.declaredNamespacesIterator) {
+        if (! result.contains(namespace.prefix))
+          result += namespace.prefix -> map(namespace)
+      }
+      currentElem = currentElem.getParent
+    }
+
+    // It seems that by default this may not be declared. However, it should be: "The prefix xml is by definition
+    // bound to the namespace name http://www.w3.org/XML/1998/namespace. It MAY, but need not, be declared, and MUST
+    // NOT be bound to any other namespace name. Other prefixes MUST NOT be bound to this namespace name, and it
+    // MUST NOT be declared as the default namespace."
+    result += XmlNamespace.prefix -> map(XmlNamespace)
+    result
   }
 
-  // TODO: Only used by `NodeWrapper` and almost identical to `declaredNamespaces`, can we get rid of it?
-  def additionalNamespaces: ju.List[Namespace] = {
-    val answer = new ju.ArrayList[Namespace]
-    val list = internalContent
-    val size = list.size
+  def allInScopeNamespacesAsNodes: Map[String, Namespace] =
+    allInScopeNamespacesAs(identity)
 
-    // `for (i <- 0 until size)` is inefficient and shows in the profiler
-    var i = 0
-    while (i < size) {
-      list.get(i) match {
-        case namespace: Namespace if namespace != getNamespace => answer.add(namespace)
-        case _ =>
-      }
-      i += 1
-    }
-    answer
-  }
-
-  def declaredNamespaces: ju.List[Namespace] = {
-    val answer = new ju.ArrayList[Namespace]
-    val list = internalContent
-    val size = list.size
-
-    // `for (i <- 0 until size)` is inefficient and shows in the profiler
-    var i = 0
-    while (i < size) {
-      list.get(i) match {
-        case namespace: Namespace => answer.add(namespace)
-        case _ =>
-      }
-      i += 1
-    }
-    answer
-  }
+  def allInScopeNamespacesAsStrings: Map[String, String] =
+    allInScopeNamespacesAs(_.uri)
 
   def add(element: Element)    : Unit    = addNode(element)
   def remove(element: Element) : Boolean = removeNode(element)
@@ -807,9 +784,8 @@ class ConcreteElement(var qname: QName)
 
   protected def removeNode(node: Node): Boolean = {
     val answer = internalContent.remove(node)
-    if (answer) {
+    if (answer)
       childRemoved(node)
-    }
     answer
   }
 
@@ -832,16 +808,13 @@ class ConcreteElement(var qname: QName)
   /**
    * Called when a new child node is added to create any parent relationships
    */
-  protected[dom] def childAdded(node: Node): Unit = {
-    if (node ne null) {
+  protected[dom] def childAdded(node: Node): Unit =
+    if (node ne null)
       node.setParent(this)
-    }
-  }
 
-  protected[dom] def childRemoved(node: Node): Unit = {
+  protected[dom] def childRemoved(node: Node): Unit =
     if (node ne null) {
       node.setParent(null)
       node.setDocument(null)
     }
-  }
 }

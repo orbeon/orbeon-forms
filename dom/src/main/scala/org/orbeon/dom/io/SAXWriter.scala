@@ -167,18 +167,12 @@ class SAXWriter extends XMLReader {
       namespaceStack.push(elementNamespace)
       contentHandler.startPrefixMapping(elementNamespace.prefix, elementNamespace.uri)
     }
-    val declaredNamespaces = element.declaredNamespaces
-    val size = declaredNamespaces.size
-    // `for (i <- 0 until size)` is inefficient and shows in the profiler
-    var i = 0
-    while (i < size) {
-      val namespace = declaredNamespaces.get(i)
-      if (!isIgnoreableNamespace(namespace, namespaceStack)) {
+
+    for (namespace <- element.declaredNamespacesIterator)
+      if (! isIgnoreableNamespace(namespace, namespaceStack)) {
         namespaceStack.push(namespace)
         contentHandler.startPrefixMapping(namespace.prefix, namespace.uri)
       }
-      i += 1
-    }
   }
 
   private def endPrefixMapping(stack: NamespaceStack, stackSize: Int): Unit = {

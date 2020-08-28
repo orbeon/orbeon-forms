@@ -101,7 +101,7 @@ abstract class XFormsModelSubmissionBase
         xfcd              = containingDocument,
         ref               = currentNodeInfo,
         relevanceHandling = relevanceHandling,
-        namespaceContext  = Dom4jUtils.getNamespaceContext(getSubmissionElement).asScala.toMap,
+        namespaceContext  = getSubmissionElement.allInScopeNamespacesAsStrings,
         annotateWith      = annotateWith,
         relevantAttOpt    = relevantAttOpt
       )
@@ -170,7 +170,7 @@ object XFormsModelSubmissionBase {
               case Some((name, value)) =>
                 name -> {
                   value.trimAllToOpt map
-                    (Dom4jUtils.extractTextValueQName(namespaceContext.asJava, _, true)) getOrElse
+                    (Dom4jUtils.extractTextValueQName(namespaceContext, _, true)) getOrElse
                     QName(name, XXFORMS_NAMESPACE_SHORT)
                 }
               case None =>

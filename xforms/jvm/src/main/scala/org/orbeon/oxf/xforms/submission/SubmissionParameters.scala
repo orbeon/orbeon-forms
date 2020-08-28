@@ -5,16 +5,14 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{RelevanceHandling, UrlType}
-
-import scala.collection.JavaConverters._
 
 
 // Subset of `SubmissionParameters`
@@ -119,7 +117,7 @@ object SubmissionParameters {
         staticSubmission.avtMethod flatMap stringAvtTrimmedOpt getOrElse "get"
 
       Dom4jUtils.extractTextValueQName(
-        staticSubmission.namespaceMapping.mapping.asJava,
+        staticSubmission.namespaceMapping.mapping,
         resolvedMethodQName,
         true
       ).clarkName
@@ -169,7 +167,7 @@ object SubmissionParameters {
         staticSubmission.avtXxfRelevantAttOpt flatMap
           stringAvtTrimmedOpt                 map (
             Dom4jUtils.extractTextValueQName(
-              staticSubmission.namespaceMapping.mapping.asJava,
+              staticSubmission.namespaceMapping.mapping,
               _,
               true
             )

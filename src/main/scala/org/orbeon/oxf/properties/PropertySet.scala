@@ -23,12 +23,11 @@ import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.xml.NamespaceMapping
 
+import scala.collection.compat._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.collection.compat._
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
 
@@ -72,7 +71,7 @@ class PropertySet {
   def setProperty(element: Element, name: String, typ: QName, stringValue: String): Unit = {
 
     val value    = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
-    val property = Property(typ, value, Dom4jUtils.getNamespaceContext(element).asScala.toMap)
+    val property = Property(typ, value, if (element eq null) Map.empty else element.allInScopeNamespacesAsStrings)
 
     // Store exact property name anyway
     exactProperties += name -> property

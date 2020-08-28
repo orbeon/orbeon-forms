@@ -12,8 +12,11 @@ import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.UntypedAtomicValue;
 import org.orbeon.saxon.value.Value;
+import scala.Tuple2;
+import scala.collection.Iterator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -453,7 +456,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     public String getAttributeValue(int fingerprint) {
         if (node instanceof Element) {
-            Iterator list = ((Element) node).jAttributes().iterator();
+            java.util.Iterator<Attribute> list = ((Element) node).jAttributes().iterator();
             NamePool pool = docWrapper.getNamePool();
             while (list.hasNext()) {
                 Attribute att = (Attribute) list.next();
@@ -527,7 +530,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     private final class AttributeEnumeration extends Navigator.BaseEnumeration {
 
-        private Iterator<Attribute> atts;
+        private java.util.Iterator<Attribute> atts;
         private NodeWrapper start;
 
         AttributeEnumeration(NodeWrapper start) {
@@ -551,48 +554,17 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     private final class NamespaceEnumeration extends Navigator.BaseEnumeration {
 
-        private HashMap<String, Namespace> nslist = new HashMap<String, Namespace>();
-        private Iterator<String> prefixes;
+        private Iterator<Namespace> namespaceIterator;
         private NodeWrapper start;
 
         NamespaceEnumeration(NodeWrapper start) {
             this.start = start;
-            NodeWrapper curr = start;
-
-            // build the complete list of namespaces
-
-            do {
-                final Element elem = (Element) curr.node;
-                final Namespace ns = elem.getNamespace();
-                final String prefix = ns.prefix();
-                final String uri = ns.uri();
-
-                if (!(prefix.length() == 0 && uri.length() == 0)) {
-                    if (!nslist.containsKey(prefix)) {
-                        nslist.put(prefix, ns);
-                    }
-                }
-
-                final List<Namespace> additionalNamespaces = elem.additionalNamespaces();
-                if (!additionalNamespaces.isEmpty()) {
-                    for (final Namespace additionalNamespace : additionalNamespaces) {
-                        if (!nslist.containsKey(additionalNamespace.prefix())) {
-                            nslist.put(additionalNamespace.prefix(), additionalNamespace);
-                        }
-                    }
-                }
-                curr = (NodeWrapper) curr.getParent();
-            } while (curr != null && curr.getNodeKind() == Type.ELEMENT);// NOTE: support elements detached from document
-
-            nslist.put("xml", Namespace$.MODULE$.XMLNamespace());
-            prefixes = nslist.keySet().iterator();
+            namespaceIterator = ((Element) start.node).allInScopeNamespacesAsNodes().valuesIterator();
         }
 
         public void advance() {
-            if (prefixes.hasNext()) {
-                final String prefix = prefixes.next();
-                final Namespace ns = nslist.get(prefix);
-                current = makeWrapper(ns, docWrapper, start);
+            if (namespaceIterator.hasNext()) {
+                current = makeWrapper(namespaceIterator.next(), docWrapper, start);
             } else {
                 current = null;
             }
@@ -759,29 +731,24 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     public int[] getDeclaredNamespaces(int[] buffer) {
         if (node instanceof Element) {
             final Element elem = (Element) node;
-            final List namespaces = elem.declaredNamespaces();
-
-            if (namespaces == null || namespaces.isEmpty()) {
-                return EMPTY_NAMESPACE_LIST;
-            }
-            final int count = namespaces.size();
-            if (count == 0) {
+            final scala.collection.immutable.Map<String, Namespace> namespaces = elem.allInScopeNamespacesAsNodes();
+            if (namespaces.isEmpty()) {
                 return EMPTY_NAMESPACE_LIST;
             } else {
+                final int count = namespaces.size();
+
                 int[] result = (buffer == null || count > buffer.length ? new int[count] : buffer);
                 NamePool pool = getNamePool();
                 int n = 0;
-                for (Iterator i = namespaces.iterator(); i.hasNext(); ) {
-                    final Namespace namespace = (Namespace) i.next();
-                    final String prefix = namespace.prefix();
-                    final String uri = namespace.uri();
-
-                    result[n++] = pool.allocateNamespaceCode(prefix, uri);
+                for (Iterator<Tuple2<String, Namespace>> i = namespaces.iterator(); i.hasNext(); ) {
+                    final Tuple2<String, Namespace> namespace = i.next();
+                    result[n++] = pool.allocateNamespaceCode(namespace._1, namespace._2.uri());
                 }
                 if (count < result.length) {
                     result[count] = -1;
                 }
                 return result;
+
             }
         } else {
             return null;

@@ -19,6 +19,7 @@ import java.{util => ju}
 import org.orbeon.dom._
 import org.orbeon.dom.io._
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xml._
 import org.xml.sax.helpers.AttributesImpl
@@ -102,38 +103,10 @@ object Dom4jUtils {
   }
 
   /**
-    * Return a Map of namespaces in scope on the given element.
-    */
-  def getNamespaceContext(elem: Element): ju.Map[String, String] = {
-    val namespaces = new ju.HashMap[String, String]
-    var currentElem = elem
-    while (currentElem ne null) {
-      val currentNamespaces = currentElem.declaredNamespaces
-      for (namespace <- currentNamespaces.iterator.asScala) {
-        if (!namespaces.containsKey(namespace.prefix)) {
-          namespaces.put(namespace.prefix, namespace.uri)
-          // TODO: Intern namespace strings to save memory; should use NamePool later
-          //   namespaces.put(namespace.getPrefix().intern(), namespace.getURI().intern());
-        }
-      }
-      currentElem = currentElem.getParent
-    }
-    // It seems that by default this may not be declared. However, it should be: "The prefix xml is by definition
-    // bound to the namespace name http://www.w3.org/XML/1998/namespace. It MAY, but need not, be declared, and MUST
-    // NOT be bound to any other namespace name. Other prefixes MUST NOT be bound to this namespace name, and it
-    // MUST NOT be declared as the default namespace."
-    namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI)
-    namespaces
-  }
-
-  /**
     * Return a Map of namespaces in scope on the given element, without the default namespace.
     */
-  def getNamespaceContextNoDefault(elem: Element): ju.Map[String, String] = {
-    val namespaces = getNamespaceContext(elem)
-    namespaces.remove("")
-    namespaces
-  }
+  def getNamespaceContextNoDefault(elem: Element): ju.Map[String, String] =
+    elem.allInScopeNamespacesAsStrings.filterKeys(_ != "").asJava
 
   /**
     * Extract a QName from an Element and an attribute name. The prefix of the QName must be in
@@ -169,7 +142,7 @@ object Dom4jUtils {
     * @return a QName object or null if not found
     */
   def extractTextValueQName(elem: Element, qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
-    extractTextValueQName(getNamespaceContext(elem), qNameString, unprefixedIsNoNamespace)
+    extractTextValueQName(elem.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace)
 
   /**
     * Extract a QName from a string value, given namespace mappings. Return null if the text is empty.
@@ -179,7 +152,7 @@ object Dom4jUtils {
     * @param unprefixedIsNoNamespace if true, an unprefixed value is in no namespace; if false, it is in the default namespace
     * @return a QName object or null if not found
     */
-  def extractTextValueQName(namespaces: ju.Map[String, String], qNameStringOrig: String, unprefixedIsNoNamespace: Boolean): QName = {
+  def extractTextValueQName(namespaces: Map[String, String], qNameStringOrig: String, unprefixedIsNoNamespace: Boolean): QName = {
     if (qNameStringOrig eq null)
       return null
 
@@ -198,18 +171,14 @@ object Dom4jUtils {
       if (unprefixedIsNoNamespace)
         namespaceURI = ""
       else {
-        val nsURI = namespaces.get(prefix)
-        namespaceURI = if (nsURI eq null) ""
-        else nsURI
+        namespaceURI = namespaces.getOrElse(prefix, "")
       }
     } else if (colonIndex == 0) {
       throw new OXFException("Empty prefix for QName: " + qNameString)
     } else {
       prefix = qNameString.substring(0, colonIndex)
       localName = qNameString.substring(colonIndex + 1)
-      namespaceURI = namespaces.get(prefix)
-      if (namespaceURI eq null)
-        throw new OXFException("No namespace declaration found for prefix: " + prefix)
+      namespaceURI = namespaces.getOrElse(prefix, throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
     }
     QName(localName, Namespace(prefix, namespaceURI))
   }
@@ -250,30 +219,29 @@ object Dom4jUtils {
     * @return new document
     */
   def createDocumentCopyParentNamespaces(newRoot: Element, detach: Boolean): Document = {
-    val parentElement = newRoot.getParent
+    val parentElemOpt = Option(newRoot.getParent)
     val document =
-      if (detach) {
-        // Detach
+      if (detach)
         Document(newRoot.detach().asInstanceOf[Element])
-      } else {
-        // Copy
+      else
         Document(newRoot.createCopy)
-      }
-    copyMissingNamespaces(parentElement, document.getRootElement)
+    copyMissingNamespaces(parentElemOpt, document.getRootElement)
     document
   }
 
-  def copyMissingNamespaces(sourceElem: Element, destinationElement: Element) {
-    val parentNamespaceContext = getNamespaceContext(sourceElem)
-    val rootElementNamespaceContext = getNamespaceContext(destinationElement)
-    for (prefix <- parentNamespaceContext.keySet.asScala) {
-      // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
-      // namespace even if there are no namespace nodes
-      if (rootElementNamespaceContext.get(prefix) eq null) {
-        val uri = parentNamespaceContext.get(prefix)
+  private val XmlNamespaceMap = Map(XMLConstants.XML_PREFIX -> XMLConstants.XML_URI)
+
+  def copyMissingNamespaces(sourceElem: Option[Element], destinationElement: Element) {
+
+    val parentNamespaceContext =
+      sourceElem map (_.allInScopeNamespacesAsStrings) getOrElse XmlNamespaceMap
+
+    val rootElementNamespaceContext =
+      destinationElement.allInScopeNamespacesAsStrings
+
+    for ((prefix, uri) <- parentNamespaceContext)
+      if (! rootElementNamespaceContext.contains(prefix))
         destinationElement.addNamespace(prefix, uri)
-      }
-    }
   }
 
   /**
@@ -285,13 +253,11 @@ object Dom4jUtils {
     val document = Document(newRoot.createCopy)
     val rootElement = document.getRootElement
     val parentElement = newRoot.getParent
-    val parentNamespaceContext = getNamespaceContext(parentElement)
-    val rootElemNamespaceContext = getNamespaceContext(rootElement)
-    for (prefix <- parentNamespaceContext.keySet.asScala) {
-      if ((rootElemNamespaceContext.get(prefix) eq null) && ! prefixesToFilter.contains(prefix)) {
-        val uri = parentNamespaceContext.get(prefix)
+    val parentNamespaceContext = parentElement.allInScopeNamespacesAsStrings
+    val rootElemNamespaceContext = rootElement.allInScopeNamespacesAsStrings
+    for ((prefix, uri) <- parentNamespaceContext) {
+      if (! rootElemNamespaceContext.contains(prefix) && ! prefixesToFilter.contains(prefix))
         rootElement.addNamespace(prefix, uri)
-      }
     }
     document
   }
@@ -304,7 +270,7 @@ object Dom4jUtils {
     */
   def copyElementCopyParentNamespaces(sourceElem: Element): Element = {
     val newElement = sourceElem.createCopy
-    copyMissingNamespaces(sourceElem.getParent, newElement)
+    copyMissingNamespaces(Option(sourceElem.getParent), newElement)
     newElement
   }
 
@@ -319,10 +285,12 @@ object Dom4jUtils {
   def getLocationData: LocationData =
     getLocationData(1, isDebug = false)
 
-  def getLocationData(depth: Int, isDebug: Boolean): LocationData = { // Enable this with a property for debugging only, as it is time consuming
-
-    if (!isDebug && !org.orbeon.oxf.properties.Properties.instance.getPropertySet.getBoolean("oxf.debug.enable-java-location-data", default = false))
-      return null
+  private def getLocationData(depth: Int, isDebug: Boolean): LocationData = {
+    // Enable this with a property for debugging only, as it is time consuming
+    if (
+      ! isDebug &&
+      ! Properties.instance.getPropertySet.getBoolean("oxf.debug.enable-java-location-data", default = false)
+    ) return null
 
     // Compute stack trace and extract useful information
     val e = new Exception

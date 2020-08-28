@@ -15,8 +15,6 @@ package org.orbeon.dom
 
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.JavaConverters._
-
 class DOMTest extends AnyFunSpec {
 
   val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
@@ -40,13 +38,13 @@ class DOMTest extends AnyFunSpec {
       val rootElem = newRootElem
       rootElem.addText("Deneb")
 
-      assert("Deneb" === rootElem.getText)
-      assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
+      assert("Deneb" == rootElem.getText)
+      assert(Set(XS, XF) == rootElem.declaredNamespacesIterator.toSet)
 
       rootElem.clearContent()
 
-      assert("" === rootElem.getText)
-      assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
+      assert("" == rootElem.getText)
+      assert(Set(XS, XF) == rootElem.declaredNamespacesIterator.toSet)
     }
 
     it("must clear text content also when no namespaces are present (following another code path)") {
@@ -56,15 +54,15 @@ class DOMTest extends AnyFunSpec {
 
       nestedElem.addText("Deneb")
 
-      assert("Deneb" === nestedElem.getText)
-      assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
-      assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+      assert("Deneb" == nestedElem.getText)
+      assert(Set(XS, XF)      == rootElem.declaredNamespacesIterator.toSet)
+      assert(Set[Namespace]() == nestedElem.declaredNamespacesIterator.toSet)
 
       nestedElem.clearContent()
 
-      assert("" === nestedElem.getText)
-      assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
-      assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+      assert("" == nestedElem.getText)
+      assert(Set(XS, XF)      == rootElem.declaredNamespacesIterator.toSet)
+      assert(Set[Namespace]() == nestedElem.declaredNamespacesIterator.toSet)
     }
   }
 

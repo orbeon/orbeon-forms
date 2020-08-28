@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.{util => ju}
-
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -28,7 +26,7 @@ import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
  */
 class Event extends XFormsFunction with RuntimeDependentFunction {
 
-  private var namespaceMappings: ju.Map[String, String] = null
+  private var namespaceMappings: Map[String, String] = null
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -59,7 +57,7 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     if (namespaceMappings eq null) {
       val env = visitor.getStaticContext
       super.checkArguments(visitor)
-      namespaceMappings = new ju.HashMap[String, String]
+      namespaceMappings = Map()
 
       val namespaceResolver = env.getNamespaceResolver
 
@@ -68,7 +66,7 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
         val prefix = iterator.next().asInstanceOf[String]
         if (prefix != "") {
           val uri = namespaceResolver.getURIForPrefix(prefix, true)
-          namespaceMappings.put(prefix, uri)
+          namespaceMappings += prefix -> uri
         }
       }
     }

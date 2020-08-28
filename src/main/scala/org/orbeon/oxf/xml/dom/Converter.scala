@@ -17,7 +17,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 
 object Converter {
-
   implicit class ConverterOps[E](private val e: scala.xml.Elem) extends AnyVal {
     def toDocument: org.orbeon.dom.Document = Dom4jUtils.readDom4j(e.toString)
   }

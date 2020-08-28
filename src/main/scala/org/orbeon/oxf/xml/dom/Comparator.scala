@@ -1,11 +1,3 @@
-package org.orbeon.oxf.xml.dom
-
-import java.{lang => jl, util => ju}
-
-import org.orbeon.dom._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.saxon.value.Whitespace
-
 /**
  * Copyright (C) 2007 Orbeon, Inc.
  *
@@ -19,6 +11,15 @@ import org.orbeon.saxon.value.Whitespace
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+package org.orbeon.oxf.xml.dom
+
+import java.{lang => jl, util => ju}
+
+import org.orbeon.dom._
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.saxon.value.Whitespace
+
+
 object Comparator {
 
   /**

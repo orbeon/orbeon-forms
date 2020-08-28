@@ -55,7 +55,7 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
         case Left(uriLocal)    => uriLocal
         case Right(namespaces) =>
           val propertyNameString = stringArgument(0)
-          val qName = Dom4jUtils.extractTextValueQName(namespaces.asJava, propertyNameString, false)
+          val qName = Dom4jUtils.extractTextValueQName(namespaces, propertyNameString, false)
           (qName.namespace.uri, qName.localName)
       }
 

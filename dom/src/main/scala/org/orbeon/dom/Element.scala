@@ -16,24 +16,17 @@ trait Element extends Branch {
   def getNamespace: Namespace
   def getQName(qualifiedName: String): QName
   def getNamespaceForPrefix(prefix: String): Namespace
-  def getNamespaceForURI(uri: String): Namespace
   def getNamespacePrefix: String
   def getNamespaceURI: String
   def getQualifiedName: String
 
   /**
-   * Returns any additional namespaces declarations for this element other
-   * than namespace returned via the `getNamespace` method. If no
-   * additional namespace declarations are present for this element then an
-   * empty list will be returned.
+   * Returns all the namespaces declared by this element.
    */
-  def additionalNamespaces: ju.List[Namespace]
+  def declaredNamespacesIterator: Iterator[Namespace]
 
-  /**
-   * Returns all the namespaces declared by this element. If no namespaces are
-   * declared for this element then an empty list will be returned.
-   */
-  def declaredNamespaces: ju.List[Namespace]
+  def allInScopeNamespacesAsNodes: Map[String, Namespace]
+  def allInScopeNamespacesAsStrings: Map[String, String]
 
   /**
    * Adds the attribute value of the given local name. If an attribute already

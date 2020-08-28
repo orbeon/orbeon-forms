@@ -49,7 +49,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.ErrorInfo;
-import org.orbeon.xforms.XFormsNames;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
@@ -62,6 +61,7 @@ import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.xforms.XFormsNames;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Option;
@@ -132,7 +132,7 @@ public class XFormsModelSchemaValidator {
         }
 
         public String resolveNamespacePrefix(final String prefix) {
-            return Dom4jUtils.getNamespaceContext(currentElement).get(prefix);
+            return currentElement.allInScopeNamespacesAsNodes().apply(prefix).prefix();
         }
 
         public String getBaseUri() {

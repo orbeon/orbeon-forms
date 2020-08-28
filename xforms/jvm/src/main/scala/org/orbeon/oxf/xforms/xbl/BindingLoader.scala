@@ -61,7 +61,7 @@ trait BindingLoader extends Logging {
 
         def propertyQNames(property: Property) =
           property.value.toString.tokenizeToSet map
-            (Dom4jUtils.extractTextValueQName(property.namespaces.asJava, _, true))
+            (Dom4jUtils.extractTextValueQName(property.namespaces, _, true))
 
         def pathsForQNames(qNames: Set[QName]) =
           qNames flatMap { qName =>

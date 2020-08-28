@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import java.{util => ju}
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
@@ -85,13 +86,13 @@ object XBLTransformer {
       nodes            : ju.List[Node],
       attributeQName   : QName,
       attributeValue   : String,
-      namespaceElement : Element
+      namespaceElemOpt : Option[Element]
     ): Unit =
       if ((attributeValue ne null) && (nodes ne null) && ! nodes.isEmpty) {
         for (node <- nodes.asScala) {
           node match {
             case element: Element =>
-              Dom4jUtils.copyMissingNamespaces(namespaceElement, element)
+              Dom4jUtils.copyMissingNamespaces(namespaceElemOpt, element)
               element.addAttribute(attributeQName, attributeValue)
             case _ =>
           }
@@ -149,7 +150,7 @@ object XBLTransformer {
             val elements = XPathCache.evaluate(
               boundElementInfo,
               xpathExpression,
-              NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+              NamespaceMapping(currentElem.allInScopeNamespacesAsStrings),
               null,
               null,
               null,
@@ -190,10 +191,10 @@ object XBLTransformer {
           resultingNodes = contentToInsert
           if (scopeAttribute.nonAllBlank) {
             // If author specified scope attribute, use it
-            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
+            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, None)
           } else {
             // By default, set xxbl:scope="outer" on resulting elements
-            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", null)
+            setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", None)
           }
           true
         } else if (! DefaultXblSupport.keepElement(partAnalysis, boundElement, directNameOpt, currentElem)) {
@@ -230,7 +231,7 @@ object XBLTransformer {
               // This is not xbl:text, copy the attribute
               val attributeValue = boundElement.attributeValue(valueQName)
               if (attributeValue ne null)
-                setAttribute(resultingNodes, valueQName, attributeValue, boundElement)
+                setAttribute(resultingNodes, valueQName, attributeValue, boundElement.some)
             } else {
               // This is xbl:text
               // "The xbl:text value cannot occur by itself in the list"
@@ -266,7 +267,7 @@ object XBLTransformer {
               // found! We assume the rule is ignored in this case.
               if (! isLeftSideXBLText) {
                 // Set attribute value
-                setAttribute(resultingNodes, leftSideQName, rightSideValue, namespaceElement)
+                setAttribute(resultingNodes, leftSideQName, rightSideValue, namespaceElement.some)
               } else {
                 // Set text value
 
@@ -294,7 +295,7 @@ object XBLTransformer {
         val nodeInfos = XPathCache.evaluate(
           boundElementInfo,
           xxblAttrString,
-          NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+          NamespaceMapping(currentElem.allInScopeNamespacesAsStrings),
           null,
           null,
           null,
@@ -307,7 +308,7 @@ object XBLTransformer {
             val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
             if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
               val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
-              setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, currentAttribute.getParent)
+              setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, Option(currentAttribute.getParent))
             }
           }
         }
@@ -321,7 +322,7 @@ object XBLTransformer {
             val newValue = XPathCache.evaluateAsAvt(
               boundElementInfo,
               attValue,
-              NamespaceMapping(Dom4jUtils.getNamespaceContext(currentElem)),
+              NamespaceMapping(currentElem.allInScopeNamespacesAsStrings),
               null,
               null,
               null,
@@ -329,7 +330,7 @@ object XBLTransformer {
               null,
               null
             )
-            setAttribute(ju.Collections.singletonList[Node](currentElem), att.getQName, newValue, currentElem)
+            setAttribute(ju.Collections.singletonList[Node](currentElem), att.getQName, newValue, currentElem.some)
           }
         }
       }

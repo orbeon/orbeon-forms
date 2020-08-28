@@ -180,7 +180,7 @@ class StaticBind(
 
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) map
-      (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping.asJava, _, true))
+      (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
 
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
     Option(element.attributeValue(XXFORMS_WHITESPACE_QNAME)) map

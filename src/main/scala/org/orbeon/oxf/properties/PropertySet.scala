@@ -21,6 +21,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xml.NamespaceMapping
@@ -95,18 +96,12 @@ class PropertySet {
 
   def allPropertiesAsJson: String = {
 
-    def escapeJavaScript(value: String): String =
-      value
-        .replaceAllLiterally("\\", "\\\\")
-        .replaceAllLiterally("\"", "\\\"")
-        .replaceAllLiterally("\n", "\\n")
-
     val jsonProperties =
       for ((name, prop) <- exactProperties.to(List).sortBy(_._1))
         yield
           s"""|  "$name": {
-              |    "type": "${escapeJavaScript(prop.typ.toString)}",
-              |    "value": "${escapeJavaScript(prop.value.toString)}"
+              |    "type": "${prop.typ.toString.escapeJavaScript}",
+              |    "value": "${prop.value.toString.escapeJavaScript}"
               |  }""".stripMargin
 
     jsonProperties mkString ("{\n", ",\n", "\n}")

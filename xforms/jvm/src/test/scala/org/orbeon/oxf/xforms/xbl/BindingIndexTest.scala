@@ -17,8 +17,8 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpec
 

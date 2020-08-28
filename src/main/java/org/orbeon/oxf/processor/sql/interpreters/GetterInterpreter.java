@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.sql.interpreters;
 import org.joda.time.format.ISODateTimeFormat;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.ProcessorSupport;
 import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
@@ -25,7 +26,6 @@ import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -99,7 +99,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 final int columnType = metadata.getColumnType(columnIndex);
 
                 final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnType);
-                if (Dom4jUtils.qNameToExplodedQName(XPLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
+                if (ProcessorSupport.qNameToExplodedQName(XPLConstants.OPS_XMLFRAGMENT_QNAME()).equals(xmlType)) {
                     // XML fragment requested
                     String columnTypeName = metadata.getColumnTypeName(columnIndex);
                     if (columnType == Types.CLOB) {

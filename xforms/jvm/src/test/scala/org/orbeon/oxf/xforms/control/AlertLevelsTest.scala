@@ -85,7 +85,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
       def copyFormInstance = {
         val formInstance = instance("fr-form-instance").get.underlyingDocumentOpt.get
-        Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
+        org.orbeon.dom.Document(formInstance.getRootElement.createCopy)
       }
 
       def copyAndAnnotate(tokens: Set[String]) =

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.{Attribute, Document, Element, Node}
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom.Comparator
 
 object InstanceDataOps {
 

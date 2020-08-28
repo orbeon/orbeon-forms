@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._

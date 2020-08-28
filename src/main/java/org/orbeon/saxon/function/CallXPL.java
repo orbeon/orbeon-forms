@@ -22,10 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.XPLConstants;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.FunctionSupportJava;
@@ -172,7 +169,7 @@ public class CallXPL extends FunctionSupportJava {
                 // Read all outputs in sequence
                 List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
                 for (DOMSerializer domSerializer: domSerializers) {
-                    results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodesJava(domSerializer.runGetDocument(pipelineContext)), null,
+                    results.add(new DocumentWrapper((Document) ProcessorSupport.normalizeTextNodesJava(domSerializer.runGetDocument(pipelineContext)), null,
                             xpathContext.getConfiguration()));
                 }
                 return new ListIterator(results);

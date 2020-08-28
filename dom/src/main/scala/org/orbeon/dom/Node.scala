@@ -106,6 +106,7 @@ trait Node extends Cloneable {
   // TODO: Move this to a separate object, like `Node.deepCopy()` and use pattern matching.
   // Maybe check this: https://tpolecat.github.io/2015/04/29/f-bounds.html
   def deepCopy: Node
+  def createCopy: Node
 }
 
 object Text {

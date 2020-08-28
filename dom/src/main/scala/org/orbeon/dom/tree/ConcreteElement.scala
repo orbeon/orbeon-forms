@@ -598,7 +598,7 @@ class ConcreteElement(var qname: QName)
   }
 
   // The clone will have parent eq null but will have any necessary namespace declarations this element's ancestors.
-  override def deepCopy: Node = {
+  override def deepCopy: Element = {
 
     val clone = cloneInternal
     var ancestor = getParent
@@ -655,7 +655,7 @@ class ConcreteElement(var qname: QName)
     clone
   }
 
-  def createCopy: Element = {
+  override def createCopy: Element = {
     val clone = Element(getQName)
     appendAttributes(this, clone)
     clone.appendContent(this)

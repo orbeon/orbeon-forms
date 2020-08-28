@@ -17,6 +17,7 @@ import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.Node$;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -29,12 +30,11 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
-import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -135,7 +135,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                             final Element currentElement = (Element) i.next();
 
                             // Create DOMGenerator
-                            final String systemId = Dom4jUtils.makeSystemId(currentElement);
+                            final String systemId = ProcessorSupport.makeSystemId(currentElement);
                             final DOMGenerator domGenerator = new DOMGenerator
                                     (currentElement, "for each input", DOMGenerator.ZeroValidity, systemId);
                             domGenerator.createOutput(OUTPUT_DATA);
@@ -266,7 +266,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                 final Element currentElement = (Element) i.next();
 
                 // Create DOMGenerator
-                final String systemId = Dom4jUtils.makeSystemId(currentElement);
+                final String systemId = ProcessorSupport.makeSystemId(currentElement);
                 final DOMGenerator domGenerator = new DOMGenerator
                         (currentElement, "for each input", DOMGenerator.ZeroValidity, systemId);
                 domGenerator.createOutput(OUTPUT_DATA);

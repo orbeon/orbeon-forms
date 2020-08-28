@@ -63,7 +63,7 @@ public abstract class ConverterBase extends ProcessorImpl {
                         final Element methodElement = (Element) XPathUtils.selectSingleNode(configElement, "/config/method");
                         if (methodElement != null) {
                             final QName methodQName = Dom4jUtils.extractTextValueQName(methodElement, true);
-                            config.method = Dom4jUtils.qNameToExplodedQName(methodQName);
+                            config.method = ProcessorSupport.qNameToExplodedQName(methodQName);
                         }
 
                         config.contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");

@@ -60,26 +60,11 @@ trait Element extends Branch {
   def remove(text: Text): Boolean
 
   /**
-   * Returns the text value of this element without recursing through child
-   * elements. This method iterates through all Text
-   * nodes that this element contains and appends the text
-   * values together.
-   */
-  def getText: String
-
-  /**
    * @return the trimmed text value where whitespace is trimmed and normalised
    *         into single spaces. This method does not return null.
    */
   // TODO: review as trimming is ok, but normalization should follow standard semantic, and method renamed if kept
   def getTextTrim: String
-
-  /**
-   * Returns the XPath string-value of this node. The behaviour of this method
-   * is defined in the XPath specification. This method returns the string-value of all the
-   * contained Text and Element nodes all appended together.
-   */
-  def getStringValue: String
 
   def getData: AnyRef
   def setData(data: AnyRef): Unit
@@ -195,11 +180,8 @@ trait Element extends Branch {
    */
   def isRootElement: Boolean
 
-  /**
-   * Creates a deep copy of this element The new element is detached from its
-   * parent, and getParent() on the clone will return null.
-   */
-  def createCopy: Element
+  override def deepCopy: Element
+  override def createCopy: Element
 }
 
 object Element {

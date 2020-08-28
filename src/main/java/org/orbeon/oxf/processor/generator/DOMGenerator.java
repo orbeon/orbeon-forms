@@ -130,10 +130,7 @@ public final class DOMGenerator extends ProcessorImpl {
     public final static String DefaultContext = "oxf:/";
 
     private static org.orbeon.dom.Document makeCopyDoc(final org.orbeon.dom.Element e) {
-        final org.orbeon.dom.Element cpy = e.createCopy();
-        final Document ret = Document.apply();
-        ret.setRootElement(cpy);
-        return ret;
+        return Document.apply(e.createCopy());
     }
 
     private static DocumentInfo makeCopyDoc(final NodeInfo nodeInfo) {

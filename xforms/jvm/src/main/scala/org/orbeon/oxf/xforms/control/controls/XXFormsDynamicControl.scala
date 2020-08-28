@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -31,13 +30,13 @@ import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type => SaxonType}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.w3c.dom.Node.ELEMENT_NODE
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.JavaConverters._
 import scala.collection.generic.Growable
@@ -172,7 +171,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // Create new part
     val (template, partAnalysis) =
       createPartAnalysis(
-        Dom4jUtils.createDocumentCopyElement(boundElem.getUnderlyingNode.asInstanceOf[Element]),
+        org.orbeon.dom.Document(boundElem.getUnderlyingNode.asInstanceOf[Element].createCopy),
         part
       )
 

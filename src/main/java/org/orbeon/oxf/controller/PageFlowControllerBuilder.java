@@ -20,6 +20,7 @@ import org.orbeon.dom.QName;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.ProcessorSupport;
 import org.orbeon.oxf.processor.XPLConstants;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
@@ -166,13 +167,13 @@ public class PageFlowControllerBuilder {
                 addInput(new ASTInput("setvalues", setvaluesDocument));
                 addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutputOrParamId)));
             } else {
-                addInput(new ASTInput("setvalues", Dom4jUtils.NullDocument()));
-                addInput(new ASTInput("matcher-result", Dom4jUtils.NullDocument()));
+                addInput(new ASTInput("setvalues", ProcessorSupport.NullDocument()));
+                addInput(new ASTInput("matcher-result", ProcessorSupport.NullDocument()));
             }
             if (defaultSubmissionAttribute != null) {
                 addInput(new ASTInput("default-submission", new ASTHrefId(defaultSubmission)));
             } else {
-                addInput(new ASTInput("default-submission", Dom4jUtils.NullDocument()));
+                addInput(new ASTInput("default-submission", ProcessorSupport.NullDocument()));
             }
             addOutput(xformedInstance);
         }});
@@ -197,7 +198,7 @@ public class PageFlowControllerBuilder {
                 setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
 
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                    addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                     addOutput(new ASTOutput("data", xupdatedInstance));
                 }});
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
@@ -207,7 +208,7 @@ public class PageFlowControllerBuilder {
                     addOutput(new ASTOutput("data", isRedirect));
                 }});
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                    addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                     addOutput(new ASTOutput("data", actionData));
                 }});
             }});
@@ -252,9 +253,9 @@ public class PageFlowControllerBuilder {
                     if (actionAttribute != null) {
                         // TODO: handle passing and modifications of action data in model, and view, and pass to instance
                         addStatement(new StepProcessorCall(stepProcessorContext, urlBase, actionAttribute, "action") {{
-                            addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                            addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                             addInput(new ASTInput("instance", new ASTHrefId(xformedInstance)));
-                            addInput(new ASTInput("xforms-model", Dom4jUtils.NullDocument()));
+                            addInput(new ASTInput("xforms-model", ProcessorSupport.NullDocument()));
                             addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
@@ -278,7 +279,7 @@ public class PageFlowControllerBuilder {
                         }});
                     } else {
                         addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                            addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                            addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                             addOutput(new ASTOutput("data", actionData));
                         }});
                     }
@@ -350,7 +351,7 @@ public class PageFlowControllerBuilder {
                         addOutput(new ASTOutput("data", isRedirect));
                     }});
                     addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                         addOutput(new ASTOutput("data", actionData));
                     }});
                 }});
@@ -372,7 +373,7 @@ public class PageFlowControllerBuilder {
                     addStatement(new StepProcessorCall(stepProcessorContext, urlBase, modelAttribute, "model") {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
-                        addInput(new ASTInput("xforms-model", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("xforms-model", ProcessorSupport.NullDocument()));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                         final String[] locationParams =
                                 new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
@@ -406,7 +407,7 @@ public class PageFlowControllerBuilder {
                     addStatement(new StepProcessorCall(stepProcessorContext, urlBase, viewAttribute, "view") {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
-                        addInput(new ASTInput("xforms-model", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("xforms-model", ProcessorSupport.NullDocument()));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                         final String[] locationParams =
                                 new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
@@ -425,11 +426,11 @@ public class PageFlowControllerBuilder {
                 } else {
                     // There is no view, send nothing to epilogue
                     addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                         addOutput(new ASTOutput("data", viewData));
                     }});
                     addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                         addOutput(new ASTOutput("data", viewInstance));
                     }});
                 }
@@ -445,7 +446,7 @@ public class PageFlowControllerBuilder {
                 if (modelAttribute == null && viewAttribute == null) {
                     // Send out epilogue model data as a null document
                     addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                         addOutput(new ASTOutput("data", epilogueModelData));
                     }});
                 } else {
@@ -470,15 +471,15 @@ public class PageFlowControllerBuilder {
                     addInput(new ASTInput("data", new ASTHrefId(actionData)));
                 }});
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                    addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                     addOutput(new ASTOutput("data", viewData));
                 }});
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                    addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                     addOutput(new ASTOutput("data", epilogueModelData));
                 }});
                 addStatement(new ASTProcessorCall(XPLConstants.IDENTITY_PROCESSOR_QNAME()) {{
-                    addInput(new ASTInput("data", Dom4jUtils.NullDocument()));
+                    addInput(new ASTInput("data", ProcessorSupport.NullDocument()));
                     addOutput(new ASTOutput("data", viewInstance));
                 }});
             }});
@@ -517,7 +518,7 @@ public class PageFlowControllerBuilder {
                 if (actionData != null)
                     addInput(new ASTInput("action", new ASTHrefId(actionData)));// action
                 else
-                    addInput(new ASTInput("action",  Dom4jUtils.NullDocument()));// action
+                    addInput(new ASTInput("action",  ProcessorSupport.NullDocument()));// action
                 addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});// updated-instance
             }});
         } else {
@@ -544,7 +545,7 @@ public class PageFlowControllerBuilder {
                     // Pass parameters only if needed
                     when.addStatement(new ASTProcessorCall(XPLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME()) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NullDocument()));
+                        addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : ProcessorSupport.NullDocument()));
                         addOutput(new ASTOutput("data", parametersOutput));
                     }});
                 } else {

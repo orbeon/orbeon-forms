@@ -13,7 +13,7 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util => u}
 
 import scala.collection.JavaConverters._

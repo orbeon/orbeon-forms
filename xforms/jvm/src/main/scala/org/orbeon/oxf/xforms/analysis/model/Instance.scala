@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, S
 import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
-import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import shapeless.syntax.typeable._
 
@@ -230,7 +230,7 @@ object Instance {
       excludeResultPrefixes match {
         case prefixes if prefixes("#all") =>
           // Special #all
-          Dom4jUtils.createDocumentCopyElement(element)
+          Document(element.createCopy)
         case prefixes if prefixes.nonEmpty =>
           // List of prefixes
           Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)

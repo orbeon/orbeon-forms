@@ -19,7 +19,7 @@ import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.xforms.xbl.Scope
 
 

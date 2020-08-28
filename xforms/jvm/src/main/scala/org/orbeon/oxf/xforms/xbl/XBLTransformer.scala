@@ -19,15 +19,14 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
@@ -54,9 +53,9 @@ object XBLTransformer {
   }
 
   /**
-    * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
+    * Apply an XBL transformation, i.e. apply `xbl:content`, `xbl:attr`, etc.
     *
-    * NOTE: This mutates shadowTreeDocument.
+    * NOTE: This mutates `shadowTreeDocument`.
     */
   def transform(
     partAnalysis          : PartAnalysisImpl, // for `XblSupport`
@@ -111,7 +110,7 @@ object XBLTransformer {
         }
       }
 
-    Dom4j.visitSubtree(shadowTreeDocument.getRootElement, currentElem => {
+    visitSubtree(shadowTreeDocument.getRootElement, currentElem => {
 
       val isXBLContent = currentElem.getQName == XBLContentQName
       var resultingNodes: ju.List[Node] = null
@@ -135,7 +134,7 @@ object XBLTransformer {
                   if (! mustFilterOut(elem))
                     clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
                 case node =>
-                  clonedContent.add(Dom4jUtils.createCopy(node))
+                  clonedContent.add(node.createCopy)
               }
             }
             contentToInsert = clonedContent
@@ -339,4 +338,14 @@ object XBLTransformer {
     })
     shadowTreeDocument
   }
+
+  private def visitSubtree(container: Element, process: Element => Boolean): Unit =
+    for (childNode <- container.content.toList) {
+      childNode match {
+        case e: Element =>
+          if (process(e))
+            visitSubtree(e, process)
+        case _ =>
+      }
+    }
 }

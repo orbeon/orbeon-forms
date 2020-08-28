@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl}
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.xforms.EventNames
 
 import scala.collection.mutable

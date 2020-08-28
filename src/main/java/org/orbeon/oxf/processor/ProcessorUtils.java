@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.dom.*;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -73,7 +76,7 @@ public class ProcessorUtils {
                 if (originalElement == null)
                     throw new OXFException("Input content is mandatory");
                 Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
-                final String sid = Dom4jUtils.makeSystemId( originalElement );
+                final String sid = ProcessorSupport.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
                     (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
 

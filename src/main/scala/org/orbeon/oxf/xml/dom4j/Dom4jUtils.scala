@@ -19,25 +19,14 @@ import java.{util => ju}
 import org.orbeon.dom._
 import org.orbeon.dom.io._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xml._
-import org.xml.sax.SAXException
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
 
 // TODO: move this to Scala/remove unneeded stuff
 object Dom4jUtils {
-
-    // NOTE: This should be an immutable document, but we don't have support for this yet.
-    val NullDocument: Document = {
-      val d = Document()
-      val nullElement = Element("null")
-      nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true")
-      d.setRootElement(nullElement)
-      d
-    }
 
   private def createSAXReader(parserConfiguration: XMLParsing.ParserConfiguration): SAXReader =
     new SAXReader(XMLParsing.newXMLReader(parserConfiguration))
@@ -66,74 +55,17 @@ object Dom4jUtils {
   def readDom4j(reader: Reader, uri: String): Document =
     createSAXReader.read(reader, uri)
 
-  /*
-   * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it creates work for GC
-   * (because it relies on JAXP).
-   */
-  def readDom4j(xmlString: String, parserConfiguration: XMLParsing.ParserConfiguration): Document = {
+  def readDom4j(xmlString: String): Document = {
     val stringReader = new StringReader(xmlString)
-    createSAXReader(parserConfiguration).read(stringReader)
+    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(stringReader)
   }
 
-  def readDom4j(xmlString: String): Document =
-    readDom4j(xmlString, XMLParsing.ParserConfiguration.PLAIN)
-
-  @throws[SAXException]
-  @throws[DocumentException]
   def readDom4j(inputStream: InputStream, uri: String, parserConfiguration: XMLParsing.ParserConfiguration): Document =
     createSAXReader(parserConfiguration).read(inputStream, uri)
 
-  @throws[SAXException]
-  @throws[DocumentException]
   def readDom4j(inputStream: InputStream): Document =
     createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(inputStream)
 
-  def makeSystemId(e: Element): String =
-    Option(e.getData.asInstanceOf[LocationData]) flatMap
-      (d => Option(d.file))                      getOrElse
-      DOMGenerator.DefaultContext
-
-  // 1 Java caller
-  def normalizeTextNodesJava(nodeToNormalize: Node): Node =
-    nodeToNormalize.normalizeTextNodes
-
-  /*
-   * Saxon's error handler is expensive for the service it provides so we just use our
-   * singleton instead.
-   *
-   * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the
-   * handling of a single request to '/' in the examples app. i.e. The trace below was
-   * responsible for creating 200k of garbage during the handing of a single request to '/'.
-   *
-   * delta: 213408 live: 853632 alloc: 4497984 trace: 380739 class: byte[]
-   *
-   * TRACE 380739:
-   * java.nio.HeapByteBuffer.<init>(HeapByteBuffer.java:39)
-   * java.nio.ByteBuffer.allocate(ByteBuffer.java:312)
-   * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:310)
-   * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:290)
-   * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:274)
-   * sun.nio.cs.StreamEncoder.forOutputStreamWriter(StreamEncoder.java:69)
-   * java.io.OutputStreamWriter.<init>(OutputStreamWriter.java:93)
-   * java.io.PrintWriter.<init>(PrintWriter.java:109)
-   * java.io.PrintWriter.<init>(PrintWriter.java:92)
-   * org.orbeon.saxon.StandardErrorHandler.<init>(StandardErrorHandler.java:22)
-   * org.orbeon.saxon.event.Sender.sendSAXSource(Sender.java:165)
-   * org.orbeon.saxon.event.Sender.send(Sender.java:94)
-   * org.orbeon.saxon.IdentityTransformer.transform(IdentityTransformer.java:31)
-   * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:453)
-   * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:423)
-   * org.orbeon.oxf.processor.generator.DOMGenerator.<init>(DOMGenerator.java:93)
-   *
-   * Before mod
-   *
-   * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	10510 ms ( 150 mb ), 7124 ( 512 mb ) 	2.131312472239924 ( 150 mb ), 1.7474380872589803 ( 512 mb )
-   *
-   * after mod
-   *
-   * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	9154 ms ( 150 mb ), 6949 ( 512 mb ) 	1.7316203642295738 ( 150 mb ), 1.479365288194895 ( 512 mb )
-   *
-   */
   def getDocumentSource(d: Document): DocumentSource = {
     val lds = new LocationDocumentSource(d)
     val rdr = lds.getXMLReader
@@ -287,7 +219,7 @@ object Dom4jUtils {
     *
     * 2020-08-27: 1 caller.
     */
-  def explodedQNameToQName(qName: String): QName = {
+  def explodedQNameToQName(qName: String, prefix: String): QName = {
 
     val openIndex = qName.indexOf("{")
     if (openIndex == -1)
@@ -296,25 +228,8 @@ object Dom4jUtils {
     val namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"))
     val localName = qName.substring(qName.indexOf("}") + 1)
 
-    QName(localName, Namespace("p1", namespaceURI))
+    QName(localName, Namespace(prefix, namespaceURI))
   }
-
-  /**
-    * Create a copy of a dom4j Node.
-    *
-    * @param source source Node
-    * @return copy of Node
-    */
-  def createCopy(source: Node): Node = source match {
-    case elem: Element => elem.createCopy
-    case _             => source.deepCopy
-  }
-
-  /**
-    * Return a new document with a copy of newRoot as its root.
-    */
-  def createDocumentCopyElement(newRoot: Element) =
-    Document(newRoot.createCopy)
 
   /**
     * Return a new document with all parent namespaces copied to the new root element, assuming they are not already
@@ -339,12 +254,10 @@ object Dom4jUtils {
     val document =
       if (detach) {
         // Detach
-        val d = Document()
-        d.setRootElement(newRoot.detach().asInstanceOf[Element])
-        d
+        Document(newRoot.detach().asInstanceOf[Element])
       } else {
         // Copy
-        createDocumentCopyElement(newRoot)
+        Document(newRoot.createCopy)
       }
     copyMissingNamespaces(parentElement, document.getRootElement)
     document
@@ -369,7 +282,7 @@ object Dom4jUtils {
     * root element.
     */
   def createDocumentCopyParentNamespaces(newRoot: Element, prefixesToFilter: ju.Set[String]): Document = {
-    val document = createDocumentCopyElement(newRoot)
+    val document = Document(newRoot.createCopy)
     val rootElement = document.getRootElement
     val parentElement = newRoot.getParent
     val parentNamespaceContext = getNamespaceContext(parentElement)
@@ -528,10 +441,6 @@ object Dom4jUtils {
 
     result.getDocument
   }
-
-  // 2019-11-14: Only used by processor/pipeline Java code
-  def qNameToExplodedQName(qName: QName): String =
-    if (qName eq null) null else qName.clarkName
 
   trait VisitorListener {
     def startElement(element: Element)

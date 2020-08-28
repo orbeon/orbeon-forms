@@ -19,9 +19,9 @@ import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, LangRef}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.xforms.{Constants, EventNames}
 
 /**

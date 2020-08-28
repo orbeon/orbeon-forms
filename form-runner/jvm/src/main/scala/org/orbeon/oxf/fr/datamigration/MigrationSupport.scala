@@ -213,7 +213,7 @@ object MigrationSupport {
       data match {
         case virtualNode: VirtualNode =>
           virtualNode.getUnderlyingNode match {
-            case doc: Document => Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
+            case doc: Document => Document(doc.getRootElement.createCopy)
             case _             => throw new IllegalStateException
           }
         case _ =>

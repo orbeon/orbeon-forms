@@ -160,7 +160,7 @@ object XFormsModelSubmissionBase {
         val copy =
           virtualNode.getUnderlyingNode match {
             case e: Element => Dom4jUtils.createDocumentCopyParentNamespaces(e)
-            case n: Node    => Dom4jUtils.createDocumentCopyElement(n.getDocument.getRootElement)
+            case n: Node    => Document(n.getDocument.getRootElement.createCopy)
             case _          => throw new IllegalStateException
           }
 

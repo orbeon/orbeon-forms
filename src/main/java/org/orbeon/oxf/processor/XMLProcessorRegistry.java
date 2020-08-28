@@ -52,7 +52,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     throw new OXFException("Missing or empty processor name!");
 
                 if (processorQName != null)
-                    logger.debug("Binding name: " + Dom4jUtils.qNameToExplodedQName(processorQName));
+                    logger.debug("Binding name: " + ProcessorSupport.qNameToExplodedQName(processorQName));
                 if (processorURI != null)
                     logger.debug("Binding name: " + processorURI);
 
@@ -63,7 +63,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     if (logger.isDebugEnabled())
                         logger.debug("To class: " + className);
 
-                    final String defaultName = (processorQName != null) ? Dom4jUtils.qNameToExplodedQName(processorQName) : processorURI;
+                    final String defaultName = (processorQName != null) ? ProcessorSupport.qNameToExplodedQName(processorQName) : processorURI;
                     final QName defaultQName = (processorQName != null) ? processorQName : QName.apply(processorURI);
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
@@ -106,7 +106,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                     throw new OXFException("Missing or empty processor name!");
 
                                 if (processorQName != null)
-                                    logger.debug("Binding name: " + Dom4jUtils.qNameToExplodedQName(processorQName));
+                                    logger.debug("Binding name: " + ProcessorSupport.qNameToExplodedQName(processorQName));
                                 if (processorURI != null)
                                     logger.debug("Binding name: " + processorURI);
 
@@ -132,7 +132,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                         final Object processorConfigValidity = getInputValidity(ctxt, processorConfigInput);
                                         // We must have some XML in the <input> tag
                                         final Element childElement = (Element) inputElement.jElements().get(0);
-                                        final String sid = Dom4jUtils.makeSystemId(childElement);
+                                        final String sid = ProcessorSupport.makeSystemId(childElement);
                                         final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
                                                 (childElement, "input from registry", processorConfigValidity, sid);
                                         PipelineUtils.connect(domGenerator, OUTPUT_DATA, baseProcessor, name);

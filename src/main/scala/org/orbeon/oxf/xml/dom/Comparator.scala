@@ -4,10 +4,7 @@ import java.{lang => jl, util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils.createCopy
 import org.orbeon.saxon.value.Whitespace
-
-import scala.annotation.tailrec
 
 /**
  * Copyright (C) 2007 Orbeon, Inc.
@@ -44,8 +41,8 @@ object Comparator {
    */
   def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document): Boolean =
     compareTwoNodes(
-      left = createCopy(left.getRootElement).normalizeTextNodes,
-      right = createCopy(right.getRootElement).normalizeTextNodes
+      left = left.getRootElement.createCopy.normalizeTextNodes,
+      right = right.getRootElement.createCopy.normalizeTextNodes
     )(
       normalizeText = _.trimAllToEmpty
     )
@@ -58,7 +55,7 @@ object Comparator {
 
   def compareElementsIgnoreNamespacesInScopeCollapse(left: Element, right: Element): Boolean = {
     val normalizeText = (c: String) => Whitespace.collapseWhitespace(c).toString
-    compareTwoNodes(createCopy(left).normalizeTextNodes, createCopy(right).normalizeTextNodes)(normalizeText)
+    compareTwoNodes(left.createCopy.normalizeTextNodes, right.createCopy.normalizeTextNodes)(normalizeText)
   }
 
   // Only keep the nodes we care about

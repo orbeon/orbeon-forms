@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, XMLParsing}
+import org.orbeon.oxf.xml.XMLParsing
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._

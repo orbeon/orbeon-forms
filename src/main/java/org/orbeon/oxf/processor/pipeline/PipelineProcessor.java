@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
@@ -31,6 +30,7 @@ import org.orbeon.oxf.processor.pipeline.foreach.ConcreteForEachProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -194,7 +194,7 @@ public class PipelineProcessor extends ProcessorImpl {
                 ASTProcessorCall processorCall = (ASTProcessorCall) statement;
 
                 final LocationData processorLocationData = processorCall.getLocationData();
-                final String processorNameOrURI = Dom4jUtils.qNameToExplodedQName(processorCall.getName());
+                final String processorNameOrURI = ProcessorSupport.qNameToExplodedQName(processorCall.getName());
 
                 // Direct call
                 if (processorCall.getProcessor() == null) {

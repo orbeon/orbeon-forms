@@ -16,9 +16,9 @@ package org.orbeon.oxf.processor.converter;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.processor.ProcessorSupport;
 import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
  * Converts XML into text according to the XSLT XML output method.
@@ -47,7 +47,7 @@ public class XMLConverter extends TextConverterBase {
             throw new OXFException("System doctype is required if a public doctype is present");
 
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : Dom4jUtils.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
+                config.method != null ? config.method : ProcessorSupport.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
                 config.version != null ? config.version : DEFAULT_VERSION,
                 config.publicDoctype != null ? config.publicDoctype : null,
                 config.systemDoctype != null ? config.systemDoctype : null,

@@ -15,7 +15,7 @@ package org.orbeon.oxf.pipeline.api;
 
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.processor.ProcessorSupport;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -90,7 +90,7 @@ public class ProcessorDefinition {
 
     public String toString() {
         final StringBuilder sb = new StringBuilder("[");
-        sb.append(Dom4jUtils.qNameToExplodedQName(getName()));
+        sb.append(ProcessorSupport.qNameToExplodedQName(getName()));
         for (final Map.Entry<String, Object> currentEntry: getEntries().entrySet()) {
             final String key = currentEntry.getKey();
             final Object value = currentEntry.getValue();

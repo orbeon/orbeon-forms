@@ -15,9 +15,9 @@ package org.orbeon.oxf.pipeline
 
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
-import org.orbeon.oxf.processor.{DOMSerializer, XPLConstants}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, PipelineReader}
+import org.orbeon.oxf.processor.{DOMSerializer, ProcessorSupport, XPLConstants}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, PipelineUtils}
@@ -128,7 +128,7 @@ object Transform {
       Dom4jUtils.createDocumentCopyParentNamespaces(elem),
       "xbl-transform-data",
       DOMGenerator.ZeroValidity,
-      Dom4jUtils.makeSystemId(elem)
+      ProcessorSupport.makeSystemId(elem)
     )
     PipelineUtils.connect(domGeneratorData, "data", pipeline, "data")
 

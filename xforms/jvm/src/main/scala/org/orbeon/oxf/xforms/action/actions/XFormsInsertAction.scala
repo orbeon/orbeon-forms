@@ -105,7 +105,7 @@ object XFormsInsertAction {
 
               // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
 
-              Iterator(Dom4jUtils.createCopy(singleSourceNode))
+              Iterator(singleSourceNode.createCopy)
             case Right(_) =>
               if (indentedLogger != null && indentedLogger.isDebugEnabled)
                 indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating")

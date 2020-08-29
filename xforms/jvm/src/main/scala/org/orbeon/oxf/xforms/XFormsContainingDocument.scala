@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStaticState
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary
 
 import scala.collection.Seq

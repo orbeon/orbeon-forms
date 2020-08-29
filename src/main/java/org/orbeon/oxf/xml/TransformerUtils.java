@@ -25,7 +25,7 @@ import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;

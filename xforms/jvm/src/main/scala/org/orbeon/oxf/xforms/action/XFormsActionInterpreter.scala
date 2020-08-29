@@ -27,12 +27,13 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.xml.NamespaceMapping
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.xforms.{XFormsNames, XFormsId}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.JavaConverters._
 import scala.util.control.{Breaks, NonFatal}

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.orbeon.dom.Document;
+import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 
 import javax.xml.transform.sax.SAXResult;
 
@@ -29,5 +30,4 @@ public class LocationDocumentResult extends SAXResult {
     public Document getDocument() {
         return locationSAXContentHandler.getDocument();
     }
-
 }

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xml.dom4j;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.io.DocumentSource;
+import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 
 public class LocationDocumentSource extends DocumentSource {
 
@@ -28,5 +29,4 @@ public class LocationDocumentSource extends DocumentSource {
         super(node);
         setXMLReader(new LocationSAXWriter());
     }
-
 }

@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 

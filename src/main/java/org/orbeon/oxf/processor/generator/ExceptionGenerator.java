@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.Iterator;

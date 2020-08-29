@@ -23,10 +23,9 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.xforms.xbl.Scope
+import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, IOSupport}
 import org.orbeon.oxf.xml.dom4j._
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
 import org.orbeon.saxon.expr._
@@ -34,6 +33,7 @@ import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable.LinkedHashSet

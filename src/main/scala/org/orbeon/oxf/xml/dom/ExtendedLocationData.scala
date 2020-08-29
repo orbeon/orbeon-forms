@@ -11,9 +11,11 @@
 *
 * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
-package org.orbeon.oxf.xml.dom4j
+package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.xml.dom.ExtendedLocationData.arrayToPairs
+import org.orbeon.oxf.xml.dom4j.LocationData
 
 import scala.collection.compat._
 import scala.collection.immutable
@@ -50,7 +52,7 @@ class ExtendedLocationData private (
     this(
       locationData,
       Option(description),
-      ExtendedLocationData.arrayToPairs(params),
+      arrayToPairs(params),
       Option(element)
     )
 
@@ -75,7 +77,7 @@ class ExtendedLocationData private (
   def getElementDebugString        = elementString.orNull
   def getParameters: Array[String] = params.iterator.flatMap(p => Array(p._1, p._2)).to(Array)
 
-  override def toString = {
+  override def toString: String = {
 
     def parametersString =
       params collect { case (k, v) if v ne null => s"$k='$v'" } mkString ", "

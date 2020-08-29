@@ -17,7 +17,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
 import XFormsEvent._
 
 class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)

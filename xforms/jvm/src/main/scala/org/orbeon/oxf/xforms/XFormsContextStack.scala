@@ -25,13 +25,13 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
-import org.xml.sax.SAXException
 
 import scala.util.control.NonFatal
 

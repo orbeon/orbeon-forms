@@ -17,8 +17,8 @@ import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom._
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xml.dom.LocationSAXWriter
-import org.orbeon.oxf.xml.dom4j.{LocationData, LocationDocumentSource, LocationSAXContentHandler}
+import org.orbeon.oxf.xml.dom.{LocationSAXContentHandler, LocationSAXWriter}
+import org.orbeon.oxf.xml.dom4j.{LocationData, LocationDocumentSource}
 import org.orbeon.oxf.xml.{DigestContentHandler, NamespaceCleanupXMLReceiver, XMLConstants, XMLParsing}
 
 

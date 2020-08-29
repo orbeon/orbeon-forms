@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAct
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
 
 

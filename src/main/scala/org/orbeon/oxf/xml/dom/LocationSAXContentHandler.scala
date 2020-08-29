@@ -11,10 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xml.dom4j
+package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.{Attributes, Locator}
 
 class LocationSAXContentHandler
@@ -27,7 +28,7 @@ class LocationSAXContentHandler
 
   private var locator: Locator = null
 
-  override def setDocumentLocator(locator: Locator) = this.locator = locator
+  override def setDocumentLocator(locator: Locator): Unit = this.locator = locator
 
   override def startElement(
     namespaceURI  : String,

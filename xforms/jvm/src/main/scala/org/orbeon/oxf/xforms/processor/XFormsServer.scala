@@ -42,7 +42,7 @@ import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{DelayedEvent, Load, Message}
 

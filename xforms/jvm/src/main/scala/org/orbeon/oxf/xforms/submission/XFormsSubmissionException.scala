@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.ExtendedLocationData
 
 class XFormsSubmissionException(
   submission       : XFormsModelSubmission,

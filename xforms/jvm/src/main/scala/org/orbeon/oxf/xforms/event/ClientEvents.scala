@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
+import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{EventNames, XFormsId}
 

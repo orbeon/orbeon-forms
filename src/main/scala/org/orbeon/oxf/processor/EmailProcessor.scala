@@ -34,6 +34,7 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.LocationSAXWriter
 import org.orbeon.oxf.xml.dom4j._
 
 import scala.collection.JavaConverters._

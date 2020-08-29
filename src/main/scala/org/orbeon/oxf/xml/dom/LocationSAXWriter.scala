@@ -11,10 +11,11 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.xml.dom4j
+package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.dom.{Document, Element}
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.Locator
 
 class LocationSAXWriter extends SAXWriter {
@@ -25,26 +26,23 @@ class LocationSAXWriter extends SAXWriter {
     Some(
       new Locator {
 
-        def getSystemId: String = {
+        def getSystemId: String =
           if (_currentLocationData eq null)
             null
           else
             _currentLocationData.file
-        }
 
-        def getLineNumber: Int = {
+        def getLineNumber: Int =
           if (_currentLocationData eq null)
             -1
           else
             _currentLocationData.line
-        }
 
-        def getColumnNumber: Int = {
+        def getColumnNumber: Int =
           if (_currentLocationData eq null)
             -1
           else
             _currentLocationData.col
-        }
 
         def getPublicId = null
       }

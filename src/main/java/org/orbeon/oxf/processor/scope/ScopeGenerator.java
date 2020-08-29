@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

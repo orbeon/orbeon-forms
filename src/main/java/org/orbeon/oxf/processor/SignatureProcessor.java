@@ -20,7 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;

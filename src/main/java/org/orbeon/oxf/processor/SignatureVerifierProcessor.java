@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;

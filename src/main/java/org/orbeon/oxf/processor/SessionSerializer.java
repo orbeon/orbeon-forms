@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 
 public class SessionSerializer extends ProcessorImpl {
 

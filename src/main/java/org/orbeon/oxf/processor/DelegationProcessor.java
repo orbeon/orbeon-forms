@@ -36,7 +36,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.xml.NamespaceMapping;

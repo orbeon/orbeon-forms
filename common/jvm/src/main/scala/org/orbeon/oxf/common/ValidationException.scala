@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.common
 
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 
 class ValidationException(val message: String, val throwable: Throwable, locationDataOrNull: LocationData)
     extends OXFException((Option(locationDataOrNull) map (_.toString + ": ") getOrElse "") + message, throwable) {

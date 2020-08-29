@@ -39,7 +39,7 @@ import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.ConstantLocator;
 import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.saxon.*;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
 import org.orbeon.saxon.event.MessageEmitter;

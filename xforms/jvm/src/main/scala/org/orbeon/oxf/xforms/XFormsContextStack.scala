@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames

@@ -20,7 +20,7 @@ import org.orbeon.dom.Node;
 import org.orbeon.dom.Node$;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.util.Collection;
 import java.util.Iterator;

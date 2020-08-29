@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 
 case class LHHAValue(label: String, isHTML: Boolean) {
 

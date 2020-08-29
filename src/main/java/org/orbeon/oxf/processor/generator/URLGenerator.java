@@ -36,7 +36,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 import scala.Option;

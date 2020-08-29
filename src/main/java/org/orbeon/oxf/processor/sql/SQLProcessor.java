@@ -24,7 +24,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;

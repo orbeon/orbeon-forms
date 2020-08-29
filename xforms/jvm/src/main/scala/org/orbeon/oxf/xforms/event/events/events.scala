@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.EventNames
 import shapeless.syntax.typeable._
 import scala.collection.compat._

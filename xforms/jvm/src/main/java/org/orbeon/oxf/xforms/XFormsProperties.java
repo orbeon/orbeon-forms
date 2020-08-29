@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.util.Collections;
 import java.util.HashMap;

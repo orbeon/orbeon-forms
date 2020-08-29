@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport.{withBinding, withIteration}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.XFormsNames
 
 import scala.collection.JavaConverters._

@@ -60,7 +60,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.xforms.XFormsNames;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;

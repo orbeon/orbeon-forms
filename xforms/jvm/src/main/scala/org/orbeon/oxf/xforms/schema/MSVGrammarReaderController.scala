@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLParsing
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.xml.sax.{InputSource, Locator}
 
 import scala.util.control.NonFatal

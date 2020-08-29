@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal

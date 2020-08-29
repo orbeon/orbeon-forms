@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.xml.sax.Locator
 
 

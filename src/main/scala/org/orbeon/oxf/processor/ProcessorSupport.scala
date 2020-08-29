@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.processor
 
-import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom._
+import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xml.dom.{LocationSAXContentHandler, LocationSAXWriter}
-import org.orbeon.oxf.xml.dom4j.{LocationData, LocationDocumentSource}
+import org.orbeon.oxf.xml.dom.{LocationData, LocationSAXContentHandler, LocationSAXWriter}
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import org.orbeon.oxf.xml.{DigestContentHandler, NamespaceCleanupXMLReceiver, XMLConstants, XMLParsing}
 
 

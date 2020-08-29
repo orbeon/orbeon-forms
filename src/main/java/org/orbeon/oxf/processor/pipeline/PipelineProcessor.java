@@ -33,7 +33,7 @@ import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.util.*;
 

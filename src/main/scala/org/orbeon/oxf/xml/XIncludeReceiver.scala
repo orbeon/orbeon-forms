@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}
 import org.orbeon.oxf.xml.XIncludeReceiver._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLNames._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax._

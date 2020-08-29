@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 
 import scala.collection.JavaConverters._

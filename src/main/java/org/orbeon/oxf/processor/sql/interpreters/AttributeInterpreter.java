@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;

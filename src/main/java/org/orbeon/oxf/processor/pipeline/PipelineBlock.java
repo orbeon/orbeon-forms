@@ -29,7 +29,7 @@ import org.orbeon.oxf.processor.transformer.XPathProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.net.URL;
 import java.util.*;

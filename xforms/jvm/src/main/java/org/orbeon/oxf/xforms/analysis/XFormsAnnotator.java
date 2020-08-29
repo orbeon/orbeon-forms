@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.xforms.XFormsNames;
 import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.Attributes;

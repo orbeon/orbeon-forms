@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.util.*;
 import java.util.regex.Matcher;

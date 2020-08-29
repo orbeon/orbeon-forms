@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes

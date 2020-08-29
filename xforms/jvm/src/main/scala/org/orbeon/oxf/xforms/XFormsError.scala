@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.XFormsNames
 

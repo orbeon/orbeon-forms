@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Name10Checker
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._

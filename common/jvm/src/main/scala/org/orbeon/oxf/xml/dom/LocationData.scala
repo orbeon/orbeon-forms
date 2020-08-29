@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xml.dom4j
+package org.orbeon.oxf.xml.dom
 
 import java.{lang => jl}
 import javax.xml.transform.SourceLocator
@@ -34,12 +34,15 @@ object LocationData {
 
 case class LocationData(file: String, line: Int, col: Int) {
 
+  // 62 usages by processors and XML stuff
   def this(locator: Locator) =
     this(locator.getSystemId, locator.getLineNumber, locator.getColumnNumber)
 
+  // 1 usage in XSLT transformer
   def this(sourceLocator: SourceLocator) =
-    this(sourceLocator.getSystemId,sourceLocator.getLineNumber, sourceLocator.getColumnNumber)
+    this(sourceLocator.getSystemId, sourceLocator.getLineNumber, sourceLocator.getColumnNumber)
 
+  // 7 usages by processors and XML stuff
   def this(exception: SAXParseException) =
     this(exception.getSystemId, exception.getLineNumber, exception.getColumnNumber)
 

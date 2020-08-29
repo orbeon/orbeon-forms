@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.Locator
 
 class LocationSAXWriter extends SAXWriter {

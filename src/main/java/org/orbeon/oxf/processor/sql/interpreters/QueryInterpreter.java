@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

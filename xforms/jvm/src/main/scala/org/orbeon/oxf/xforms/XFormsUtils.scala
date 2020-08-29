@@ -35,8 +35,8 @@ import org.orbeon.oxf.xforms.model.{DataModel, InstanceData}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.dom4j.{LocationData, LocationDocumentResult}
+import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo, VirtualNode}
 import org.orbeon.xforms.XFormsNames
 import org.w3c.dom

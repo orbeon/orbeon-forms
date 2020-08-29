@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.Int64Value
 

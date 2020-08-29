@@ -16,7 +16,7 @@ package org.orbeon.oxf.common
 import collection.JavaConverters._
 import javax.xml.transform.TransformerException
 import org.orbeon.errorified.Exceptions
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.xml.sax.SAXParseException
 import scala.util.control.NonFatal
 

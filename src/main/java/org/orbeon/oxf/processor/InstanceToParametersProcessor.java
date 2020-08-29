@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.EncodeDecode;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;

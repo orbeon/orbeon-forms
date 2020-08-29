@@ -24,8 +24,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, IOSupport}
-import org.orbeon.oxf.xml.dom4j._
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, IOSupport, LocationData}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
 import org.orbeon.saxon.expr._

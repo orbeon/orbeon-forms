@@ -20,7 +20,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}

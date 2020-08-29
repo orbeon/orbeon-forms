@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.util.*;
 

@@ -25,7 +25,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 

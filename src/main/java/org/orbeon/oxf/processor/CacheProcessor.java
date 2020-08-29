@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.saxon.value.DurationValue;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;

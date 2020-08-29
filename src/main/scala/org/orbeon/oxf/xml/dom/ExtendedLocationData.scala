@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xml.dom.ExtendedLocationData.arrayToPairs
-import org.orbeon.oxf.xml.dom4j.LocationData
 
 import scala.collection.compat._
 import scala.collection.immutable

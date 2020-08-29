@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml.dom
 
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.{Attributes, Locator}
 
 class LocationSAXContentHandler

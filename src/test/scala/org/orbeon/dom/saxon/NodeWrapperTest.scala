@@ -35,11 +35,11 @@ class NodeWrapperTest extends AnyFunSpec {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val text1  = dom.Text("before")                                |!> rootElem.add
-    val child1 = dom.Element("elem1")                              |!> rootElem.add
-    val text2  = dom.Text("between")                               |!> rootElem.add
-    val child2 = dom.Element("elem2")                              |!> rootElem.add
-    val text3  = dom.Text("after")                                 |!> rootElem.add
+    val text1  = dom.Text("before")          |!> rootElem.add
+    val child1 = dom.Element("elem1")        |!> rootElem.add
+    val text2  = dom.Text("between")         |!> rootElem.add
+    val child2 = dom.Element("elem2")        |!> rootElem.add
+    val text3  = dom.Text("after")           |!> rootElem.add
 
     val att1   = dom.Attribute("att1", "v1") |!> child1.add
     val att2   = dom.Attribute("att2", "v2") |!> child1.add
@@ -69,7 +69,5 @@ class NodeWrapperTest extends AnyFunSpec {
     for (((node, expected), index) <- expected.zipWithIndex)
       it(s"for index $index") {
         assert(docWrapper.wrap(node).asInstanceOf[SiblingCountingNode].getSiblingPosition === expected)}
-
   }
-
 }

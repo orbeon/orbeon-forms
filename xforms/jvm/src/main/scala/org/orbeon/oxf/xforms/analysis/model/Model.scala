@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
@@ -424,6 +423,4 @@ object Model {
 
   val XFormsTypeNames =
     XForms11TypeNames ++ XForms20TypeNames
-
-  val jXFormsVariationTypeNames = XFormsVariationTypeNames.asJava
 }

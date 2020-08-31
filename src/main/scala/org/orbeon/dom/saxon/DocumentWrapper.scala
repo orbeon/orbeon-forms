@@ -17,11 +17,6 @@ import org.orbeon.saxon.om.{DocumentInfo, NamePool, NodeInfo}
  */
 object DocumentWrapper {
 
-  // An implementation of this interface can be set on DocumentWrapper to provide access to an index of elements by id.
-  trait IdGetter {
-    def apply(id: String): Element
-  }
-
   /**
    * Wrap a node without a document. The node must not have a document.
    */
@@ -38,12 +33,10 @@ class DocumentWrapper(
 ) extends NodeWrapper(doc, null)
     with DocumentInfo {
 
-  import DocumentWrapper._
-
   this.docWrapper = this
 
   private val documentNumber = config.getDocumentNumberAllocator.allocateDocumentNumber
-  private var idGetter: IdGetter = null
+  private var idGetter: String => Element = null
 
   def wrap(node: Node): NodeInfo =
     if (node eq this.node)
@@ -53,7 +46,7 @@ class DocumentWrapper(
 
   override def getDocumentNumber: Int = documentNumber
 
-  def setIdGetter(idGetter: IdGetter): Unit =
+  def setIdGetter(idGetter: String => Element): Unit =
     this.idGetter = idGetter
 
   def selectID(id: String): NodeInfo =

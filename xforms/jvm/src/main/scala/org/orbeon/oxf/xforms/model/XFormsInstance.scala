@@ -28,8 +28,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
-import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
@@ -359,23 +358,21 @@ trait XFormsInstanceIndex {
     idIndex = null
     if (instance.indexIds && self.documentInfo.isInstanceOf[DocumentWrapper]) {
       val wrapper = self.documentInfo.asInstanceOf[DocumentWrapper]
-      wrapper.setIdGetter(new DocumentWrapper.IdGetter {
+      wrapper.setIdGetter(id => {
 
         object ElementOrdering extends Ordering[Element] {
-          def compare(x: Element, y: Element) =
+          def compare(x: Element, y: Element): Int =
             wrapper.wrap(x).compareOrder(wrapper.wrap(y))
         }
 
-        def apply(id: String) = {
-          // Lazily create index the first time if needed
-          createIndexIfNeeded()
+        // Lazily create index the first time if needed
+        createIndexIfNeeded()
 
-          // Query index
-          idIndex.get(id) match {
-            case Some(list) if list.size > 1 => list.min(ElementOrdering) // get first in document order
-            case Some(list)                  => list.head                 // empty list not allowed in the map
-            case None                        => null
-          }
+        // Query index
+        idIndex.get(id) match {
+          case Some(list) if list.size > 1 => list.min(ElementOrdering) // get first in document order
+          case Some(list)                  => list.head                 // empty list not allowed in the map
+          case None                        => null
         }
       })
     }

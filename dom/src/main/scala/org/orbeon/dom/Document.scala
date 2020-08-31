@@ -34,7 +34,7 @@ class Document extends AbstractBranch {
   def getRootElement: Element = _rootElement
 
   private var _internalContent: ju.List[Node] = _
-  protected def internalContent = {
+  protected def internalContent: ju.List[Node] = {
     if (_internalContent eq null) {
       _internalContent = new ju.ArrayList[Node](1)
       if (_rootElement ne null)
@@ -43,7 +43,7 @@ class Document extends AbstractBranch {
     _internalContent
   }
 
-  def jContent = internalContent
+  def jContent: ju.List[Node] = internalContent
 
   override def deepCopy: Node = {
     val document = super.deepCopy.asInstanceOf[Document]

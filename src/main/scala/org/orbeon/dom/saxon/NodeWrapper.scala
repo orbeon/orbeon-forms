@@ -261,16 +261,19 @@ class NodeWrapper protected (
     axisNumber match {
       case Axis.ANCESTOR =>
         if (nodeKind == Type.DOCUMENT)
-          return EmptyIterator.getInstance
-        new Navigator.AxisFilter(new Navigator.AncestorEnumeration(this, false), nodeTest)
+          EmptyIterator.getInstance
+        else
+          new Navigator.AxisFilter(new Navigator.AncestorEnumeration(this, false), nodeTest)
       case Axis.ANCESTOR_OR_SELF =>
         if (nodeKind == Type.DOCUMENT)
-          return Navigator.filteredSingleton(this, nodeTest)
-        new Navigator.AxisFilter(new Navigator.AncestorEnumeration(this, true), nodeTest)
+          Navigator.filteredSingleton(this, nodeTest)
+        else
+          new Navigator.AxisFilter(new Navigator.AncestorEnumeration(this, true), nodeTest)
       case Axis.ATTRIBUTE =>
         if (nodeKind != Type.ELEMENT)
-          return EmptyIterator.getInstance
-        new Navigator.AxisFilter(new AttributeEnumeration(this), nodeTest)
+          EmptyIterator.getInstance
+        else
+          new Navigator.AxisFilter(new AttributeEnumeration(this), nodeTest)
       case Axis.CHILD =>
         if (hasChildNodes)
           new Navigator.AxisFilter(new ChildEnumeration(this, true, true), nodeTest)
@@ -294,11 +297,11 @@ class NodeWrapper protected (
         }
       case Axis.NAMESPACE =>
         if (nodeKind != Type.ELEMENT)
-          return EmptyIterator.getInstance
-        new Navigator.AxisFilter(new NamespaceEnumeration(this), nodeTest)
+          EmptyIterator.getInstance
+        else
+          new Navigator.AxisFilter(new NamespaceEnumeration(this), nodeTest)
       case Axis.PARENT =>
-        getParent
-        Navigator.filteredSingleton(parent, nodeTest)
+        Navigator.filteredSingleton(getParent, nodeTest)
       case Axis.PRECEDING =>
         new Navigator.AxisFilter(new Navigator.PrecedingEnumeration(this, false), nodeTest)
       case Axis.PRECEDING_SIBLING =>

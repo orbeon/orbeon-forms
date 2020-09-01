@@ -15,6 +15,8 @@ package org.orbeon.oxf.util
 
 import StringUtils._
 
+import scala.collection.compat.IterableOnce
+
 object PathUtils {
 
   trait UrlEncoderDecoder {
@@ -23,10 +25,10 @@ object PathUtils {
   }
 
   implicit class PathOps(private val s: String) extends AnyVal {
-    def dropTrailingSlash = if (s.isEmpty || s.last != '/')  s else s.init
-    def dropStartingSlash = if (s.isEmpty || s.head != '/')  s else s.tail
-    def appendSlash       = if (s.nonEmpty && s.last == '/') s else s + '/'
-    def prependSlash      = if (s.nonEmpty && s.head == '/') s else '/' + s
+    def dropTrailingSlash: String = if (s.isEmpty || s.last != '/')  s else s.init
+    def dropStartingSlash: String = if (s.isEmpty || s.head != '/')  s else s.tail
+    def appendSlash      : String = if (s.nonEmpty && s.last == '/') s else s + '/'
+    def prependSlash     : String = if (s.nonEmpty && s.head == '/') s else "/" + s
   }
 
   // Split out a URL's query part
@@ -47,7 +49,7 @@ object PathUtils {
   }
 
   // Recombine a path/query and parameters into a resulting URL
-  def recombineQuery(pathQuery: String, params: TraversableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
+  def recombineQuery(pathQuery: String, params: IterableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
     pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
   // Decode a query string into a list of pairs
@@ -74,7 +76,7 @@ object PathUtils {
 
   // Encode a sequence of pairs to a query string
   def encodeSimpleQuery(
-    parameters : TraversableOnce[(String, String)],
+    parameters : IterableOnce[(String, String)],
     separator  : String = "&")(implicit
     ed         : UrlEncoderDecoder
   ): String =

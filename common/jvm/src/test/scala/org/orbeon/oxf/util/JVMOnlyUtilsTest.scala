@@ -25,7 +25,7 @@ class JVMOnlyUtilsTest extends AnyFunSpec {
 
       val closable = new {
         var closed = false
-        def close() = closed = true
+        def close(): Unit = closed = true
         def value = 42
       }
 
@@ -34,7 +34,7 @@ class JVMOnlyUtilsTest extends AnyFunSpec {
     }
 
     it("must support a `null` closable") {
-      assert(null eq useAndClose(null: {def close()})(identity))
+      assert(null eq useAndClose(null: {def close(): Unit})(identity))
     }
 
   }

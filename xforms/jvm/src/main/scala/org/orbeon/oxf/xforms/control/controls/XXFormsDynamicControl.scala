@@ -287,7 +287,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // If more than one change touches a given id, processed it once using the last element
   private def groupChanges(changes: Seq[(String, Element)]): List[(String, Element)] =
-    changes groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) =>
+    changes.toList groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) =>
       prefixedId -> (prefixedIdsToElemsInSource map (_._2) last)
     }
 

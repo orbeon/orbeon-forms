@@ -129,9 +129,13 @@ val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Lif
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
+
+lazy val scala212 = "2.12.10"
+lazy val scala213 = "2.13.1"
+lazy val supportedScalaVersions = List(scala212, scala213)
+
 // "ThisBuild is a Scope encompassing all projects"
-scalaVersion                in ThisBuild := "2.12.10"
-//scalaVersion                in ThisBuild := "2.13.1"
+scalaVersion                in ThisBuild := scala212
 organization                in ThisBuild := "org.orbeon"
 version                     in ThisBuild := orbeonVersionFromProperties.value
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
@@ -413,7 +417,8 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(
     name := "orbeon-common",
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
-    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion
+    libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
+    crossScalaVersions := supportedScalaVersions
   )
   .jvmSettings(commonScalaJvmSettings)
   .jvmSettings(
@@ -436,7 +441,8 @@ lazy val commonJS  = common.js
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-dom"
+    name := "orbeon-dom",
+    crossScalaVersions := supportedScalaVersions
   )
 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)
@@ -779,8 +785,8 @@ lazy val core = (project in file("src"))
       "orbeonEdition" -> orbeonEditionFromProperties.value
     ),
 
+    crossScalaVersions                 := Nil,
     defaultConfiguration               := Some(Compile),
-
     sourceDirectory in ThisProject     := baseDirectory.value // until we have a more standard layout
   )
   .settings(jUnitTestOptions: _*)
@@ -871,5 +877,6 @@ lazy val root = (project in file("."))
   .settings(
     // TEMP: override so that root project doesn't search under src
     sourceDirectory in ThisProject     := baseDirectory.value / "root", // until we have a more standard layout
-    publishArtifact                    := false
+    publishArtifact                    := false,
+    crossScalaVersions                 := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
   )

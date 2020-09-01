@@ -31,7 +31,7 @@ object Node {
 
       n.accept(
         new VisitorSupport {
-          override def visit(elem: Element) {
+          override def visit(elem: Element): Unit = {
             var previousNode: Node = null
             var sb: jl.StringBuilder = null
             for (currentNode <- elem.nodeIterator) {

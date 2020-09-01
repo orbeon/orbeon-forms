@@ -57,7 +57,7 @@ object IOUtils {
 
   // Scala 2.13 has `scala.util.Using`. Switch to that when possible.
   // Use a closable item and make sure an attempt to close it is done after use
-  def useAndClose[T <: {def close()}, U](closable: T)(block: T => U): U =
+  def useAndClose[T <: {def close(): Unit}, U](closable: T)(block: T => U): U =
     try block(closable)
     finally {
       if (closable ne null)

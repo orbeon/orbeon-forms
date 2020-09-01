@@ -147,7 +147,7 @@ class ResourcesPatcherTest
               val leftChildren  = left  / *
               val rightChildren = right / *
 
-              val duplicates = (leftChildren map (_.name)).findDuplicates filterNot AllowedDuplicateNames
+              val duplicates = (leftChildren map (_.name)).toList.findDuplicates filterNot AllowedDuplicateNames
 
               assert(
                 duplicates.isEmpty,

@@ -71,7 +71,7 @@ trait Element extends Branch {
    * element and vice versa.
    */
   def jAttributes: ju.List[Attribute]
-  def attributes: Seq[Attribute] = jAttributes.asScala
+  def attributes: collection.Seq[Attribute] = jAttributes.asScala
 
   def attributeCount: Int
   def jAttributeIterator: ju.Iterator[Attribute]
@@ -136,7 +136,7 @@ trait Element extends Branch {
    * contain any elements then this method returns an empty list.
    */
   def jElements: ju.List[Element]
-  def elements: Seq[Element] = jElements.asScala
+  def elements: collection.Seq[Element] = jElements.asScala
 
   /**
    * Returns the elements contained in this element with the given local name
@@ -144,7 +144,7 @@ trait Element extends Branch {
    * empty list.
    */
   def jElements(name: String): ju.List[Element]
-  def elements(name: String): Seq[Element] = jElements(name).asScala
+  def elements(name: String): collection.Seq[Element] = jElements(name).asScala
 
   /**
    * Returns the elements contained in this element with the given fully
@@ -152,7 +152,7 @@ trait Element extends Branch {
    * empty list.
    */
   def jElements(qName: QName): ju.List[Element]
-  def elements(qName: QName): Seq[Element] = jElements(qName).asScala
+  def elements(qName: QName): collection.Seq[Element] = jElements(qName).asScala
 
   /**
    * Returns an iterator over all this elements child elements.

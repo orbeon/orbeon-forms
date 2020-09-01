@@ -250,7 +250,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     import XMLNames._
 
     val allMappings =
-      startNode ancestor *             flatMap
+      (startNode ancestor *).toList    flatMap // `toList` for `keepDistinctBy`, see comments
       (_ attValueOpt FRItemsetMapTest) flatMap
       decodeSimpleQuery                keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
       (_._1)

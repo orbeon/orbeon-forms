@@ -27,7 +27,7 @@ trait Branch extends Node {
    * branch and vice versa.
    */
   def jContent: ju.List[Node]
-  def content: Seq[Node] = jContent.asScala
+  def content: collection.Seq[Node] = jContent.asScala
 
   /**
    * Returns an iterator through the content nodes of this branch

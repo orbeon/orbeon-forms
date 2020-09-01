@@ -18,7 +18,7 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.compat._
-import scala.collection.{AbstractIterator, IterableLike, mutable}
+import scala.collection.{AbstractIterator, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
 
@@ -91,16 +91,19 @@ object CollectionUtils {
   // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
   def collectByErasedType[T: ClassTag](value: Any): Option[T] = Option(value) collect { case t: T => t }
 
-  implicit class IterableLikeOps[A, Repr](private val t: IterableLike[A, Repr]) extends AnyVal {
+  // 2020-09-02: For 2.13 compat, make these only operations on `List` as we are getting errors when
+  // trying to make this apply to any collection type. Once we migrate to 2.13, we can try to make
+  // this general again.
+  implicit class ListOps[A](private val t: List[A]) extends AnyVal {
 
-    def groupByKeepOrder[K](f: A => K)(implicit cbf: Factory[A, Repr]): List[(K, Repr)] = {
-      val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
+    def groupByKeepOrder[K](f: A => K): List[(K, List[A])] = {
+      val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, List[A]]]
       for (elem <- t) {
         val key = f(elem)
-        val bldr = m.getOrElseUpdate(key, cbf.newBuilder)
+        val bldr = m.getOrElseUpdate(key, List.newBuilder[A])
         bldr += elem
       }
-      val b = List.newBuilder[(K, Repr)]
+      val b = List.newBuilder[(K, List[A])]
       for ((k, v) <- m)
         b += ((k, v.result()))
 

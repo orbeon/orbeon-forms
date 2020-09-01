@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
-import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, LHHAValue}
+import org.orbeon.oxf.xforms.itemset.{ItemNode, LHHAValue}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
@@ -256,7 +256,7 @@ object FormRunnerMetadata {
     val selectedControls =
       controls.values flatMap (_.narrowTo[XFormsSingleNodeControl]) filter isBoundToFormDataInScope
 
-    val sortedControls =
+    val sortedControls: List[XFormsSingleNodeControl] =
       selectedControls.to(List).sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =

@@ -152,9 +152,6 @@ class ConcreteElement(var qname: QName)
   }
 
   override def containsElement: Boolean = {
-
-    import scala.collection.JavaConverters._
-
     internalContent.iterator.asScala exists {
       case _: Element => true
       case _          => false
@@ -790,8 +787,6 @@ class ConcreteElement(var qname: QName)
 
   // 1 external usage
   def clearContent(): Unit = {
-
-    import scala.collection.JavaConverters._
 
     val it = internalContent.iterator.asScala filter (_.isInstanceOf[Namespace])
 

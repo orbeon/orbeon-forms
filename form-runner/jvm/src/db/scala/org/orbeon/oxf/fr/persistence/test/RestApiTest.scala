@@ -29,11 +29,11 @@ import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Random
-import scala.xml.Elem
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -68,7 +68,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val FormURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
       // First time we put with "latest" (AKA unspecified)
-      val first = HttpCall.XML(<gaga1/>)
+      val first = HttpCall.XML(<gaga1/>.toDocument)
       HttpAssert.put(FormURL, Unspecified, first, 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
       HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
@@ -76,14 +76,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.del(FormURL, Specific(2), 404)
 
       // Put again with "latest" (AKA unspecified) updates the current version
-      val second = <gaga2/>
+      val second = <gaga2/>.toDocument
       HttpAssert.put(FormURL, Unspecified, HttpCall.XML(second), 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedCode(404))
 
       // Put with "next" to get two versions
-      val third = <gaga3/>
+      val third = <gaga3/>.toDocument
       HttpAssert.put(FormURL, Next, HttpCall.XML(third), 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
@@ -91,7 +91,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.get(FormURL, Specific(3), HttpAssert.ExpectedCode(404))
 
       // Put a specific version
-      val fourth = <gaga4/>
+      val fourth = <gaga4/>.toDocument
       HttpAssert.put(FormURL, Specific(1), HttpCall.XML(fourth), 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
@@ -105,7 +105,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.get(FormURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
 
       // After a delete the version number is reused
-      val fifth = <gaga5/>
+      val fifth = <gaga5/>.toDocument
       HttpAssert.put(FormURL, Next, HttpCall.XML(fifth), 201)
       HttpAssert.get(FormURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
       HttpAssert.get(FormURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(fifth),  Operations.None, Some(2)))
@@ -123,8 +123,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val FirstDataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
       // Storing for specific form version
-      val first = <gaga1/>
-      val myStage = Some(Stage("my-stage"))
+      val first = <gaga1/>.toDocument
+      val myStage = Some(Stage("my-stage", ""))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), expectedCode = 201, stage = myStage)
@@ -162,7 +162,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val SecondDataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
       val first         = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first"))
       val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
-      val data          = <gaga/>
+      val data          = <gaga/>.toDocument
 
       HttpAssert.put(FormURL      , Unspecified, HttpCall.XML(first) , 201)
       HttpAssert.put(FormURL      , Next       , HttpCall.XML(second), 201)
@@ -179,7 +179,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     provider     : Provider,
     permissions  : Permissions,
     title        : Option[String] = None
-  ): Elem =
+  ): Document =
     <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
       <xh:head>
         <xf:model id="fr-form-model">
@@ -193,7 +193,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
           </xf:instance>
         </xf:model>
       </xh:head>
-    </xh:html>
+    </xh:html>.toDocument
 
   /**
    * Data permissions
@@ -205,7 +205,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       implicit val externalContext = NetUtils.getExternalContext
 
       val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-      val data    = <data/>
+      val data    = <data/>.toDocument
       val guest   = None
       val clerk   = Some(Credentials("tom", Some("clerk")  , List(SimpleRole("clerk"  )), Nil))
       val manager = Some(Credentials("jim", Some("manager"), List(SimpleRole("manager")), Nil))
@@ -281,7 +281,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val dManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "d")), Nil))
 
       val dataURL   = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
-      val dataBody  = HttpCall.XML(<gaga/>)
+      val dataBody  = HttpCall.XML(<gaga/>.toDocument)
 
       // User can read their own data, as well as their managers
       HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
@@ -349,8 +349,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       implicit val externalContext = NetUtils.getExternalContext
 
       // Draft and non-draft are different
-      val first  = HttpCall.XML(<gaga1/>)
-      val second = HttpCall.XML(<gaga2/>)
+      val first  = HttpCall.XML(<gaga1/>.toDocument)
+      val second = HttpCall.XML(<gaga2/>.toDocument)
       val DataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val DraftURL = HttpCall.crudURLPrefix(provider) + "draft/123/data.xml"
       HttpAssert.put(DataURL,  Specific(1), first, 201)
@@ -371,7 +371,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), 201)
 
-      val expectedBody: Document =
+      val expectedBody =
         <forms>
             <form operations="read create">
                 <application-name>{provider.entryName}</application-name>
@@ -382,7 +382,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
                     <permission operations="read create"/>
                 </permissions>
             </form>
-        </forms>
+        </forms>.toDocument
 
       val (resultCode, _, resultBodyTry) = HttpCall.get(currentMetadataURL, Unspecified, None)
 

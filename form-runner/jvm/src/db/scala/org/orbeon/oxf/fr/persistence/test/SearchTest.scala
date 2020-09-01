@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.Specific
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
 class SearchTest
@@ -44,7 +45,7 @@ class SearchTest
               <my-section>
                 <my-field>42</my-field>
               </my-section>
-            </form>
+            </form>.toDocument
 
           val searchRequest =
             <search>
@@ -53,9 +54,10 @@ class SearchTest
                 <page-size>10</page-size>
                 <page-number>1</page-number>
                 <lang>en</lang>
-            </search>
+            </search>.toDocument
+
           val searchResult =
-            <documents search-total="0"/>
+            <documents search-total="0"/>.toDocument
 
           HttpCall.assertCall(
             HttpCall.SolicitedRequest(

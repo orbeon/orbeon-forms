@@ -110,7 +110,7 @@ class ResourcesPatcherTest
   describe("Resources consistency") {
     it(s"must ensure that resources in multiple languages are consistent") {
 
-      def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
+      def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == lang
 
       val urls = Seq(
         "oxf:/apps/fr/i18n/resources.xml",

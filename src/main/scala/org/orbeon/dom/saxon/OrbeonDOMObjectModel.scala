@@ -53,7 +53,7 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
 
   private def isRecognizedNodeClass(nodeClass: Class[_]) = classOf[Node].isAssignableFrom(nodeClass)
 
-  private def convertObjectToXPathValue(obj: Any, config: Configuration): ValueRepresentation = {
+  private def convertObjectToXPathValue(obj: Any, config: Configuration): NodeInfo = {
 
     def wrapDocument(node: Document) =
       new DocumentWrapper(node.getDocument, null, config)

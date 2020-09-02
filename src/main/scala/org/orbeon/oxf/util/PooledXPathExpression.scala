@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPath._
 import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation}
-import org.orbeon.saxon.sxpath.{XPathExpression, XPathVariable}
+import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathVariable}
 import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
 
@@ -42,21 +42,19 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
    * @param contextItems          List of Item
    * @param contextPosition       1-based current position
    */
-  def setContextItems(contextItems: ju.List[Item], contextPosition: Int): Unit = {
+  def setContextItems(contextItems: ju.List[Item], contextPosition: Int): Unit =
     if (contextPosition > 0 && contextPosition <= contextItems.size)
       setContextItem(contextItems.get(contextPosition - 1), contextPosition)
     else
       setContextItem(null, 0)
-  }
 
   def setContextItem(contextItem: Item, contextPosition: Int): Unit = {
     this.contextItem = contextItem
     this.contextPosition = contextPosition
   }
 
-  def setVariables(variableToValueMap: ju.Map[String, ValueRepresentation]): Unit = {
+  def setVariables(variableToValueMap: ju.Map[String, ValueRepresentation]): Unit =
     this.variableToValueMap = variableToValueMap
-  }
 
   /**
    * This *must* be called in a finally block to return the expression to the pool.
@@ -68,7 +66,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
       pool.returnObject(this)
   }
 
-  def internalExpression = expression.getInternalExpression
+  def internalExpression: Expression = expression.getInternalExpression
 
   /**
    * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
@@ -180,7 +178,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     expression.iterate(dynamicContext)
   }
 
-  // Called from xxf:evaluate-avt()
+  // Called from `xxf:evaluate-avt()
   def prepareExpression(xpathContext: XPathContextMajor): Expression = {
     expression.createDynamicContext(xpathContext, contextItem, contextPosition)
     prepareDynamicContext(xpathContext)
@@ -197,8 +195,8 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
       }
     }
 
-  // Called from exf:sort() and evaluate()
-  def newDynamicAndMajorContexts = {
+  // Called from `exf:sort()` and `evaluate()`
+  def newDynamicAndMajorContexts: (XPathDynamicContext, XPathContextMajor) = {
     val dynamicContext = expression.createDynamicContext(contextItem, contextPosition)
     (dynamicContext, dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor])
   }

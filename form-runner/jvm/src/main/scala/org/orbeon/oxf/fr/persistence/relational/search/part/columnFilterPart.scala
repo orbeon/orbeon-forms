@@ -53,7 +53,7 @@ object columnFilterPart {
               request.columns.flatMap { case Column(path, matchType) =>
                 matchType match {
                   case FilterType.None              => List.empty
-                  case FilterType.Exact(filter)     => path :: List(filter.toLowerCase)
+                  case FilterType.Exact(filter)     => path :: List(filter)
                   case FilterType.Substring(filter) => path :: List(s"%${filter.toLowerCase}%")
                   case FilterType.Token(tokens)     => path :: tokens.map(token => s"% $token %")
                 }

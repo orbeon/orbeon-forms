@@ -469,7 +469,7 @@ object ItemsetSupport {
     val contextStack = container.getContextStack
     withBinding(childElement, sourceEffectiveId, scope) { _ =>
       val containsHTML = Array[Boolean](false)
-      XFormsUtils.getElementValue(
+      XFormsElementValue.getElementValue(
         container,
         contextStack,
         sourceEffectiveId,

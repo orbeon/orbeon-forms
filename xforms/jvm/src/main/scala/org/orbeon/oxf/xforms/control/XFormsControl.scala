@@ -303,7 +303,7 @@ object XFormsControl {
       }
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
-        if (! isStartElement || ! XFormsUtils.VoidElements(localname)) {
+        if (! isStartElement || ! XFormsElementValue.VoidElements(localname)) {
           // We serialize to HTML: don't close elements that just opened (will cover `<br>`, `<hr>`, etc.). Be sure not
           // to drop closing elements of other tags though!
           sb.append("</")

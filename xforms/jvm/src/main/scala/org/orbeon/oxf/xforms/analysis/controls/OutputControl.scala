@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StaticStateContext, XPathAnalysis}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ValueControl(staticStateContext, element, parent, preceding, scope)
@@ -43,7 +43,7 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
 
   val staticValue: Option[String] =
     (! isImageMediatype && ! isDownloadAppearance && LHHAAnalysis.hasStaticValue(staticStateContext, element)) option
-      XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
+      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
 
   // Q: Do we need to handle the context anyway?
   override protected def computeContextAnalysis: Option[XPathAnalysis] = staticValue.isEmpty flatOption super.computeContextAnalysis

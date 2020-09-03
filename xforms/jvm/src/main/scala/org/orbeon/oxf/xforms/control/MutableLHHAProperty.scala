@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
@@ -128,7 +128,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
       // LHHA is direct child of control, evaluate within context
       contextStack.setBinding(control.bindingContext)
       withBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope) { _ =>
-        XFormsUtils.getElementValue(
+        XFormsElementValue.getElementValue(
           control.lhhaContainer,
           contextStack,
           control.effectiveId,

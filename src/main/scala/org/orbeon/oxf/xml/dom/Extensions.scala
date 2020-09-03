@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom
 
+import java.net.URI
 import java.{util => ju}
 
 import org.orbeon.dom._
@@ -105,6 +106,51 @@ object Extensions {
           case text: Text => visitorListener.text(text)
           case _ => // Ignore as we don't need other node types for now
         }
+    }
+
+    def ancestorIterator(includeSelf: Boolean): Iterator[Element] = new Iterator[Element] {
+
+      private var current = if (includeSelf) e else e.getParent
+
+      override def hasNext: Boolean = current ne null
+
+      override def next(): Element = {
+        val r = current
+        current = r.getParent
+        r
+      }
+    }
+
+    /**
+     * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
+     * the resolution.
+     *
+     * @param baseURI optional base URI
+     * @param uri     URI to resolve
+     * @return resolved URI
+     */
+    def resolveXMLBase(baseURI: Option[String], uri: String): URI = {
+
+      // Allow for null `Element` (why? and what about `baseURI` in this case?)
+      if (e == null)
+        return new URI(uri)
+
+      // Collect `xml:base` attributes
+      val xmlBaseValuesLeafToRootIt =
+        ancestorIterator(includeSelf = true) flatMap
+          (_.attributeValueOpt(XMLConstants.XML_BASE_QNAME))
+
+      val urisRootToLeaf =
+        baseURI.iterator ++ xmlBaseValuesLeafToRootIt.toArray.reverseIterator ++ Iterator(uri)
+
+      urisRootToLeaf.foldLeft(null: URI) {
+        case (r, s) =>
+          val currentXMLBaseURI = new URI(s)
+          if (r eq null)
+            currentXMLBaseURI
+          else
+            r.resolve(currentXMLBaseURI)
+      }
     }
   }
 

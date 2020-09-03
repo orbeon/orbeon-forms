@@ -247,7 +247,7 @@ trait SelectionControlTrait
                 val containsHTML = Array[Boolean](false)
 
                 val valueOpt =
-                  XFormsUtils.getStaticChildElementValue(
+                  XFormsElementValue.getStaticChildElementValue(
                     containerScope.fullPrefix,
                     lhhaElem,
                     isFull,
@@ -282,10 +282,10 @@ trait SelectionControlTrait
 
                 val rawValue =
                   element.elementOpt(XFORMS_VALUE_QNAME) map (
-                    XFormsUtils.getStaticChildElementValue(
+                    XFormsElementValue.getStaticChildElementValue(
                       containerScope.fullPrefix,
                       _,
-                      false,
+                      acceptHTML = false,
                       null
                     )
                   ) getOrElse (

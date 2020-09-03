@@ -55,7 +55,7 @@ object SubmissionHeaders {
             xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
 
           withBinding(element, sourceEffectiveId, scope) { _ =>
-            XFormsUtils.getElementValue(
+            XFormsElementValue.getElementValue(
               xblContainer,
               contextStack,
               sourceEffectiveId,

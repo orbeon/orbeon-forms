@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
@@ -48,7 +48,7 @@ class XFormsLHHAControl(
   override def computeValue: String = {
 
     def fromDynamicContent =
-      XFormsUtils.getElementValue(
+      XFormsElementValue.getElementValue(
         lhhaContainer,
         getContextStack |!> (_.setBinding(bindingContext)),
         effectiveId,

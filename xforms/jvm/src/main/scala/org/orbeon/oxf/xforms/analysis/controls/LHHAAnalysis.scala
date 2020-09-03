@@ -183,7 +183,7 @@ class LHHAAnalysis(
   //
   val staticValue: Option[String] =
     LHHAAnalysis.hasStaticValue(staticStateContext, element) option
-      XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
+      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
   def debugOut(): Unit =
     if (staticValue.isDefined)

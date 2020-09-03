@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import java.net.URI
+
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
@@ -27,6 +29,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes
+import dom.Extensions._
 
 import scala.collection.JavaConverters._
 
@@ -129,7 +132,7 @@ object XBLBindingBuilder {
   ): Document =
     withDebug("annotating tree") {
 
-      val baseURI = XFormsUtils.resolveXMLBase(boundElement.orNull, null, ".").toString
+      val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
       val fullAnnotatedTree = annotateShadowTree(partAnalysis.metadata, rawTree, containerScope.fullPrefix)
 
       TransformerUtils.writeDom4j(
@@ -283,7 +286,7 @@ object XBLBindingBuilder {
       ignoreRoot     : Boolean
     ): (SAXStore, Document) = withDebug("annotating and extracting tree") {
 
-      val baseURI = XFormsUtils.resolveXMLBase(boundElement.orNull, null, ".").toString
+      val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
 
       val (templateTree, compactTree) = {
 

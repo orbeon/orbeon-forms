@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
@@ -71,7 +71,7 @@ class XFormsMessageAction extends XFormsAction {
 
     // Get message value
     val messageValue =
-      XFormsUtils.getElementValue(
+      XFormsElementValue.getElementValue(
         actionContext.interpreter.container,
         actionContext.interpreter.actionXPathContext,
         actionContext.interpreter.getSourceEffectiveId(actionContext.element),

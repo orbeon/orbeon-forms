@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.processor
 import java.util.concurrent.Callable
 import java.{util => ju}
 
-import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
@@ -37,6 +37,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
+import org.orbeon.oxf.xforms.event.events.{KeyboardEvent, XXFormsDndEvent, XXFormsLoadEvent, XXFormsUploadDoneEvent}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvents}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
@@ -44,7 +45,8 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{DelayedEvent, Load, Message}
+import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
@@ -71,6 +73,7 @@ object XFormsServer {
   def outputAjaxResponse(
     containingDocument        : XFormsContainingDocument,
     eventFindings             : ClientEvents.EventsFindings,
+    allEvents                 : Boolean,
     beforeFocusedControlIdOpt : Option[String],
     repeatHierarchyOpt        : Option[String],
     requestDocument           : Document,
@@ -96,7 +99,7 @@ object XFormsServer {
         locally {
           // Create a containing document in the initial state
           val initialContainingDocumentOpt =
-            eventFindings.allEvents option {
+            allEvents option {
               // NOTE: Document is removed from cache if it was found there. This may or may not be desirable.
               // Set disableUpdates = true so that we don't needlessly try to copy the controls tree. Also addresses:
               // #54: "Browser back causes server exception" https://github.com/orbeon/orbeon-forms/issues/54
@@ -260,16 +263,17 @@ object XFormsServer {
 
   def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
 
-    val uuid = XFormsStateManager.getRequestUUID(request) ensuring (_ ne null)
+    val uuid = getRequestUUID(request) ensuring (_ ne null)
 
     val sequenceElement =
-      request.getRootElement.element(XXFORMS_SEQUENCE_QNAME) ensuring (_ ne null)
+      request.getRootElement.elementOpt(XXFORMS_SEQUENCE_QNAME) getOrElse
+        (throw new IllegalArgumentException)
 
     val sequenceOpt =
       sequenceElement.getTextTrim.trimAllToOpt map (_.toLong)
 
     val encodedStaticStateOpt =
-      Option(request.getRootElement.element(XXFORMS_STATIC_STATE_QNAME)) flatMap
+      request.getRootElement.elementOpt(XXFORMS_STATIC_STATE_QNAME) flatMap
         (_.getTextTrim.trimAllToOpt)
 
     val qName =
@@ -279,13 +283,61 @@ object XFormsServer {
         XXFORMS_DYNAMIC_STATE_QNAME
 
     val encodedDynamicStateOpt =
-      Option(request.getRootElement.element(qName)) flatMap
+      request.getRootElement.elementOpt(qName) flatMap
         (_.getTextTrim.trimAllToOpt)
 
     RequestParameters(uuid, sequenceOpt, encodedStaticStateOpt, encodedDynamicStateOpt)
   }
 
+  def extractWireEvents(actionElement: Element): List[WireAjaxEvent] =
+    actionElement.elements(XXFORMS_EVENT_QNAME).toList map extractWireEvent
+
   private object Private {
+
+    // Only a few events specify custom properties that can be set by the client
+    val AllStandardProperties =
+      XXFormsDndEvent.StandardProperties        ++
+      KeyboardEvent.StandardProperties          ++
+      XXFormsUploadDoneEvent.StandardProperties ++
+      XXFormsLoadEvent.StandardProperties
+
+    def extractWireEvent(eventElem: Element): WireAjaxEvent = {
+
+      val eventName   = eventElem.attributeValue("name")
+      val targetIdOpt = eventElem.attributeValueOpt("source-control-id")
+      val properties  = eventElem.elements(XXFORMS_PROPERTY_QNAME) map { e => (e.attributeValue("name"), e.getText) } toMap
+
+      def standardPropertiesIt =
+        for {
+          attributeNames <- AllStandardProperties.get(eventName).iterator
+          attributeName  <- attributeNames
+          attributeValue <- eventElem.attributeValueOpt(attributeName)
+        } yield
+          attributeName -> attributeValue
+
+      val allProperties = properties ++ standardPropertiesIt
+
+      targetIdOpt match {
+        case Some(targetId) =>
+          WireAjaxEventWithTarget(
+            eventName,
+            targetId,
+            allProperties
+          )
+        case None =>
+          WireAjaxEventWithoutTarget(
+            eventName,
+            allProperties
+          )
+      }
+    }
+
+    def getRequestUUID(request: Document): String = {
+      val uuidElement =
+        request.getRootElement.elementOpt(XFormsNames.XXFORMS_UUID_QNAME) getOrElse
+          (throw new IllegalArgumentException)
+      uuidElement.getTextTrim.trimAllToNull
+    }
 
     def diffControls(
       containingDocument             : XFormsContainingDocument,
@@ -528,20 +580,23 @@ class XFormsServer extends ProcessorImpl {
     if (logRequestResponse)
       debug("ajax request", List("body" -> requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
 
-    // Get action
-    val actionElement = requestDocument.getRootElement.element(XXFORMS_ACTION_QNAME)
+    val parameters = extractParameters(requestDocument, isInitialState = false)
 
-    val remainingClientEvents =
+    val remainingClientEvents = {
+
+      val actionElement   = requestDocument.getRootElement.elementOpt(XXFORMS_ACTION_QNAME)
+      val extractedEvents = actionElement map extractWireEvents getOrElse Nil
+
       xmlReceiverOpt match {
         case Some(xmlReceiver) =>
 
           val remainingClientEvents =
             ClientEvents.handleQuickReturnEvents(
               xmlReceiver,
+              parameters.uuid,
               request,
-              requestDocument,
               logRequestResponse,
-              ClientEvents.extractLocalEvents(actionElement)
+              extractedEvents
             )
 
           if (remainingClientEvents.isEmpty)
@@ -549,8 +604,9 @@ class XFormsServer extends ProcessorImpl {
 
           remainingClientEvents
         case None =>
-          ClientEvents.extractLocalEvents(actionElement)
+          extractedEvents collect { case e: WireAjaxEventWithTarget => e }
       }
+    }
 
     // Was the following, but this is not true in tests right now:
     // `request.getMethod == HttpMethod.POST && ContentTypes.isXMLContentType(request.getContentType)`
@@ -558,9 +614,6 @@ class XFormsServer extends ProcessorImpl {
 
     // Find an output stream for xf:submission[@replace = 'all']
     val response = PipelineResponse.getResponse(xmlReceiverOpt.orNull, externalContext)
-
-    // The following throws if the session has expired
-    val parameters = extractParameters(requestDocument, isInitialState = false)
 
     // We don't wait on the lock for an Ajax request. But for a simulated request on GET, we do wait. See:
     // - https://github.com/orbeon/orbeon-forms/issues/2071
@@ -616,8 +669,25 @@ class XFormsServer extends ProcessorImpl {
                         containingDocument.beforeExternalEvents(response, isAjaxRequest)
 
                         // Dispatch the events
+
+                        // Flatten client and server events
+                        // NOTE: Only the upload now requires server events
+                        val allClientAndServerEvents =
+                          remainingClientEvents flatMap {
+                            case e @ WireAjaxEventWithoutTarget(EventNames.XXFormsServerEvents, _) =>
+                              e.valueOpt.toList flatMap (v =>
+                                extractWireEvents(EncodeDecode.decodeXML(v, true).getRootElement)
+                              ) collect {
+                                case e: WireAjaxEventWithTarget => e -> true
+                              }
+                            case e: WireAjaxEventWithTarget =>
+                              List(e -> false)
+                            case _ =>
+                              Nil
+                          }
+
                         val result =
-                          ClientEvents.processEvents(containingDocument, remainingClientEvents)
+                          ClientEvents.processEvents(containingDocument, allClientAndServerEvents)
 
                         // End external events
                         // The following will process async submission and delayed events
@@ -671,10 +741,15 @@ class XFormsServer extends ProcessorImpl {
 
                               val responseReceiver = new TeeXMLReceiver(receivers)
 
+                              // Whether we got a request for all events
+                              val allEvents = remainingClientEvents exists
+                                (_.eventName == EventNames.XXFormsAllEventsRequired)
+
                               // Prepare and/or output response
                               XFormsServer.outputAjaxResponse(
                                 containingDocument        = containingDocument,
                                 eventFindings             = eventsFindingsOpt getOrElse ClientEvents.EmptyEventsFindings,
+                                allEvents                 = allEvents,
                                 beforeFocusedControlIdOpt = beforeFocusedControlIdOpt,
                                 repeatHierarchyOpt        = beforeRepeatHierarchyOpt,
                                 requestDocument           = requestDocument,

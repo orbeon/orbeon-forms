@@ -17,6 +17,7 @@ import cats.syntax.option._
 import io.circe.generic.auto._
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.facade.Controls
+import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -77,8 +78,6 @@ object AjaxEvent {
         "eventName" -> eventName
       )
     )
-
-  private val EventsWithoutTargetId = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
 }
 
 @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
@@ -150,6 +149,21 @@ class AjaxEvent(args: js.Any*) extends js.Object {
 
   scribe.debug(toString)
 
+  def toWireAjaxEvent: WireAjaxEvent =
+    targetIdOpt match {
+      case Some(targetId) =>
+        WireAjaxEventWithTarget(
+          eventName,
+          targetId,
+          properties mapValues (_.toString) toMap
+        )
+      case None =>
+        WireAjaxEventWithoutTarget(
+          eventName,
+          properties mapValues (_.toString) toMap
+        )
+    }
+
   override def toString =
-    s"AjaxServerEvent(eventName = `$eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties map (kv => s"${kv._1} => ${kv._2}") mkString "/"}`)"
+    s"AjaxServerEvent(eventName = `$eventName`, targetIdOpt = `$targetIdOpt`, form = `${form.id}`, incremental = `$incremental`, ignoreErrors = `$ignoreErrors`, showProgress = `$showProgress`, properties = `${ properties.iterator map (kv => s"${kv._1} => ${kv._2}") mkString "/"}`)"
 }

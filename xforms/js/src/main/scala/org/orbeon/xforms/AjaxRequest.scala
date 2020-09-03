@@ -17,9 +17,8 @@ import java.{lang => jl}
 
 import cats.data.NonEmptyList
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.xforms.EventNames.XXFormsUploadProgress
-
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
+import shapeless.syntax.typeable.typeableOps
 
 
 object AjaxRequest {
@@ -27,7 +26,11 @@ object AjaxRequest {
   private val Indent: String = " " * 4
 
   // NOTE: Later we can switch this to an automatically-generated protocol
-  def buildXmlRequest(currentFormId: String, eventsToSend: NonEmptyList[AjaxEvent]): String = {
+  def buildXmlRequest(
+    currentFormId     : String,
+    eventsToSend      : NonEmptyList[WireAjaxEvent],
+    sequenceNumberOpt : Option[Int]
+  ): String = {
 
     val requestDocumentString = new jl.StringBuilder
 
@@ -50,29 +53,10 @@ object AjaxRequest {
     requestDocumentString.append("</xxf:uuid>")
     newLine()
 
-    val mustIncludeSequence =
-      eventsToSend exists { event =>
-        event.eventName != XXFormsUploadProgress && event.eventName != EventNames.XXFormsSessionHeartbeat
-      }
-
     // Still send the element name even if empty as this is what the schema and server-side code expects
     indent(1)
     requestDocumentString.append("<xxf:sequence>")
-    if (mustIncludeSequence) {
-
-      val currentSequenceNumber = StateHandling.getSequence(currentFormId)
-      requestDocumentString.append(currentSequenceNumber)
-
-      // `require(EventQueue.ajaxRequestInProgress == false)`
-      AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("sequence number") foreach { _ =>
-        // Increment sequence number, now that we know the server processed our request
-        // If we were to do this after the request was processed, we might fail to increment the sequence
-        // if we were unable to process the response (i.e. JS error). Doing this here, before the
-        // response is processed, we incur the risk of incrementing the counter while the response is
-        // garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
-        StateHandling.updateSequence(currentFormId, currentSequenceNumber.toInt + 1)
-      }
-    }
+    sequenceNumberOpt foreach requestDocumentString.append
     requestDocumentString.append("</xxf:sequence>")
     newLine()
 
@@ -90,9 +74,11 @@ object AjaxRequest {
       indent(2)
       requestDocumentString.append("<xxf:event")
       requestDocumentString.append(s""" name="${event.eventName}"""")
-      event.targetIdOpt. foreach { targetId =>
-        requestDocumentString.append(s""" source-control-id="${Page.deNamespaceIdIfNeeded(currentFormId, targetId)}"""")
+
+      event.narrowTo[WireAjaxEventWithTarget] foreach { e =>
+        requestDocumentString.append(s""" source-control-id="${Page.deNamespaceIdIfNeeded(currentFormId, e.targetId)}"""")
       }
+
       requestDocumentString.append(">")
 
       if (event.properties.nonEmpty) {
@@ -101,7 +87,7 @@ object AjaxRequest {
         newLine()
         event.properties foreach { case (key, value) =>
 
-          val stringValue = value.toString // support number and boolean
+          val stringValue = value // support number and boolean
 
           indent(3)
           requestDocumentString.append(s"""<xxf:property name="${key.escapeXmlForAttribute}">""")

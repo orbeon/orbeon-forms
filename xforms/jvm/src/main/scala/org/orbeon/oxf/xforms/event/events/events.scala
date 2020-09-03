@@ -111,7 +111,7 @@ class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
 }
 
 object XXFormsLoadEvent {
-  val StandardProperties = Map(XXFORMS_LOAD -> Seq("resource"))
+  val StandardProperties = Map(XXFORMS_LOAD -> List("resource"))
 }
 
 // NOTE: Event default behavior done at target so event is left cancelable.
@@ -145,7 +145,7 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
 
 object XXFormsUploadDoneEvent {
   val StandardProperties = Map(
-    EventNames.XXFormsUploadDone -> Seq("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
+    EventNames.XXFormsUploadDone -> List("file", "filename", Headers.ContentTypeLower, Headers.ContentLengthLower)
   )
 }
 

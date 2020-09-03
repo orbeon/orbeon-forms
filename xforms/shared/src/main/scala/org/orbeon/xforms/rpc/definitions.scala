@@ -35,3 +35,22 @@ case class Initializations(
   pollEvent              : Option[PollEvent],
   userScripts            : List[UserScript]
 )
+
+sealed trait WireAjaxEvent {
+
+  def eventName  : String
+  def properties : Map[String, String]
+
+  def valueOpt: Option[String] = properties.get("value")
+}
+
+case class WireAjaxEventWithTarget(
+  eventName  : String,
+  targetId   : String,
+  properties : Map[String, String]
+) extends WireAjaxEvent
+
+case class WireAjaxEventWithoutTarget(
+  eventName  : String,
+  properties : Map[String, String]
+) extends WireAjaxEvent

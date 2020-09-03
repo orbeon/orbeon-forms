@@ -17,12 +17,13 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
+import org.orbeon.xforms.rpc.LightClientServerChannel
 import org.scalajs.dom
-import org.scalajs.dom.experimental.AbortController
 import org.scalajs.dom.ext._
-import org.scalajs.dom.{FormData, html}
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.concurrent.duration._
@@ -31,8 +32,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
-import scala.scalajs.js.{timers, |}
-import scala.util.{Failure, Success}
+import scala.scalajs.js.timers
 
 
 object AjaxClient {
@@ -103,7 +103,6 @@ object AjaxClient {
   def handleFailure(
     response     : String Either dom.Document,
     formId       : String,
-    requestBody  : String | FormData,
     ignoreErrors : Boolean
   ): Boolean = {
 
@@ -166,6 +165,7 @@ object AjaxClient {
         true
 
       case _ =>
+        // This will cause a retry for event requests (but not uploads)
         false
     }
   }
@@ -299,7 +299,6 @@ object AjaxClient {
     val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis
 
     var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
-    var requestTryCount       : Int     = 0                  // attempts to run the current Ajax request done so far
   }
 
   private object Private {
@@ -331,10 +330,11 @@ object AjaxClient {
     }
 
     def handleResponse(
-      responseXML  : dom.Document,
-      formId       : String,
-      showProgress : Boolean,
-      ignoreErrors : Boolean
+      responseXML        : dom.Document,
+      formId             : String,
+      requestSequenceOpt : Option[Int],
+      showProgress       : Boolean,
+      ignoreErrors       : Boolean
     ): Unit = {
 
       // This is a little tricky. Some code registers callbacks or `Future`s for the Ajax response received.
@@ -346,6 +346,10 @@ object AjaxClient {
 
       callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
 
+        requestSequenceOpt foreach { requestSequence =>
+          StateHandling.updateSequence(formId, requestSequence + 1)
+        }
+
         scribe.debug("before `handleResponseDom`")
         AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
         scribe.debug("after `handleResponseDom`")
@@ -353,6 +357,8 @@ object AjaxClient {
         // Reset changes, as changes are included in this batch of events
         AjaxFieldChangeTracker.afterResponseProcessed()
         ServerValueStore.purgeExpired()
+
+        // `require(EventQueue.ajaxRequestInProgress == false)`
 
         EventQueue.ajaxRequestInProgress = false
         Page.loadingIndicator().requestEnded(showProgress)
@@ -366,63 +372,6 @@ object AjaxClient {
 
       // And then we fire the callback, which triggers both direct callbacks and `Future`s
       ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, formId))
-    }
-
-    // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
-    // a maximum delay.
-    def retryRequestAfterDelay(requestFunction: () => Unit): Unit = {
-      val delay = Math.min(Properties.retryDelayIncrement.get() * (EventQueue.requestTryCount - 1), Properties.retryMaxDelay.get())
-      if (delay == 0)
-        requestFunction()
-      else
-        timers.setTimeout(delay.millis)(requestFunction())
-    }
-
-    def asyncAjaxRequest(
-      requestFormId : String,
-      requestBody   : String | FormData,
-      showProgress  : Boolean,
-      ignoreErrors  : Boolean
-    ): Unit = {
-
-      val requestForm = Page.getForm(requestFormId)
-      EventQueue.requestTryCount += 1
-
-      // Timeout support using `AbortController`
-      val controller = new AbortController
-      js.timers.setTimeout(Properties.delayBeforeAjaxTimeout.get().millis) {
-        controller.abort()
-      }
-
-      EventQueue.ajaxRequestInProgress = true
-      Page.loadingIndicator().requestStarted(showProgress)
-
-      Support.fetchText(
-        url         = requestForm.xformsServerPath,
-        requestBody = requestBody,
-        contentType = "application/xml".some,
-        formId      = requestFormId,
-        abortSignal = controller.signal.some
-      ).onComplete { response =>
-
-        // Ignore response if for a form we don't have anymore on the page
-        if (dom.document.body.contains(requestForm.elem)) {
-          response match {
-            case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
-              // We ignore HTTP status and just check that we have a well-formed response document
-              handleResponse(responseXml, requestFormId, showProgress, ignoreErrors)
-            case Success((503, _, _)) =>
-              // We return an explicit 503 when the Ajax server is still busy
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
-            case Success((_, responseText, responseXmlOpt)) =>
-              if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
-                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
-            case Failure(_) =>
-              logAndShowError(_, requestFormId, ignoreErrors)
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
-          }
-        }
-      }
     }
 
     def findEventsToProcess(originalEvents: NonEmptyList[AjaxEvent]): Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
@@ -535,8 +484,6 @@ object AjaxClient {
 
       val currentFormId = currentForm.id
 
-      EventQueue.requestTryCount = 0
-
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)
 
@@ -547,10 +494,37 @@ object AjaxClient {
       if (foundEventOtherThanHeartBeat)
         Page.getForm(currentFormId).clearDiscardableTimerIds()
 
-      // Don't ignore errors if any of the events tell us not to ignore errors
-      // So we only ignore errors if all of the events tell us to ignore errors
+      // Don't ignore errors if *any* of the events tell us not to ignore errors.
+      // (Corollary: We only ignore errors if *all* of the events tell us to ignore errors.)
       val ignoreErrors = events.forall(_.ignoreErrors)
-      asyncAjaxRequest(currentFormId, AjaxRequest.buildXmlRequest(currentFormId, events), showProgress, ignoreErrors)
+
+      // This is set here, and cleared only once `handleResponse` completes
+      EventQueue.ajaxRequestInProgress = true
+
+      val eventsToSend = events map (_.toWireAjaxEvent)
+
+      val mustIncludeSequence =
+        eventsToSend exists { event =>
+          ! EventNames.EventsWithoutSequence(event.eventName)
+        }
+
+      val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentFormId).toInt
+
+      LightClientServerChannel.sendEvents(
+        requestFormId     = currentFormId,
+        eventsToSend      = eventsToSend,
+        sequenceNumberOpt = sequenceNumberOpt,
+        showProgress      = showProgress,
+        ignoreErrors      = ignoreErrors
+      ) foreach { responseXml =>
+        handleResponse(
+          responseXml,
+          currentFormId,
+          sequenceNumberOpt,
+          showProgress,
+          ignoreErrors
+        )
+      }
     }
   }
 }

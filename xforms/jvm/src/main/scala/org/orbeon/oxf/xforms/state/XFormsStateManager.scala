@@ -16,19 +16,16 @@ package org.orbeon.oxf.xforms.state
 import java.util.concurrent.locks.{Lock, ReentrantLock}
 import java.util.concurrent.{ConcurrentLinkedQueue, TimeUnit}
 
-import org.orbeon.dom.Document
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
-import org.orbeon.xforms.XFormsNames
 
 import scala.collection.JavaConverters._
 
@@ -58,7 +55,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
   val Logger  = Loggers.getIndentedLogger("state")
 
   // For Java callers
-  def instance = XFormsStateManager
+  def instance: XFormsStateManager.type = XFormsStateManager
 
   // Information about a document tied to the session.
   case class SessionDocument(uuid: String) {
@@ -73,16 +70,10 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
   }
 
-  def getRequestUUID(request: Document): String = {
-    val uuidElement = request.getRootElement.element(XFormsNames.XXFORMS_UUID_QNAME)
-    assert(uuidElement != null)
-    uuidElement.getTextTrim.trimAllToNull
-  }
-
   def getDocumentLock(uuid: String): Option[ReentrantLock] =
     getSessionDocument(uuid) map (_.lock)
 
-  def getDocumentLockOrNull(uuid: String) =
+  def getDocumentLockOrNull(uuid: String): ReentrantLock =
     getDocumentLock(uuid).orNull
 
   /**
@@ -362,7 +353,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         case value: SessionDocument => value
       }
 
-    def getUUIDSessionKey(uuid: String) =
+    def getUUIDSessionKey(uuid: String): String =
       XFormsStateManagerUuidKeyPrefix + uuid
 
     // Tricky: if `onRemove()` is called upon session expiration, there might not be an `ExternalContext`. But it's fine,

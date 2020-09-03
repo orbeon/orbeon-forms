@@ -1,5 +1,3 @@
-package org.orbeon.xforms
-
 /**
  * Copyright (C) 2007 Orbeon, Inc.
  *
@@ -13,41 +11,46 @@ package org.orbeon.xforms
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+package org.orbeon.xforms
+
+
 object EventNames {
 
   private val Prefix = "xxforms-upload-"
 
-  val XXFormsUploadStart = Prefix + "start"
-  val XXFormsUploadProgress = Prefix + "progress"
-  val XXFormsUploadCancel = Prefix + "cancel"
-  val XXFormsUploadDone = Prefix + "done"
-  val XXFormsUploadError = Prefix + "error"
+  val XXFormsUploadStart       = Prefix + "start"
+  val XXFormsUploadProgress    = Prefix + "progress"
+  val XXFormsUploadCancel      = Prefix + "cancel"
+  val XXFormsUploadDone        = Prefix + "done"
+  val XXFormsUploadError       = Prefix + "error"
 
   val XXFormsAllEventsRequired = "xxforms-all-events-required"
-  val XXFormsSessionHeartbeat = "xxforms-session-heartbeat"
-  val XXFormsServerEvents = "xxforms-server-events"
-  val XXFormsPoll = "xxforms-poll"
-  val XXFormsValue = "xxforms-value"
-  val XXFormsRpcRequest = "xxforms-rpc-request"
-  val XXFormsDnD = "xxforms-dnd"
+  val XXFormsSessionHeartbeat  = "xxforms-session-heartbeat"
+  val XXFormsServerEvents      = "xxforms-server-events"
+  val XXFormsPoll              = "xxforms-poll"
+  val XXFormsValue             = "xxforms-value"
+  val XXFormsRpcRequest        = "xxforms-rpc-request"
+  val XXFormsDnD               = "xxforms-dnd"
 
-  val XFormsFocus = "xforms-focus"
+  val XFormsFocus              = "xforms-focus"
 
-  val Change = "change"
-  val KeyPress = "keypress"
-  val KeyDown = "keydown"
-  val KeyUp = "keyup"
-  val TouchStart = "touchstart"
-  val FocusIn = "focusin"
-  val FocusOut = "focusout"
-  val DOMContentLoaded = "DOMContentLoaded"
-  val DOMActivate = "DOMActivate"
+  val Change                   = "change"
+  val KeyPress                 = "keypress"
+  val KeyDown                  = "keydown"
+  val KeyUp                    = "keyup"
+  val TouchStart               = "touchstart"
+  val FocusIn                  = "focusin"
+  val FocusOut                 = "focusout"
+  val DOMContentLoaded         = "DOMContentLoaded"
+  val DOMActivate              = "DOMActivate"
 
-  val KeyTextPropertyName = "text"
+  val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
-
-  val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 
   val InteractiveReadyState = "interactive"
   val CompleteReadyState = "complete"
+
+  val EventsWithoutTargetId: Set[String] = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
+  val EventsWithoutSequence: Set[String] = Set(XXFormsUploadProgress, XXFormsSessionHeartbeat)
+  val KeyboardEvents       : Set[String] = Set(KeyPress, KeyDown, KeyUp)
 }

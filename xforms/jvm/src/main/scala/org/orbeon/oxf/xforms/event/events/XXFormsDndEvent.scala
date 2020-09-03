@@ -26,5 +26,5 @@ class XXFormsDndEvent(target: XFormsEventTarget, properties: PropertyGetter)
 }
 
 object XXFormsDndEvent {
-  val StandardProperties = Map(XXFORMS_DND -> Seq("dnd-start", "dnd-end"))
+  val StandardProperties = Map(XXFORMS_DND -> List("dnd-start", "dnd-end"))
 }

@@ -107,6 +107,7 @@ object XFormsToXHTML {
       XFormsServer.outputAjaxResponse(
         containingDocument        = containingDocument,
         eventFindings             = ClientEvents.EmptyEventsFindings,
+        allEvents                 = false,
         beforeFocusedControlIdOpt = None,
         repeatHierarchyOpt        = None,
         requestDocument           = null,

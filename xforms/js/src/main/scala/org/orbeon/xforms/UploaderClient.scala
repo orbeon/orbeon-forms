@@ -161,7 +161,7 @@ object UploaderClient {
         case Success((_, responseText, responseXmlOpt)) =>
           // Here we can at least get 413, 409, and 500 status codes at least as those are explicitly set by the server
           cancel(doAbort = false, EventNames.XXFormsUploadError)
-          AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, formData, ignoreErrors = false)
+          AjaxClient.handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors = false)
         case Failure(_) =>
           // NOTE: can be an `AbortError` (to verify)
           cancel(doAbort = false, EventNames.XXFormsUploadError)

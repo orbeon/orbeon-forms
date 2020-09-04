@@ -14,7 +14,7 @@
 <project name="orbeon" default="orbeon-dev-war" xmlns:xdb="http://exist-db.org/ant">
 
     <!-- Properties to update when version number changes -->
-    <property name="version.number" value="2019.2.3-SNAPSHOT"/>
+    <property name="version.number" value="2020.1-SNAPSHOT"/>
     <property name="edition"        value="CE"/>
 
     <property file="build-local.properties"/>

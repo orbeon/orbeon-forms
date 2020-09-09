@@ -177,7 +177,7 @@ object ItemsetSupport {
             private var currentContainer: ItemContainer = result
 
             private def getElementEffectiveId(elem: Element): String =
-              XFormsId.getRelatedEffectiveId(select1Control.getEffectiveId, XFormsUtils.getElementId(elem))
+              XFormsId.getRelatedEffectiveId(select1Control.getEffectiveId, elem.idOrNull)
 
             def startElement(elem: Element): Unit = {
 

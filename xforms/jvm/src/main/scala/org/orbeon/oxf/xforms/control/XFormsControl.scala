@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.Constants.RepeatSeparatorString
@@ -103,7 +104,7 @@ class XFormsControl(
     container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
 
   final def getChildElementScope(element: Element): Scope =
-    part.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
+    part.scopeForPrefixedId(container.getFullPrefix + element.idOrNull)
 
   // Update this control's effective id based on the parent's effective id
   def updateEffectiveId(): Unit = {

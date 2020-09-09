@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 object ControlAnalysisFactory {
 
@@ -310,7 +310,7 @@ object ControlAnalysisFactory {
     require(scope ne null)
 
     val factory =
-      context.partAnalysis.metadata.findAbstractBindingByPrefixedId(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement))) match {
+      context.partAnalysis.metadata.findAbstractBindingByPrefixedId(scope.prefixedIdForStaticId(controlElement.idOrNull)) match {
         case Some(abstractBinding) => ComponentFactories.get(abstractBinding.modeValue, abstractBinding.modeLHHA)
         case None                  => ControlOrActionFactory(controlElement)
       }

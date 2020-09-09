@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
-import org.orbeon.xforms.XFormsNames
 import org.w3c.dom
 import org.xml.sax.InputSource
 
@@ -330,7 +329,4 @@ object XFormsUtils {
 
   def getNamespacedFormId(containingDocument: XFormsContainingDocument): String =
     namespaceId(containingDocument, "xforms-form")
-
-  def getElementId(element: Element): String =
-    element.attributeValue(XFormsNames.ID_QNAME)
 }

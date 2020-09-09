@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport.{withBinding, withIteration}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.XFormsNames
 
@@ -52,7 +53,7 @@ object SubmissionHeaders {
             throw new OXFException(s"Missing <${name.qualifiedName}> child element of <header> element")
 
           val scope =
-            xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
+            xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + element.idOrNull)
 
           withBinding(element, sourceEffectiveId, scope) { _ =>
             XFormsElementValue.getElementValue(
@@ -110,7 +111,7 @@ object SubmissionHeaders {
       // Process all nested <header> elements
       for (headerElement <- headerElements.asScala) {
         val headerScope =
-          xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(headerElement))
+          xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + headerElement.idOrNull)
 
         contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 

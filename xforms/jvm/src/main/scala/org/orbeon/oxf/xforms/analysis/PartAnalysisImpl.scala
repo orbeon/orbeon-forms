@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -87,7 +88,7 @@ class PartAnalysisImpl(
    */
   def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping = {
 
-    val id = XFormsUtils.getElementId(element) ensuring (_ ne null)
+    val id = element.idOrThrow
     val prefixedId = if (prefix ne null) prefix + id else id
 
     metadata.getNamespaceMapping(prefixedId) getOrElse
@@ -113,9 +114,8 @@ class PartAnalysisImpl(
     val locationData = ElementAnalysis.createLocationData(controlElement)
 
     // Check for mandatory id
-    val controlStaticId = XFormsUtils.getElementId(controlElement)
-    if (controlStaticId eq null)
-      throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName, locationData)
+    val controlStaticId = controlElement.idOpt getOrElse
+      (throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName, locationData))
 
     // Prefixed id
     val controlPrefixedId = containerScope.fullPrefix + controlStaticId

@@ -172,7 +172,7 @@ class XFormsAnnotatorTest
 
         val resultElement = result collectFirst { case v: VirtualNode => unsafeUnwrapElement(v) }
 
-        assert(resultElement exists (XFormsUtils.getElementId(_).nonAllBlank))
+        assert(resultElement exists (_.idOrNull.nonAllBlank))
         assert(resultElement exists (_.attributeValue(XFormsNames.NAME_QNAME) == attName))
       }
   }

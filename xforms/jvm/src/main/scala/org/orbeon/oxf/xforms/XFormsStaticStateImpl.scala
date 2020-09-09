@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLSupport
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.`type`.BuiltInAtomicType
@@ -418,9 +419,7 @@ object XFormsStaticStateImpl {
     def lastId: Int = {
       val idElement = staticStateElement.element(XFormsExtractor.LastIdQName)
       require(idElement ne null)
-      val lastId = XFormsUtils.getElementId(idElement)
-      require(lastId ne null)
-      lastId.toInt
+      idElement.idOrThrow.toInt
     }
 
     // Optional template as Base64

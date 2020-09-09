@@ -18,7 +18,7 @@ import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, T
 import org.orbeon.dom.Element
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
@@ -169,7 +169,7 @@ trait BindingMetadata extends Logging {
 
         newBindings foreach { newBinding =>
 
-          val bindingPrefixedId = scope.fullPrefix + XFormsUtils.getElementId(newBinding.bindingElement)
+          val bindingPrefixedId = scope.fullPrefix + newBinding.bindingElement.idOrNull
 
           currentMappings foreach {
             case (controlPrefixedId, InlineBindingRef(`bindingPrefixedId`, _, _)) =>

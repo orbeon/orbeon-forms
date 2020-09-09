@@ -6,13 +6,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.{util => u}
 import org.orbeon.xforms.XFormsNames._
 
@@ -164,14 +163,14 @@ class StaticBind(
         e           <- element.elements(XFORMS_VALIDATION_QNAME)
         value       <- Option(e.attributeValue(TYPE_QNAME))
       } yield
-        new TypeMIP(getElementId(e), value)
+        new TypeMIP(e.idOrNull, value)
 
     def fromNestedElement =
       for {
         e           <- element.elements(XFORMS_TYPE_QNAME) // `<xf:type>`
         value       <- e.getText.trimAllToOpt              // text literal (doesn't support `@value`)
       } yield
-        new TypeMIP(getElementId(e), value)
+        new TypeMIP(e.idOrNull, value)
 
     // Only support collecting one type MIP per bind (but at runtime more than one type MIP can touch a given node)
     fromAttribute orElse fromNestedElement.headOption orElse fromNestedElementsLegacy.headOption
@@ -185,7 +184,7 @@ class StaticBind(
     Option(element.attributeValue(XXFORMS_WHITESPACE_QNAME)) map
     (Policy.withNameOption(_) getOrElse Preserve)            filterNot
     (_ == Preserve)                                          map
-    (new WhitespaceMIP(getElementId(element), _))
+    (new WhitespaceMIP(element.idOrNull, _))
   }
 
   // Built-in XPath MIPs
@@ -199,16 +198,16 @@ class StaticBind(
     def fromNestedElementLegacy(name: QName) =
       for {
         e     <- element.elements(XFORMS_VALIDATION_QNAME).toList
-        value <- Option(e.attributeValue(name))
+        value <- e.attributeValueOpt(name)
       } yield
-        (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
+        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map LevelByName getOrElse ErrorLevel)
 
     def fromNestedElement(name: QName) =
       for {
         e     <- element.elements(name).toList
         value <- Option(e.attributeValue(VALUE_QNAME))
       } yield
-        (getElementId(e), value, Option(e.attributeValue(LEVEL_QNAME)) map LevelByName getOrElse ErrorLevel)
+        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map LevelByName getOrElse ErrorLevel)
 
     for {
       mip              <- QNameToXPathMIP.values
@@ -280,7 +279,7 @@ class StaticBind(
   def iterateNestedIds: Iterator[String] =
     for {
       elem <- element.elements.iterator
-      id   <- Option(XFormsUtils.getElementId(elem))
+      id   <- elem.idOpt
     } yield
       id
 

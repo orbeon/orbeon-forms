@@ -131,7 +131,7 @@ object InstanceMirror {
       case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
 
         val element = instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
-        val instanceId = XFormsUtils.getElementId(element) ensuring (_ ne null)
+        val instanceId = element.idOrThrow
 
         val namespaces = {
           val partAnalysis = container.partAnalysis

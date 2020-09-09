@@ -18,10 +18,10 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.collection.{mutable => m}
 
@@ -132,7 +132,7 @@ class SimpleElementAnalysis(
   }
 
   def getChildElementScope(childElement: Element): Scope = {
-    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
+    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)
     part.scopeForPrefixedId(childPrefixedId)
   }
 

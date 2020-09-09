@@ -27,8 +27,8 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.xbl.Scope
@@ -62,7 +62,7 @@ class XFormsActionInterpreter(
     container.getFullPrefix + getActionStaticId(actionElement)
 
   private def getActionStaticId(actionElement: Element): String =
-    XFormsUtils.getElementId(actionElement) ensuring (_ ne null)
+    actionElement.idOrThrow
 
   def getActionScope(actionElement: Element): Scope =
     container.getPartAnalysis.scopeForPrefixedId(getActionPrefixedId(actionElement))

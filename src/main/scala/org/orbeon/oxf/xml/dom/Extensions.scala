@@ -33,8 +33,13 @@ object Extensions {
   }
 
   private val XmlNamespaceMap = Map(XMLConstants.XML_PREFIX -> XMLConstants.XML_URI)
+  private val IdQName = QName("id")
 
   implicit class DomElemOps(private val e: Element) extends AnyVal {
+
+    def idOpt: Option[String] = e.attributeValueOpt(IdQName)
+    def idOrNull: String      = e.attributeValue(IdQName)
+    def idOrThrow: String     = idOpt getOrElse (throw new IllegalArgumentException)
 
     def resolveStringQName(qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
       Extensions.resolveQName(e.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace)

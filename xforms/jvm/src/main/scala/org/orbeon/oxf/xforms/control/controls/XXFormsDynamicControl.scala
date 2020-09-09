@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
@@ -391,7 +392,7 @@ object XXFormsDynamicControl {
 
     modelOption map { modelNode =>
       val modelElement = unsafeUnwrapElement(modelNode)
-      XFormsUtils.getElementId(modelElement) -> modelElement
+      modelElement.idOrNull -> modelElement
     }
   }
 

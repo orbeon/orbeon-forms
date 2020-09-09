@@ -22,14 +22,12 @@ import org.orbeon.oxf.processor.ProcessorSupport
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._
@@ -198,7 +196,7 @@ object AbstractBinding {
 
     assert(bindingElem ne null)
 
-    val bindingId = Option(XFormsUtils.getElementId(bindingElem))
+    val bindingId = bindingElem.idOpt
 
     val styles =
       for {

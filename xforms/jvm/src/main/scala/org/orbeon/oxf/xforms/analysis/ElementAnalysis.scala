@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
+import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
 import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, Extensions}
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, Extensions, LocationData}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
@@ -126,7 +126,7 @@ abstract class ElementAnalysis(
   def containerScope: Scope
 
   // Ids
-  val staticId  : String = getElementId(element)
+  val staticId  : String = element.idOrNull
   val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
 
   // Location

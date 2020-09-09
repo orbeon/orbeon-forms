@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames
@@ -600,7 +600,7 @@ class XFormsContextStack {
         if (bindingElement == null)
           null
         else
-          XFormsUtils.getElementId(bindingElement)
+          bindingElement.idOrNull
 
       this.head =
         new BindingContext(

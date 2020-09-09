@@ -49,12 +49,10 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
   }
 
   def requestEnded(showProgress: Boolean): Unit =
-    if (showProgress) {
-      // Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
-      js.timers.setTimeout(1) {
-        hideIfAlreadyVisible()
+    if (showProgress)
+      js.timers.setTimeout(1) { // Defer hiding the indicator to give a chance to next request to start,
+        hideIfAlreadyVisible()  // so we don't flash the indicator.
       }
-    }
 
   // Public for `AjaxServer.js`
   def showIfNotAlreadyVisible(): Unit = {

@@ -31,7 +31,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
   def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): SubmissionResult = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = containingDocument,
-      currentElem                  = Option(submission.getSubmissionElement),
+      currentElem                  = Option(submission.staticSubmission.element),
       doReplace                    = true,
       value                        = PathUtils.appendQueryString(p2.actionOrResource, Option(sp.queryString) getOrElse ""),
       target                       = None,

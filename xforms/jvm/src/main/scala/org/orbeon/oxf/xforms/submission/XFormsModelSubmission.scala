@@ -17,16 +17,15 @@ import java.util
 import java.util.concurrent.Callable
 
 import org.apache.log4j.Logger
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsProperties}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget, XFormsEvents}
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget, XFormsEvents}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase.getRequestedSerialization
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsProperties}
 import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.xforms.xbl.Scope
@@ -118,15 +117,14 @@ class XFormsModelSubmission(
       new RegularSubmission(this)
     )
 
-  def getSubmissionElement: Element = staticSubmission.element
-
   def getId               : String            = staticSubmission.staticId
   def getPrefixedId       : String            = XFormsId.getPrefixedId(getEffectiveId)
   def scope               : Scope             = staticSubmission.scope
   def getEffectiveId      : String            = XFormsId.getRelatedEffectiveId(model.getEffectiveId, getId)
   def getLocationData     : LocationData      = staticSubmission.locationData
   def parentEventObserver : XFormsEventTarget = model
-  def getModel            : XFormsModel       = model
+
+  def performTargetAction(event: XFormsEvent): Unit = ()
 
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
@@ -298,11 +296,11 @@ class XFormsModelSubmission(
 
           // Result information
           val submissionResultOpt =
-            submissions find (_.isMatch(p, p2, sp)) map { submission =>
+            submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
               if (indentedLogger.isDebugEnabled)
                 indentedLogger.startHandleOperation("", "connecting", "type", submission.getType)
               try {
-                 submission.connect(p, p2, sp)
+                 Option(submission.connect(p, p2, sp))
               } finally
                 if (indentedLogger.isDebugEnabled)
                   indentedLogger.endHandleOperation()
@@ -551,10 +549,6 @@ class XFormsModelSubmission(
       case node: NodeInfo if node.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE => node
       case _ => null
     }
-  }
-
-  def performTargetAction(event: XFormsEvent): Unit = {
-    // NOP
   }
 
   def getIndentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)

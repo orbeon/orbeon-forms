@@ -32,8 +32,8 @@ class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandlerImp
     case submission: XFormsModelSubmission =>
       // Evaluate the binding of the submission element based on the model's inner context
       // NOTE: When the submission actually starts processing, the binding will be re-evaluated
-      val contextStack = new XFormsContextStack(submission.container, submission.getModel.getDefaultEvaluationContext)
-      contextStack.pushBinding(submission.getSubmissionElement, submission.getEffectiveId, submission.getModel.getResolutionScope)
+      val contextStack = new XFormsContextStack(submission.container, submission.model.getDefaultEvaluationContext)
+      contextStack.pushBinding(submission.staticSubmission.element, submission.getEffectiveId, submission.model.getResolutionScope)
       contextStack.getCurrentBindingContext
     case _ =>
       // We know we are either nested directly within the model, or within a submission

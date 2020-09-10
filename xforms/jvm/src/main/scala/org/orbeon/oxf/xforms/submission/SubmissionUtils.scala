@@ -131,9 +131,9 @@ object SubmissionUtils {
 
       SubmissionHeaders.evaluateHeaders(
         submission.container,
-        submission.getModel.getContextStack,
+        submission.model.getContextStack,
         submission.getEffectiveId,
-        submission.getSubmissionElement,
+        submission.staticSubmission.element,
         headersToForward
       )
 

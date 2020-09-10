@@ -168,7 +168,7 @@ object SerializationParameters {
               new URI(
                 XFormsUtils.resolveServiceURL(
                   submission.containingDocument,
-                  submission.getSubmissionElement,
+                  submission.staticSubmission.element,
                   documentToSubmit.getRootElement.getStringValue,
                   URLRewriter.REWRITE_MODE_ABSOLUTE
                 )
@@ -176,7 +176,7 @@ object SerializationParameters {
 
             try {
               SerializationParameters(
-                messageBody            = SubmissionUtils.readByteArray(submission.getModel, resolvedAbsoluteUrl),
+                messageBody            = SubmissionUtils.readByteArray(submission.model, resolvedAbsoluteUrl),
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )

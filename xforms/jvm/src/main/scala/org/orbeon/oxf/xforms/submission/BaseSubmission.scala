@@ -52,7 +52,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
     resolve(
       containingDocument,
-      submission.getSubmissionElement,
+      submission.staticSubmission.element,
       PathUtils.appendQueryString(resolvedActionOrResource, queryString),
       if (isNorewrite) URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT else URLRewriter.REWRITE_MODE_ABSOLUTE
     )

@@ -26,7 +26,7 @@ class XFormsSubmissionException(
 ) extends ValidationException(
   message            = message,
   throwable          = throwable,
-  locationDataOrNull = new ExtendedLocationData(submission.getLocationData, description, submission.getSubmissionElement)
+  locationDataOrNull = new ExtendedLocationData(submission.getLocationData, description, submission.staticSubmission.element)
 ) {
   def submitErrorEventOpt: Option[XFormsSubmitErrorEvent] =
     Option(submitErrorEvent)

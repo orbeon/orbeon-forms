@@ -285,7 +285,7 @@ object SubmissionParameters {
     val staticSubmission   = dynamicSubmission.staticSubmission
     val containingDocument = dynamicSubmission.containingDocument
 
-    val model = dynamicSubmission.getModel
+    val model = dynamicSubmission.model
     model.resetAndEvaluateVariables()
 
     val contextStack = model.getContextStack

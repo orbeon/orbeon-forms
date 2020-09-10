@@ -35,6 +35,8 @@ import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
 import shapeless.syntax.typeable._
 
+import org.orbeon.oxf.util.Logging._
+
 import scala.collection.compat._
 import scala.collection.mutable
 
@@ -46,7 +48,7 @@ abstract class XFormsModelSubmissionBase
 
   import XFormsModelSubmissionBase._
 
-  def getModel: XFormsModel
+  def model: XFormsModel
 
   protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
     sendSubmitErrorWithDefault(
@@ -63,7 +65,7 @@ abstract class XFormsModelSubmissionBase
   private def sendSubmitErrorWithDefault(throwable: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
     // After a submission, the context might have changed
-    getModel.resetAndEvaluateVariables()
+    model.resetAndEvaluateVariables()
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
@@ -101,7 +103,7 @@ abstract class XFormsModelSubmissionBase
         xfcd              = containingDocument,
         ref               = currentNodeInfo,
         relevanceHandling = relevanceHandling,
-        namespaceContext  = getSubmissionElement.allInScopeNamespacesAsStrings,
+        namespaceContext  = staticSubmission.element.allInScopeNamespacesAsStrings,
         annotateWith      = annotateWith,
         relevantAttOpt    = relevantAttOpt
       )
@@ -115,10 +117,10 @@ abstract class XFormsModelSubmissionBase
       isSatisfiesValidity(documentToSubmit, relevanceHandling)
 
     if (! instanceSatisfiesValidRequired) {
-      if (indentedLogger.isDebugEnabled) {
-        val documentString = TransformerUtils.tinyTreeToString(currentNodeInfo)
-        indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted", "document", documentString)
-      }
+      debug(
+        "instance document or subset thereof cannot be submitted",
+        List("document" -> TransformerUtils.tinyTreeToString(currentNodeInfo))
+      )
       throw new XFormsSubmissionException(
         submission       = thisSubmission,
         message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
@@ -373,20 +375,17 @@ object XFormsModelSubmissionBase {
     if (indentedLogger.isDebugEnabled)
       node match {
         case e: Element =>
-            indentedLogger.logDebug(
-              "",
+            debug(
               "found invalid node",
-              "element name",
-              e.toDebugString
+              List("element name" -> e.toDebugString)
             )
         case a: Attribute =>
-          indentedLogger.logDebug(
-            "",
+          debug(
             "found invalid attribute",
-            "attribute name",
-            a.toDebugString,
-            "parent element",
-            a.getParent.toDebugString
+            List(
+              "attribute name" -> a.toDebugString,
+              "parent element" -> a.getParent.toDebugString
+            )
           )
         case _ =>
           throw new IllegalArgumentException
@@ -436,7 +435,7 @@ object XFormsModelSubmissionBase {
           List(e)
         } else {
           e.attributes.filter(isLocallyNonRelevant) ++:
-            e.elements.to(List).flatMap(processElement)
+            e.elements.toList.flatMap(processElement)
         }
 
       processElement(doc.getRootElement) foreach (_.detach())

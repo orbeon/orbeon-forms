@@ -208,8 +208,6 @@ trait ContainingDocumentTransientState {
   def setReplaceAllCallable(callable: Callable[SubmissionResult]): Unit =
     transientState.replaceAllCallable = Option(callable)
 
-  def setGotSubmission(): Unit = ()
-
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)
       throw new OXFException("Unable to run a second submission with `replace=\"all\"` within a same action sequence.")

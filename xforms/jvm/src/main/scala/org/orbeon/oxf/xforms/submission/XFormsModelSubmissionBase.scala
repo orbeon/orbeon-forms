@@ -28,14 +28,13 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.{Extensions, IOSupport}
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
 import shapeless.syntax.typeable._
 
-import scala.collection.JavaConverters._
 import scala.collection.compat._
 import scala.collection.mutable
 
@@ -400,12 +399,12 @@ object XFormsModelSubmissionBase {
   ): Option[String] =
       xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
 
-  def getRequestedSerializationOrNull(
+  def getRequestedSerialization(
     xformsSerialization : Option[String],
     xformsMethod        : String,
     httpMethod          : HttpMethod
-  ): String =
-    requestedSerialization(xformsSerialization, xformsMethod, httpMethod).orNull
+  ): Option[String] =
+    requestedSerialization(xformsSerialization, xformsMethod, httpMethod)
 
   private object Private {
 
@@ -436,8 +435,8 @@ object XFormsModelSubmissionBase {
         if (isLocallyNonRelevant(e)) {
           List(e)
         } else {
-          e.jAttributes.asScala.filter(isLocallyNonRelevant) ++:
-            e.jElements.asScala.to(List).flatMap(processElement)
+          e.attributes.filter(isLocallyNonRelevant) ++:
+            e.elements.to(List).flatMap(processElement)
         }
 
       processElement(doc.getRootElement) foreach (_.detach())
@@ -459,7 +458,7 @@ object XFormsModelSubmissionBase {
           (_.setValue(""))
 
         if (e.containsElement)
-          e.jElements.asScala foreach (processElement(_, elemNonRelevant))
+          e.elements foreach (processElement(_, elemNonRelevant))
         else if (elemNonRelevant)
           e.setText("")
       }
@@ -479,7 +478,7 @@ object XFormsModelSubmissionBase {
           removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
         } else {
           e.removeAttribute(relevantAnnotationAttQName)
-          e.jElements.asScala foreach processElem
+          e.elements foreach processElem
         }
 
       processElem(doc.getRootElement)
@@ -489,13 +488,13 @@ object XFormsModelSubmissionBase {
 
       def processElem(e: Element): Unit = {
         e.removeAttribute(attQname)
-        e.jElements.asScala foreach processElem
+        e.elements foreach processElem
       }
 
       if (includeSelf)
         processElem(startElem)
       else
-        startElem.jElements.asScala foreach processElem
+        startElem.elements foreach processElem
     }
 
     def findFirstElementOrAttributeWith(startNode: Node, check: Node => Boolean): Option[Node] = {
@@ -512,7 +511,7 @@ object XFormsModelSubmissionBase {
             override def visit(element: Element)     = checkNodeAndBreakIfFail(element)
             override def visit(attribute: Attribute) = checkNodeAndBreakIfFail(attribute)
 
-            def checkNodeAndBreakIfFail(node: Node) =
+            def checkNodeAndBreakIfFail(node: Node): Unit =
               if (check(node)) {
                 foundNode = node
                 break()

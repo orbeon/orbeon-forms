@@ -249,7 +249,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     // Check if a submission requires file upload information
                     if (requestedSerialization.startsWith("multipart/") && p.refContext().refInstanceOpt().isDefined()) {
                         // Annotate before re-rooting/pruning
-                        XFormsSubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refContext().refInstanceOpt().get());
+                        SubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refContext().refInstanceOpt().get());
                     }
 
                     // Create document to submit

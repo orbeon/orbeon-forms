@@ -139,7 +139,7 @@ object SerializationParameters {
           )
         case "multipart/form-data" =>
           // Build multipart/form-data body
-          val multipartFormData = XFormsSubmissionUtils.createMultipartFormData(documentToSubmit)
+          val multipartFormData = SubmissionUtils.createMultipartFormData(documentToSubmit)
           val os = new ByteArrayOutputStream
           multipartFormData.writeTo(os)
 

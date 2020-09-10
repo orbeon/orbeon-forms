@@ -279,7 +279,6 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
     findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
 
-  def getUploadControlsJava : jl.Iterable[XFormsUploadControl] = getUploadControls.asJava
   def getUploadControls     : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](UPLOAD_NAME)
   def getRepeatControls     : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](REPEAT_NAME)
   def getDialogControls     : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_NAME)

@@ -267,7 +267,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       case n: ProcessingInstruction => writeProcessingInstruction(n)
       case n: Comment               => writeComment(n.getText)
       case n: Document              => write(n)
-      case n: Namespace             =>
+      case _: Namespace             =>
       case _                        => throw new IllegalStateException
     }
 

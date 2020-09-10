@@ -42,7 +42,7 @@ object SecureUtils {
   }
 
   private def getKeyLength: Int =
-    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128).intValue
+    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
 
   private def getHashAlgorithm: String =
     Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")

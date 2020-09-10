@@ -310,7 +310,7 @@ trait ContainingDocumentUpload {
           AllowedMediatypes.unapply
 
       def fromFormSetting =
-        staticState.staticStringProperty(UPLOAD_MEDIATYPES_PROPERTY).trimAllToOpt flatMap
+        staticState.staticStringProperty(UploadMediatypesProperty).trimAllToOpt flatMap
           AllowedMediatypes.unapply
 
       fromCommonConstraint orElse
@@ -384,11 +384,11 @@ trait ContainingDocumentProperties {
 
   // Used by the property() function
   def getProperty(propertyName: String): Any = propertyName match {
-    case READONLY_APPEARANCE_PROPERTY => if (staticReadonly) READONLY_APPEARANCE_STATIC_VALUE else READONLY_APPEARANCE_DYNAMIC_VALUE
-    case NOSCRIPT_PROPERTY            => false
-    case ENCRYPT_ITEM_VALUES_PROPERTY => encodeItemValues
-    case ORDER_PROPERTY               => lhhacOrder
-    case _                            => staticState.propertyMaybeAsExpression(propertyName).left.get
+    case ReadonlyAppearanceProperty => if (staticReadonly) ReadonlyAppearanceStaticValue else ReadonlyAppearanceDynamicValue
+    case NoscriptProperty           => false
+    case EncryptItemValuesProperty  => encodeItemValues
+    case OrderProperty              => lhhacOrder
+    case _                          => staticState.propertyMaybeAsExpression(propertyName).left.get
   }
 
   private object Memo {
@@ -436,83 +436,81 @@ trait ContainingDocumentProperties {
   // Dynamic properties
   def staticReadonly =
     dynamicProperty(
-      READONLY_APPEARANCE_PROPERTY,
-      _ == READONLY_APPEARANCE_STATIC_VALUE
+      ReadonlyAppearanceProperty,
+      _ == ReadonlyAppearanceStaticValue
     )
 
   def encodeItemValues =
     dynamicProperty(
-      ENCRYPT_ITEM_VALUES_PROPERTY,
+      EncryptItemValuesProperty,
       _.toBoolean
     )
 
   def lhhacOrder =
     dynamicProperty(
-      ORDER_PROPERTY,
+      OrderProperty,
       LHHA.getBeforeAfterOrderTokens
     )
 
   def staticReadonlyHint: Boolean =
     dynamicProperty(
-      STATIC_READONLY_HINT_PROPERTY,
+      StaticReadonlyHintProperty,
       _.toBoolean
     )
 
   def staticReadonlyAlert: Boolean =
     dynamicProperty(
-      STATIC_READONLY_ALERT_PROPERTY,
+      StaticReadonlyAlertProperty,
       _.toBoolean
     )
 
   def hostLanguage =
     dynamicProperty(
-      HOST_LANGUAGE,
+      HostLanguage,
       identity
     )
 
   def isNoUpdates =
     dynamicProperty(
-      NO_UPDATES,
+      NoUpdates,
       _.toBoolean
     )
 
   // Static properties
-  def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)
-  def isLocalSubmissionInclude              = staticBooleanProperty(LOCAL_SUBMISSION_INCLUDE_PROPERTY)
-  def isLocalInstanceInclude                = staticBooleanProperty(LOCAL_INSTANCE_INCLUDE_PROPERTY)
-  def isExposeXPathTypes                    = staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
-  def isSessionHeartbeat                    = staticBooleanProperty(SESSION_HEARTBEAT_PROPERTY)
-  def isXForms11Switch                      = staticBooleanProperty(XFORMS11_SWITCH_PROPERTY)
-  def isClientStateHandling                 = staticBooleanProperty[String](STATE_HANDLING_PROPERTY, _ == STATE_HANDLING_CLIENT_VALUE)
-  def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, _ == "full")
-  def isReadonlyAppearanceStaticSelect1Full = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY, _ ==  "full")
+  def isOptimizeGetAllSubmission            = staticBooleanProperty(OptimizeGetAllProperty)
+  def isExposeXPathTypes                    = staticBooleanProperty(ExposeXpathTypesProperty)
+  def isSessionHeartbeat                    = staticBooleanProperty(SessionHeartbeatProperty)
+  def isXForms11Switch                      = staticBooleanProperty(Xforms11SwitchProperty)
+  def isClientStateHandling                 = staticBooleanProperty[String](StateHandlingProperty, _ == StateHandlingClientValue)
+  def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](ReadonlyAppearanceStaticSelectProperty, _ == "full")
+  def isReadonlyAppearanceStaticSelect1Full = staticBooleanProperty[String](ReadonlyAppearanceStaticSelect1Property, _ ==  "full")
 
-  def getLabelElementName                   = staticStringProperty(LABEL_ELEMENT_NAME_PROPERTY)
-  def getHintElementName                    = staticStringProperty(HINT_ELEMENT_NAME_PROPERTY)
-  def getHelpElementName                    = staticStringProperty(HELP_ELEMENT_NAME_PROPERTY)
-  def getAlertElementName                   = staticStringProperty(ALERT_ELEMENT_NAME_PROPERTY)
-  def getLabelAppearances                   = staticStringProperty(LABEL_APPEARANCE_PROPERTY).tokenizeToSet
-  def getHintAppearances                    = staticStringProperty(HINT_APPEARANCE_PROPERTY).tokenizeToSet
-  def getHelpAppearance                     = staticStringProperty(HELP_APPEARANCE_PROPERTY)
-  def getDateFormatInput                    = staticStringProperty(DATE_FORMAT_INPUT_PROPERTY)
+  def getLabelElementName                   = staticStringProperty(LabelElementNameProperty)
+  def getHintElementName                    = staticStringProperty(HintElementNameProperty)
+  def getHelpElementName                    = staticStringProperty(HelpElementNameProperty)
+  def getAlertElementName                   = staticStringProperty(AlertElementNameProperty)
+  def getLabelAppearances                   = staticStringProperty(LabelAppearanceProperty).tokenizeToSet
+  def getHintAppearances                    = staticStringProperty(HintAppearanceProperty).tokenizeToSet
+  def getHelpAppearance                     = staticStringProperty(HelpAppearanceProperty)
+  def getDateFormatInput                    = staticStringProperty(DateFormatInputProperty)
 
-  def getShowMaxRecoverableErrors           = staticIntProperty(SHOW_RECOVERABLE_ERRORS_PROPERTY)
-  def getSubmissionPollDelay                = staticIntProperty(ASYNC_SUBMISSION_POLL_DELAY)
-  def getAjaxFullUpdateThreshold            = staticIntProperty(AJAX_UPDATE_FULL_THRESHOLD)
+  def getShowMaxRecoverableErrors           = staticIntProperty(ShowRecoverableErrorsProperty)
+  def getSubmissionPollDelay                = staticIntProperty(AsyncSubmissionPollDelay)
+  def getAjaxFullUpdateThreshold            = staticIntProperty(AjaxUpdateFullThreshold)
 
   def isLocalSubmissionForward =
-    staticBooleanProperty(LOCAL_SUBMISSION_FORWARD_PROPERTY) &&
-    staticBooleanProperty(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY)
+    staticBooleanProperty(LocalSubmissionForwardProperty) &&
+    staticBooleanProperty(OptimizeLocalSubmissionReplaceAllProperty)
 
   import ContainingDocumentProperties._
 
   def getTypeOutputFormat(typeName: String) =
     SupportedTypesForOutputFormat(typeName) option
-      staticStringProperty(TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName)
+      staticStringProperty(TypeOutputFormatPropertyPrefix + typeName)
 
   def getTypeInputFormat(typeName: String) = {
     require(SupportedTypesForInputFormat(typeName))
-    staticStringProperty(TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName)
+    staticStringProperty(TypeInputFormatPropertyPrefix + typeName)
   }
 }
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
-import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
+import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -79,7 +79,7 @@ class PartAnalysisImpl(
 
   def getMark(prefixedId: String): Option[SAXStore#Mark] = metadata.getMark(prefixedId)
 
-  def isExposeXPathTypes: Boolean = staticState.staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
+  def isExposeXPathTypes: Boolean = staticState.staticBooleanProperty(ExposeXpathTypesProperty)
 
   /**
    * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not

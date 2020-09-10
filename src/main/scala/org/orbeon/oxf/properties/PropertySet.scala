@@ -26,8 +26,8 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.compat._
 import scala.collection.JavaConverters._
+import scala.collection.compat._
 import scala.collection.mutable
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
@@ -97,7 +97,7 @@ class PropertySet {
   def allPropertiesAsJson: String = {
 
     val jsonProperties =
-      for ((name, prop) <- exactProperties.to(List).sortBy(_._1))
+      for ((name, prop) <- exactProperties.toList.sortBy(_._1))
         yield
           s"""|  "$name": {
               |    "type": "${prop.typ.toString.escapeJavaScript}",
@@ -214,7 +214,7 @@ class PropertySet {
   def getObjectOpt(name: String): Option[AnyRef] =
     getPropertyValueOpt(name, null)
 
-  def getObject(name: String, default: AnyRef): AnyRef =
+  def getObject(name: String, default: Any): Any =
     getObjectOpt(name) getOrElse default
 
   def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
@@ -246,15 +246,15 @@ class PropertySet {
   def getString(name: String, default: String): String =
     getNonBlankString(name) getOrElse default
 
-  // 2019-05-03: 2 Java callers
+  // 2019-05-03: 2 calls in `XFormsProperties`
   def getNmtokens(name: String): ju.Set[String] =
     getPropertyValueOrNull(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
 
   def getInteger(name: String): jl.Integer =
     getPropertyValueOrNull(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]
 
-  def getInteger(name: String, default: Int): jl.Integer =
-    Option(getInteger(name)) getOrElse new jl.Integer(default)
+  def getInteger(name: String, default: Int): Int =
+    Option(getInteger(name)) map (_.intValue) getOrElse default
 
   def getBoolean(name: String): jl.Boolean =
     getPropertyValueOrNull(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[jl.Boolean]

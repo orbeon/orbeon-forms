@@ -20,7 +20,7 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
-import org.orbeon.oxf.xforms.XFormsProperties.NO_UPDATES
+import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -342,7 +342,7 @@ object XFormsContainingDocument {
       val uuid = SecureUtils.randomHexId
 
       // attempt to ignore `oxf:xforms-submission`
-      if (staticState.propertyMaybeAsExpression(NO_UPDATES).fold(_.toString != "true" , _ => true))
+      if (staticState.propertyMaybeAsExpression(NoUpdates).fold(_.toString != "true" , _ => true))
         LifecycleLogger.eventAssumingRequest("xforms", "new form session", List("uuid" -> uuid))
 
       val doc = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)

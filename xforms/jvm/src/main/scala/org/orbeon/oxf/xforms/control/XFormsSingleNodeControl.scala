@@ -303,7 +303,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   def hasStaticReadonlyAppearance =
     containingDocument.staticReadonly ||
-      XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
+      XFormsProperties.ReadonlyAppearanceStaticValue == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
   override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],

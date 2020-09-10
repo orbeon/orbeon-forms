@@ -70,18 +70,18 @@ class XFormsStaticStateImpl(
   // Properties
   // These are `lazy val`s because they depend on the default model being found, which is done when
   // the `PartAnalysisImpl` is created above. Yes, this is tricky and not ideal.
-  lazy val allowedExternalEvents   = staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY).tokenizeToSet
+  lazy val allowedExternalEvents   = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet
   lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
-  lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),     P.XPATH_ANALYSIS_PROPERTY)
-  lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)
-  lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
-  lazy val isInlineResources       = staticBooleanProperty(P.INLINE_RESOURCES_PROPERTY)
+  lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XpathAnalysisProperty),     P.XpathAnalysisProperty)
+  lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CalculateAnalysisProperty), P.CalculateAnalysisProperty)
+  lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SanitizeProperty))
+  lazy val isInlineResources       = staticBooleanProperty(P.InlineResourcesProperty)
 
   lazy val assets: XFormsAssets =
     XFormsAssets.updateAssets(
       XFormsAssets.fromJSONProperty,
-      staticStringProperty(P.ASSETS_BASELINE_EXCLUDES_PROPERTY),
-      staticStringProperty(P.ASSETS_BASELINE_UPDATES_PROPERTY)
+      staticStringProperty(P.AssetsBaselineExcludesProperty),
+      staticStringProperty(P.AssetsBaselineUpdatesProperty)
     )
 
   private def loadClass[T : ClassTag](propertyName: String): Option[T] =
@@ -110,7 +110,7 @@ class XFormsStaticStateImpl(
   // evaluates AVT properties, which themselves require finding the default model, which is not yet ready! So we
   // use `staticStateDocument.nonDefaultProperties` instead.
   lazy val functionLibrary: FunctionLibrary =
-    loadClass[FunctionLibrary](FUNCTION_LIBRARY_PROPERTY) match {
+    loadClass[FunctionLibrary](FunctionLibraryProperty) match {
       case Some(library) =>
         new FunctionLibraryList                         |!>
           (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
@@ -120,16 +120,16 @@ class XFormsStaticStateImpl(
     }
 
   lazy val xblSupport: Option[XBLSupport] =
-    loadClass[XBLSupport](XBL_SUPPORT_PROPERTY)
+    loadClass[XBLSupport](XblSupportProperty)
 
   lazy val uploadMaxSize: MaximumSize =
-    staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap
+    staticStringProperty(UploadMaxSizeProperty).trimAllToOpt flatMap
       MaximumSize.unapply orElse
       MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse
       MaximumSize.LimitedSize(0L)
 
   lazy val uploadMaxSizeAggregate: MaximumSize =
-    staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY).trimAllToOpt flatMap
+    staticStringProperty(UploadMaxSizeAggregateProperty).trimAllToOpt flatMap
       MaximumSize.unapply getOrElse
       MaximumSize.UnlimitedSize
 
@@ -137,7 +137,7 @@ class XFormsStaticStateImpl(
 
     val compiledExpressionOpt =
       for {
-        rawProperty <- staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY).trimAllToOpt
+        rawProperty <- staticStringProperty(UploadMaxSizeAggregateExpressionProperty).trimAllToOpt
         model       <- topLevelPart.defaultModel // ∃ property => ∃ model, right?
       } yield
         XPath.compileExpression(
@@ -157,14 +157,14 @@ class XFormsStaticStateImpl(
       case Some(CompiledExpression(expr, _, _)) if getExpressionType(expr) == BuiltInAtomicType.INTEGER =>
         compiledExpressionOpt
       case Some(_) =>
-        throw new IllegalArgumentException(s"property `$UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY` must return `xs:integer` type")
+        throw new IllegalArgumentException(s"property `$UploadMaxSizeAggregateExpressionProperty` must return `xs:integer` type")
       case None =>
         None
     }
   }
 
-  def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
-  def isServerStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
+  def isClientStateHandling = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingClientValue
+  def isServerStateHandling = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingServerValue
 
   private lazy val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
     staticStateDocument.nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>
@@ -176,32 +176,32 @@ class XFormsStaticStateImpl(
           case None if isInline && maybeAVT =>
             throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
           case _ =>
-            Left(P.getPropertyDefinition(name).parseProperty(rawPropertyValue))
+            Left(P.SupportedDocumentProperties(name).parseProperty(rawPropertyValue))
         }
       }
     }
 
   // For properties which can be AVTs
   def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression] =
-    nonDefaultPropertiesOnly.getOrElse(name, Left(P.getPropertyDefinition(name).defaultValue))
+    nonDefaultPropertiesOnly.getOrElse(name, Left(P.SupportedDocumentProperties(name).defaultValue))
 
   // For properties known to be static
   private def staticPropertyOrDefault(name: String) =
     staticStateDocument.nonDefaultProperties.get(name) map
       (_._1)                                           map
-      P.getPropertyDefinition(name).parseProperty      getOrElse
-      P.getPropertyDefinition(name).defaultValue
+      P.SupportedDocumentProperties(name).parseProperty      getOrElse
+      P.SupportedDocumentProperties(name).defaultValue
 
   def staticProperty       (name: String) = staticPropertyOrDefault(name: String)
   def staticStringProperty (name: String) = staticPropertyOrDefault(name: String).toString
   def staticBooleanProperty(name: String) = staticPropertyOrDefault(name: String).asInstanceOf[Boolean]
   def staticIntProperty    (name: String) = staticPropertyOrDefault(name: String).asInstanceOf[Int]
 
-  // 2014-05-02: Used by XHTMLHeadHandler only
-  def clientNonDefaultProperties: Map[String, AnyRef] =
+  // 2020-09-10: Used by `ScriptBuilder` only.
+  def clientNonDefaultProperties: Map[String, Any] =
     for {
       (propertyName, _) <- staticStateDocument.nonDefaultProperties
-      if getPropertyDefinition(propertyName).isPropagateToClient
+      if SupportedDocumentProperties(propertyName).propagateToClient
     } yield
       propertyName -> staticProperty(propertyName)
 
@@ -448,8 +448,8 @@ object XFormsStaticStateImpl {
       }
 
     private def isClientStateHandling: Boolean = {
-      def nonDefault = nonDefaultProperties.get(P.STATE_HANDLING_PROPERTY) map (_._1 == STATE_HANDLING_CLIENT_VALUE)
-      def default    = P.getPropertyDefinition(P.STATE_HANDLING_PROPERTY).defaultValue.toString == STATE_HANDLING_CLIENT_VALUE
+      def nonDefault = nonDefaultProperties.get(P.StateHandlingProperty) map (_._1 == StateHandlingClientValue)
+      def default    = P.SupportedDocumentProperties(P.StateHandlingProperty).defaultValue.toString == StateHandlingClientValue
 
       nonDefault getOrElse default
     }

@@ -21,7 +21,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -533,9 +533,9 @@ trait ExtractorProperties {
 
       val propertiesToKeep = {
         for {
-          (name, prop) <- SUPPORTED_DOCUMENT_PROPERTIES.asScala
+          (name, prop) <- SupportedDocumentProperties
           defaultValue = prop.defaultValue
-          globalValue  = propertySet.getObject(XFORMS_PROPERTY_PREFIX + name, defaultValue)
+          globalValue  = propertySet.getObject(XFormsProperties.PropertyPrefix + name, defaultValue)
         } yield
           unparsedInlineProperties.get(name) match {
             case Some(localValue) => localValue  != defaultValue.toString option (name, localValue          , true)

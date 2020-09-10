@@ -102,7 +102,7 @@ class LHHAAnalysis(
         hasLocalMinimalAppearance || (
           ! hasLocalFullAppearance &&
             staticStateContext.partAnalysis.staticState.staticStringProperty(
-              if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+              if (lhhaType == LHHA.Hint) HintAppearanceProperty else LabelAppearanceProperty
             )
           .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
         )

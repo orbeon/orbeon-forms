@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.apache.commons.io.IOUtils
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunnerSupport._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
@@ -26,6 +27,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache
+
 import scala.collection.compat._
 
 object FormRunnerSupport {
@@ -77,7 +79,7 @@ trait FormRunnerSupport extends DocumentTestBase {
         content     = content
       )
 
-    val responseContent = BufferedContent(response.content)
+    val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)
     val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, CharsetNames.Utf8)) map (_.group(1))
 
     val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests

@@ -57,7 +57,7 @@ trait EmbeddingContext {
   def getSessionAttribute(name: String)                : Option[AnyRef]
   def setSessionAttribute(name: String, value: AnyRef) : Unit
   def removeSessionAttribute(name: String)             : Unit
-  def httpClient                                       : HttpClient
+  def httpClient                                       : HttpClient[org.apache.http.client.CookieStore]
   def client                                           : String
 }
 
@@ -73,7 +73,7 @@ private case class EmbeddingSettings(
   formRunnerURL  : String,
   orbeonPrefix   : String,
   resourcesRegex : String,
-  httpClient     : HttpClient
+  httpClient     : HttpClient[org.apache.http.client.CookieStore]
 ) {
   val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?${APISupport.XFormsServerSubmit.dropStartingSlash}".r
   val OrbeonResourcePathRegex     : Regex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r

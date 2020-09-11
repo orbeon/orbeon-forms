@@ -43,7 +43,7 @@ import org.orbeon.io.IOUtils._
 import org.slf4j.LoggerFactory
 
 
-class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
+class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
 
   import Private._
 
@@ -175,7 +175,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         ) toMap
 
       lazy val lastModified =
-        Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+        DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
 
       lazy val content = StreamedContent.fromStreamAndHeaders(
         Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream,

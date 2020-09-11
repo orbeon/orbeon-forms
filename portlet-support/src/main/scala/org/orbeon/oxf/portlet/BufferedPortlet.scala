@@ -17,6 +17,7 @@ import java.io.{OutputStream, PrintWriter}
 import java.{util => ju}
 
 import javax.portlet._
+import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
@@ -32,7 +33,7 @@ class PortletEmbeddingContext(
   context            : PortletContext,
   request            : PortletRequest,
   response           : PortletResponse,
-  val httpClient     : HttpClient
+  val httpClient     : HttpClient[org.apache.http.client.CookieStore]
 ) extends EmbeddingContext {
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
@@ -50,7 +51,7 @@ class PortletEmbeddingContextWithResponse(
   context            : PortletContext,
   request            : PortletRequest,
   response           : MimeResponse,
-  httpClient         : HttpClient
+  httpClient         : HttpClient[org.apache.http.client.CookieStore]
 ) extends PortletEmbeddingContext(
   context,
   request,
@@ -152,7 +153,7 @@ trait BufferedPortlet {
 
           // Store response
           storeResponseWithParameters(
-            ResponseWithParams(BufferedContent(content), storedParams)
+            ResponseWithParams(BufferedContent(content)(IOUtils.toByteArray), storedParams)
           )
         }
     }

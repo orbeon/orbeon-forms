@@ -21,5 +21,4 @@ object NumericUtils {
   // See also http://stackoverflow.com/questions/35098868/
   def parseLong(l: String): Option[Long] =
     Try(l.toLong).toOption
-
 }

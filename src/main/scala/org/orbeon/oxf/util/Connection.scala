@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.net.URI
-import java.util.{Map => JMap}
+import java.{util => ju}
 
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
@@ -130,7 +130,7 @@ class Connection private (
 
             val capitalizedHeaders =
               for {
-                (name, values) <- headers.to(List)
+                (name, values) <- headers.toList
                 if values ne null
                 value <- values
                 if value ne null
@@ -150,8 +150,8 @@ class Connection private (
 
           val (effectiveConnectionUrlString, client) =
             findInternalUrl(normalizedUrl, isInternalPath) match {
-              case Some(internalPath) => (internalPath, InternalHttpClient)
-              case _                  => (normalizedUrlString,    PropertiesApacheHttpClient)
+              case Some(internalPath) => (internalPath,         InternalHttpClient)
+              case _                  => (normalizedUrlString,  PropertiesApacheHttpClient)
             }
 
           val response =
@@ -249,7 +249,7 @@ trait ConnectionState {
     debugStore("saved HTTP state", "did not save HTTP state")
   }
 
-  private def debugStore(positive: String, negative: String)(implicit logger: IndentedLogger) =
+  private def debugStore(positive: String, negative: String)(implicit logger: IndentedLogger): Unit =
     ifDebug {
       cookieStoreOpt match {
         case Some(cookieStore) =>
@@ -288,7 +288,7 @@ trait ConnectionState {
 private object ConnectionState {
 
   // TODO: See `ScopeProcessorBase.Scope` enumeration.
-  def stateScopeFromProperty = {
+  def stateScopeFromProperty: String = {
     val propertySet = Properties.instance.getPropertySet
     val scopeString = propertySet.getString(HttpStateProperty, DefaultStateScope)
 
@@ -404,7 +404,7 @@ object Connection extends Logging {
   }
 
   private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT, LOCK, UNLOCK)
-  def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)
+  def requiresRequestBody(httpMethod: HttpMethod): Boolean = HttpMethodsWithRequestBody(httpMethod)
 
   private def schemeRequiresHeaders(scheme: UriScheme) =
     ! (scheme == UriScheme.File || scheme == UriScheme.Oxf)
@@ -430,7 +430,7 @@ object Connection extends Logging {
   def jBuildConnectionHeadersCapitalizedIfNeeded(
     url                 : URI,
     hasCredentials      : Boolean,
-    customHeadersOrNull : JMap[String, Array[String]],
+    customHeadersOrNull : ju.Map[String, Array[String]],
     headersToForward    : String,
     getHeader           : String => Option[List[String]],
     logger              : IndentedLogger,
@@ -499,8 +499,8 @@ object Connection extends Logging {
   private def getPropertyHandleCustom(propertyName: String) = {
     val propertySet = Properties.instance.getPropertySet
 
-    propertySet.getNonBlankString(propertyName).to(List) ++
-      propertySet.getNonBlankString(propertyName + ".private").to(List) mkString " "
+    propertySet.getNonBlankString(propertyName).toList ++
+      propertySet.getNonBlankString(propertyName + ".private").toList mkString " "
   }
 
   private def valueAs[T[_]](value: String)(implicit cbf: Factory[String, T[String]]): T[String] =
@@ -511,7 +511,7 @@ object Connection extends Logging {
     valueAs[Set](getPropertyHandleCustom(HttpForwardHeadersProperty)) ++
       valueAs[Set](getPropertyHandleCustom(LegacyXFormsHttpForwardHeadersProperty))
 
-  def jHeadersToForward =
+  def jHeadersToForward: String =
     (headersToForwardFromProperty mkString " ").trimAllToNull
 
   // Get a List of cookie names to forward from the configuration properties
@@ -539,7 +539,7 @@ object Connection extends Logging {
     }
 
     for {
-      nameCapitalized <- headerNamesCapitalized.to(List)
+      nameCapitalized <- headerNamesCapitalized.toList
       nameLower       = nameCapitalized.toLowerCase
       values          <- getHeader(nameLower)
       if canForwardHeader(nameLower)

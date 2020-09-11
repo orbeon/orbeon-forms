@@ -27,7 +27,7 @@ import scala.annotation.tailrec
 //
 // - no actual HTTP requests are performed
 // - internal requests are made to the Orbeon servlet
-object InternalHttpClient extends HttpClient {
+object InternalHttpClient extends HttpClient[CookieStore] {
 
   def connect(
     url         : String,
@@ -107,7 +107,7 @@ object InternalHttpClient extends HttpClient {
     new HttpResponse {
       lazy val statusCode   = response.statusCode
       lazy val headers      = response.capitalizedHeaders
-      lazy val lastModified = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+      lazy val lastModified = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
       lazy val content      = response.streamedContent
       def disconnect()      = content.close()
     }

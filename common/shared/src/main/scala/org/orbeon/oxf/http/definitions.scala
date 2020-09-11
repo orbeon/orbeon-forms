@@ -16,7 +16,6 @@ package org.orbeon.oxf.http
 import java.io.{ByteArrayInputStream, InputStream}
 
 import enumeratum._
-import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
@@ -44,7 +43,7 @@ case class StreamedContent(
 
 object StreamedContent {
 
-  def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None) =
+  def fromBytes(bytes: Array[Byte], contentType: Option[String], title: Option[String] = None): StreamedContent =
     StreamedContent(
       inputStream   = new ByteArrayInputStream(bytes),
       contentType   = contentType,
@@ -52,7 +51,7 @@ object StreamedContent {
       title         = title
     )
 
-  def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, i.Seq[String]], title: Option[String] = None) =
+  def fromStreamAndHeaders(inputStream: InputStream, headers: Map[String, i.Seq[String]], title: Option[String] = None): StreamedContent =
     StreamedContent(
       inputStream   = inputStream,
       contentType   = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
@@ -60,7 +59,7 @@ object StreamedContent {
       title         = title
     )
 
-  val Empty =
+  val Empty: StreamedContent =
     StreamedContent(
       inputStream   = EmptyInputStream,
       contentType   = None,
@@ -79,8 +78,8 @@ case class BufferedContent(
 }
 
 object BufferedContent {
-  def apply(content: StreamedContent): BufferedContent =
-    BufferedContent(useAndClose(content.inputStream)(IOUtils.toByteArray), content.contentType, content.title)
+  def apply(content: StreamedContent)(toByteArray: InputStream => Array[Byte]): BufferedContent =
+    BufferedContent(useAndClose(content.inputStream)(toByteArray), content.contentType, content.title)
 }
 
 case class Redirect(
@@ -243,12 +242,12 @@ object HttpMethod extends Enum[HttpMethod] {
   case object UNLOCK  extends HttpMethod
 }
 
-trait HttpClient {
+trait HttpClient[CookieStore] {
 
   def connect(
     url         : String,
     credentials : Option[Credentials],
-    cookieStore : org.apache.http.client.CookieStore,
+    cookieStore : CookieStore,
     method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]

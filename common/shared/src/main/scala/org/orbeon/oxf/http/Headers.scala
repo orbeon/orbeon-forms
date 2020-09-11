@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.http
 
-import org.orbeon.oxf.util.{DateUtils, NumericUtils}
+import org.orbeon.oxf.util.NumericUtils
 
 
 object Headers {
@@ -132,9 +132,6 @@ object Headers {
 
   def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap NumericUtils.parseLong filter (_ >= 0L)
-
-  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
-    firstItemIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
   // List of common HTTP headers
   val CommonHeaders = Seq(

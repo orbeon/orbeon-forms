@@ -87,7 +87,7 @@ object SubmissionParameters {
         submitErrorEvent = new XFormsSubmitErrorEvent(
           dynamicSubmission,
           ErrorType.NoData,
-          null
+          None
         )
       )
 
@@ -99,7 +99,7 @@ object SubmissionParameters {
         submitErrorEvent = new XFormsSubmitErrorEvent(
           dynamicSubmission,
           ErrorType.NoData,
-          null
+          None
         )
       )
 
@@ -275,7 +275,7 @@ object SubmissionParameters {
           submitErrorEvent = new XFormsSubmitErrorEvent(
             dynamicSubmission,
             ErrorType.XXFormsMethodError,
-            null
+            None
           )
         )
     }

@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsNames
 
@@ -33,7 +33,7 @@ class XFormsSendAction extends XFormsAction {
 
     // Find submission object
     val submissionId = actionElement.attributeValue(XFormsNames.SUBMISSION_QNAME)
-    if (submissionId == null)
+    if (submissionId eq null)
       throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 
     // Resolve AVT
@@ -43,16 +43,18 @@ class XFormsSendAction extends XFormsAction {
       return
 
     // Find actual target
-    val submission = interpreter.resolveObject(actionElement, resolvedSubmissionStaticId)
-
-    if (submission.isInstanceOf[XFormsModelSubmission]) {
-      // Dispatch event to submission object
-      val newEvent = new XFormsSubmitEvent(submission.asInstanceOf[XFormsEventTarget], XFormsAction.eventProperties(interpreter, actionElement))
-      Dispatch.dispatchEvent(newEvent)
-    } else {
-      // "If there is a null search result for the target object and the source object is an XForms action such as
-      // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-      warn("xf:send: submission does not refer to an existing xf:submission element, ignoring action", List("submission id" -> submissionId))
+    interpreter.resolveObject(actionElement, resolvedSubmissionStaticId) match {
+      case submission: XFormsModelSubmission =>
+        // Dispatch event to submission object
+        val newEvent = new XFormsSubmitEvent(submission, XFormsAction.eventProperties(interpreter, actionElement))
+        Dispatch.dispatchEvent(newEvent)
+      case _ =>
+        // "If there is a null search result for the target object and the source object is an XForms action such as
+        // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+        warn(
+          "xf:send: submission does not refer to an existing xf:submission element, ignoring action",
+          List("submission id" -> submissionId)
+        )
     }
   }
 }

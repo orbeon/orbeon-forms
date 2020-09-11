@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.File
 import java.net.URI
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -48,7 +49,7 @@ class BinaryReplacer(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Runnable = {
+  ): Option[Runnable] = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
     def filenameFromHeader : Option[String] = None // MAYBE: `Content-Disposition`'s `filename`.
@@ -78,6 +79,6 @@ class BinaryReplacer(
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    submission.sendSubmitDone(connectionResult)
+    submission.sendSubmitDone(connectionResult).some
   }
 }

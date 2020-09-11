@@ -30,13 +30,6 @@ object ReplaceType extends Enum[ReplaceType] {
   case object Text     extends ReplaceType
   case object None     extends ReplaceType
   case object Binary   extends ReplaceType
-
-  // For Java callers
-  def isReplaceAll     (replaceType: ReplaceType) = replaceType == All
-  def isReplaceInstance(replaceType: ReplaceType) = replaceType == Instance
-  def isReplaceText    (replaceType: ReplaceType) = replaceType == Text
-  def isReplaceNone    (replaceType: ReplaceType) = replaceType == None
-  def isReplaceBinary  (replaceType: ReplaceType) = replaceType == Binary
 }
 
 case class RefContext(

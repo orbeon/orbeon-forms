@@ -14,13 +14,17 @@
 package org.orbeon.oxf.xforms.submission
 
 
-
 import java.net.URI
 import java.util.concurrent.Callable
 
+import cats.syntax.option._
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.StreamedContent
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
+
+import scala.util.{Failure, Success}
+import scala.util.control.NonFatal
 
 /**
   * Regular remote submission going through a protocol handler.
@@ -34,7 +38,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     p  : SubmissionParameters,
     p2 : SecondPassParameters,
     sp : SerializationParameters
-  ): SubmissionResult = {
+  ): Option[SubmissionResult] = {
 
     val absoluteResolvedURL = new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType))
 
@@ -60,7 +64,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val submissionEffectiveId = submission.getEffectiveId
 
     val messageBody: Option[Array[Byte]] =
-      if (Connection.requiresRequestBody(p.httpMethod)) Option(sp.messageBody) orElse Some(Array()) else None
+      if (Connection.requiresRequestBody(p.httpMethod)) sp.messageBody orElse Some(Array.emptyByteArray) else None
 
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
@@ -83,7 +87,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     // - now and synchronously
     // - now and asynchronously
     // - later as a "foreground" asynchronous submission
-    val callable = new Callable[SubmissionResult]() {
+    val callable = new Callable[SubmissionResult] {
 
       def call: SubmissionResult = {
         // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
@@ -95,38 +99,35 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         var connected    = false
         var deserialized = false
 
-        var connectionResult: ConnectionResult = null
+        var connectionResultOpt: Option[ConnectionResult] = None
         try {
 
-          detailsLogger.startHandleOperation("", "opening connection")
-          try {
-            // Connect, and cleanup
-            // TODO: Consider how the state could be saved. Maybe do this before connect() in the initiating thread?
-            // Or make sure it's ok to touch app/session (but not request) from other thread (ExternalContext
-            // in scope + synchronization)
-            connectionResult = connection.connect(! p2.isAsynchronous)
-          } finally {
-            // In case an exception is thrown in the body, still do adjust the logs
-            detailsLogger.endHandleOperation()
-          }
+          val connectionResult =
+            withDebug("opening connection") {
+              // Connect, and cleanup
+              // TODO: Consider how the state could be saved. Maybe do this before connect() in the initiating thread?
+              // Or make sure it's ok to touch app/session (but not request) from other thread (`ExternalContext`
+              // in scope + synchronization)
+              connection.connect(! p2.isAsynchronous)
+            }(detailsLogger)
 
+          connectionResultOpt = connectionResult.some
           connected = true
 
           // TODO: This refers to Submission.
           val replacer = submission.getReplacer(connectionResult, p)
 
-          if (replacer ne null) {
-            // Deserialize here so it can run in parallel
-            replacer.deserialize(connectionResult, p, p2)
-            // Update status
-            deserialized = true
-          }
+          // Deserialize here so it can run in parallel
+          replacer.deserialize(connectionResult, p, p2)
+          // Update status
+          deserialized = true
 
-          new SubmissionResult(submissionEffectiveId, replacer, connectionResult)
+          SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult)))
         } catch {
-          case throwable: Throwable =>
+          case NonFatal(throwable) =>
             // Exceptions are handled further down
-            new SubmissionResult(submissionEffectiveId, throwable, connectionResult)
+            connectionResultOpt foreach (_.close())
+            SubmissionResult(submissionEffectiveId, Failure(throwable))
         } finally {
           if (p2.isAsynchronous && timingLogger.isDebugEnabled)
             timingLogger.endHandleOperation(

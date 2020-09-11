@@ -27,6 +27,6 @@ class XFormsSubmitDoneEvent(target: XFormsEventTarget, properties: PropertyGette
     _connectionResult = Option(connectionResult)
   }
 
-  private[this] var _connectionResult: Option[ConnectionResult] = None
-  def connectionResult = _connectionResult
+  private var _connectionResult: Option[ConnectionResult] = None
+  def connectionResult: Option[ConnectionResult] = _connectionResult
 }

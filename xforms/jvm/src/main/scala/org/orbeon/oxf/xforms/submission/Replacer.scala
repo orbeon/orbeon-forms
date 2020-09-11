@@ -17,9 +17,16 @@ import org.orbeon.oxf.util.ConnectionResult
 
 trait Replacer {
 
-  def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters)
+  def deserialize(
+    connectionResult : ConnectionResult,
+    p                : SubmissionParameters,
+    p2               : SecondPassParameters)
+  : Unit
 
-  // NOTE: replace() is allowed to throw exceptions, including `XFormsSubmissionException`
-  // TODO: Can return null. Ouch!
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable
+  // NOTE: This is allowed to throw exceptions, including `XFormsSubmissionException`.
+  def replace(
+    connectionResult : ConnectionResult,
+    p                : SubmissionParameters,
+    p2               : SecondPassParameters
+  ): Option[Runnable]
 }

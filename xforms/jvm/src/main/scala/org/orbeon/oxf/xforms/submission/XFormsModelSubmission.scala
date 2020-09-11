@@ -16,9 +16,11 @@ package org.orbeon.oxf.xforms.submission
 import java.util
 import java.util.concurrent.Callable
 
+import cats.syntax.option._
 import org.apache.log4j.Logger
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget, XFormsEvents}
@@ -32,6 +34,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
 
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 /**
  * Represents an XForms model submission instance.
@@ -44,7 +47,7 @@ object XFormsModelSubmission {
   val logger: Logger = LoggerFactory.createLogger(classOf[XFormsModelSubmission])
 
   /**
-   * Run the given submission callable. This must be a callable for a replace="all" submission.
+   * Run the given submission callable. This must be a callable for a `replace="all"` submission.
    *
    * @param callable callable run
    * @param response response to write to if needed
@@ -54,22 +57,23 @@ object XFormsModelSubmission {
     val result = callable.call()
     if (result != null) {
       // Callable did not do all the work, completed it here
-      try
-        if (result.getReplacer != null) {
+      result.result match {
+        case Success((replacer, connectionResult)) =>
           // Replacer provided, perform replacement
-          result.getReplacer match {
-            case _: AllReplacer => AllReplacer.forwardResultToResponse(result.connectionResult, response)
-            case _: RedirectReplacer => RedirectReplacer.doReplace(result.connectionResult, response)
-            case _ => assert(result.getReplacer.isInstanceOf[NoneReplacer])
+          try {
+            replacer match {
+              case _: AllReplacer      => AllReplacer.forwardResultToResponse(connectionResult, response)
+              case _: RedirectReplacer => RedirectReplacer.doReplace(connectionResult, response)
+              case _: NoneReplacer     => // NOP
+              case r                   => throw new IllegalArgumentException(r.getClass.getName)
+            }
+          } finally {
+            connectionResult.close()
           }
-        } else if (result.getThrowable != null) {
+        case Failure(throwable) =>
           // Propagate throwable, which might have come from a separate thread
-          throw new OXFException(result.getThrowable)
-        } else {
-          // Should not happen
-        }
-      finally
-        result.close()
+          throw new OXFException(throwable)
+      }
     }
   }
 
@@ -79,7 +83,7 @@ object XFormsModelSubmission {
     indentedLogger  : IndentedLogger,
     newDebugEnabled : Boolean
   ) =
-    if (p2.isAsynchronous && !ReplaceType.isReplaceNone(p.replaceType)) {
+    if (p2.isAsynchronous && p.replaceType != ReplaceType.None) {
       // Background asynchronous submission creates a new logger with its own independent indentation
       val newIndentation = new IndentedLogger.Indentation(indentedLogger.getIndentation.indentation)
       new IndentedLogger(indentedLogger, newIndentation, newDebugEnabled)
@@ -104,17 +108,17 @@ class XFormsModelSubmission(
   val model            : XFormsModel
 ) extends XFormsModelSubmissionBase {
 
-  thisXFormsModelSubmission =>
+  thisSubmission =>
 
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
 
   // All the submission types in the order they must be checked
   val submissions =
     List(
-      new EchoSubmission(this),
-      new ClientGetAllSubmission(this),
-      new CacheableSubmission(this),
-      new RegularSubmission(this)
+      new EchoSubmission(thisSubmission),
+      new ClientGetAllSubmission(thisSubmission),
+      new CacheableSubmission(thisSubmission),
+      new RegularSubmission(thisSubmission)
     )
 
   def getId               : String            = staticSubmission.staticId
@@ -129,7 +133,7 @@ class XFormsModelSubmission(
   def performDefaultAction(event: XFormsEvent): Unit =
     event match {
       case e: XFormsSubmitEvent                       => doSubmit(e)
-      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(this, e.throwable)
+      case e: XXFormsActionErrorEvent                 => XFormsError.handleNonFatalActionError(thisSubmission, e.throwable)
       case e if e.name == XFormsEvents.XXFORMS_SUBMIT => doSubmit(e)
       case _ =>
     }
@@ -139,11 +143,11 @@ class XFormsModelSubmission(
     // Variables declared here as they are used in a catch/finally block
     var p: SubmissionParameters = null
     var resolvedActionOrResource: String = null
-    var submitDoneOrErrorRunnable: Runnable = null
+    var submitDoneOrErrorRunnableOpt: Option[Runnable] = None
     try {
       try {
         // Big bag of initial runtime parameters
-        p = SubmissionParameters(event.name)(thisXFormsModelSubmission)
+        p = SubmissionParameters(event.name)(thisSubmission)
         if (indentedLogger.isDebugEnabled) {
           val message =
             if (p.isDeferredSubmissionFirstPass)
@@ -164,7 +168,7 @@ class XFormsModelSubmission(
             "existing submission",
             twoPassParams.get.targetEffectiveId,
             "new submission",
-            this.getEffectiveId
+            getEffectiveId
           )
           return
         }
@@ -176,14 +180,14 @@ class XFormsModelSubmission(
         if (p.serialize && p.xxfUploads &&
           SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext.refInstanceOpt))
           throw new XFormsSubmissionException(
-            this,
+            thisSubmission,
             "xf:submission: instance to submit has at least one pending upload.",
             "checking pending uploads",
             null,
             new XFormsSubmitErrorEvent(
-              thisXFormsModelSubmission,
-              ErrorType.XXFORMS_PENDING_UPLOADS,
-              null
+              thisSubmission,
+              ErrorType.XXFormsPendingUploads,
+              None
             )
           )
 
@@ -232,7 +236,7 @@ class XFormsModelSubmission(
         /* ***** Submission second pass ************************************************************************* */
 
         // Compute parameters only needed during second pass
-        val p2 = SecondPassParameters(thisXFormsModelSubmission, p)
+        val p2 = SecondPassParameters(thisSubmission, p)
         resolvedActionOrResource = p2.actionOrResource // in case of exception
 
         /* ***** Serialization ********************************************************************************** */
@@ -240,7 +244,7 @@ class XFormsModelSubmission(
         getRequestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod) match {
           case None =>
             throw new XFormsSubmissionException(
-              this,
+              thisSubmission,
               "xf:submission: invalid submission method requested: " + p.xformsMethod,
               "serializing instance",
               null,
@@ -279,7 +283,7 @@ class XFormsModelSubmission(
               // consists of a serialization of the selected instance data according to the rules stated at 11.9
               // Submission Options."
               val serializeEvent =
-                new XFormsSubmitSerializeEvent(thisXFormsModelSubmission, p.refContext.refNodeInfo, requestedSerialization)
+                new XFormsSubmitSerializeEvent(thisSubmission, p.refContext.refNodeInfo, requestedSerialization)
 
               Dispatch.dispatchEvent(serializeEvent)
 
@@ -290,20 +294,16 @@ class XFormsModelSubmission(
             }
 
           // Serialize
-          val sp = SerializationParameters(this, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData)
+          val sp = SerializationParameters(thisSubmission, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData)
 
           /* ***** Submission connection ************************************************************************** */
 
           // Result information
           val submissionResultOpt =
             submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
-              if (indentedLogger.isDebugEnabled)
-                indentedLogger.startHandleOperation("", "connecting", "type", submission.getType)
-              try {
-                 Option(submission.connect(p, p2, sp))
-              } finally
-                if (indentedLogger.isDebugEnabled)
-                  indentedLogger.endHandleOperation()
+              withDebug("connecting", List("type" -> submission.getType)) {
+                submission.connect(p, p2, sp)
+              }(indentedLogger)
             }
 
           /* ***** Submission result processing ******************************************************************* */
@@ -311,25 +311,27 @@ class XFormsModelSubmission(
 
           // `None` in case the submission is running asynchronously, AND when ???
           submissionResultOpt foreach { submissionResult =>
-            submitDoneOrErrorRunnable =
+            submitDoneOrErrorRunnableOpt =
               handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = true) // true because function context might have changed
           }
         }
       } catch {
-        case throwable: Throwable =>
+        case NonFatal(throwable) =>
           /* ***** Handle errors ********************************************************************************** */
           val pVal = p
           val resolvedActionOrResourceVal = resolvedActionOrResource
-          submitDoneOrErrorRunnable = new Runnable() {
-            override def run() {
-              if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward) { // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                throw new XFormsSubmissionException(thisXFormsModelSubmission, "Error while processing xf:submission", "processing submission", throwable, null)
-              }
-              else { // Any exception will cause an error event to be dispatched
-                sendSubmitError(throwable, resolvedActionOrResourceVal)
-              }
-            }
-          }
+          submitDoneOrErrorRunnableOpt = Some(() => {
+            // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
+            if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
+              throw new XFormsSubmissionException(
+                thisSubmission,
+                "Error while processing xf:submission", "processing submission",
+                throwable,
+                null
+              )
+            else
+              sendSubmitError(throwable, resolvedActionOrResourceVal) // any exception will cause an error event to be dispatched
+          })
       }
     } finally {
       // Log total time spent in submission
@@ -338,7 +340,7 @@ class XFormsModelSubmission(
     }
     // Execute post-submission code if any
     // This typically dispatches xforms-submit-done/xforms-submit-error, or may throw another exception
-    if (submitDoneOrErrorRunnable != null) {
+    submitDoneOrErrorRunnableOpt foreach { submitDoneOrErrorRunnable =>
       // We do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
       // or xforms-submit-error we don't dispatch xforms-submit-error (which would be illegal).
       // This will also close the connection result if needed.
@@ -351,15 +353,17 @@ class XFormsModelSubmission(
    */
   private[submission]
   def doSubmitReplace(submissionResult: SubmissionResult): Unit = {
+
     require(submissionResult ne null)
-    val p = SubmissionParameters(null)(thisXFormsModelSubmission)
-    val p2 = SecondPassParameters(thisXFormsModelSubmission, p)
-    val submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = false)
-    // Execute submit done runnable if any
-    if (submitDoneRunnable != null)
-      // Do this outside the handleSubmissionResult catch block so that if a problem occurs during dispatching
-      // xforms-submit-done we don't dispatch xforms-submit-error (which would be illegal)
+
+    val p = SubmissionParameters(null)(thisSubmission)
+    val p2 = SecondPassParameters(thisSubmission, p)
+
+    handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = false) foreach { submitDoneRunnable =>
+      // Do this outside the `handleSubmissionResult` catch block so that if a problem occurs during dispatching
+      // `xforms-submit-done` we don't dispatch `xforms-submit-error` (which would be illegal).
       submitDoneRunnable.run()
+    }
   }
 
   private def handleSubmissionResult(
@@ -367,139 +371,124 @@ class XFormsModelSubmission(
     p2                     : SecondPassParameters,
     submissionResult       : SubmissionResult,
     initializeXPathContext : Boolean
-  ): Runnable = {
+  ): Option[Runnable] = {
 
     require(p ne null)
     require(p2 ne null)
     require(submissionResult ne null)
 
-    val submitDoneOrErrorRunnable: Runnable =
-      try {
-        val indentedLogger = getIndentedLogger
-        if (indentedLogger.isDebugEnabled)
-          indentedLogger.startHandleOperation("", "handling result")
-        try {
-          // Get fresh XPath context if requested
-          val updatedP =
-            if (initializeXPathContext)
-              SubmissionParameters.withUpdatedRefContext(p)(thisXFormsModelSubmission)
-            else
-                p
-          // Process the different types of response
-          if (submissionResult.getThrowable != null) {
-            () => sendSubmitError(submissionResult.getThrowable, submissionResult)
-          } else {
-            assert(submissionResult.getReplacer != null)
-            submissionResult.getReplacer.replace(submissionResult.connectionResult, updatedP, p2)
-          }
-        } finally
-          if (indentedLogger.isDebugEnabled)
-            indentedLogger.endHandleOperation()
-      } catch {
-        case NonFatal(throwable) =>
-          () => sendSubmitError(throwable, submissionResult)
-      }
-    // Create wrapping runnable to make sure the submission result is closed
-    () =>
-      try
-        if (submitDoneOrErrorRunnable ne null)
-          submitDoneOrErrorRunnable.run()
-      finally {
-        // Close only after the submission result has run
-        submissionResult.close()
-      }
+    try {
+      val indentedLogger = getIndentedLogger
+      withDebug("handling result") {
+
+        val updatedP =
+          if (initializeXPathContext)
+            SubmissionParameters.withUpdatedRefContext(p)(thisSubmission)
+          else
+              p
+
+        submissionResult.result match {
+          case Success((replacer, connectionResult)) =>
+            try {
+              replacer.replace(connectionResult, updatedP, p2)
+            } finally {
+              connectionResult.close()
+            }
+          case Failure(throwable) =>
+            ((() => sendSubmitError(throwable, submissionResult)): Runnable).some
+        }
+      }(indentedLogger)
+    } catch {
+      case NonFatal(throwable) =>
+        ((() => sendSubmitError(throwable, submissionResult)): Runnable).some
+    }
   }
 
   def sendSubmitDone(connectionResult: ConnectionResult): Runnable =
-    new Runnable {
-      def run() {
-        // After a submission, the context might have changed
-        model.resetAndEvaluateVariables()
-        Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisXFormsModelSubmission, connectionResult))
-      }
+    () => {
+      // After a submission, the context might have changed
+      model.resetAndEvaluateVariables()
+      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, connectionResult))
     }
 
   def getReplacer(connectionResult: ConnectionResult, p: SubmissionParameters): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
-    if (connectionResult != null) {
-      // Handle response
-      if (connectionResult.dontHandleResponse) {
-        // Always return a replacer even if it does nothing, this way we don't have to deal with null
-        new NoneReplacer(this, containingDocument)
-      } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) { // Successful response
-        if (connectionResult.hasContent) { // There is a body
-          // Get replacer
-          if (ReplaceType.isReplaceAll(p.replaceType))
-            new AllReplacer(this, containingDocument)
-          else if (ReplaceType.isReplaceInstance(p.replaceType))
-            new InstanceReplacer(this, containingDocument)
-          else if (ReplaceType.isReplaceText(p.replaceType))
-            new TextReplacer(this, containingDocument)
-          else if (ReplaceType.isReplaceNone(p.replaceType))
-            new NoneReplacer(this, containingDocument)
-          else if (ReplaceType.isReplaceBinary(p.replaceType))
-            new BinaryReplacer(this, containingDocument)
-          else
-            throw new XFormsSubmissionException(
-              thisXFormsModelSubmission,
-              "xf:submission: invalid replace attribute: " + p.replaceType,
-              "processing instance replacement",
-              null,
-              new XFormsSubmitErrorEvent(
-                this,
-                ErrorType.XXFORMS_INTERNAL_ERROR,
-                connectionResult
-              )
-            )
-        } else {
-          // There is no body, notify that processing is terminated
-          if (ReplaceType.isReplaceInstance(p.replaceType) || ReplaceType.isReplaceText(p.replaceType)) {
-            // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
-            // no instance replacement took place
-            val indentedLogger = getIndentedLogger
-            indentedLogger.logWarning(
-              "",
-              "instance or text replacement did not take place upon successful response because no body was provided.",
-              "submission id",
-              getEffectiveId
-            )
-          }
-          // "For a success response not including a body, submission processing concludes after dispatching
-          // xforms-submit-done"
-          new NoneReplacer(this, containingDocument)
-        }
-      } else if (NetUtils.isRedirectCode(connectionResult.statusCode)) {
-        // Got a redirect
-        // Currently we don't know how to handle a redirect for replace != "all"
-        if (! ReplaceType.isReplaceAll(p.replaceType))
+    // Handle response
+    if (connectionResult.dontHandleResponse) {
+      // Always return a replacer even if it does nothing, this way we don't have to deal with null
+      new NoneReplacer(thisSubmission, containingDocument)
+    } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) { // Successful response
+      if (connectionResult.hasContent) { // There is a body
+        // Get replacer
+        if (p.replaceType == ReplaceType.All)
+          new AllReplacer(thisSubmission, containingDocument)
+        else if (p.replaceType == ReplaceType.Instance)
+          new InstanceReplacer(thisSubmission, containingDocument)
+        else if (p.replaceType == ReplaceType.Text)
+          new TextReplacer(thisSubmission, containingDocument)
+        else if (p.replaceType == ReplaceType.None)
+          new NoneReplacer(thisSubmission, containingDocument)
+        else if (p.replaceType == ReplaceType.Binary)
+          new BinaryReplacer(thisSubmission, containingDocument)
+        else
           throw new XFormsSubmissionException(
-            this,
-            "xf:submission for submission id: " + getId + ", redirect code received with replace=\"" + p.replaceType + "\"",
-            "processing submission response",
+            thisSubmission,
+            "xf:submission: invalid replace attribute: " + p.replaceType,
+            "processing instance replacement",
             null,
             new XFormsSubmitErrorEvent(
-              this,
-              ErrorType.RESOURCE_ERROR,
-              connectionResult
+              thisSubmission,
+              ErrorType.XXFormsInternalError,
+              connectionResult.some
             )
           )
-        new RedirectReplacer(this, containingDocument)
       } else {
-        // Error code received
+        // There is no body, notify that processing is terminated
+        if (p.replaceType == ReplaceType.Instance || p.replaceType == ReplaceType.Text) {
+          // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
+          // no instance replacement took place
+          val indentedLogger = getIndentedLogger
+          indentedLogger.logWarning(
+            "",
+            "instance or text replacement did not take place upon successful response because no body was provided.",
+            "submission id",
+            getEffectiveId
+          )
+        }
+        // "For a success response not including a body, submission processing concludes after dispatching
+        // xforms-submit-done"
+        new NoneReplacer(thisSubmission, containingDocument)
+      }
+    } else if (NetUtils.isRedirectCode(connectionResult.statusCode)) {
+      // Got a redirect
+      // Currently we don't know how to handle a redirect for replace != "all"
+      if (p.replaceType != ReplaceType.All)
         throw new XFormsSubmissionException(
-          this,
-          "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + connectionResult.statusCode,
+          thisSubmission,
+          "xf:submission for submission id: " + getId + ", redirect code received with replace=\"" + p.replaceType + "\"",
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
-            this,
-            ErrorType.RESOURCE_ERROR,
-            connectionResult
+            thisSubmission,
+            ErrorType.ResourceError,
+            connectionResult.some
           )
         )
-      }
-    } else
-      null
+      new RedirectReplacer(thisSubmission, containingDocument)
+    } else {
+      // Error code received
+      throw new XFormsSubmissionException(
+        thisSubmission,
+        "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + connectionResult.statusCode,
+        "processing submission response",
+        null,
+        new XFormsSubmitErrorEvent(
+          thisSubmission,
+          ErrorType.ResourceError,
+          connectionResult.some
+        )
+      )
+    }
   }
 
   def findReplaceInstanceNoTargetref(refInstance: Option[XFormsInstance]): XFormsInstance =
@@ -551,7 +540,8 @@ class XFormsModelSubmission(
     }
   }
 
-  def getIndentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
+  private def getIndentedLogger: IndentedLogger =
+    containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
 
   def getDetailsLogger(p: SubmissionParameters, p2: SecondPassParameters): IndentedLogger =
     XFormsModelSubmission.getNewLogger(p, p2, getIndentedLogger, XFormsModelSubmission.isLogDetails)

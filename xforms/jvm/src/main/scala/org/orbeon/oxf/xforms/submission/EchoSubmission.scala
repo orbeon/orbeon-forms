@@ -16,8 +16,11 @@ package org.orbeon.oxf.xforms.submission
 import java.io.ByteArrayInputStream
 import java.net.URI
 
+import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
+
+import scala.util.Success
 
 /**
  * Test submission which just echoes the incoming document.
@@ -37,20 +40,21 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ): SubmissionResult = {
+  ): Option[SubmissionResult] = {
 
-    if (sp.messageBody == null) {
-      // Not sure when this can happen, but it can't be good
-      throw new XFormsSubmissionException(
-        submission  = submission,
-        message     = "Action 'test:': no message body.",
-        description = "processing submission response"
-      )
-    }  else {
-      // Log message body for debugging purposes
-      val indentedLogger = getDetailsLogger(p, p2)
-      if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
-        Connection.logRequestBody(sp.actualRequestMediatype, sp.messageBody)(indentedLogger)
+    sp.messageBody match {
+      case None =>
+        // Not sure when this can happen, but it can't be good
+        throw new XFormsSubmissionException(
+          submission  = submission,
+          message     = "Action 'test:': no message body.",
+          description = "processing submission response"
+        )
+      case Some(messageBody) =>
+        // Log message body for debugging purposes
+        val indentedLogger = getDetailsLogger(p, p2)
+        if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
+          Connection.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
@@ -83,9 +87,9 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       statusCode          = 200,
       headers             = headers,
       content             = StreamedContent(
-        inputStream     = new ByteArrayInputStream(sp.messageBody),
+        inputStream     = new ByteArrayInputStream(sp.messageBody getOrElse Array.emptyByteArray),
         contentType     = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
-        contentLength   = Some(sp.messageBody.length),
+        contentLength   = Some(sp.messageBody map (_.length.toLong) getOrElse 0L),
         title           = None
       )
     )
@@ -94,6 +98,6 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     // Deserialize here so it can run in parallel
     replacer.deserialize(connectionResult, p, p2)
 
-    new SubmissionResult(submission.getEffectiveId, replacer, connectionResult)
+    SubmissionResult(submission.getEffectiveId, Success((replacer, connectionResult))).some
   }
 }

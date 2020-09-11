@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.oxf.common.{OrbeonLocationException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -261,11 +261,10 @@ class XFormsContainingDocument(
   private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit = {
     val manager = getAsynchronousSubmissionManager(false)
     if (manager != null && manager.hasPendingAsynchronousSubmissions) {
-      if (! skipDeferredEventHandling)
-        startOutermostActionHandler()
-      manager.processCompletedAsynchronousSubmissions()
-      if (! skipDeferredEventHandling)
-        endOutermostActionHandler()
+
+      maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
+        manager.processCompletedAsynchronousSubmissions()
+      }
 
       // Remember to send a poll event if needed
       if (addPollEvent)

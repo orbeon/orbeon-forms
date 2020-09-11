@@ -33,8 +33,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
@@ -86,8 +85,8 @@ class XFormsModel(
           staticEventHandler <- staticModel.eventHandlers
           parent             =
             staticEventHandler.parent match {
-              case Some(sp: Submission) => _submissions(sp.staticId)
-              case _                    => selfModel
+              case Some(staticSubmission: Submission) => _submissions(staticSubmission.staticId)
+              case _                                  => selfModel
             }
         } yield
           (staticEventHandler.staticId, new XFormsModelAction(parent, staticEventHandler))
@@ -474,7 +473,7 @@ trait XFormsModelInstances {
       if (instance.cache && ! ProcessorImpl.isProcessorInputScheme(instanceResource)) {
         // Instance 1) has cache hint and 2) is not input:*, so it can be cached
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
-        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), null)
+        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
         val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(instance, caching, instance.readonly, loadInstance)
         indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, false, true))
       } else {

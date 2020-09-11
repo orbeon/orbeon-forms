@@ -359,8 +359,17 @@ trait ContainingDocumentEvent {
     r
   }
 
+  def maybeWithOutermostActionHandler[T](cond: Boolean)(block: => T): T = {
+    if (cond)
+      startOutermostActionHandler()
+    val r = block
+    if (cond)
+      endOutermostActionHandler()
+    r
+  }
+
   def startOutermostActionHandler(): Unit = // Q: What about relevance?
-    allModels foreach (_.startOutermostActionHandler)
+    allModels foreach (_.startOutermostActionHandler())
 
   def endOutermostActionHandler(): Unit =
     if (isRelevant)

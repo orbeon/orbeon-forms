@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
@@ -62,7 +63,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ResourceError,
-            connectionResult
+            connectionResult.some
           )
         )
     }
@@ -71,9 +72,9 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Runnable = {
+  ): Option[Runnable] = {
     responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, connectionResult, p, _))
-    submission.sendSubmitDone(connectionResult)
+    submission.sendSubmitDone(connectionResult).some
   }
 }
 
@@ -97,7 +98,7 @@ object TextReplacer {
         submitErrorEvent = new XFormsSubmitErrorEvent(
           target           = submission,
           errorType        = ErrorType.TargetError,
-          connectionResult = connectionResult
+          connectionResult = connectionResult.some
         )
       )
 

@@ -111,7 +111,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     * Submissions are processed in the order in which they are made available upon termination by the completion
     * service.
     */
-  def processAllAsynchronousSubmissions(): Unit = {
+  def processAllAsynchronousSubmissionsForJoin(): Unit = {
 
     val asynchronousSubmissionOpt =
       findAsynchronousSubmissions(

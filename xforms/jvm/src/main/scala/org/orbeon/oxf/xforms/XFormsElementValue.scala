@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.{lang => jl}
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils.BooleanOps

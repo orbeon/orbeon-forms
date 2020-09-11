@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.ByteArrayOutputStream
 import java.net.{URI, URLEncoder}
 
+import cats.syntax.option._
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.DocumentSource
@@ -31,7 +32,7 @@ import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import scala.util.control.NonFatal
 
 case class SerializationParameters(
-  messageBody            : Array[Byte],
+  messageBody            : Option[Array[Byte]],
   queryString            : String,
   actualRequestMediatype : String
 )
@@ -57,13 +58,13 @@ object SerializationParameters {
           // Form author set data to serialize
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
-              messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8),
+              messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8).some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(ContentTypes.XmlContentType)
             )
           } else {
             SerializationParameters(
-              messageBody            = null,
+              messageBody            = None,
               queryString            = URLEncoder.encode(overriddenSerializedData, CharsetNames.Utf8),
               actualRequestMediatype = actualRequestMediatype(null)
             )
@@ -71,13 +72,13 @@ object SerializationParameters {
         case serialization @ "application/x-www-form-urlencoded" =>
           if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
-              messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8),
+              messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8).some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
           } else {
             SerializationParameters(
-              messageBody            = null,
+              messageBody            = None,
               queryString            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator),
               actualRequestMediatype = actualRequestMediatype(null)
             )
@@ -104,7 +105,7 @@ object SerializationParameters {
             identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
 
             SerializationParameters(
-                messageBody            = os.toByteArray,
+                messageBody            = os.toByteArray.some,
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
@@ -125,7 +126,7 @@ object SerializationParameters {
           )
 
           SerializationParameters(
-              messageBody            = result.getBytes(p2.encoding),
+              messageBody            = result.getBytes(p2.encoding).some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
@@ -145,7 +146,7 @@ object SerializationParameters {
 
           // The mediatype also contains the boundary
           SerializationParameters(
-            messageBody            = os.toByteArray,
+            messageBody            = os.toByteArray.some,
             queryString            = null,
             actualRequestMediatype = actualRequestMediatype(multipartFormData.getContentType.getValue)
           )
@@ -176,7 +177,7 @@ object SerializationParameters {
 
             try {
               SerializationParameters(
-                messageBody            = SubmissionUtils.readByteArray(submission.model, resolvedAbsoluteUrl),
+                messageBody            = SubmissionUtils.readByteArray(submission.model, resolvedAbsoluteUrl).some,
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )
@@ -213,7 +214,7 @@ object SerializationParameters {
             identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
 
             SerializationParameters(
-              messageBody            = os.toByteArray,
+              messageBody            = os.toByteArray.some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
@@ -246,7 +247,7 @@ object SerializationParameters {
             identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
 
             SerializationParameters(
-              messageBody            = os.toByteArray,
+              messageBody            = os.toByteArray.some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
@@ -269,7 +270,7 @@ object SerializationParameters {
     } else {
       SerializationParameters(
         queryString            = null,
-        messageBody            = null,
+        messageBody            = None,
         actualRequestMediatype = null
       )
     }

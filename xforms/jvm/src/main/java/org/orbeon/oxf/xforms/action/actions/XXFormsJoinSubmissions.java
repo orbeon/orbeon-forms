@@ -31,7 +31,7 @@ public class XXFormsJoinSubmissions extends XFormsAction {
             // Only supported in PE version
             final AsynchronousSubmissionManager manager = actionInterpreter.containingDocument().getAsynchronousSubmissionManager(false);
             if (manager != null)
-                manager.processAllAsynchronousSubmissions();
+                manager.processAllAsynchronousSubmissionsForJoin();
         } else {
             // It's better to throw an exception since this action can have an impact on application behavior, not only performance
             throw new OXFException("xxf:join-submissions extension action is only supported in Orbeon Forms PE.");

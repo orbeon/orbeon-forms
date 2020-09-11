@@ -53,7 +53,7 @@ abstract class XFormsModelSubmissionBase
   protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
     sendSubmitErrorWithDefault(
       throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.connectionResult)
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.result.toOption map (_._2))
     )
 
   protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =
@@ -125,7 +125,7 @@ abstract class XFormsModelSubmissionBase
         submission       = thisSubmission,
         message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
         description      = "checking instance validity",
-        submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, null)
+        submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, None)
       )
     }
 
@@ -507,8 +507,8 @@ object XFormsModelSubmissionBase {
         startNode.accept(
           new VisitorSupport {
 
-            override def visit(element: Element)     = checkNodeAndBreakIfFail(element)
-            override def visit(attribute: Attribute) = checkNodeAndBreakIfFail(attribute)
+            override def visit(element: Element)    : Unit = checkNodeAndBreakIfFail(element)
+            override def visit(attribute: Attribute): Unit = checkNodeAndBreakIfFail(attribute)
 
             def checkNodeAndBreakIfFail(node: Node): Unit =
               if (check(node)) {

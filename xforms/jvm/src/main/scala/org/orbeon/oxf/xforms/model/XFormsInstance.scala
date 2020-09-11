@@ -69,10 +69,10 @@ object InstanceCaching {
 
   // Not using "apply" as that causes issues for Java callers
   def fromValues(
-    timeToLive            : Long,
-    handleXInclude        : Boolean,
-    sourceURI             : String,
-    requestBodyHashOrNull : String
+    timeToLive      : Long,
+    handleXInclude  : Boolean,
+    sourceURI       : String,
+    requestBodyHash : Option[String]
   ): InstanceCaching =
     InstanceCaching(
       timeToLive        = timeToLive,
@@ -82,7 +82,7 @@ object InstanceCaching {
         filter        = isInternalPath)(
         ec            = NetUtils.getExternalContext
       ) getOrElse sourceURI, // adjust for internal path so replication works
-      requestBodyHash   = Option(requestBodyHashOrNull)
+      requestBodyHash   = requestBodyHash
     )
 }
 

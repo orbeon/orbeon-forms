@@ -35,7 +35,7 @@ import scala.util.control.NonFatal
 trait SubmitResponseEvent extends XFormsEvent {
 
   def connectionResult: Option[ConnectionResult]
-  final def headers = connectionResult map (_.headers)
+  final def headers: Option[Map[String, List[String]]] = connectionResult map (_.headers)
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
   // `event('response-body')` multiple times.

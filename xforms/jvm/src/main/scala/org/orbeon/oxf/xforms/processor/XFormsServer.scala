@@ -780,9 +780,9 @@ class XFormsServer extends ProcessorImpl {
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case someCallable =>
-                      // Check if there is a submission with replace="all" that needs processing
-                      someCallable
+                    case callableOpt =>
+                      // Check if there is a submission with `replace="all"` that needs processing
+                      callableOpt
                   }
                 }
               )

@@ -68,7 +68,7 @@ object Headers {
   val RequestHeadersToRemove  = HeadersToRemove ++ List("host", "cookie", "cookie2", "accept-encoding")
   val ResponseHeadersToRemove = HeadersToRemove ++ List("set-cookie", "set-cookie2", "content-encoding")
 
-  val EmptyHeaders = Map.empty[String, List[String]]
+  val EmptyHeaders: Map[String, List[String]] = Map.empty
 
   // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
   type ConvertibleToSeq[T[_], U] = T[U] => Seq[U]

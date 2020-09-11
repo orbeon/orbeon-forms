@@ -196,7 +196,7 @@ class Connection private (
           }
 
           // Create result
-          val connectionResult = ConnectionResult.apply(
+          val connectionResult = ConnectionResult(
             url        = normalizedUrlString,
             statusCode = response.statusCode,
             headers    = response.headers,

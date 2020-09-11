@@ -42,20 +42,20 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     _errorType = errorType
   }
 
-  def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: ConnectionResult) = {
+  def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: Option[ConnectionResult]) = {
     this(
       target     = target,
       properties = Map("error-type" -> Some(errorType.entryName))
     )
     _errorType = errorType
-    _connectionResult = Option(connectionResult)
+    _connectionResult = connectionResult
   }
 
-  private[this] var _errorType: ErrorType = _
-  def errorType = _errorType
+  private var _errorType: ErrorType = _
+  def errorType: ErrorType = _errorType
 
-  private[this] var _connectionResult: Option[ConnectionResult] = None
-  def connectionResult = _connectionResult
+  private var _connectionResult: Option[ConnectionResult] = None
+  def connectionResult: Option[ConnectionResult] = _connectionResult
 
   def logThrowable(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)
@@ -90,10 +90,4 @@ object ErrorType extends Enum[ErrorType] {
   case object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads") // CHECK: doc
   case object XXFormsInternalError  extends ErrorType("xxforms-internal-error")  // CHECK: doc
   case object XXFormsMethodError    extends ErrorType("xxforms-method-error")    // CHECK: doc
-
-  // For Java callers
-  def RESOURCE_ERROR          = ResourceError
-  def TARGET_ERROR            = TargetError
-  def XXFORMS_PENDING_UPLOADS = XXFormsPendingUploads
-  def XXFORMS_INTERNAL_ERROR  = XXFormsInternalError
 }

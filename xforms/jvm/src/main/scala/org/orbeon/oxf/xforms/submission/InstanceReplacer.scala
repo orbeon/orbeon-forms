@@ -36,7 +36,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
   // Unwrapped document set by `deserialize()`
   private var _resultingDocumentOpt: Option[Document Either DocumentInfo] = None
-  def resultingDocumentOrDocumentInfo = _resultingDocumentOpt map (_.merge) orNull
+  def resultingDocumentOpt: Option[Either[Document, DocumentInfo]] = _resultingDocumentOpt
 
   // For CacheableSubmission
   private var wrappedDocumentInfo: Option[DocumentInfo] = None
@@ -75,7 +75,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         submitErrorEvent = new XFormsSubmitErrorEvent(
           submission,
           ErrorType.ResourceError,
-          connectionResult
+          connectionResult.some
         )
       )
     }
@@ -133,7 +133,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ParseError,
-            connectionResult
+            connectionResult.some
           )
         )
     }
@@ -143,7 +143,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Runnable = {
+  ): Option[Runnable] = {
 
     // Set new instance document to replace the one submitted
 
@@ -166,7 +166,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             target           = submission,
             errorType        = ErrorType.TargetError,
-            connectionResult = connectionResult
+            connectionResult = connectionResult.some
           )
         )
       case Some(replaceInstanceNoTargetref) =>
@@ -192,7 +192,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -206,7 +206,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -222,7 +222,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -309,7 +309,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // - doDelete() does as well
           // Does this mean that we should check that the node is still where it should be?
         }
-        submission.sendSubmitDone(connectionResult)
+        submission.sendSubmitDone(connectionResult).some
     }
   }
 }

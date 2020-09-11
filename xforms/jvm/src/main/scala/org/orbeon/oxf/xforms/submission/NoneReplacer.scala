@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
@@ -32,6 +33,6 @@ class NoneReplacer(
     connectionResult: ConnectionResult,
     p: SubmissionParameters,
     p2: SecondPassParameters
-  ): Runnable =
-    submission.sendSubmitDone(connectionResult)
+  ): Option[Runnable] =
+    submission.sendSubmitDone(connectionResult).some
 }

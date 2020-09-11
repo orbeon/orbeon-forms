@@ -31,10 +31,10 @@ class RedirectReplacer(submission: XFormsModelSubmission, containingDocument: XF
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable = {
+  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Runnable] = {
     val response = NetUtils.getExternalContext.getResponse
     containingDocument.setGotSubmissionRedirect()
     RedirectReplacer.doReplace(connectionResult, response)
-    null
+    None
   }
 }

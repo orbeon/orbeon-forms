@@ -41,7 +41,7 @@ val CommonsIoVersion              = "2.7"
 val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.4.0"
 val JavaMailVersion               = "1.6.2"
-val JavaActivationVersion         = "1.2.2"
+val JavaActivationVersion         = "1.2.0"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -73,8 +73,8 @@ val CoreLibraryDependencies = Seq(
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
-  "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
-  "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
+  "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
+  "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,

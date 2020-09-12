@@ -49,6 +49,7 @@ val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
 val LiferayPortalKernelVersion    = "5.3.0"
 
+
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,

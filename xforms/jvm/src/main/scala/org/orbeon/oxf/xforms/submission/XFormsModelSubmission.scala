@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.submission
 
 import java.util
-import java.util.concurrent.Callable
 
+import cats.Eval
 import cats.syntax.option._
 import org.apache.log4j.Logger
 import org.orbeon.oxf.common.OXFException
@@ -47,35 +47,25 @@ object XFormsModelSubmission {
   val logger: Logger = LoggerFactory.createLogger(classOf[XFormsModelSubmission])
 
   /**
-   * Run the given submission callable. This must be a callable for a `replace="all"` submission.
-   *
-   * @param callable callable run
-   * @param response response to write to if needed
+   * Run the given submission `Eval`. This must be for a `replace="all"` submission.
    */
-  def runDeferredSubmission(callable: Callable[SubmissionResult], response: ExternalContext.Response) {
-    // Run submission
-    val result = callable.call()
-    if (result != null) {
-      // Callable did not do all the work, completed it here
-      result.result match {
-        case Success((replacer, connectionResult)) =>
-          // Replacer provided, perform replacement
-          try {
-            replacer match {
-              case _: AllReplacer      => AllReplacer.forwardResultToResponse(connectionResult, response)
-              case _: RedirectReplacer => RedirectReplacer.doReplace(connectionResult, response)
-              case _: NoneReplacer     => // NOP
-              case r                   => throw new IllegalArgumentException(r.getClass.getName)
-            }
-          } finally {
-            connectionResult.close()
+  def runDeferredSubmission(eval: Eval[SubmissionResult], response: ExternalContext.Response): Unit =
+    eval.value.result match {
+      case Success((replacer, connectionResult)) =>
+        try {
+          replacer match {
+            case _: AllReplacer      => AllReplacer.forwardResultToResponse(connectionResult, response)
+            case _: RedirectReplacer => RedirectReplacer.updateResponse(connectionResult, response)
+            case _: NoneReplacer     => // NOP
+            case r                   => throw new IllegalArgumentException(r.getClass.getName)
           }
-        case Failure(throwable) =>
-          // Propagate throwable, which might have come from a separate thread
-          throw new OXFException(throwable)
-      }
+        } finally {
+          connectionResult.close()
+        }
+      case Failure(throwable) =>
+        // Propagate throwable, which might have come from a separate thread
+        throw new OXFException(throwable)
     }
-  }
 
   private def getNewLogger(
     p               : SubmissionParameters,
@@ -143,7 +133,7 @@ class XFormsModelSubmission(
     // Variables declared here as they are used in a catch/finally block
     var p: SubmissionParameters = null
     var resolvedActionOrResource: String = null
-    var submitDoneOrErrorRunnableOpt: Option[Runnable] = None
+    var submitDoneOrErrorEvalOpt: Option[Eval[Unit]] = None
     try {
       try {
         // Big bag of initial runtime parameters
@@ -307,11 +297,10 @@ class XFormsModelSubmission(
             }
 
           /* ***** Submission result processing ******************************************************************* */
-          // NOTE: handleSubmissionResult() catches Throwable and returns a Runnable
 
           // `None` in case the submission is running asynchronously, AND when ???
           submissionResultOpt foreach { submissionResult =>
-            submitDoneOrErrorRunnableOpt =
+            submitDoneOrErrorEvalOpt =
               handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = true) // true because function context might have changed
           }
         }
@@ -320,7 +309,7 @@ class XFormsModelSubmission(
           /* ***** Handle errors ********************************************************************************** */
           val pVal = p
           val resolvedActionOrResourceVal = resolvedActionOrResource
-          submitDoneOrErrorRunnableOpt = Some(() => {
+          submitDoneOrErrorEvalOpt = Some(Eval.later {
             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
             if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
               throw new XFormsSubmissionException(
@@ -340,11 +329,11 @@ class XFormsModelSubmission(
     }
     // Execute post-submission code if any
     // This typically dispatches xforms-submit-done/xforms-submit-error, or may throw another exception
-    submitDoneOrErrorRunnableOpt foreach { submitDoneOrErrorRunnable =>
+    submitDoneOrErrorEvalOpt foreach { submitDoneOrErrorEval =>
       // We do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
       // or xforms-submit-error we don't dispatch xforms-submit-error (which would be illegal).
       // This will also close the connection result if needed.
-      submitDoneOrErrorRunnable.run()
+      submitDoneOrErrorEval.value
     }
   }
 
@@ -359,10 +348,10 @@ class XFormsModelSubmission(
     val p = SubmissionParameters(null)(thisSubmission)
     val p2 = SecondPassParameters(thisSubmission, p)
 
-    handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = false) foreach { submitDoneRunnable =>
+    handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = false) foreach { submitDoneEval=>
       // Do this outside the `handleSubmissionResult` catch block so that if a problem occurs during dispatching
       // `xforms-submit-done` we don't dispatch `xforms-submit-error` (which would be illegal).
-      submitDoneRunnable.run()
+      submitDoneEval.value
     }
   }
 
@@ -371,7 +360,7 @@ class XFormsModelSubmission(
     p2                     : SecondPassParameters,
     submissionResult       : SubmissionResult,
     initializeXPathContext : Boolean
-  ): Option[Runnable] = {
+  ): Option[Eval[Unit]] = {
 
     require(p ne null)
     require(p2 ne null)
@@ -395,17 +384,17 @@ class XFormsModelSubmission(
               connectionResult.close()
             }
           case Failure(throwable) =>
-            ((() => sendSubmitError(throwable, submissionResult)): Runnable).some
+            Eval.later(sendSubmitError(throwable, submissionResult)).some
         }
       }(indentedLogger)
     } catch {
       case NonFatal(throwable) =>
-        ((() => sendSubmitError(throwable, submissionResult)): Runnable).some
+        Eval.later(sendSubmitError(throwable, submissionResult)).some
     }
   }
 
-  def sendSubmitDone(connectionResult: ConnectionResult): Runnable =
-    () => {
+  def sendSubmitDone(connectionResult: ConnectionResult): Eval[Unit] =
+    Eval.later {
       // After a submission, the context might have changed
       model.resetAndEvaluateVariables()
       Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, connectionResult))
@@ -416,7 +405,7 @@ class XFormsModelSubmission(
     // Handle response
     if (connectionResult.dontHandleResponse) {
       // Always return a replacer even if it does nothing, this way we don't have to deal with null
-      new NoneReplacer(thisSubmission, containingDocument)
+      new NoneReplacer(thisSubmission)
     } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) { // Successful response
       if (connectionResult.hasContent) { // There is a body
         // Get replacer
@@ -427,7 +416,7 @@ class XFormsModelSubmission(
         else if (p.replaceType == ReplaceType.Text)
           new TextReplacer(thisSubmission, containingDocument)
         else if (p.replaceType == ReplaceType.None)
-          new NoneReplacer(thisSubmission, containingDocument)
+          new NoneReplacer(thisSubmission)
         else if (p.replaceType == ReplaceType.Binary)
           new BinaryReplacer(thisSubmission, containingDocument)
         else
@@ -457,7 +446,7 @@ class XFormsModelSubmission(
         }
         // "For a success response not including a body, submission processing concludes after dispatching
         // xforms-submit-done"
-        new NoneReplacer(thisSubmission, containingDocument)
+        new NoneReplacer(thisSubmission)
       }
     } else if (NetUtils.isRedirectCode(connectionResult.statusCode)) {
       // Got a redirect
@@ -474,7 +463,7 @@ class XFormsModelSubmission(
             connectionResult.some
           )
         )
-      new RedirectReplacer(thisSubmission, containingDocument)
+      new RedirectReplacer(containingDocument)
     } else {
       // Error code received
       throw new XFormsSubmissionException(

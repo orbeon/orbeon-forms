@@ -13,9 +13,9 @@
   */
 package org.orbeon.oxf.xforms.processor
 
-import java.util.concurrent.Callable
 import java.{util => ju}
 
+import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.exception.OrbeonFormatter
@@ -619,7 +619,7 @@ class XFormsServer extends ProcessorImpl {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Option[Callable[SubmissionResult]]] =
+    val lockResult: Try[Option[Eval[SubmissionResult]]] =
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -710,7 +710,7 @@ class XFormsServer extends ProcessorImpl {
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequenceNumber) {
-                  containingDocument.getReplaceAllCallable match {
+                  containingDocument.getReplaceAllEval match {
                     case None =>
                       xmlReceiverOpt match {
                         case Some(xmlReceiver) =>
@@ -780,9 +780,9 @@ class XFormsServer extends ProcessorImpl {
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case callableOpt =>
+                    case evalOpt =>
                       // Check if there is a submission with `replace="all"` that needs processing
-                      callableOpt
+                      evalOpt
                   }
                 }
               )
@@ -833,12 +833,12 @@ class XFormsServer extends ProcessorImpl {
 
     // Throw the exception if there was any
     lockResult match {
-      case Success(Some(replaceAllCallable)) =>
+      case Success(Some(replaceAllEval)) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmission.runDeferredSubmission(replaceAllCallable, response)
+        XFormsModelSubmission.runDeferredSubmission(replaceAllEval, response)
       case Success(None) =>
       case Failure(t)    => throw t
     }

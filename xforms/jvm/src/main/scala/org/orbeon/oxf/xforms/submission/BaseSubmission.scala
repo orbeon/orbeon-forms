@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.util.concurrent.Callable
-
+import cats.Eval
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
@@ -59,28 +58,26 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
   }
 
   /**
-   * Submit the Callable for synchronous or asynchronous execution.
-   *
-   * @return ConnectionResult or null if asynchronous
+   * Submit the `Eval` for synchronous or asynchronous execution.
    */
-  protected def submitCallable(
-    p        : SubmissionParameters,
-    p2       : SecondPassParameters,
-    callable : Callable[SubmissionResult]
+  protected def submitEval(
+    p    : SubmissionParameters,
+    p2   : SecondPassParameters,
+    eval : Eval[SubmissionResult]
   ): Option[SubmissionResult] =
     if (p2.isAsynchronous) {
       // Tell XFCD that we have one more async submission
-      containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(callable)
+      containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(eval)
       // Tell caller he doesn't need to do anything
       None
     }  else if (p.isDeferredSubmissionSecondPass) {
       // Tell XFCD that we have a submission replace="all" ready for a second pass
       // Tell caller he doesn't need to do anything
-      containingDocument.setReplaceAllCallable(callable)
+      containingDocument.setReplaceAllEval(eval)
       None
     }  else {
       // Just run it now
-      Option(callable.call)
+      Option(eval.value)
     }
 
   protected def getDetailsLogger(

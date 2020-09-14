@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent._
 
+import cats.Eval
 import javax.enterprise.concurrent.ManagedExecutorService
 import javax.naming.{InitialContext, NamingException}
 import org.orbeon.oxf.externalcontext.{AsyncRequest, LocalExternalContext}
@@ -58,7 +59,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         allowDuplicates   = false  // no need for duplicates
       )
 
-  def addAsynchronousSubmission(callable: Callable[SubmissionResult]): Unit = {
+  def addAsynchronousSubmission(eval: Eval[SubmissionResult]): Unit = {
     val asynchronousSubmissionsOpt =
       findAsynchronousSubmissions(
         create = true,
@@ -68,25 +69,26 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     // NOTE: If we want to re-enable foreground async submissions, we must:
     // - do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
     // - OR provide an explicit hint on xf:submission
-    asynchronousSubmissionsOpt foreach {
-      _.submit(
-        {
-          // Make sure this is created at the time `submit` is called
-          // Should we use `AsyncExternalContext` here?
-          val newExternalContext = {
+    asynchronousSubmissionsOpt foreach { asynchronousSubmissions =>
 
-              val currentExternalContext = NetUtils.getExternalContext
+      // Make sure this is created at the time `submit` is called
+      // Should we use `AsyncExternalContext` here?
+      val newExternalContext = {
 
-              new LocalExternalContext(
-                currentExternalContext.getWebAppContext,
-                new AsyncRequest(currentExternalContext.getRequest),
-                currentExternalContext.getResponse
-              )
-            }
+        val currentExternalContext = NetUtils.getExternalContext
 
-          () => withPipelineContext { pipelineContext =>
+        new LocalExternalContext(
+          currentExternalContext.getWebAppContext,
+          new AsyncRequest(currentExternalContext.getRequest),
+          currentExternalContext.getResponse
+        )
+      }
+
+      asynchronousSubmissions.submit(
+        Eval.later {
+          withPipelineContext { pipelineContext =>
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
-            callable.call()
+            eval.value
           }
         }
       )
@@ -229,14 +231,8 @@ private object AsynchronousSubmissionManager {
     private var _pendingCount = 0
     def pendingCount = _pendingCount
 
-    def submit(task: () => SubmissionResult): Future[SubmissionResult] = {
-
-      val future = completionService.submit(
-        new Callable[SubmissionResult]() {
-          def call() = task()
-        }
-      )
-
+    def submit(task: Eval[SubmissionResult]): Future[SubmissionResult] = {
+      val future = completionService.submit(() => task.value)
       _pendingCount += 1
       future
     }

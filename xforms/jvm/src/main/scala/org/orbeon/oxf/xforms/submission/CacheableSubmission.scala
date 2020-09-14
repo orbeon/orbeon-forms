@@ -13,19 +13,18 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.util.concurrent.Callable
-
+import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.saxon.om.VirtualNode
-import Logging._
 
-import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 /**
  * Cacheable remote submission going through a protocol handler.
@@ -58,7 +57,6 @@ class CacheableSubmission(submission: XFormsModelSubmission)
 
     val detailsLogger = getDetailsLogger(p, p2)
 
-    // Parameters to callable
     val submissionEffectiveId = submission.getEffectiveId
 
     // Find and check replacement location
@@ -81,96 +79,93 @@ class CacheableSubmission(submission: XFormsModelSubmission)
       replacer.setCachedResult(cachedDocumentInfo, instanceCaching)
       SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult))).some
     } else {
-      // NOTE: technically, somebody else could put an instance in cache between now and the Callable execution
+      // NOTE: technically, somebody else could put an instance in cache between now and the `Eval` execution
       if (detailsLogger.isDebugEnabled)
         detailsLogger.logDebug("", "did not find instance in cache", "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash.orNull)
       val timingLogger = getTimingLogger(p, p2)
-      // Create callable for synchronous or asynchronous loading
-      val callable = new Callable[SubmissionResult] {
-        def call: SubmissionResult = {
-          if (p2.isAsynchronous && timingLogger.isDebugEnabled)
-            timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
-          var loadingAttempted = false
-          var deserialized = false
-          try {
-            val newDocumentInfo =
-              XFormsServerSharedInstancesCache.findContentOrLoad(
-                staticInstance,
-                instanceCaching,
-                p2.isReadonly,
-                (instanceSourceURI: String, handleXInclude: Boolean) => {
-                  // Update status
-                  loadingAttempted = true
-                  // Call regular submission
-                  var submissionResultOpt: Option[SubmissionResult] = None
-                  try {
-                    // Run regular submission but force:
-                    // - synchronous execution
-                    // - readonly result
-
-                    val updatedP2 = p2.copy(isAsynchronous = false, isReadonly = true)
-
-                    val submissionResult =
-                      List(new RegularSubmission(submission)) find (_.isMatch(p, p2, sp)) flatMap { submission =>
-                        withDebug("connecting", List("type" -> submission.getType)) {
-                          submission.connect(p, updatedP2, sp)
-                        }(detailsLogger)
-                      } getOrElse
-                        (throw new IllegalArgumentException("can only cache a `RegularSubmission`"))
-
-                    submissionResultOpt = submissionResult.some
-
-                    submissionResult.result match {
-                      case Success((replacer: InstanceReplacer, _)) =>
-                        deserialized = true
-                        // load() requires an immutable TinyTree
-                        // Since we forced readonly above, the result must also be a readonly instance
-                        replacer.resultingDocumentOpt match {
-                          case Some(Right(_: VirtualNode))  => throw new IllegalStateException
-                          case Some(Right(documentInfo))    => documentInfo
-                          case _                            => throw new IllegalStateException
-                        }
-                      case Failure(throwable) =>
-                        throw new CacheableSubmission.ThrowableWrapper(throwable)
-                      case _ =>
-                        // We know that `RegularSubmission` returns a `Replacer` with an instance document so this
-                        // should not happen!
-                        throw new IllegalStateException
-                    }
-                  } catch {
-                    case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
-                      // In case we just threw it above, just propagate
-                      throw throwableWrapper
-                    case NonFatal(throwable) =>
-                      // Exceptions are handled further down
-                      throw new CacheableSubmission.ThrowableWrapper(throwable)
-                  }
-                })(detailsLogger)
-            // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the `DocumentInfo`
-            replacer.setCachedResult(newDocumentInfo, instanceCaching)
-
-            SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult)))
-          } catch {
-            case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
-              // The ThrowableWrapper was thrown within the inner load() method above
-              SubmissionResult(submissionEffectiveId, Failure(throwableWrapper.throwable))
-            case NonFatal(throwable) =>
-              // Any other throwable
-              SubmissionResult(submissionEffectiveId, Failure(throwable))
-          } finally
+      // Create deferred evaluation for synchronous or asynchronous loading
+      val eval = Eval.later {
         if (p2.isAsynchronous && timingLogger.isDebugEnabled)
-          timingLogger.endHandleOperation(
-            "id",
-            submission.getEffectiveId,
-            "asynchronous", p2.isAsynchronous.toString,
-            "loading attempted", loadingAttempted.toString,
-            "deserialized", deserialized.toString
-          )
-        }
+          timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
+        var loadingAttempted = false
+        var deserialized = false
+        try {
+          val newDocumentInfo =
+            XFormsServerSharedInstancesCache.findContentOrLoad(
+              staticInstance,
+              instanceCaching,
+              p2.isReadonly,
+              (instanceSourceURI: String, handleXInclude: Boolean) => {
+                // Update status
+                loadingAttempted = true
+                // Call regular submission
+                var submissionResultOpt: Option[SubmissionResult] = None
+                try {
+                  // Run regular submission but force:
+                  // - synchronous execution
+                  // - readonly result
+
+                  val updatedP2 = p2.copy(isAsynchronous = false, isReadonly = true)
+
+                  val submissionResult =
+                    List(new RegularSubmission(submission)) find (_.isMatch(p, p2, sp)) flatMap { submission =>
+                      withDebug("connecting", List("type" -> submission.getType)) {
+                        submission.connect(p, updatedP2, sp)
+                      }(detailsLogger)
+                    } getOrElse
+                      (throw new IllegalArgumentException("can only cache a `RegularSubmission`"))
+
+                  submissionResultOpt = submissionResult.some
+
+                  submissionResult.result match {
+                    case Success((replacer: InstanceReplacer, _)) =>
+                      deserialized = true
+                      // load() requires an immutable TinyTree
+                      // Since we forced readonly above, the result must also be a readonly instance
+                      replacer.resultingDocumentOpt match {
+                        case Some(Right(_: VirtualNode))  => throw new IllegalStateException
+                        case Some(Right(documentInfo))    => documentInfo
+                        case _                            => throw new IllegalStateException
+                      }
+                    case Failure(throwable) =>
+                      throw new CacheableSubmission.ThrowableWrapper(throwable)
+                    case _ =>
+                      // We know that `RegularSubmission` returns a `Replacer` with an instance document so this
+                      // should not happen!
+                      throw new IllegalStateException
+                  }
+                } catch {
+                  case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
+                    // In case we just threw it above, just propagate
+                    throw throwableWrapper
+                  case NonFatal(throwable) =>
+                    // Exceptions are handled further down
+                    throw new CacheableSubmission.ThrowableWrapper(throwable)
+                }
+              })(detailsLogger)
+          // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the `DocumentInfo`
+          replacer.setCachedResult(newDocumentInfo, instanceCaching)
+
+          SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult)))
+        } catch {
+          case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
+            // The ThrowableWrapper was thrown within the inner load() method above
+            SubmissionResult(submissionEffectiveId, Failure(throwableWrapper.throwable))
+          case NonFatal(throwable) =>
+            // Any other throwable
+            SubmissionResult(submissionEffectiveId, Failure(throwable))
+        } finally
+      if (p2.isAsynchronous && timingLogger.isDebugEnabled)
+        timingLogger.endHandleOperation(
+          "id",
+          submission.getEffectiveId,
+          "asynchronous", p2.isAsynchronous.toString,
+          "loading attempted", loadingAttempted.toString,
+          "deserialized", deserialized.toString
+        )
       }
-      // Submit the callable
-      // This returns null if the execution is deferred
-      submitCallable(p, p2, callable)
+
+      submitEval(p, p2, eval) // returns `None` if the execution is deferred
     }
   }
 

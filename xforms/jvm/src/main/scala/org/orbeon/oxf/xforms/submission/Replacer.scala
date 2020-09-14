@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import org.orbeon.oxf.util.ConnectionResult
 
 trait Replacer {
@@ -28,5 +29,5 @@ trait Replacer {
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Option[Runnable]
+  ): Option[Eval[Unit]]
 }

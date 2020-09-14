@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.concurrent.Callable
 import java.util.concurrent.locks.Lock
 import java.{util => ju}
 
+import cats.Eval
 import cats.syntax.option._
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
@@ -161,7 +161,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
 
-    var replaceAllCallable       : Option[Callable[SubmissionResult]] = None
+    var replaceAllEval           : Option[Eval[SubmissionResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -203,10 +203,10 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: i.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllCallable: Option[Callable[SubmissionResult]] = transientState.replaceAllCallable
+  def getReplaceAllEval: Option[Eval[SubmissionResult]] = transientState.replaceAllEval
 
-  def setReplaceAllCallable(callable: Callable[SubmissionResult]): Unit =
-    transientState.replaceAllCallable = Option(callable)
+  def setReplaceAllEval(eval: Eval[SubmissionResult]): Unit =
+    transientState.replaceAllEval = Option(eval)
 
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)

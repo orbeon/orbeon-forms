@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -72,7 +73,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Option[Runnable] = {
+  ): Option[Eval[Unit]] = {
     responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, connectionResult, p, _))
     submission.sendSubmitDone(connectionResult).some
   }

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
@@ -143,7 +144,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Option[Runnable] = {
+  ): Option[Eval[Unit]] = {
 
     // Set new instance document to replace the one submitted
 

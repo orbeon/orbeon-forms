@@ -13,28 +13,28 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 object RedirectReplacer {
 
-  def doReplace(connectionResult: ConnectionResult, response: ExternalContext.Response): Unit = {
+  def updateResponse(connectionResult: ConnectionResult, response: ExternalContext.Response): Unit = {
     SubmissionUtils.forwardResponseHeaders(connectionResult, response)
     response.setStatus(connectionResult.statusCode)
   }
 }
 
-class RedirectReplacer(submission: XFormsModelSubmission, containingDocument: XFormsContainingDocument)
+class RedirectReplacer(containingDocument: XFormsContainingDocument)
   extends Replacer {
 
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Runnable] = {
-    val response = NetUtils.getExternalContext.getResponse
+  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
     containingDocument.setGotSubmissionRedirect()
-    RedirectReplacer.doReplace(connectionResult, response)
+    RedirectReplacer.updateResponse(connectionResult, NetUtils.getExternalContext.getResponse)
     None
   }
 }

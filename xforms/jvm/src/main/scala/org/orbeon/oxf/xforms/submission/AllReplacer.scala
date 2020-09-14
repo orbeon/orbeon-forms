@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
@@ -70,7 +71,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
   // NOP
   def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Runnable] = {
+  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
     // Remember that we got a submission producing output

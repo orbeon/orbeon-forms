@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import java.io.File
 import java.net.URI
 
+import cats.Eval
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
@@ -49,7 +50,7 @@ class BinaryReplacer(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Option[Runnable] = {
+  ): Option[Eval[Unit]] = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
     def filenameFromHeader : Option[String] = None // MAYBE: `Content-Disposition`'s `filename`.

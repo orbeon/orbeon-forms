@@ -747,5 +747,3 @@ lazy val root = (project in file("."))
     sourceDirectory in ThisProject     := baseDirectory.value / "root", // until we have a more standard layout
     publishArtifact                    := false
   )
-
-sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

@@ -124,7 +124,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       // Storing for specific form version
       val first = <gaga1/>.toDocument
-      val myStage = Some(Stage("my-stage", ""))
+      val myStage = Some(Stage("my-stage"))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), expectedCode = 201, stage = myStage)

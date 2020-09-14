@@ -144,7 +144,7 @@ object Tabbable {
         $(containerElem).on("click.tabbable.data-api", "[data-toggle = 'tabbable']", {
           (bound: html.Element, e: JQueryEventObject) => {
 
-            e.preventDefault()  // don"t allow anchor navigation
+            e.preventDefault()  // don't allow anchor navigation
             e.stopPropagation() // prevent ancestor tab handlers from running
 
             val newLi = $(bound).parent(ExcludeRepeatClassesSelector)

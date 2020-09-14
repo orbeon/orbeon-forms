@@ -82,7 +82,7 @@ object AjaxRequest {
       requestDocumentString.append(">")
 
       if (event.properties.nonEmpty) {
-        // Only add properties when we don"t have a value (in the future, the value should be
+        // Only add properties when we don't have a value (in the future, the value should be
         // sent in a sub-element, so both a value and properties can be sent for the same event)
         newLine()
         event.properties foreach { case (key, value) =>

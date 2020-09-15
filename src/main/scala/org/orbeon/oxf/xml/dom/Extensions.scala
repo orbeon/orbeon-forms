@@ -18,7 +18,7 @@ import java.{util => ju}
 
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 
 import scala.jdk.CollectionConverters._

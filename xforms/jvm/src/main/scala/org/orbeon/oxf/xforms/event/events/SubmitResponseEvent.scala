@@ -143,7 +143,7 @@ private object SubmitResponseEvent {
 
         def tryText: Try[String Either DocumentInfo]  =
           Try {
-            Left(IOUtils.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+            Left(IOUtils.readStreamAsStringAndClose(URLFactory.createURL(tempURI).openStream(), cxr.charset))
           }
 
         def asString(value: String Either DocumentInfo) = value match {

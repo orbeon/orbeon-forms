@@ -20,18 +20,19 @@ import java.nio.charset.Charset
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
-import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants}
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 import scala.collection.mutable
@@ -313,4 +314,40 @@ object SubmissionUtils {
         InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype)
       }
     }
+
+  def readTextContent(content: StreamedContent): Option[String] = {
+
+    val mediatype = content.contentType flatMap ContentTypes.getContentTypeMediaType
+
+    mediatype collect {
+      case mediatype if ContentTypes.isXMLMediatype(mediatype) =>
+        // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
+        //
+        // http://tools.ietf.org/html/rfc7303:
+        //
+        //  The former confusion
+        //  around the question of default character sets for the two text/ types
+        //  no longer arises because
+        //
+        //     [RFC7231] changes [RFC2616] by removing the ISO-8859-1 default and
+        //     not defining any default at all;
+        //
+        //     [RFC6657] updates [RFC2046] to remove the US-ASCII [ASCII]
+        //
+        // [...]
+        //
+        // this specification sets the priority as follows:
+        //
+        //    A BOM (Section 3.3) is authoritative if it is present in an XML
+        //    MIME entity;
+        //
+        //    In the absence of a BOM (Section 3.3), the charset parameter is
+        //    authoritative if it is present
+        //
+        IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream))
+      case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
+        val charset = content.contentType flatMap ContentTypes.getContentTypeCharset
+        IOUtils.readStreamAsStringAndClose(content.inputStream, charset)
+    }
+  }
 }

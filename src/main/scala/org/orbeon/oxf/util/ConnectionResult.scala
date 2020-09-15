@@ -17,9 +17,7 @@ import java.io._
 import java.{lang => jl}
 
 import org.apache.log4j.Level
-import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
-import org.orbeon.oxf.xml.XMLParsing
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -56,36 +54,6 @@ case class ConnectionResult(
   def getHeaderIgnoreCase(name: String): List[String] = {
     val nameLowercase = name.toLowerCase
     headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase => v } getOrElse Nil
-  }
-
-  def readTextResponseBody: Option[String] = mediatype collect {
-    case mediatype if ContentTypes.isXMLMediatype(mediatype) =>
-      // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
-      //
-      // http://tools.ietf.org/html/rfc7303:
-      //
-      //  The former confusion
-      //  around the question of default character sets for the two text/ types
-      //  no longer arises because
-      //
-      //     [RFC7231] changes [RFC2616] by removing the ISO-8859-1 default and
-      //     not defining any default at all;
-      //
-      //     [RFC6657] updates [RFC2046] to remove the US-ASCII [ASCII]
-      //
-      // [...]
-      //
-      // this specification sets the priority as follows:
-      //
-      //    A BOM (Section 3.3) is authoritative if it is present in an XML
-      //    MIME entity;
-      //
-      //    In the absence of a BOM (Section 3.3), the charset parameter is
-      //    authoritative if it is present
-      //
-      IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream))
-    case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
-      IOUtils.readStreamAsStringAndClose(content.inputStream, charset)
   }
 
   private var _didLogResponseDetails = false

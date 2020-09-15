@@ -37,7 +37,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     p                : SubmissionParameters,
     p2               : SecondPassParameters
   ): Unit =
-    connectionResult.readTextResponseBody match {
+    SubmissionUtils.readTextContent(connectionResult.content) match {
       case s @ Some(_) =>
         this.responseBodyOpt = s
       case None =>

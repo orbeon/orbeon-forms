@@ -103,7 +103,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           Left(
             if (isJSON) {
               val receiver = new LocationSAXContentHandler
-              Converter.jsonStringToXmlStream(connectionResult.readTextResponseBody.get, receiver)
+              Converter.jsonStringToXmlStream(SubmissionUtils.readTextContent(connectionResult.content).get, receiver)
               receiver.getDocument
             } else {
               TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
@@ -116,11 +116,10 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // NOTE: isApplicationSharedHint is always false when get get here. `isApplicationSharedHint="true"` is handled above.
 
           Right(
-            if (isJSON) {
-              Converter.jsonStringToXmlDoc(connectionResult.readTextResponseBody.get)
-            } else {
+            if (isJSON)
+              Converter.jsonStringToXmlDoc(SubmissionUtils.readTextContent(connectionResult.content).get)
+            else
               TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
-            }
           )
         }
       }

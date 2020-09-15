@@ -657,40 +657,6 @@ public class NetUtils {
     }
 
     /**
-     * Remove the first path element of a path. Return null if there is only one path element
-     *
-     * E.g. /foo/bar => /bar?a=b
-     *
-     * @param path  path to modify
-     * @return      modified path or null
-     */
-    // TODO: Move to PathUtils.
-    public static String removeFirstPathElement(String path) {
-        final int secondSlashIndex = path.indexOf('/', 1);
-        if (secondSlashIndex == -1)
-            return null;
-
-        return path.substring(secondSlashIndex);
-    }
-
-    /**
-     * Return the first path element of a path. If there is only one path element, return the entire path.
-     *
-     * E.g. /foo/bar => /foo
-     *
-     * @param path  path to analyze
-     * @return      first path element
-     */
-    // TODO: Move to PathUtils.
-    public static String getFirstPathElement(String path) {
-        final int secondSlashIndex = path.indexOf('/', 1);
-        if (secondSlashIndex == -1)
-            return path;
-
-        return path.substring(0, secondSlashIndex);
-    }
-
-    /**
      * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
      *
      * W3C note: https://www.w3.org/TR/leiri/

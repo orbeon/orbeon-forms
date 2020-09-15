@@ -13,11 +13,11 @@
  */
 package org.orbeon.exception
 
-import org.apache.commons.lang3.StringUtils._
 import org.orbeon.errorified._
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.compat._
 
@@ -38,7 +38,7 @@ object OrbeonFormatter extends Formatter {
 
   // Create SourceLocation from LocationData
   private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
-    isNotBlank(locationData.file) option {
+    locationData.file.nonAllBlank option {
 
       val (description, params) =
         locationData match {

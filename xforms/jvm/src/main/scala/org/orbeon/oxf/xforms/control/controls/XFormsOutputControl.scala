@@ -181,7 +181,7 @@ class XFormsOutputControl(
               )
             case "base64Binary" =>
               // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
-              doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
+              doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.logger), -1)
             case _ =>
               defaultValue
           }

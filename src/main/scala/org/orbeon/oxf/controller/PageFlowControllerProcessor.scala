@@ -334,7 +334,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       )
 
       // For debugging
-      if (logger.isDebugEnabled) {
+      if (logger.debugEnabled) {
         val astDocumentHandler = new ASTDocumentHandler
         ast.walk(astDocumentHandler)
         debug(

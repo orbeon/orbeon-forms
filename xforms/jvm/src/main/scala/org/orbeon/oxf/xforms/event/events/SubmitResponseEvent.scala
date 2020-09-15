@@ -121,7 +121,7 @@ private object SubmitResponseEvent {
       val tempURIOpt =
         try {
           useAndClose(cxr.content.inputStream) { is =>
-            Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
+            Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger))
           }
         } catch {
           warn("error while reading response body.")

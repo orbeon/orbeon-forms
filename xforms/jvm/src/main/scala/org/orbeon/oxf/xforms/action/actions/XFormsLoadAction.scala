@@ -90,7 +90,7 @@ class XFormsLoadAction extends XFormsAction {
                   mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
                 )
               case None =>
-                if (interpreter.indentedLogger.isDebugEnabled)
+                if (interpreter.indentedLogger.debugEnabled)
                   interpreter.indentedLogger.logDebug(
                     "xf:load",
                     "resource AVT returned an empty sequence, ignoring action",

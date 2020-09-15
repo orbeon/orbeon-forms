@@ -75,11 +75,11 @@ object XFormsModelSubmission {
   ) =
     if (p2.isAsynchronous && p.replaceType != ReplaceType.None) {
       // Background asynchronous submission creates a new logger with its own independent indentation
-      val newIndentation = new IndentedLogger.Indentation(indentedLogger.getIndentation.indentation)
+      val newIndentation = new IndentedLogger.Indentation(indentedLogger.indentation.indentation)
       new IndentedLogger(indentedLogger, newIndentation, newDebugEnabled)
-    } else if (indentedLogger.isDebugEnabled != newDebugEnabled) {
+    } else if (indentedLogger.debugEnabled != newDebugEnabled) {
       // Keep shared indentation but use new debug setting
-      new IndentedLogger(indentedLogger, indentedLogger.getIndentation, newDebugEnabled)
+      new IndentedLogger(indentedLogger, indentedLogger.indentation, newDebugEnabled)
     } else {
       // Synchronous submission or foreground asynchronous submission uses current logger
       indentedLogger
@@ -138,7 +138,7 @@ class XFormsModelSubmission(
       try {
         // Big bag of initial runtime parameters
         p = SubmissionParameters(event.name)(thisSubmission)
-        if (indentedLogger.isDebugEnabled) {
+        if (indentedLogger.debugEnabled) {
           val message =
             if (p.isDeferredSubmissionFirstPass)
               "submission first pass"
@@ -324,7 +324,7 @@ class XFormsModelSubmission(
       }
     } finally {
       // Log total time spent in submission
-      if (p != null && indentedLogger.isDebugEnabled)
+      if (p != null && indentedLogger.debugEnabled)
         indentedLogger.endHandleOperation()
     }
     // Execute post-submission code if any
@@ -537,7 +537,7 @@ class XFormsModelSubmission(
 
   def getTimingLogger(p: SubmissionParameters, p2: SecondPassParameters): IndentedLogger = {
     val indentedLogger = getIndentedLogger
-    XFormsModelSubmission.getNewLogger(p, p2, indentedLogger, indentedLogger.isDebugEnabled)
+    XFormsModelSubmission.getNewLogger(p, p2, indentedLogger, indentedLogger.debugEnabled)
   }
 
   def allowExternalEvent(eventName: String): Boolean =

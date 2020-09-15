@@ -28,42 +28,42 @@ trait Logging {
 
   // Info with optional parameters
   def info(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    if (logger.isInfoEnabled)
+    if (logger.logger.isInfoEnabled)
       logger.logInfo("", message, flattenTuples(parameters): _*)
 
   // Debug with optional parameters
   def debug(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    if (logger.isDebugEnabled)
+    if (logger.debugEnabled)
       logger.logDebug("", message, flattenTuples(parameters): _*)
 
   // Debug with optional parameters
   def log(logLevel: Level, message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    if (logger.isDebugEnabled)
+    if (logger.debugEnabled)
       logger.log(logLevel, "", message, flattenTuples(parameters): _*)
 
   // Debug block with optional parameters
   def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T =
     try {
-      if (logger.isDebugEnabled)
+      if (logger.debugEnabled)
         logger.startHandleOperation("", message, flattenTuples(parameters): _*)
 
       body
     } finally {
-      if (logger.isDebugEnabled)
+      if (logger.debugEnabled)
         logger.endHandleOperation()
     }
 
   // Run the given block only in debug mode
   def ifDebug[T](body: => T)(implicit logger: IndentedLogger): Unit =
-    if (logger.isDebugEnabled)
+    if (logger.debugEnabled)
       body
 
   // Whether debug logging is enabled
-  def debugEnabled(implicit logger: IndentedLogger): Boolean = logger.isDebugEnabled
+  def debugEnabled(implicit logger: IndentedLogger): Boolean = logger.debugEnabled
 
   // Call from a result block to set result parameters
   def debugResults(parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
-    if (logger.isDebugEnabled)
+    if (logger.debugEnabled)
       logger.setDebugResults(flattenTuples(parameters): _*)
 
   private def flattenTuples(tuples: Seq[(String, String)]) =

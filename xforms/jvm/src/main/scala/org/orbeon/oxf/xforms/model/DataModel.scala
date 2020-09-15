@@ -200,7 +200,7 @@ object DataModel {
     instanceEffectiveId : Option[String])(implicit
     logger              : IndentedLogger
   ): Unit =
-    if (logger.isDebugEnabled)
+    if (logger.debugEnabled)
       logger.logDebug("xf:setvalue", "setting instance value", "source", source,
         "old value", oldValue, "new value", newValue,
         "instance", instanceEffectiveId getOrElse "N/A")

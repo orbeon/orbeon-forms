@@ -96,7 +96,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
 
         if (! isReadonly) {
-          if (logger.isDebugEnabled)
+          if (logger.debugEnabled)
             logger.logDebug("", "deserializing to mutable instance")
           // Q: What about configuring validation? And what default to choose?
 
@@ -110,7 +110,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             }
           )
         } else {
-          if (logger.isDebugEnabled)
+          if (logger.debugEnabled)
             logger.logDebug("", "deserializing to read-only instance")
           // Q: What about configuring validation? And what default to choose?
           // NOTE: isApplicationSharedHint is always false when get get here. `isApplicationSharedHint="true"` is handled above.
@@ -231,7 +231,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
 
         // Obtain root element to insert
-        if (detailsLogger.isDebugEnabled)
+        if (detailsLogger.debugEnabled)
           detailsLogger.logDebug(
             "",
             if (p2.isReadonly)

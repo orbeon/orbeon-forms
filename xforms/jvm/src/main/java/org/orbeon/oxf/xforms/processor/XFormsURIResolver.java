@@ -92,7 +92,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (indentedLogger.isDebugEnabled())
+                    if (indentedLogger.debugEnabled())
                         indentedLogger.logDebug("", "resolving resource through initialization resolver", "uri", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));

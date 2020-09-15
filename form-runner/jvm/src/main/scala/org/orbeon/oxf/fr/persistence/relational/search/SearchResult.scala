@@ -60,7 +60,7 @@ trait SearchResult extends SearchRequest {
         )
       }</documents>
 
-    if (Logger.isDebugEnabled)
+    if (Logger.debugEnabled)
       Logger.logDebug("search result", documentsElem.toString)
 
     NodeConversions.elemToSAX(documentsElem, receiver)

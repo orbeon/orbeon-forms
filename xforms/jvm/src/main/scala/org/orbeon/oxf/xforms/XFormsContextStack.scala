@@ -211,7 +211,7 @@ class XFormsContextStack {
         } toMap
 
       val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-      if (indentedLogger.isDebugEnabled)
+      if (indentedLogger.debugEnabled)
         indentedLogger.logDebug("", "evaluated model variables", "count", variableInfos.size.toString)
 
       for (_ <- 0 until variableInfos.size)

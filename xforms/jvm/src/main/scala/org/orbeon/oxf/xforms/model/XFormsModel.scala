@@ -422,7 +422,8 @@ trait XFormsModelInstances {
         loadInitialExternalInstanceFromCacheIfNeeded(instance)
       } else if (instance.useInlineContent) {
         // Load from inline content
-        try setInlineInstance(instance)
+        try
+          setInlineInstance(instance)
         catch {
           case NonFatal(_) =>
             Dispatch.dispatchEvent(
@@ -520,7 +521,7 @@ trait XFormsModelInstances {
           // NOTE: If there is no resolver, URLs of the form input:* are not allowed
           assert(! ProcessorImpl.isProcessorInputScheme(absoluteURLString))
 
-          if (indentedLogger.isDebugEnabled)
+          if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
 
           val absoluteResolvedUrl = new URI(absoluteURLString)
@@ -560,7 +561,7 @@ trait XFormsModelInstances {
           }
         case Some(uriResolver) =>
           // Optimized case that uses the provided resolver
-          if (indentedLogger.isDebugEnabled)
+          if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString)
 
           // TODO: Handle validating and handleXInclude!

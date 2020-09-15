@@ -41,7 +41,7 @@ class BinaryReplacer(
       NetUtils.inputStreamToAnyURI(
         connectionResult.content.inputStream,
         NetUtils.SESSION_SCOPE,
-        submission.getDetailsLogger(p, p2).getLogger
+        submission.getDetailsLogger(p, p2).logger
       )
     )
   }

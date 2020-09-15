@@ -284,7 +284,7 @@ private object XFormsProcessorBase {
             URLRewriter.REWRITE_MODE_ABSOLUTE
           )
       } yield {
-        if (logger.isDebugEnabled)
+        if (logger.debugEnabled)
             logger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL)
 
         (resolvedDependencyURL, instance.credentials)
@@ -300,7 +300,7 @@ private object XFormsProcessorBase {
         schemaURIs       <- currentModel.getSchemaURIs.toList
         currentSchemaURI <- schemaURIs
       } yield {
-        if (logger.isDebugEnabled)
+        if (logger.debugEnabled)
           logger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI)
         (currentSchemaURI, None)
       }

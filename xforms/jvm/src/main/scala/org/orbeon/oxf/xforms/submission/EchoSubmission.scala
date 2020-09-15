@@ -53,7 +53,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       case Some(messageBody) =>
         // Log message body for debugging purposes
         val indentedLogger = getDetailsLogger(p, p2)
-        if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
+        if (indentedLogger.debugEnabled && BaseSubmission.isLogBody)
           Connection.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
     }
 

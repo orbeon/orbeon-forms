@@ -33,7 +33,7 @@ trait SearchRequest {
 
   def parseRequest(searchDocument: DocumentInfo, version: Version): Request = {
 
-    if (Logger.isDebugEnabled)
+    if (Logger.debugEnabled)
       Logger.logDebug("search request", TransformerUtils.tinyTreeToString(searchDocument))
 
     httpRequest.getRequestPath match {

@@ -372,7 +372,7 @@ object XFormsModelSubmissionBase {
     }
 
   def logInvalidNode(node: Node)(implicit indentedLogger: IndentedLogger): Unit =
-    if (indentedLogger.isDebugEnabled)
+    if (indentedLogger.debugEnabled)
       node match {
         case e: Element =>
             debug(

@@ -90,7 +90,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val eval = Eval.later {
       // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
       // because it may get out of the caches and not be picked up by further incoming Ajax requests.
-      if (p2.isAsynchronous && timingLogger.isDebugEnabled)
+      if (p2.isAsynchronous && timingLogger.debugEnabled)
         timingLogger.startHandleOperation("", "running asynchronous submission", "id", submissionEffectiveId)
 
       // Open the connection
@@ -127,8 +127,8 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
           connectionResultOpt foreach (_.close())
           SubmissionResult(submissionEffectiveId, Failure(throwable))
       } finally {
-        if (p2.isAsynchronous && timingLogger.isDebugEnabled)
-          timingLogger.endHandleOperation(
+        if (p2.isAsynchronous && timingLogger.debugEnabled) {
+          timingLogger.setDebugResults(
             "id",
             submissionEffectiveId,
             "asynchronous",
@@ -138,6 +138,8 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
             "deserialized",
             deserialized.toString
           )
+          timingLogger.endHandleOperation()
+        }
       }
     }
 

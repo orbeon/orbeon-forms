@@ -307,7 +307,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         assert(isServerState)
 
         // State must be found by UUID in the store
-        if (Logger.isDebugEnabled)
+        if (Logger.debugEnabled)
           Logger.logDebug(
             LogType,
             "Getting document state from store.",

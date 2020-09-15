@@ -80,12 +80,12 @@ class CacheableSubmission(submission: XFormsModelSubmission)
       SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult))).some
     } else {
       // NOTE: technically, somebody else could put an instance in cache between now and the `Eval` execution
-      if (detailsLogger.isDebugEnabled)
+      if (detailsLogger.debugEnabled)
         detailsLogger.logDebug("", "did not find instance in cache", "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash.orNull)
       val timingLogger = getTimingLogger(p, p2)
       // Create deferred evaluation for synchronous or asynchronous loading
       val eval = Eval.later {
-        if (p2.isAsynchronous && timingLogger.isDebugEnabled)
+        if (p2.isAsynchronous && timingLogger.debugEnabled)
           timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId, "cacheable", "true")
         var loadingAttempted = false
         var deserialized = false
@@ -155,14 +155,18 @@ class CacheableSubmission(submission: XFormsModelSubmission)
             // Any other throwable
             SubmissionResult(submissionEffectiveId, Failure(throwable))
         } finally
-      if (p2.isAsynchronous && timingLogger.isDebugEnabled)
-        timingLogger.endHandleOperation(
-          "id",
-          submission.getEffectiveId,
-          "asynchronous", p2.isAsynchronous.toString,
-          "loading attempted", loadingAttempted.toString,
-          "deserialized", deserialized.toString
-        )
+          if (p2.isAsynchronous && timingLogger.debugEnabled) {
+
+            timingLogger.setDebugResults(
+              "id",
+              submission.getEffectiveId,
+              "asynchronous", p2.isAsynchronous.toString,
+              "loading attempted", loadingAttempted.toString,
+              "deserialized", deserialized.toString
+            )
+
+            timingLogger.endHandleOperation()
+          }
       }
 
       submitEval(p, p2, eval) // returns `None` if the execution is deferred
@@ -209,7 +213,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
         )
       )
     }
-    if (indentedLogger.isDebugEnabled)
+    if (indentedLogger.debugEnabled)
       indentedLogger.logDebug("", "using instance from application shared instance cache", "instance", updatedInstance.getEffectiveId)
     updatedInstance
   }

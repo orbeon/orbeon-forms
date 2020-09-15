@@ -172,7 +172,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
               deleteFileIfPossible(newValueUriString)
               converted
             } else {
-              val newFile    = NetUtils.renameAndExpireWithSession(newValueUriString, logger.getLogger)
+              val newFile    = NetUtils.renameAndExpireWithSession(newValueUriString, logger.logger)
               val newFileURL = newFile.toURI.toString
 
               hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))

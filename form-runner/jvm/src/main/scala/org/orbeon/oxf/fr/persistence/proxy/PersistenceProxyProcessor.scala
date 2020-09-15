@@ -19,8 +19,7 @@ import java.net.URI
 import javax.xml.transform.stream.StreamResult
 import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
-import org.orbeon.io.IOUtils._
-import org.orbeon.io.UriScheme
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
@@ -38,12 +37,12 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.xforms.RelevanceHandling
-import org.orbeon.xforms.RelevanceHandling._
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.RelevanceHandling._
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -190,8 +189,8 @@ private object PersistenceProxyProcessor {
     val receiver = TransformerUtils.getIdentityTransformerHandler
     receiver.setResult(new StreamResult(os))
 
-    useAndClose(is) { is =>
-      useAndClose(os) { _ =>
+    IOUtils.useAndClose(is) { is =>
+      IOUtils.useAndClose(os) { _ =>
         XMLParsing.inputStreamToSAX(
           is,
           null,
@@ -215,7 +214,8 @@ private object PersistenceProxyProcessor {
     response       : Response,
     transforms     : List[(InputStream, OutputStream) => Unit]
   ): Unit =
-    useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
+    IOUtils.useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
+    
       // Proxy status code
       response.setStatus(cxr.statusCode)
       // Proxy incoming headers
@@ -229,7 +229,7 @@ private object PersistenceProxyProcessor {
         transforms       : List[(InputStream, OutputStream) => Unit]
       ): Unit = {
         transforms match {
-          case Nil                             => copyStream(startInputStream, endOutputStream)
+          case Nil                             => IOUtils.copyStreamAndClose(startInputStream, endOutputStream)
           case List(transform)                 => transform(startInputStream, endOutputStream)
           case headTransform :: tailTransforms =>
             val intermediateOutputStream = new ByteArrayOutputStream

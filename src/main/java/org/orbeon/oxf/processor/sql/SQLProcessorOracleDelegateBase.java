@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.sql;
 import oracle.jdbc.*;
 import oracle.sql.*;
 import oracle.xdb.XMLType;
+import org.orbeon.io.IOUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLParsing;

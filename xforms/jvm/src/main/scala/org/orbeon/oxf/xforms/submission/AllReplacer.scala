@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import cats.Eval
 import cats.syntax.option._
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -38,16 +39,7 @@ object AllReplacer {
 
     SubmissionUtils.forwardResponseHeaders(cxr, response)
 
-    // Forward content to response
-    val outputStream = response.getOutputStream
-    try
-      NetUtils.copyStream(cxr.content.inputStream, outputStream)
-    finally
-      cxr.close()
-
-    // End document and close
-    outputStream.flush()
-    outputStream.close()
+    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
   }
 
   class ReplaceAllResponse(val response: ExternalContext.Response)

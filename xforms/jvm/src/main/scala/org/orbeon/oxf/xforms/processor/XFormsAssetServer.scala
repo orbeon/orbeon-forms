@@ -17,7 +17,8 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.{CharsetNames, UriScheme}
+import org.orbeon.io.CharsetNames
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -31,9 +32,10 @@ import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquire
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 
+import scala.collection.compat._
+import scala.collection.immutable.ListSet
 import scala.util.Try
 import scala.util.control.NonFatal
-import scala.collection.compat._
 
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -80,7 +82,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
         )
 
-        useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+        IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
           fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
             writer.write(content)
           }
@@ -100,7 +102,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
-          useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+          IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
             ScriptBuilder.writeScripts(
               state.topLevelPart.uniqueJsScripts,
               writer.write
@@ -178,11 +180,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
 
-          useAndClose(cxr.content.inputStream) { is =>
-            useAndClose(response.getOutputStream) { os =>
-              copyStream(is, os)
-            }
-          }
+          IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
         } catch {
           case NonFatal(t) => warn("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
         }

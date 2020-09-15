@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.apache.log4j.Level
+import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.resources.URLFactory
@@ -142,7 +143,7 @@ private object SubmitResponseEvent {
 
         def tryText: Try[String Either DocumentInfo]  =
           Try {
-            Left(ConnectionResult.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+            Left(IOUtils.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
           }
 
         def asString(value: String Either DocumentInfo) = value match {

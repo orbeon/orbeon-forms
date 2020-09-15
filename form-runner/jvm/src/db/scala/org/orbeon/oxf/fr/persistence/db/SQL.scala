@@ -36,7 +36,7 @@ private[persistence] object SQL extends Logging {
       val inputStream = URLFactory.createURL(url).openStream()
       val reader = new InputStreamReader(inputStream)
       val writer = new StringWriter
-      copyReader(reader, writer)
+      copyReaderAndClose(reader, writer)
       writer.toString
     }
 

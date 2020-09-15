@@ -18,6 +18,7 @@ import java.net.URI
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
+import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
 import org.orbeon.oxf.fr.permission.Operations
@@ -30,7 +31,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger}
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.scalatest.Assertions._
 
@@ -99,12 +100,11 @@ private[persistence] object HttpCall {
 
       // Check body
       expectedResponse.body.foreach { expectedBody =>
-        val actualBody =
-          useAndClose(actualResponse.content.inputStream) { inputStream =>
-            val outputStream = new ByteArrayOutputStream
-            NetUtils.copyStream(inputStream, outputStream)
-            outputStream.toByteArray
-          }
+        val actualBody = {
+          val outputStream = new ByteArrayOutputStream
+          IOUtils.copyStreamAndClose(actualResponse.content.inputStream, outputStream)
+          outputStream.toByteArray
+        }
         expectedBody match {
           case HttpCall.XML(expectedDoc) =>
             val resultDoc  = IOSupport.readDom4j(new ByteArrayInputStream(actualBody))
@@ -238,12 +238,10 @@ private[persistence] object HttpCall {
       val headers      = httpResponse.headers
 
       val body =
-        useAndClose(httpResponse.content.inputStream) { inputStream =>
-          Try {
-            val outputStream = new ByteArrayOutputStream
-            NetUtils.copyStream(inputStream, outputStream)
-            outputStream.toByteArray
-          }
+        Try {
+          val outputStream = new ByteArrayOutputStream
+          IOUtils.copyStreamAndClose(httpResponse.content.inputStream, outputStream)
+          outputStream.toByteArray
         }
 
       (statusCode, headers, body)

@@ -14,12 +14,11 @@
 package org.orbeon.oxf.util
 
 import java.io._
-import java.lang.{Long => JLong}
+import java.{lang => jl}
 
 import org.apache.log4j.Level
-import org.orbeon.oxf.common.Defaults
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.xml.XMLParsing
 
 import scala.util.Try
@@ -34,11 +33,9 @@ case class ConnectionResult(
   dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
 ) extends Logging {
 
-  import ConnectionResult._
-
   val lastModified: Option[Long] = DateHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
 
-  def lastModifiedJava: JLong = lastModified map (_.asInstanceOf[JLong]) orNull
+  def lastModifiedJava: jl.Long = lastModified map (_.asInstanceOf[jl.Long]) orNull
 
   def close(): Unit = content.close()
 
@@ -86,11 +83,9 @@ case class ConnectionResult(
       //    In the absence of a BOM (Section 3.3), the charset parameter is
       //    authoritative if it is present
       //
-      useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader =>
-        NetUtils.readStreamAsString(reader)
-      }
+      IOUtils.readStreamAsStringAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream))
     case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) =>
-      readStreamAsText(content.inputStream, charset)
+      IOUtils.readStreamAsStringAndClose(content.inputStream, charset)
   }
 
   private var _didLogResponseDetails = false
@@ -175,16 +170,6 @@ object ConnectionResult {
       case NonFatal(t) =>
         cxr.close()
         throw t
-    }
-  }
-
-  // TODO: Move to some IOUtils object.
-  def readStreamAsText(is: InputStream, charset: Option[String]): String = {
-    // - JSON: "JSON text SHALL be encoded in Unicode.  The default encoding is UTF-8."
-    //   http://www.ietf.org/rfc/rfc4627.txt
-    // - other: we pick UTF-8 anyway (2014-09-18)
-    useAndClose(new InputStreamReader(is, charset getOrElse Defaults.DefaultEncodingForModernUse)) { reader =>
-      NetUtils.readStreamAsString(reader)
     }
   }
 }

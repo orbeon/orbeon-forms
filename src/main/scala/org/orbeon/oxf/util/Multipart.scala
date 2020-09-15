@@ -223,7 +223,7 @@ object Multipart {
             val maxSizeForSpecificFileItemOpt =
               lifecycleOpt flatMap (_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`
 
-            copyStream(
+            copyStreamAndClose(
               in  = maxSizeForSpecificFileItemOpt map (
                 new LimiterInputStream(
                   fis.openStream,

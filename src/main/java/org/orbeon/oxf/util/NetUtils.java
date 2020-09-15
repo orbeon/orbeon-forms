@@ -18,8 +18,8 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.io.CharsetNames;
-import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;
@@ -30,12 +30,12 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.datatypes.LocationData;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -216,6 +216,7 @@ public class NetUtils {
                 && ((url1.getPath() == null && url2.getPath() == null) || url2.getPath().startsWith(url1.getPath()));
     }
 
+    // 10 Java callers
     public static void copyStream(InputStream is, OutputStream os) throws IOException {
         int count;
         final byte[] buffer = new byte[COPY_BUFFER_SIZE];
@@ -223,17 +224,12 @@ public class NetUtils {
             os.write(buffer, 0, count);
     }
 
+    // 1 Java caller
     public static void copyStream(Reader reader, Writer writer) throws IOException {
         int count;
         final char[] buffer = new char[COPY_BUFFER_SIZE / 2];
         while ((count = reader.read(buffer)) > 0)
             writer.write(buffer, 0, count);
-    }
-
-    public static String readStreamAsString(Reader reader) throws IOException {
-        final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
-        copyStream(reader, writer);
-        return writer.result();
     }
 
     /**

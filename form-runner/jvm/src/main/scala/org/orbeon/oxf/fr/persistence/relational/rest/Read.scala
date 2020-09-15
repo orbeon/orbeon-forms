@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.joda.time.DateTime
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.Operation.Read
@@ -136,7 +136,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 case PostgreSQL => new ByteArrayInputStream(resultSet.getBytes("file_content"))
                 case _          => resultSet.getBlob("file_content").getBinaryStream
               }
-              NetUtils.copyStream(stream, httpResponse.getOutputStream)
+              IOUtils.copyStreamAndClose(stream, httpResponse.getOutputStream)
             } else {
               val stream = req.provider match {
                 case PostgreSQL => new StringReader(resultSet.getString("xml"))
@@ -148,9 +148,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               httpResponse.setHeader(Headers.Created,      DateUtils.RFC1123Date.print(new DateTime(createdDateTime)))
               httpResponse.setHeader(Headers.LastModified, DateUtils.RFC1123Date.print(new DateTime(lastModifiedDateTime)))
 
-              val writer = new OutputStreamWriter(httpResponse.getOutputStream, CharsetNames.Utf8)
-              NetUtils.copyStream(stream, writer)
-              writer.close()
+              IOUtils.copyReaderAndClose(stream, new OutputStreamWriter(httpResponse.getOutputStream, CharsetNames.Utf8))
             }
 
           } else {

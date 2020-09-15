@@ -20,7 +20,7 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.io.IOUtils._
-import org.orbeon.io.StringBuilderWriter
+import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
@@ -79,7 +79,7 @@ object RequestReader {
 
   def bytes(): Array[Byte] = {
     val os = new ByteArrayOutputStream
-    NetUtils.copyStream(requestInputStream(), os)
+    IOUtils.copyStreamAndClose(requestInputStream(), os)
     os.toByteArray
   }
 

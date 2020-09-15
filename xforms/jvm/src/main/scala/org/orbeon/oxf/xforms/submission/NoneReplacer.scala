@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.Eval
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.oxf.util.ConnectionResult
 
 /**

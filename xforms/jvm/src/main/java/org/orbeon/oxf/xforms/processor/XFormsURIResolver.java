@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReaderToReceiver;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.xml.sax.InputSource;
@@ -112,7 +112,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             // XInclude handled by source if needed
             return TransformerUtils.readDom4j(source, false);
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(urlString, -1, -1));
         }
     }
 
@@ -122,7 +122,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             // XInclude handled by source if needed
             return TransformerUtils.readTinyTree(configuration, source, false);
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(urlString, -1, -1));
         }
     }
 }

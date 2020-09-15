@@ -19,6 +19,7 @@ import java.net.{URI, URISyntaxException}
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.{Result, TransformerException}
 import org.ccil.cowan.tagsoup.HTMLSchema
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
@@ -27,7 +28,7 @@ import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.w3c.dom

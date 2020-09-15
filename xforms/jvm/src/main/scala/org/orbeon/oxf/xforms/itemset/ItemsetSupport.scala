@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._

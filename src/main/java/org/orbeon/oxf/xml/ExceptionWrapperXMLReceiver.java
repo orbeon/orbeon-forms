@@ -15,8 +15,8 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -201,7 +201,7 @@ public class ExceptionWrapperXMLReceiver extends SimpleForwardingXMLReceiver {
 
     private void wrapException(Exception e) throws SAXException {
         if (locator != null)
-            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(new LocationData(locator), message));
+            throw OrbeonLocationException.wrapException(e, XmlExtendedLocationData.apply(XmlLocationData.apply(locator), message));
         else if (e instanceof SAXException)
             throw (SAXException) e;
         else if (e instanceof RuntimeException)
@@ -212,7 +212,7 @@ public class ExceptionWrapperXMLReceiver extends SimpleForwardingXMLReceiver {
 
     private void wrapException(Exception e, String uri, String qName, Attributes attributes) throws SAXException {
         if (locator != null)
-            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(new LocationData(locator), message, new String[]{"element", SAXUtils.saxElementToDebugString(uri, qName, attributes)}));
+            throw OrbeonLocationException.wrapException(e, XmlExtendedLocationData.apply(XmlLocationData.apply(locator), message, new String[]{"element", SAXUtils.saxElementToDebugString(uri, qName, attributes)}));
         else if (e instanceof SAXException)
             throw (SAXException) e;
         else if (e instanceof RuntimeException)

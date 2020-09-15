@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
@@ -20,9 +21,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.EventNames
 import shapeless.syntax.typeable._
+
 import scala.collection.compat._
 
 class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)

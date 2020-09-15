@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 public class ErrorProcessor extends ProcessorImpl {
 

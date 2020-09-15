@@ -36,8 +36,8 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.xml.NamespaceMapping;
 import org.w3c.dom.Node;
@@ -120,7 +120,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                     }
                                 }
                                 if (operation == null)
-                                    throw new ValidationException("No operation '" + operationName + "' declared", new LocationData(locator));
+                                    throw new ValidationException("No operation '" + operationName + "' declared", XmlLocationData.apply(locator));
                             }
 
                             // Get timeout if any
@@ -130,10 +130,10 @@ public class DelegationProcessor extends ProcessorImpl {
                                     try {
                                         operationTimeout = new Integer(timeoutAttribute);
                                     } catch (NumberFormatException e) {
-                                        throw new ValidationException("Invalid timeout specified: " + timeoutAttribute, new LocationData(locator));
+                                        throw new ValidationException("Invalid timeout specified: " + timeoutAttribute, XmlLocationData.apply(locator));
                                     }
                                     if (operationTimeout.intValue() < 0)
-                                        throw new ValidationException("Invalid timeout specified: " + operationTimeout, new LocationData(locator));
+                                        throw new ValidationException("Invalid timeout specified: " + operationTimeout, XmlLocationData.apply(locator));
                                 }
                             }
 
@@ -372,10 +372,10 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Call EJB method
                                             final Context jndiContext = (Context) context.getAttribute(ProcessorService.JNDIContext());
                                             if (jndiContext == null)
-                                                throw new ValidationException("JNDI context not found in pipeline context.", new LocationData(locator));
+                                                throw new ValidationException("JNDI context not found in pipeline context.", XmlLocationData.apply(locator));
                                             final Object home = jndiContext.lookup(service.jndiName);
                                             if (home == null)
-                                                throw new ValidationException("Home interface not found in JNDI context: " + service.jndiName, new LocationData(locator));
+                                                throw new ValidationException("Home interface not found in JNDI context: " + service.jndiName, XmlLocationData.apply(locator));
                                             final Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
                                             final Object instance = create.invoke(home);
                                             final String result = callMethod(instance.getClass(), operationName, parameterTypes, instance, parameterValues);

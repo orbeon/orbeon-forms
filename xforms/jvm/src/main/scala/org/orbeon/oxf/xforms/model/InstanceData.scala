@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.model
 
 import java.util
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om._
 
 import scala.collection.JavaConverters._

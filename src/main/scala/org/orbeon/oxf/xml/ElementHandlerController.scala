@@ -20,7 +20,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
@@ -107,7 +107,7 @@ object ElementHandlerController {
       thunk
     } catch {
       case NonFatal(e) =>
-        throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator))
+        throw OrbeonLocationException.wrapException(e, XmlLocationData.createIfPresent(locator))
     }
 }
 

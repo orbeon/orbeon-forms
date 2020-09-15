@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import cats.syntax.option._
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
@@ -23,7 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target
 import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, Extensions, LocationData}
+import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
@@ -483,7 +485,7 @@ object ElementAnalysis {
   def createLocationData(element: Element): ExtendedLocationData =
       element.getData match {
         case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
-          new ExtendedLocationData(data, "gathering static information", element)
+          XmlExtendedLocationData(data, "gathering static information".some, element = element.some)
         case _ => null
       }
 

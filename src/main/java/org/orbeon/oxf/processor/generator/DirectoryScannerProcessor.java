@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 import java.io.BufferedInputStream;
 import java.io.File;

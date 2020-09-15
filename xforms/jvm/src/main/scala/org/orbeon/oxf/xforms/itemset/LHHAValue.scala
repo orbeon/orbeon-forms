@@ -13,13 +13,13 @@
   */
 package org.orbeon.oxf.xforms.itemset
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.dom.LocationData
 
 case class LHHAValue(label: String, isHTML: Boolean) {
 

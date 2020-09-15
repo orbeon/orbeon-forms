@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 /**
  * Base interface for processor input and outputs.

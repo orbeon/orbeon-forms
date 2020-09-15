@@ -16,6 +16,7 @@ package org.orbeon.oxf.properties
 import java.net.{URI, URISyntaxException}
 import java.{lang => jl, util => ju}
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.ValidationException
@@ -23,7 +24,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Name10Checker
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._

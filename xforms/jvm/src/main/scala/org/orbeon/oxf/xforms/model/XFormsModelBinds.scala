@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import cats.syntax.option._
 import org.apache.commons.validator.routines.{EmailValidator, RegexValidator}
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper
@@ -22,22 +23,22 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsNames._
 
+import scala.collection.compat._
 import scala.collection.{mutable => m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
-import scala.collection.compat._
 
 class XFormsModelBinds(protected val model: XFormsModel)
   extends RebuildBindOps
@@ -137,10 +138,10 @@ object XFormsModelBinds {
         case NonFatal(t) =>
           throw OrbeonLocationException.wrapException(
             t,
-            new ExtendedLocationData(
+            XmlExtendedLocationData(
               currentBind.staticBind.locationData,
-              "evaluating XForms binds",
-              currentBind.staticBind.element
+              "evaluating XForms binds".some,
+              element = currentBind.staticBind.element.some
             )
           )
       }
@@ -196,7 +197,7 @@ object XFormsModelBinds {
       case t =>
         // All other errors dispatch an event and will cause the usual fatal-or-not behavior
         val ve = OrbeonLocationException.wrapException(t,
-          new ExtendedLocationData(
+          XmlExtendedLocationData(
             locationData = bindNode.locationData,
             description  = Option(message),
             params       = List("expression" -> xpathMIP.compiledExpression.string),

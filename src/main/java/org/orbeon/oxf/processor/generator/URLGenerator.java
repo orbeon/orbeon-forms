@@ -14,6 +14,8 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.log4j.Logger;
+import org.orbeon.datatypes.BasicLocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.io.CharsetNames;
@@ -36,7 +38,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 import scala.Option;
@@ -589,18 +591,18 @@ public class URLGenerator extends ProcessorImpl {
                         }
                     }
                 } catch (SAXParseException spe) {
-                    throw new ValidationException(spe.getMessage(), new LocationData(spe));
+                    throw new ValidationException(spe.getMessage(), XmlLocationData.apply(spe));
                 } catch (ValidationException e) {
                     final LocationData locationData = e.firstLocationData();
                     // The system id may not be set
                     if (locationData == null || locationData.file() == null)
-                        throw OrbeonLocationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                        throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                     else
                         throw e;
                 } catch (OXFException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new ValidationException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                    throw new ValidationException(e, BasicLocationData.apply(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                 }
             }
 

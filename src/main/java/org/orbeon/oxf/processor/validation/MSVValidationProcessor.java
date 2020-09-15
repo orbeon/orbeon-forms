@@ -27,7 +27,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -191,15 +192,15 @@ public class MSVValidationProcessor extends ProcessorImpl {
                         }
 
                         public void error(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
 
                         public void fatalError(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
 
                         public void warning(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
                     });
 

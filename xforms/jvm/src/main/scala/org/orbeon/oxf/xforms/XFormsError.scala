@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
@@ -23,7 +24,6 @@ import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.XFormsNames
 

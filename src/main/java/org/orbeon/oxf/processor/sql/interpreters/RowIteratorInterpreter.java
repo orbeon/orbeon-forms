@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -122,7 +122,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 interpreterContext.popFunctionContext();
             }
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
         }
     }
 
@@ -170,7 +170,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                     groupCount++;
 
                 } catch (SQLException e) {
-                    throw new ValidationException(e, new LocationData(getDocumentLocator()));
+                    throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
                 }
 
             } else if (localname.equals("member")) {

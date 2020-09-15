@@ -13,10 +13,10 @@
   */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, VariableAnalysis, VariableAnalysisTrait}
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.{EmptySequence, StringValue}
 import org.orbeon.xforms.XFormsId

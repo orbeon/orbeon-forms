@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;

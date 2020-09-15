@@ -28,10 +28,10 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.Seq
 import scala.util.control.NonFatal
@@ -357,7 +357,7 @@ object XFormsContainingDocument {
       doc
     } catch {
       case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(null, "initializing XForms containing document"))
+        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "initializing XForms containing document".some))
     }
 
   /**
@@ -389,7 +389,7 @@ object XFormsContainingDocument {
       doc
     } catch {
       case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(null, "re-initializing XForms containing document"))
+        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "re-initializing XForms containing document".some))
     }
 
   private def findOrRestoreStaticState(

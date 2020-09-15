@@ -18,6 +18,7 @@ import java.util
 import cats.Eval
 import cats.syntax.option._
 import org.apache.log4j.Logger
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.Logging._
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase.getRequestedSerialization
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsProperties}
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}

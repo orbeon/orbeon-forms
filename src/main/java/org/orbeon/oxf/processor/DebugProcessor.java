@@ -14,15 +14,16 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
+import org.orbeon.datatypes.BasicLocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
 
@@ -49,7 +50,7 @@ public class DebugProcessor extends ProcessorImpl {
                             final Element configElement = readInputAsOrbeonDom(pipelineContext, INPUT_CONFIG).getRootElement();
                             debugMessage = configElement.element("message").getText();
                             if (configElement.element("system-id") != null) {
-                                debugLocationData = new LocationData(configElement.element("system-id").getText(),
+                                debugLocationData = BasicLocationData.apply(configElement.element("system-id").getText(),
                                         Integer.parseInt(configElement.element("line").getText()),
                                         Integer.parseInt(configElement.element("column").getText()));
                             } else {

@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.common
 
-import collection.JavaConverters._
 import javax.xml.transform.TransformerException
+import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.oxf.xml.dom.LocationData
 import org.xml.sax.SAXParseException
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 object OrbeonLocationException {
@@ -44,12 +45,12 @@ object OrbeonLocationException {
         te.getException match {
           case null | NonFatal(_) => // unclear logic
             Option(te.getLocator) map
-            { l => new LocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
+            { l => BasicLocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
           case _ =>
             Nil
         }
       case t: SAXParseException =>
-        List(new LocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
+        List(BasicLocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
       case _ =>
         Nil
     }

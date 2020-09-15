@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
@@ -20,7 +21,6 @@ import org.orbeon.oxf.xforms.XFormsContextStackSupport.{withBinding, withIterati
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.XFormsNames
 
 import scala.collection.JavaConverters._

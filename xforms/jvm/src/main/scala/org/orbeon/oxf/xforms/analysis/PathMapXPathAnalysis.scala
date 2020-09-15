@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import java.io.ByteArrayOutputStream
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
@@ -24,7 +25,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, IOSupport, LocationData}
+import org.orbeon.oxf.xml.dom.{IOSupport, XmlExtendedLocationData}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
 import org.orbeon.saxon.expr._
@@ -321,7 +322,7 @@ object PathMapXPathAnalysis {
     } catch {
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(t,
-          new ExtendedLocationData(
+          XmlExtendedLocationData(
             compiledExpression.locationData,
             Some("analysing XPath expression"),
             List("expression" -> xpathString),

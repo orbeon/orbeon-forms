@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.ExtendedLocationData;
 
 import java.util.Iterator;
 import java.util.List;
@@ -115,7 +115,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                     if (description != null)
                         helper.element("description", description);
 
-                    String elementString = extendedLocationData.getElementString();
+                    String elementString = extendedLocationData.getElementDebugString();
                     final String[] parameters = extendedLocationData.getParameters();
                     if (parameters.length > 0) {
                         helper.startElement("parameters");

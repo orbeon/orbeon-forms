@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.xml.NamespaceMapping;
 
 import java.util.*;

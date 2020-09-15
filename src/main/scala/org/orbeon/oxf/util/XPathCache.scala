@@ -15,10 +15,11 @@ package org.orbeon.oxf.util
 
 import collection.JavaConverters._
 import java.util.{List => JList, Map => JMap}
+
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -27,6 +28,7 @@ import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.sxpath._
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.SequenceExtent
+
 import scala.util.control.NonFatal
 
 /**

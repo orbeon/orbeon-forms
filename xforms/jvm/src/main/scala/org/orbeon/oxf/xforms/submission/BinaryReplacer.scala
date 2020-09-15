@@ -17,7 +17,7 @@ import java.io.File
 import java.net.URI
 
 import cats.Eval
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument

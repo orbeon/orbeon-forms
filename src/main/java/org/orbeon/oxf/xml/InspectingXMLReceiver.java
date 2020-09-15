@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -47,7 +47,7 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
     public void startDocument() throws SAXException {
 
         if (documentStarted)
-            throw new ValidationException("startDocument() called twice", new LocationData(locator));
+            throw new ValidationException("startDocument() called twice", XmlLocationData.apply(locator));
 
         documentStarted = true;
         super.startDocument();
@@ -55,10 +55,10 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
 
     public void endDocument() throws SAXException {
         if (elementStack.size() != 0)
-            throw new ValidationException("Document ended before all the elements are closed", new LocationData(locator));
+            throw new ValidationException("Document ended before all the elements are closed", XmlLocationData.apply(locator));
 
         if (documentEnded)
-            throw new ValidationException("endDocument() called twice", new LocationData(locator));
+            throw new ValidationException("endDocument() called twice", XmlLocationData.apply(locator));
 
         documentEnded = true;
         super.endDocument();
@@ -68,7 +68,7 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
         namespaceContext.startElement();
         final String error = checkInDocument();
         if (error != null)
-            throw new ValidationException(error + ": element " + qname, new LocationData(locator));
+            throw new ValidationException(error + ": element " + qname, XmlLocationData.apply(locator));
 
         elementStack.push(new NameInfo(uri, localname, qname, new AttributesImpl(attributes)));
 
@@ -83,13 +83,13 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
     public void endElement(String uri, String localname, String qname) throws SAXException {
         final String error = checkInElement();
         if (error != null)
-            throw new ValidationException(error + ": element " + qname, new LocationData(locator));
+            throw new ValidationException(error + ": element " + qname, XmlLocationData.apply(locator));
 
         final NameInfo startElementNameInfo = elementStack.pop();
         final NameInfo endElementNameInfo = new NameInfo(uri, localname, qname, null);
         if (!startElementNameInfo.compareNames(endElementNameInfo))
             throw new ValidationException("endElement() doesn't match startElement(). startElement(): "
-                    + startElementNameInfo.toString() + "; endElement(): " + endElementNameInfo.toString(), new LocationData(locator));
+                    + startElementNameInfo.toString() + "; endElement(): " + endElementNameInfo.toString(), XmlLocationData.apply(locator));
 
         // Check name
         checkElementName(uri, localname, qname);
@@ -102,7 +102,7 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
     public void characters(char[] chars, int start, int length) throws SAXException {
         String error = checkInElement();
         if (error != null)
-            throw new ValidationException(error + ": '" + new String(chars, start, length) + "'", new LocationData(locator));
+            throw new ValidationException(error + ": '" + new String(chars, start, length) + "'", XmlLocationData.apply(locator));
         super.characters(chars, start, length);
     }
 
@@ -134,7 +134,7 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
 
     private void checkAttributeName(String uri, String localname, String qname) {
         if (uri != null && qname != null && !"".equals(uri) && qname.indexOf(':') == -1)
-            throw new ValidationException("Non-prefixed attribute cannot be in a namespace. URI: " + uri + "; localname: " + localname + "; QName: " + qname, new LocationData(locator));
+            throw new ValidationException("Non-prefixed attribute cannot be in a namespace. URI: " + uri + "; localname: " + localname + "; QName: " + qname, XmlLocationData.apply(locator));
         checkName(uri, localname, qname);
     }
 
@@ -150,15 +150,15 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
 
     private void checkName(String uri, String localname, String qname) {
         if (StringUtils.isEmpty(localname))
-            throw new ValidationException("Empty local name in SAX event. QName: " + qname, new LocationData(locator));
+            throw new ValidationException("Empty local name in SAX event. QName: " + qname, XmlLocationData.apply(locator));
         if (StringUtils.isEmpty(qname))
-            throw new ValidationException("Empty qualified name in SAX event. Localname: " + localname + "; QName: " + qname, new LocationData(locator));
+            throw new ValidationException("Empty qualified name in SAX event. Localname: " + localname + "; QName: " + qname, XmlLocationData.apply(locator));
         if (uri == null)
-            throw new ValidationException("Null URI. Localname: " + localname, new LocationData(locator));
+            throw new ValidationException("Null URI. Localname: " + localname, XmlLocationData.apply(locator));
         if (uri.equals("") && !localname.equals(qname))
-            throw new ValidationException("Localname and QName must be equal when name is in no namespace. Localname: " + localname + "; QName: " + qname, new LocationData(locator));
+            throw new ValidationException("Localname and QName must be equal when name is in no namespace. Localname: " + localname + "; QName: " + qname, XmlLocationData.apply(locator));
         if (!uri.equals("") && !localname.equals(qname.substring(qname.indexOf(':') + 1)))
-            throw new ValidationException("Local part or QName must be equal to localname when name is in namespace. Localname: " + localname + "; QName: " + qname, new LocationData(locator));
+            throw new ValidationException("Local part or QName must be equal to localname when name is in namespace. Localname: " + localname + "; QName: " + qname, XmlLocationData.apply(locator));
 
         final int colonIndex = qname.indexOf(':');
         // Check namespace mappings
@@ -167,22 +167,22 @@ public class InspectingXMLReceiver extends ForwardingXMLReceiver {
             if (colonIndex == -1) {
                 // QName is not prefixed, check that we match the default namespace
                 if (!uri.equals(namespaceContext.getURI("")))
-                    throw new ValidationException("Namespace doesn't match default namespace. Namespace: " + uri + "; QName: " + qname, new LocationData(locator));
+                    throw new ValidationException("Namespace doesn't match default namespace. Namespace: " + uri + "; QName: " + qname, XmlLocationData.apply(locator));
             } else if (colonIndex == 0 || colonIndex == (qname.length() - 1)) {
                 // Invalid position of colon in QName
-                throw new ValidationException("Invalid position of colon in QName: " + qname, new LocationData(locator));
+                throw new ValidationException("Invalid position of colon in QName: " + qname, XmlLocationData.apply(locator));
             } else {
                 // Name is prefixed: check that prefix is bound and maps to namespace
                 final String prefix = qname.substring(0, colonIndex);
                 if (namespaceContext.getURI(prefix) == null)
-                    throw new ValidationException("QName prefix is not in scope: " + qname, new LocationData(locator));
+                    throw new ValidationException("QName prefix is not in scope: " + qname, XmlLocationData.apply(locator));
                 if (!uri.equals(namespaceContext.getURI(prefix)))
-                    throw new ValidationException("QName prefix maps to URI: " + namespaceContext.getURI(prefix) + "; but namespace provided is: " + uri, new LocationData(locator));
+                    throw new ValidationException("QName prefix maps to URI: " + namespaceContext.getURI(prefix) + "; but namespace provided is: " + uri, XmlLocationData.apply(locator));
             }
         } else {
             // We are not in a namespace
             if (colonIndex != -1)
-                throw new ValidationException("QName has prefix but we are not in a namespace: " + qname, new LocationData(locator));
+                throw new ValidationException("QName has prefix but we are not in a namespace: " + qname, XmlLocationData.apply(locator));
         }
     }
 

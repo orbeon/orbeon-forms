@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
+import cats.syntax.option._
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
@@ -23,7 +24,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.app
 import org.orbeon.oxf.xforms.processor.handlers.{OutputInterceptor, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.xml.sax.Attributes
 
 import scala.util.control.NonFatal
@@ -123,7 +124,11 @@ class XFormsRepeatHandler(
           case NonFatal(t) =>
             throw OrbeonLocationException.wrapException(
               t,
-              new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element)
+              XmlExtendedLocationData(
+                repeatControl.getLocationData,
+                "unrolling xf:repeat control".some,
+                element = repeatControl.element.some
+              )
             )
         }
         xformsHandlerContext.popRepeatContext()

@@ -22,6 +22,7 @@ import javax.mail._
 import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.io.IOUtils._
@@ -34,7 +35,7 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.{LocationData, LocationSAXWriter}
+import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
 import scala.collection.JavaConverters._
 

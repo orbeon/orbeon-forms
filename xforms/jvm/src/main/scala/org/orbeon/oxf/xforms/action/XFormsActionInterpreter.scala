@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action
 
 import java.{util => ju}
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
@@ -28,7 +29,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.xbl.Scope
@@ -128,7 +129,7 @@ class XFormsActionInterpreter(
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(
           t,
-          new ExtendedLocationData(
+          XmlExtendedLocationData(
             locationData = staticAction.element.getData.asInstanceOf[LocationData],
             description  = "running XForms action",
             element      = staticAction.element,

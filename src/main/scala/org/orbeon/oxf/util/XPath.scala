@@ -17,13 +17,13 @@ import java.util.{List => JList}
 
 import javax.xml.transform._
 import javax.xml.transform.sax.SAXSource
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
@@ -376,7 +376,7 @@ object XPath {
     val validationException =
       OrbeonLocationException.wrapException(
         t,
-        new ExtendedLocationData(locationData, Option(description), List("expression" -> xpathString))
+        XmlExtendedLocationData(locationData, Option(description), List("expression" -> xpathString))
       )
 
     // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,

@@ -30,7 +30,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;

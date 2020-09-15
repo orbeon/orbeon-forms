@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms
 import java.{lang => jl}
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttri
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsNames
 

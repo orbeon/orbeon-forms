@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.xml.NamespaceMapping;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 

@@ -17,7 +17,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.datatypes.ExtendedLocationData
 import XFormsEvent._
 
 class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -37,8 +37,11 @@ class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
 private object XXFormsActionErrorEvent {
 
+  private def elementString(x: ExtendedLocationData) =
+    x.params collectFirst { case ("element", v) => v }
+
   val Getters = Map[String, XXFormsActionErrorEvent => Option[Any]](
-    "element"   -> (e => e.rootLocationOpt collect { case x: ExtendedLocationData if x.elementString.isDefined => x.elementString.get }),
+    "element"   -> (e => e.rootLocationOpt collect { case x: ExtendedLocationData if elementString(x).isDefined => elementString(x).get }),
     "system-id" -> (e => e.rootLocationOpt flatMap (l => Option(l.file))),
     "line"      -> (e => e.rootLocationOpt flatMap (l => Option(l.line))),
     "column"    -> (e => e.rootLocationOpt flatMap (l => Option(l.col))),

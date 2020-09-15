@@ -16,6 +16,7 @@ package org.orbeon.oxf.controller
 import java.util.regex.Pattern
 import java.util.{List => JList, Map => JMap}
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.errorified.Exceptions._
@@ -37,7 +38,6 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal

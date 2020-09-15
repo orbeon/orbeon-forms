@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
@@ -20,7 +21,6 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope

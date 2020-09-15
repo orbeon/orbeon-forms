@@ -17,6 +17,7 @@ import java.util
 import java.util.Collections
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{XPath, XPathCache}
@@ -26,7 +27,7 @@ import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames
@@ -318,7 +319,11 @@ class XFormsContextStack {
 
     val locationData =
       if (keepLocationData && bindingElement != null)
-        new ExtendedLocationData(bindingElement.getData.asInstanceOf[LocationData], "pushing XForms control binding", bindingElement)
+        XmlExtendedLocationData(
+          bindingElement.getData.asInstanceOf[LocationData],
+          "pushing XForms control binding".some,
+          element = bindingElement.some
+        )
       else
         null
 
@@ -622,16 +627,16 @@ class XFormsContextStack {
         if (bindingElement != null)
           throw OrbeonLocationException.wrapException(
             t,
-            new ExtendedLocationData(
+            XmlExtendedLocationData(
               locationData,
-              "evaluating binding expression",
-              bindingElement
+              "evaluating binding expression".some,
+              element = bindingElement.some
             )
           )
         else
           throw OrbeonLocationException.wrapException(
             t,
-            new ExtendedLocationData(
+            XmlExtendedLocationData(
               locationData, "" + "evaluating binding expression",
               bindingElement,
               Array("ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId)

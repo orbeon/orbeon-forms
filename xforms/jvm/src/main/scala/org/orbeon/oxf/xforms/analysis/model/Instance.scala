@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
@@ -26,13 +27,11 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, S
 import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable._
-
-import scala.collection.JavaConverters._
 
 /**
  * Static analysis of an XForms instance.
@@ -54,7 +53,7 @@ class Instance(
   def partExposeXPathTypes: Boolean = part.isExposeXPathTypes
 
   override def extendedLocationData =
-    new ExtendedLocationData(
+    XmlExtendedLocationData(
       locationData,
       Some("processing XForms instance"),
       List("id" -> staticId),

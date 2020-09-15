@@ -17,6 +17,7 @@ import java.net.URI
 import java.{util => ju}
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -33,7 +34,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
@@ -432,10 +433,10 @@ trait XFormsModelInstances {
                 null,
                 new ValidationException(
                   "Error extracting or setting inline instance",
-                  new ExtendedLocationData(
+                  XmlExtendedLocationData(
                     instance.locationData,
-                    "processing XForms instance",
-                    instance.element
+                    "processing XForms instance".some,
+                    element = instance.element.some
                   )
                 )
               )
@@ -449,10 +450,10 @@ trait XFormsModelInstances {
             "",
             new ValidationException(
               s"Required @src attribute, @resource attribute, or inline content for instance: `${instance.staticId}`",
-              new ExtendedLocationData(
+              XmlExtendedLocationData(
                 instance.locationData,
-                "processing XForms instance",
-                instance.element
+                "processing XForms instance".some,
+                element = instance.element.some
               )
             )
           )
@@ -498,10 +499,10 @@ trait XFormsModelInstances {
             instanceResource,
             OrbeonLocationException.wrapException(
               e,
-              new ExtendedLocationData(
+              XmlExtendedLocationData(
                 instance.locationData,
-                "reading external instance",
-                instance.element
+                "reading external instance".some,
+                element = instance.element.some
               )
             )
           )

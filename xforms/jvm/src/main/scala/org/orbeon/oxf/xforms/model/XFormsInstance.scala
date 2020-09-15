@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.model
 import java.net.URI
 
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
@@ -28,7 +29,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
-import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
@@ -165,7 +166,7 @@ class XFormsInstance(
   def getLocationData =
     underlyingDocumentOpt match {
       case Some(doc) => XFormsUtils.getNodeLocationData(doc.getRootElement)
-      case None      => new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
+      case None      => BasicLocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
     }
 
   def parentEventObserver: XFormsEventTarget = model

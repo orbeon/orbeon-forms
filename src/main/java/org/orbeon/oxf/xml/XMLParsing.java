@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.util.SequenceReader;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.xml.sax.*;
@@ -218,7 +218,7 @@ public class XMLParsing {
         }
 
         public void fatalError(SAXParseException exception) throws SAXException {
-            throw new ValidationException("Fatal error: " + exception.getMessage(), new LocationData(exception));
+            throw new ValidationException("Fatal error: " + exception.getMessage(), XmlLocationData.apply(exception));
         }
 
         public void warning(SAXParseException exception) throws SAXException {
@@ -320,7 +320,7 @@ public class XMLParsing {
             xmlReader.setErrorHandler(ERROR_HANDLER);
             xmlReader.parse(inputSource);
         } catch (SAXParseException e) {
-            throw new ValidationException(e.getMessage(), new LocationData(e));
+            throw new ValidationException(e.getMessage(), XmlLocationData.apply(e));
         } catch (Exception e) {
             throw new OXFException(e);
         } finally {

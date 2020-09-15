@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.SAXException;

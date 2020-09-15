@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.xforms.XFormsNames
 
 /**

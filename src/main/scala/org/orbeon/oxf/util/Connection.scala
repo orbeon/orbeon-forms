@@ -20,6 +20,7 @@ import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
+import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{CharsetNames, FileUtils, UriScheme}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
@@ -33,11 +34,10 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom.LocationData
 
 import scala.collection.JavaConverters._
-import scala.util.control.NonFatal
 import scala.collection.compat._
+import scala.util.control.NonFatal
 
 /**
  * Connection to a URL.
@@ -218,7 +218,7 @@ class Connection private (
           throw new OXFException(s"URL scheme `$scheme` not supported for method `$method`")
       }
     } catch {
-      case NonFatal(t) => throw new ValidationException(t, new LocationData(normalizedUrlString, -1, -1))
+      case NonFatal(t) => throw new ValidationException(t, BasicLocationData(normalizedUrlString, -1, -1))
     }
   }
 }

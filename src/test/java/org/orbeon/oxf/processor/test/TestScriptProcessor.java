@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Comparator;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 import java.io.File;
 import java.util.Iterator;

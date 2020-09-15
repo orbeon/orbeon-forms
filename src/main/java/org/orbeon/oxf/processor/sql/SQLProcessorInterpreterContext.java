@@ -25,7 +25,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 
@@ -296,7 +296,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                 return getConnection(pipelineContext, jndiName);
             } catch (RuntimeException e) {
                 if (documentLocator != null)
-                    throw new ValidationException(e, new LocationData(documentLocator));
+                    throw new ValidationException(e, XmlLocationData.apply(documentLocator));
                 else
                     throw e;
             }

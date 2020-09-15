@@ -26,7 +26,8 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.xforms.Constants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -135,7 +136,7 @@ public class HandlerContext {
 
         // TEMP: in this case, we should probably map our own prefix, or set
         // the default namespace and restore it on children elements
-        throw new ValidationException("No prefix found for HTML namespace", LocationData.createIfPresent(controller.locator()));
+        throw new ValidationException("No prefix found for HTML namespace", XmlLocationData.createIfPresent(controller.locator()));
     }
 
     private String findFormattingPrefix() {
@@ -221,7 +222,7 @@ public class HandlerContext {
      * @return  LocationData, null if no Locator was found
      */
     public LocationData getLocationData() {
-        return LocationData.createIfPresent(getController().locator());
+        return XmlLocationData.createIfPresent(getController().locator());
     }
 
     public String getIdPrefix() {

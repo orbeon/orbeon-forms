@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}
 import org.orbeon.oxf.xml.XIncludeReceiver._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLNames._
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax._
@@ -133,7 +133,7 @@ class XIncludeReceiver(
       // Entering xi:include element
 
       if (uri == XIncludeLegacyURI)
-        Logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XIncludeURI + "' at " + new LocationData(outputLocator).toString)
+        Logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XIncludeURI + "' at " + XmlLocationData(outputLocator).toString)
 
       val href     = attributes.getValue("href")
       val parse    = Option(attributes.getValue("parse"))
@@ -147,7 +147,7 @@ class XIncludeReceiver(
       }
 
       if (parse exists (_ != "xml"))
-        throw new ValidationException("Invalid 'parse' attribute value: " + parse.get, new LocationData(outputLocator))
+        throw new ValidationException("Invalid 'parse' attribute value: " + parse.get, XmlLocationData(outputLocator))
 
       // Get SAXSource
       val base = Option(outputLocator) map (_.getSystemId) orNull
@@ -183,11 +183,11 @@ class XIncludeReceiver(
 
             // Each resulting object is output through the next level of processing
             for (item <- result.asScala)
-              XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, new LocationData(outputLocator))
+              XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, XmlLocationData(outputLocator))
 
           case Some(xpointer) =>
             // Other XPointer schemes are not supported
-            throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, new LocationData(outputLocator))
+            throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, XmlLocationData(outputLocator))
           case None =>
             // No xpointer attribute specified, just stream the child document
             val xmlReader = source.getXMLReader
@@ -208,7 +208,7 @@ class XIncludeReceiver(
       }
     } else if (isXIURI) {
       // NOTE: Should support xi:fallback
-      throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(outputLocator))
+      throw new ValidationException("Invalid XInclude element: " + localname, XmlLocationData(outputLocator))
     } else {
       // Start a regular element
       playStartPrefixMappings(_contexts.head.pending)

@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om._
 import org.orbeon.xforms.XFormsId
 

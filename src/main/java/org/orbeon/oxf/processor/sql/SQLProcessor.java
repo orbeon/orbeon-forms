@@ -24,8 +24,8 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -507,7 +507,7 @@ public class SQLProcessor extends ProcessorImpl {
             if (forwardingLevel == level) {
                 final String key = "{" + uri + "}" + localname;
                 if (!currentKey.equals(key))
-                    throw new ValidationException("Illegal document: expecting " + key + ", got " + currentKey, new LocationData(getDocumentLocator()));
+                    throw new ValidationException("Illegal document: expecting " + key + ", got " + currentKey, XmlLocationData.apply(getDocumentLocator()));
 
                 final InterpreterContentHandler elementHandler = (InterpreterContentHandler) elementHandlers.get(key);
                 if (elementHandler.isRepeating()) {

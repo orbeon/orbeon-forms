@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
@@ -27,9 +29,8 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.XFormsId
@@ -209,7 +210,14 @@ class XFormsControl(
     try preEvaluateImpl(relevant = true, parentRelevant = true)
     catch {
       case e: ValidationException =>
-        throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
+        throw OrbeonLocationException.wrapException(
+          e,
+          XmlExtendedLocationData(
+            getLocationData,
+            "evaluating control".some,
+            element = Option(element)
+          )
+        )
     }
 
   // Called to clear the control's values when the control becomes non-relevant

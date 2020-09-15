@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.{Constants, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
@@ -274,7 +274,7 @@ class XFormsExtractor(
                 throw new ValidationException(
                   s"Error creating URI from: `$parentElementDetails` and `$xmlBaseAttribute`.",
                   e,
-                  LocationData.createIfPresent(locator)
+                  XmlLocationData.createIfPresent(locator)
                 )
             }
           case None =>
@@ -367,13 +367,13 @@ class XFormsExtractor(
       // TODO: Just warn?
       if (isXXForms) {
         if (! AllowedXXFormsElements(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
-          throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+          throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       } else if (isEXForms) {
         if (! AllowedEXFormElements(localname))
-          throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+          throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       } else if (isXBL) {
         if (! AllowedXBLElements(localname))
-          throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+          throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       }
 
       // Preserve as is the content of labels, etc., instances, and schemas

@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.xforms.XFormsNames;
 import org.orbeon.xml.NamespaceMapping;
 import org.xml.sax.Attributes;
@@ -516,8 +516,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // TODO: create Element to provide more location info?
                 if (isTopLevel && metadata.idGenerator().contains(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
-                        new ExtendedLocationData(LocationData.createIfPresent(documentLocator()), "analyzing control element",
-                                new String[] { "element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));
+                        XmlExtendedLocationData.apply(XmlLocationData.createIfPresent(documentLocator()), "analyzing control element",
+                            new String[]{"element", SAXUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId}));
             }
 
         } else {

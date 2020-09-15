@@ -36,7 +36,7 @@ class LocationSAXContentHandler
     attributes    : Attributes
   ): Unit = {
     super.startElement(namespaceURI, localName, qualifiedName, attributes)
-    val locationData = LocationData.createIfPresent(locator)
+    val locationData = XmlLocationData.createIfPresent(locator)
     if (locationData ne null)
       elementStack.get(elementStack.size - 1).setData(locationData)
   }

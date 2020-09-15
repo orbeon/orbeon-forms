@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 
@@ -150,7 +150,7 @@ object Dispatch extends Logging {
         // Add location information if possible
         val locationData = Option(target.getLocationData).orNull
         throw OrbeonLocationException.wrapException(t,
-          new ExtendedLocationData(
+          XmlExtendedLocationData(
             locationData,
             Some("dispatching XForms event"),
             List(

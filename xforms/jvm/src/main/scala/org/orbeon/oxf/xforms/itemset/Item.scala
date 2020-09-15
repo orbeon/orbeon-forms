@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
 

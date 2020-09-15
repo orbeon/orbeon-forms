@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.processor
 
+import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom._
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xml.dom.{LocationData, LocationSAXContentHandler, LocationSAXWriter}
+import org.orbeon.oxf.xml.dom.{LocationSAXContentHandler, LocationSAXWriter}
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import org.orbeon.oxf.xml.{DigestContentHandler, NamespaceCleanupXMLReceiver, XMLConstants, XMLParsing}
 
@@ -110,7 +111,7 @@ object ProcessorSupport {
     val sysID = stkTrc(depthToUse).getFileName
     val line = stkTrc(depthToUse).getLineNumber
 
-    new LocationData(sysID, line, -1)
+    BasicLocationData(sysID, line, -1)
   }
 
   def getDocumentSource(d: Document): DocumentSource = {

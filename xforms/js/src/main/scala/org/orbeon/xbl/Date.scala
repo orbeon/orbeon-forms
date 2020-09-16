@@ -60,6 +60,8 @@ private class DateCompanion extends XBLCompanionWithState {
     } else {
 
       // Initialize bootstrap-datepicker
+      // 1. We set the date picker to be rendered inside the control, for our generic code handling `blur` to be able to detect that
+      //    the focus is still inside the control should users click inside the date picker; also see issue #4647
       val options              = new DatePickerOptions
       options.autoclose        = true
       options.enableOnReadonly = false
@@ -67,7 +69,7 @@ private class DateCompanion extends XBLCompanionWithState {
       options.showOnFocus      = false
       options.forceParse       = false
       options.language         = Language.getLang()
-      options.container        = ".orbeon"
+      options.container        = "#" + containerElem.id // See note 1 above
       datePicker = inputEl.parent().datepicker(options)
 
       // Register listeners

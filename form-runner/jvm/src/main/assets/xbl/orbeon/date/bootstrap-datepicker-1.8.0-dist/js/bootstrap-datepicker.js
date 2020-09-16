@@ -2016,7 +2016,13 @@
               '</tr>'+
             '</tfoot>'
   };
-  DPGlobal.template = '<div class="datepicker">'+
+
+  // Making the date picker focusable (with -1 so it is not focusable with the keyboard, and only with the mouse);
+  // this is so when the date picker is open, and users click inside the date picker, and the input field looses the focus,
+  // our code for `blur` is able to detect that the focus has moved to an element that is still part of the date or date-time
+  // control, and thus there is no need to sand a focus out event to the server, which otherwise might prematurely mark the
+  // control as invalid, For instance if the value was required, and none has been provided yet by the user; also see issue #4647
+  DPGlobal.template = '<div class="datepicker" tabindex="-1">'+
               '<div class="datepicker-days">'+
                 '<table class="table-condensed">'+
                   DPGlobal.headTemplate+

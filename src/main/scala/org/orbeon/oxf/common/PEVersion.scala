@@ -25,10 +25,10 @@ import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
-import org.orbeon.oxf.util.DateUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon}
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom.IOSupport
 
@@ -108,7 +108,7 @@ private object PEVersion {
   def dateFromVersionNumber(currentVersion: String): Option[Long] = (
     Some(currentVersion)
     collect { case MatchTimestamp(_, year, month, day, _) => year + '-' + month + '-' + day }
-    map parseISODateOrDateTime
+    map DateUtilsUsingSaxon.parseISODateOrDateTime
   )
 
   case class LicenseInfo(
@@ -126,9 +126,9 @@ private object PEVersion {
     def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
     def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end => dateFromVersionNumber(versionNumber) exists (_ > end))
 
-    def formattedExpiration      = expiration                           map DateNoZone.print
-    def formattedSubscriptionEnd = subscriptionEnd                      map DateNoZone.print
-    def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateNoZone.print
+    def formattedExpiration      = expiration                           map DateUtils.formatIsoDateNoZone
+    def formattedSubscriptionEnd = subscriptionEnd                      map DateUtils.formatIsoDateNoZone
+    def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateUtils.formatIsoDateNoZone
 
     override def toString = {
       val versionString         = version                  map (" for version " + _) getOrElse ""
@@ -152,8 +152,8 @@ private object PEVersion {
       val issued             = select("issued")
 
       val versionOpt         = select("version").trimAllToOpt
-      val expirationOpt      = select("expiration").trimAllToOpt       map parseISODateOrDateTime
-      val subscriptionEndOpt = select("subscription-end").trimAllToOpt map parseISODateOrDateTime
+      val expirationOpt      = select("expiration").trimAllToOpt       map DateUtilsUsingSaxon.parseISODateOrDateTime
+      val subscriptionEndOpt = select("subscription-end").trimAllToOpt map DateUtilsUsingSaxon.parseISODateOrDateTime
 
       LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
     }

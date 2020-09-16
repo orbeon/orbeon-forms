@@ -13,48 +13,18 @@
  */
 package org.orbeon.oxf.util
 
+import java.time.Instant
+
 import org.scalatest.funspec.AnyFunSpec
 
 
 class DateUtilsTest extends AnyFunSpec {
 
-  describe("Date parsing") {
-
-    val utcTimezones = List("+00:00", "-00:00", "Z")
-
-    val valuesNoExplicitTz = List(
-      "1970-01-01T00:00:00.000" -> 0L,
-      "1970-01-01T00:00:00"     -> 0L,
-      "1970-01-01"              -> 0L,
-      "2012-05-29T19:35:04.123" -> 1338320104123L,
-      "2012-05-29T19:35:04"     -> 1338320104000L,
-      "2012-05-29"              -> 1338249600000L
-    )
-
-    // How many minutes to add to UTC time to get the local time
-    val defaultTzOffsetMs = DateUtils.DefaultOffsetMinutes * 60 * 1000
-
-    for ((value, expected) <- valuesNoExplicitTz)
-      it(s"must parse `$value` with no explicit timezone") {
-        assert(expected - defaultTzOffsetMs === DateUtils.parseISODateOrDateTime(value))
-      }
-
-    for {
-      (value, expected) <- valuesNoExplicitTz
-      utcTimezone       <- utcTimezones
-      valueWithTz       = value + utcTimezone
-    } locally {
-      it(s"must parse `$value` with timezone `$utcTimezone`") {
-        assert(expected === DateUtils.parseISODateOrDateTime(valueWithTz))
-      }
-    }
-
-    // Test all 3 HTTP date formats
-    for (value <- List("Tue, 29 May 2012 19:35:04 GMT", "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"))
+  describe("RFC1123 date parsing") {
+    for (value <- List("Tue, 29 May 2012 19:35:04 GMT")) // "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"
       it(s"must parse `$value` in all formats") {
         assert(1338320104000L === DateUtils.parseRFC1123(value))
       }
-
   }
 
   describe("Date formatting") {
@@ -68,7 +38,7 @@ class DateUtilsTest extends AnyFunSpec {
 
     for ((expected, formatterName, formatter, instant) <- data)
       it(s"must format instant `$instant` using formatter `$formatterName`") {
-        assert(expected === formatter.print(instant))
+        assert(expected === formatter.format(Instant.ofEpochMilli(instant)))
       }
   }
 }

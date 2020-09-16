@@ -21,7 +21,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{DateUtils, XPath}
+import org.orbeon.oxf.util.{DateUtilsUsingSaxon, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.Name10Checker
@@ -113,7 +113,7 @@ object PropertyStore {
   private def convertString (value: String, element: Element) = value
   private def convertInteger(value: String, element: Element) = new jl.Integer(value)
   private def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
-  private def convertDate   (value: String, element: Element) = new ju.Date(DateUtils.parseISODateOrDateTime(value))
+  private def convertDate   (value: String, element: Element) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 
   private def convertQName(value: String, element: Element): QName =
     element.resolveAttValueQName("value", unprefixedIsNoNamespace = true)

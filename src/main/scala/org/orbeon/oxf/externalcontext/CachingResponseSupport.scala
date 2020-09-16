@@ -29,7 +29,7 @@ trait CachingResponseSupport {
       setHeader(key, value)
 
   private def setDateHeader(name: String, value: Long) =
-      setHeader(name, DateUtils.RFC1123Date.print(value))
+      setHeader(name, DateUtils.formatRfc1123DateTimeGmt(value))
 
   def setPageCaching(lastModified: Long): Unit =
     if (responseCachingDisabled) {

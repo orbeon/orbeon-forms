@@ -23,7 +23,7 @@ import org.orbeon.oxf.externalcontext.WebAppExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
@@ -90,7 +90,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         if ("now".equalsIgnoreCase(startTimeString)) {
                             startTime = System.currentTimeMillis();
                         } else {
-                            startTime = DateUtils.parseISODateOrDateTime(startTimeString);
+                            startTime = DateUtilsUsingSaxon.parseISODateOrDateTime(startTimeString);
                         }
                         config.setStartTime(startTime);
 

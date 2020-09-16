@@ -68,7 +68,7 @@ public class UnzipProcessor extends ProcessorImpl {
                         // Get file name
                         String fileName = zipEntry.getName();
                         long fileSize = zipEntry.getSize();
-                        String fileTime = DateUtils.DateTime().print(zipEntry.getTime());
+                        String fileTime = DateUtils.formatIsoDateTimeUtc(zipEntry.getTime());
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
                         String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE, logger);

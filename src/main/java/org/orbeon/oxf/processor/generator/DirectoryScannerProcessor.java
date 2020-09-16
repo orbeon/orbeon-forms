@@ -23,6 +23,7 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifReader;
 import com.drew.metadata.iptc.IptcReader;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.Defaults;
@@ -37,7 +38,6 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.datatypes.LocationData;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -213,7 +213,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                             String filePath = path + name;
                             File file = new File(config.getBaseDirectory(), filePath);
                             long lastModified = file.lastModified();
-                            String lastModifiedDate = DateUtils.DateTime().print(lastModified);
+                            String lastModifiedDate = DateUtils.formatIsoDateTimeUtc(lastModified);
                             long fileSize = file.length();
 
                             helper.startElement(FILE_ELEMENT, new String[]{"last-modified-ms", Long.toString(lastModified),

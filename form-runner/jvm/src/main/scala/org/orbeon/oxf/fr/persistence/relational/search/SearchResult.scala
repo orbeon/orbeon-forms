@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, Request}
-import org.orbeon.oxf.util.DateUtils._
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 
@@ -34,8 +34,8 @@ trait SearchResult extends SearchRequest {
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created        ={DateTime.print(doc.metadata.created.getTime)}
-            last-modified  ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
+            created        ={DateUtils.formatIsoDateTimeUtc(doc.metadata.created.getTime)}
+            last-modified  ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
             workflow-stage ={doc.metadata.workflowStage.map(xml.Text(_))}
             name           ={doc.metadata.documentId}
             draft          ={doc.metadata.draft.toString}

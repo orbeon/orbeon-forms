@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
@@ -24,14 +25,13 @@ import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.Base64XMLReceiver;
-import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.datatypes.LocationData;
 import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -519,14 +519,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.DATE);
                                                 } else {
-                                                    java.sql.Date date = new java.sql.Date(DateUtils.parseISODateOrDateTime(stringValue));
+                                                    java.sql.Date date = new java.sql.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(stringValue));
                                                     stmt.setDate(index, date);
                                                 }
                                             } else if (ProcessorSupport.qNameToExplodedQName(XMLConstants.XS_DATETIME_QNAME()).equals(xmlType)) {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.TIMESTAMP);
                                                 } else {
-                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtils.parseISODateOrDateTime(stringValue));
+                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtilsUsingSaxon.parseISODateOrDateTime(stringValue));
                                                     stmt.setTimestamp(index, timestamp);
                                                 }
                                             } else if (ProcessorSupport.qNameToExplodedQName(XMLConstants.XS_BOOLEAN_QNAME()).equals(xmlType)) {

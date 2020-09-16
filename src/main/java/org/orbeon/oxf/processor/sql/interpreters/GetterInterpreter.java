@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.joda.time.format.ISODateTimeFormat;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.ProcessorSupport;
@@ -39,6 +38,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -459,11 +460,11 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (columnType == Types.DATE) {
             final Date value = resultSet.getDate(columnIndex);
             if (value != null)
-                stringValue = ISODateTimeFormat.date().print(value.getTime());
+                stringValue = DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(value.getTime()));
         } else if (columnType == Types.TIMESTAMP) {
             final Timestamp value = resultSet.getTimestamp(columnIndex);
             if (value != null)
-                stringValue = DateUtils.DateTime().print(value.getTime());
+                stringValue = DateUtils.formatIsoDateTimeUtc(value.getTime());
         } else if (columnType == Types.DECIMAL
                 || columnType == Types.NUMERIC) {
             final BigDecimal value = resultSet.getBigDecimal(columnIndex);

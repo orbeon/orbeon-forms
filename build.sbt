@@ -33,7 +33,6 @@ val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val JodaConvertVersion            = "2.2.1"
 val Slf4jVersion                  = "1.7.30"
 val HttpComponentsVersion         = "4.5.12"
 val Log4jVersion                  = "1.2.17"
@@ -59,8 +58,6 @@ val CoreLibraryDependencies = Seq(
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
-  "joda-time"                   %  "joda-time"                      % "2.10.6",
-  "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
   "org.apache.commons"          %  "commons-lang3"                  % "3.11",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
@@ -438,6 +435,12 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 
 lazy val commonJVM = common.jvm
 lazy val commonJS  = common.js
+//  .enablePlugins(TzdbPlugin)
+  .settings(
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
+//    zonesFilter := {(z: String) => z == "America/Los_Angeles"} // Q: See if/how we do this filtering
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.0.0" % Test // for now, get the whole database
+  )
 
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
   .settings(commonSettings: _*)
@@ -462,8 +465,7 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-full-portlet",
-    libraryDependencies += "org.joda"           % "joda-convert"              % JodaConvertVersion          % Provided,
-    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      % "portlet-api"               % PortletApiVersion           % Provided,
     libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
@@ -521,7 +523,6 @@ lazy val formRunnerJVM = formRunner.jvm
     sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
     javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies += "org.joda"      %  "joda-convert"     % JodaConvertVersion % Provided,
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
 
@@ -550,7 +551,8 @@ lazy val formRunnerJS = formRunner.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion
+      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion,
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -678,7 +680,8 @@ lazy val xformsJS = xforms.js
       "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion
+      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",

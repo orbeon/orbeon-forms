@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
+import java.time.{Instant, ZoneOffset}
+import java.time.format.DateTimeFormatter
 import java.{util => ju}
 
-import org.joda.time.format.ISODateTimeFormat
 import org.orbeon.oxf.fr.excel.{ExcelDateUtils, NumberToTextConverter}
 import org.orbeon.oxf.fr.excel.ExcelDateUtils.FormatType
 import org.orbeon.oxf.util.StringUtils._
@@ -24,16 +25,18 @@ import scala.util.Try
 
 object FormRunnerImport {
 
-  private val DateTimeFormatter = ISODateTimeFormat.dateTime.withZoneUTC
-  private val DateFormatter     = ISODateTimeFormat.date.withZoneUTC
-  private val TimeFormatter     = ISODateTimeFormat.time.withZoneUTC
+  private val IsoDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC)
+  private val IsoDateFormatter     = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC)
+  private val IsoTimeFormatter     = DateTimeFormatter.ISO_LOCAL_TIME.withZone(ZoneOffset.UTC)
 
+  //@XPathFunction
   def findOoxmlCellType(formatIndex: Int, formatString: String): String =
     if (formatString.toLowerCase == "general" || formatString.isEmpty)
       FormatType.Other.entryName
     else
       ExcelDateUtils.analyzeFormatType(formatIndex, formatString).entryName
 
+  //@XPathFunction
   def convertDateTime(value: String, formatTypeString: String, use1904windowing: Boolean): String = {
 
     val dateOpt =
@@ -51,9 +54,9 @@ object FormRunnerImport {
 
     def formatter =
       formatType match {
-        case FormatType.DateTime => DateTimeFormatter
-        case FormatType.Date     => DateFormatter
-        case FormatType.Time     => TimeFormatter
+        case FormatType.DateTime => IsoDateTimeFormatter
+        case FormatType.Date     => IsoDateFormatter
+        case FormatType.Time     => IsoTimeFormatter
         case FormatType.Other    => throw new IllegalArgumentException(formatTypeString)
       }
 
@@ -68,12 +71,14 @@ object FormRunnerImport {
 
     dateOpt                         map
       (_.getTime)                   map
-      formatter.print               map
+      Instant.ofEpochMilli          map
+      formatter.format              map
       removeTrailingZIfPresent      map
       removeTrailingMillisIfPresent orNull
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/4452
+  //@XPathFunction
   def convertNumber(value: String): String =
     Try(NumberToTextConverter.toText(value.toDouble)).toOption.getOrElse(value)
 }

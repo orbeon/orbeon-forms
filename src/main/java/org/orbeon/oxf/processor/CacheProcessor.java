@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.xml.DigestContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -144,7 +145,7 @@ public class CacheProcessor extends ProcessorImpl {
                 }
             } else {
                 // Validity is a date
-                state.validity = new Long(DateUtils.parseISODateOrDateTime(validity.validity));
+                state.validity = new Long(DateUtilsUsingSaxon.parseISODateOrDateTime(validity.validity));
             }
         }
         return state;

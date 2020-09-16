@@ -49,7 +49,7 @@ object URLGeneratorBase {
   ): ju.Map[String, Array[String]] = {
 
     val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) => (k, v.to(Array)) }} getOrElse Map.empty[String, Array[String]]
-    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified => "If-Modified-Since" -> Array(DateUtils.RFC1123Date.print(lastModified))).to(List)
+    val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified => "If-Modified-Since" -> Array(DateUtils.formatRfc1123DateTimeGmt(lastModified))).to(List)
 
     headersOrEmpty ++ newHeaderAsList
   }.asJava

@@ -269,15 +269,16 @@ trait ProcessInterpreter extends Logging {
     (_ => trySuccess(EmptyActionParams))
 
   // Resume a process
-  def tryResume(params: ActionParams): Try[Any] = {
-    val serialized = readSuspendedProcess
-
-    // TODO: Restore processId
-    val processId :: continuation = serialized.splitTo[List]("|")
-
-    writeSuspendedProcess("")
-    runSubProcess(continuation mkString "|")
-  }
+  def tryResume(params: ActionParams): Try[Any] =
+    readSuspendedProcess.splitTo[List]("|") match {
+      case processId :: continuation =>
+        // TODO: Restore processId
+        writeSuspendedProcess("")
+        runSubProcess(continuation mkString "|")
+      case other =>
+        error(s"error finding process to resume: `$other`")
+        Failure(new IllegalArgumentException)
+    }
 
   // Abort a suspended process
   def tryAbort(params: ActionParams): Try[Any] =

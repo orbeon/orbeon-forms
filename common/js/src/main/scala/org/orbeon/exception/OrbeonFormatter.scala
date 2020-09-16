@@ -23,4 +23,7 @@ object OrbeonFormatter {
     throwable.printStackTrace(new PrintWriter(sw))
     sw.toString
   }
+
+  def message(throwable : scala.Throwable) : String =
+    throwable.getMessage
 }

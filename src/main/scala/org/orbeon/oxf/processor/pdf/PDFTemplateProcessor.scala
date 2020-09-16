@@ -20,7 +20,7 @@ import java.util.{List => JList}
 
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
-import org.apache.log4j.Logger
+import org.log4s
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
@@ -352,7 +352,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger)
+            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger.logger)
             // NOTE: iText's Image.getInstance() closes the local URL's InputStream
             Image.getInstance(URLFactory.createURL(tempURLString))
           }
@@ -401,7 +401,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
 object PDFTemplateProcessor {
 
-  val Logger: Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
+  val Logger: log4s.Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
   val PDFTemplateModelNamespaceURI = "http://www.orbeon.com/oxf/pdf-template/model"
 
   def createBarCode(barcodeType: String): Barcode = barcodeType match {

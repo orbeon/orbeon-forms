@@ -14,26 +14,25 @@
 package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.xml.NamespaceMapping;
-import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.xml.NamespaceMapping;
 
 import java.util.*;
 
 public class ConcreteChooseProcessor extends ProcessorImpl {
 
-    public static Logger logger = LoggerFactory.createLogger(ConcreteChooseProcessor.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(ConcreteChooseProcessor.class);
 
     // Created when constructed
     private LocationData locationData;

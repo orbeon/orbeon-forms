@@ -13,20 +13,18 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.log4j.Logger;
-import org.orbeon.dom.Document;
-import org.orbeon.dom.Element;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom.IOSupport;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -34,7 +32,10 @@ import org.xml.sax.helpers.ParserAdapter;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The Bean generator generates an XML document based on:
@@ -49,7 +50,7 @@ public class BeanGenerator extends ProcessorImpl {
     public static final String BEAN_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/bean";
     public static final String INPUT_MAPPING = "mapping";
 
-    private static Logger logger = LoggerFactory.createLogger(BeanGenerator.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(BeanGenerator.class);
 
     public BeanGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, BEAN_CONFIG_NAMESPACE_URI));

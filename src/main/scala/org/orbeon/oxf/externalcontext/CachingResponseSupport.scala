@@ -70,5 +70,5 @@ trait CachingResponseSupport {
     }
 
   def checkIfModifiedSince(request: Request, lastModified: Long): Boolean =
-    responseCachingDisabled || NetUtils.checkIfModifiedSince(request, lastModified, ServletExternalContext.Logger)
+    responseCachingDisabled || NetUtils.checkIfModifiedSince(request, lastModified, ServletExternalContext.Logger.logger)
 }

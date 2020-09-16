@@ -98,7 +98,7 @@ class CustomUserAgent(
         NetUtils.inputStreamToAnyURI(
           resolveAndOpenStream(resolvedUriString),
           NetUtils.REQUEST_SCOPE,
-          XHTMLToPDFProcessor.logger
+          XHTMLToPDFProcessor.logger.logger
         )
 
       indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUri)

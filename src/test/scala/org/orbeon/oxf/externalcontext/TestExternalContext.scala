@@ -126,7 +126,7 @@ class TestExternalContext(
               locationData.file
 
           val saxSource = PartUtils.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType)
-          val fileItem  = PartUtils.handleStreamedPartContent(pipelineContext, saxSource)
+          val fileItem  = PartUtils.handleStreamedPartContent(saxSource)(TestExternalContext.Logger)
           if (! (ContentTypes.isTextOrJSONContentType(contentType) || ContentTypes.isXMLContentType(contentType))) {
             // This is binary content
             if (fileItem ne null) {

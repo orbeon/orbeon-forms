@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.processor.CacheableInputReader;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
@@ -35,7 +38,7 @@ import java.io.*;
  */
 public class FileSerializer extends ProcessorImpl {
 
-    private static Logger logger = LoggerFactory.createLogger(FileSerializer.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(FileSerializer.class);
 
     public static final String FILE_SERIALIZER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/file-serializer-config";
 

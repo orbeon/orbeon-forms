@@ -14,10 +14,11 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.io.CharsetNames;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.OutputCacheKey;
@@ -25,19 +26,20 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
 import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.util.SystemUtils;
-import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -45,7 +47,7 @@ import java.util.*;
  */
 public class JavaProcessor extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(JavaProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(JavaProcessor.class);
     private final static String PATH_SEPARATOR = System.getProperty("path.separator");
     private final static ExpirationMap lastModifiedMap = new ExpirationMap(1000);
 

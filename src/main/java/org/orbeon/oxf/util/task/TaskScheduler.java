@@ -15,7 +15,8 @@ package org.orbeon.oxf.util.task;
 
 // imports
 
-import org.apache.log4j.Logger;
+import org.log4s.Logger;
+import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.externalcontext.WebAppContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;
@@ -45,7 +46,7 @@ import java.util.TimerTask;
 
 public class TaskScheduler {
 
-    private static Logger logger = LoggerFactory.createLogger(TaskScheduler.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(TaskScheduler.class);
 
     // instance variables
     private Timer schedulerThread;

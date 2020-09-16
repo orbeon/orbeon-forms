@@ -82,6 +82,8 @@ private object PersistenceProxyProcessor {
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
+  implicit val Logger                = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
+
   // Proxy the request to the appropriate persistence implementation
   def proxyRequest(request: Request, response: Response): Unit = {
     val incomingPath = request.getRequestPath
@@ -117,10 +119,27 @@ private object PersistenceProxyProcessor {
         case None          => request.getInputStream
       }
 
+<<<<<<< HEAD
       implicit val logger = new IndentedLogger(ProcessorImpl.logger)
       val (bodyInputStream, bodyContentLength) =
         FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
           .getOrElse(requestInputStream -> request.contentLengthOpt)
+=======
+      val inputData = requestInputStream -> request.contentLengthOpt
+      val (bodyInputStream, bodyContentLength) = formOrData match {
+        case FormOrData.Form =>
+          // Don't encrypt form definitions
+          inputData
+        case FormOrData.Data =>
+          FieldEncryption.encryptDataIfNecessary(
+            request,
+            requestInputStream,
+            app,
+            form,
+            isDataXmlRequest
+          ).getOrElse(inputData)
+      }
+>>>>>>> b835475a40... Implement #4670 "Unify Scala.js and Scala JVM logging"
 
       StreamedContent(
         bodyInputStream,

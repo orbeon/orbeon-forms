@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.util
 
-import java.{lang => jl, util => ju}
+import java.{lang => jl}
 
-import org.apache.log4j.{Level, Logger}
+import org.log4s
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.IndentedLogger._
 
 import scala.annotation.varargs
 
 /**
- * Abstraction over log4j, which provides:
+ * Abstraction which provides:
  *
  * - start/end operation with parameters
  * - indenting depending on current nesting of operations
@@ -38,8 +38,7 @@ object IndentedLogger {
   }
 
   private def log(
-    logger      : Logger,
-    level       : Level,
+    logger      : log4s.Logger.LevelLogger,
     indentLevel : Int,
     `type`      : String,
     message     : String,
@@ -70,7 +69,7 @@ object IndentedLogger {
         ""
     val text = (if (`type`.nonEmpty) `type` + " - " else "") + message + parametersString
     val indentation = getLogIndentSpaces(indentLevel)
-    logger.log(level, indentation + text)
+    logger(indentation + text)
   }
 
   class Indentation(var indentation: Int) {
@@ -78,14 +77,14 @@ object IndentedLogger {
   }
 }
 
-class IndentedLogger(val logger: Logger, val debugEnabled: Boolean, val indentation: Indentation) {
+class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val indentation: Indentation) {
 
-  private val stack = new ju.Stack[Operation]
+  private var stack: List[Operation] = Nil
 
-  def this(logger: Logger) =
+  def this(logger: log4s.Logger) =
     this(logger, logger.isDebugEnabled, new Indentation)
 
-  def this(logger: Logger, isDebugEnabled: Boolean) =
+  def this(logger: log4s.Logger, isDebugEnabled: Boolean) =
     this(logger, isDebugEnabled, new Indentation)
 
   // 2 usages
@@ -97,59 +96,65 @@ class IndentedLogger(val logger: Logger, val debugEnabled: Boolean, val indentat
 
   def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled) {
-      stack.push(new Operation(`type`, message))
+      stack ::= new Operation(`type`, message)
       logDebug(`type`, "start " + message, parameters: _*)
       indentation.indentation += 1
     }
 
   def endHandleOperation(): Unit =
     if (debugEnabled) {
-      val resultParameters = stack.peek.resultParameters
+      val resultParameters = stack.head.resultParameters
       indentation.indentation -= 1
-      val operation = stack.pop()
-      if (operation ne null) {
 
-        val timeParams = List("time (ms)", operation.timeElapsed.toString)
+      stack match {
+        case operation :: tail =>
 
-        val newParams =
-          if (resultParameters ne null)
-            timeParams ::: resultParameters.toList
-          else
-            timeParams
+          stack = tail
+
+          val timeParams = List("time (ms)", operation.timeElapsed.toString)
+
+          val newParams =
+            if (resultParameters ne null)
+              timeParams ::: resultParameters.toList
+            else
+              timeParams
 
           logDebug(operation.`type`, "end " + operation.message, newParams: _*)
+        case _ =>
       }
     }
 
   def setDebugResults(parameters: String*): Unit =
-    stack.peek.resultParameters = parameters
+    stack.head.resultParameters = parameters
 
-  def log(level: Level, `type`: String, message: String, parameters: String*): Unit =
+  def log(level: log4s.LogLevel, `type`: String, message: String, parameters: String*): Unit =
     log(level, indentation.indentation, `type`, message, parameters: _*)
 
   @varargs
   def logDebug(`type`: String, message: String, parameters: String*): Unit =
-    log(Level.DEBUG, indentation.indentation, `type`, message, parameters: _*)
+    if (debugEnabled)
+      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, message, parameters: _*)
 
   def logDebug(`type`: String, message: String, throwable: Throwable): Unit =
-    log(Level.DEBUG, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
+    if (debugEnabled)
+      IndentedLogger.log(logger(log4s.Debug), indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
 
   def logWarning(`type`: String, message: String, parameters: String*): Unit =
-    log(Level.WARN, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Warn, indentation.indentation, `type`, message, parameters: _*)
 
   def logInfo(`type`: String, message: String, parameters: String*): Unit =
-    log(Level.INFO, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Info, indentation.indentation, `type`, message, parameters: _*)
 
   def logWarning(`type`: String, message: String, throwable: Throwable): Unit =
-    log(Level.WARN, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
+    log(log4s.Warn, indentation.indentation, `type`, message, "throwable", OrbeonFormatter.format(throwable))
 
   def logError(`type`: String, message: String, parameters: String*): Unit =
-    log(Level.ERROR, indentation.indentation, `type`, message, parameters: _*)
+    log(log4s.Error, indentation.indentation, `type`, message, parameters: _*)
 
   // Handle DEBUG level locally, everything else goes through
-  private def log(level: Level, indentLevel: Int, `type`: String, message: String, parameters: String*): Unit =
-    if (! ((level eq Level.DEBUG) && ! debugEnabled))
-      IndentedLogger.log(logger, level, indentLevel, `type`, message, parameters: _*)
+  private def log(level: log4s.LogLevel, indentLevel: Int, `type`: String, message: String, parameters: String*): Unit =
+    if (! ((level eq log4s.Debug) && ! debugEnabled))
+      IndentedLogger.log(logger(level), indentLevel, `type`, message, parameters: _*)
 
   private class Operation(val `type`: String, val message: String) {
 

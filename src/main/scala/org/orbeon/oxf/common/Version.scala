@@ -16,9 +16,9 @@ package org.orbeon.oxf.common
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.util.control.NonFatal
-import org.orbeon.oxf.util.StringUtils._
 
 // Product version information
 // NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.
@@ -81,7 +81,7 @@ object Version {
 
     def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
       case NonFatal(t) =>
-        logger.info(message, t)
+        logger.info(t)(message)
         None
     }
 

@@ -19,7 +19,7 @@ import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
-import org.apache.log4j.Level
+import org.log4s
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{CharsetNames, FileUtils, UriScheme}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -105,8 +105,8 @@ class Connection private (
           )
 
           if (debugEnabled) {
-            connectionResult.logResponseDetailsOnce(Level.DEBUG)
-            connectionResult.logResponseBody(Level.DEBUG, logBody)
+            connectionResult.logResponseDetailsOnce(log4s.Debug)
+            connectionResult.logResponseBody(log4s.Debug, logBody)
           }
 
           connectionResult
@@ -204,8 +204,8 @@ class Connection private (
           )
 
           ifDebug {
-            connectionResult.logResponseDetailsOnce(Level.DEBUG)
-            connectionResult.logResponseBody(Level.DEBUG, logBody)
+            connectionResult.logResponseDetailsOnce(log4s.Debug)
+            connectionResult.logResponseBody(log4s.Debug, logBody)
           }
 
           // Save state if possible

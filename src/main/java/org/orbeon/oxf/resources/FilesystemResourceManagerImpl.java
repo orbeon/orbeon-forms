@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.apache.log4j.Logger;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -28,7 +27,7 @@ import java.util.Map;
  */
 public class FilesystemResourceManagerImpl extends ResourceManagerBase {
 
-    private static Logger logger = LoggerFactory.createLogger(FilesystemResourceManagerImpl.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(FilesystemResourceManagerImpl.class);
 
     private boolean hasSandbox;
     protected File rootDirectory;

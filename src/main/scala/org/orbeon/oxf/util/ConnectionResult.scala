@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import java.io._
 import java.{lang => jl}
 
-import org.apache.log4j.Level
+import org.log4s
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
 
 import scala.util.Try
@@ -59,7 +59,7 @@ case class ConnectionResult(
   private var _didLogResponseDetails = false
 
   // See https://github.com/orbeon/orbeon-forms/issues/1900
-  def logResponseDetailsOnce(logLevel: Level)(implicit logger: IndentedLogger): Unit = {
+  def logResponseDetailsOnce(logLevel: log4s.LogLevel)(implicit logger: IndentedLogger): Unit = {
     if (! _didLogResponseDetails) {
       log(logLevel, "response", Seq("status code" -> statusCode.toString))
       if (headers.nonEmpty) {
@@ -75,7 +75,7 @@ case class ConnectionResult(
   }
 
   // See https://github.com/orbeon/orbeon-forms/issues/1900
-  def logResponseBody(logLevel: Level, logBody: Boolean)(implicit logger: IndentedLogger): Unit =
+  def logResponseBody(logLevel: log4s.LogLevel, logBody: Boolean)(implicit logger: IndentedLogger): Unit =
     if (hasContent)
       log(logLevel, "response has content")
     else

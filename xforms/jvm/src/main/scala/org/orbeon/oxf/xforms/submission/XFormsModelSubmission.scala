@@ -17,7 +17,7 @@ import java.util
 
 import cats.Eval
 import cats.syntax.option._
-import org.apache.log4j.Logger
+import org.log4s.Logger
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext

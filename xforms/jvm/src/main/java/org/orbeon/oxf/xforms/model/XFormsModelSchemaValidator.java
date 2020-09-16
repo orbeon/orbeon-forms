@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.model;
 
-import org.apache.log4j.Logger;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Attribute;
 import org.orbeon.dom.Element;
@@ -83,7 +82,7 @@ import java.util.List;
 public class XFormsModelSchemaValidator {
 
     private static final ValidationContext validationContext = new ValidationContext();
-    public static Logger logger = LoggerFactory.createLogger(XFormsModelSchemaValidator.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XFormsModelSchemaValidator.class);
 
     private Element modelElement;
     private IndentedLogger indentedLogger;

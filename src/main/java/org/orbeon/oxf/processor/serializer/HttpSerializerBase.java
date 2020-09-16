@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.serializer;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
@@ -48,7 +47,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     private static final boolean DEFAULT_FORCE_ENCODING = false;
     private static final boolean DEFAULT_IGNORE_DOCUMENT_ENCODING = false;
 
-    private static Logger logger = LoggerFactory.createLogger(HttpSerializerBase.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(HttpSerializerBase.class);
 
     protected HttpSerializerBase() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, getConfigSchemaNamespaceURI()));

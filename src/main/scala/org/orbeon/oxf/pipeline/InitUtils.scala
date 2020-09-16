@@ -15,7 +15,7 @@ package org.orbeon.oxf.pipeline
 
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpSession}
-import org.apache.log4j.Logger
+import org.log4s.Logger
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
@@ -66,7 +66,7 @@ object InitUtils {
     val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
 
     if (logger.isInfoEnabled)
-      externalContext.getStartLoggerString.trimAllToOpt foreach logger.info
+      externalContext.getStartLoggerString.trimAllToOpt foreach (logger.info(_))
 
     // Set ExternalContext into PipelineContext
     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)

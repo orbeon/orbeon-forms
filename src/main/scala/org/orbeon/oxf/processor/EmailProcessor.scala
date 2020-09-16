@@ -285,7 +285,7 @@ class EmailProcessor extends ProcessorImpl {
 
             // Generate a FileItem from the source
             val source = PartUtils.getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, mediatype)
-            Left(PartUtils.handleStreamedPartContent(pipelineContext, source))
+            Left(PartUtils.handleStreamedPartContent(source)(EmailProcessor.Logger))
           case None =>
             // Content of the part is inline
 

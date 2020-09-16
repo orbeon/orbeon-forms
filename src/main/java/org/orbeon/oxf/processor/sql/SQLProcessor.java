@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.sql;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -58,7 +57,7 @@ import java.util.*;
  */
 public class SQLProcessor extends ProcessorImpl {
 
-    public static Logger logger = LoggerFactory.createLogger(SQLProcessor.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SQLProcessor.class);
     public static final String SQL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/sql";
 
     private static final String INPUT_DATASOURCE = "datasource";

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
-import org.apache.log4j.Logger;
+import org.log4s.Logger;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 
 /**

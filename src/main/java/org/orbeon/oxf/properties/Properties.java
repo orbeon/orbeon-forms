@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.properties;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -22,6 +21,7 @@ import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.LoggerFactory$;
 import org.orbeon.oxf.util.PipelineUtils;
 
 import java.util.Set;
@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class Properties {
 
-    public static final Logger logger = LoggerFactory.createLogger("org.orbeon.properties");
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava("org.orbeon.properties");
 
     public static final String DEFAULT_PROPERTIES_URI = "oxf:/properties.xml";
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";
@@ -150,7 +150,7 @@ public class Properties {
 
                     success = true;
                 } catch (Throwable t) {
-                    LoggerFactory.logger.error(t);
+                    LoggerFactory$.MODULE$.logger().error("", t);
                 } finally {
                     pipelineContext.destroy(success);
                 }

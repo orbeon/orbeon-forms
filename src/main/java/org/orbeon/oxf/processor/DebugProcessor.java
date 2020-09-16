@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
@@ -29,7 +28,7 @@ import org.xml.sax.SAXException;
 
 public class DebugProcessor extends ProcessorImpl {
 
-    static public Logger logger = LoggerFactory.createLogger(DebugProcessor.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(DebugProcessor.class);
 
     public DebugProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
@@ -68,7 +67,7 @@ public class DebugProcessor extends ProcessorImpl {
                                 throw new OXFException("Null document for debug '" + debugMessage + "'");
                         }
 
-                        // Send to log4j
+                        // Log
                         logger.info(debugMessage + ":\n"
                                 + (debugLocationData != null ? debugLocationData.toString() + "\n" : "")
                                 + IOSupport.domToPrettyStringJava(loggedDocument));

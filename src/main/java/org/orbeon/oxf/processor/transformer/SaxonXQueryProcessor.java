@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -23,6 +22,7 @@ import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
@@ -53,7 +53,7 @@ import java.util.Map;
  */
 public class SaxonXQueryProcessor extends ProcessorImpl {
 
-    private static Logger logger = Logger.getLogger(SaxonXQueryProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SaxonXQueryProcessor.class);
 
     // This input determines attributes to set on the Configuration
     private static final String INPUT_ATTRIBUTES = "attributes";

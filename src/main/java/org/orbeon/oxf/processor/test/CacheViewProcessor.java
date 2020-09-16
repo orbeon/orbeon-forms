@@ -13,17 +13,19 @@
  */
 package org.orbeon.oxf.processor.test;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.InputCacheKey;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 public class CacheViewProcessor extends ProcessorImpl {
 
-    private static Logger logger = LoggerFactory.createLogger(CacheViewProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(CacheViewProcessor.class);
 
     public CacheViewProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
@@ -41,18 +43,18 @@ public class CacheViewProcessor extends ProcessorImpl {
                 if (outputCacheKey != null) {
                     final InputCacheKey inputCacheKey = new InputCacheKey(input, outputCacheKey);
 
-                    logger.info(inputCacheKey);
+                    logger.info(inputCacheKey.toString());
 
                     final Object inputValidity = getInputValidity(context, input);
                     if (inputValidity != null) {
-                        logger.info(inputValidity);
+                        logger.info(inputValidity.toString());
                     } else {
                         logger.info("validity is null");
                     }
                 } else {
                     logger.info("key is null");
                 }
-                
+
                 readInputAsSAX(context, INPUT_DATA, xmlReceiver);
             }
 

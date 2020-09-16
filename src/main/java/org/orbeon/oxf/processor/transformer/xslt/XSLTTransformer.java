@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
-import org.apache.log4j.Logger;
 import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
@@ -35,6 +34,7 @@ import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
@@ -75,7 +75,7 @@ import java.util.*;
  */
 public abstract class XSLTTransformer extends ProcessorImpl {
 
-    private static Logger logger = Logger.getLogger(XSLTTransformer.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XSLTTransformer.class);
 
     public static final String XSLT_URI = "http://www.w3.org/1999/XSL/Transform";
     public static final String XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-transformer-config";

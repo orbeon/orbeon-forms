@@ -13,31 +13,17 @@
  */
 package org.orbeon.oxf.test;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.orbeon.dom.Document;
-import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.XMLProcessorRegistry;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLParsing;
-
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public abstract class ResourceManagerTestBase {
 
-    public static final Logger logger = LoggerFactory.createLogger(ResourceManagerTestBase.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(ResourceManagerTestBase.class);
 
     public static IndentedLogger newIndentedLogger() {
         return new IndentedLogger(logger, true);

@@ -17,14 +17,14 @@ import orbeon.apache.xerces.impl.Constants;
 import orbeon.apache.xerces.impl.XMLEntityManager;
 import orbeon.apache.xerces.impl.XMLErrorReporter;
 import orbeon.apache.xerces.xni.parser.XMLInputSource;
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SequenceReader;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class XMLParsing {
 
-    private static Logger logger = Logger.getLogger(XMLParsing.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XMLParsing.class);
 
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
     public static final ErrorHandler ERROR_HANDLER = new ErrorHandler();

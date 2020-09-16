@@ -34,6 +34,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.XMLReceiver
 
 import scala.collection.JavaConverters._
+
 // This processor converts a PDF, provided as a binary document on its `data` input, into an image (possibly a
 // multi-page TIFF image) on its `data` output. It is configurable via its `config` input.
 //
@@ -48,7 +49,6 @@ import scala.collection.JavaConverters._
 //
 // In the future one could imagine the processor producing a sequence of images as well, which could then be
 // combined into a ZIP file for example.
-
 class PDFToImageProcessor extends ProcessorImpl with Logging {
 
   import PDFToImage._
@@ -95,7 +95,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
         val outputStream = new ContentHandlerOutputStream(xmlReceiver, true)
         outputStream.setContentType(s"image/${config.format}")
 
-        val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, Logger)
+        val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, Logger.logger)
         try {
           readInputAsSAX(pc, "data", new BinaryTextXMLReceiver(fileItem.getOutputStream))
           convert(config, fileItem.asInstanceOf[DiskFileItem].getStoreLocation, outputStream)

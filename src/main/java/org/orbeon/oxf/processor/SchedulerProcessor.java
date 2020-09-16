@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
@@ -37,7 +36,7 @@ import java.util.List;
 
 public class SchedulerProcessor extends ProcessorImpl {
 
-    private static final Logger logger = LoggerFactory.createLogger(SchedulerProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SchedulerProcessor.class);
 
     public static final String SCHEDULER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/scheduler";
 

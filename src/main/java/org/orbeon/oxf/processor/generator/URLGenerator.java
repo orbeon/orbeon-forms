@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.log4j.Logger;
 import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
@@ -66,7 +65,7 @@ import java.util.*;
  */
 public class URLGenerator extends ProcessorImpl {
 
-    private static Logger logger = Logger.getLogger(URLGenerator.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(URLGenerator.class);
     public static IndentedLogger indentedLogger = new IndentedLogger(logger);
 
     public static final boolean DEFAULT_VALIDATING = false;

@@ -14,23 +14,30 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.orbeon.dom.*;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
-import javax.naming.*;
-import javax.naming.directory.Attribute;
+import javax.naming.Context;
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 public class LDAPProcessor extends ProcessorImpl {
-    static private Logger logger = LoggerFactory.createLogger(LDAPProcessor.class);
+
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(LDAPProcessor.class);
 
     public static final String INPUT_FILTER = "filter";
     public static final String LDAP_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/ldap/config";

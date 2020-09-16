@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xml
 
 import javax.xml.transform.sax.SAXSource
-
 import org.apache.commons.fileupload.FileItem
+import org.log4s.Logger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
@@ -27,8 +27,8 @@ import org.xml.sax.InputSource
 object PartUtils {
 
   // Read a text or binary document and return it as a FileItem
-  def handleStreamedPartContent(pipelineContext: PipelineContext, source: SAXSource): FileItem = {
-    val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, ProcessorImpl.logger)
+  def handleStreamedPartContent(source: SAXSource)(logger: Logger): FileItem = {
+    val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, logger.logger)
     TransformerUtils.sourceToSAX(source, new BinaryTextXMLReceiver(fileItem.getOutputStream))
     fileItem
   }

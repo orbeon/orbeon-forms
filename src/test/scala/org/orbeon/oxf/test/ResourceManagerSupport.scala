@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.test
 
-import org.apache.log4j.Logger
+import org.log4s.Logger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.XMLProcessorRegistry
 import org.orbeon.oxf.processor.generator.DOMGenerator

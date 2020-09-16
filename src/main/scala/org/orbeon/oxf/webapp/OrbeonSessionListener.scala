@@ -86,7 +86,7 @@ class OrbeonSessionListener extends HttpSessionListener {
           } catch {
             case NonFatal(t) =>
               // Catch so we can continue running the remaining listeners
-              logger.error("Throwable caught when calling listener", t)
+              logger.error(t)("Throwable caught when calling listener")
           }
         }
       }

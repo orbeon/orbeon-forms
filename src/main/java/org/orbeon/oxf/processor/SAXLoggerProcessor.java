@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -26,7 +25,7 @@ import org.xml.sax.SAXException;
 
 public class SAXLoggerProcessor extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(SAXLoggerProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SAXLoggerProcessor.class);
 
     public SAXLoggerProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));

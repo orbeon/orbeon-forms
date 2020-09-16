@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.apache.log4j.Level
+import org.log4s
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
@@ -99,7 +99,7 @@ private object SubmitResponseEvent {
 
   private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
     // Log response details if not done already
-    cxr.logResponseDetailsOnce(Level.ERROR)
+    cxr.logResponseDetailsOnce(log4s.Error)
 
     if (cxr.hasContent) {
 

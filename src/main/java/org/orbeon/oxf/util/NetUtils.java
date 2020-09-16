@@ -17,7 +17,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.log4j.Logger;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
@@ -30,6 +29,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom.IOSupport;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;

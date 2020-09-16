@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
-    public static Logger logger = LoggerFactory.createLogger(URIProcessorOutputImpl.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(URIProcessorOutputImpl.class);
 
     private ProcessorImpl processorImpl;
     private String configInputName;

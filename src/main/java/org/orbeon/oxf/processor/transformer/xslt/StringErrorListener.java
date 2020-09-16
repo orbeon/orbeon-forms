@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.ExtendedLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.datatypes.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.ErrorListener;

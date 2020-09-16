@@ -29,6 +29,7 @@ val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
+val Log4sVersion                  = "1.8.2"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
@@ -58,6 +59,7 @@ val CoreLibraryDependencies = Seq(
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
+  "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "org.apache.commons"          %  "commons-lang3"                  % "3.11",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
@@ -416,6 +418,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     name := "orbeon-common",
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
     libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
+    libraryDependencies += "org.log4s"              %%% "log4s"             % Log4sVersion,
     crossScalaVersions := supportedScalaVersions
   )
   .jvmSettings(commonScalaJvmSettings)
@@ -426,7 +429,9 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (includeFilter in unmanagedJars).value,
       (excludeFilter in unmanagedJars).value
     ),
-    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided
+    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided,
+    libraryDependencies += "org.slf4j"              %  "slf4j-api"     % Slf4jVersion,
+    libraryDependencies += "org.slf4j"              %  "slf4j-log4j12" % Slf4jVersion
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(

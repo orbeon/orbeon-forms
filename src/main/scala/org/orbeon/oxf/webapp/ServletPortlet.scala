@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.apache.log4j.Logger
+import org.log4s.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.exception.OrbeonFormatter

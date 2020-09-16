@@ -92,6 +92,9 @@ class IndentedLogger(val logger: Logger, val debugEnabled: Boolean, val indentat
   def this(indentedLogger: IndentedLogger, indentation: Indentation, isDebugEnabled: Boolean) =
     this(indentedLogger.logger, isDebugEnabled, indentation)
 
+  def infoEnabled: Boolean =
+    logger.isInfoEnabled
+
   def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
     if (debugEnabled) {
       stack.push(new Operation(`type`, message))

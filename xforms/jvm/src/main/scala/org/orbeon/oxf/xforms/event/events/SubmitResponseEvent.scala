@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.immutable
 import scala.util.Try
@@ -121,11 +122,9 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try {
-          useAndClose(cxr.content.inputStream) { is =>
-            Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger))
-          }
+          CrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
         } catch {
-          warn("error while reading response body.")
+          warn("error while reading response body")
         }
 
       tempURIOpt flatMap { tempURI =>

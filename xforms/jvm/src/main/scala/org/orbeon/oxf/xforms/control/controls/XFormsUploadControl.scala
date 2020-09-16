@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal
@@ -172,9 +172,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
               deleteFileIfPossible(newValueUriString)
               converted
             } else {
-              val newFile    = NetUtils.renameAndExpireWithSession(newValueUriString, logger.logger)
-              val newFileURL = newFile.toURI.toString
-
+              val newFileURL = CrossPlatformSupport.renameAndExpireWithSession(newValueUriString).toString
               hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))
             }
 

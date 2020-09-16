@@ -28,7 +28,7 @@ trait Logging {
 
   // Info with optional parameters
   def info(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: IndentedLogger): Unit =
-    if (logger.logger.isInfoEnabled)
+    if (logger.infoEnabled)
       logger.logInfo("", message, flattenTuples(parameters): _*)
 
   // Debug with optional parameters

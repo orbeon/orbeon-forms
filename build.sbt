@@ -469,7 +469,6 @@ lazy val fullPortlet = (project in file("full-portlet"))
     libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
-
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -477,8 +476,8 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-proxy-portlet",
-    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -488,8 +487,8 @@ lazy val portletSupport = (project in file("portlet-support"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-portlet-support",
-    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )

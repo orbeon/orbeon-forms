@@ -15,6 +15,9 @@ package org.orbeon.datatypes
 
 import java.{lang => jl}
 
+import scala.collection.compat._
+import scala.collection.immutable
+
 
 trait LocationData {
   val file : String
@@ -62,4 +65,31 @@ object LocationData {
 case class BasicLocationData(file: String, line: Int, col: Int) extends LocationData {
   override def toString: String =
     LocationData.asString(this)
+}
+
+case class ExtendedLocationData private (
+  file        : String,
+  line        : Int,
+  col         : Int,
+  description : Option[String],
+  params      : immutable.Seq[(String, String)]
+) extends LocationData {
+
+  // For Java callers
+  def getDescription        : String        = description.orNull
+  def getElementDebugString : String        = params collectFirst { case ("element", v) => v } orNull
+  def getParameters         : Array[String] = params.iterator.flatMap(p => Array(p._1, p._2)).to(Array)
+
+  override def toString: String = {
+
+    def parametersString =
+      params collect { case (k, v) if v ne null => s"$k='$v'" } mkString ", "
+
+    LocationData.asString(this) + (
+      if (description.isDefined || params.nonEmpty)
+        " (" + (description getOrElse "") + (if (params.nonEmpty) (": " + parametersString) else "") + ")"
+      else
+        ""
+    )
+  }
 }

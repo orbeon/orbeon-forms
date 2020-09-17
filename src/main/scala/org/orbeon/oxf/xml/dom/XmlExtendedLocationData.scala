@@ -1,10 +1,3 @@
-package org.orbeon.oxf.xml.dom
-
-import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
-import org.orbeon.dom.Element
-
-import scala.collection.immutable
-
 /**
  * Copyright (C) 2007 Orbeon, Inc.
  *
@@ -18,6 +11,14 @@ import scala.collection.immutable
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+package org.orbeon.oxf.xml.dom
+
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.dom.Element
+import org.orbeon.oxf.util.CoreUtils._
+
+import scala.collection.immutable
+
 object XmlExtendedLocationData {
 
   // 1 Java caller
@@ -36,7 +37,7 @@ object XmlExtendedLocationData {
       Option(locationData) map (_.line) getOrElse -1,
       Option(locationData) map (_.col) getOrElse -1,
       description,
-      (if (element.isDefined) List("element" -> (element map (_.toDebugString) get)) else Nil) ++: params
+      ((element map (e => List("element" -> e.toDebugString)) getOrElse Nil) ++: params) filter (_._2 ne null)
     )
 
   // 14 Java callers

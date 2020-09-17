@@ -240,7 +240,7 @@ public class NetUtils {
     // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<>();
         if (queryString != null) {
             final Matcher matcher = PATTERN_NO_AMP.matcher(queryString);
             int matcherEnd = 0;
@@ -275,7 +275,7 @@ public class NetUtils {
     // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryStringPortlet(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<>();
         if (queryString != null) {
             final Matcher matcher = PATTERN_AMP.matcher(queryString);
             int matcherEnd = 0;

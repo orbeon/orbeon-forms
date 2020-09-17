@@ -21,6 +21,7 @@ import org.log4s.Logger
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event.events._
@@ -406,8 +407,10 @@ class XFormsModelSubmission(
     if (connectionResult.dontHandleResponse) {
       // Always return a replacer even if it does nothing, this way we don't have to deal with null
       new NoneReplacer(thisSubmission)
-    } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) { // Successful response
-      if (connectionResult.hasContent) { // There is a body
+    } else if (StatusCode.isSuccessCode(connectionResult.statusCode)) {
+      // Successful response
+      if (connectionResult.hasContent) {
+        // There is a body
         // Get replacer
         if (p.replaceType == ReplaceType.All)
           new AllReplacer(thisSubmission, containingDocument)
@@ -448,7 +451,7 @@ class XFormsModelSubmission(
         // xforms-submit-done"
         new NoneReplacer(thisSubmission)
       }
-    } else if (NetUtils.isRedirectCode(connectionResult.statusCode)) {
+    } else if (StatusCode.isRedirectCode(connectionResult.statusCode)) {
       // Got a redirect
       // Currently we don't know how to handle a redirect for replace != "all"
       if (p.replaceType != ReplaceType.All)

@@ -17,8 +17,7 @@ import java.io._
 
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, StatusCode, StreamedContent}
 
 import scala.collection.mutable
 
@@ -121,7 +120,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     }
 
   def setStatus(status: Int): Unit = {
-    if (! NetUtils.isSuccessCode(status))
+    if (!StatusCode.isSuccessCode(status))
         responseCachingDisabled = true
     this._statusCode = status
   }

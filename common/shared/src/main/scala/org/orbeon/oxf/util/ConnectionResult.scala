@@ -18,6 +18,7 @@ import java.{lang => jl}
 
 import org.log4s
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
+import org.orbeon.oxf.util.Logging._
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -29,7 +30,7 @@ case class ConnectionResult(
   content           : StreamedContent,
   hasContent        : Boolean,
   dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
-) extends Logging {
+) {
 
   val lastModified: Option[Long] = DateHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
 
@@ -37,7 +38,7 @@ case class ConnectionResult(
 
   def close(): Unit = content.close()
 
-  def isSuccessResponse: Boolean = NetUtils.isSuccessCode(statusCode)
+  def isSuccessResponse: Boolean = StatusCode.isSuccessCode(statusCode)
 
   val mediatype: Option[String] =
     content.contentType flatMap (ct => ContentTypes.getContentTypeMediaType(ct))
@@ -129,7 +130,7 @@ object ConnectionResult {
         case ConnectionResult(_, _, _, StreamedContent(inputStream, _, _, _), _, _) if cxr.isSuccessResponse =>
           val result = body(inputStream)
           if (closeOnSuccess)
-            cxr.close() // this eventually calls InputStream.close()
+            cxr.close() // this eventually calls `InputStream.close()`
           result
         case ConnectionResult(_, statusCode, _, _, _, _) =>
           throw HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError)

@@ -26,7 +26,6 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
@@ -130,7 +129,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // If local caching of the data is enabled and if the configuration status code is a success code, use
                 // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
-                if (config.cacheUseLocalCache && NetUtils.isSuccessCode(config.statusCode)) {
+                if (config.cacheUseLocalCache && StatusCode.isSuccessCode(config.statusCode)) {
 
                     // We return a ResultStore
                     final boolean[] read = new boolean[1];
@@ -182,7 +181,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         @Override
                         public boolean allowCaching() {
                             // It doesn't make sense in HTTP to allow caching of non-successful responses
-                            return NetUtils.isSuccessCode(statusCode);
+                            return StatusCode.isSuccessCode(statusCode);
                         }
                     });
 

@@ -17,7 +17,8 @@ import cats.Eval
 import cats.syntax.option._
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
-import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
+import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 
@@ -80,7 +81,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
     // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
     // error-type of resource-error"
     if (!p.isDeferredSubmissionSecondPass) {
-      if (NetUtils.isSuccessCode(cxr.statusCode))
+      if (StatusCode.isSuccessCode(cxr.statusCode))
         submission.sendSubmitDone(cxr).some
       else {
         // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has

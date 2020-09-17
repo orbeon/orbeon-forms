@@ -805,15 +805,6 @@ public class NetUtils {
         System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
     }
 
-    public static boolean isSuccessCode(int code) {
-        // Accept any success code (in particular "201 Resource Created")
-        return code >= 200 && code < 300;
-    }
-
-    public static boolean isRedirectCode(int code) {
-        return (code >= 301 && code <= 303) || code == 307;
-    }
-
     /**
      * Get a File object from either a URL or a path.
      */

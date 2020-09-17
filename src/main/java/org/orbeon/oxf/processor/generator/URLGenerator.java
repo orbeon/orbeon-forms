@@ -27,6 +27,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.http.HttpStatusCodeException;
+import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -1068,7 +1069,7 @@ public class URLGenerator extends ProcessorImpl {
         public boolean isFailureStatusCode() throws IOException {
             // NOTE: We accept -1 internally to indicate we don't have an actual status code
             final int statusCode = getConnectionStatusCode();
-            return statusCode > 0 && ! NetUtils.isSuccessCode(statusCode);
+            return statusCode > 0 && ! StatusCode.isSuccessCode(statusCode);
         }
 
         private void checkStatusCode() throws IOException {

@@ -15,11 +15,12 @@ package org.orbeon.oxf.servlet
 
 import java.io._
 import java.util._
+
 import javax.servlet._
 import javax.servlet.http._
-
-import org.orbeon.oxf.common.Defaults
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.common.Defaults
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
@@ -105,7 +106,7 @@ class OrbeonXFormsFilter extends Filter {
             httpResponse.setContentLength(-1)
 
             val failureCodeOpt =
-              responseWrapper.statusCode filterNot NetUtils.isSuccessCode
+              responseWrapper.statusCode filterNot StatusCode.isSuccessCode
 
             failureCodeOpt match {
               case None =>

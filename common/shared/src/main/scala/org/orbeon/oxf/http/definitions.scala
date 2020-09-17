@@ -223,6 +223,12 @@ object StatusCode {
   val Locked                = 423
   val InternalServerError   = 500
   val ServiceUnavailable    = 503
+
+  def isSuccessCode(code: Int): Boolean =
+    code >= 200 && code < 300
+
+  def isRedirectCode(code: Int): Boolean =
+    (code >= 301 && code <= 303) || code == 307
 }
 
 sealed trait HttpMethod extends EnumEntry

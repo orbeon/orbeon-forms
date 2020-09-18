@@ -84,7 +84,7 @@ object ExternalContext {
     def getServerPort: Int
 
     def getSession(create: Boolean): Session
-    def sessionInvalidate()
+    def sessionInvalidate(): Unit
     def isRequestedSessionIdValid: Boolean
     def getRequestedSessionId: String
 
@@ -133,14 +133,14 @@ object ExternalContext {
     def getOutputStream: OutputStream
 
     def isCommitted: Boolean
-    def reset()
+    def reset(): Unit
     def setContentType(contentType: String)
     def setStatus(status: Int)
     def setContentLength(len: Int)
     def setHeader(name: String, value: String)
     def addHeader(name: String, value: String)
 
-    def sendError(code: Int)
+    def sendError(code: Int): Unit
 
     def getCharacterEncoding: String
 
@@ -159,11 +159,11 @@ object ExternalContext {
       * @param lastModified last modification date of resource, or <= 0 if unknown
       * @param expires      requested expiration, or <=0 if unknown or to trigger default policy
       */
-    def setResourceCaching(lastModified: Long, expires: Long)
+    def setResourceCaching(lastModified: Long, expires: Long): Unit
 
     def checkIfModifiedSince(request: Request, lastModified: Long): Boolean
 
-    def setTitle(title: String)
+    def setTitle(title: String): Unit
 
     def getNativeResponse: AnyRef
   }
@@ -240,8 +240,8 @@ trait WebAppContext {
   def getAttributesMap: ju.Map[String, AnyRef] = jAttributes
 
   // Logging
-  def log(message: String, throwable: Throwable)
-  def log(message: String)
+  def log(message: String, throwable: Throwable): Unit
+  def log(message: String): Unit
 
   // Add webAppDestroyed listener
   def addListener(listener: WebAppListener): Unit =

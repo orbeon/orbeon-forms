@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import enumeratum._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.MarkupUtils._
@@ -77,7 +77,7 @@ object FormRunnerAuth {
 
     getCredentialsUseSession(userRoles, session, getHeader) match {
       case Some(credentials) =>
-        val result = Credentials.toHeaders(credentials)
+        val result = CredentialsSupport.toHeaders(credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
         result
       case None =>
@@ -193,7 +193,7 @@ object FormRunnerAuth {
           // Credentials coming from the JSON-encoded HTTP header
           def fromCredentialsHeader =
             headerList(HeaderCredentialsPropertyName).headOption flatMap
-            (Credentials.parseCredentials(_, decodeForHeader = true)) kestrel
+            (CredentialsSupport.parseCredentials(_, decodeForHeader = true)) kestrel
             (_ => Logger.debug(s"found from credential headers"))
 
           // Credentials coming from individual headers (requires at least the username)

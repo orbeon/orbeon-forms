@@ -20,26 +20,9 @@ import org.orbeon.oxf.util.StringUtils._
 import spray.json._
 import scala.collection.compat._
 
-sealed trait UserRole   { def roleName: String }
-case class   SimpleRole      (roleName: String)                           extends UserRole
-case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
+object CredentialsSupport {
 
-case class Organization(
-  levels       : List[String] // levels from root to leaf
-)
-
-case class Credentials(
-  username      : String,
-  group         : Option[String],
-  roles         : List[UserRole],
-  organizations : List[Organization]
-) {
-  def defaultOrganization: Option[Organization] = organizations.headOption
-}
-
-object Credentials {
-
-  object Symbols {
+  private object Symbols {
     val Username      = "username"
     val Groups        = "groups"
     val Roles         = "roles"

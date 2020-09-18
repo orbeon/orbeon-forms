@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLEl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.RepeatSeparator
-import org.orbeon.xforms.rpc
+import org.orbeon.xforms.{CrossPlatformSupport, rpc}
 import shapeless.syntax.typeable._
 
 import scala.collection.{immutable => i}
@@ -397,7 +397,7 @@ class ControlsComparator(
       //
       // So for now, perform simple steps here, and later this can be revisited.
       //
-      val externalContext = NetUtils.getExternalContext
+      val externalContext = CrossPlatformSupport.externalContext
 
       controller.setOutput(
         new DeferredXMLReceiverImpl(

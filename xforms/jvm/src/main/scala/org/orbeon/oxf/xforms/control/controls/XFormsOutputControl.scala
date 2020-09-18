@@ -153,7 +153,7 @@ class XFormsOutputControl(
                   // values. So for now we keep the proxying for data: URLs.
 
                   val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, trimmedInternalValue)
-                  val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
+                  val servletRewriter = new ServletURLRewriter(CrossPlatformSupport.externalContext.getRequest)
                   val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
                   val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
 

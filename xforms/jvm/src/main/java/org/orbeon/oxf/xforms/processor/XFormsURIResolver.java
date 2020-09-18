@@ -17,7 +17,7 @@ import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -62,7 +62,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         return resolve(href, base, null);
     }
 
-    public SAXSource resolve(String href, String base, final Credentials credentials) throws TransformerException {
+    public SAXSource resolve(String href, String base, final BasicCredentials credentials) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -106,7 +106,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, Credentials credentials) {
+    public Document readAsDom4j(String urlString, BasicCredentials credentials) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
@@ -116,7 +116,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Credentials credentials) {
+    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, BasicCredentials credentials) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed

@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.externalcontext.Credentials._
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -41,8 +40,8 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
   describe("JSON serialization and deserialization") {
     for {
       encode <- List(false, true)
-      serialized   = serializeCredentials(TestCredentials, encode)
-      deserialized = parseCredentials(serialized, encode)
+      serialized   = CredentialsSupport.serializeCredentials(TestCredentials, encode)
+      deserialized = CredentialsSupport.parseCredentials(serialized, encode)
     } locally {
       it (s"must pass with `encode` set to `$encode`") {
         assert(deserialized === Some(TestCredentials))
@@ -63,7 +62,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
     import org.orbeon.scaxon.SimplePath._
 
     val rootElem =
-      Converter.jsonStringToXmlDoc(serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement
+      Converter.jsonStringToXmlDoc(CredentialsSupport.serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement
 
     val expectedXml: NodeInfo =
       <json type="object">
@@ -217,7 +216,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
 
     for ((description, json, credentials) <- expectedPassing)
       it (s"must support $description") {
-        assert(Some(credentials) === parseCredentials(json, decodeForHeader = false))
+        assert(Some(credentials) === CredentialsSupport.parseCredentials(json, decodeForHeader = false))
       }
 
     val expectedFailing = List(
@@ -234,9 +233,8 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
     for ((description, json) <- expectedFailing)
       it (s"must reject $description") {
         intercept[DeserializationException] {
-          parseCredentials(json, decodeForHeader = false)
+          CredentialsSupport.parseCredentials(json, decodeForHeader = false)
         }
       }
   }
-
 }

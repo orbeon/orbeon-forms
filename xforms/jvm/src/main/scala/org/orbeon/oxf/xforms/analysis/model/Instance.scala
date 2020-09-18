@@ -17,7 +17,7 @@ import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
-import org.orbeon.oxf.http.Credentials
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -151,14 +151,14 @@ trait InstanceMetadata {
   def isStrictValidation = validation == "strict"
   def isSchemaValidation = isLaxValidation || isStrictValidation
 
-  val credentials: Option[Credentials] = {
+  val credentials: Option[BasicCredentials] = {
     // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
     def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
     def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
     def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
     def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
-    Option(username) map (Credentials(_, password, preemptiveAuth, domain))
+    Option(username) map (BasicCredentials(_, password, preemptiveAuth, domain))
   }
 
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet

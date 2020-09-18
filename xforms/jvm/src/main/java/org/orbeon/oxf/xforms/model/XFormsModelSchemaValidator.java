@@ -41,7 +41,7 @@ import org.orbeon.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -555,7 +555,7 @@ public class XFormsModelSchemaValidator {
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
             final String resolvedURLString = org.orbeon.oxf.xforms.XFormsUtils.resolveServiceURL(containingDocument, modelElement, schemaURIs[0],
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE());
 
             // Load associated grammar
             schemaGrammar = loadCacheGrammar(containingDocument, resolvedURLString);

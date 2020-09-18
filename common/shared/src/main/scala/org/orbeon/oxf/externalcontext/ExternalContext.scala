@@ -14,6 +14,7 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io._
+import java.net.URL
 import java.{util => ju}
 
 import enumeratum.values.{IntEnum, IntEnumEntry}
@@ -21,6 +22,25 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 
 import scala.collection.JavaConverters._
+import scala.collection.immutable
+import scala.util.control.NonFatal
+
+sealed trait UserRole   { def roleName: String }
+case class   SimpleRole      (roleName: String)                           extends UserRole
+case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
+
+case class Organization(
+  levels       : List[String] // levels from root to leaf
+)
+
+case class Credentials(
+  username      : String,
+  group         : Option[String],
+  roles         : List[UserRole],
+  organizations : List[Organization]
+) {
+  def defaultOrganization: Option[Organization] = organizations.headOption
+}
 
 /**
   * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
@@ -31,9 +51,9 @@ import scala.collection.JavaConverters._
   */
 object ExternalContext {
 
-  val StandardCharacterEncoding       = CharsetNames.Utf8
-  val StandardHeaderCharacterEncoding = StandardCharacterEncoding
-  val StandardFormCharacterEncoding   = StandardCharacterEncoding
+  val StandardCharacterEncoding       : String = CharsetNames.Utf8
+  val StandardHeaderCharacterEncoding : String = StandardCharacterEncoding
+  val StandardFormCharacterEncoding   : String = StandardCharacterEncoding
 
   trait Request {
 
@@ -151,7 +171,7 @@ object ExternalContext {
   sealed abstract class SessionScope(val value: Int) extends IntEnumEntry
   object SessionScope extends IntEnum[SessionScope] {
 
-    val values = findValues
+    val values: immutable.IndexedSeq[SessionScope] = findValues
 
     case object Application extends SessionScope(1)
     case object Local       extends SessionScope(2)
@@ -198,4 +218,75 @@ trait ExternalContext {
 
   def getStartLoggerString: String
   def getEndLoggerString: String
+}
+
+// Abstraction for ServletContext and PortletContext
+trait WebAppContext {
+  // Resource handling
+  def getResource(s: String): URL
+  def getResourceAsStream(s: String): InputStream
+  def getRealPath(s: String): String
+
+  // Immutable context initialization parameters
+  def initParameters: Map[String, String]
+
+  def jInitParameters: ju.Map[String, String] = initParameters.asJava
+  def getInitParametersMap: ju.Map[String, String] = jInitParameters
+
+  // Mutable context attributes backed by the actual context
+  def attributes: collection.mutable.Map[String, AnyRef]
+
+  def jAttributes: ju.Map[String, AnyRef] = attributes.asJava
+  def getAttributesMap: ju.Map[String, AnyRef] = jAttributes
+
+  // Logging
+  def log(message: String, throwable: Throwable)
+  def log(message: String)
+
+  // Add webAppDestroyed listener
+  def addListener(listener: WebAppListener): Unit =
+    attributes.getOrElseUpdate(WebAppContext.WebAppListeners, new WebAppListeners)
+      .asInstanceOf[WebAppListeners].addListener(listener)
+
+  // Remove webAppDestroyed listener
+  def removeListener(listener: WebAppListener): Unit =
+   webAppListenersOption foreach (_.removeListener(listener))
+
+  // Call all webAppDestroyed listeners
+  def webAppDestroyed(): Unit =
+    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener =>
+      try {
+        listener.webAppDestroyed()
+      } catch {
+        case NonFatal(t) => log("Throwable caught when calling listener", t)
+      }
+    }
+
+  private def webAppListenersOption: Option[WebAppListeners] =
+    attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
+
+  // Access to native context
+  def getNativeContext: AnyRef
+}
+
+trait WebAppListener {
+  def webAppDestroyed(): Unit
+}
+
+class WebAppListeners extends Serializable {
+
+  @transient private var _listeners: List[WebAppListener] = Nil
+
+  def addListener(listener: WebAppListener): Unit =
+    _listeners ::= listener
+
+  def removeListener(listener: WebAppListener): Unit =
+    _listeners = _listeners filter (_ ne listener)
+
+  def iterator: Iterator[WebAppListener] =
+    _listeners.reverse.toIterator
+}
+
+private object WebAppContext {
+  val WebAppListeners = "oxf.webapp.listeners"
 }

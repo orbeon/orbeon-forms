@@ -186,14 +186,14 @@ object HttpClientSettings {
   val expiredConnectionsPollingDelayPropertyDefault = 5000
 }
 
-case class Credentials(username: String, password: Option[String], preemptiveAuth: Boolean, domain: Option[String]) {
+case class BasicCredentials(username: String, password: Option[String], preemptiveAuth: Boolean, domain: Option[String]) {
   require(username.nonAllBlank)
   def getPrefix: String = Option(password) map (username + ":" + _ + "@") getOrElse username + "@"
 }
 
-object Credentials {
-  def apply(username: String, password: String, preemptiveAuth: String, domain: String): Credentials =
-    Credentials(
+object BasicCredentials {
+  def apply(username: String, password: String, preemptiveAuth: String, domain: String): BasicCredentials =
+    BasicCredentials(
       username.trimAllToEmpty,
       password.trimAllToOpt,
       ! (preemptiveAuth.trimAllToOpt contains "false"),
@@ -252,7 +252,7 @@ trait HttpClient[CookieStore] {
 
   def connect(
     url         : String,
-    credentials : Option[Credentials],
+    credentials : Option[BasicCredentials],
     cookieStore : CookieStore,
     method      : HttpMethod,
     headers     : Map[String, List[String]],

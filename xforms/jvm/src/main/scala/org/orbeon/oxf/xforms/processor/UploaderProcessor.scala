@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.scaxon.NodeConversions
+import org.orbeon.xforms.CrossPlatformSupport
 
 class UploaderProcessor extends ProcessorImpl {
   override def createOutput(name: String) =
@@ -34,7 +35,7 @@ class UploaderProcessor extends ProcessorImpl {
       new ProcessorOutputImpl(UploaderProcessor.this, name) {
         override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) = {
 
-          UploaderServer.processUpload(NetUtils.getExternalContext.getRequest) match {
+          UploaderServer.processUpload(CrossPlatformSupport.externalContext.getRequest) match {
             case (nameValues, None) =>
 
               // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to

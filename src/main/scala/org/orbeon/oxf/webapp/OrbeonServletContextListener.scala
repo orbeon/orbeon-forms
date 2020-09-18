@@ -14,8 +14,7 @@
 package org.orbeon.oxf.webapp
 
 import javax.servlet.{ServletContextEvent, ServletContextListener, ServletException}
-
-import org.orbeon.oxf.externalcontext.WebAppContext
+import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.webapp.ServletPortlet._
 
@@ -47,6 +46,6 @@ class OrbeonServletContextListener extends ServletContextListener {
       runWithServletContext(event.getServletContext, None, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
       // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
       // TODO: Shouldn't a singleton `WebAppContext` be available instead?
-      WebAppContext(event.getServletContext).webAppDestroyed()
+      ServletWebAppContext(event.getServletContext).webAppDestroyed()
     }
 }

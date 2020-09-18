@@ -49,7 +49,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
 
   def connect(
     url         : String,
-    credentials : Option[Credentials],
+    credentials : Option[BasicCredentials],
     cookieStore : CookieStore,
     method      : HttpMethod,
     headers     : Map[String, List[String]],
@@ -88,9 +88,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
       credentialsProvider.setCredentials(
         new AuthScope(uri.getHost, uri.getPort),
         actualCredentials match {
-          case Credentials(username, passwordOpt, _, None) =>
+          case BasicCredentials(username, passwordOpt, _, None) =>
             new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
-          case Credentials(username, passwordOpt, _, Some(domain)) =>
+          case BasicCredentials(username, passwordOpt, _, Some(domain)) =>
             new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
         }
       )

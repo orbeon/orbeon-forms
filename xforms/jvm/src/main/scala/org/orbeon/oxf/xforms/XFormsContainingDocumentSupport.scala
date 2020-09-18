@@ -591,7 +591,7 @@ trait ContainingDocumentRequest {
     isPortletContainer || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
 
   protected def initializeRequestInformation(): Unit =
-    Option(NetUtils.getExternalContext.getRequest) match {
+    Option(CrossPlatformSupport.externalContext.getRequest) match {
       case Some(request) =>
         // Remember if filter provided separate deployment information
 
@@ -798,7 +798,7 @@ trait ContainingDocumentClientState {
 
   def setInitialClientScript(): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
@@ -807,7 +807,7 @@ trait ContainingDocumentClientState {
       ScriptBuilder.findConfigurationProperties(
         this,
         URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, NetUtils.getExternalContext)
+        XFormsStateManager.getHeartbeatDelay(this, CrossPlatformSupport.externalContext)
       ).toList :::
       List(
         ScriptBuilder.buildJavaScriptInitialData(

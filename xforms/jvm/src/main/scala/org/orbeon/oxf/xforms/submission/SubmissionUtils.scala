@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.mutable
 
@@ -103,7 +104,7 @@ object SubmissionUtils {
   private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {
 
     implicit val _logger          = model.indentedLogger
-    implicit val _externalContext = NetUtils.getExternalContext
+    implicit val _externalContext = CrossPlatformSupport.externalContext
 
     Connection(
       method          = GET,

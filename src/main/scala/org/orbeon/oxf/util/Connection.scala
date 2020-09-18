@@ -19,6 +19,9 @@ import java.{util => ju}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.resources.URLFactory
+
 import org.log4s
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.{CharsetNames, FileUtils, UriScheme}
@@ -28,8 +31,6 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -54,7 +55,7 @@ import scala.util.control.NonFatal
 class Connection private (
   method          : HttpMethod,
   normalizedUrl   : URI,
-  credentials     : Option[Credentials],
+  credentials     : Option[BasicCredentials],
   content         : Option[StreamedContent],
   headers         : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
   logBody         : Boolean)(implicit
@@ -317,7 +318,7 @@ object Connection extends Logging {
   def apply(
     method          : HttpMethod,
     url             : URI,
-    credentials     : Option[Credentials],
+    credentials     : Option[BasicCredentials],
     content         : Option[StreamedContent],
     headers         : Map[String, List[String]],
     loadState       : Boolean,
@@ -345,7 +346,7 @@ object Connection extends Logging {
   def jApply(
     httpMethod        : HttpMethod,
     url               : URI,
-    credentialsOrNull : Credentials,
+    credentialsOrNull : BasicCredentials,
     messageBodyOrNull : Array[Byte],
     headers           : Map[String, List[String]],
     loadState         : Boolean,

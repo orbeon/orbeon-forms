@@ -35,7 +35,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
     if (_httpResponse.isEmpty)
       _httpResponse = {
 
-        def credentialsFromURL(url: URL): Option[Credentials] = {
+        def credentialsFromURL(url: URL): Option[BasicCredentials] = {
           url.getUserInfo.trimAllToOpt flatMap { userInfo =>
             // Set username and optional password specified on URL
             val separatorPosition = userInfo.indexOf(":")
@@ -53,7 +53,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
             val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
 
             usernameOpt map { username =>
-              Credentials(username, passwordOpt, preemptiveAuth = true, None)
+              BasicCredentials(username, passwordOpt, preemptiveAuth = true, None)
             }
           }
         }

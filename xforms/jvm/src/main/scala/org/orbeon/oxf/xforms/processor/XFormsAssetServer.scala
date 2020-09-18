@@ -17,8 +17,7 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.CharsetNames
-import org.orbeon.io.IOUtils
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -31,6 +30,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
@@ -46,7 +46,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     val requestPath = externalContext.getRequest.getRequestPath
     val response    = externalContext.getResponse
@@ -276,7 +276,7 @@ object XFormsAssetServer {
   ): String = {
 
     // Get session
-    val externalContext = NetUtils.getExternalContext
+    val externalContext = CrossPlatformSupport.externalContext
     val session = externalContext.getRequest.getSession(true)
 
     require(session ne null, "proxyURI requires a session")
@@ -285,7 +285,7 @@ object XFormsAssetServer {
     // an absolute URI.
     val serviceAbsoluteUrl = new URI(
       URLRewriterUtils.rewriteServiceURL(
-        NetUtils.getExternalContext.getRequest,
+        CrossPlatformSupport.externalContext.getRequest,
         uri,
         URLRewriter.REWRITE_MODE_ABSOLUTE
       )
@@ -327,7 +327,7 @@ object XFormsAssetServer {
     removeFile      : Boolean
   ): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     findDynamicResource(requestPath) foreach { resource =>
       externalContext.getRequest.sessionOpt foreach { session =>

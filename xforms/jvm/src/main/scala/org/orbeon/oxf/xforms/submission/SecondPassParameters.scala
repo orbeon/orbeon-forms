@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.http.{Credentials, HttpMethod}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 
@@ -9,7 +9,7 @@ case class SecondPassParameters(
 
   actionOrResource   : String,
   isAsynchronous     : Boolean,
-  credentialsOpt     : Option[Credentials],
+  credentialsOpt     : Option[BasicCredentials],
 
   // Serialization
   separator          : String,
@@ -62,7 +62,7 @@ object SecondPassParameters {
       staticSubmission.avtXxfUsernameOpt flatMap
         stringAvtTrimmedOpt              map { username =>
 
-        Credentials(
+        BasicCredentials(
           username       = username,
           password       =    staticSubmission.avtXxfPasswordOpt       flatMap stringAvtTrimmedOpt,
           preemptiveAuth = ! (staticSubmission.avtXxfPreemptiveAuthOpt flatMap stringAvtTrimmedOpt contains false.toString),

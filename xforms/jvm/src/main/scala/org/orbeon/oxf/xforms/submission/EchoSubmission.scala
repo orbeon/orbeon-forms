@@ -18,7 +18,8 @@ import java.net.URI
 
 import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult}
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.Success
 
@@ -78,7 +79,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       headersToForward = Connection.headersToForwardFromProperty,
       getHeader        = containingDocument.headersGetter)(
       logger           = getDetailsLogger(p, p2),
-      externalContext  = NetUtils.getExternalContext
+      externalContext  = CrossPlatformSupport.externalContext
     )
 
     // Do as if we are receiving a regular XML response

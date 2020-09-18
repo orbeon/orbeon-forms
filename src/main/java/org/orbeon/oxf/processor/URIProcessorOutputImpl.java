@@ -16,7 +16,8 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
+import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
@@ -260,9 +261,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         public final String context;
         public final String spec;
-        public final Credentials credentials;
+        public final BasicCredentials credentials;
 
-        public URIReference(String context, String spec, Credentials credentials) {
+        public URIReference(String context, String spec, BasicCredentials credentials) {
             this.context = context;
             this.spec = spec;
             this.credentials = credentials;
@@ -288,22 +289,22 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         private Map<String, DocumentInfo> map;
 
-        public void setDocument(String urlString, Credentials credentials, SAXStore documentSAXStore, Long lastModified) {
+        public void setDocument(String urlString, BasicCredentials credentials, SAXStore documentSAXStore, Long lastModified) {
             if (map == null)
                 map = new HashMap<String, DocumentInfo>();
             map.put(buildURIUsernamePasswordString(urlString, credentials), new DocumentInfo(documentSAXStore, lastModified));
         }
 
-        public boolean isDocumentSet(String urlString, Credentials credentials) {
+        public boolean isDocumentSet(String urlString, BasicCredentials credentials) {
             return map != null && map.get(buildURIUsernamePasswordString(urlString, credentials)) != null;
         }
 
-        public Long getLastModified(String urlString, Credentials credentials) {
+        public Long getLastModified(String urlString, BasicCredentials credentials) {
             final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.lastModified;
         }
 
-        public SAXStore getDocument(String urlString, Credentials credentials) {
+        public SAXStore getDocument(String urlString, BasicCredentials credentials) {
             final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.saxStore;
         }
@@ -324,7 +325,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
          * @param spec              URL spec
          * @param credentials       optional credentials
          */
-        public void addReference(String context, String spec, Credentials credentials) {
+        public void addReference(String context, String spec, BasicCredentials credentials) {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
@@ -358,7 +359,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
      * @param state             state to read to
      * @param credentials       optional credentials
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Credentials credentials) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, BasicCredentials credentials) {
 
         final String urlString = url.toExternalForm();
 
@@ -375,9 +376,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 final URI submissionURL;
                 try {
                     submissionURL = new URI(
-                        URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(),
-                        urlString,
-                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE)
+                        URLRewriterUtils.rewriteServiceURL(
+                            externalContext.getRequest(),
+                            urlString,
+                            URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()
+                        )
                     );
                 } catch (URISyntaxException e) {
                     throw new OXFException(e);
@@ -424,7 +427,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         }
     }
 
-    private static String buildURIUsernamePasswordString(String uriString, Credentials credentials) {
+    private static String buildURIUsernamePasswordString(String uriString, BasicCredentials credentials) {
         // We don't care that the result is an actual URI
         if (credentials != null)
             return credentials.getPrefix() + uriString;

@@ -16,10 +16,13 @@ package org.orbeon.xforms
 import java.io.InputStream
 import java.net.URI
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.IndentedLogger
 
 
 object CrossPlatformSupport extends CrossPlatformSupportTrait {
+
+  def externalContext: ExternalContext = ???
 
   def proxyURI(
     uri              : String,

@@ -31,7 +31,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
 
   def connect(
     url         : String,
-    credentials : Option[Credentials], // ignored
+    credentials : Option[BasicCredentials], // ignored
     cookieStore : CookieStore,         // ignored
     method      : HttpMethod,
     headers     : Map[String, List[String]],

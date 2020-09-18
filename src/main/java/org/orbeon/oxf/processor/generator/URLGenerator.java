@@ -24,7 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.http.HttpStatusCodeException;
 import org.orbeon.oxf.http.StatusCode;
@@ -979,9 +979,9 @@ public class URLGenerator extends ProcessorImpl {
                 final Map<String, String[]> newHeaders =
                     URLGeneratorBase.setIfModifiedIfNeeded(config.getHeaderNameValues(), lastModified);
 
-                final Credentials credentials = config.getUsername() == null ?
+                final BasicCredentials credentials = config.getUsername() == null ?
                     null :
-                    Credentials.apply(
+                    BasicCredentials.apply(
                         config.getUsername(),
                         config.getPassword(),
                         config.isPreemptiveAuth() ? "true" : "false",

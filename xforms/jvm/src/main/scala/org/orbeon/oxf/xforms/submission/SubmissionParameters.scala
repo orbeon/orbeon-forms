@@ -2,9 +2,9 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
-import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
@@ -13,7 +13,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{RelevanceHandling, UrlType}
+import org.orbeon.xforms.{CrossPlatformSupport, RelevanceHandling, UrlType}
 
 
 // Subset of `SubmissionParameters`
@@ -226,7 +226,7 @@ object SubmissionParameters {
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
     // NOTE: Method can be `null` e.g. in a portlet render request.
-    val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
+    val incomingMethod = CrossPlatformSupport.externalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing

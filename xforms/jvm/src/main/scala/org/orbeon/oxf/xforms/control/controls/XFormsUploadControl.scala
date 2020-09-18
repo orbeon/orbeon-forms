@@ -82,18 +82,18 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _: XXFormsUploadCancelEvent =>
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
       case doneEvent: XXFormsUploadDoneEvent =>
         // Upload done: process upload to this control
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
         visitWithAncestors()
       case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
       case _ =>
     }
   }

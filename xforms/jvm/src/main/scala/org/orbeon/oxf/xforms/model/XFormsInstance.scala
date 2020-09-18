@@ -33,7 +33,7 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 
 import scala.collection.JavaConverters._
 
@@ -81,7 +81,7 @@ object InstanceCaching {
       pathOrAbsoluteURI = Connection.findInternalUrl(
         normalizedUrl = new URI(sourceURI).normalize,
         filter        = isInternalPath)(
-        ec            = NetUtils.getExternalContext
+        ec            = CrossPlatformSupport.externalContext
       ) getOrElse sourceURI, // adjust for internal path so replication works
       requestBodyHash   = requestBodyHash
     )

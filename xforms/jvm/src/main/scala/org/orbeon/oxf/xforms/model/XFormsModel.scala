@@ -40,7 +40,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.{CrossPlatformSupport, XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
 
@@ -403,7 +403,7 @@ trait XFormsModelInstances {
       model               = selfModel,
       resolvedAbsoluteUrl = new URI(
         URLRewriterUtils.rewriteServiceURL(
-          NetUtils.getExternalContext.getRequest,
+          CrossPlatformSupport.externalContext.getRequest,
           pathOrAbsoluteURI,
           URLRewriter.REWRITE_MODE_ABSOLUTE
         )
@@ -527,7 +527,7 @@ trait XFormsModelInstances {
 
           val absoluteResolvedUrl = new URI(absoluteURLString)
 
-          implicit val ec: ExternalContext = NetUtils.getExternalContext
+          implicit val ec: ExternalContext = CrossPlatformSupport.externalContext
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
             url              = absoluteResolvedUrl,

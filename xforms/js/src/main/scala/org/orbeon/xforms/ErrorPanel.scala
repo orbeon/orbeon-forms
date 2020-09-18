@@ -16,8 +16,10 @@ package org.orbeon.xforms
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
+import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
+import scala.collection.compat._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global => g}
@@ -28,41 +30,18 @@ object ErrorPanel {
 
   def initializeErrorPanel(formElem: html.Form): Option[js.Object] = {
 
-    // Expected layout of the HTML:
-    //
-    // <div class="xforms-error-dialogs">
-    //   <div class="xforms-error-panel xforms-initially-hidden">
-    //       <div class="hd" id="error-dialog-title"/>
-    //       <div class="bd">
-    //           <ul>
-    //               <li><a class="xforms-error-panel-close">Close this dialog</a> etc.</li>
-    //               <li><a class="xforms-error-panel-reload">Reload this page</a> etc.</li>
-    //           </ul>
-    //           <div class="xforms-error-panel-details-hidden">
-    //               <p>
-    //                   <a class="xforms-error-panel-show-details">
-    //                       <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-    //                       <span>Show details</span>
-    //                   </a>
-    //               </p>
-    //           </div>
-    //           <div class="xforms-error-panel-details-shown xforms-disabled">
-    //               <p>
-    //                   <a class="xforms-error-panel-hide-details">
-    //                       <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-    //                       <span>Hide details</span>
-    //                   </a>
-    //               </p>
-    //               <div class="xforms-error-panel-details"/>
-    //           </div>
-    //       </div>
-    //   </div>
-    // </div>
+    // See `error-dialog.xml` for the expected layout of the HTML
 
-    val panelElemOrUndef: js.UndefOr[html.Element] =
-      $(formElem).find(".xforms-error-dialogs > .xforms-error-panel")(0)
+    // We support multiple error panels, try to find one with a `lang` attribute that matches the language of the form,
+    // and if we can't find one, use the error panel we find
+    val allErrorPanelsNode           = formElem.querySelectorAll(".xforms-error-dialogs > .xforms-error-panel")
+    val allErrorPanelsElements       = allErrorPanelsNode.to(List).asInstanceOf[List[html.Element]]
+    val formLang                     = dom.document.firstElementChild.getAttribute("lang")
+    val panelElemWithMatchingLangOpt = allErrorPanelsElements.find(_.getAttribute("lang") == formLang)
+    val panelElemOpt                 = panelElemWithMatchingLangOpt.orElse(allErrorPanelsElements.headOption)
+    org.scalajs.dom.console.log("Panel found", panelElemOpt)
 
-    panelElemOrUndef.toOption map { panelElem =>
+    panelElemOpt map { panelElem =>
 
       val jPanelElem = $(panelElem)
 

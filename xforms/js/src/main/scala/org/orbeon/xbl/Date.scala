@@ -19,6 +19,7 @@ import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Language}
 import org.scalajs.dom
+import org.scalajs.dom.FocusEvent
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
@@ -59,9 +60,6 @@ private class DateCompanion extends XBLCompanionWithState {
       inputEl.on("change", () => onDateSelectedUpdateStateAndSendValueToServer())
     } else {
 
-      // Initialize bootstrap-datepicker
-      // 1. We set the date picker to be rendered inside the control, for our generic code handling `blur` to be able to detect that
-      //    the focus is still inside the control should users click inside the date picker; also see issue #4647
       val options              = new DatePickerOptions
       options.autoclose        = true
       options.enableOnReadonly = false
@@ -69,7 +67,7 @@ private class DateCompanion extends XBLCompanionWithState {
       options.showOnFocus      = false
       options.forceParse       = false
       options.language         = Language.getLang()
-      options.container        = "#" + containerElem.id // See note 1 above
+      options.container        = ".orbeon"
       datePicker = inputEl.parent().datepicker(options)
 
       // Register listeners
@@ -86,6 +84,21 @@ private class DateCompanion extends XBLCompanionWithState {
           datePicker.update()
         }
       )
+
+      // When the focus leaves the input going to the date picker, we stop propagation, so our generic code doesn't take this as
+      // the field loosing the focus, which might prematurely show the field as invalid, before users got a chance to select a value
+      // in the date picker
+      val inputElement = containerElem.querySelector("input")
+      inputElement.addEventListener(
+        "focusout",
+        (event: FocusEvent) => {
+          val relatedTarget = event.relatedTarget.asInstanceOf[dom.html.Element]
+          if (relatedTarget.classList.contains("datepicker-dropdown"))
+            event.stopPropagation()
+        },
+        useCapture = true
+      )
+
     }
   }
 

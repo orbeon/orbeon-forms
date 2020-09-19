@@ -2321,13 +2321,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
          */
         _findParentXFormsControl: function (element) {
             while (true) {
-                if (! element) return null; // No more parent, stop search
-                if (element.xformsElement) {
-                    // FCKeditor HTML area on Firefox: event target is the document, return the textarea
-                    return element.xformsElement;
-                } else if (element.ownerDocument && element.ownerDocument.xformsElement) {
-                    // FCKeditor HTML area on IE: event target is the body of the document, return the textarea
-                    return element.ownerDocument.xformsElement;
+                if (! element) {
+                    // No more parent, stop search
+                    return null;
                 } else if (element.tagName != null
                         && element.tagName.toLowerCase() == "iframe") {
                     // This might be the iframe that corresponds to a dialog on IE6

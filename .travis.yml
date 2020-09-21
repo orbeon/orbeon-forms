@@ -57,5 +57,7 @@ before_script:
 # Download other Docker images
 - if [ "$TARGET" == "test-unit" ]; then docker pull tomcat:8.0; fi
 - if [ "$TARGET" == "test-unit" ]; then docker pull haproxy:1.7; fi
+- mkdir -p $HOME/.sbt/launchers/0.13.18/
+- curl -L -o $HOME/.sbt/launchers/0.13.18/sbt-launch.jar https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/sbt-launch.jar
 script:
 - "ant $TARGET"

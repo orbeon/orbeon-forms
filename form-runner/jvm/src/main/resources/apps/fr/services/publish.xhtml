@@ -34,6 +34,9 @@
 
             <xf:instance id="fr-form-definition-instance" src="input:instance"/>
 
+            <!-- So that we can run processes (for #3814) -->
+            <xf:instance id="fr-form-instance"><_/></xf:instance>
+
             <xf:instance
                 id="fr-response-instance"
                 xxf:exclude-result-prefixes="#all">
@@ -115,26 +118,13 @@
                     name="version-comment-or-empty"
                     value="for $vc in xxf:get-request-parameter('version-comment') return xxf:trim($vc)"/>
 
-                <xf:var
-                    name="force-attachments"
-                    value="xxf:trim(xxf:get-request-parameter('force-attachments')) = 'true'"/>
-
                 <!-- For remote publish -->
-                <xf:var
-                    name="to-base-url"
-                    value="xxf:trim(xxf:get-request-parameter('remote-server-url'))"/>
-
                 <xf:var
                     name="form-definition-version"
                     value="xxf:get-request-parameter('form-definition-version')"/>
 
-                <xf:var
-                    name="local-write"
-                    value="$to-base-url = ''"/>
-
                 <xf:delete
                     ref="$metadata/available"/>
-
                 <xf:insert
                     if="not($available)"
                     context="$metadata"
@@ -144,7 +134,6 @@
                 <xf:action if="exists($version-comment-or-empty)">
                     <xf:delete
                         ref="$metadata/version-comment"/>
-
                     <xf:insert
                         if="xxf:non-blank($version-comment-or-empty)"
                         context="$metadata"
@@ -153,67 +142,97 @@
                 </xf:action>
 
                 <xf:var
-                    name="result"
+                    name="form-maybe-upgraded"
                     value="
-                        for $form-maybe-upgraded in
-                            if ($upgrade) then
-                                xxf:call-xpl(
-                                    'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                    (
-                                        'data',
-                                        'bindings'
-                                    ),
-                                    (
-                                        xxf:call-xpl(
-                                            'oxf:/forms/orbeon/builder/form/add-migration.xpl',
-                                            (
+                        if ($upgrade) then
+                            xxf:call-xpl(
+                                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                                (
+                                    'data',
+                                    'bindings'
+                                ),
+                                (
+                                    xxf:call-xpl(
+                                        'oxf:/forms/orbeon/builder/form/add-migration.xpl',
+                                        (
+                                            'data',
+                                            'bindings'
+                                        ),
+                                        (
+                                           xxf:call-xpl(
+                                                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
                                                 'data',
-                                                'bindings'
-                                            ),
-                                            (
-                                               xxf:call-xpl(
-                                                    'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                                    'data',
-                                                    xxf:call-xpl(
-                                                        'oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                        (
-                                                            'data',
-                                                            'bindings'
-                                                        ),
-                                                        (
-                                                            instance('fr-form-definition-instance'),
-                                                            instance('fr-components-instance')
-                                                        ),
-                                                        'data'
+                                                xxf:call-xpl(
+                                                    'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                    (
+                                                        'data',
+                                                        'bindings'
+                                                    ),
+                                                    (
+                                                        instance('fr-form-definition-instance'),
+                                                        instance('fr-components-instance')
                                                     ),
                                                     'data'
                                                 ),
-                                                instance('fr-components-instance')
+                                                'data'
                                             ),
-                                            'data'
+                                            instance('fr-components-instance')
                                         ),
-                                        instance('fr-components-instance')
+                                        'data'
                                     ),
-                                    'data'
-                                )
-                            else
-                                instance('fr-form-definition-instance')
-                        return
-                            frf:publish(
-                                $form-maybe-upgraded,
-                                $to-base-url,       (: '' for local publish :)
-                                $app,
-                                $form,
-                                $document-id,       (: might be empty       :)
-                                if (not($local-write)) then xxf:get-request-parameter('username') else (),
-                                if (not($local-write)) then xxf:get-request-parameter('password') else (),
-                                $force-attachments,
-                                $form-definition-version
+                                    instance('fr-components-instance')
+                                ),
+                                'data'
                             )
+                        else
+                            instance('fr-form-definition-instance')
                 "/>
 
-                <xf:setvalue ref="instance('fr-response-instance')/app"                   value="$app"/>
-                <xf:setvalue ref="instance('fr-response-instance')/form"                  value="$form"/>
+                <xf:dispatch name="do-publish-actual" targetid="fr-form-model">
+                    <xf:property name="doc"                      value="$form-maybe-upgraded"/>
+                    <xf:property name="app"                      value="$app"/>
+                    <xf:property name="form"                     value="$form"/>
+                    <xf:property name="document-id"              value="$document-id"/>
+                    <xf:property name="form-definition-version"  value="$form-definition-version"/>
+                </xf:dispatch>
+
+            </xf:action>
+
+            <!-- For #3814: run this separately so that the process has access to details via `event()`. -->
+            <xf:action event="do-publish-actual">
+
+                <xf:var
+                    name="to-base-url"
+                    value="xxf:trim(xxf:get-request-parameter('remote-server-url'))"/>
+                <xf:var
+                    name="local-write"
+                    value="$to-base-url = ''"/>
+                <xf:var
+                    name="force-attachments"
+                    value="xxf:trim(xxf:get-request-parameter('force-attachments')) = 'true'"/>
+
+                <!-- #3814-->
+                <xf:action type="xpath">
+                    fr:run-process-by-name('oxf.fr.detail.process', 'before-publish')
+                </xf:action>
+
+                <xf:var
+                    name="result"
+                    value="
+                        frf:publish(
+                            event('doc'),
+                            $to-base-url,               (: '' for local publish :)
+                            event('app'),
+                            event('form'),
+                            event('document-id'),       (: might be empty       :)
+                            if (not($local-write)) then xxf:get-request-parameter('username') else (),
+                            if (not($local-write)) then xxf:get-request-parameter('password') else (),
+                            $force-attachments,
+                            event('form-definition-version')
+                        )"/>
+
+                <xf:setvalue ref="instance('fr-response-instance')/app"                   value="event('app')"/>
+                <xf:setvalue ref="instance('fr-response-instance')/form"                  value="event('form')"/>
                 <xf:setvalue ref="instance('fr-response-instance')/published-attachments" value="map:get($result, 'published-attachments')"/>
                 <xf:setvalue ref="instance('fr-response-instance')/published-version"     value="map:get($result, 'published-version')"/>
 

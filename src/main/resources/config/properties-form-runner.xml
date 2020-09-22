@@ -454,4 +454,7 @@
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"          value=""/>
 
+    <!-- Process for the publish API -->
+    <property as="xs:string"  name="oxf.fr.detail.process.before-publish"/>
+
 </properties>

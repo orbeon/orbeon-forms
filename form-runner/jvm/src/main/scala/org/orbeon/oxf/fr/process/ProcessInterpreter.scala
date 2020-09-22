@@ -365,7 +365,8 @@ object ProcessInterpreter {
         XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI,
         XHTML_PREFIX         -> XMLConstants.XHTML_NAMESPACE_URI,
         XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI,
-        XMLNames.FRPrefix    -> XMLNames.FR
+        XMLNames.FRPrefix    -> XMLNames.FR,
+        "grid-migration"     -> "java:org.orbeon.oxf.fr.GridDataMigration" // TODO: should be from properties file
       )
     )
 

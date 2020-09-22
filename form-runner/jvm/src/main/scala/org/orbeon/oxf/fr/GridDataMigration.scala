@@ -39,6 +39,23 @@ object GridDataMigration {
       data
 
   //@XPathFunction
+  def dataMaybeMigratedToDatabaseFormat(
+    app       : String,
+    form      : String,
+    data      : DocumentInfo,
+    metadata  : Option[DocumentInfo]
+  ): DocumentInfo =
+    MigrationSupport.migrateDataWithFormMetadataMigrations(
+      appForm       = AppForm(app, form),
+      data          = data,
+      metadataOpt   = metadata,
+      srcVersion    = DataFormatVersion.Edge,
+      dstVersion    = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+      pruneMetadata = false
+    ) getOrElse
+      data
+
+  //@XPathFunction
   def dataMaybeMigratedFromEdge(
     app                     : String,
     form                    : String,

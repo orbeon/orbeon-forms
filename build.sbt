@@ -412,6 +412,9 @@ lazy val assetsSettings = Seq(
   }
 )
 
+// This project contains utilities with no dependencies. It is mostly cross-JS/JVM platforms, with
+// a few exceptions that are JS- or JVM-only. `common` is not a good name. On the other hand,
+// `utils` is also very general. Can we find something more telling?
 lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
@@ -447,6 +450,7 @@ lazy val commonJS  = common.js
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.0.0" % Test // for now, get the whole database
   )
 
+// Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
   .settings(commonSettings: _*)
   .settings(
@@ -655,9 +659,9 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 lazy val xformsJVM = xforms.jvm
   .dependsOn(
     commonJVM,
+    xformsCommonJVM,
     core % "test->test;compile->compile"
   )
-  .dependsOn(xformsCommon.jvm)
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
   .settings(commonScalaJvmSettings)
@@ -676,7 +680,7 @@ lazy val xformsJVM = xforms.jvm
 
 lazy val xformsJS = xforms.js
   .dependsOn(commonJS % "test->test;compile->compile")
-  .dependsOn(xformsCommon.js)
+  .dependsOn(xformsCommonJS)
   .settings(commonScalaJsSettings)
   .settings(
 
@@ -718,11 +722,11 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
 
 lazy val xformsCommonJVM = xformsCommon.jvm
   .dependsOn(commonJVM)
-  .dependsOn(dom.jvm)
+  .dependsOn(domJVM)
 
 lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(commonJS)
-  .dependsOn(dom.js)
+  .dependsOn(domJS)
   .settings(commonScalaJsSettings)
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
@@ -776,9 +780,31 @@ lazy val webFacades = (project in file("web-facades"))
     )
   )
 
+lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("core-cross-platform"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-core-cross-platform"
+  )
+
+lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm
+  .dependsOn(commonJVM)
+  .dependsOn(domJVM)
+  .settings(
+    libraryDependencies                ++= CoreLibraryDependencies
+  )
+
+lazy val coreCrossPlatformJS = coreCrossPlatform.js
+  .dependsOn(commonJS)
+  .dependsOn(domJS)
+  .settings(commonScalaJsSettings)
+
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtWeb)
-  .dependsOn(commonJVM, dom.jvm)
+  .dependsOn(
+    coreCrossPlatformJVM,
+    commonJVM,
+    domJVM
+  )
   .configs(DebugTest)
   .settings(commonSettings: _*)
   .settings(commonScalaJvmSettings)
@@ -812,7 +838,7 @@ lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.
 lazy val orbeonWarJVM = orbeonWar.jvm
   .dependsOn(
     commonJVM,
-    dom.jvm,
+    domJVM,
     core,
     xformsJVM,
     formRunnerJVM,
@@ -867,7 +893,7 @@ lazy val root = (project in file("."))
   .aggregate(
     commonJVM,
     commonJS,
-    dom.jvm,
+    domJVM,
     core,
     xformsJVM,
     xformsJS,

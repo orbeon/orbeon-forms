@@ -30,7 +30,9 @@ trait XFormsActions {
     "xf:dispatch" -> tryXFormsDispatch,
     "xf:show"     -> tryShowDialog,
     "xf:hide"     -> tryHideDialog,
-    "xf:setvalue" -> trySetvalue
+    "xf:setvalue" -> trySetvalue,
+    "xf:insert"   -> tryInsert,
+    "xf:delete"   -> tryDelete
   )
 
   def tryXFormsSend(params: ActionParams): Try[Any] =
@@ -88,5 +90,25 @@ trait XFormsActions {
         case _ =>
           debug("setvalue: `ref` parameter did not return a node, ignoring")
       }
+    }
+
+  def tryInsert(params: ActionParams): Try[Any] =
+    Try {
+
+      def paramAsNodes(name: String): List[NodeInfo] =
+        paramByName(params, name).toList flatMap (evaluate(_)) collect { case n: NodeInfo => n }
+
+      insert(
+        origin = evaluate(requiredParamByName(params, "insert", "origin")) collect { case n: NodeInfo => n },
+        into   = paramAsNodes("into"),
+        before = paramAsNodes("before"),
+        after  = paramAsNodes("after")
+      )
+    }
+
+  def tryDelete(params: ActionParams): Try[Any] =
+    Try {
+      val refParam = requiredParamByName(params, "delete", "ref")
+      delete(ref = evaluate(refParam) collect { case n: NodeInfo => n })
     }
 }

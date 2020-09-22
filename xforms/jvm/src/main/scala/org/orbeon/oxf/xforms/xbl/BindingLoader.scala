@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.xforms.CrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
 
@@ -394,12 +395,11 @@ trait BindingLoader extends Logging {
 
 object BindingLoader extends BindingLoader {
 
-  import org.orbeon.oxf.properties.Properties
   import org.orbeon.oxf.resources.ResourceManagerWrapper
 
   private val rm = ResourceManagerWrapper.instance
 
-  def getPropertySet = Properties.instance.getPropertySet
+  def getPropertySet = CrossPlatformSupport.properties
 
   def lastModifiedByPath(path: String): Long = {
     debug("checking last modified", List("path" -> path))

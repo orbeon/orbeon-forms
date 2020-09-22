@@ -31,25 +31,25 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-// TODO: Find way to get rid of `mutable.Map`. Check callers' expectations.
-class PropertyStore(globalPropertySet: PropertySet, processorPropertySets: mutable.Map[QName, PropertySet]) {
+
+class PropertyStore(globalPropertySet: PropertySet, processorPropertySets: Map[QName, PropertySet]) {
 
   def getGlobalPropertySet: PropertySet =
     globalPropertySet
 
   def getProcessorPropertySet(processorQName: QName): PropertySet =
-    processorPropertySets.getOrElseUpdate(processorQName, new PropertySet)
+    processorPropertySets.getOrElse(processorQName, PropertySet.empty)
 }
 
+// Construction of a `PropertyStore` currently depends on Saxon classes.
 object PropertyStore {
 
   def parse(doc: Document): PropertyStore = {
 
-    val globalPropertySet = new PropertySet
-    val processorPropertySets = mutable.HashMap[QName, PropertySet]()
+    import PropertySet.PropertyParams
 
-    def getProcessorPropertySet(processorQName: QName): PropertySet =
-      processorPropertySets.getOrElseUpdate(processorQName, new PropertySet)
+    val globalPropertyDefs = mutable.ListBuffer[PropertyParams]()
+    val namedPropertySets = mutable.HashMap[QName, mutable.ListBuffer[PropertyParams]]()
 
     val dw = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
 
@@ -63,7 +63,7 @@ object PropertyStore {
 
         val typeQName = propertyElement.resolveAttValueQName("as", unprefixedIsNoNamespace = true)
 
-        if (! PropertyStore.SupportedTypes.contains(typeQName))
+        if (! Private.SupportedTypes.contains(typeQName))
           throw new ValidationException(s"Invalid `as` attribute: ${typeQName.qualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
 
         val name = propertyElement.attributeValue("name")
@@ -74,83 +74,87 @@ object PropertyStore {
             case None                     => trimAllToEmpty(propertyElement.getText)
           }
 
-        propertyElement.attributeValueOpt("processor-name") match {
-          case Some(_) =>
-            val processorQName = propertyElement.resolveAttValueQName("processor-name", unprefixedIsNoNamespace = true)
-            getProcessorPropertySet(processorQName).setProperty(propertyElement, name, typeQName, value)
-          case None =>
-            globalPropertySet.setProperty(propertyElement, name, typeQName, value)
-        }
+        val builder =
+          propertyElement.attributeValueOpt("processor-name") match {
+            case Some(_) =>
+              val processorQName = propertyElement.resolveAttValueQName("processor-name", unprefixedIsNoNamespace = true)
+              namedPropertySets.getOrElseUpdate(processorQName, mutable.ListBuffer[PropertyParams]())
+            case None =>
+              globalPropertyDefs
+          }
+
+        builder += ((propertyElement, name, typeQName, Private.getObjectFromStringValue(value, typeQName, propertyElement)))
       }
     }
 
-    new PropertyStore(globalPropertySet, processorPropertySets)
+    new PropertyStore(
+      PropertySet(globalPropertyDefs),
+      namedPropertySets.iterator map { case (name, defs) => name -> PropertySet(defs) } toMap
+    )
   }
 
-  private val SupportedTypes = Map[QName, (String, Element) => AnyRef](
-    XS_STRING_QNAME             -> convertString,
-    XS_INTEGER_QNAME            -> convertInteger,
-    XS_BOOLEAN_QNAME            -> convertBoolean,
-    XS_DATE_QNAME               -> convertDate,
-    XS_DATETIME_QNAME           -> convertDate,
-    XS_QNAME_QNAME              -> convertQName,
-    XS_ANYURI_QNAME             -> convertURI,
-    XS_NCNAME_QNAME             -> convertNCName,
-    XS_NMTOKEN_QNAME            -> convertNMTOKEN,
-    XS_NMTOKENS_QNAME           -> convertNMTOKENS,
-    XS_NONNEGATIVEINTEGER_QNAME -> convertNonNegativeInteger
-  )
+  private object Private {
 
-  /**
-    * Convert a property's string value to an object.
-    *
-    * @param element Element on which the property is defined. Used for QName resolution if needed.
-    * @return        object or null
-    */
-  def getObjectFromStringValue(stringValue: String, typ: QName, element: Element): AnyRef =
-    SupportedTypes.get(typ) map (_(stringValue, element)) orNull
+    val SupportedTypes =
+      Map[QName, (String, Element) => AnyRef](
+        XS_STRING_QNAME             -> convertString,
+        XS_INTEGER_QNAME            -> convertInteger,
+        XS_BOOLEAN_QNAME            -> convertBoolean,
+        XS_DATE_QNAME               -> convertDate,
+        XS_DATETIME_QNAME           -> convertDate,
+        XS_QNAME_QNAME              -> convertQName,
+        XS_ANYURI_QNAME             -> convertURI,
+        XS_NCNAME_QNAME             -> convertNCName,
+        XS_NMTOKEN_QNAME            -> convertNMTOKEN,
+        XS_NMTOKENS_QNAME           -> convertNMTOKENS,
+        XS_NONNEGATIVEINTEGER_QNAME -> convertNonNegativeInteger
+      )
 
-  private def convertString (value: String, element: Element) = value
-  private def convertInteger(value: String, element: Element) = new jl.Integer(value)
-  private def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
-  private def convertDate   (value: String, element: Element) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
+    def getObjectFromStringValue(stringValue: String, typ: QName, element: Element): AnyRef =
+      SupportedTypes.get(typ) map (_(stringValue, element)) orNull
 
-  private def convertQName(value: String, element: Element): QName =
-    element.resolveAttValueQName("value", unprefixedIsNoNamespace = true)
+    def convertString (value: String, element: Element) = value
+    def convertInteger(value: String, element: Element) = new jl.Integer(value)
+    def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
+    def convertDate   (value: String, element: Element) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 
-  private def convertURI(value: String, element: Element): URI =
-    try {
-      new URI(value)
-    } catch {
-      case e: URISyntaxException =>
-        throw new ValidationException(e, null)
+    def convertQName(value: String, element: Element): QName =
+      element.resolveAttValueQName("value", unprefixedIsNoNamespace = true)
+
+    def convertURI(value: String, element: Element): URI =
+      try {
+        new URI(value)
+      } catch {
+        case e: URISyntaxException =>
+          throw new ValidationException(e, null)
+      }
+
+    def convertNCName(value: String, element: Element): String = {
+      if (! Name10Checker.getInstance.isValidNCName(value))
+        throw new ValidationException("Not an NCName: " + value, null)
+      value
     }
 
-  private def convertNCName(value: String, element: Element): String = {
-    if (! Name10Checker.getInstance.isValidNCName(value))
-      throw new ValidationException("Not an NCName: " + value, null)
-    value
-  }
-
-  private def convertNMTOKEN(value: String, element: Element): String = {
-    if (! Name10Checker.getInstance.isValidNmtoken(value))
-      throw new ValidationException("Not an NMTOKEN: " + value, null)
-    value
-  }
-
-  private def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
-    val tokens = value.splitTo[Set]()
-    for (token <- tokens) {
-      if (! Name10Checker.getInstance.isValidNmtoken(token))
-        throw new ValidationException(s"Not an NMTOKENS: $value" , null)
+    def convertNMTOKEN(value: String, element: Element): String = {
+      if (! Name10Checker.getInstance.isValidNmtoken(value))
+        throw new ValidationException("Not an NMTOKEN: " + value, null)
+      value
     }
-    tokens.asJava
-  }
 
-  private def convertNonNegativeInteger(value: String, element: Element): jl.Integer = {
-    val ret = convertInteger(value, element)
-    if (ret < 0)
-      throw new ValidationException(s"Not a non-negative integer: $value", null)
-    ret
+    def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
+      val tokens = value.splitTo[Set]()
+      for (token <- tokens) {
+        if (! Name10Checker.getInstance.isValidNmtoken(token))
+          throw new ValidationException(s"Not an NMTOKENS: $value" , null)
+      }
+      tokens.asJava
+    }
+
+    def convertNonNegativeInteger(value: String, element: Element): jl.Integer = {
+      val ret = convertInteger(value, element)
+      if (ret < 0)
+        throw new ValidationException(s"Not a non-negative integer: $value", null)
+      ret
+    }
   }
 }

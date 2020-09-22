@@ -19,11 +19,14 @@ import java.net.URI
 import cats.syntax.option._
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.{Connection, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 
 
 object CrossPlatformSupport extends CrossPlatformSupportTrait {
+
+  def properties: PropertySet = Properties.instance.getPropertySet
 
   def externalContext: ExternalContext = NetUtils.getExternalContext
 

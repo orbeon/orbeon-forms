@@ -17,10 +17,14 @@ import java.io.InputStream
 import java.net.URI
 
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.IndentedLogger
 
 
 object CrossPlatformSupport extends CrossPlatformSupportTrait {
+
+
+  def properties: PropertySet = ???
 
   def externalContext: ExternalContext = ???
 

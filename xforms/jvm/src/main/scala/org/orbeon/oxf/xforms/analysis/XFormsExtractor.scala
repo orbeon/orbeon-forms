@@ -17,23 +17,21 @@ import java.net.{URI, URISyntaxException}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.XmlLocationData
-import org.orbeon.xforms.{Constants, XXBLScope}
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{Constants, CrossPlatformSupport, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 
 object XFormsExtractor {
@@ -529,7 +527,7 @@ trait ExtractorProperties {
   protected def outputNonDefaultProperties(): Unit =
     xmlReceiverOpt foreach { implicit xmlReceiver =>
 
-      val propertySet = Properties.instance.getPropertySet
+      val propertySet = CrossPlatformSupport.properties
 
       val propertiesToKeep = {
         for {

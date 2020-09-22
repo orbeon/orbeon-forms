@@ -16,6 +16,8 @@ package org.orbeon.xforms
 import java.io.InputStream
 import java.net.URI
 
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.IndentedLogger
 
 
@@ -24,6 +26,10 @@ import org.orbeon.oxf.util.IndentedLogger
 // must have separate implementations on each side.
 //
 trait CrossPlatformSupportTrait {
+
+  def properties: PropertySet
+
+  def externalContext: ExternalContext
 
   def proxyURI(
     uri              : String,

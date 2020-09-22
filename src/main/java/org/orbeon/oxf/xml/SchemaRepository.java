@@ -57,7 +57,7 @@ public class SchemaRepository {
     private static SchemaRepository instance;
 
     static {
-        SCHEMAS.put(Properties.PROPERTIES_SCHEMA_URI, BASE_PATH + "properties/properties.rng");
+//        SCHEMAS.put(Properties.PROPERTIES_SCHEMA_URI, BASE_PATH + "properties/properties.rng");
 
         SCHEMAS.put(PipelineProcessor.PIPELINE_NAMESPACE_URI, "schemas/pipeline.rng");
         SCHEMAS.put(AggregatorProcessor.AGGREGATOR_NAMESPACE_URI, "schemas/aggregator.rng");

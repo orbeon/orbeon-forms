@@ -260,13 +260,10 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-      val props = new PropertySet |!>
-        (_.setProperty(
-          element     = null,
-          name        = "oxf.fr.resource.*.*.fr.authentication.login.password",
-          typ         = XS_STRING_QNAME,
-          stringValue = "Mot de passe"
-        ))
+
+
+      val props =
+        PropertySet(List((null, "oxf.fr.resource.*.*.fr.authentication.login.password", XS_STRING_QNAME, "Mot de passe")))
 
       ResourcesPatcher.transform(initial, AppForm("*", "*"))(props)
 

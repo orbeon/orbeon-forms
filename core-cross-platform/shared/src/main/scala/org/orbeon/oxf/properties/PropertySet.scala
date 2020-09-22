@@ -19,6 +19,7 @@ import java.{lang => jl, util => ju}
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.properties.PropertySet._
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -30,6 +31,7 @@ import scala.collection.JavaConverters._
 import scala.collection.compat._
 import scala.collection.mutable
 
+
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
 
   private var _associatedValue: Option[Any] = None
@@ -40,12 +42,7 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
     _associatedValue.get.asInstanceOf[U]
   }
 
-  def namespaceMapping = NamespaceMapping(namespaces)
-}
-
-private class PropertyNode {
-  var property: Option[Property] = None
-  var children = mutable.LinkedHashMap[String, PropertyNode]()
+  def namespaceMapping: NamespaceMapping = NamespaceMapping(namespaces)
 }
 
 /**
@@ -53,46 +50,58 @@ private class PropertyNode {
  *
  * A property name can be exact, e.g. foo.bar.gaga, or it can contain wildcards, like ".*.bar.gaga", "foo.*.gaga", or
  * "foo.bar.*", or "*.bar.*", etc.
- *
- * TODO: Make this effectively immutable and remove `setProperty`.
  */
-class PropertySet {
+object PropertySet {
 
-  private var exactProperties    = Map[String, Property]()
-  private val wildcardProperties = new PropertyNode
-
-  /**
-   * Set a property. Used by PropertyStore.
-   *
-   * @param element         Element on which the property is defined. Used for QName resolution if needed.
-   * @param name            property name
-   * @param typ             property type, or null
-   * @param stringValue     property string value
-   */
-  def setProperty(element: Element, name: String, typ: QName, stringValue: String): Unit = {
-
-    val value    = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
-    val property = Property(typ, value, if (element eq null) Map.empty else element.allInScopeNamespacesAsStrings)
-
-    // Store exact property name anyway
-    exactProperties += name -> property
-
-    // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
-    var currentNode = wildcardProperties
-    for (currentToken <- name.splitTo[List](".")) {
-      currentNode = currentNode.children.getOrElse(currentToken, {
-        val newPropertyNode = new PropertyNode
-        currentNode.children += currentToken -> newPropertyNode
-        newPropertyNode
-      })
-    }
-
-    // Store value
-    currentNode.property = property.some
+  private class PropertyNode {
+    var property: Option[Property] = None
+    var children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
   }
 
+  def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)
+
+  type PropertyParams = (Element, String, QName, AnyRef)
+
+  def apply(globalProperties: Iterable[PropertyParams]): PropertySet = {
+
+    var exactProperties    = Map[String, Property]()
+    val wildcardProperties = new PropertyNode
+
+    def setProperty(elem: Element, name: String, typ: QName, value: AnyRef): Unit = {
+
+      val property = Property(typ, value, if (elem eq null) Map.empty else elem.allInScopeNamespacesAsStrings)
+
+      // Store exact property name anyway
+      exactProperties += name -> property
+
+      // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties
+      // that start with some token)
+      var currentNode = wildcardProperties
+      for (currentToken <- name.splitTo[List](".")) {
+        currentNode = currentNode.children.getOrElse(currentToken, {
+          val newPropertyNode = new PropertyNode
+          currentNode.children += currentToken -> newPropertyNode
+          newPropertyNode
+        })
+      }
+
+      // Store value
+      currentNode.property = property.some
+    }
+
+    globalProperties foreach { case (elem, name, typ, value) => setProperty(elem, name, typ, value) }
+
+    new PropertySet(exactProperties, wildcardProperties)
+  }
+}
+
+class PropertySet private (
+  exactProperties    : Map[String, Property],
+  wildcardProperties : PropertyNode // this contains mutable nodes, but the don't mutate after construction
+) {
+
   def keySet: ju.Set[String] = exactProperties.keySet.asJava
-  def size = exactProperties.size
+  def size: Int = exactProperties.size
 
   def allPropertiesAsJson: String = {
 

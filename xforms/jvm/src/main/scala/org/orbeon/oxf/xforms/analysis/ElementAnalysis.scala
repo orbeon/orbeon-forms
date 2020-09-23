@@ -21,12 +21,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
-import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
+import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
@@ -166,7 +166,7 @@ abstract class ElementAnalysis(
   private var _contextAnalyzed = false
   private var bindingAnalysis: Option[XPathAnalysis] = None
   private var _bindingAnalyzed = false
-  def bindingAnalyzed = _bindingAnalyzed
+  def bindingAnalyzed: Boolean = _bindingAnalyzed
   private var valueAnalysis: Option[XPathAnalysis] = None
   private var _valueAnalyzed = false
   def valueAnalyzed: Boolean = _valueAnalyzed
@@ -281,9 +281,9 @@ trait ElementEventHandlers {
 
       def matchesPhaseNameTarget(eventHandler: EventHandler) =
         (
-          eventHandler.isCapturePhaseOnly && phase == Capture ||
-          eventHandler.isTargetPhase      && phase == Target  ||
-          eventHandler.isBubblingPhase    && phase == Bubbling
+          eventHandler.isCapturePhaseOnly && phase == Phase.Capture ||
+          eventHandler.isTargetPhase      && phase == Phase.Target  ||
+          eventHandler.isBubblingPhase    && phase == Phase.Bubbling
         ) &&
           eventHandler.isMatchByNameAndTarget(eventName, selfElement.prefixedId)
 
@@ -351,17 +351,17 @@ trait ElementEventHandlers {
     val observersFromLeafToRoot = relevantObserversFromLeafToRoot
 
     val captureHandlers =
-      handlersForPhase(observersFromLeafToRoot.reverse.init, Capture)
+      handlersForPhase(observersFromLeafToRoot.reverse.init, Phase.Capture)
 
     val targetHandlers =
       if (propagate)
-        handlersForPhase(List(observersFromLeafToRoot.head), Target)
+        handlersForPhase(List(observersFromLeafToRoot.head), Phase.Target)
       else
         None
 
     val bubblingHandlers =
       if (propagate)
-        handlersForPhase(observersFromLeafToRoot.tail, Bubbling)
+        handlersForPhase(observersFromLeafToRoot.tail, Phase.Bubbling)
       else
         None
 

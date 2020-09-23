@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, S
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{EventNames, XFormsId}
 

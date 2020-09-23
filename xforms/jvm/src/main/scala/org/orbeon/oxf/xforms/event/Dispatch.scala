@@ -17,11 +17,11 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.runtime.XFormsObject
 
 import scala.util.control.NonFatal
@@ -105,7 +105,7 @@ object Dispatch extends Logging {
               Iterator.iterate(target.parentEventObserver)(_.parentEventObserver) takeWhile (_ ne null) toList
 
             // Capture phase
-            handlers.get(Capture) foreach (doPhase(ancestorObservers.reverse, _, Capture))
+            handlers.get(Phase.Capture) foreach (doPhase(ancestorObservers.reverse, _, Phase.Capture))
 
             // Target phase
             locally {
@@ -115,14 +115,14 @@ object Dispatch extends Logging {
               // processing, and in XFormsUploadControl for upload processing.
               target.performTargetAction(event)
 
-              handlers.get(Target) foreach (doPhase(List(target), _, Target))
+              handlers.get(Phase.Target) foreach (doPhase(List(target), _, Phase.Target))
 
               callNativeListeners(target)
             }
 
             // Bubbling phase, which the event may not support
             if (event.bubbles)
-              handlers.get(Bubbling) foreach (doPhase(ancestorObservers, _, Bubbling))
+              handlers.get(Phase.Bubbling) foreach (doPhase(ancestorObservers, _, Phase.Bubbling))
 
             // Perform default action
             if (! event.cancelable || performDefaultAction)
@@ -135,7 +135,7 @@ object Dispatch extends Logging {
           }
         } else {
           // No handlers, try to do as little as possible
-          event.currentPhase = Target
+          event.currentPhase = Phase.Target
           target.performTargetAction(event)
           callNativeListeners(target)
           if (! event.cancelable || performDefaultAction)

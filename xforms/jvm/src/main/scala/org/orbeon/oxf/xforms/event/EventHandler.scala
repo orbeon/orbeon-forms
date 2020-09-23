@@ -15,20 +15,9 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.Modifier
+import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 
-
-sealed trait Propagate
-object Propagate {
-  case object Continue extends Propagate
-  case object Stop     extends Propagate
-}
-
-sealed trait Perform
-object Perform {
-  case object Perform extends Perform
-  case object Cancel  extends Perform
-}
 
 trait EventHandler {
 

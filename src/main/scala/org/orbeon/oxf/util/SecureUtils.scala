@@ -25,7 +25,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.common.OXFException
 
-object SecureUtils {
+object SecureUtils extends SecureUtilsTrait {
 
   // Properties
   private val XFormsPasswordProperty    = "oxf.xforms.password" // for backward compatibility

@@ -81,9 +81,7 @@ trait ConnectionTrait {
     logger           : IndentedLogger
   ): Option[(String, List[String])]
 
-//  def getHeaderFromRequest(request: ExternalContext.Request): String => Option[List[String]]
-
-  def buildSOAPHeadersCapitalizedIfNeeded(
+  private def buildSOAPHeadersCapitalizedIfNeeded(
     method                    : HttpMethod,
     mediatypeMaybeWithCharset : Option[String],
     encoding                  : String)(implicit

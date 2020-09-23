@@ -22,7 +22,7 @@ import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.control.NonFatal

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.common
 
+import java.{util => ju}
+
 import javax.xml.transform.TransformerException
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.errorified.Exceptions
@@ -28,13 +30,13 @@ object OrbeonLocationException {
   def getAllLocationData(throwable: Throwable): List[LocationData] =
     Exceptions.causesIterator(throwable).toList.reverse flatMap getLocationData
 
-  def jGetAllLocationData(throwable: Throwable) =
+  def jGetAllLocationData(throwable: Throwable): ju.List[LocationData] =
     getAllLocationData(throwable).asJava
 
   // NOTE: We used to attempt to get a "better" LocationData instead of the first one. It's unclear that this made
   // much sense. See:
   // https://github.com/orbeon/orbeon-forms/blob/75f6fc832a76eb66b125d01a36df52489af8c79f/src/main/java/org/orbeon/oxf/common/ValidationException.java#L63
-  def getRootLocationData(throwable: Throwable) =
+  def getRootLocationData(throwable: Throwable): Option[LocationData] =
     getAllLocationData(throwable).headOption
 
   private def getLocationData(throwable: Throwable): List[LocationData] =

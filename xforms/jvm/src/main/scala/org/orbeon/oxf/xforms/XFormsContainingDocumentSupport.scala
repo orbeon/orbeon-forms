@@ -50,6 +50,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionPara
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms._
+import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec

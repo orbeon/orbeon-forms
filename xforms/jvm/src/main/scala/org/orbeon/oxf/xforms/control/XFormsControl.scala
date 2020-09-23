@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.Constants.RepeatSeparatorString
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes

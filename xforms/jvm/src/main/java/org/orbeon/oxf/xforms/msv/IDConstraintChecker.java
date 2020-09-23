@@ -28,7 +28,7 @@ import org.orbeon.msv.grammar.xmlschema.KeyRefConstraint;
 import org.orbeon.msv.util.LightStack;
 import org.orbeon.msv.util.StartTagInfo;
 import org.orbeon.msv.verifier.Acceptor;
-import org.orbeon.oxf.xforms.ErrorInfo;
+import org.orbeon.xforms.runtime.ErrorInfo;
 import org.orbeon.msv.relaxng.datatype.Datatype;
 import org.orbeon.msv.relaxng.datatype.ValidationContext;
 

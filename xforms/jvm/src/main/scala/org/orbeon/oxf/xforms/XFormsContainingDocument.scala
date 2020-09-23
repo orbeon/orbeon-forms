@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.Seq

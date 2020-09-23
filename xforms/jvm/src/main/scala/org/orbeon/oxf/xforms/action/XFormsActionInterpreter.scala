@@ -32,6 +32,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping

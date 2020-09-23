@@ -39,6 +39,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId, XFormsNames}
 

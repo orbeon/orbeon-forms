@@ -33,6 +33,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._

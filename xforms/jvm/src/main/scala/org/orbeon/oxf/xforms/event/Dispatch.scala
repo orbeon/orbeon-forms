@@ -17,12 +17,12 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.runtime.XFormsObject
 
 import scala.util.control.NonFatal
 

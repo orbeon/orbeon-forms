@@ -527,7 +527,8 @@ trait XFormsModelInstances {
 
           val absoluteResolvedUrl = new URI(absoluteURLString)
 
-          implicit val ec: ExternalContext = CrossPlatformSupport.externalContext
+          implicit val ec                      : ExternalContext               = CrossPlatformSupport.externalContext
+          implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
             url              = absoluteResolvedUrl,
@@ -539,16 +540,15 @@ trait XFormsModelInstances {
           )
 
           val connectionResult =
-            Connection(
+            Connection.connectNow(
               method      = HttpMethod.GET,
               url         = absoluteResolvedUrl,
               credentials = instance.credentials,
               content     = None,
               headers     = headers,
               loadState   = true,
+              saveState   = true,
               logBody     = BaseSubmission.isLogBody
-            ).connect(
-              saveState = true
             )
 
           ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>

@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.persistence.http.HttpCall
 import org.orbeon.oxf.fr.persistence.relational.Version.Specific
 import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -29,6 +29,7 @@ class SearchTest
      with AnyFunSpecLike {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
+  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
   describe("Search API") {
 

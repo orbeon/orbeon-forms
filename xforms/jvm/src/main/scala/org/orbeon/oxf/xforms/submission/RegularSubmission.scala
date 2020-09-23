@@ -19,9 +19,10 @@ import java.net.URI
 import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.http.Headers.{ContentType, firstItemIgnoreCase}
+import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait}
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.control.NonFatal
@@ -50,29 +51,30 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-        url              = absoluteResolvedURL,
-        method           = p.httpMethod,
-        hasCredentials   = p2.credentialsOpt.isDefined,
-        mediatype        = sp.actualRequestMediatype,
-        encodingForSOAP  = p2.encoding,
-        customHeaders    = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
-        headersToForward = Connection.headersToForwardFromProperty,
-        getHeader        = containingDocument.headersGetter)(
-        logger           = detailsLogger,
-        externalContext  = externalContext
+        url                      = absoluteResolvedURL,
+        method                   = p.httpMethod,
+        hasCredentials           = p2.credentialsOpt.isDefined,
+        mediatypeOpt             = sp.actualRequestMediatype.some,
+        encodingForSOAP          = p2.encoding,
+        customHeaders            = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
+        headersToForward         = Connection.headersToForwardFromProperty,
+        getHeader                = containingDocument.headersGetter)(
+        logger                   = detailsLogger,
+        externalContext          = externalContext,
+        coreCrossPlatformSupport = CoreCrossPlatformSupport
       )
 
     val submissionEffectiveId = submission.getEffectiveId
 
     val messageBody: Option[Array[Byte]] =
-      if (Connection.requiresRequestBody(p.httpMethod)) sp.messageBody orElse Some(Array.emptyByteArray) else None
+      if (HttpMethodsWithRequestBody(p.httpMethod)) sp.messageBody orElse Some(Array.emptyByteArray) else None
 
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstItemIgnoreCase(headers, ContentType)))
 
     // Prepare Connection in this thread as async submission can't access the request object
-    val connection =
-      Connection(
+    val connectionResultEval =
+      Connection.connectLater(
         method          = p.httpMethod,
         url             = absoluteResolvedURL,
         credentials     = p2.credentialsOpt,
@@ -88,7 +90,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     // - now and synchronously
     // - now and asynchronously
     // - later as a "foreground" asynchronous submission
-    val eval = Eval.later {
+    def processSubmissionResultEval(cxr: ConnectionResult) = Eval.later {
       // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
       // because it may get out of the caches and not be picked up by further incoming Ajax requests.
       if (p2.isAsynchronous && timingLogger.debugEnabled)
@@ -107,7 +109,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
             // TODO: Consider how the state could be saved. Maybe do this before connect() in the initiating thread?
             // Or make sure it's ok to touch app/session (but not request) from other thread (`ExternalContext`
             // in scope + synchronization)
-            connection.connect(! p2.isAsynchronous)
+            cxr
           }(detailsLogger)
 
         connectionResultOpt = connectionResult.some
@@ -144,6 +146,6 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
       }
     }
 
-    submitEval(p, p2, eval)
+    submitEval(p, p2, connectionResultEval flatMap processSubmissionResultEval)
   }
 }

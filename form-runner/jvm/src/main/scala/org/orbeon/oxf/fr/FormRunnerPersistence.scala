@@ -19,7 +19,7 @@ import java.{util => ju}
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.io.UriScheme
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
@@ -284,7 +284,9 @@ trait FormRunnerPersistence {
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext          = NetUtils.getExternalContext
+    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+
     val request = externalContext.getRequest
 
     val rewrittenURLString =
@@ -305,16 +307,15 @@ trait FormRunnerPersistence {
       Connection.getHeaderFromRequest(request)
     )
 
-    val cxr = Connection(
+    val cxr = Connection.connectNow(
       method      = GET,
       url         = url,
       credentials = None,
       content     = None,
       headers     = headers,
       loadState   = true,
+      saveState   = true,
       logBody     = false
-    ).connect(
-      saveState = true
     )
 
     // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test

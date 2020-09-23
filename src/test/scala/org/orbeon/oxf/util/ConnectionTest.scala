@@ -18,7 +18,7 @@ import java.{util => ju}
 
 import cats.syntax.option._
 import org.mockito.Mockito
-import org.orbeon.io.{CharsetNames, UriScheme}
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.http.Headers._
@@ -68,16 +68,17 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          url              = new URI("/foo/bar"),
-          method           = HttpMethod.GET,
-          hasCredentials   = false,
-          mediatype        = null,
-          encodingForSOAP  = CharsetNames.Utf8,
-          customHeaders    = customHeaderValuesMap,
-          headersToForward = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
-          getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest))(
-          logger           = ResourceManagerTestBase.newIndentedLogger,
-          externalContext  = externalContext
+          url                      = new URI("/foo/bar"),
+          method                   = HttpMethod.GET,
+          hasCredentials           = false,
+          mediatypeOpt             = None,
+          encodingForSOAP          = CharsetNames.Utf8,
+          customHeaders            = customHeaderValuesMap,
+          headersToForward         = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
+          getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest))(
+          logger                   = ResourceManagerTestBase.newIndentedLogger,
+          externalContext          = externalContext,
+          coreCrossPlatformSupport = CoreCrossPlatformSupport
         )
 
       val request =
@@ -123,16 +124,17 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          url              = new URI("/foo/bar"),
-          method           = method,
-          hasCredentials   = false,
-          mediatype        = bodyMediaType,
-          encodingForSOAP  = CharsetNames.Utf8,
-          customHeaders    = explicitHeaders,
-          headersToForward = Set.empty,
-          getHeader        = _ => None)(
-          logger           = ResourceManagerTestBase.newIndentedLogger,
-          externalContext  = externalContext
+          url                      = new URI("/foo/bar"),
+          method                   = method,
+          hasCredentials           = false,
+          mediatypeOpt             = bodyMediaType.some,
+          encodingForSOAP          = CharsetNames.Utf8,
+          customHeaders            = explicitHeaders,
+          headersToForward         = Set.empty,
+          getHeader                = _ => None)(
+          logger                   = ResourceManagerTestBase.newIndentedLogger,
+          externalContext          = externalContext,
+          coreCrossPlatformSupport = CoreCrossPlatformSupport
         )
 
       val wrapper =
@@ -172,16 +174,17 @@ class ConnectionTest
       it(s"must ${if (expectedHeaderValue.isDefined) "" else "not " }include a `Content-Type` header when using the `${method.entryName}` method") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-            url              = new URI("/foo/bar"),
-            method           = method,
-            hasCredentials   = false,
-            mediatype        = contentType,
-            encodingForSOAP  = CharsetNames.Utf8,
-            customHeaders    = Map.empty,
-            headersToForward = Set.empty,
-            getHeader        = _ => None)(
-            logger           = ResourceManagerTestBase.newIndentedLogger,
-            externalContext  = externalContext
+            url                      = new URI("/foo/bar"),
+            method                   = method,
+            hasCredentials           = false,
+            mediatypeOpt             = contentType.some,
+            encodingForSOAP          = CharsetNames.Utf8,
+            customHeaders            = Map.empty,
+            headersToForward         = Set.empty,
+            getHeader                = _ => None)(
+            logger                   = ResourceManagerTestBase.newIndentedLogger,
+            externalContext          = externalContext,
+            coreCrossPlatformSupport = CoreCrossPlatformSupport
           )
 
         assert(expectedHeaderValue == firstItemIgnoreCase(headersCapitalized, Headers.ContentType))
@@ -209,16 +212,17 @@ class ConnectionTest
       it(s"call to `$urlString` with `$httpMethod` must ${if (mustIncludeToken) "" else "not " }include an `Orbeon-Token` header") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-            url              = new URI(serviceAbsoluteUrl),
-            method           = httpMethod,
-            hasCredentials   = false,
-            mediatype        = ContentTypes.XmlContentType,
-            encodingForSOAP  = CharsetNames.Utf8,
-            customHeaders    = Map.empty,
-            headersToForward = Set.empty,
-            getHeader        = _ => None)(
-            logger           = ResourceManagerTestBase.newIndentedLogger,
-            externalContext  = externalContext
+            url                      = new URI(serviceAbsoluteUrl),
+            method                   = httpMethod,
+            hasCredentials           = false,
+            mediatypeOpt             = ContentTypes.XmlContentType.some,
+            encodingForSOAP          = CharsetNames.Utf8,
+            customHeaders            = Map.empty,
+            headersToForward         = Set.empty,
+            getHeader                = _ => None)(
+            logger                   = ResourceManagerTestBase.newIndentedLogger,
+            externalContext          = externalContext,
+            coreCrossPlatformSupport = CoreCrossPlatformSupport
           )
 
         assert(mustIncludeToken == firstItemIgnoreCase(headersCapitalized, Headers.OrbeonToken).isDefined)

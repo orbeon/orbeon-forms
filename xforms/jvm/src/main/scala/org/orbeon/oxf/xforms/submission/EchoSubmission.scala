@@ -18,7 +18,7 @@ import java.net.URI
 
 import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.Success
@@ -55,7 +55,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         // Log message body for debugging purposes
         val indentedLogger = getDetailsLogger(p, p2)
         if (indentedLogger.debugEnabled && BaseSubmission.isLogBody)
-          Connection.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
+          SubmissionUtils.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
@@ -70,16 +70,17 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       )
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-      url              = url,
-      method           = p.httpMethod,
-      hasCredentials   = p2.credentialsOpt.isDefined,
-      mediatype        = sp.actualRequestMediatype,
-      encodingForSOAP  = p2.encoding,
-      customHeaders    = customHeaderNameValues,
-      headersToForward = Connection.headersToForwardFromProperty,
-      getHeader        = containingDocument.headersGetter)(
-      logger           = getDetailsLogger(p, p2),
-      externalContext  = CrossPlatformSupport.externalContext
+      url                      = url,
+      method                   = p.httpMethod,
+      hasCredentials           = p2.credentialsOpt.isDefined,
+      mediatypeOpt             = sp.actualRequestMediatype.some,
+      encodingForSOAP          = p2.encoding,
+      customHeaders            = customHeaderNameValues,
+      headersToForward         = Connection.headersToForwardFromProperty,
+      getHeader                = containingDocument.headersGetter)(
+      logger                   = getDetailsLogger(p, p2),
+      externalContext          = CrossPlatformSupport.externalContext,
+      coreCrossPlatformSupport = CoreCrossPlatformSupport
     )
 
     // Do as if we are receiving a regular XML response

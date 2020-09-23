@@ -396,11 +396,23 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                         Connection.jHeadersToForward(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger,
-                        externalContext
+                        externalContext,
+                        CoreCrossPlatformSupport$.MODULE$
                     );
 
-                final ConnectionResult connectionResult
-                    = Connection.jApply(HttpMethod.GET$.MODULE$, submissionURL, credentials, null, headers, true, false, indentedLogger, externalContext).connect(true);
+                final ConnectionResult connectionResult =
+                    Connection.jConnectNow(
+                        HttpMethod.GET$.MODULE$,
+                        submissionURL,
+                        credentials,
+                        null,
+                        headers,
+                        true,
+                        true,
+                        false,
+                        indentedLogger,
+                        externalContext
+                    );
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode() != 200)

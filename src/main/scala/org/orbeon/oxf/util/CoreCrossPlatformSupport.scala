@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018 Orbeon, Inc.
+ * Copyright (C) 2020 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,24 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.io
+package org.orbeon.oxf.util
 
-import enumeratum.EnumEntry.Lowercase
-import enumeratum._
 
-sealed trait UriScheme extends EnumEntry with Lowercase
-
-object UriScheme extends Enum[UriScheme] {
-
-  val values = findValues
-
-  case object Http   extends UriScheme
-  case object Https  extends UriScheme
-  case object File   extends UriScheme
-  case object Data   extends UriScheme
-  case object Mailto extends UriScheme
-  case object Oxf    extends UriScheme
-  case object Echo   extends UriScheme
-
-  val SchemesWithHeaders: Set[UriScheme] = Set(Http, Https, Echo)
+object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
+  def randomHexId: String = SecureUtils.randomHexId
 }

@@ -40,6 +40,14 @@ import scala.collection.mutable
 
 object SubmissionUtils {
 
+  def logRequestBody(mediatype: String, messageBody: Array[Byte])(implicit logger: IndentedLogger): Unit =
+    if (ContentTypes.isXMLMediatype(mediatype) ||
+      ContentTypes.isTextOrJSONContentType(mediatype) ||
+      mediatype == "application/x-www-form-urlencoded")
+      logger.logDebug("submission", "setting request body", "body", new String(messageBody, CharsetNames.Utf8))
+    else
+      logger.logDebug("submission", "setting binary request body")
+
   // Create an `application/x-www-form-urlencoded` string, encoded in UTF-8, based on the elements and text content
   // present in an XML document. This assumes that non-relevant elements are already pruned or blanked if needed.
   def createWwwFormUrlEncoded(document: Document, separator: String): String = {
@@ -103,10 +111,11 @@ object SubmissionUtils {
 
   private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {
 
-    implicit val _logger          = model.indentedLogger
-    implicit val _externalContext = CrossPlatformSupport.externalContext
+    implicit val _logger                   = model.indentedLogger
+    implicit val _externalContext          = CrossPlatformSupport.externalContext
+    implicit val _coreCrossPlatformSupport = CoreCrossPlatformSupport
 
-    Connection(
+    Connection.connectNow(
       method          = GET,
       url             = resolvedAbsoluteUrl,
       credentials     = None,
@@ -114,19 +123,21 @@ object SubmissionUtils {
       headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = resolvedAbsoluteUrl,
         hasCredentials   = false,
-        customHeaders    = Map(),
+        customHeaders    = Map.empty,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = model.containingDocument.headersGetter
       ) mapValues (_.toList),
       loadState       = true,
+      saveState       = true,
       logBody         = BaseSubmission.isLogBody
-    ).connect(
-      saveState = true
     )
   }
 
-  def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, List[String]] = {
+  def evaluateHeaders(
+    submission           : XFormsModelSubmission,
+    forwardClientHeaders : Boolean
+  ): Map[String, List[String]] = {
     try {
       val headersToForward =
         clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
@@ -150,7 +161,10 @@ object SubmissionUtils {
     }
   }
 
-  def clientHeadersToForward(allHeaders: Map[String, List[String]], forwardClientHeaders: Boolean): Map[String, List[String]] = {
+  def clientHeadersToForward(
+    allHeaders           : Map[String, List[String]],
+    forwardClientHeaders : Boolean
+  ): Map[String, List[String]] =
     if (forwardClientHeaders) {
       // Forwarding the user agent and accept headers makes sense when dealing with resources that
       // typically would come from the client browser, including:
@@ -169,7 +183,6 @@ object SubmissionUtils {
       toForward.toMap
     } else
       Map.empty[String, List[String]]
-  }
 
   def forwardResponseHeaders(cxr: ConnectionResult, response: ExternalContext.Response): Unit =
     for {

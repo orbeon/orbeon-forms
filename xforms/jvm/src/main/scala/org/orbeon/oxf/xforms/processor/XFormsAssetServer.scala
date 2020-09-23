@@ -166,16 +166,15 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         // Copy stream out
         try {
           val cxr =
-            Connection(
+            Connection.connectNow(
               method      = GET,
               url         = resource.uri,
               credentials = None,
               content     = None,
               headers     = resource.headers,
               loadState   = true,
+              saveState   = true,
               logBody     = false
-            ).connect(
-              saveState = true
             )
 
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
@@ -293,14 +292,15 @@ object XFormsAssetServer {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url              = serviceAbsoluteUrl,
-        hasCredentials   = false,
-        customHeaders    = customHeaders,
-        headersToForward = headersToForward,
-        cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = getHeader)(
-        logger           = logger,
-        externalContext  = externalContext
+        url                      = serviceAbsoluteUrl,
+        hasCredentials           = false,
+        customHeaders            = customHeaders,
+        headersToForward         = headersToForward,
+        cookiesToForward         = Connection.cookiesToForwardFromProperty,
+        getHeader                = getHeader)(
+        logger                   = logger,
+        externalContext          = externalContext,
+        coreCrossPlatformSupport = CoreCrossPlatformSupport
       )
 
     val resource =

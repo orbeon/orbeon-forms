@@ -1005,11 +1005,23 @@ public class URLGenerator extends ProcessorImpl {
                         config.getForwardHeaders(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger,
-                        externalContext
+                        externalContext,
+                        CoreCrossPlatformSupport$.MODULE$
                     );
 
                 connectionResult =
-                    Connection.jApply(HttpMethod.GET$.MODULE$, url, credentials, null, headers, true, false, indentedLogger, externalContext).connect(true);
+                    Connection.jConnectNow(
+                        HttpMethod.GET$.MODULE$,
+                        url,
+                        credentials,
+                        null,
+                        headers,
+                        true,
+                        true,
+                        false,
+                        indentedLogger,
+                        externalContext
+                    );
 
                 inputStream = connectionResult.content().inputStream();
 

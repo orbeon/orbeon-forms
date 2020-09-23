@@ -31,7 +31,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ContentTypes, IndentedLogger}
+import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.scalatest.Assertions._
 
@@ -63,10 +63,11 @@ private[persistence] object HttpCall {
   )
 
   def assertCall(
-    actualRequest    : SolicitedRequest,
-    expectedResponse : ExpectedResponse)(implicit
-    logger           : IndentedLogger,
-    externalContext : ExternalContext
+    actualRequest            : SolicitedRequest,
+    expectedResponse         : ExpectedResponse)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     useAndClose(
       request(
@@ -121,15 +122,16 @@ private[persistence] object HttpCall {
   }
 
   private def request(
-    path            : String,
-    method          : HttpMethod,
-    version         : Version,
-    stage           : Option[Stage],
-    body            : Option[Body],
-    credentials     : Option[Credentials],
-    timeout         : Option[Int] = None)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    path                     : String,
+    method                   : HttpMethod,
+    version                  : Version,
+    stage                    : Option[Stage],
+    body                     : Option[Body],
+    credentials              : Option[Credentials],
+    timeout                  : Option[Int] = None)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): ClosableHttpResponse = {
 
     val documentURL = PersistenceBase.appendSlash + path.dropStartingSlash
@@ -195,41 +197,45 @@ private[persistence] object HttpCall {
   def metadataURL     (provider: Provider) = s"form/${provider.entryName}/$FormName"
 
   def post(
-    url             : String,
-    version         : Version,
-    body            : Body,
-    credentials     : Option[Credentials] = None)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    version                  : Version,
+    body                     : Body,
+    credentials              : Option[Credentials] = None)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Int =
     useAndClose(request(url, POST, version, None, Some(body), credentials))(_.httpResponse.statusCode)
 
   def put(
-    url             : String,
-    version         : Version,
-    stage           : Option[Stage],
-    body            : Body,
-    credentials     : Option[Credentials] = None)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    version                  : Version,
+    stage                    : Option[Stage],
+    body                     : Body,
+    credentials              : Option[Credentials] = None)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Int =
     useAndClose(request(url, PUT, version, stage, Some(body), credentials))(_.httpResponse.statusCode)
 
   def del(
-    url             : String,
-    version         : Version,
-    credentials     : Option[Credentials] = None)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    version                  : Version,
+    credentials              : Option[Credentials] = None)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Int =
     useAndClose(request(url, DELETE, version, None, None, credentials))(_.httpResponse.statusCode)
 
   def get(
-    url             : String,
-    version         : Version,
-    credentials     : Option[Credentials] = None)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    version                  : Version,
+    credentials              : Option[Credentials] = None)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
     useAndClose(request(url, GET, version, None, None, credentials)) { chr =>
 
@@ -248,30 +254,33 @@ private[persistence] object HttpCall {
     }
 
   def lock(
-    url             : String,
-    lockInfo        : LockInfo,
-    timeout         : Int)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    lockInfo                 : LockInfo,
+    timeout                  : Int)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Int =
     Private.lockUnlock(LOCK, url, lockInfo, Some(timeout))
 
   def unlock(
-    url             : String,
-    lockInfo        : LockInfo)(implicit
-    logger          : IndentedLogger,
-    externalContext : ExternalContext
+    url                      : String,
+    lockInfo                 : LockInfo)(implicit
+    logger                   : IndentedLogger,
+    externalContext          : ExternalContext,
+    coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Int =
     Private.lockUnlock(UNLOCK, url, lockInfo, None)
 
   private object Private {
     def lockUnlock(
-      method          : HttpMethod,
-      url             : String,
-      lockInfo        : LockInfo,
-      timeout         : Option[Int])(implicit
-      logger          : IndentedLogger,
-      externalContext : ExternalContext
+      method                   : HttpMethod,
+      url                      : String,
+      lockInfo                 : LockInfo,
+      timeout                  : Option[Int])(implicit
+      logger                   : IndentedLogger,
+      externalContext          : ExternalContext,
+      coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
     ): Int = {
       val body = Some(XML(LockInfo.toDom4j(lockInfo)))
       useAndClose(request(url, method, Version.Unspecified, None, body, None, timeout))(_.httpResponse.statusCode)

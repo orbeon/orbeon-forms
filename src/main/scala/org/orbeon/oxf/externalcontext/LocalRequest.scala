@@ -16,11 +16,11 @@ package org.orbeon.oxf.externalcontext
 import java.{util => ju}
 
 import org.apache.commons.io.IOUtils
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.http.HttpMethod.POST
+import org.orbeon.oxf.http.HttpMethod.{HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 
@@ -58,7 +58,7 @@ class LocalRequest(
       }
 
     def bodyHeadersIt =
-      if (Connection.requiresRequestBody(method)) {
+      if (HttpMethodsWithRequestBody(method)) {
         (_contentLengthOpt.iterator map (value => Headers.ContentLengthLower -> Array(value.toString))) ++
         (_contentTypeOpt.iterator   map (value => Headers.ContentTypeLower   -> Array(value)))
       } else

@@ -328,27 +328,27 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           val externalContext = NetUtils.getExternalContext
 
           val cxr =
-            Connection(
+            Connection.connectNow(
               method          = GET,
               url             = url,
               credentials     = None,
               content         = None,
               headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-                url              = url,
-                hasCredentials   = false,
-                customHeaders    = URLGeneratorBase.extractHeaders(context.element),
-                headersToForward = Connection.headersToForwardFromProperty,
-                cookiesToForward = Connection.cookiesToForwardFromProperty,
-                getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest))(
-                logger           = context.logger,
-                externalContext  = externalContext
+                url                      = url,
+                hasCredentials           = false,
+                customHeaders            = URLGeneratorBase.extractHeaders(context.element),
+                headersToForward         = Connection.headersToForwardFromProperty,
+                cookiesToForward         = Connection.cookiesToForwardFromProperty,
+                getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest))(
+                logger                   = context.logger,
+                externalContext          = externalContext,
+                coreCrossPlatformSupport = CoreCrossPlatformSupport
               ),
               loadState       = true,
+              saveState       = true,
               logBody         = false)(
               logger          = context.logger,
               externalContext = externalContext
-            ).connect(
-              saveState = true
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>

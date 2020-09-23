@@ -27,6 +27,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{HttpMethod, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -112,34 +113,17 @@ private object PersistenceProxyProcessor {
     // Throws if there is an incompatibility
     checkDataFormatVersions(request, app, form, formOrData)
 
-    val requestContent = Connection.requiresRequestBody(request.getMethod) option {
+    val requestContent = HttpMethodsWithRequestBody(request.getMethod) option {
 
       val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
         case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
         case None          => request.getInputStream
       }
 
-<<<<<<< HEAD
       implicit val logger = new IndentedLogger(ProcessorImpl.logger)
       val (bodyInputStream, bodyContentLength) =
         FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
           .getOrElse(requestInputStream -> request.contentLengthOpt)
-=======
-      val inputData = requestInputStream -> request.contentLengthOpt
-      val (bodyInputStream, bodyContentLength) = formOrData match {
-        case FormOrData.Form =>
-          // Don't encrypt form definitions
-          inputData
-        case FormOrData.Data =>
-          FieldEncryption.encryptDataIfNecessary(
-            request,
-            requestInputStream,
-            app,
-            form,
-            isDataXmlRequest
-          ).getOrElse(inputData)
-      }
->>>>>>> b835475a40... Implement #4670 "Unify Scala.js and Scala JVM logging"
 
       StreamedContent(
         bodyInputStream,
@@ -274,7 +258,8 @@ private object PersistenceProxyProcessor {
     headers        : Map[String, String]
   ): ConnectionResult = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext          = NetUtils.getExternalContext
+    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
     val outgoingURL =
       new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
@@ -304,16 +289,15 @@ private object PersistenceProxyProcessor {
     if (! SupportedMethods(method))
       throw new OXFException(s"Unsupported method: $method")
 
-    Connection(
+    Connection.connectNow(
       method      = method,
       url         = outgoingURL,
       credentials = None,
       content     = requestContent,
       headers     = allHeaders,
       loadState   = true,
+      saveState   = true,
       logBody     = false
-    ).connect(
-      saveState = true
     )
   }
 

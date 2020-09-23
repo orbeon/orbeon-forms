@@ -17,6 +17,7 @@ import java.io._
 import java.net.URL
 import java.{util => ju}
 
+import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -24,6 +25,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 import scala.util.control.NonFatal
+
 
 sealed trait UserRole   { def roleName: String }
 case class   SimpleRole      (roleName: String)                           extends UserRole
@@ -54,6 +56,25 @@ object ExternalContext {
   val StandardCharacterEncoding       : String = CharsetNames.Utf8
   val StandardHeaderCharacterEncoding : String = StandardCharacterEncoding
   val StandardFormCharacterEncoding   : String = StandardCharacterEncoding
+
+  sealed trait Scope extends EnumEntry
+  object Scope extends Enum[Scope] {
+
+    val values = findValues
+
+    case object Request     extends Scope
+    case object Session     extends Scope
+    case object Application extends Scope
+  }
+
+  sealed abstract class SessionScope(val value: Int) extends IntEnumEntry
+  object SessionScope extends IntEnum[SessionScope] {
+
+    val values: immutable.IndexedSeq[SessionScope] = findValues
+
+    case object Application extends SessionScope(1)
+    case object Local       extends SessionScope(2)
+  }
 
   trait Request {
 
@@ -166,15 +187,6 @@ object ExternalContext {
     def setTitle(title: String): Unit
 
     def getNativeResponse: AnyRef
-  }
-
-  sealed abstract class SessionScope(val value: Int) extends IntEnumEntry
-  object SessionScope extends IntEnum[SessionScope] {
-
-    val values: immutable.IndexedSeq[SessionScope] = findValues
-
-    case object Application extends SessionScope(1)
-    case object Local       extends SessionScope(2)
   }
 
   trait SessionListener extends java.io.Serializable {

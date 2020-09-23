@@ -246,6 +246,8 @@ object HttpMethod extends Enum[HttpMethod] {
   case object TRACE   extends HttpMethod
   case object LOCK    extends HttpMethod
   case object UNLOCK  extends HttpMethod
+
+  val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT, LOCK, UNLOCK)
 }
 
 trait HttpClient[CookieStore] {

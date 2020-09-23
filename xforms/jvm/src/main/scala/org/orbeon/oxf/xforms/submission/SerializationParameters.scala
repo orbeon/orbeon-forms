@@ -23,8 +23,9 @@ import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.util.{Connection, ContentTypes, XPath}
+import org.orbeon.oxf.util.{ContentTypes, XPath}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
@@ -56,7 +57,7 @@ object SerializationParameters {
       requestedSerialization match {
         case _ if (overriddenSerializedData ne null) && overriddenSerializedData != "" =>
           // Form author set data to serialize
-          if (Connection.requiresRequestBody(p.httpMethod)) {
+          if (HttpMethodsWithRequestBody(p.httpMethod)) {
             SerializationParameters(
               messageBody            = overriddenSerializedData.getBytes(CharsetNames.Utf8).some,
               queryString            = null,
@@ -70,7 +71,7 @@ object SerializationParameters {
             )
           }
         case serialization @ "application/x-www-form-urlencoded" =>
-          if (Connection.requiresRequestBody(p.httpMethod)) {
+          if (HttpMethodsWithRequestBody(p.httpMethod)) {
             SerializationParameters(
               messageBody            = SubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes(CharsetNames.Utf8).some,
               queryString            = null,

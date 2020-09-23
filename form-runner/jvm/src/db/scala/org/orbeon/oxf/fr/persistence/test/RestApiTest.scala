@@ -28,7 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20191.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -45,6 +45,7 @@ import scala.util.Random
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
+  private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
   val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete))
   val CanCreate           = SpecificOperations(List(Create))

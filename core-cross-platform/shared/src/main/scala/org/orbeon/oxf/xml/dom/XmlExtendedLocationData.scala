@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml.dom
 
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.immutable
 

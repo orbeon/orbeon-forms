@@ -41,4 +41,3 @@ object Modifier extends Enum[Modifier] with CirceEnum[Modifier] {
         withNameLowercaseOnly
   }
 }
-

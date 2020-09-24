@@ -22,11 +22,10 @@ import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 
 import scala.annotation.tailrec
@@ -319,5 +318,5 @@ object LHHAAnalysis {
     stringOptionToSet(validationAtt)
 
   def gatherAlertLevels(levelAtt: Option[String]): Set[ValidationLevel] =
-    stringOptionToSet(levelAtt) collect LevelByName
+    stringOptionToSet(levelAtt) collect ValidationLevel.LevelByName
 }

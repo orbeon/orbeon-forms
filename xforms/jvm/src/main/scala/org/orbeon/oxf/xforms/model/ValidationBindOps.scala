@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model.{Constraint, Required, Type}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -29,6 +28,7 @@ import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
 
@@ -328,7 +328,7 @@ trait ValidationBindOps extends Logging {
       }
 
       // Remember invalid instances
-      if (! bindNode.constraintsSatisfiedForLevel(ErrorLevel)) {
+      if (! bindNode.constraintsSatisfiedForLevel(ValidationLevel.ErrorLevel)) {
         containingDocument.instanceForNodeOpt(currentNode) foreach
           (invalidInstances += _.getEffectiveId)
       }

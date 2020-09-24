@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary

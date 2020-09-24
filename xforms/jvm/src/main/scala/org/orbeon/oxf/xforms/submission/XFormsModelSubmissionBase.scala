@@ -16,13 +16,12 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
@@ -33,9 +32,8 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable._
-
-import org.orbeon.oxf.util.Logging._
 
 import scala.collection.compat._
 import scala.collection.mutable
@@ -196,7 +194,7 @@ object XFormsModelSubmissionBase {
           doc              = copy,
           levelsToAnnotate =
             attributeNamesForTokens.keySet collect
-              LevelByName                  map { level =>
+              ValidationLevel.LevelByName  map { level =>
                 level -> attributeNamesForTokens(level.entryName)
             } toMap
         )

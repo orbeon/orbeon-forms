@@ -19,11 +19,12 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node._
 
 import scala.collection.{mutable => m}

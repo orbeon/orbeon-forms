@@ -19,7 +19,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.dom.Converter._

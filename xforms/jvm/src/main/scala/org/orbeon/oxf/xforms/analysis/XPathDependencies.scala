@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.NodeInfo

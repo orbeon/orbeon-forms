@@ -31,7 +31,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI

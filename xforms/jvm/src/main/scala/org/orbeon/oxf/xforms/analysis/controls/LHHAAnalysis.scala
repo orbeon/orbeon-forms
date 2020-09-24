@@ -37,7 +37,6 @@ class LHHAAnalysis(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-   with SingleNodeTrait
    with OptionalSingleNode
    with AppearanceTrait {
 

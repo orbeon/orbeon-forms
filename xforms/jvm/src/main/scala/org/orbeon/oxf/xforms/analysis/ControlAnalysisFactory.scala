@@ -51,7 +51,6 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
        with ValueTrait
-       with ChildrenBuilderTrait
        with ChildrenLHHAAndActionsTrait
        with FormatTrait
 
@@ -87,7 +86,6 @@ object ControlAnalysisFactory {
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
        with OptionalSingleNode
        with TriggerAppearanceTrait
-       with ChildrenBuilderTrait
        with ChildrenLHHAAndActionsTrait {
     override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
     override val externalEvents              = externalEventsDef
@@ -164,7 +162,6 @@ object ControlAnalysisFactory {
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
        with OptionalSingleNode
        with StaticLHHASupport
-       with ChildrenBuilderTrait
        with AppearanceTrait {
 
     val caseref           = element.attributeValueOpt(CASEREF_QNAME)
@@ -182,8 +179,7 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
        with OptionalSingleNode
-       with StaticLHHASupport
-       with ChildrenBuilderTrait {
+       with StaticLHHASupport {
 
     val selected        = element.attributeValueOpt(SELECTED_QNAME)
     val valueExpression = element.attributeValueOpt(VALUE_QNAME)
@@ -204,10 +200,6 @@ object ControlAnalysisFactory {
     }
   }
 
-  private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _) with ChildrenActionsTrait
-  private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
-  private val ValueControlFactory   : ControlFactory = new InputValueControl(_, _, _, _, _)
-
   class GroupControl(
     staticStateContext : StaticStateContext,
     element            : Element,
@@ -216,8 +208,7 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
        with OptionalSingleNode
-       with StaticLHHASupport
-       with ChildrenBuilderTrait {
+       with StaticLHHASupport {
 
     // Extension attributes depend on the name of the element
     override protected val allowedExtensionAttributes =
@@ -229,10 +220,22 @@ object ControlAnalysisFactory {
     override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
   }
 
-  private val DialogControlFactory: ControlFactory =
-    new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait {
-      override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
-    }
+  class DialogControl(
+    staticStateContext : StaticStateContext,
+    element            : Element,
+    parent             : Option[ElementAnalysis],
+    preceding          : Option[ElementAnalysis],
+    scope              : Scope
+  ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+     with OptionalSingleNode
+     with StaticLHHASupport {
+
+    override val externalEvents =
+      super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
+  }
+
+  private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _)
+  private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
 
   // Variable factories indexed by QName
   // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xf:var>)
@@ -242,13 +245,13 @@ object ControlAnalysisFactory {
 
   // Other factories indexed by QName
   private val byQNameFactory = Map[QName, ControlFactory](
-    XBL_TEMPLATE_QNAME            -> (new ContainerControl(_, _, _, _, _) with ChildrenBuilderTrait),
+    XBL_TEMPLATE_QNAME            -> (new ContainerControl(_, _, _, _, _)),
     // Core value controls
     XFORMS_INPUT_QNAME            -> (new InputControl(_, _, _, _, _)),
     XFORMS_SECRET_QNAME           -> (new SecretControl(_, _, _, _, _)),
     XFORMS_TEXTAREA_QNAME         -> (new TextareaControl(_, _, _, _, _)),
     XFORMS_UPLOAD_QNAME           -> (new UploadControl(_, _, _, _, _)),
-    XFORMS_RANGE_QNAME            -> ValueControlFactory,
+    XFORMS_RANGE_QNAME            -> (new InputValueControl(_, _, _, _, _)),
     XXFORMS_TEXT_QNAME            -> (new OutputControl(_, _, _, _, _)),// TODO: don't accept any external events
     XFORMS_OUTPUT_QNAME           -> (new OutputControl(_, _, _, _, _)),
     // Core controls
@@ -263,9 +266,9 @@ object ControlAnalysisFactory {
     XFORMS_GROUP_QNAME            -> (new GroupControl(_, _, _, _, _)),
     XFORMS_SWITCH_QNAME           -> (new SwitchControl(_, _, _, _, _)),
     XFORMS_CASE_QNAME             -> (new CaseControl(_, _, _, _, _)),
-    XXFORMS_DIALOG_QNAME          -> DialogControlFactory,
+    XXFORMS_DIALOG_QNAME          -> (new DialogControl(_, _, _, _, _)),
     // Dynamic control
-    XXFORMS_DYNAMIC_QNAME         -> (new ContainerControl(_, _, _, _, _) with RequiredSingleNode),
+    XXFORMS_DYNAMIC_QNAME         -> (new SimpleElementAnalysis(_, _, _, _, _) with RequiredSingleNode with ViewTrait), // NOTE: No longer `ContainerControl`!
     // Repeat control
     XFORMS_REPEAT_QNAME           -> (new RepeatControl(_, _, _, _, _)),
     XFORMS_REPEAT_ITERATION_QNAME -> (new RepeatIterationControl(_, _, _, _, _)),

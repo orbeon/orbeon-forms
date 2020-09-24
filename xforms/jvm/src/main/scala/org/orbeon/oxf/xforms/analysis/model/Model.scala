@@ -80,7 +80,7 @@ class Model(
   // For now this only checks actions and submissions, in the future should also build rest of content
   override def findRelevantChildrenElements =
     findAllChildrenElements collect {
-      case t @ (e, s) if XFormsActions.isAction(e.getQName) || ChildrenElementsQNames(e.getQName) => t
+      case t @ (e, _) if XFormsActions.isAction(e.getQName) || ChildrenElementsQNames(e.getQName) => t
     }
 
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.

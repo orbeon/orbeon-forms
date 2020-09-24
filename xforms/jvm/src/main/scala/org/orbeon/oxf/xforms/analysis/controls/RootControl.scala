@@ -28,8 +28,7 @@ import org.orbeon.xforms.{Constants, EventNames}
  * Single root container for a part, whether top-level or a nested part.
  */
 class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
-  extends ContainerControl(staticStateContext, element, None, None, scope)
-  with ChildrenBuilderTrait {
+  extends ContainerControl(staticStateContext, element, None, None, scope) {
 
   override val staticId       = Constants.DocumentId
   override val prefixedId     = part.startScope.fullPrefix + staticId

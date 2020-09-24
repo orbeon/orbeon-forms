@@ -26,7 +26,8 @@ class ContainerControl(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-     with ViewTrait {
+     with ViewTrait
+     with ChildrenBuilderTrait {
 
   // For <xf:group xxf:element="xh:div">. Can be null.
   val elementQName: QName = element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)

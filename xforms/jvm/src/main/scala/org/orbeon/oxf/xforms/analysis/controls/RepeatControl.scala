@@ -27,7 +27,6 @@ class RepeatControl(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-   with ChildrenBuilderTrait
    with AppearanceTrait { // for separator appearance
 
   val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)

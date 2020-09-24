@@ -82,7 +82,7 @@ class SimpleElementAnalysis(
         }
     }
 
-  protected def computeContextAnalysis: Option[XPathAnalysis] = {
+  protected def computeContextAnalysis: Option[XPathAnalysis] =
     context match {
       case Some(context) =>
         // @context attribute, use the overridden in-scope context
@@ -91,9 +91,8 @@ class SimpleElementAnalysis(
         // No @context attribute, use the original in-scope context
         getInScopeContext
     }
-  }
 
-  protected def computeBindingAnalysis: Option[XPathAnalysis] = {
+  protected def computeBindingAnalysis: Option[XPathAnalysis] =
     bind match {
       case Some(bindStaticId) =>
         // Use @bind analysis directly from model
@@ -112,12 +111,11 @@ class SimpleElementAnalysis(
             getContextAnalysis
         }
     }
-  }
 
   // No value defined, leave this to subclasses
   protected def computeValueAnalysis: Option[XPathAnalysis] = None
 
-  private def getInScopeContext: Option[XPathAnalysis] = {
+  private def getInScopeContext: Option[XPathAnalysis] =
     ElementAnalysis.getClosestAncestorInScopeModel(self, ScopeModel(scope, model)) match {
       case Some(ancestor: ElementAnalysis) =>
         // There is an ancestor in the same scope with same model, use its analysis as base
@@ -129,7 +127,6 @@ class SimpleElementAnalysis(
           case None => None // no model
         }
     }
-  }
 
   def getChildElementScope(childElement: Element): Scope = {
     val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)

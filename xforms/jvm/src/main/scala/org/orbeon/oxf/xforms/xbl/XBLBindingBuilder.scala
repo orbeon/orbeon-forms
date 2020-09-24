@@ -75,7 +75,7 @@ object XBLBindingBuilder {
   // - `mapScopeIds`
   // - updates to `Metadata`
   //
-  //  Indexing of of the result, OTOH, is done by the caller.
+  //  Indexing of the result, OTOH, is done by the caller.
   //
   def createConcreteBindingFromElem(
     partAnalysis      : PartAnalysisImpl,
@@ -210,7 +210,7 @@ object XBLBindingBuilder {
       containerScope         : Scope,
       abstractBinding        : AbstractBinding,
       rawShadowTree          : Document
-    ) = {
+    ): (ConcreteBinding, Option[Global]) = {
 
       // New prefix corresponds to bound element prefixed id
       //val newPrefix = boundControlPrefixedId + COMPONENT_SEPARATOR

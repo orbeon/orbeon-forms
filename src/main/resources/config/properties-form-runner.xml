@@ -117,11 +117,15 @@
     <!-- TOC disabled by default -->
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
+
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*">
         /fr/service/custom/my-app/new
     </property>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
+
+    <property as="xs:boolean" name="oxf.fr.detail.service.*.enable-return-data.*.*"             value="false"/>
+
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         summary clear pdf save-final review
     </property>

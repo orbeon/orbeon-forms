@@ -492,6 +492,37 @@
                 ref="instance('fr-background-response-instance')/document-id"
                 value="fr:document-id()"/>
 
+            <xf:delete
+                ref="instance('fr-background-response-instance')/data"/>
+
+            <xf:action
+                if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
+                    xxf:get-request-parameter('fr-return-data') = 'true'                and (: caller must request data   :)
+                    xxf:property(                                                           (: property must allow it     :)
+                        string-join(
+                            (
+                                'oxf.fr.detail.service',
+                                 if ($is-background) then 'background' else 'foreground',
+                                 'enable-return-data',
+                                 $app,
+                                 $form
+                             ),
+                            '.'
+                        )
+                    )">
+
+                <xf:insert
+                    ref="instance('fr-background-response-instance')/document-id"
+                    origin="
+                        xf:element(
+                            'data',
+                            xxf:instance('fr-form-instance')
+                        )
+                    "
+                />
+
+            </xf:action>
+
             <xf:send submission="fr-send-background-response"/>
 
         </xf:action>

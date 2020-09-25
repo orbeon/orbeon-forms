@@ -44,11 +44,22 @@
             for $d in xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))
             return xs:integer($d[. castable as xs:integer])"/>
 
+    <xf:var
+        name="is-background"
+        value="
+            starts-with(xxf:get-request-path(), '/fr/service/') and
+            (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
+               probably, as they also need to send an XML response back. :)
+            $mode = ('new', 'edit') and
+            (: PE only :)
+            (fr:is-pe() or frf:sendError(404))"/>
+
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
         name="autosave-enabled"
         value="
             frf:isAutosaveSupported($app, $form)                and
+            not($is-background)                                 and
             $autosave-delay gt 0                                and
             xxf:non-blank(xxf:username())                       and
             frf:xpathAllAuthorizedOperations(
@@ -65,16 +76,6 @@
         name="is-submit"
         value="exists(xxf:get-request-attribute('fr-form-data')) or
                exists(xxf:get-request-parameter('fr-form-data'))"/>
-
-    <xf:var
-        name="is-background"
-        value="
-            starts-with(xxf:get-request-path(), '/fr/service/') and
-            (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
-               probably, as they also need to send an XML response back. :)
-            $mode = ('new', 'edit') and
-            (: PE only :)
-            (fr:is-pe() or frf:sendError(404))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action

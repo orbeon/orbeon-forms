@@ -468,7 +468,7 @@ object XXFormsDynamicControl {
 
     // Update the shadow tree
     // Can return `None` if the binding does not have a template.
-    part.createOrUpdateShadowTree(staticComponent, elemInSource getOrElse staticComponent.element)
+    part.createOrUpdateShadowTreeForDynamic(staticComponent, elemInSource getOrElse staticComponent.element)
 
     doc.addControlStructuralChange(componentControl.prefixedId)
   }

@@ -150,7 +150,7 @@ trait PartXBLAnalysis extends TransientState {
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
   // NOTE: Can be used only in a sub-part, as this mutates the tree.
   // Can return `None` if the binding does not have a template.
-  def createOrUpdateShadowTree(existingComponent: ComponentControl, elemInSource: Element): Unit = {
+  def createOrUpdateShadowTreeForDynamic(existingComponent: ComponentControl, elemInSource: Element): Unit = {
 
     assert(! isTopLevel)
 

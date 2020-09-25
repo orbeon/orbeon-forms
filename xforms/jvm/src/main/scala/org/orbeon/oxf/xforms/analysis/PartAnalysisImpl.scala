@@ -161,7 +161,7 @@ class PartAnalysisImpl(
       val attributes    = m.Buffer[AttributeControl]()
 
       // Rebuild children
-      PartAnalysisImpl.build(container, build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
+      PartAnalysisImpl.buildAllElemDescendants(container, build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
 
       // Attach LHHA
       for (lhha <- lhhas)
@@ -203,7 +203,7 @@ class PartAnalysisImpl(
       val buildGatherLHHAAndHandlers: PartAnalysisImpl.Builder =
         build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
 
-      PartAnalysisImpl.build(rootControlAnalysis, buildGatherLHHAAndHandlers)
+      PartAnalysisImpl.buildAllElemDescendants(rootControlAnalysis, buildGatherLHHAAndHandlers)
 
       // Issues with `xxbl:global`
       //
@@ -223,7 +223,7 @@ class PartAnalysisImpl(
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) match {
               case newParent: WithChildrenTrait =>
-                PartAnalysisImpl.build(newParent, buildGatherLHHAAndHandlers)
+                PartAnalysisImpl.buildAllElemDescendants(newParent, buildGatherLHHAAndHandlers)
                 newParent
               case other =>
                 other
@@ -278,8 +278,8 @@ object PartAnalysisImpl {
   private val ModelChildrenToKeep  = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
 
   // Return all the children to consider, including relevant shadow tree elements
-   def findXblRelevantChildrenElements(e: ComponentControl): Seq[(Element, Scope)] =
-     e.bindingOpt map { binding =>
+  private def findXblRelevantChildrenElements(e: ComponentControl): Seq[(Element, Scope)] =
+    e.bindingOpt map { binding =>
 
       def annotateChild(child: Element) = {
         // Inner scope in effect for the component element itself (NOT the shadow tree's scope)
@@ -322,7 +322,7 @@ object PartAnalysisImpl {
       def directlyNestedLHHA =
         if (e.abstractBinding.modeLHHA)
           e.element.elements filter
-            (e => LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null)) map
+            (e => LHHA.isLHHA(e) && (e.attributeOpt(FOR_QNAME).isEmpty)) map
               annotateChild
         else
           Nil
@@ -338,9 +338,10 @@ object PartAnalysisImpl {
     } getOrElse
       Nil
 
-  def childrenElements(e: WithChildrenTrait): Seq[(Element, Scope)] = {
+  private def childrenElements(e: WithChildrenTrait): Seq[(Element, Scope)] = {
 
     import ControlAnalysisFactory.isVariable
+    import LHHA.isLHHA
     import SelectionControlUtil.TopLevelItemsetQNames
     import XFormsActions.isAction
 
@@ -362,11 +363,11 @@ object PartAnalysisImpl {
         }
       case _: SelectionControl =>
         allChildren collect {
-          case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || TopLevelItemsetQNames(e.getQName) || isAction(e.getQName) => (e, s)
+          case (e, s) if isLHHA(e) && (e.attributeOpt(FOR_QNAME).isEmpty) || TopLevelItemsetQNames(e.getQName) || isAction(e.getQName) => (e, s)
         }
       case _: ValueControl | _: TriggerControl =>
         allChildren collect {
-          case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || isAction(e.getQName) => (e, s)
+          case (e, s) if isLHHA(e) && (e.attributeOpt(FOR_QNAME).isEmpty) || isAction(e.getQName) => (e, s)
         }
       case _: ActionTrait =>
         allChildren collect {
@@ -380,29 +381,25 @@ object PartAnalysisImpl {
   }
 
   // Recursively build this element's children and its descendants
-  final def build(parentElem: WithChildrenTrait, builder: Builder): Unit = {
+  def buildAllElemDescendants(parentElem: WithChildrenTrait, builder: Builder): Unit =
+    parentElem.addChildren( // TODO: consider have children add themselves to the parent?
+      {
+        // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
+        var precedingElem: Option[ElementAnalysis] = None
 
-    def buildChildren() = {
-
-      // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
-      var precedingElem: Option[ElementAnalysis] = None
-
-      // Build and collect the children
-      for ((childElement, childContainerScope) <- childrenElements(parentElem))
-        yield builder(parentElem, precedingElem, childElement, childContainerScope) match {
-          // The element has children
-          case newControl: WithChildrenTrait =>
-            build(newControl, builder)
-            precedingElem = Some(newControl)
-            newControl
-          // The element does not have children
-          case newControl =>
-            precedingElem = Some(newControl)
-            newControl
-        }
-    }
-
-    // Build direct children
-    parentElem.addChildren(buildChildren()) // TODO: consider have children add themselves to the parent?
-  }
+        // Build and collect the children
+        for ((childElement, childContainerScope) <- childrenElements(parentElem))
+          yield builder(parentElem, precedingElem, childElement, childContainerScope) match {
+            // The element has children
+            case newControl: WithChildrenTrait =>
+              buildAllElemDescendants(newControl, builder)
+              precedingElem = Some(newControl)
+              newControl
+            // The element does not have children
+            case newControl =>
+              precedingElem = Some(newControl)
+              newControl
+          }
+      }
+    )
 }

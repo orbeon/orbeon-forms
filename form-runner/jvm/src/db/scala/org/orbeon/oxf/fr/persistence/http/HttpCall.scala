@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader, Version}
-import org.orbeon.oxf.fr.workflow.definitions20191.Stage
+import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.test.TestHttpClient

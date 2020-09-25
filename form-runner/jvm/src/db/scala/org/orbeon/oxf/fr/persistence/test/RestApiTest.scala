@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.fr.workflow.definitions20191.Stage
+import org.orbeon.oxf.fr.workflow.definitions20201.Stage
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}

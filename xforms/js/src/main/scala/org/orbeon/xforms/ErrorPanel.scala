@@ -39,7 +39,6 @@ object ErrorPanel {
     val formLang                     = dom.document.firstElementChild.getAttribute("lang")
     val panelElemWithMatchingLangOpt = allErrorPanelsElements.find(_.getAttribute("lang") == formLang)
     val panelElemOpt                 = panelElemWithMatchingLangOpt.orElse(allErrorPanelsElements.headOption)
-    org.scalajs.dom.console.log("Panel found", panelElemOpt)
 
     panelElemOpt map { panelElem =>
 

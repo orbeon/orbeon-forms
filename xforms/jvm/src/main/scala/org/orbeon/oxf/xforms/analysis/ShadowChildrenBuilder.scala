@@ -32,7 +32,7 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
 
     def annotateChild(child: Element) = {
       // Inner scope in effect for the component element itself (NOT the shadow tree's scope)
-      def innerScope = containerScope
+      val innerScope = containerScope
 
       // Outer scope in effect for the component element itself
       def outerScope =

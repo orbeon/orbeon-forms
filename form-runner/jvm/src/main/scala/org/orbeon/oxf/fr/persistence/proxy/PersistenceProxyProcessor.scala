@@ -120,7 +120,6 @@ private object PersistenceProxyProcessor {
         case None          => request.getInputStream
       }
 
-      implicit val logger = new IndentedLogger(ProcessorImpl.logger)
       val (bodyInputStream, bodyContentLength) =
         FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
           .getOrElse(requestInputStream -> request.contentLengthOpt)
@@ -218,7 +217,7 @@ private object PersistenceProxyProcessor {
     transforms     : List[(InputStream, OutputStream) => Unit]
   ): Unit =
     IOUtils.useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
-    
+
       // Proxy status code
       response.setStatus(cxr.statusCode)
       // Proxy incoming headers
@@ -271,8 +270,6 @@ private object PersistenceProxyProcessor {
     // Forwards all incoming headers, with exceptions like connection headers and, importantly, cookie headers
     val proxiedHeaders =
       proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
-
-    implicit val logger = new IndentedLogger(ProcessorImpl.logger)
 
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(

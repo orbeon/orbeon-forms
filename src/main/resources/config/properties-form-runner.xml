@@ -124,7 +124,7 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.service.*.enable-return-data.*.*"             value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.*.*"    value="false"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         summary clear pdf save-final review

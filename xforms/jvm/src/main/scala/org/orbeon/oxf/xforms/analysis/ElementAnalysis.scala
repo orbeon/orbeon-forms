@@ -18,13 +18,21 @@ import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
+
+
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
+
+
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandler
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
+
+
+
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
 import org.orbeon.xforms.xbl.Scope
@@ -37,7 +45,7 @@ import scala.util.control.Breaks
 
 // xml:lang reference
 sealed trait LangRef
-case class LiteralLangRef(lang: String) extends LangRef
+case class LiteralLangRef(lang: String)      extends LangRef
 case class AVTLangRef(att: AttributeControl) extends LangRef
 
 /**
@@ -59,13 +67,11 @@ abstract class ElementAnalysis(
   implicit def logger: IndentedLogger = part.getIndentedLogger
 
   // xml:lang, inherited from parent unless overridden locally
-  lazy val lang: Option[LangRef] = {
-    val v = element.attributeValue(XML_LANG_QNAME)
-    if (v ne null)
-      extractXMLLang(v)
-    else
-      parent flatMap (_.lang)
-  }
+  lazy val lang: Option[LangRef] =
+    element.attributeValueOpt(XML_LANG_QNAME) match {
+      case Some(v) => extractXMLLang(v)
+      case None    => parent flatMap (_.lang)
+    }
 
   protected def extractXMLLang(lang: String): Some[LangRef] =
     if (! lang.startsWith("#"))
@@ -89,8 +95,10 @@ abstract class ElementAnalysis(
   val inScopeVariables: Map[String, VariableTrait]
 
   def removeFromParent(): Unit =
-    parent foreach
-      { case parent: ChildrenBuilderTrait => parent.removeChild(selfElement); case _ => }
+    parent foreach {
+      case parent: ChildrenBuilderTrait => parent.removeChild(selfElement)
+      case _ =>
+    }
 
   lazy val treeInScopeVariables: Map[String, VariableTrait] = {
 
@@ -151,7 +159,7 @@ abstract class ElementAnalysis(
   // Extension attributes
   protected def allowedExtensionAttributes = Set.empty[QName]
 
-  final lazy val extensionAttributes =
+  final lazy val extensionAttributes: Map[QName, String] =
     Map() ++ (
       CommonExtensionAttributes ++
       (element.attributeIterator collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
@@ -217,7 +225,7 @@ trait ElementEventHandlers {
   // Event handler information as a tuple:
   // - whether the default action needs to run
   // - all event handlers grouped by phase and observer prefixed id
-  private type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
+  type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
 
   // Cache for event handlers
   // Use an immutable map and @volatile so that update are published to other threads accessing this static state.
@@ -483,11 +491,11 @@ object ElementAnalysis {
       element.attributeValueOpt(XFormsNames.NODESET_QNAME)
 
   def createLocationData(element: Element): ExtendedLocationData =
-      element.getData match {
-        case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
-          XmlExtendedLocationData(data, "gathering static information".some, element = element.some)
-        case _ => null
-      }
+    element.getData match {
+      case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
+        XmlExtendedLocationData(data, "gathering static information".some, element = element.some)
+      case _ => null
+    }
 
   /**
    * Get the value of an attribute containing a space-separated list of tokens as a set.

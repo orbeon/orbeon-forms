@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
-import org.scalajs.dom.{FormData, html}
+import org.scalajs.dom.{Element, EventTarget, FocusEvent, FormData, html}
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -100,5 +100,21 @@ object Support {
         text,
         Support.parseStringAsXml(text)
       )
+  }
+
+  def stopFocusOutPropagation(
+    element     : Element,
+    eventTarget : (FocusEvent) => EventTarget,
+    targetClass : String
+  ): Unit = {
+    element.addEventListener(
+      "focusout",
+      (event: FocusEvent) => {
+        val relatedTarget = eventTarget(event).asInstanceOf[dom.html.Element]
+        if (relatedTarget.classList.contains(targetClass))
+          event.stopPropagation()
+      },
+      useCapture = true
+    )
   }
 }

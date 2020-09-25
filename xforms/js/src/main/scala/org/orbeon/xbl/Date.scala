@@ -17,7 +17,7 @@ import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Language}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Language, Support}
 import org.scalajs.dom
 import org.scalajs.dom.FocusEvent
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -89,16 +89,7 @@ private class DateCompanion extends XBLCompanionWithState {
       // the field loosing the focus, which might prematurely show the field as invalid, before users got a chance to select a value
       // in the date picker
       val inputElement = containerElem.querySelector("input")
-      inputElement.addEventListener(
-        "focusout",
-        (event: FocusEvent) => {
-          val relatedTarget = event.relatedTarget.asInstanceOf[dom.html.Element]
-          if (relatedTarget.classList.contains("datepicker-dropdown"))
-            event.stopPropagation()
-        },
-        useCapture = true
-      )
-
+      Support.stopFocusOutPropagation(inputElement, _.relatedTarget, "datepicker-dropdown")
     }
   }
 

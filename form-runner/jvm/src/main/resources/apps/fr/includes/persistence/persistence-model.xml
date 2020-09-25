@@ -497,7 +497,7 @@
 
             <xf:action
                 if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
-                    xxf:get-request-parameter('fr-return-data') = 'true'                and (: caller must request data   :)
+                    xxf:get-request-parameter('return-data') = 'true'                   and (: caller must request data   :)
                     xxf:property(                                                           (: property must allow it     :)
                         string-join(
                             (
@@ -514,10 +514,27 @@
                 <xf:insert
                     ref="instance('fr-background-response-instance')/document-id"
                     origin="
-                        xf:element(
-                            'data',
-                            xxf:instance('fr-form-instance')
-                        )
+                        let $data-format-version  := (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
+                            $prune-metadata-param := xxf:get-request-parameter('prune-metadata'),
+                            $prune-metadata       :=
+                                if (exists($prune-metadata-param)) then
+                                    $prune-metadata-param = 'true'
+                                else if ($data-format-version = 'edge') then
+                                    false()
+                                else
+                                    true()
+                        return
+                            xf:element(
+                                'data',
+                                grid-migration:dataMaybeMigratedFromEdge(
+                                   fr:app-name(),
+                                   fr:form-name(),
+                                   xxf:instance('fr-form-instance')/root(),
+                                   xxf:instance('fr-form-metadata')/root(),
+                                   $data-format-version,
+                                   $prune-metadata
+                               )
+                            )
                     "
                 />
 

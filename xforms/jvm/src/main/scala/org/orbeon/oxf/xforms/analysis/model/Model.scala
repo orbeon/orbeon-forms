@@ -78,7 +78,8 @@ class Model(
   }
 
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
-  override def indexedElements = super.indexedElements ++ bindsById.values
+  override def indexedElements: Iterator[ElementAnalysis] =
+    super.indexedElements ++ bindsById.valuesIterator
 
   override def analyzeXPath(): Unit = {
     // Analyze this
@@ -166,7 +167,7 @@ trait ModelEventHandlers {
   self: Model =>
 
   // Event handlers, including on submissions and within nested actions
-  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl => e }
+  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl => e } toList
 }
 
 trait ModelBinds {

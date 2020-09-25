@@ -29,24 +29,22 @@ trait WithChildrenTrait extends ElementAnalysis {
     _children = _children filterNot (_ eq child)
 
   // All this element's descendants (valid after build() has been called)
-  // xxx as `Iterator`
-  final def descendants: Seq[ElementAnalysis] = {
+  final def descendants: Iterator[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: WithChildrenTrait => child }
+      _children.iterator collect { case child: WithChildrenTrait => child }
 
-    _children ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
+    _children.iterator ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
   }
 
   // Some elements can create and index elements which are not processed as descendants above. To enable de-indexing,
   // they can override indexedElements to add elements to de-index.
   // Overridden by `Model`
-  // xxx as `Iterator`
-  def indexedElements: Seq[ElementAnalysis] = {
+  def indexedElements: Iterator[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: WithChildrenTrait => child }
+      _children.iterator collect { case child: WithChildrenTrait => child }
 
-    _children ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
+    _children.iterator ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
   }
 }

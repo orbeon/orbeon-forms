@@ -118,7 +118,7 @@ object PartAnalysisDebugSupport {
       a.children foreach recurse
     }
 
-    def writeChildrenBuilder(a: ChildrenBuilderTrait)(implicit receiver: XMLReceiver): Unit = {
+    def writeChildrenBuilder(a: WithChildrenTrait)(implicit receiver: XMLReceiver): Unit = {
       writeElementAnalysis(a)
       a.children foreach recurse
     }
@@ -192,7 +192,7 @@ object PartAnalysisDebugSupport {
           case a: Model                 => writeModel(a)
           case a: StaticBind            => writeStaticBind(a)
           case a: SelectionControlTrait => writeSelectionControl(a)
-          case a: ChildrenBuilderTrait  => writeChildrenBuilder(a)
+          case a: WithChildrenTrait     => writeChildrenBuilder(a)
           case a                        => writeElementAnalysis(a)
         }
       }

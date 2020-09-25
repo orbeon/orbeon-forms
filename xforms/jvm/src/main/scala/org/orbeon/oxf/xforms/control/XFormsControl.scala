@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
-import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel
@@ -257,7 +257,7 @@ class XFormsControl(
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
   def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]): Unit =
     staticControl match {
-      case withChildren: ChildrenBuilderTrait => Controls.buildChildren(self, withChildren.children, buildTree, idSuffix)
+      case withChildren: WithChildrenTrait => Controls.buildChildren(self, withChildren.children, buildTree, idSuffix)
       case _ =>
     }
 }

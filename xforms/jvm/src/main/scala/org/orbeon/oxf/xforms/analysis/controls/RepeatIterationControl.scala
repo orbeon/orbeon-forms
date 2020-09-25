@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, ElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)

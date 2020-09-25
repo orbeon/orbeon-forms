@@ -28,7 +28,7 @@ class VariableControl(
 ) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
   with ViewTrait
   with OptionalSingleNode
-  with ChildrenActionsTrait
+  with WithChildrenTrait
   with VariableAnalysisTrait {
 
   override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)

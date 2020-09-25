@@ -96,7 +96,7 @@ abstract class ElementAnalysis(
 
   def removeFromParent(): Unit =
     parent foreach {
-      case parent: ChildrenBuilderTrait => parent.removeChild(selfElement)
+      case parent: WithChildrenTrait => parent.removeChild(selfElement)
       case _ =>
     }
 

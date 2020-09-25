@@ -51,7 +51,7 @@ object ControlAnalysisFactory {
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
        with ValueTrait
-       with ChildrenLHHAAndActionsTrait
+       with WithChildrenTrait
        with FormatTrait
 
   class InputValueControl(
@@ -86,7 +86,7 @@ object ControlAnalysisFactory {
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
        with OptionalSingleNode
        with TriggerAppearanceTrait
-       with ChildrenLHHAAndActionsTrait {
+       with WithChildrenTrait {
     override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
     override val externalEvents              = externalEventsDef
 
@@ -282,9 +282,9 @@ object ControlAnalysisFactory {
     XFORMS_SUBMISSION_QNAME       -> (new Submission(_, _, _, _, _)),
     XFORMS_INSTANCE_QNAME         -> (new Instance(_, _, _, _, _)),
     // Itemsets
-    XFORMS_CHOICES_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
-    XFORMS_ITEM_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
-    XFORMS_ITEMSET_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
+    XFORMS_CHOICES_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
+    XFORMS_ITEM_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
+    XFORMS_ITEMSET_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
     XFORMS_VALUE_QNAME            -> (new SimpleElementAnalysis(_, _, _, _, _) with ValueTrait with OptionalSingleNode),
     XFORMS_COPY_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with RequiredSingleNode)
   ) ++ variableFactory

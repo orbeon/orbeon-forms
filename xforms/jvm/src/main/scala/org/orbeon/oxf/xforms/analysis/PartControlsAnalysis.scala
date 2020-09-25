@@ -178,7 +178,7 @@ trait PartControlsAnalysis extends TransientState {
     }
 
     tree match {
-      case childrenBuilder: ChildrenBuilderTrait =>
+      case childrenBuilder: WithChildrenTrait =>
         childrenBuilder.indexedElements foreach deindexControl
 
         if (! self)

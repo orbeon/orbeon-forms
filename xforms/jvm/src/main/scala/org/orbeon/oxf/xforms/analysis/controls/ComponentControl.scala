@@ -15,7 +15,7 @@ class ComponentControl(
   preceding          : Option[ElementAnalysis],
   scope              : Scope
 ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-     with ShadowChildrenBuilder
+     with WithChildrenTrait
      with OptionalSingleNode {   // binding could be mandatory, optional, or prohibited
 
   val hasLazyBinding: Boolean =

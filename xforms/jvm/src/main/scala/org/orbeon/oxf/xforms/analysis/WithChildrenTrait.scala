@@ -13,19 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.Element
-import org.orbeon.xforms.xbl.Scope
-
 import scala.collection.compat._
 
-trait ChildrenBuilderTrait extends ElementAnalysis {
-
-  type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => ElementAnalysis
-
-  def findRelevantChildrenElements: Seq[(Element, Scope)] = findAllChildrenElements
-
-  // Default implementation: return all children element with the same container scope as the parent element
-  protected def findAllChildrenElements: Seq[(Element, Scope)] = element.elements map ((_, containerScope))
+trait WithChildrenTrait extends ElementAnalysis {
 
   // This element's children (valid after build() has been called)
   private var _children = Seq[ElementAnalysis]()
@@ -39,48 +29,24 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
     _children = _children filterNot (_ eq child)
 
   // All this element's descendants (valid after build() has been called)
+  // xxx as `Iterator`
   final def descendants: Seq[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: ChildrenBuilderTrait => child }
+      _children collect { case child: WithChildrenTrait => child }
 
     _children ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
   }
 
   // Some elements can create and index elements which are not processed as descendants above. To enable de-indexing,
   // they can override indexedElements to add elements to de-index.
+  // Overridden by `Model`
+  // xxx as `Iterator`
   def indexedElements: Seq[ElementAnalysis] = {
 
     def nestedChildrenBuilderTraits =
-      _children collect { case child: ChildrenBuilderTrait => child }
+      _children collect { case child: WithChildrenTrait => child }
 
     _children ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
-  }
-
-  // Build this element's children and its descendants
-  final def build(builder: Builder): Unit = {
-
-    def buildChildren() = {
-
-      // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
-      var preceding: Option[ElementAnalysis] = None
-
-      // Build and collect the children
-      for ((childElement, childContainerScope) <- findRelevantChildrenElements)
-        yield builder(this, preceding, childElement, childContainerScope) match {
-          // The element has children
-          case newControl: ChildrenBuilderTrait =>
-            newControl.build(builder)
-            preceding = Some(newControl)
-            newControl
-          // The element does not have children
-          case newControl =>
-            preceding = Some(newControl)
-            newControl
-        }
-    }
-
-    // Build direct children
-    _children = buildChildren()
   }
 }

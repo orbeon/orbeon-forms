@@ -34,7 +34,7 @@ import org.orbeon.xforms.XFormsNames._
 trait SelectionControlTrait
   extends InputValueControl
      with SelectAppearanceTrait
-     with ChildrenLHHAItemsetsAndActionsTrait {
+     with WithChildrenTrait {
 
   if (element.attributeValue("selection") == "open")
     throw new ValidationException("Open selection is currently not supported.", locationData)

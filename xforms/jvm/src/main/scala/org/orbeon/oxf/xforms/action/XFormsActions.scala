@@ -19,7 +19,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
-import org.orbeon.oxf.xforms.analysis.{ChildrenActionsAndVariablesTrait, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
 // 2016-02-05: This object mixes runtime actions and compile-time actions. We should separate this properly.
@@ -69,8 +69,8 @@ object XFormsActions {
     def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 
     val actionFactory: PartialFunction[Element, ControlFactory] = {
-      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait
-      case e if isContainerAction(e.getQName)                      => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait
+      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with WithChildrenTrait
+      case e if isContainerAction(e.getQName)                      => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with WithChildrenTrait
       case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait
       case e if isAction(e.getQName)                               => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
     }

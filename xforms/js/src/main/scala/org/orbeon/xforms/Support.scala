@@ -71,34 +71,34 @@ object Support {
     abortSignal : Option[AbortSignal]
   ): Future[(Int, String, Option[dom.Document])] = {
 
-      val fetchPromise =
-        Fetch.fetch(
-          url,
-          new RequestInit {
-            var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
-            var body           : js.UndefOr[BodyInit]           = requestBody
-            var headers        : js.UndefOr[HeadersInit]        = contentType map (ct => js.defined(js.Dictionary("Content-Type" -> ct))) getOrElse js.undefined
-            var referrer       : js.UndefOr[String]             = js.undefined
-            var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
-            var mode           : js.UndefOr[RequestMode]        = js.undefined
-            var credentials    : js.UndefOr[RequestCredentials] = js.undefined
-            var cache          : js.UndefOr[RequestCache]       = js.undefined
-            var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
-            var integrity      : js.UndefOr[String]             = js.undefined
-            var keepalive      : js.UndefOr[Boolean]            = js.undefined
-            var signal         : js.UndefOr[AbortSignal]        = abortSignal map (js.defined.apply) getOrElse js.undefined
-            var window         : js.UndefOr[Null]               = null
-          }
-        )
+    val fetchPromise =
+      Fetch.fetch(
+        url,
+        new RequestInit {
+          var method         : js.UndefOr[HttpMethod]         = HttpMethod.POST
+          var body           : js.UndefOr[BodyInit]           = requestBody
+          var headers        : js.UndefOr[HeadersInit]        = contentType map (ct => js.defined(js.Dictionary("Content-Type" -> ct))) getOrElse js.undefined
+          var referrer       : js.UndefOr[String]             = js.undefined
+          var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
+          var mode           : js.UndefOr[RequestMode]        = js.undefined
+          var credentials    : js.UndefOr[RequestCredentials] = js.undefined
+          var cache          : js.UndefOr[RequestCache]       = js.undefined
+          var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
+          var integrity      : js.UndefOr[String]             = js.undefined
+          var keepalive      : js.UndefOr[Boolean]            = js.undefined
+          var signal         : js.UndefOr[AbortSignal]        = abortSignal map (js.defined.apply) getOrElse js.undefined
+          var window         : js.UndefOr[Null]               = null
+        }
+      )
 
-      for {
-        response <- fetchPromise.toFuture
-        text     <- response.text().toFuture
-      } yield
-        (
-          response.status,
-          text,
-          Support.parseStringAsXml(text)
-        )
-    }
+    for {
+      response <- fetchPromise.toFuture
+      text     <- response.text().toFuture
+    } yield
+      (
+        response.status,
+        text,
+        Support.parseStringAsXml(text)
+      )
+  }
 }

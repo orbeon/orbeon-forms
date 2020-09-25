@@ -64,12 +64,12 @@ object XMLNames {
       XFRequiredTest
 
   val FormulaTest: Test =
-    FBConstraintTest               ||
-    FBDefaultTest                  ||
-    FBRelevantTest                 ||
-    FBCalculateTest                ||
-    FBReadonlyTest                 ||
-    FBRequiredTest                 ||
+    FBConstraintTest           ||
+    FBDefaultTest              ||
+    FBRelevantTest             ||
+    FBCalculateTest            ||
+    FBReadonlyTest             ||
+    FBRequiredTest             ||
     XFormsNames.REQUIRED_QNAME ||
     XFormsNames.VALUE_QNAME
 }

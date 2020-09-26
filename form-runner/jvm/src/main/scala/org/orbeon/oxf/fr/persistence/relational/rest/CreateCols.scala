@@ -73,7 +73,7 @@ trait CreateCols extends RequestResponse with Common {
 
     val (xmlOpt, metadataOpt) =
       if (! delete && ! req.forAttachment) {
-        val (xml, metadataOpt) = RequestReader.dataAndMetadataAsString(metadata = !req.forData)
+        val (xml, metadataOpt) = RequestReader.dataAndMetadataAsString(req.provider, metadata = !req.forData)
         (Some(xml), metadataOpt)
       } else {
         (None, None)

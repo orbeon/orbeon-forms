@@ -21,17 +21,17 @@ import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
-import org.orbeon.oxf.fr.Names
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence, Names}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
@@ -83,23 +83,37 @@ object RequestReader {
     os.toByteArray
   }
 
-  def dataAndMetadataAsString(metadata: Boolean): (String, Option[String]) =
-    dataAndMetadataAsString(requestInputStream(), metadata)
+  def dataAndMetadataAsString(provider: Provider, metadata: Boolean): (String, Option[String]) =
+    dataAndMetadataAsString(provider, requestInputStream(), metadata)
 
-  def dataAndMetadataAsString(inputStream: InputStream, metadata: Boolean): (String, Option[String]) = {
+  def dataAndMetadataAsString(provider: Provider, inputStream: InputStream, metadata: Boolean): (String, Option[String]) = {
 
     def newTransformer = (
       TransformerUtils.getXMLIdentityTransformer
       |!> (_.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
     )
 
-    def newIdentityReceiver(writer: Writer) = (
-      TransformerUtils.getIdentityTransformerHandler
-      |!> (_.getTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"))
-      |!> (_.getTransformer.setOutputProperty(OutputKeys.INDENT, "no"))
-      |!> (_.getTransformer.setOutputProperty(SaxonOutputKeys.INCLUDE_CONTENT_TYPE, "no"))
-      |!> (_.setResult(new StreamResult(writer)))
-    )
+    def newIdentityReceiver(writer: Writer): TransformerXMLReceiver = {
+      val receiver    = TransformerUtils.getIdentityTransformerHandler
+
+      // Configure the receiver's transformer
+      locally {
+        val transformer = receiver.getTransformer
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION     , "yes")
+        transformer.setOutputProperty(OutputKeys.INDENT                   , "no")
+        transformer.setOutputProperty(SaxonOutputKeys.INCLUDE_CONTENT_TYPE, "no")
+        val escapeNonAsciiCharacters = FormRunner.providerPropertyAsBoolean(
+          provider = provider.entryName,
+          property = "escape-non-ascii-characters",
+          default = false
+        )
+        if (escapeNonAsciiCharacters)
+          transformer.setOutputProperty(OutputKeys.ENCODING, "US-ASCII")
+      }
+
+      receiver.setResult(new StreamResult(writer))
+      receiver
+    }
 
     val metadataWriterAndReceiver = metadata option {
 

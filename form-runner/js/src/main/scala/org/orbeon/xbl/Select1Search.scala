@@ -85,7 +85,8 @@ private class Select1SearchCompanion extends XBLCompanion {
         }
 
         jSelect.select2(options)
-        if (servicePerformsSearch)
+        val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
+        if (isDatabound)
           jSelect.on("change", onChange _)
       }
 

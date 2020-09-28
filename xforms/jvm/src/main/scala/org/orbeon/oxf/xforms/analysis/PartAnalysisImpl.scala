@@ -292,7 +292,10 @@ object PartAnalysisImpl {
           else {
             // Search in ancestor parts too
             val controlId = e.containerScope.fullPrefix.init
-            val controlAnalysis = e.part.ancestorOrSelfIterator map (_.getControlAnalysis(controlId)) find (_ ne null) get
+            val controlAnalysis =
+              ElementAnalysis.ancestorsAcrossPartsIterator(e, includeSelf = false) find
+                (_.prefixedId == controlId) getOrElse
+                (throw new IllegalStateException)
 
             controlAnalysis.scope
           }

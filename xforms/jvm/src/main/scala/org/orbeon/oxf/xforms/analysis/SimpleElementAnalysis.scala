@@ -161,7 +161,10 @@ class SimpleElementAnalysis(
 
     // Return a map of static id => analysis for all the ancestor-or-self in scope.
     def getInScopeContexts: collection.Map[String, ElementAnalysis] =
-      m.LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*)
+      m.LinkedHashMap(
+        ElementAnalysis.getAllAncestorsInScope(self, self.scope, includeSelf = true) map
+          (elementAnalysis => elementAnalysis.staticId -> elementAnalysis): _*
+      )
 
     // Return analysis for closest ancestor repeat in scope.
     def getInScopeRepeat: Option[RepeatControl] = self.ancestorRepeatInScope

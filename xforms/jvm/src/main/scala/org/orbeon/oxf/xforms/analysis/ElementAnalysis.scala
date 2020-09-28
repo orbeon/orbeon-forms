@@ -268,7 +268,7 @@ trait ElementEventHandlers {
     def relevant(observer: ElementAnalysis) =
       observer.scope == selfElement.scope || hasPhantomHandler(observer)
 
-    (ancestorOrSelfIterator(selfElement) filter relevant) ++: observersInAncestorParts
+    (ancestorsIterator(selfElement, includeSelf = true) filter relevant) ++: observersInAncestorParts
   }
 
   // Find all the handlers for the given event name if an event with that name is dispatched to this element.
@@ -444,14 +444,12 @@ object ElementAnalysis {
   /**
    * Return an iterator over all the element's ancestors.
    */
-  def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
-    new IteratorBase(start.parent, _.parent) {}
+  def ancestorsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
+    new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}
 
-  /**
-   * Iterator over the element and all its ancestors.
-   */
-  def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
-    new IteratorBase(Option(start), _.parent) {}
+  def ancestorsAcrossPartsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
+    (new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}) ++
+      (start.part.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
 
   /**
    * Iterator over the element's preceding siblings.
@@ -462,26 +460,20 @@ object ElementAnalysis {
   /**
    * Return a list of ancestors in the same scope from leaf to root.
    */
-  def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope): List[ElementAnalysis] =
-    ancestorIterator(start) filter (_.scope == scope) toList
-
-  /**
-   * Return a list of ancestor-or-self in the same scope from leaf to root.
-   */
-  def getAllAncestorsOrSelfInScope(start: ElementAnalysis): List[ElementAnalysis] =
-    start :: getAllAncestorsInScope(start, start.scope)
+  def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope, includeSelf: Boolean): List[ElementAnalysis] =
+    ancestorsIterator(start, includeSelf = includeSelf) filter (_.scope == scope) toList
 
   /**
    * Get the closest ancestor in the same scope.
    */
   def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope): Option[ElementAnalysis] =
-    ancestorIterator(start) find (_.scope == scope)
+    ancestorsIterator(start, includeSelf = false) find (_.scope == scope)
 
   /**
    * Return the first ancestor with a binding analysis that is in the same scope/model.
    */
   def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel): Option[ElementAnalysis] =
-    ancestorIterator(start) find (e => ScopeModel(e.scope, e.model) == scopeModel)
+    ancestorsIterator(start, includeSelf = false) find (e => ScopeModel(e.scope, e.model) == scopeModel)
 
   /**
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.

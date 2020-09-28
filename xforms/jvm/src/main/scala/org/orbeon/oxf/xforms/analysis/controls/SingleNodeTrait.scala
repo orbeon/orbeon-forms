@@ -32,7 +32,7 @@ trait SingleNodeTrait extends ElementAnalysis {
     case Some("explicit") => true
     case Some(_)          => false
     case None             =>
-      ElementAnalysis.ancestorIterator(this) collectFirst
+      ElementAnalysis.ancestorsIterator(this, includeSelf = false) collectFirst
         { case c: SingleNodeTrait => c.explicitValidation } getOrElse
         false
   }

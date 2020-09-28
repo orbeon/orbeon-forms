@@ -183,6 +183,7 @@ abstract class ElementAnalysis(
   final def getBindingAnalysis: Option[XPathAnalysis] = { assert(_bindingAnalyzed); bindingAnalysis }
   final def getValueAnalysis  : Option[XPathAnalysis] = { assert(_valueAnalyzed)  ; valueAnalysis   }
 
+  // `Model` (vars and binds) and `SelectionControlTrait` (itemsets) override this
   def analyzeXPath(): Unit = {
     contextAnalysis = computeContextAnalysis
     _contextAnalyzed = true

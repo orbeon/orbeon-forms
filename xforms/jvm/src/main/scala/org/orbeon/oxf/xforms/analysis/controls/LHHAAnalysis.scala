@@ -180,14 +180,14 @@ class LHHAAnalysis(
   // TODO: figure out whether to allow HTML or not (could default to true?)
   //
   val staticValue: Option[String] =
-    LHHAAnalysis.hasStaticValue(staticStateContext, element) option
+    LHHAAnalysis.hasStaticValue(element) option
       XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
   def debugOut(): Unit =
     if (staticValue.isDefined)
       println("static value for control " + prefixedId + " => " + staticValue.get)
 
-  // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
+  // Consider that LHHA don't have context/binding as we delegate implementation in `computeValueAnalysis`
   override protected def computeContextAnalysis: Option[XPathAnalysis] = None
   override protected def computeBindingAnalysis: Option[XPathAnalysis] = None
 
@@ -284,7 +284,7 @@ object LHHAAnalysis {
   }
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
-  def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
+  def hasStaticValue(lhhaElement: Element): Boolean = {
 
     val SearchExpression =
       """

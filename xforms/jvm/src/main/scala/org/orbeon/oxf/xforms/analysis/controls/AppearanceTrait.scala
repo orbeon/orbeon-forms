@@ -14,20 +14,21 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import java.{lang => jl}
-import org.orbeon.xforms.XFormsNames._
+
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.orbeon.dom.QName
+import org.orbeon.xforms.XFormsNames._
 
 // Trait for all elements that have an appearance
 trait AppearanceTrait extends SimpleElementAnalysis {
 
   import AppearanceTrait._
 
-  val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-  val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
+  val appearances: Set[QName]     = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+  val mediatype  : Option[String] = Option(element.attributeValue(MEDIATYPE_QNAME))
 
-  def encodeAndAppendAppearances(sb: jl.StringBuilder) =
+  def encodeAndAppendAppearances(sb: jl.StringBuilder): Unit =
     appearances foreach (encodeAndAppendAppearance(sb, localName, _))
 }
 
@@ -47,7 +48,7 @@ object AppearanceTrait {
     encodeAppearanceValue(sb, appearance)
   }
 
-  def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName) = {
+  def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName): jl.StringBuilder = {
     // Names in a namespace may get a prefix
     val uri = appearance.namespace.uri
     if (uri.nonEmpty) {

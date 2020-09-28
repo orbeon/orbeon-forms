@@ -161,7 +161,7 @@ trait PartXBLAnalysis extends TransientState {
     analyzeSubtree(existingComponent)
   }
 
-  override def freeTransientState() = {
+  override def freeTransientState(): Unit = {
     super.freeTransientState()
     metadata.commitBindingIndex()
   }

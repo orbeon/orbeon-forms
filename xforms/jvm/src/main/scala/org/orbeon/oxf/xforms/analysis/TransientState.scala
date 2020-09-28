@@ -15,5 +15,5 @@ package org.orbeon.oxf.xforms.analysis
 
 
 trait TransientState {
-  def freeTransientState() = ()
+  def freeTransientState(): Unit = ()
 }

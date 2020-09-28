@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.net.URI
-
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
@@ -29,7 +27,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes
-import dom.Extensions._
 
 import scala.collection.JavaConverters._
 
@@ -98,7 +95,7 @@ object XBLBindingBuilder {
 
   // From a raw non-control tree (handlers, models) rooted at an element, produce a full annotated tree.
   def annotateSubtreeByElement(
-    partAnalysis   : PartAnalysisImpl,
+    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
     boundElement   : Element,
     element        : Element,
     innerScope     : Scope,
@@ -120,8 +117,8 @@ object XBLBindingBuilder {
 
   // Annotate a tree
   def annotateSubtree(
-    partAnalysis   : PartAnalysisImpl,
-    boundElement   : Option[Element], // for `xml:base` resolution
+    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
+    boundElement   : Option[Element],  // for `xml:base` resolution
     rawTree        : Document,
     innerScope     : Scope,
     outerScope     : Scope,

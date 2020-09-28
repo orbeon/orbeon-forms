@@ -50,20 +50,8 @@ class SimpleElementAnalysis(
 
   // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
   // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
-  lazy val model: Option[Model] = findContainingModel
-
-  val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
-
-  lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
-
-  protected def getRootVariables: Map[String, VariableTrait] = Map.empty
-
-  def containerScope: Scope = part.containingScope(prefixedId)
-
-  /**
-   * Find the model associated with the given element, whether explicitly set with @model, or inherited.
-   */
-  private def findContainingModel =
+  // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
+  final lazy val model: Option[Model] =
     // Check for local @model attribute
     element.attributeValue(XFormsNames.MODEL_QNAME) match {
       case localModelStaticId: String =>
@@ -81,6 +69,18 @@ class SimpleElementAnalysis(
           case None           => part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
         }
     }
+
+  final val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
+
+  // Only overridden anonymously in `VariableAnalysisTrait` where it says "This is bad architecture"
+  // FIXME
+  lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
+
+  protected def getRootVariables: Map[String, VariableTrait] = Map.empty
+
+  // Only overridden by `RootControl`
+  // TODO: pass during construction?
+  def containerScope: Scope = part.containingScope(prefixedId)
 
   protected def computeContextAnalysis: Option[XPathAnalysis] =
     context match {

@@ -42,8 +42,8 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
   override val externalEvents: Set[String] = externalEventsDef
 
   val staticValue: Option[String] =
-    (! isImageMediatype && ! isDownloadAppearance && LHHAAnalysis.hasStaticValue(staticStateContext, element)) option
-      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
+    (! isImageMediatype && ! isDownloadAppearance && LHHAAnalysis.hasStaticValue(element)) option
+      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
   // Q: Do we need to handle the context anyway?
   override protected def computeContextAnalysis: Option[XPathAnalysis] = staticValue.isEmpty flatOption super.computeContextAnalysis

@@ -42,7 +42,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
         nestedSelf =>
 
-        override protected def computeValueAnalysis =
+        override protected def computeValueAnalysis: Option[XPathAnalysis] =
           valueOrSelectAttribute(nestedSelf.element) match {
             case Some(value) => Some(analyzeXPath(nestedSelf.getChildrenContext, value))
             case None        => Some(StringAnalysis()) // TODO: store constant value?
@@ -53,13 +53,13 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
         // default algorithm.
 
         // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
-        override lazy val inScopeVariables =
+        override lazy val inScopeVariables: Map[String, VariableTrait] =
           if (variableSelf.scope == nestedSelf.scope)
             variableSelf.inScopeVariables
           else
             getRootVariables ++ nestedSelf.treeInScopeVariables
 
-        override protected def getRootVariables = variableSelf match {
+        override protected def getRootVariables: Map[String, VariableAnalysisTrait] = variableSelf match {
           case _: ViewTrait => nestedSelf.model match { case Some(model) => model.variablesMap; case None => Map() }
           case _            => Map()
         }

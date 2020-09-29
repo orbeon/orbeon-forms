@@ -16,7 +16,7 @@ class ComponentControl(
   scope              : Scope
 ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
      with WithChildrenTrait
-     with OptionalSingleNode {   // binding could be mandatory, optional, or prohibited
+     with OptionalSingleNode { // binding could be mandatory, optional, or prohibited
 
   val hasLazyBinding: Boolean =
     ! part.isTopLevel &&
@@ -26,7 +26,7 @@ class ComponentControl(
     part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
 
   // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
-  private var _concreteBindingOpt: Option[ConcreteBinding] = None//part.getBinding(prefixedId)
+  private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)
 
   def bindingOpt      : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! part.isTopLevel)
   def bindingOrThrow  : ConcreteBinding         = _concreteBindingOpt getOrElse (throw new IllegalStateException)

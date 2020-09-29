@@ -60,11 +60,11 @@ class XFormsValueComponentControl(
   private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String]): Option[String] =
     for {
       binding              <- staticControl.bindingOpt
-      abstractBinding      = binding.abstractBinding
+      namespaceMapping     = binding.abstractBinding.namespaceMapping
       nestedContainer      <- nestedContainerOpt
       nestedBindingContext <- bindingContextForChildOpt
       result               <- eval(
-                               abstractBinding.namespaceMapping,
+                               namespaceMapping,
                                XFormsFunction.Context(
                                  container         = nestedContainer,
                                  bindingContext    = nestedBindingContext,

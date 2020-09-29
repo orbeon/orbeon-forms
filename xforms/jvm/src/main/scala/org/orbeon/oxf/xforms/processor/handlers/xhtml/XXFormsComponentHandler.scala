@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import java.lang.StringBuilder
+import java.{lang => jl}
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
@@ -42,7 +42,7 @@ class XXFormsComponentHandler(
   protected override def getContainingElementQName =
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.abstractBinding.containerElementName)
 
-  protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
+  protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
 

@@ -405,7 +405,7 @@ trait ContainerResolver {
     // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853. Unclear. For `xxf:dynamic`, `self.prefixedId`
     // is the prefixed id of the `xxf:dynamic` in the outer scope. So we can't just use `getPartAnalysis`. Use parent
     // part if any?
-    val bindingIdOpt = containingDocument.staticOps.getBinding(self.prefixedId) map (_.bindingId)
+    val bindingIdOpt = containingDocument.staticOps.getBinding(self.prefixedId) flatMap (_.abstractBinding.bindingId)
     if (bindingIdOpt.contains(staticOrAbsoluteId))
       return containingDocument.findControlByEffectiveId(effectiveId).toList
 

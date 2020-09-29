@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.xforms.XFormsNames._
 
-// Trait for all elements that have an appearance
+
 trait AppearanceTrait extends SimpleElementAnalysis {
 
   import AppearanceTrait._

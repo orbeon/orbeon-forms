@@ -31,12 +31,12 @@ import scala.collection.{mutable => m}
  * Static analysis of an XForms model <xf:model> element.
  */
 class Model(
-  val staticStateContext : StaticStateContext,
-  elem                   : Element,
-  parent                 : Option[ElementAnalysis],
-  preceding              : Option[ElementAnalysis],
-  val scope              : Scope
-) extends ElementAnalysis(staticStateContext.partAnalysis, elem, parent, preceding)
+  staticStateContext : StaticStateContext,
+  elem               : Element,
+  parent             : Option[ElementAnalysis],
+  preceding          : Option[ElementAnalysis],
+  scope              : Scope
+) extends SimpleElementAnalysis(staticStateContext, elem, parent, preceding, scope)
   with WithChildrenTrait
   with ModelInstances
   with ModelVariables
@@ -47,13 +47,7 @@ class Model(
   require(staticStateContext ne null)
   require(scope ne null)
 
-  val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
-
-  val model = Some(this)
-
-  // NOTE: Same code is in `SimpleElementAnalysis`, which is not optimal -> maybe think about passing the container
-  // scope to constructors
-  def containerScope = part.containingScope(prefixedId)
+  override lazy val model = this.some
 
   override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
     PathMapXPathAnalysis(
@@ -103,7 +97,7 @@ trait ModelVariables {
   self: Model =>
 
   // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
-  val inScopeVariables = Map.empty[String, VariableTrait]
+  override lazy val inScopeVariables = Map.empty[String, VariableTrait]
 
   // Get *:variable/*:var elements
   private val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName))

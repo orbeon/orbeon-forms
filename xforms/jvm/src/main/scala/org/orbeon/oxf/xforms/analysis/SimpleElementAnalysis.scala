@@ -47,7 +47,7 @@ class SimpleElementAnalysis(
   // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
   // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
   // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
-  final lazy val model: Option[Model] =
+  lazy val model: Option[Model] =
     // Check for local @model attribute
     element.attributeValue(XFormsNames.MODEL_QNAME) match {
       case localModelStaticId: String =>

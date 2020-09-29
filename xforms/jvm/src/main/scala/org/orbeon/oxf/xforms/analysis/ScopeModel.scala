@@ -16,7 +16,5 @@ package org.orbeon.oxf.xforms.analysis
 import model.Model
 import org.orbeon.xforms.xbl.Scope
 
-/**
- * NOTE: There is always a scope, but the model can be missing if there is no model, e.g. in model-less XBL components.
- */
+// There is always a scope, but the model can be missing if there is no model, e.g. in model-less XBL components.
 case class ScopeModel(scope: Scope, containingModel: Option[Model])

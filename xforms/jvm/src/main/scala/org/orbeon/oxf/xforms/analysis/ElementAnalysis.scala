@@ -160,7 +160,7 @@ abstract class ElementAnalysis(
   protected def allowedExtensionAttributes = Set.empty[QName]
 
   final lazy val extensionAttributes: Map[QName, String] =
-    Map() ++ (
+    Map.empty ++ (
       CommonExtensionAttributes ++
       (element.attributeIterator collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
       allowedExtensionAttributes map (qName => (qName, element.attributeValue(qName))) filter (_._2 ne null)
@@ -170,33 +170,10 @@ abstract class ElementAnalysis(
     extensionAttributes map { case (k, v) => k -> (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
-  private var contextAnalysis: Option[XPathAnalysis] = None
-  private var _contextAnalyzed = false
-  private var bindingAnalysis: Option[XPathAnalysis] = None
-  private var _bindingAnalyzed = false
-  def bindingAnalyzed: Boolean = _bindingAnalyzed
-  private var valueAnalysis: Option[XPathAnalysis] = None
-  private var _valueAnalyzed = false
-  def valueAnalyzed: Boolean = _valueAnalyzed
-
-  final def getContextAnalysis: Option[XPathAnalysis] = { assert(_contextAnalyzed); contextAnalysis }
-  final def getBindingAnalysis: Option[XPathAnalysis] = { assert(_bindingAnalyzed); bindingAnalysis }
-  final def getValueAnalysis  : Option[XPathAnalysis] = { assert(_valueAnalyzed)  ; valueAnalysis   }
-
-  // `Model` (vars and binds) and `SelectionControlTrait` (itemsets) override this
-  def analyzeXPath(): Unit = {
-    contextAnalysis = computeContextAnalysis
-    _contextAnalyzed = true
-    bindingAnalysis = computeBindingAnalysis
-    _bindingAnalyzed = true
-    valueAnalysis = computeValueAnalysis
-    _valueAnalyzed = true
-  }
-
-  // To implement in subclasses
-  protected def computeContextAnalysis: Option[XPathAnalysis]
-  protected def computeBindingAnalysis: Option[XPathAnalysis]
-  protected def computeValueAnalysis: Option[XPathAnalysis]
+  final var getContextAnalysis: Option[XPathAnalysis] = None
+  final var getBindingAnalysis: Option[XPathAnalysis] = None
+  final var getValueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
+  // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
 
   /**
    * Return the context within which children elements or values evaluate. This is the element binding if any, or the
@@ -207,12 +184,9 @@ abstract class ElementAnalysis(
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   def freeTransientState(): Unit = {
-    if (_contextAnalyzed && getContextAnalysis.isDefined)
-      getContextAnalysis.get.freeTransientState()
-    if (_bindingAnalyzed && getBindingAnalysis.isDefined)
-      getBindingAnalysis.get.freeTransientState()
-    if (_valueAnalyzed && getValueAnalysis.isDefined)
-      getValueAnalysis.get.freeTransientState()
+    getContextAnalysis foreach (_.freeTransientState())
+    getBindingAnalysis foreach (_.freeTransientState())
+    getValueAnalysis   foreach (_.freeTransientState())
   }
 }
 

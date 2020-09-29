@@ -93,7 +93,7 @@ object DependencyAnalyzer {
       val bindsIt   = iterateBinds(tree.topLevelBinds)
       val detailsIt = bindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
-      detailsIt.to(List)
+      detailsIt.toList
     }
 
     // The algorithm requires all vertices so create all the ones which are referenced by name by expressions, but
@@ -135,7 +135,7 @@ object DependencyAnalyzer {
       visit(bindsForSort, Nil).reverse
     }
 
-    def logResult(result: List[StaticBind]) =
+    def logResult(result: List[StaticBind]): Unit =
       if (result.nonEmpty && Logger.isDebugEnabled) {
 
         val idsToRefs = bindsWithMIPDetails map (b => b.staticBind.staticId -> b.refs) toMap

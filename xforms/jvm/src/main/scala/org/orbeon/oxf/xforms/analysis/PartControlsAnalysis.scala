@@ -32,6 +32,10 @@ trait PartControlsAnalysis extends TransientState {
   val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
   protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
+  def iterateControlsNoModels: Iterator[ElementAnalysis] =
+    for (control <- controlAnalysisMap.valuesIterator if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
+      yield control
+
   // Special handling of attributes
   private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
 
@@ -84,13 +88,6 @@ trait PartControlsAnalysis extends TransientState {
           existingMap + (forId -> (existingAttributes ++ newAttributes))
       }
     }
-
-  protected def analyzeControlsXPath() =
-    for (control <- controlAnalysisMap.values if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
-      control.analyzeXPath()
-
-  def iterateControls =
-    controlAnalysisMap.valuesIterator
 
   def findControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId)

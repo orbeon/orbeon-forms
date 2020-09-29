@@ -431,7 +431,7 @@
     <test description="Simple xxf:sequence/xxf:value within xf:var" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -499,7 +499,7 @@
     <test description="Event handler within variable can access outer variable value" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">

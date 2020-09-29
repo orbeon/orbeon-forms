@@ -40,7 +40,7 @@ class XFormsVariableControl(
   override type Control <: VariableControl
 
   // Actual variable name/value representation
-  private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], containingDocument)
+  private val variable = new Variable(staticControl, containingDocument)
 
   // This is the context within or after this control, which is affected by the value of the variable
   private var _bindingContextForChild: BindingContext = null
@@ -66,7 +66,7 @@ class XFormsVariableControl(
 
   override def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
-    super.preEvaluateImpl(relevant, parentRelevant)
+    super.preEvaluateImpl(relevant, parentRelevant) // 2019-09-13: `super` is a NOP
 
     if (relevant) {
       // Evaluate variable value if needed if relevant
@@ -83,7 +83,6 @@ class XFormsVariableControl(
           case None =>
             _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
         }
-
       }
     } else {
       // Value is empty sequence if non-relevant

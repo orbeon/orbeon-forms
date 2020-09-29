@@ -19,10 +19,9 @@ import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentContr
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.xforms.{Constants, XFormsId}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{Constants, XFormsId}
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 case class Global(templateTree: SAXStore, compactShadowTree: Document)
@@ -73,7 +72,7 @@ trait PartXBLAnalysis extends TransientState {
   def dumpScopes(): Unit = {
     println("scopes:")
     println(
-      prefixedIdToXBLScopeMap.to(List).map{
+      prefixedIdToXBLScopeMap.toList.map{
         case (id, scope) => s"$id -> ${scope.scopeId}"
       }.sorted.mkString("\n")
     )

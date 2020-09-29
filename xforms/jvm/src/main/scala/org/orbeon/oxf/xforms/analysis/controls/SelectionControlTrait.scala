@@ -104,11 +104,7 @@ trait SelectionControlTrait
     else
       element.attributeValueOpt(ENCRYPT_ITEM_VALUES) map (_.toBoolean)
 
-  private var itemsetAnalysis: Option[XPathAnalysis] = None
-  private var _itemsetAnalyzed = false
-  def itemsetAnalyzed: Boolean = _itemsetAnalyzed
-
-  final def getItemsetAnalysis: Option[XPathAnalysis] = { assert(_itemsetAnalyzed); itemsetAnalysis }
+  final var itemsetAnalysis: Option[XPathAnalysis] = None
 
   override def isAllowedBoundItem(item: om.Item): Boolean =
     if (useCopy)
@@ -116,110 +112,9 @@ trait SelectionControlTrait
     else
       super.isAllowedBoundItem(item)
 
-  override def analyzeXPath(): Unit = {
-    super.analyzeXPath()
-    itemsetAnalysis = computeItemsetAnalysis()
-    _itemsetAnalyzed = true
-  }
-
-  def computeItemsetAnalysis(): Option[XPathAnalysis] = {
-
-    // TODO: operate on nested ElementAnalysis instead of Element
-
-    var combinedAnalysis: XPathAnalysis = StringAnalysis()
-
-    element.visitDescendants(
-      new VisitorListener {
-
-        var stack: List[SimpleElementAnalysis] = SelectionControlTrait.this :: Nil
-
-        def startElement(element: Element): Unit = {
-
-          // Make lazy as might not be used
-          lazy val itemElementAnalysis =
-            new SimpleElementAnalysis(staticStateContext, element, Some(stack.head), None, stack.head.getChildElementScope(element))
-              with ValueTrait with OptionalSingleNode with ViewTrait
-
-          def processElement(qName: QName, required: Boolean): Unit = {
-            val nestedElement = element.element(qName)
-
-            if (required)
-              require(nestedElement ne null)
-
-            if (nestedElement ne null) {
-              val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
-                staticStateContext = staticStateContext,
-                element            = nestedElement,
-                parent             = Some(itemElementAnalysis),
-                preceding          = None,
-                scope              = itemElementAnalysis.getChildElementScope(nestedElement)
-              )
-              nestedAnalysis.analyzeXPath()
-              combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
-            }
-          }
-
-          element.getQName match {
-
-            case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
-
-              // Analyze container and add as a value dependency
-              // We add this as dependency because the itemset must also be recomputed if any returned item of
-              // a container is changing. That's because that influences whether the item is present or not,
-              // as in:
-              //
-              // <xf:itemset ref=".[not(context() = instance('foo'))]">
-              //   <xf:label>Year</xf:label>
-              //   <xf:value/>
-              // </xf:itemset>
-              //
-              // This is not an issue with controls, as container relevance ensures we don't evaluate nested
-              // expressions, but it must be done for itemsets.
-              //
-              // See also #289 https://github.com/orbeon/orbeon-forms/issues/289 (closed)
-              itemElementAnalysis.analyzeXPath()
-              combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
-
-              processElement(LABEL_QNAME, required = true)
-              processElement(XFORMS_VALUE_QNAME, required = false)
-              processElement(XFORMS_COPY_QNAME, required = false)
-
-              if (isFull) {
-                processElement(HELP_QNAME, required = false)
-                processElement(HINT_QNAME, required = false)
-              }
-
-            case XFORMS_CHOICES_QNAME =>
-
-              // Analyze container and add as a value dependency (see above)
-              itemElementAnalysis.analyzeXPath()
-              combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
-
-              processElement(LABEL_QNAME, required = false) // label is optional on xf:choices
-
-              // Always push the container
-              stack ::= itemElementAnalysis
-
-            case _ => // ignore
-          }
-        }
-
-        def endElement(element: Element): Unit =
-          if (element.getQName == XFORMS_CHOICES_QNAME)
-            stack = stack.tail
-
-        def text(text: Text): Unit = ()
-      },
-      mutable = false
-    )
-
-    Some(combinedAnalysis)
-  }
-
   override def freeTransientState(): Unit = {
     super.freeTransientState()
-    if (_itemsetAnalyzed && getItemsetAnalysis.isDefined)
-      getItemsetAnalysis.get.freeTransientState()
+    itemsetAnalysis foreach (_.freeTransientState())
   }
 
   // Return the control's static itemset if any

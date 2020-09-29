@@ -625,7 +625,7 @@ class PathMapXPathDependencies(
     assert(inRefresh || inBindingUpdate)
 
     def requireUpdate =
-      control.getItemsetAnalysis match {
+      control.itemsetAnalysis match {
         case Some(analysis) if ! analysis.figuredOutDependencies => // dependencies are unknown
           itemsetUnknownDependencies += 1
           true
@@ -639,7 +639,7 @@ class PathMapXPathDependencies(
           throw new IllegalStateException("Itemset not analyzed")
       }
 
-    buildRepeatResultCacheKey(control, control.getItemsetAnalysis.toList, controlEffectiveId: String) match {
+    buildRepeatResultCacheKey(control, control.itemsetAnalysis.toList, controlEffectiveId: String) match {
       case Some(key) => modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }

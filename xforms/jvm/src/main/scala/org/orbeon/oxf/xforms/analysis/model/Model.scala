@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom._
-import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
@@ -25,7 +25,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 
 /**
@@ -49,11 +48,6 @@ class Model(
   require(scope ne null)
 
   val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
-
-  // NOTE: It is possible to imagine a model having a context and binding, but this is not supported now
-  protected def computeContextAnalysis = None
-  protected def computeValueAnalysis   = None
-  protected def computeBindingAnalysis = None
 
   val model = Some(this)
 
@@ -80,14 +74,6 @@ class Model(
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
   override def indexedElements: Iterator[ElementAnalysis] =
     super.indexedElements ++ bindsById.valuesIterator
-
-  override def analyzeXPath(): Unit = {
-    // Analyze this
-    super.analyzeXPath()
-
-    analyzeVariablesXPath()
-    analyzeBindsXPath()
-  }
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
@@ -120,7 +106,7 @@ trait ModelVariables {
   val inScopeVariables = Map.empty[String, VariableTrait]
 
   // Get *:variable/*:var elements
-  private val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName)) asJava
+  private val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName))
 
   // Handle variables
   val variablesSeq: Seq[VariableAnalysisTrait] = {
@@ -129,14 +115,16 @@ trait ModelVariables {
     // In the future, we might want to change that to use document order between variables and binds, but some
     // more thinking is needed wrt the processing model.
 
+    val someSelf = self.some
+
     // Iterate and resolve all variables in order
-    var preceding: Option[SimpleElementAnalysis with VariableAnalysisTrait] = None
+    var preceding: Option[VariableAnalysisTrait] = None
 
     for {
-      variableElement <- variableElements.asScala
+      variableElement <- variableElements
       analysis: VariableAnalysisTrait = {
-        val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(self), preceding, scope) with VariableAnalysisTrait
-        preceding = Some(result)
+        val result = new SimpleElementAnalysis(staticStateContext, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
+        preceding = result.some
         result
       }
     } yield
@@ -144,10 +132,6 @@ trait ModelVariables {
   }
 
   val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
-
-  def analyzeVariablesXPath(): Unit =
-    for (variable <- variablesSeq)
-      variable.analyzeXPath()
 
   def freeVariablesTransientState(): Unit =
     for (variable <- variablesSeq)
@@ -200,7 +184,8 @@ trait ModelBinds {
     }
   }
 
-  private var bindTree = new LazyConstant(new BindTree(selfModel, selfModel.element.elements(XFORMS_BIND_QNAME), isCustomMIP))
+  private var _bindTree = new LazyConstant(new BindTree(selfModel, selfModel.element.elements(XFORMS_BIND_QNAME), isCustomMIP))
+  def bindTree = _bindTree()
 
   private def annotateSubTree(rawElement: Element) = {
     val annotatedTree =
@@ -223,8 +208,8 @@ trait ModelBinds {
 
     assert(! selfModel.part.isTopLevel)
 
-    bindTree().destroy()
-    bindTree = new LazyConstant(
+    _bindTree().destroy()
+    _bindTree = new LazyConstant(
       new BindTree(
         selfModel,
         rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement),
@@ -233,36 +218,35 @@ trait ModelBinds {
     )
   }
 
-  def bindsById                             = bindTree().bindsById
-  def bindsByName                           = bindTree().bindsByName
+  def bindsById                             = _bindTree().bindsById
+  def bindsByName                           = _bindTree().bindsByName
 
-  def hasDefaultValueBind                   = bindTree().hasDefaultValueBind
-  def hasCalculateBind                      = bindTree().hasCalculateBind
-  def hasTypeBind                           = bindTree().hasTypeBind
-  def hasRequiredBind                       = bindTree().hasRequiredBind
-  def hasConstraintBind                     = bindTree().hasConstraintBind
-  def hasNonPreserveWhitespace              = bindTree().hasNonPreserveWhitespace
+  def hasDefaultValueBind                   = _bindTree().hasDefaultValueBind
+  def hasCalculateBind                      = _bindTree().hasCalculateBind
+  def hasTypeBind                           = _bindTree().hasTypeBind
+  def hasRequiredBind                       = _bindTree().hasRequiredBind
+  def hasConstraintBind                     = _bindTree().hasConstraintBind
+  def hasNonPreserveWhitespace              = _bindTree().hasNonPreserveWhitespace
 
-  def mustRevalidate                        = bindTree().mustRevalidate
-  def mustRecalculate                       = bindTree().mustRecalculate
+  def mustRevalidate                        = _bindTree().mustRevalidate
+  def mustRecalculate                       = _bindTree().mustRecalculate
 
-  def bindInstances                         = bindTree().bindInstances
-  def computedBindExpressionsInstances      = bindTree().computedBindExpressionsInstances
-  def validationBindInstances               = bindTree().validationBindInstances
+  def bindInstances                         = _bindTree().bindInstances
+  def computedBindExpressionsInstances      = _bindTree().computedBindExpressionsInstances
+  def validationBindInstances               = _bindTree().validationBindInstances
 
   // TODO: use and produce variables introduced with xf:bind/@name
 
-  def topLevelBinds                         = bindTree().topLevelBinds
+  def topLevelBinds                         = _bindTree().topLevelBinds
 
-  def hasBinds                              = bindTree().hasBinds
-  def containsBind(bindId: String)          = bindTree().bindIds(bindId)
+  def hasBinds                              = _bindTree().hasBinds
+  def containsBind(bindId: String)          = _bindTree().bindIds(bindId)
 
-  def figuredAllBindRefAnalysis             = bindTree().figuredAllBindRefAnalysis
-  def recalculateOrder                      = bindTree().recalculateOrder
-  def defaultValueOrder                     = bindTree().defaultValueOrder
+  def figuredAllBindRefAnalysis             = _bindTree().figuredAllBindRefAnalysis
+  def recalculateOrder                      = _bindTree().recalculateOrder
+  def defaultValueOrder                     = _bindTree().defaultValueOrder
 
-  def analyzeBindsXPath()                   = bindTree().analyzeBindsXPath()
-  def freeBindsTransientState()             = bindTree().freeBindsTransientState()
+  def freeBindsTransientState()             = _bindTree().freeBindsTransientState()
 }
 
 object Model {

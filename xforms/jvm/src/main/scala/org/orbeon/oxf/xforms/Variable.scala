@@ -66,7 +66,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
         if (pushContext)
           contextStack.pushBinding(staticVariable.valueElement, sourceEffectiveId, staticVariable.valueScope)
 
-        val result= {
+        val result = {
           val bindingContext = contextStack.getCurrentBindingContext
           val currentNodeset = bindingContext.nodeset
           if (! currentNodeset.isEmpty) {

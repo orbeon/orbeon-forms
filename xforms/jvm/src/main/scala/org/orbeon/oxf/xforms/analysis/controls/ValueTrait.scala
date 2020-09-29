@@ -13,20 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.{XPathAnalysis, SimpleElementAnalysis}
-import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.saxon.om.Item
 
 /**
  * Trait representing an element supporting a value, whether the string value of the binding node or whether through
  * a @value attribute.
  */
 trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
-
-  override protected def computeValueAnalysis: Option[XPathAnalysis] = {
-    val subExpression = if (value.isDefined) "string((" + value.get + ")[1])" else "string(.)"
-    Some(analyzeXPath(getChildrenContext, subExpression))
-  }
 
   override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedValueBoundItem(item)
 

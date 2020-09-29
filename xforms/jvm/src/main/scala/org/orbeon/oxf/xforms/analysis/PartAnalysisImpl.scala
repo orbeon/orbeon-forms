@@ -14,20 +14,17 @@
 package org.orbeon.oxf.xforms.analysis
 
 import cats.implicits.catsSyntaxOptionId
-import org.orbeon.dom.{Element, QName, Text}
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
-import org.orbeon.oxf.xforms.analysis.controls.{SelectionControlTrait, _}
+import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.{SAXStore, ShareableXPathStaticContext}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -135,7 +132,7 @@ class PartAnalysisImpl(
 
     elementAnalysisOpt  match {
       case Some(componentControl: ComponentControl) if ! componentControl.hasLazyBinding =>
-        componentControl.setConcreteBinding(controlElement)
+        ElementAnalysisTreeBuilder.setConcreteBinding(componentControl, controlElement)(getIndentedLogger)
         index(componentControl)
         componentControl
       case Some(elementAnalysis) =>

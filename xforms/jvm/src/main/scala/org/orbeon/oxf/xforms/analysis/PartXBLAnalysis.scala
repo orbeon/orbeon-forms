@@ -156,7 +156,7 @@ trait PartXBLAnalysis extends TransientState {
     if (existingComponent.bindingOpt.isDefined)
       existingComponent.removeConcreteBinding()
 
-    existingComponent.setConcreteBinding(elemInSource)
+    ElementAnalysisTreeBuilder.setConcreteBinding(existingComponent, elemInSource)(getIndentedLogger)
     analyzeSubtree(existingComponent)
   }
 

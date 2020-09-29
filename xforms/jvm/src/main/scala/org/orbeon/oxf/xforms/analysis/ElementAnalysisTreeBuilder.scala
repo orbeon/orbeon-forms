@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
@@ -55,6 +56,36 @@ object ElementAnalysisTreeBuilder {
           }
       }
     )
+
+  // Set the component's binding
+  // Might not create the binding if the binding does not have a template.
+  // Also called indirectly by `XXFormsDynamicControl`.
+  def setConcreteBinding(
+    e              : ComponentControl,
+    elemInSource   : Element)(implicit
+    indentedLogger : IndentedLogger
+  ): Unit = {
+
+    assert(! e.hasConcreteBinding)
+
+    XBLBindingBuilder.createConcreteBindingFromElem(
+      e.part,
+      e.abstractBinding,
+      elemInSource,
+      e.prefixedId,
+      e.containerScope
+    ) foreach { case (newBinding, globalOpt) =>
+
+      globalOpt foreach { global =>
+        e.part.abstractBindingsWithGlobals += e.abstractBinding // TODO: indexing
+        e.part.allGlobals += global                             // TODO: indexing
+      }
+
+      e.part.addBinding(e.prefixedId, newBinding)               // TODO: indexing
+
+      e.setConcreteBinding(newBinding)
+    }
+  }
 
   private object Private {
 

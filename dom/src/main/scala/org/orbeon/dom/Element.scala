@@ -92,6 +92,7 @@ trait Element extends Branch {
    */
   def attribute(name: String): Attribute
   def attributeOpt(name: String): Option[Attribute] = Option(attribute(name))
+  def hasAttribute(name: String): Boolean = attribute(name) ne null
 
   /**
    * @return the attribute for the given fully qualified name or null if it
@@ -99,6 +100,7 @@ trait Element extends Branch {
    */
   def attribute(qName: QName): Attribute
   def attributeOpt(qName: QName): Option[Attribute] = Option(attribute(qName))
+  def hasAttribute(qName: QName): Boolean = attribute(qName) ne null
 
   /**
    * This returns the attribute value for the attribute with the given name

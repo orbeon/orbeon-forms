@@ -109,7 +109,7 @@ object ElementAnalysisTreeBuilder {
         def directlyNestedLHHA =
           if (e.abstractBinding.modeLHHA)
             e.element.elements filter
-              (e => LHHA.isLHHA(e) && e.attributeOpt(FOR_QNAME).isEmpty) map
+              (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
                 annotateChild
           else
             Nil
@@ -150,11 +150,11 @@ object ElementAnalysisTreeBuilder {
           }
         case _: SelectionControl =>
           allChildren collect {
-            case (e, s) if isLHHA(e) && e.attributeOpt(FOR_QNAME).isEmpty || TopLevelItemsetQNames(e.getQName) || isAction(e.getQName) => (e, s)
+            case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || TopLevelItemsetQNames(e.getQName) || isAction(e.getQName) => (e, s)
           }
         case _: ValueControl | _: TriggerControl =>
           allChildren collect {
-            case (e, s) if isLHHA(e) && e.attributeOpt(FOR_QNAME).isEmpty || isAction(e.getQName) => (e, s)
+            case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || isAction(e.getQName) => (e, s)
           }
         case _: ActionTrait =>
           allChildren collect {

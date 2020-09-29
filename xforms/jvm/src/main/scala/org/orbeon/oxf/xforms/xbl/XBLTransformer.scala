@@ -71,7 +71,7 @@ object XBLTransformer {
 
     val documentWrapper  = new DocumentWrapper(boundElement.getDocument, null, org.orbeon.oxf.util.XPath.GlobalConfiguration)
     val boundElementInfo = documentWrapper.wrap(boundElement)
-    val directNameOpt    = abstractBindingOpt flatMap (_.directName)
+    val directNameOpt    = abstractBindingOpt flatMap (_.commonBinding.directName)
 
     def isNestedHandler(e: Element): Boolean =
       (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)

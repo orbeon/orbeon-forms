@@ -156,7 +156,11 @@ trait PartXBLAnalysis extends TransientState {
     if (existingComponent.bindingOpt.isDefined)
       existingComponent.removeConcreteBinding()
 
-    ElementAnalysisTreeBuilder.setConcreteBinding(existingComponent, elemInSource)(getIndentedLogger)
+    val abstractBinding =
+      existingComponent.part.metadata.findAbstractBindingByPrefixedId(existingComponent.prefixedId) getOrElse
+        (throw new IllegalStateException)
+
+    ElementAnalysisTreeBuilder.setConcreteBinding(existingComponent, abstractBinding, elemInSource)(getIndentedLogger)
     analyzeSubtree(existingComponent)
   }
 

@@ -119,7 +119,7 @@ class LHHAAnalysis(
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
         e match {
           case xbl: ComponentControl =>
-            xbl.abstractBinding.labelFor match {
+            xbl.commonBinding.labelFor match {
               case Some(nestedLabelForStaticId) =>
                 searchLHHAControlInScope(xbl.bindingOrThrow.innerScope, nestedLabelForStaticId) match {
                   case Some(nestedLabelForTarget) => searchXblLabelFor(nestedLabelForTarget) // recurse

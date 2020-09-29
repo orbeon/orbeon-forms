@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}

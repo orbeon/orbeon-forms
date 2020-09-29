@@ -21,7 +21,7 @@ import org.orbeon.xforms.xbl.Scope
 // NOTE: 2018-02-23: This is only created if the `AbstractBinding` has a template. Wondering if we should support components with
 // no templates (or creating an empty template in that case) so that we don't have to special-case bindings without templates.
 case class ConcreteBinding(
-  abstractBinding   : AbstractBinding,   //                                                                       [namespaceMapping, modeSelection, bindingId]
+  abstractBinding   : AbstractBinding,   //                                                                       [namespaceMapping, bindingId]
   innerScope        : Scope,             // each binding defines a new scope
   outerScope        : Scope,             // this binding's outer scope                                            [FIXME: unused]
   handlers          : Seq[Element],      // annotated event handler elements                                      [FIXME: ElementAnalysisTreeBuilder only]

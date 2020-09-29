@@ -187,7 +187,7 @@ class ControlsComparator(
         // - https://github.com/orbeon/orbeon-forms/issues/3909
         // - https://github.com/orbeon/orbeon-forms/issues/3957
         control2 match {
-          case cc2: XFormsComponentControl if cc2.staticControl.abstractBinding.modeJavaScriptLifecycle =>
+          case cc2: XFormsComponentControl if cc2.staticControl.commonBinding.modeJavaScriptLifecycle =>
 
             control1Opt.asInstanceOf[Option[XFormsComponentControl]] match {
               case None =>
@@ -200,7 +200,7 @@ class ControlsComparator(
                     valueChangeOpt =
                       for {
                         vcc2 <- cc2.narrowTo[XFormsValueComponentControl]
-                        if vcc2.staticControl.abstractBinding.modeExternalValue
+                        if vcc2.staticControl.commonBinding.modeExternalValue
                       } yield
                         vcc2.getEscapedExternalValue
                   )
@@ -213,7 +213,7 @@ class ControlsComparator(
                 val valueChangeOpt =
                   for {
                     vcc2        <- cc2.narrowTo[XFormsValueComponentControl]
-                    if vcc2.staticControl.abstractBinding.modeExternalValue
+                    if vcc2.staticControl.commonBinding.modeExternalValue
                     valueChange <- findValueChange(cc1.asInstanceOf[XFormsValueComponentControl], vcc2)
                   } yield
                     valueChange
@@ -227,7 +227,7 @@ class ControlsComparator(
                   )
             }
 
-          case vcc2: XFormsValueComponentControl if vcc2.staticControl.abstractBinding.modeExternalValue =>
+          case vcc2: XFormsValueComponentControl if vcc2.staticControl.commonBinding.modeExternalValue =>
 
             // NOTE: `modeExternalValue` can be used without `modeJavaScriptLifecycle`, although that is an uncommon use case.
 

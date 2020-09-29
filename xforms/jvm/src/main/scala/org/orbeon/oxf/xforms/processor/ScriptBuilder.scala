@@ -60,7 +60,7 @@ object ScriptBuilder {
     Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
       case c: XFormsValueComponentControl =>
         if (c.isRelevant) {
-          val abstractBinding = c.staticControl.abstractBinding
+          val abstractBinding = c.staticControl.commonBinding
           if (abstractBinding.modeJavaScriptLifecycle)
             controlsToInitialize +=
               c.getEffectiveId -> (
@@ -71,7 +71,7 @@ object ScriptBuilder {
               )
         }
       case c: XFormsComponentControl =>
-        if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
+        if (c.isRelevant && c.staticControl.commonBinding.modeJavaScriptLifecycle)
           controlsToInitialize += c.getEffectiveId -> None
       case c =>
         // Legacy JavaScript initialization

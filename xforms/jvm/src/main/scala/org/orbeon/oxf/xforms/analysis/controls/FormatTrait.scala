@@ -17,6 +17,6 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.xforms.XFormsNames
 
 trait FormatTrait extends SimpleElementAnalysis {
-  val format   = Option(element.attributeValue(XFormsNames.XXFORMS_FORMAT_QNAME))
-  val unformat = Option(element.attributeValue(XFormsNames.XXFORMS_UNFORMAT_QNAME))
+  def format  : Option[String] = element.attributeValueOpt(XFormsNames.XXFORMS_FORMAT_QNAME)
+  def unformat: Option[String] = element.attributeValueOpt(XFormsNames.XXFORMS_UNFORMAT_QNAME)
 }

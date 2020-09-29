@@ -82,13 +82,13 @@ class Instance(
               "model id"       -> parent.get.staticId,
               "instance id"    -> staticId,
               "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
-              "binding name"   -> component.abstractBinding.debugBindingName,
+              "binding name"   -> component.commonBinding.debugBindingName,
               "model index"    -> modelIndex.toString,
               "instance index" -> instanceIndex.toString
             )
           )
 
-          component.abstractBinding.constantInstances((modelIndex, instanceIndex))
+          component.commonBinding.constantInstances((modelIndex, instanceIndex))
         case None =>
 
           debug(

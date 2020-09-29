@@ -53,11 +53,93 @@ case class InlineBindingRef(
   val lastModified = -1L
 }
 
+object CommonBindingBuilder {
+
+  def apply(
+    bindingElement : Element,
+    directName     : Option[QName],
+    cssName        : Option[String],
+    modelElements  : Seq[Element]
+  ): CommonBinding = {
+
+    // XBL modes
+    val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
+
+    val modeValue               = xblMode("value")
+    val modeExternalValue       = modeValue && xblMode("external-value")
+    val modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
+    val modeLHHA                = xblMode("lhha")
+    val modeFocus               = xblMode("focus")
+
+    // LHHA that are handled the standard way (as opposed to the "custom" way)
+    val standardLhhaAsSeq: Seq[LHHA] = {
+
+      val modeLHHACustom = modeLHHA && xblMode("custom-lhha")
+
+      LHHA.values flatMap { lhha =>
+        ! (
+          modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
+            modeLHHA     &&   xblMode(s"+custom-${lhha.entryName}")
+          ) option
+          lhha
+      }
+    }
+
+    // CSS classes to put in the markup
+    val cssClasses: String =
+      "xbl-component"                                            ::
+      (cssName.toList           map  ("xbl-" +))                 :::
+      (modeFocus                list "xbl-focusable")            :::
+      (modeJavaScriptLifecycle  list "xbl-javascript-lifecycle") :::
+      attSet(bindingElement, CLASS_QNAME).toList mkString " "
+
+    val allowedExternalEvents: Set[String] =
+      attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
+      (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
+      (if (modeExternalValue) List(EventNames.XXFormsValue) else Nil)
+
+    // Constant instance DocumentInfo by model and instance index
+    // We use the indexes because at this time, no id annotation has taken place yet
+    val constantInstances: Map[(Int, Int), DocumentInfo] = (
+      for {
+        (m, mi) <- modelElements.zipWithIndex
+        (i, ii) <- m.elements(XFORMS_INSTANCE_QNAME).zipWithIndex
+        im      = new ThrowawayInstance(i)
+        if im.readonly && im.useInlineContent
+      } yield
+        (mi, ii) -> im.inlineContent
+    ) toMap
+
+    CommonBinding(
+      directName                  = directName,
+      cssName                     = cssName,
+      containerElementName        = bindingElement.attributeValueOpt(XXBL_CONTAINER_QNAME) getOrElse "div",
+      modeBinding                 = xblMode("binding"), // "optional binding" (would need mandatory, optional, and prohibited)
+      modeValue                   = modeValue,
+      modeExternalValue           = modeExternalValue,
+      modeJavaScriptLifecycle     = modeJavaScriptLifecycle,
+      modeLHHA                    = modeLHHA,
+      modeFocus                   = modeFocus,
+      modeItemset                 = xblMode("itemset"), // NIY as of 2019-05-09
+      modeSelection               = xblMode("selection"), // to indicate that the control acts as a selection control
+      modeHandlers                = ! xblMode("nohandlers"),
+      standardLhhaAsSeq           = standardLhhaAsSeq,
+      standardLhhaAsSet           = standardLhhaAsSeq.to(Set),
+      labelFor                    = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME),
+      formatOpt                   = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME),
+      serializeExternalValueOpt   = bindingElement.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME),
+      deserializeExternalValueOpt = bindingElement.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME),
+      debugBindingName            = bindingElement.getQualifiedName,
+      cssClasses                  = cssClasses,
+      allowedExternalEvents       = allowedExternalEvents,
+      constantInstances           = constantInstances
+    )
+  }
+}
+
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
   selectors        : List[Selector],
-  directName       : Option[QName],
-  cssName          : Option[String],
   bindingElement   : Element,
   path             : Option[String],
   lastModified     : Long,
@@ -67,76 +149,16 @@ case class AbstractBinding(
   handlers         : Seq[Element],
   modelElements    : Seq[Element],
   global           : Option[Document],
-  namespaceMapping : NamespaceMapping
+  namespaceMapping : NamespaceMapping,
+  commonBinding    : CommonBinding
 ) extends IndexableBinding {
 
-  val containerElementName =          // "div" by default
-    Option(bindingElement.attributeValue(XXBL_CONTAINER_QNAME)) getOrElse
-      "div"
-
-  // XBL modes
   private val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
-  val modeBinding             = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
   val modeValue               = xblMode("value")
-  val modeExternalValue       = modeValue && xblMode("external-value")
-  val modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
   val modeLHHA                = xblMode("lhha")
-  val modeFocus               = xblMode("focus")
-  val modeItemset             = xblMode("itemset") // NIY as of 2019-05-09
-  val modeSelection           = xblMode("selection") // to indicate that the control acts as a selection control
-  val modeHandlers            = ! xblMode("nohandlers")
 
-  // LHHA that are handled the standard way (as opposed to the "custom" way)
-  val standardLhhaAsSeq: Seq[LHHA] = {
-
-    val modeLHHACustom = modeLHHA && xblMode("custom-lhha")
-
-    LHHA.values flatMap { lhha =>
-      ! (
-        modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
-          modeLHHA     &&   xblMode(s"+custom-${lhha.entryName}")
-        ) option
-        lhha
-    }
-  }
-
-  val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.to(Set)
-
-  val labelFor                   : Option[String] = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME)
-  val formatOpt                  : Option[String] = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME)
-  val serializeExternalValueOpt  : Option[String] = bindingElement.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME)
-  val deserializeExternalValueOpt: Option[String] = bindingElement.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME)
-
-  // Printable name for the binding match
-  def debugBindingName = bindingElement.getQualifiedName
-
-  // CSS classes to put in the markup
-  val cssClasses: String =
-    "xbl-component"                                            ::
-    (cssName.toList           map  ("xbl-" +))                 :::
-    (modeFocus                list "xbl-focusable")            :::
-    (modeJavaScriptLifecycle  list "xbl-javascript-lifecycle") :::
-    attSet(bindingElement, CLASS_QNAME).toList mkString " "
-
-  val allowedExternalEvents: Set[String] =
-    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
-    (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
-    (if (modeExternalValue) List(EventNames.XXFormsValue) else Nil)
-
-  // Constant instance DocumentInfo by model and instance index
-  // We use the indexes because at this time, no id annotation has taken place yet
-  val constantInstances: Map[(Int, Int), DocumentInfo] = (
-    for {
-      (m, mi) <- modelElements.zipWithIndex
-      (i, ii) <- m.elements(XFORMS_INSTANCE_QNAME).zipWithIndex
-      im      = new ThrowawayInstance(i)
-      if im.readonly && im.useInlineContent
-    } yield
-      (mi, ii) -> im.inlineContent
-  ) toMap
-
-  def templateElementOpt = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
-  def supportAVTs        = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
+  def templateElementOpt: Option[Element] = bindingElement.elementOpt(XBL_TEMPLATE_QNAME)
+  def supportAVTs       : Boolean = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
   private def transformQNameOption = templateElementOpt flatMap
     (e => Option(e.resolveAttValueQName(XXBL_TRANSFORM_QNAME, unprefixedIsNoNamespace = true)))
@@ -236,8 +258,6 @@ object AbstractBinding {
 
     AbstractBinding(
       selectors,
-      directName,
-      cssName,
       bindingElem,
       path,
       lastModified,
@@ -247,7 +267,8 @@ object AbstractBinding {
       handlers,
       modelElements,
       global,
-      bindingNs
+      bindingNs,
+      CommonBindingBuilder(bindingElem, directName, cssName, modelElements)
     )
   }
 }

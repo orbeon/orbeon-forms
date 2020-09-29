@@ -337,7 +337,7 @@ private object FormRunnerFunctions {
         def fromMetadataAndProperties: Option[AtomicValue] =
           FRComponentParam.fromMetadataAndProperties(
             partAnalysis  = staticControl.part,
-            directNameOpt = staticControl.abstractBinding.directName,
+            directNameOpt = staticControl.commonBinding.directName,
             paramName     = paramName
           )
 

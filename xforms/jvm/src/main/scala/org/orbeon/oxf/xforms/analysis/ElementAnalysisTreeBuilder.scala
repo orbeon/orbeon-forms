@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsActions
@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLBindingBuilder}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
@@ -62,6 +62,7 @@ object ElementAnalysisTreeBuilder {
   // Also called indirectly by `XXFormsDynamicControl`.
   def setConcreteBinding(
     e              : ComponentControl,
+    abstractBinding: AbstractBinding,
     elemInSource   : Element)(implicit
     indentedLogger : IndentedLogger
   ): Unit = {
@@ -70,19 +71,18 @@ object ElementAnalysisTreeBuilder {
 
     XBLBindingBuilder.createConcreteBindingFromElem(
       e.part,
-      e.abstractBinding,
+      abstractBinding,
       elemInSource,
       e.prefixedId,
       e.containerScope
     ) foreach { case (newBinding, globalOpt) =>
 
       globalOpt foreach { global =>
-        e.part.abstractBindingsWithGlobals += e.abstractBinding // TODO: indexing
-        e.part.allGlobals += global                             // TODO: indexing
+        e.part.abstractBindingsWithGlobals += abstractBinding // TODO: indexing; to know if globals have been processed already
+        e.part.allGlobals += global                           // TODO: indexing
       }
 
-      e.part.addBinding(e.prefixedId, newBinding)               // TODO: indexing
-
+      e.part.addBinding(e.prefixedId, newBinding)             // TODO: indexing
       e.setConcreteBinding(newBinding)
     }
   }
@@ -129,7 +129,7 @@ object ElementAnalysisTreeBuilder {
 
         // Directly nested handlers (if enabled)
         def directlyNestedHandlers =
-          if (e.abstractBinding.modeHandlers)
+          if (e.commonBinding.modeHandlers)
             e.element.elements filter
               EventHandlerImpl.isEventHandler map
                 annotateChild
@@ -138,7 +138,7 @@ object ElementAnalysisTreeBuilder {
 
         // Directly nested LHHA (if enabled)
         def directlyNestedLHHA =
-          if (e.abstractBinding.modeLHHA)
+          if (e.commonBinding.modeLHHA)
             e.element.elements filter
               (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
                 annotateChild

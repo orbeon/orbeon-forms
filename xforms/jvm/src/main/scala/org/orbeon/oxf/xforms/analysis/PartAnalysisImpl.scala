@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -130,9 +130,18 @@ class PartAnalysisImpl(
         scope          = scopeForPrefixedId(controlPrefixedId)
       )
 
-    elementAnalysisOpt  match {
-      case Some(componentControl: ComponentControl) if ! componentControl.hasLazyBinding =>
-        ElementAnalysisTreeBuilder.setConcreteBinding(componentControl, controlElement)(getIndentedLogger)
+    elementAnalysisOpt match {
+      case Some(componentControl: ComponentControl) =>
+
+        val abstractBinding =
+          metadata.findAbstractBindingByPrefixedId(componentControl.prefixedId) getOrElse
+            (throw new IllegalStateException)
+
+        componentControl.commonBinding = abstractBinding.commonBinding
+
+        if (! componentControl.hasLazyBinding)
+          ElementAnalysisTreeBuilder.setConcreteBinding(componentControl, abstractBinding, controlElement)(getIndentedLogger)
+
         index(componentControl)
         componentControl
       case Some(elementAnalysis) =>

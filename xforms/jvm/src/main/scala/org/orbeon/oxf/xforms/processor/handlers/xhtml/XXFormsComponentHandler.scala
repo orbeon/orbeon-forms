@@ -37,16 +37,16 @@ class XXFormsComponentHandler(
     xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
 
   override def getContainingElementName =
-    staticControl.abstractBinding.containerElementName
+    staticControl.commonBinding.containerElementName
 
   protected override def getContainingElementQName =
-    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.abstractBinding.containerElementName)
+    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, staticControl.commonBinding.containerElementName)
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
       classes.append(' ')
 
-    classes.append(staticControl.abstractBinding.cssClasses)
+    classes.append(staticControl.commonBinding.cssClasses)
   }
 
   override protected def handleControlStart(): Unit = {
@@ -66,20 +66,20 @@ class XXFormsComponentHandler(
     xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
-    if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
+    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
         forEffectiveId           = getForEffectiveId(getEffectiveId),
         lhha                     = LHHA.Label,
-        requestedElementNameOpt  = (staticControl.abstractBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
+        requestedElementNameOpt  = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
         controlOrNull            = currentControl,
         isExternal               = false
       )
 
-  protected override def handleAlert() = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
-  protected override def handleHint()  = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
-  protected override def handleHelp()  = if (staticControl.abstractBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
+  protected override def handleAlert() = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
+  protected override def handleHint()  = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
+  protected override def handleHelp()  = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.

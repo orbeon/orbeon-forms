@@ -51,7 +51,7 @@ class XXFormsComponentParam extends XFormsFunction {
         fromProperties(
           paramName,
           Nil,
-          staticControl.abstractBinding.directName
+          staticControl.commonBinding.directName
         )
     } orNull
   }

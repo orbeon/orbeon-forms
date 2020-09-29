@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
@@ -111,7 +111,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         case _: Model                                               => None
         case e: OutputControl if e.staticValue.isDefined            => None
         // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
-        case e: ComponentControl if ! e.abstractBinding.modeBinding => e.getContextAnalysis
+        case e: ComponentControl if ! e.commonBinding.modeBinding   => e.getContextAnalysis
         case e                                                      => computeBasicBindingAnalysis(e.part, e)
       }
 

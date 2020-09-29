@@ -38,7 +38,6 @@ import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 import scala.xml.Elem
 
 object FormRunnerMetadata {
@@ -227,7 +226,7 @@ object FormRunnerMetadata {
 
       val lhhas =
         for {
-          lhha     <- LHHA.values.to(List)
+          lhha     <- LHHA.values.toList
           if staticControl.hasLHHA(lhha)
           lhhaName = lhha.entryName
           holder   <- enclosingHolder child lhhaName
@@ -257,7 +256,7 @@ object FormRunnerMetadata {
       controls.values flatMap (_.narrowTo[XFormsSingleNodeControl]) filter isBoundToFormDataInScope
 
     val sortedControls: List[XFormsSingleNodeControl] =
-      selectedControls.to(List).sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
+      selectedControls.toList.sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {
@@ -344,7 +343,7 @@ object FormRunnerMetadata {
 
       val lhhas =
         for {
-          lhha   <- LHHA.values.to(List)
+          lhha   <- LHHA.values.toList
           if staticControl.hasLHHA(lhha)
           holder <- enclosingHolder child lhha.entryName
         } yield
@@ -363,7 +362,7 @@ object FormRunnerMetadata {
 
       // TODO: multiple alerts: level of alert
 
-      (lhhas, items.to(List))
+      (lhhas, items.toList)
     }
 
     val selectedControls =
@@ -373,7 +372,7 @@ object FormRunnerMetadata {
         (c => isBoundToFormDataInScope(c) || isRepeatedGridComponent(c))
 
     val sortedControls =
-      selectedControls.to(List).sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
+      selectedControls.toList.sortBy(c => ErrorSummary.controlSearchIndexes(c.absoluteId))(ErrorSummary.IntIteratorOrdering)
 
     val controlMetadata =
       for {
@@ -399,7 +398,7 @@ object FormRunnerMetadata {
             } yield
               lang -> resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
 
-          val lhhaAndItemsList = lhhaAndItemsIt.to(List)
+          val lhhaAndItemsList = lhhaAndItemsIt.toList
 
           val valueOpt =
             Option(control) collect {
@@ -415,7 +414,7 @@ object FormRunnerMetadata {
 
                 SingleControlValue(c.getValue, selectedLabel) // TODO
 
-              case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection =>
+              case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.commonBinding.modeSelection =>
 
                 val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
 

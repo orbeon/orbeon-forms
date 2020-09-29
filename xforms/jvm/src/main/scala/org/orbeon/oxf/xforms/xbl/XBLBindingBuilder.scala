@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
@@ -192,9 +193,9 @@ object XBLBindingBuilder {
               xblSupport            = partAnalysis.staticState.xblSupport,
               shadowTreeDocument    = shadowTreeDocument,
               boundElement          = boundElement,
-              abstractBindingOpt    = Some(abstractBinding),
-              excludeNestedHandlers = abstractBinding.modeHandlers,
-              excludeNestedLHHA     = abstractBinding.modeLHHA,
+              abstractBindingOpt    = abstractBinding.some,
+              excludeNestedHandlers = abstractBinding.commonBinding.modeHandlers,
+              excludeNestedLHHA     = abstractBinding.commonBinding.modeLHHA,
               supportAVTs           = abstractBinding.supportAVTs
             )
           }(indentedLogger)

@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, CommonBinding, ConcreteBinding}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 
@@ -22,8 +22,7 @@ class ComponentControl(
     ! part.isTopLevel &&
       element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
-  val abstractBinding: AbstractBinding =
-    part.metadata.findAbstractBindingByPrefixedId(prefixedId) getOrElse (throw new IllegalStateException)
+  var commonBinding: CommonBinding = null // TODO: pass via constructor
 
   // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)
@@ -54,14 +53,14 @@ class ComponentControl(
   }
 
   // Only support binding if the control defines it has a binding
-  override def hasBinding = abstractBinding.modeBinding && super.hasBinding
+  override def hasBinding: Boolean = commonBinding.modeBinding && super.hasBinding
 
   // Leave as 'def' as the binding can, in theory, mutate
-  override protected def externalEventsDef = super.externalEventsDef ++ abstractBinding.allowedExternalEvents
+  override protected def externalEventsDef = super.externalEventsDef ++ commonBinding.allowedExternalEvents
   override def externalEvents              = externalEventsDef
 }
 
 trait ValueComponentTrait extends ComponentControl with ValueTrait with FormatTrait {
-  override val format  : Option[String] = abstractBinding.formatOpt
+  override def format  : Option[String] = commonBinding.formatOpt
   override val unformat: Option[String] = None
 }

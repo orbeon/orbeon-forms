@@ -3,9 +3,11 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.xml.NamespaceMapping
 
 
 case class CommonBinding(
+  bindingElemNamespaceMapping: NamespaceMapping,
   directName                 : Option[QName],
   cssName                    : Option[String],
   containerElementName       : String,

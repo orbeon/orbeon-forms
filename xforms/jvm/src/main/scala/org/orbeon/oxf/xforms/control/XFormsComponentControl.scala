@@ -59,12 +59,11 @@ class XFormsValueComponentControl(
 
   private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String]): Option[String] =
     for {
-      binding              <- staticControl.bindingOpt
-      namespaceMapping     = binding.abstractBinding.namespaceMapping
+      _                    <- staticControl.bindingOpt
       nestedContainer      <- nestedContainerOpt
       nestedBindingContext <- bindingContextForChildOpt
       result               <- eval(
-                               namespaceMapping,
+                               staticControl.commonBinding.bindingElemNamespaceMapping,
                                XFormsFunction.Context(
                                  container         = nestedContainer,
                                  bindingContext    = nestedBindingContext,
@@ -240,11 +239,11 @@ class XFormsComponentControl(
 
     super.onCreate(restoreState, state, update)
 
-    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isEmpty) {
+    if (staticControl.hasLazyBinding && ! staticControl.hasConcreteBinding) {
 
       // Only update the static tree. The dynamic tree is created later.
       XXFormsDynamicControl.createOrUpdateStaticShadowTree(this, None)
-      assert(staticControl.bindingOpt.isDefined)
+      assert(staticControl.hasConcreteBinding)
 
       // See https://github.com/orbeon/orbeon-forms/issues/4018
       //
@@ -320,7 +319,7 @@ class XFormsComponentControl(
 
     super.onDestroy(update)
 
-    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
+    if (staticControl.hasLazyBinding && staticControl.hasConcreteBinding) {
 
       if (update) {
         containingDocument.controls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
@@ -480,7 +479,7 @@ class XFormsComponentControl(
     buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
     idSuffix: Seq[Int]
   ): Unit =
-    if (staticControl.bindingOpt.isDefined)
+    if (staticControl.hasConcreteBinding)
       Controls.buildChildren(
         control   = this,
         children  = staticControl.children,

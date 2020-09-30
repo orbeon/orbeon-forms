@@ -29,8 +29,6 @@ import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
-
 
 /**
  * Gather static information about XBL bindings.
@@ -256,7 +254,7 @@ object XBLBindingBuilder {
           annotatedModels,
           templateTree,
           compactShadowTree,
-          boundElement.jAttributes.asScala map { att => att.getQName -> att.getValue } toMap
+          boundElement.attributes map { att => att.getQName -> att.getValue } toMap
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl

@@ -56,14 +56,15 @@ case class InlineBindingRef(
 object CommonBindingBuilder {
 
   def apply(
-    bindingElement : Element,
-    directName     : Option[QName],
-    cssName        : Option[String],
-    modelElements  : Seq[Element]
+    bindingElem                 : Element,
+    bindingElemNamespaceMapping : NamespaceMapping,
+    directName                  : Option[QName],
+    cssName                     : Option[String],
+    modelElements               : Seq[Element]
   ): CommonBinding = {
 
     // XBL modes
-    val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
+    val xblMode         = attSet(bindingElem, XXBL_MODE_QNAME)
 
     val modeValue               = xblMode("value")
     val modeExternalValue       = modeValue && xblMode("external-value")
@@ -91,10 +92,10 @@ object CommonBindingBuilder {
       (cssName.toList           map  ("xbl-" +))                 :::
       (modeFocus                list "xbl-focusable")            :::
       (modeJavaScriptLifecycle  list "xbl-javascript-lifecycle") :::
-      attSet(bindingElement, CLASS_QNAME).toList mkString " "
+      attSet(bindingElem, CLASS_QNAME).toList mkString " "
 
     val allowedExternalEvents: Set[String] =
-      attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
+      attSet(bindingElem, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
       (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
       (if (modeExternalValue) List(EventNames.XXFormsValue) else Nil)
 
@@ -111,9 +112,10 @@ object CommonBindingBuilder {
     ) toMap
 
     CommonBinding(
+      bindingElemNamespaceMapping = bindingElemNamespaceMapping,
       directName                  = directName,
       cssName                     = cssName,
-      containerElementName        = bindingElement.attributeValueOpt(XXBL_CONTAINER_QNAME) getOrElse "div",
+      containerElementName        = bindingElem.attributeValueOpt(XXBL_CONTAINER_QNAME) getOrElse "div",
       modeBinding                 = xblMode("binding"), // "optional binding" (would need mandatory, optional, and prohibited)
       modeValue                   = modeValue,
       modeExternalValue           = modeExternalValue,
@@ -125,11 +127,11 @@ object CommonBindingBuilder {
       modeHandlers                = ! xblMode("nohandlers"),
       standardLhhaAsSeq           = standardLhhaAsSeq,
       standardLhhaAsSet           = standardLhhaAsSeq.to(Set),
-      labelFor                    = bindingElement.attributeValueOpt(XXBL_LABEL_FOR_QNAME),
-      formatOpt                   = bindingElement.attributeValueOpt(XXBL_FORMAT_QNAME),
-      serializeExternalValueOpt   = bindingElement.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME),
-      deserializeExternalValueOpt = bindingElement.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME),
-      debugBindingName            = bindingElement.getQualifiedName,
+      labelFor                    = bindingElem.attributeValueOpt(XXBL_LABEL_FOR_QNAME),
+      formatOpt                   = bindingElem.attributeValueOpt(XXBL_FORMAT_QNAME),
+      serializeExternalValueOpt   = bindingElem.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME),
+      deserializeExternalValueOpt = bindingElem.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME),
+      debugBindingName            = bindingElem.getQualifiedName,
       cssClasses                  = cssClasses,
       allowedExternalEvents       = allowedExternalEvents,
       constantInstances           = constantInstances
@@ -247,10 +249,10 @@ object AbstractBinding {
     val selectors =
       CSSSelectorParser.parseSelectors(bindingElem.attributeValue(ELEMENT_QNAME))
 
-    val bindingNs = NamespaceMapping(bindingElem.allInScopeNamespacesAsStrings)
+    val bindingElemNamespaceMapping = NamespaceMapping(bindingElem.allInScopeNamespacesAsStrings)
 
     val directName =
-      selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)
+      selectors collectFirst BindingDescriptor.directBindingPF(bindingElemNamespaceMapping, None) flatMap (_.elementName)
 
     // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
     val cssName =
@@ -267,8 +269,8 @@ object AbstractBinding {
       handlers,
       modelElements,
       global,
-      bindingNs,
-      CommonBindingBuilder(bindingElem, directName, cssName, modelElements)
+      bindingElemNamespaceMapping,
+      CommonBindingBuilder(bindingElem, bindingElemNamespaceMapping, directName, cssName, modelElements)
     )
   }
 }

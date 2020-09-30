@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
+//import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
@@ -181,26 +182,28 @@ trait ModelBinds {
   private var _bindTree = new LazyConstant(new BindTree(selfModel, selfModel.element.elements(XFORMS_BIND_QNAME), isCustomMIP))
   def bindTree = _bindTree()
 
-  private def annotateSubTree(rawElement: Element) = {
-    val annotatedTree =
-      XBLBindingBuilder.annotateSubtree(
-        selfModel.part,
-        None,
-        rawElement.createDocumentCopyParentNamespaces(detach = false),
-        scope,
-        scope,
-        XXBLScope.Inner,
-        containerScope,
-        hasFullUpdate = false,
-        ignoreRoot = false
-      )
-
-    annotatedTree
-  }
-
+  // For `xxf:dynamic`
+  // TODO: move out to builder
   def rebuildBinds(rawModelElement: Element): Unit = {
 
     assert(! selfModel.part.isTopLevel)
+
+    def annotateSubTree(rawElement: Element) = {
+      val annotatedTree =
+        XBLBindingBuilder.annotateSubtree(
+          selfModel.part,
+          None,
+          rawElement.createDocumentCopyParentNamespaces(detach = false),
+          scope,
+          scope,
+          XXBLScope.Inner,
+          containerScope,
+          hasFullUpdate = false,
+          ignoreRoot = false
+        )
+
+      annotatedTree
+    }
 
     _bindTree().destroy()
     _bindTree = new LazyConstant(

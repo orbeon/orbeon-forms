@@ -44,11 +44,7 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.xforms.runtime.ErrorInfo;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
@@ -61,6 +57,7 @@ import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
 import org.orbeon.xforms.XFormsNames;
+import org.orbeon.xforms.runtime.ErrorInfo;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Option;
@@ -101,7 +98,7 @@ public class XFormsModelSchemaValidator {
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME());
         if (schemaAttribute != null)
-            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
+            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(MarkupUtils.encodeHRRI(schemaAttribute, false));
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."

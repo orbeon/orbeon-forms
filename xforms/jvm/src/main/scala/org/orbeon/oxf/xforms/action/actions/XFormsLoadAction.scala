@@ -17,6 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
@@ -65,7 +66,7 @@ class XFormsLoadAction extends XFormsAction {
           containingDocument = actionContext.containingDocument,
           currentElem        = Some(actionElem),
           doReplace          = show == LegacyShow.Replace,
-          value              = NetUtils.encodeHRRI(DataModel.getValue(item), true),
+          value              = DataModel.getValue(item).encodeHRRI(processSpace = true),
           target             = targetOpt,
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
@@ -82,7 +83,7 @@ class XFormsLoadAction extends XFormsAction {
                   containingDocument = actionContext.containingDocument,
                   currentElem        = Some(actionElem),
                   doReplace          = show == LegacyShow.Replace,
-                  value              = NetUtils.encodeHRRI(resolvedResource, true),
+                  value              = resolvedResource.encodeHRRI(processSpace = true),
                   target             = targetOpt,
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,

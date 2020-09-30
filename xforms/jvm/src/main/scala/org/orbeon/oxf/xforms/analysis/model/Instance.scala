@@ -20,8 +20,9 @@ import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
+import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.model.InstanceDataOps
@@ -181,7 +182,7 @@ trait InstanceMetadata {
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
   private def getAttributeEncode(qName: QName): Option[String] =
-    Option(element.attributeValue(qName)) map (att => NetUtils.encodeHRRI(att.trimAllToEmpty, true))
+    element.attributeValueOpt(qName) map (att => att.trimAllToEmpty.encodeHRRI(processSpace = true))
 
   private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
   private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)

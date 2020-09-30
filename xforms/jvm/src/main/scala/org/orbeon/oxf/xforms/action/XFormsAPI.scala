@@ -19,7 +19,8 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
+import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.actions._
@@ -360,7 +361,7 @@ object XFormsAPI {
       containingDocument           = inScopeContainingDocument,
       currentElem                  = None,
       doReplace                    = true,
-      value                        = NetUtils.encodeHRRI(url, true),
+      value                        = url.encodeHRRI(processSpace = true),
       target                       = target,
       urlType                      = UrlType.Render,
       urlNorewrite                 = false,

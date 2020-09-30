@@ -175,7 +175,7 @@ public class URLRewriterUtils {
      */
     private static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
         // Accept human-readable URI
-        urlString = NetUtils.encodeHRRI(urlString, true);
+        urlString = MarkupUtils.encodeHRRI(urlString, true);
 
         // Case where a protocol is specified: the URL is left untouched (except for human-readable processing)
         if (NetUtils.urlHasProtocol(urlString))

@@ -17,8 +17,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.dom.Document;
-import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
@@ -407,12 +407,12 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testHRRI() {
         // Test for spaces
-        assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.encodeHRRI("http://localhost:8080/myapp/a b", true));
-        assertEquals("http://localhost:8080/myapp/a b", NetUtils.encodeHRRI("http://localhost:8080/myapp/a b", false));
+        assertEquals("http://localhost:8080/myapp/a%20b", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", true));
+        assertEquals("http://localhost:8080/myapp/a b", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/a b", false));
         // Test for trim()
-        assertEquals("http://localhost:8080/", NetUtils.encodeHRRI("  http://localhost:8080/  ", true));
+        assertEquals("http://localhost:8080/", MarkupUtils.encodeHRRI("  http://localhost:8080/  ", true));
         // Test for other characters
-        assertEquals("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60", NetUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", true));
+        assertEquals("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60", MarkupUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", true));
     }
 
     @Test

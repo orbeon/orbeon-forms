@@ -9,7 +9,6 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.{util => u}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
@@ -68,11 +67,11 @@ class StaticBind(
 
       val booleanOrStringExpression =
         if (BooleanXPathMIPNames(name))
-          u.XPath.makeBooleanExpression(expression)
+          XPath.makeBooleanExpression(expression)
         else
-          u.XPath.makeStringExpression(expression)
+          XPath.makeStringExpression(expression)
 
-      u.XPath.compileExpression(
+      XPath.compileExpression(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,

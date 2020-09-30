@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
@@ -229,14 +228,14 @@ object XFormsProperties {
   val RetryDelayIncrement            = "retry.delay-increment"
   val RetryMaxDelay                  = "retry.max-delay"
 
+  private def propertySet =
+    CrossPlatformSupport.properties
+
   def getDebugLogging: collection.Set[String] =
-    Option(CrossPlatformSupport.properties.getNmtokens(PropertyPrefix + "logging.debug")) map (_.asScala) getOrElse Set.empty
+    Option(propertySet.getNmtokens(PropertyPrefix + "logging.debug")) map (_.asScala) getOrElse Set.empty
 
   def getErrorLogging: collection.Set[String] =
-    Option(CrossPlatformSupport.properties.getNmtokens(PropertyPrefix + "logging.error")) map (_.asScala) getOrElse Set.empty
-
-  private def propertySet =
-    Properties.instance.getPropertySet
+    Option(propertySet.getNmtokens(PropertyPrefix + "logging.error")) map (_.asScala) getOrElse Set.empty
 
   def isCacheDocument           : Boolean = propertySet.getBoolean("cache.document",                                      default = true)
   def isGZIPState               : Boolean = propertySet.getBoolean(PropertyPrefix + "gzip-state",                         default = true)

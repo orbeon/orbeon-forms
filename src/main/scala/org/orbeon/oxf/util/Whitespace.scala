@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.util
 
+import java.{lang => jl}
+
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon
-import scala.collection.compat._
 
 object Whitespace  {
 
@@ -25,7 +26,7 @@ object Whitespace  {
   object Policy extends Enum[Policy] {
 
     val values     = findValues
-    val valuesList = values.to(List)
+    val valuesList = values.toList
 
     case object Preserve  extends Policy
     case object Normalize extends Policy // like XML Schema's collapse and XPath's normalize-space()
@@ -53,7 +54,7 @@ object Whitespace  {
     if (length == 0 || ! saxon.value.Whitespace.containsWhitespace(cs))
       cs
     else {
-      val sb = new java.lang.StringBuilder(length)
+      val sb = new jl.StringBuilder(length)
       var inWhitespace = false
       var i = 0
       while (i < length) {

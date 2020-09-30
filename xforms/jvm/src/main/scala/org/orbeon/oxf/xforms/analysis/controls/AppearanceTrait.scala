@@ -17,7 +17,6 @@ import java.{lang => jl}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.xforms.XFormsNames._
 
 
@@ -25,8 +24,8 @@ trait AppearanceTrait extends ElementAnalysis {
 
   import AppearanceTrait._
 
-  val appearances: Set[QName]     = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-  val mediatype  : Option[String] = Option(element.attributeValue(MEDIATYPE_QNAME))
+  val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+  val mediatype  : Option[String] = element.attributeValueOpt(MEDIATYPE_QNAME)
 
   def encodeAndAppendAppearances(sb: jl.StringBuilder): Unit =
     appearances foreach (encodeAndAppendAppearance(sb, localName, _))
@@ -53,7 +52,7 @@ object AppearanceTrait {
     val uri = appearance.namespace.uri
     if (uri.nonEmpty) {
       // Try standard prefixes or else use the QName prefix
-      val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.namespace.prefix)
+      val prefix = StandardPrefixes.getOrElse(uri, appearance.namespace.prefix)
       if (prefix.nonEmpty) {
         sb.append(prefix)
         sb.append("-")

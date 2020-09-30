@@ -19,14 +19,14 @@ import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{EventHandler, _}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-//import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.{mutable => m}
+import scala.collection.mutable
+
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -83,7 +83,7 @@ trait ModelInstances {
 
   // Instance objects
   lazy val instances: collection.Map[String, Instance] =
-    m.LinkedHashMap(children collect { case instance: Instance => instance.staticId -> instance }: _*)
+    mutable.LinkedHashMap(children collect { case instance: Instance => instance.staticId -> instance }: _*)
 
   // General info about instances
   lazy val hasInstances = instances.nonEmpty

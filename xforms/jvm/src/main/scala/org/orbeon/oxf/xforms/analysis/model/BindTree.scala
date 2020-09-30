@@ -119,7 +119,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
   // Whether we figured out all XPath ref analysis
   var figuredAllBindRefAnalysis: Boolean = ! hasBinds // default value sets to true if no binds
 
-  var recalculateOrder: Option[List[StaticBind]] = None
+  var recalculateOrder : Option[List[StaticBind]] = None
   var defaultValueOrder: Option[List[StaticBind]] = None
 
   def freeBindsTransientState(): Unit =

@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.controls.VariableControl
+import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysisTrait, VariableControl}
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer

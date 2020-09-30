@@ -1,24 +1,11 @@
-/**
- *  Copyright (C) 2010 Orbeon, Inc.
- *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
- *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-package org.orbeon.oxf.xforms.analysis
+package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsNames.{NAME_QNAME, SELECT_QNAME, VALUE_QNAME, XXFORMS_SEQUENCE_QNAME, XXFORMS_VALUE_QNAME}
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
@@ -37,16 +24,16 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
         )
       )
 
-  val valueElement         : Element          = VariableAnalysis.valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
-  val expressionStringOpt  : Option[String]   = VariableAnalysis.valueOrSelectAttribute(valueElement)
+  val valueElement: Element = VariableAnalysis.valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
+  val expressionStringOpt: Option[String] = VariableAnalysis.valueOrSelectAttribute(valueElement)
 
   val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
     VariableAnalysis.valueOrSequenceElement(variableSelf.element) match {
       case Some(valueElem) =>
-        val valueElemStaticId   = valueElem.idOrNull
+        val valueElemStaticId = valueElem.idOrNull
         val valueElemPrefixedId = XFormsId.getRelatedEffectiveId(variableSelf.prefixedId, valueElemStaticId)
         val valueElemNamespaces = part.metadata.getNamespaceMapping(valueElemPrefixedId).orNull
-        val valueElemScope      = part.scopeForPrefixedId(valueElemPrefixedId) // xxx require that `mapScopeIds` has taken place
+        val valueElemScope = part.scopeForPrefixedId(valueElemPrefixedId) // xxx require that `mapScopeIds` has taken place
 
         (true, valueElemScope, valueElemNamespaces, valueElemStaticId)
       case None =>

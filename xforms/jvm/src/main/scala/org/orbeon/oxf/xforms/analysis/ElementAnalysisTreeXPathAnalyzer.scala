@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
-import org.orbeon.oxf.xforms.analysis.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{BindTree, DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}

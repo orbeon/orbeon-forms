@@ -25,9 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 
 
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
-
-
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandler
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import cats.syntax.option._
 import org.orbeon.dom._
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl

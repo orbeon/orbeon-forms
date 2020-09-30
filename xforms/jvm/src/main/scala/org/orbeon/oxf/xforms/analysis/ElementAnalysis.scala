@@ -170,23 +170,23 @@ abstract class ElementAnalysis(
     extensionAttributes map { case (k, v) => k -> (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
-  final var getContextAnalysis: Option[XPathAnalysis] = None
-  final var getBindingAnalysis: Option[XPathAnalysis] = None
-  final var getValueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
+  final var contextAnalysis: Option[XPathAnalysis] = None
+  final var bindingAnalysis: Option[XPathAnalysis] = None
+  final var valueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
   // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
 
   /**
    * Return the context within which children elements or values evaluate. This is the element binding if any, or the
    * element context if there is no binding.
    */
-  def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
+  def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) bindingAnalysis else contextAnalysis
 
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   def freeTransientState(): Unit = {
-    getContextAnalysis foreach (_.freeTransientState())
-    getBindingAnalysis foreach (_.freeTransientState())
-    getValueAnalysis   foreach (_.freeTransientState())
+    contextAnalysis foreach (_.freeTransientState())
+    bindingAnalysis foreach (_.freeTransientState())
+    valueAnalysis   foreach (_.freeTransientState())
   }
 }
 

@@ -55,7 +55,7 @@ object XXFormsLang {
   def addXMLLangDependency(pathMap: PathMap): Unit = {
     // Dependency on language
     val avtLangAnalysis = XFormsFunction.sourceElementAnalysis(pathMap).lang collect {
-      case ref: AVTLangRef => ref.att.getValueAnalysis.get
+      case ref: AVTLangRef => ref.att.valueAnalysis.get
     }
 
     // Only add the dependency if xml:lang is not a literal

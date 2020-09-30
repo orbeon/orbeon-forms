@@ -34,9 +34,9 @@ object ElementAnalysisTreeXPathAnalyzer {
 
   def analyzeXPath(e: ElementAnalysis): Unit = {
 
-    e.getContextAnalysis = computeContextAnalysis(e)
-    e.getBindingAnalysis = computeBindingAnalysis(e)
-    e.getValueAnalysis   = computeValueAnalysis(e)
+    e.contextAnalysis = computeContextAnalysis(e)
+    e.bindingAnalysis = computeBindingAnalysis(e)
+    e.valueAnalysis   = computeValueAnalysis(e)
 
     e match {
       case e: Model =>
@@ -111,7 +111,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         case _: Model                                               => None
         case e: OutputControl if e.staticValue.isDefined            => None
         // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
-        case e: ComponentControl if ! e.commonBinding.modeBinding   => e.getContextAnalysis
+        case e: ComponentControl if ! e.commonBinding.modeBinding   => e.contextAnalysis
         case e                                                      => computeBasicBindingAnalysis(e.part, e)
       }
 
@@ -125,16 +125,16 @@ object ElementAnalysisTreeXPathAnalyzer {
               s"Reference to non-existing bind id `$bindStaticId`",
               ElementAnalysis.createLocationData(e.element)
             )
-          model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
+          model.bindsById.get(bindStaticId) map (_.bindingAnalysis) orNull
         case None =>
           // No @bind
           e.ref match {
             case Some(ref) =>
               // New binding expression
-              analyzeXPath(e, e.getContextAnalysis, ref).some
+              analyzeXPath(e, e.contextAnalysis, ref).some
             case None =>
               // TODO: Return a binding anyway so that controls w/o their own binding also get updated.
-              e.getContextAnalysis
+              e.contextAnalysis
           }
       }
 
@@ -158,7 +158,7 @@ object ElementAnalysisTreeXPathAnalyzer {
               //assert(element.elements.isEmpty) // no children elements allowed in this case
 
               // Use value provided by the delegate
-              delegateAnalysis.getValueAnalysis
+              delegateAnalysis.valueAnalysis
             } else {
               // 2. E.g. <xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>
 
@@ -182,8 +182,8 @@ object ElementAnalysisTreeXPathAnalyzer {
                           scope              = delegateAnalysis.getChildElementScope(element)
                         ) with ValueTrait with OptionalSingleNode with ViewTrait
                       ElementAnalysisTreeXPathAnalyzer.analyzeXPath(outputAnalysis)
-                      if (outputAnalysis.getValueAnalysis.isDefined)
-                        combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
+                      if (outputAnalysis.valueAnalysis.isDefined)
+                        combinedAnalysis = combinedAnalysis combine outputAnalysis.valueAnalysis.get
                     } else if (hostLanguageAVTs) {
                       for {
                         attribute <- element.attributes
@@ -343,7 +343,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       val refSucceeded =
         bind.ref match {
           case Some(_) =>
-            bind.getBindingAnalysis match {
+            bind.bindingAnalysis match {
               case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
                 // There is a binding and analysis succeeded
 
@@ -409,7 +409,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                   scope              = itemElementAnalysis.getChildElementScope(nestedElement)
                 )
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(nestedAnalysis)
-                combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
+                combinedAnalysis = combinedAnalysis combine nestedAnalysis.valueAnalysis.get
               }
             }
 
@@ -432,7 +432,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                 //
                 // See also #289 https://github.com/orbeon/orbeon-forms/issues/289 (closed)
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
-                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
+                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.bindingAnalysis.get.makeValuesDependencies
 
                 processElement(LABEL_QNAME, required = true)
                 processElement(XFORMS_VALUE_QNAME, required = false)
@@ -447,7 +447,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
                 // Analyze container and add as a value dependency (see above)
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
-                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
+                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.bindingAnalysis.get.makeValuesDependencies
 
                 processElement(LABEL_QNAME, required = false) // label is optional on xf:choices
 

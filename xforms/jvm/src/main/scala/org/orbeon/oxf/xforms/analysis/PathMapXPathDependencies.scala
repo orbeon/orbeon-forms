@@ -471,7 +471,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
 
     val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
     val updateResult: UpdateResult =
@@ -479,7 +479,7 @@ class PathMapXPathDependencies(
         case Some(result) =>
           result
         case None =>
-          val tempResult = control.getBindingAnalysis match {
+          val tempResult = control.bindingAnalysis match {
             case None =>
               // Control does not have an XPath binding
               MustNotUpdateResultZero
@@ -500,7 +500,7 @@ class PathMapXPathDependencies(
               "binding requires update",
               List(
                 "effective id" -> controlEffectiveId,
-                "XPath"        -> control.getBindingAnalysis.get.xpathString
+                "XPath"        -> control.bindingAnalysis.get.xpathString
               )
             )
 
@@ -523,7 +523,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
 
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
@@ -532,12 +532,12 @@ class PathMapXPathDependencies(
           (
             result,
             if (result.requireUpdate)
-              control.getValueAnalysis
+              control.valueAnalysis
             else
               null
           )
         case None =>
-          val tempValueAnalysis = control.getValueAnalysis
+          val tempValueAnalysis = control.valueAnalysis
           val tempUpdateResult = tempValueAnalysis match {
             case None =>
               // Control does not have a value
@@ -677,8 +677,8 @@ class PathMapXPathDependencies(
         // the value to type check has changed.
         val valueAnalysis = mip match {
           case xpathMIP: StaticBind#XPathMIP => Some(xpathMIP.analysis)
-          case _: StaticBind#TypeMIP         => bind.getValueAnalysis
-          case _: StaticBind#WhitespaceMIP   => bind.getValueAnalysis
+          case _: StaticBind#TypeMIP         => bind.valueAnalysis
+          case _: StaticBind#WhitespaceMIP   => bind.valueAnalysis
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 

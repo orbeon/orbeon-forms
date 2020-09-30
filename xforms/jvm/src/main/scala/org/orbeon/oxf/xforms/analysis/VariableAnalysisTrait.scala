@@ -53,7 +53,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
         (false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
     }
 
-  def variableAnalysis: Option[XPathAnalysis] = getValueAnalysis
+  def variableAnalysis: Option[XPathAnalysis] = valueAnalysis
 }
 
 object VariableAnalysis {

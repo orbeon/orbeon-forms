@@ -51,7 +51,7 @@ object PartAnalysisDebugSupport {
 
     def writeElementAnalysis(a: ElementAnalysis)(implicit receiver: XMLReceiver): Unit = {
 
-      a.getBindingAnalysis match {
+      a.bindingAnalysis match {
         case Some(bindingAnalysis) if a.hasBinding =>
           // For now there can be a binding analysis even if there is no binding on the control
           // (hack to simplify determining which controls to update)
@@ -61,7 +61,7 @@ object PartAnalysisDebugSupport {
         case _ => // NOP
       }
 
-      a.getValueAnalysis foreach { valueAnalysis =>
+      a.valueAnalysis foreach { valueAnalysis =>
         withElement("value") {
           writeXPathAnalysis(valueAnalysis)
         }

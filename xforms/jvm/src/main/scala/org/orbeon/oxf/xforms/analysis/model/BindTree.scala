@@ -113,7 +113,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
   lazy val allBindVariables: Map[String, VariableTrait] = model.variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
 
   class BindAsVariable(val name: String, bind: StaticBind) extends VariableTrait {
-    def variableAnalysis: Option[XPathAnalysis] = bind.getBindingAnalysis
+    def variableAnalysis: Option[XPathAnalysis] = bind.bindingAnalysis
   }
 
   // Whether we figured out all XPath ref analysis

@@ -49,7 +49,7 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     lhhaAsList(lhhaType) exists (! _.isForRepeat)
 
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
-    lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
+    lhhaAsList(lhhaType) flatMap (_.valueAnalysis)
 
   def hasLHHAPlaceholder(lhhaType: LHHA): Boolean =
     lhh(lhhaType) match {

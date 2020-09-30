@@ -17,16 +17,22 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 
-class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends ValueControl(staticStateContext, element, parent, preceding, scope)
-    with OptionalSingleNode {
+class OutputControl(
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ValueControl(part, index, element, parent, preceding, scope)
+     with OptionalSingleNode {
 
   // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
   override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)

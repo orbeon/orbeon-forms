@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
@@ -44,10 +45,13 @@ case class AVTLangRef(att: AttributeControl) extends LangRef
  */
 abstract class ElementAnalysis(
   val part      : PartAnalysisImpl,
+  val index     : Int, // index of the element in the view
   val element   : Element,
   val parent    : Option[ElementAnalysis],
-  val preceding : Option[ElementAnalysis]
-) extends ElementEventHandlers with ElementRepeats {
+  val preceding : Option[ElementAnalysis],
+  val scope     : Scope
+) extends ElementEventHandlers
+     with ElementRepeats {
 
   selfElement =>
 
@@ -56,6 +60,28 @@ abstract class ElementAnalysis(
   require(element ne null)
 
   implicit def logger: IndentedLogger = part.getIndentedLogger
+
+  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
+  // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
+  // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
+  lazy val model: Option[Model] =
+    // Check for local @model attribute
+    element.attributeValue(XFormsNames.MODEL_QNAME) match {
+      case localModelStaticId: String =>
+        // Get model prefixed id and verify it belongs to this scope
+        val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
+        val localModel = part.getModel(localModelPrefixedId)
+        if (localModel eq null)
+          throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
+
+        Some(localModel)
+      case _ =>
+        // Use inherited model
+        closestAncestorInScope match {
+          case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
+          case None           => part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
+        }
+    }
 
   // xml:lang, inherited from parent unless overridden locally
   lazy val lang: Option[LangRef] =
@@ -73,17 +99,15 @@ abstract class ElementAnalysis(
       Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
     }
 
-  val namespaceMapping: NamespaceMapping
-
   // Element local name
   def localName: String = element.getName
 
-  // Scope and model
-  val scope: Scope
-  val model: Option[Model]
-
   // In-scope variables (for XPath analysis)
-  val inScopeVariables: Map[String, VariableTrait]
+  // Only overridden anonymously in `VariableAnalysisTrait` where it says "This is bad architecture"
+  // FIXME
+  lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
+
+  protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
   def removeFromParent(): Unit =
     parent foreach {
@@ -124,11 +148,20 @@ abstract class ElementAnalysis(
   // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
   //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
 
-  def containerScope: Scope
+  // Only overridden by `RootControl`
+  // TODO: pass during construction?
+  def containerScope: Scope = part.containingScope(prefixedId)
+
+  final def getChildElementScope(childElement: Element): Scope = {
+    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)
+    part.scopeForPrefixedId(childPrefixedId)
+  }
 
   // Ids
   val staticId  : String = element.idOrNull
   val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
+
+  final val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   // Location
   val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)

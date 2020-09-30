@@ -14,19 +14,21 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CoreControl
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 
 class AttributeControl(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends CoreControl(part, index, element, parent, preceding, scope)
      with ValueTrait
      with OptionalSingleNode {
 

@@ -122,7 +122,8 @@ class PartAnalysisImpl(
     // Create new control if possible
     val elementAnalysisOpt =
       ControlAnalysisFactory.create(
-        context        = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1), // Q: Benefit vs. just passing the 2 args?
+        part           = partAnalysis,
+        index          = controlAnalysisMap.size + 1,
         controlElement = controlElement,
         parent         = parent.some,
         preceding      = preceding,
@@ -199,7 +200,7 @@ class PartAnalysisImpl(
       val attributes    = m.Buffer[AttributeControl]()
 
       // Create and index root control
-      val rootControlAnalysis = new RootControl(StaticStateContext(this, 0), staticStateDocument.rootControl, startScope)
+      val rootControlAnalysis = new RootControl(this, 0, staticStateDocument.rootControl, startScope)
       indexNewControl(rootControlAnalysis, lhhas, eventHandlers, models, attributes)
 
       // Gather controls

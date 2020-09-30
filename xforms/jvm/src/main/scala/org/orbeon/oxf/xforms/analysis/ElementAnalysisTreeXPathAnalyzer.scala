@@ -146,7 +146,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
             // Delegate to concrete implementation
             val delegateAnalysis =
-              new SimpleElementAnalysis(e.staticStateContext, e.element, e.parent, e.preceding, e.scope)
+              new ElementAnalysis(e.part, e.index /* wrong */, e.element, e.parent, e.preceding, e.scope)
                 with ValueTrait with OptionalSingleNode with ViewTrait
 
             ElementAnalysisTreeXPathAnalyzer.analyzeXPath(delegateAnalysis)
@@ -174,8 +174,9 @@ object ElementAnalysisTreeXPathAnalyzer {
                     if (element.getQName == XFORMS_OUTPUT_QNAME) {
                       // Add dependencies
                       val outputAnalysis =
-                        new SimpleElementAnalysis(
-                          staticStateContext = e.staticStateContext,
+                        new ElementAnalysis(
+                          part               = e.part,
+                          index              = e.index, // wrong
                           element            = element,
                           parent             = delegateAnalysis.some,
                           preceding          = None,
@@ -226,7 +227,7 @@ object ElementAnalysisTreeXPathAnalyzer {
               // Value is provided by nested `xxf:value`
 
               val valueElementAnalysis =
-                new SimpleElementAnalysis(e.staticStateContext, valueElement, e.some, None, e.valueScope) {
+                new ElementAnalysis(e.part, e.index /* wrong */, valueElement, e.some, None, e.valueScope) {
 
                   nestedSelf =>
 
@@ -385,28 +386,30 @@ object ElementAnalysisTreeXPathAnalyzer {
       e.element.visitDescendants(
         new VisitorListener {
 
-          var stack: List[SimpleElementAnalysis] = e :: Nil
+          var stack: List[ElementAnalysis] = e :: Nil
 
           def startElement(element: Element): Unit = {
 
             // Make lazy as might not be used
             lazy val itemElementAnalysis =
-              new SimpleElementAnalysis(e.staticStateContext, element, stack.head.some, None, stack.head.getChildElementScope(element))
+              new ElementAnalysis(e.part, e.index /* wrong */, element, stack.head.some, None, stack.head.getChildElementScope(element))
                 with ValueTrait with OptionalSingleNode with ViewTrait
 
             def processElement(qName: QName, required: Boolean): Unit = {
-              val nestedElement = element.element(qName)
+
+              val nestedElementOpt = element.elementOpt(qName)
 
               if (required)
-                require(nestedElement ne null)
+                require(nestedElementOpt.isDefined)
 
-              if (nestedElement ne null) {
+              nestedElementOpt foreach { nestedElement =>
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
-                  staticStateContext = e.staticStateContext,
-                  element            = nestedElement,
-                  parent             = Some(itemElementAnalysis),
-                  preceding          = None,
-                  scope              = itemElementAnalysis.getChildElementScope(nestedElement)
+                  part      = e.part,
+                  index     = e.index, // wrong
+                  element   = nestedElement,
+                  parent    = Some(itemElementAnalysis),
+                  preceding = None,
+                  scope     = itemElementAnalysis.getChildElementScope(nestedElement)
                 )
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(nestedAnalysis)
                 combinedAnalysis = combinedAnalysis combine nestedAnalysis.valueAnalysis.get

@@ -17,8 +17,7 @@ import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
-import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.analysis.{EventHandler, _}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 //import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
@@ -33,12 +32,13 @@ import scala.collection.{mutable => m}
  * Static analysis of an XForms model <xf:model> element.
  */
 class Model(
-  staticStateContext : StaticStateContext,
-  elem               : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, elem, parent, preceding, scope)
+  part      : PartAnalysisImpl,
+  index     : Int,
+  elem      : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(part, index, elem, parent, preceding, scope)
   with WithChildrenTrait
   with ModelInstances
   with ModelVariables
@@ -46,7 +46,6 @@ class Model(
   with ModelEventHandlers
   with ModelBinds {
 
-  require(staticStateContext ne null)
   require(scope ne null)
 
   override lazy val model = this.some
@@ -119,7 +118,7 @@ trait ModelVariables {
     for {
       variableElement <- variableElements
       analysis: VariableAnalysisTrait = {
-        val result = new SimpleElementAnalysis(staticStateContext, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
+        val result = new ElementAnalysis(part, index /* would be wrong */, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
         preceding = result.some
         result
       }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.Item
 
@@ -21,7 +21,7 @@ import org.orbeon.saxon.om.Item
  * Trait representing an element supporting a value, whether the string value of the binding node or whether through
  * a @value attribute.
  */
-trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
+trait ValueTrait extends ElementAnalysis with SingleNodeTrait {
 
   override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedValueBoundItem(item)
 

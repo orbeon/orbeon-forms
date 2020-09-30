@@ -3,18 +3,19 @@ package org.orbeon.oxf.xforms.analysis.controls
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, CommonBinding, ConcreteBinding}
+import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 
 
 class ComponentControl(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ContainerControl(part, index, element, parent, preceding, scope)
      with WithChildrenTrait
      with OptionalSingleNode { // binding could be mandatory, optional, or prohibited
 

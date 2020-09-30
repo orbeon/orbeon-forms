@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.{LangRef, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.{LangRef, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.xbl.Scope
@@ -23,8 +23,12 @@ import org.orbeon.xforms.{Constants, EventNames}
 /**
  * Single root container for a part, whether top-level or a nested part.
  */
-class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
-  extends ContainerControl(staticStateContext, element, None, None, scope) {
+class RootControl(
+  part    : PartAnalysisImpl,
+  index   : Int,
+  element : Element,
+  scope   : Scope
+) extends ContainerControl(part, index, element, None, None, scope) {
 
   override val staticId       = Constants.DocumentId
   override val prefixedId     = part.startScope.fullPrefix + staticId

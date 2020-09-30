@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -37,13 +37,15 @@ import shapeless.syntax.typeable._
  * Static analysis of an XForms instance.
  */
 class Instance(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(
-  staticStateContext,
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(
+  part,
+  index,
   element,
   parent,
   preceding,

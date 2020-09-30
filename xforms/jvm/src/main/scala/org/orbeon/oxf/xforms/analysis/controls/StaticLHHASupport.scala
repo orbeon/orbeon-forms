@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, XPathAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathAnalysis}
 import org.orbeon.xforms.XFormsNames
 
 
 // Control support for nested or external LHHA elements
-trait StaticLHHASupport extends SimpleElementAnalysis {
+trait StaticLHHASupport extends ElementAnalysis {
 
   import Private._
 

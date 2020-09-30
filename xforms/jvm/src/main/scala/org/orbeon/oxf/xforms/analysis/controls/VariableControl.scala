@@ -15,21 +15,22 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.xbl.Scope
 
 class VariableControl(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, scope)
   with ViewTrait
   with OptionalSingleNode
   with WithChildrenTrait
   with VariableAnalysisTrait {
 
-  override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
+  override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedValueBoundItem(item)
 }

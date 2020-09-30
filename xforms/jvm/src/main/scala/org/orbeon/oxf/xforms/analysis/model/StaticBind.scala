@@ -21,8 +21,9 @@ class StaticBind(
   element   : Element,
   parent    : ElementAnalysis,
   preceding : Option[ElementAnalysis]
-) extends SimpleElementAnalysis(
-  bindTree.model.staticStateContext,
+) extends ElementAnalysis(
+  bindTree.model.part,
+  bindTree.model.index,
   element,
   Some(parent),
   preceding,
@@ -75,7 +76,7 @@ class StaticBind(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,
-        functionLibrary  = staticStateContext.partAnalysis.staticState.functionLibrary,
+        functionLibrary  = part.staticState.functionLibrary,
         avt              = false
       )
     }

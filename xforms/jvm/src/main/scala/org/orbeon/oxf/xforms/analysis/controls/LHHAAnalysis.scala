@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -31,12 +30,13 @@ import org.orbeon.xforms.xbl.Scope
 import scala.annotation.tailrec
 
 class LHHAAnalysis(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, scope)
    with OptionalSingleNode
    with AppearanceTrait {
 
@@ -99,7 +99,7 @@ class LHHAAnalysis(
       case LHHA.Label | LHHA.Hint =>
         hasLocalMinimalAppearance || (
           ! hasLocalFullAppearance &&
-            staticStateContext.partAnalysis.staticState.staticStringProperty(
+            part.staticState.staticStringProperty(
               if (lhhaType == LHHA.Hint) HintAppearanceProperty else LabelAppearanceProperty
             )
           .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)

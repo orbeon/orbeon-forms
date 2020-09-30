@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.orbeon.oxf.xforms.event.events.KeyboardEvent
 import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.XFormsNames._
 
 /**
  * Handle aspects of an element that are specific to the view.
  */
-trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
+trait ViewTrait extends ElementAnalysis with AppearanceTrait {
 
   // By default, external events are keypress plus those specifically allowed by the form author
   protected def externalEventsDef = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ EventNames.KeyboardEvents

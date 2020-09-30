@@ -20,14 +20,21 @@ import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 
 class ContainerControl(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-     with ViewTrait
-     with WithChildrenTrait {
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(
+  part,
+  index,
+  element,
+  parent,
+  preceding,
+  scope
+) with ViewTrait
+  with WithChildrenTrait {
 
   // For <xf:group xxf:element="xh:div">. Can be null.
   val elementQName: QName = element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)

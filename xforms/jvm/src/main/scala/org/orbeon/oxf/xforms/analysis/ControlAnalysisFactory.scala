@@ -29,7 +29,7 @@ import org.orbeon.xforms.xbl.Scope
 object ControlAnalysisFactory {
 
   // Control factories
-  type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) => ElementAnalysis
+  type ControlFactory = (PartAnalysisImpl, Int, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) => ElementAnalysis
 
   private val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE)
   private val ValueExternalEvents   = TriggerExternalEvents + EventNames.XXFormsValue
@@ -43,47 +43,63 @@ object ControlAnalysisFactory {
     EventNames.XXFormsUploadError
   )
 
+  abstract class CoreControl(
+    part      : PartAnalysisImpl,
+    index     : Int,
+    element   : Element,
+    parent    : Option[ElementAnalysis],
+    preceding : Option[ElementAnalysis],
+    scope     : Scope
+  ) extends ElementAnalysis(part, index, element, parent, preceding, scope)
+       with ViewTrait
+       with StaticLHHASupport
+
+
   abstract class ValueControl(
-    staticStateContext : StaticStateContext,
-    element            : Element,
-    parent             : Option[ElementAnalysis],
-    preceding          : Option[ElementAnalysis],
-    scope              : Scope
-  ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+    part      : PartAnalysisImpl,
+    index     : Int,
+    element   : Element,
+    parent    : Option[ElementAnalysis],
+    preceding : Option[ElementAnalysis],
+    scope     : Scope
+  ) extends CoreControl(part, index, element, parent, preceding, scope)
        with ValueTrait
        with WithChildrenTrait
        with FormatTrait
 
   class InputValueControl(
-    staticStateContext : StaticStateContext,
-    element            : Element,
-    parent             : Option[ElementAnalysis],
-    preceding          : Option[ElementAnalysis],
-    scope              : Scope
-  ) extends ValueControl(staticStateContext, element, parent, preceding, scope)
+    part      : PartAnalysisImpl,
+    index     : Int,
+    element   : Element,
+    parent    : Option[ElementAnalysis],
+    preceding : Option[ElementAnalysis],
+    scope     : Scope
+  ) extends ValueControl(part, index, element, parent, preceding, scope)
        with RequiredSingleNode {
     override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
     override val externalEvents = externalEventsDef
   }
 
   class SelectionControl(
-    staticStateContext : StaticStateContext,
-    element            : Element,
-    parent             : Option[ElementAnalysis],
-    preceding          : Option[ElementAnalysis],
-    scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
+    part      : PartAnalysisImpl,
+    index     : Int,
+    element   : Element,
+    parent    : Option[ElementAnalysis],
+    preceding : Option[ElementAnalysis],
+    scope     : Scope
+  ) extends InputValueControl(part, index, element, parent, preceding, scope)
        with SelectionControlTrait {
     override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) + XXFORMS_TITLE_QNAME
   }
 
   class TriggerControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
+  ) extends CoreControl(part, index, element, parent, preceding, scope)
        with OptionalSingleNode
        with TriggerAppearanceTrait
        with WithChildrenTrait {
@@ -94,12 +110,13 @@ object ControlAnalysisFactory {
   }
 
   class UploadControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(part, index, element, parent, preceding, scope) {
 
     val multiple: Boolean = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME) contains "true"
 
@@ -110,12 +127,13 @@ object ControlAnalysisFactory {
   }
 
   class InputControl(
-    staticStateContext : StaticStateContext,
-    element            : Element,
-    parent             : Option[ElementAnalysis],
-    preceding          : Option[ElementAnalysis],
-    scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+    part      : PartAnalysisImpl,
+    index     : Int,
+    element   : Element,
+    parent    : Option[ElementAnalysis],
+    preceding : Option[ElementAnalysis],
+    scope     : Scope
+  ) extends InputValueControl(part, index, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_TITLE_QNAME,
@@ -126,12 +144,13 @@ object ControlAnalysisFactory {
   }
 
   class SecretControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(part, index, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_MAXLENGTH_QNAME,
@@ -140,12 +159,13 @@ object ControlAnalysisFactory {
   }
 
   class TextareaControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(part, index, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_MAXLENGTH_QNAME,
       XXFORMS_COLS_QNAME,
@@ -154,12 +174,13 @@ object ControlAnalysisFactory {
   }
 
   class SwitchControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  ) extends ContainerControl(part, index, element, parent, preceding, scope)
        with OptionalSingleNode
        with StaticLHHASupport
        with AppearanceTrait {
@@ -172,12 +193,13 @@ object ControlAnalysisFactory {
   }
 
   class CaseControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  ) extends ContainerControl(part, index, element, parent, preceding, scope)
        with OptionalSingleNode
        with StaticLHHASupport {
 
@@ -190,7 +212,7 @@ object ControlAnalysisFactory {
           xpathString      = XPath.makeStringExpression(valueExpr),
           namespaceMapping = namespaceMapping,
           locationData     = locationData,
-          functionLibrary  = staticStateContext.partAnalysis.staticState.functionLibrary,
+          functionLibrary  = part.staticState.functionLibrary,
           avt              = false
         )
 
@@ -201,12 +223,13 @@ object ControlAnalysisFactory {
   }
 
   class GroupControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  ) extends ContainerControl(part, index, element, parent, preceding, scope)
        with OptionalSingleNode
        with StaticLHHASupport {
 
@@ -221,12 +244,13 @@ object ControlAnalysisFactory {
   }
 
   class DialogControl(
-    staticStateContext : StaticStateContext,
+    part      : PartAnalysisImpl,
+    index     : Int,
     element            : Element,
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+  ) extends ContainerControl(part, index, element, parent, preceding, scope)
      with OptionalSingleNode
      with StaticLHHASupport {
 
@@ -234,8 +258,8 @@ object ControlAnalysisFactory {
       super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
   }
 
-  private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _)
-  private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
+  private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _, _)
+  private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _, _)
 
   // Variable factories indexed by QName
   // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xf:var>)
@@ -245,48 +269,48 @@ object ControlAnalysisFactory {
 
   // Other factories indexed by QName
   private val byQNameFactory = Map[QName, ControlFactory](
-    XBL_TEMPLATE_QNAME            -> (new ContainerControl(_, _, _, _, _)),
+    XBL_TEMPLATE_QNAME            -> (new ContainerControl(_, _, _, _, _, _)),
     // Core value controls
-    XFORMS_INPUT_QNAME            -> (new InputControl(_, _, _, _, _)),
-    XFORMS_SECRET_QNAME           -> (new SecretControl(_, _, _, _, _)),
-    XFORMS_TEXTAREA_QNAME         -> (new TextareaControl(_, _, _, _, _)),
-    XFORMS_UPLOAD_QNAME           -> (new UploadControl(_, _, _, _, _)),
-    XFORMS_RANGE_QNAME            -> (new InputValueControl(_, _, _, _, _)),
-    XXFORMS_TEXT_QNAME            -> (new OutputControl(_, _, _, _, _)),// TODO: don't accept any external events
-    XFORMS_OUTPUT_QNAME           -> (new OutputControl(_, _, _, _, _)),
+    XFORMS_INPUT_QNAME            -> (new InputControl(_, _, _, _, _, _)),
+    XFORMS_SECRET_QNAME           -> (new SecretControl(_, _, _, _, _, _)),
+    XFORMS_TEXTAREA_QNAME         -> (new TextareaControl(_, _, _, _, _, _)),
+    XFORMS_UPLOAD_QNAME           -> (new UploadControl(_, _, _, _, _, _)),
+    XFORMS_RANGE_QNAME            -> (new InputValueControl(_, _, _, _, _, _)),
+    XXFORMS_TEXT_QNAME            -> (new OutputControl(_, _, _, _, _, _)),// TODO: don't accept any external events
+    XFORMS_OUTPUT_QNAME           -> (new OutputControl(_, _, _, _, _, _)),
     // Core controls
-    XFORMS_TRIGGER_QNAME          -> (new TriggerControl(_, _, _, _, _)),
-    XFORMS_SUBMIT_QNAME           -> (new TriggerControl(_, _, _, _, _)),
+    XFORMS_TRIGGER_QNAME          -> (new TriggerControl(_, _, _, _, _, _)),
+    XFORMS_SUBMIT_QNAME           -> (new TriggerControl(_, _, _, _, _, _)),
     // Selection controls
-    XFORMS_SELECT_QNAME           -> (new SelectionControl(_, _, _, _, _)),
-    XFORMS_SELECT1_QNAME          -> (new SelectionControl(_, _, _, _, _)),
+    XFORMS_SELECT_QNAME           -> (new SelectionControl(_, _, _, _, _, _)),
+    XFORMS_SELECT1_QNAME          -> (new SelectionControl(_, _, _, _, _, _)),
     // Attributes
-    XXFORMS_ATTRIBUTE_QNAME       -> (new AttributeControl(_, _, _, _, _)),
+    XXFORMS_ATTRIBUTE_QNAME       -> (new AttributeControl(_, _, _, _, _, _)),
     // Container controls
-    XFORMS_GROUP_QNAME            -> (new GroupControl(_, _, _, _, _)),
-    XFORMS_SWITCH_QNAME           -> (new SwitchControl(_, _, _, _, _)),
-    XFORMS_CASE_QNAME             -> (new CaseControl(_, _, _, _, _)),
-    XXFORMS_DIALOG_QNAME          -> (new DialogControl(_, _, _, _, _)),
+    XFORMS_GROUP_QNAME            -> (new GroupControl(_, _, _, _, _, _)),
+    XFORMS_SWITCH_QNAME           -> (new SwitchControl(_, _, _, _, _, _)),
+    XFORMS_CASE_QNAME             -> (new CaseControl(_, _, _, _, _, _)),
+    XXFORMS_DIALOG_QNAME          -> (new DialogControl(_, _, _, _, _, _)),
     // Dynamic control
-    XXFORMS_DYNAMIC_QNAME         -> (new SimpleElementAnalysis(_, _, _, _, _) with RequiredSingleNode with ViewTrait), // NOTE: No longer `ContainerControl`!
+    XXFORMS_DYNAMIC_QNAME         -> (new ElementAnalysis(_, _, _, _, _, _) with RequiredSingleNode with ViewTrait), // NOTE: No longer `ContainerControl`!
     // Repeat control
-    XFORMS_REPEAT_QNAME           -> (new RepeatControl(_, _, _, _, _)),
-    XFORMS_REPEAT_ITERATION_QNAME -> (new RepeatIterationControl(_, _, _, _, _)),
+    XFORMS_REPEAT_QNAME           -> (new RepeatControl(_, _, _, _, _, _)),
+    XFORMS_REPEAT_ITERATION_QNAME -> (new RepeatIterationControl(_, _, _, _, _, _)),
     // LHHA
     LABEL_QNAME                   -> LHHAControlFactory,
     HELP_QNAME                    -> LHHAControlFactory,
     HINT_QNAME                    -> LHHAControlFactory,
     ALERT_QNAME                   -> LHHAControlFactory,
     // Model
-    XFORMS_MODEL_QNAME            -> (new Model(_, _, _, _, _)),
-    XFORMS_SUBMISSION_QNAME       -> (new Submission(_, _, _, _, _)),
-    XFORMS_INSTANCE_QNAME         -> (new Instance(_, _, _, _, _)),
+    XFORMS_MODEL_QNAME            -> (new Model(_, _, _, _, _, _)),
+    XFORMS_SUBMISSION_QNAME       -> (new Submission(_, _, _, _, _, _)),
+    XFORMS_INSTANCE_QNAME         -> (new Instance(_, _, _, _, _, _)),
     // Itemsets
-    XFORMS_CHOICES_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
-    XFORMS_ITEM_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
-    XFORMS_ITEMSET_QNAME          -> (new SimpleElementAnalysis(_, _, _, _, _) with WithChildrenTrait),
-    XFORMS_VALUE_QNAME            -> (new SimpleElementAnalysis(_, _, _, _, _) with ValueTrait with OptionalSingleNode),
-    XFORMS_COPY_QNAME             -> (new SimpleElementAnalysis(_, _, _, _, _) with RequiredSingleNode)
+    XFORMS_CHOICES_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _) with WithChildrenTrait),
+    XFORMS_ITEM_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _) with WithChildrenTrait),
+    XFORMS_ITEMSET_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _) with WithChildrenTrait),
+    XFORMS_VALUE_QNAME            -> (new ElementAnalysis(_, _, _, _, _, _) with ValueTrait with OptionalSingleNode),
+    XFORMS_COPY_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _) with RequiredSingleNode)
   ) ++ variableFactory
 
   private val ControlFactory: PartialFunction[Element, ControlFactory] =
@@ -295,14 +319,15 @@ object ControlAnalysisFactory {
   private val ControlOrActionFactory = ControlFactory orElse XFormsActions.ActionFactory lift
 
   private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
-    (false, false) -> (new ComponentControl(_, _, _, _, _)                                       ),
-    (false, true)  -> (new ComponentControl(_, _, _, _, _) with                          StaticLHHASupport),
-    (true,  false) -> (new ComponentControl(_, _, _, _, _) with ValueComponentTrait                       ),
-    (true,  true)  -> (new ComponentControl(_, _, _, _, _) with ValueComponentTrait with StaticLHHASupport)
+    (false, false) -> (new ComponentControl(_, _, _, _, _, _)                                       ),
+    (false, true)  -> (new ComponentControl(_, _, _, _, _, _) with                          StaticLHHASupport),
+    (true,  false) -> (new ComponentControl(_, _, _, _, _, _) with ValueComponentTrait                       ),
+    (true,  true)  -> (new ComponentControl(_, _, _, _, _, _) with ValueComponentTrait with StaticLHHASupport)
   )
 
   def create(
-    context        : StaticStateContext,
+    part           : PartAnalysisImpl,
+    index          : Int,
     controlElement : Element,
     parent         : Option[ElementAnalysis],
     preceding      : Option[ElementAnalysis],
@@ -313,12 +338,12 @@ object ControlAnalysisFactory {
     require(scope ne null)
 
     val factory =
-      context.partAnalysis.metadata.findAbstractBindingByPrefixedId(scope.prefixedIdForStaticId(controlElement.idOrNull)) match {
+      part.metadata.findAbstractBindingByPrefixedId(scope.prefixedIdForStaticId(controlElement.idOrNull)) match {
         case Some(abstractBinding) => ComponentFactories.get(abstractBinding.modeValue, abstractBinding.modeLHHA)
         case None                  => ControlOrActionFactory(controlElement)
       }
 
-    factory map (_(context, controlElement, parent, preceding, scope))
+    factory map (_(part, index, controlElement, parent, preceding, scope))
   }
 
   def isVariable(qName: QName): Boolean = variableFactory.contains(qName)

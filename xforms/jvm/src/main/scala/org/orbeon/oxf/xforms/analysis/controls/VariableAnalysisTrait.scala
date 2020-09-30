@@ -5,12 +5,12 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.XFormsNames.{NAME_QNAME, SELECT_QNAME, VALUE_QNAME, XXFORMS_SEQUENCE_QNAME, XXFORMS_VALUE_QNAME}
+import org.orbeon.xforms.XFormsNames._
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
  */
-trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
+trait VariableAnalysisTrait extends ElementAnalysis with VariableTrait {
 
   variableSelf =>
 

@@ -15,13 +15,12 @@ package org.orbeon.oxf.xforms.action
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
-import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
-import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, WithChildrenTrait}
-import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.analysis.EventHandler._
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
+import org.orbeon.xforms.XFormsNames._
 
 object XFormsActions {
 
@@ -66,10 +65,10 @@ object XFormsActions {
   val ActionFactory: PartialFunction[Element, ControlFactory] = {
 
     val actionFactory: PartialFunction[Element, ControlFactory] = {
-      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _)      with WithChildrenTrait
-      case e if isContainerAction(e.getQName)                      => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with WithChildrenTrait
-      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _)
-      case e if isAction(e.getQName)                               => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
+      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _, _)      with WithChildrenTrait
+      case e if isContainerAction(e.getQName)                      => new ElementAnalysis(_, _, _, _, _, _) with ActionTrait with WithChildrenTrait
+      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _, _)
+      case e if isAction(e.getQName)                               => new ElementAnalysis(_, _, _, _, _, _) with ActionTrait
     }
 
     actionFactory

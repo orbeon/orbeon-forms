@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
@@ -74,7 +74,7 @@ object XBLTransformer {
     val directNameOpt    = abstractBindingOpt flatMap (_.commonBinding.directName)
 
     def isNestedHandler(e: Element): Boolean =
-      (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)
+      (e.getParent eq boundElement) && EventHandler.isEventHandler(e)
 
     def isNestedLHHA(e: Element): Boolean =
       (e.getParent eq boundElement) && LHHA.isLHHA(e)

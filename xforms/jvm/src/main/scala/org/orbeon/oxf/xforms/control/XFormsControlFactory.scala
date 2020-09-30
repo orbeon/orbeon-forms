@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHAAnalysis, ValueTrait}
 import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.XFormsNames._
 
 /**
  * Factory for all existing XForms controls including built-in controls, XBL controls, and actions.
@@ -97,7 +97,7 @@ object XFormsControlFactory {
   )
 
   private val ActionFactory: PartialFunction[QName, ControlFactory] =
-    { case qName if XFormsActions.isAction(qName) => new XFormsActionControl(_, _, _, _) }
+    { case qName if EventHandler.isAction(qName) => new XFormsActionControl(_, _, _, _) }
 
   private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 

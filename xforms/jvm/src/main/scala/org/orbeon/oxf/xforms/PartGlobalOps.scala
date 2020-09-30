@@ -17,8 +17,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global}
-import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Global}
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId

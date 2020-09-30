@@ -16,12 +16,10 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLBindingBuilder}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
@@ -131,7 +129,7 @@ object ElementAnalysisTreeBuilder {
         def directlyNestedHandlers =
           if (e.commonBinding.modeHandlers)
             e.element.elements filter
-              EventHandlerImpl.isEventHandler map
+              EventHandler.isEventHandler map
                 annotateChild
           else
             Nil
@@ -159,9 +157,9 @@ object ElementAnalysisTreeBuilder {
     def childrenElements(e: WithChildrenTrait): Seq[(Element, Scope)] = {
 
       import ControlAnalysisFactory.isVariable
+      import EventHandler.isAction
       import LHHA.isLHHA
       import SelectionControlUtil.TopLevelItemsetQNames
-      import XFormsActions.isAction
 
       def allChildren: Seq[(Element, Scope)] =
         e.element.elements map ((_, e.containerScope))

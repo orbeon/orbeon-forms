@@ -19,7 +19,6 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
@@ -364,7 +363,7 @@ class XFormsExtractor(
 
       // TODO: Just warn?
       if (isXXForms) {
-        if (! AllowedXXFormsElements(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
+        if (! AllowedXXFormsElements(localname) && ! EventHandler.isAction(QName(localname, XXFORMS_NAMESPACE)))
           throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       } else if (isEXForms) {
         if (! AllowedEXFormElements(localname))

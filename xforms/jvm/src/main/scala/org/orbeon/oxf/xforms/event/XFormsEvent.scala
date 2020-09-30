@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName

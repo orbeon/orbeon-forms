@@ -18,7 +18,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 //import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants._
@@ -147,7 +147,7 @@ trait ModelEventHandlers {
   self: Model =>
 
   // Event handlers, including on submissions and within nested actions
-  lazy val eventHandlers: Seq[EventHandlerImpl] = descendants collect { case e: EventHandlerImpl => e } toList
+  lazy val eventHandlers: Seq[EventHandler] = descendants collect { case e: EventHandler => e } toList
 }
 
 trait ModelBinds {

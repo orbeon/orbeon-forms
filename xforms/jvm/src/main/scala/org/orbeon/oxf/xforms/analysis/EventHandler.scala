@@ -11,23 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event
+package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.{IndentedLogger, Logging, Modifier}
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{IndentedLogger, Modifier}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
-import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
-import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{EventNames, XFormsId}
-
-import scala.util.control.NonFatal
 
 
 /**
@@ -36,7 +30,7 @@ import scala.util.control.NonFatal
  * All event-related information gathered is immutable (the only temporarily mutable information is the base class's
  * XPath analysis, which is unused here).
  */
-class EventHandlerImpl(
+class EventHandler(
     staticStateContext : StaticStateContext,
     element            : Element,
     parent             : Option[ElementAnalysis],
@@ -48,12 +42,9 @@ class EventHandlerImpl(
     parent,
     preceding,
     scope
-) with EventHandler
-  with Logging {
+) with ActionTrait {
 
-  self: ActionTrait =>
-
-  import EventHandlerImpl._
+  import EventHandler._
 
   // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
   private def att   (name: QName)               : String         = element.attributeValue(name)
@@ -210,9 +201,12 @@ class EventHandlerImpl(
     // if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute in no namespace is
     // the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
     // XML Events target, the attribute must be qualified as `ev:target`.
-    val isDispatchActionNoTargetId = XFormsActions.isDispatchAction(element.getQName) && (element.attribute(TARGET_QNAME) ne null) && (element.attribute(TARGETID_QNAME) eq null)
+    val isDispatchActionNoTargetId =
+      isDispatchAction(element.getQName)   &&
+        element.hasAttribute(TARGET_QNAME) &&
+        ! element.hasAttribute(TARGETID_QNAME)
 
-    val targetTokens                = attSet(element, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set() else attSet(element, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
+    val targetTokens                = attSet(element, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set.empty else attSet(element, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
     val targetsPrefixedIdsAndHashes = targetTokens flatMap (targetHashResolver orElse staticIdResolver)
 
     val ignoreDueToTarget = targetTokens.nonEmpty && targetsPrefixedIdsAndHashes.isEmpty
@@ -228,100 +222,6 @@ class EventHandlerImpl(
     }
   }
 
-  /**
-   * Process the event on the given observer.
-   */
-  def handleEvent(eventObserver: XFormsEventTarget, event: XFormsEvent): Unit = {
-
-    assert(_observersPrefixedIds ne null)
-    assert(_targetPrefixedIds ne null)
-
-    val containingDocument = event.containingDocument
-
-    // Find dynamic context within which the event handler runs
-    val (container, handlerEffectiveId, xpathContext) =
-      eventObserver match {
-
-        // Observer is the XBL component itself but from the "inside"
-        case componentControl: XFormsComponentControl if isXBLHandler =>
-
-          if (componentControl.canRunEventHandlers(event)) {
-
-            val xblContainer = componentControl.nestedContainerOpt.get // TODO: What if None?
-            xblContainer.getContextStack.resetBindingContext()
-            val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
-
-            val handlerEffectiveId =
-              xblContainer.getFullPrefix + staticId + XFormsId.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
-
-            (xblContainer, handlerEffectiveId, stack)
-          } else {
-            debug("ignoring event dispatched to non-relevant component control", List(
-              "name"       -> event.name,
-              "control id" -> componentControl.effectiveId)
-            )
-            return
-          }
-
-        // Regular observer
-        case _ =>
-
-          // Resolve the concrete handler
-          EventHandlerImpl.resolveHandler(containingDocument, self, eventObserver, event.targetObject) match {
-            case Some(concreteHandler) =>
-
-              val handlerContainer   = concreteHandler.container
-              val handlerEffectiveId = concreteHandler.getEffectiveId
-              val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
-
-              (handlerContainer, handlerEffectiveId, stack)
-            case None =>
-              return
-          }
-      }
-
-    val handlerIsRelevant =
-      containingDocument.findControlByEffectiveId(handlerEffectiveId) map (_.isRelevant) getOrElse {
-        // Actions in models do not have a dynamic representation and so are not indexed at this time. In such
-        // cases, we look at the relevance of the container.
-        container.isRelevant
-      }
-
-    if (handlerIsRelevant || isIfNonRelevant) {
-      try {
-        XFormsAPI.withScalaAction(
-          new XFormsActionInterpreter(
-            container           = container,
-            outerActionElement  = element,
-            handlerEffectiveId  = handlerEffectiveId,
-            event               = event,
-            eventObserver       = eventObserver)(
-            actionXPathContext  = xpathContext,
-            indentedLogger      = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
-          )
-        ) {
-          _.runAction(self)
-        }
-      } catch {
-        case NonFatal(t) =>
-          // Something bad happened while running the action: dispatch error event to the root of the current scope
-          // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
-          // target. We thought about dispatching to the root control of the current scope, BUT in case the action
-          // is running within a model before controls are created, that won't be available. SO the answer is to
-          // dispatch to what we know exists, and that is the current observer or the target. The observer is
-          // "closer" from the action, so we dispatch to that.
-          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
-      }
-    } else {
-      debug("skipping non-relevant handler", List(
-        "event"        -> event.name,
-        "observer"     -> event.targetObject.getEffectiveId,
-        "handler name" -> localName,
-        "handler id"   -> handlerEffectiveId
-      ))
-    }
-  }
-
   final def isMatchByName(eventName: String): Boolean =
     isAllEvents || eventNames(eventName)
 
@@ -334,79 +234,75 @@ class EventHandlerImpl(
     isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 }
 
-object EventHandlerImpl extends Logging {
+object EventHandler {
+
+  import Private._
 
   // Special observer id indicating that the observer is the preceding sibling control
-  private val ObserverIsPrecedingSibling = "#preceding-sibling"
+  val ObserverIsPrecedingSibling = "#preceding-sibling"
 
   // Special target id indicating that the target is the observer
-  private val TargetIsObserver = "#observer"
+  val TargetIsObserver = "#observer"
 
   private val TargetPhaseTestSet   = Set("target", "default")
   private val BubblingPhaseTestSet = Set("bubbling", "default")
 
-  // Given a static handler, and concrete observer and target, try to find the concrete handler
-  private def resolveHandler(
-    containingDocument : XFormsContainingDocument,
-    handler            : EventHandlerImpl,
-    eventObserver      : XFormsEventTarget,
-    targetObject       : XFormsEventTarget
-  ): Option[XFormsEventHandler] = {
-
-    val resolvedObject =
-      if (targetObject.scope == handler.scope) {
-        // The scopes match so we can resolve the id relative to the target
-        targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
-      } else if (handler.isPhantom && ! handler.isWithinRepeat) {
-        // Optimize for non-repeated phantom handler
-        containingDocument.findObjectByEffectiveId(handler.prefixedId)
-      } else if (handler.isPhantom) {
-        // Repeated phantom handler
-
-        val zeroOrOneControl =
-          for {
-            controls           <- Option(containingDocument.controls).toList
-            effectiveControlId <-
-              Controls.resolveControlsEffectiveIds(
-                containingDocument.staticOps,
-                controls.getCurrentControlTree,
-                targetObject.getEffectiveId,
-                handler.staticId,
-                followIndexes = true // so this will return 0 or 1 element
-              )
-            control            <- controls.findObjectByEffectiveId(effectiveControlId)
-          } yield
-            control
-
-        zeroOrOneControl.headOption
-
-      } else {
-        // See https://github.com/orbeon/orbeon-forms/issues/243
-        warn(
-          "skipping event in different scope (see issue #243)",
-          List(
-            "target id"             -> targetObject.getEffectiveId,
-            "handler id"            -> handler.prefixedId,
-            "observer id"           -> eventObserver.getEffectiveId,
-            "target scope"          -> targetObject.scope.scopeId,
-            "handler scope"         -> handler.scope.scopeId,
-            "observer scope"        -> eventObserver.scope.scopeId
-          ))(
-          containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-        )
-        None
-      }
-
-    resolvedObject map (_.asInstanceOf[XFormsEventHandler])
-  }
-
   // Whether the element is an event handler (a known action element with @*:event)
   def isEventHandler(element: Element): Boolean =
-    XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName) ne null)
+    isAction(element.getQName) && element.hasAttribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.localName)
 
   def parseKeyModifiers(value: Option[String]): Set[Modifier] =
     value match {
       case Some(attValue) => Modifier.parseStringToSet(attValue)
       case None           => Set.empty[Modifier]
     }
+
+  def isDispatchAction (qName: QName): Boolean = qName == DispatchAction
+  def isAction         (qName: QName): Boolean = Actions(qName)
+  def isContainerAction(qName: QName): Boolean = ContainerActions(qName)
+
+  private object Private {
+
+    val DispatchAction = xformsQName("dispatch")
+
+    val ContainerActions =
+      Set(
+        xformsQName("action"),
+        XBL_HANDLER_QNAME
+      )
+
+    val Actions =
+      Set(
+        // Standard XForms actions
+        xformsQName("action"),
+        DispatchAction,
+        xformsQName("rebuild"),
+        xformsQName("recalculate"),
+        xformsQName("revalidate"),
+        xformsQName("refresh"),
+        xformsQName("setfocus"),
+        xformsQName("load"),
+        xformsQName("setvalue"),
+        xformsQName("send"),
+        xformsQName("reset"),
+        xformsQName("message"),
+        xformsQName("toggle"),
+        xformsQName("insert"),
+        xformsQName("delete"),
+        xformsQName("setindex"),
+
+        // Extension actions
+        xxformsQName("script"),
+        xxformsQName("show"),
+        xxformsQName("hide"),
+        xxformsQName("invalidate-instance"),
+        xxformsQName("invalidate-instances"),
+        xxformsQName("join-submissions"),
+        xxformsQName("setvisited"),
+        xxformsQName("update-validity"),
+
+        // `xbl:handler` as action container working like `xf:action`
+        XBL_HANDLER_QNAME
+      )
+  }
 }

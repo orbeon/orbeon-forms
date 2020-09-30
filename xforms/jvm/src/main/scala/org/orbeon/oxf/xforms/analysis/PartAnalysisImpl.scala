@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
@@ -160,7 +159,7 @@ class PartAnalysisImpl(
 
       // Global lists of external LHHA and handlers
       val lhhas         = m.Buffer[LHHAAnalysis]()
-      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val eventHandlers = m.Buffer[EventHandler]()
       val models        = m.Buffer[Model]()
       val attributes    = m.Buffer[AttributeControl]()
 
@@ -195,7 +194,7 @@ class PartAnalysisImpl(
 
       // Global lists LHHA and handlers
       val lhhas         = m.Buffer[LHHAAnalysis]()
-      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val eventHandlers = m.Buffer[EventHandler]()
       val models        = m.Buffer[Model]()
       val attributes    = m.Buffer[AttributeControl]()
 

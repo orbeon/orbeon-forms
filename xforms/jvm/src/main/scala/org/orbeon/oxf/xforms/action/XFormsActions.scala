@@ -19,16 +19,15 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
-import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, SimpleElementAnalysis}
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.analysis.EventHandler._
 
-// 2016-02-05: This object mixes runtime actions and compile-time actions. We should separate this properly.
 object XFormsActions {
-  val LOGGING_CATEGORY = "action"
-  val logger = LoggerFactory.createLogger(XFormsActions.getClass)
 
-  private def xformsQName(name: String)  = QName(name, XFORMS_NAMESPACE)
-  private def xxformsQName(name: String) = QName(name, XXFORMS_NAMESPACE)
+  val LoggingCategory = "action"
+
+  val logger = LoggerFactory.createLogger(XFormsActions.getClass)
 
   private val Actions = Map(
     // Standard XForms actions
@@ -66,12 +65,10 @@ object XFormsActions {
   // Return a factory for action analysis
   val ActionFactory: PartialFunction[Element, ControlFactory] = {
 
-    def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
-
     val actionFactory: PartialFunction[Element, ControlFactory] = {
-      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with WithChildrenTrait
+      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _)      with WithChildrenTrait
       case e if isContainerAction(e.getQName)                      => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with WithChildrenTrait
-      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandlerImpl(_, _, _, _, _)      with ActionTrait
+      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _)
       case e if isAction(e.getQName)                               => new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
     }
 
@@ -79,15 +76,5 @@ object XFormsActions {
   }
 
   // Return the action with the QName, null if there is no such action
-  def getAction(qName: QName) = Actions.get(qName) orNull
-
-  // Whether the given action exists
-  def isAction(qName: QName) = Actions.contains(qName)
-
-  // Whether the QName is xf:action
-  def isContainerAction(qName: QName) = Set(xformsQName("action"), XBL_HANDLER_QNAME)(qName)
-
-  // Whether the element is xf:action
-  def isDispatchAction(qName: QName) =
-    qName.namespace.uri == XFORMS_NAMESPACE_URI && qName.localName == "dispatch"
+  def getAction(qName: QName): XFormsAction = Actions.get(qName) orNull
 }

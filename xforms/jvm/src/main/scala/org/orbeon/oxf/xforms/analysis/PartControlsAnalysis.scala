@@ -19,7 +19,6 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.JavaConverters._
@@ -37,12 +36,12 @@ trait PartControlsAnalysis extends TransientState {
       yield control
 
   // Special handling of attributes
-  private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
+  private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
 
   protected def indexNewControl(
     elementAnalysis : ElementAnalysis,
     lhhas           : Buffer[LHHAAnalysis],
-    eventHandlers   : Buffer[EventHandlerImpl],
+    eventHandlers   : Buffer[EventHandler],
     models          : Buffer[Model],
     attributes      : Buffer[AttributeControl]
   ): Unit = {
@@ -58,7 +57,7 @@ trait PartControlsAnalysis extends TransientState {
     // Register special controls
     elementAnalysis match {
       case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) => lhhas += lhha
-      case eventHandler: EventHandlerImpl                                                 => eventHandlers += eventHandler
+      case eventHandler: EventHandler                                                 => eventHandlers += eventHandler
       case model: Model                                                                   => models        += model
       case attribute: AttributeControl                                                    => attributes    += attribute
       case _                                                                              =>
@@ -159,7 +158,7 @@ trait PartControlsAnalysis extends TransientState {
 
     control match {
       case model: Model              => deindexModel(model)
-      case handler: EventHandlerImpl => deregisterEventHandler(handler)
+      case handler: EventHandler => deregisterEventHandler(handler)
       case att: AttributeControl     => _attributeControls -= att.forPrefixedId
       case _                         =>
     }

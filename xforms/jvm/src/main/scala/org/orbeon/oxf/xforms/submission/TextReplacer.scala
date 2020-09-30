@@ -131,7 +131,7 @@ object TextReplacer {
         isCalculate        = false,
         collector          = Dispatch.dispatchEvent)(
         containingDocument = containingDocument,
-        logger             = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
+        logger             = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
       )
 
     def handleSetValueError(reason: Reason) =

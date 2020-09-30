@@ -18,19 +18,12 @@ import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
-
-
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandler
-
-
-
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
+import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
 import org.orbeon.xforms.xbl.Scope
@@ -346,7 +339,7 @@ trait ElementEventHandlers {
       else
         None
 
-    (performDefaultAction, Map() ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
+    (performDefaultAction, Map.empty ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
   }
 }
 

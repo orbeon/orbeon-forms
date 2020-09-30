@@ -26,6 +26,10 @@ import org.orbeon.dom.{Namespace, QName}
 //
 object XFormsNames {
 
+  def xformsQName   (name: String): QName = QName(name, XFORMS_NAMESPACE)
+  def xxformsQName  (name: String): QName = QName(name, XXFORMS_NAMESPACE)
+  def xmlEventsQName(name: String): QName = QName(name, XML_EVENTS_NAMESPACE)
+
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
   val XFORMS_NAMESPACE_URI = Namespaces.XF
@@ -68,32 +72,32 @@ object XFormsNames {
   val SUBMISSION_QNAME = QName("submission")
 
   // XForms controls
-  val XFORMS_GROUP_QNAME = QName("group", XFORMS_NAMESPACE)
-  val XFORMS_REPEAT_QNAME = QName("repeat", XFORMS_NAMESPACE)
-  val XFORMS_REPEAT_ITERATION_QNAME = QName("repeat-iteration", XFORMS_NAMESPACE) // NOTE: Supposed to be xxf:repeat-iteration
+  val XFORMS_GROUP_QNAME = xformsQName("group")
+  val XFORMS_REPEAT_QNAME = xformsQName("repeat")
+  val XFORMS_REPEAT_ITERATION_QNAME = xformsQName("repeat-iteration") // NOTE: Supposed to be xxf:repeat-iteration
   val REPEAT_NAME = XFORMS_REPEAT_QNAME.localName
-  val XFORMS_SWITCH_QNAME = QName("switch", XFORMS_NAMESPACE)
-  val XFORMS_CASE_QNAME = QName("case", XFORMS_NAMESPACE)
-  val XXFORMS_DIALOG_QNAME = QName("dialog", XXFORMS_NAMESPACE)
+  val XFORMS_SWITCH_QNAME = xformsQName("switch")
+  val XFORMS_CASE_QNAME = xformsQName("case")
+  val XXFORMS_DIALOG_QNAME = xxformsQName("dialog")
   val XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.localName
-  val XXFORMS_DYNAMIC_QNAME = QName("dynamic", XXFORMS_NAMESPACE)
+  val XXFORMS_DYNAMIC_QNAME = xxformsQName("dynamic")
 
-  val XFORMS_INPUT_QNAME = QName("input", XFORMS_NAMESPACE)
-  val XFORMS_SECRET_QNAME = QName("secret", XFORMS_NAMESPACE)
-  val XFORMS_TEXTAREA_QNAME = QName("textarea", XFORMS_NAMESPACE)
-  val XFORMS_OUTPUT_QNAME = QName("output", XFORMS_NAMESPACE)
-  val XFORMS_UPLOAD_QNAME = QName("upload", XFORMS_NAMESPACE)
+  val XFORMS_INPUT_QNAME = xformsQName("input")
+  val XFORMS_SECRET_QNAME = xformsQName("secret")
+  val XFORMS_TEXTAREA_QNAME = xformsQName("textarea")
+  val XFORMS_OUTPUT_QNAME = xformsQName("output")
+  val XFORMS_UPLOAD_QNAME = xformsQName("upload")
   val UPLOAD_NAME = XFORMS_UPLOAD_QNAME.localName
-  val XFORMS_RANGE_QNAME = QName("range", XFORMS_NAMESPACE)
-  val XFORMS_SELECT_QNAME = QName("select", XFORMS_NAMESPACE)
-  val XFORMS_SELECT1_QNAME = QName("select1", XFORMS_NAMESPACE)
+  val XFORMS_RANGE_QNAME = xformsQName("range")
+  val XFORMS_SELECT_QNAME = xformsQName("select")
+  val XFORMS_SELECT1_QNAME = xformsQName("select1")
 
-  val XXFORMS_ATTRIBUTE_QNAME = QName("attribute", XXFORMS_NAMESPACE)
-  val XXFORMS_TEXT_QNAME = QName("text", XXFORMS_NAMESPACE)
+  val XXFORMS_ATTRIBUTE_QNAME = xxformsQName("attribute")
+  val XXFORMS_TEXT_QNAME = xxformsQName("text")
 
-  val XFORMS_SUBMIT_QNAME = QName("submit", XFORMS_NAMESPACE)
-  val XFORMS_TRIGGER_QNAME = QName("trigger", XFORMS_NAMESPACE)
-  val XFORMS_BIND_QNAME = QName("bind", XFORMS_NAMESPACE)
+  val XFORMS_SUBMIT_QNAME = xformsQName("submit")
+  val XFORMS_TRIGGER_QNAME = xformsQName("trigger")
+  val XFORMS_BIND_QNAME = xformsQName("bind")
 
   // eXForms at http://www.exforms.org/
   val EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0"
@@ -133,51 +137,51 @@ object XFormsNames {
   val XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME = QName("deserialize-external-value", XXBL_NAMESPACE)
 
   // Variables
-  val XXFORMS_VAR_QNAME = QName("var", XXFORMS_NAMESPACE)
-  val XXFORMS_VARIABLE_QNAME = QName("variable", XXFORMS_NAMESPACE)
-  val XFORMS_VAR_QNAME = QName("var", XFORMS_NAMESPACE)
-  val XFORMS_VARIABLE_QNAME = QName("variable", XFORMS_NAMESPACE)
+  val XXFORMS_VAR_QNAME = xxformsQName("var")
+  val XXFORMS_VARIABLE_QNAME = xxformsQName("variable")
+  val XFORMS_VAR_QNAME = xformsQName("var")
+  val XFORMS_VARIABLE_QNAME = xformsQName("variable")
   val EXFORMS_VARIABLE_QNAME = QName("variable", EXFORMS_NAMESPACE)
-  val XXFORMS_SEQUENCE_QNAME = QName("sequence", XXFORMS_NAMESPACE)
-  val XXFORMS_VALUE_QNAME = QName("value", XXFORMS_NAMESPACE)
+  val XXFORMS_SEQUENCE_QNAME = xxformsQName("sequence")
+  val XXFORMS_VALUE_QNAME = xxformsQName("value")
 
   val XML_EVENTS_PREFIX = "ev"
   val XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events"
   val XML_EVENTS_NAMESPACE = Namespace(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI)
 
-  val XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME = QName("event", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME = xmlEventsQName("event")
   val XML_EVENTS_EVENT_ATTRIBUTE_QNAME = QName("event")
-  val XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME = QName("observer", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME = xmlEventsQName("observer")
   val XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = QName("observer")
-  val XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME = QName("target", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME = xmlEventsQName("target")
   val XML_EVENTS_TARGET_ATTRIBUTE_QNAME = QName("target")
-  val XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME = QName("phase", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME = xmlEventsQName("phase")
   val XML_EVENTS_PHASE_ATTRIBUTE_QNAME = QName("phase")
-  val XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = QName("propagate", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = xmlEventsQName("propagate")
   val XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = QName("propagate")
-  val XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = QName("defaultAction", XML_EVENTS_NAMESPACE)
+  val XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = xmlEventsQName("defaultAction")
   val XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = QName("defaultAction")
 
-  val XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = QName(EventNames.KeyModifiersPropertyName, XXFORMS_NAMESPACE)
-  val XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = QName(EventNames.KeyTextPropertyName, XXFORMS_NAMESPACE)
-  val XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME = QName("phantom", XXFORMS_NAMESPACE)
-  val XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME = QName("if-non-relevant", XXFORMS_NAMESPACE)
+  val XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = xxformsQName(EventNames.KeyModifiersPropertyName)
+  val XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = xxformsQName(EventNames.KeyTextPropertyName)
+  val XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME = xxformsQName("phantom")
+  val XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME = xxformsQName("if-non-relevant")
 
   val XXFORMS_ALL_EVENTS = "#all"
 
-  val XFORMS_FILENAME_QNAME = QName("filename", XFORMS_NAMESPACE)
-  val XFORMS_MEDIATYPE_QNAME = QName("mediatype", XFORMS_NAMESPACE)
-  val XXFORMS_SIZE_QNAME = QName("size", XXFORMS_NAMESPACE)
-  val XXFORMS_TITLE_QNAME = QName("title", XXFORMS_NAMESPACE)
-  val XXFORMS_ALT_QNAME = QName("alt", XXFORMS_NAMESPACE)
-  val XXFORMS_MAXLENGTH_QNAME = QName("maxlength", XXFORMS_NAMESPACE)
-  val XXFORMS_PATTERN_QNAME = QName("pattern", XXFORMS_NAMESPACE)
-  val XXFORMS_AUTOCOMPLETE_QNAME = QName("autocomplete", XXFORMS_NAMESPACE)
-  val XXFORMS_COLS_QNAME = QName("cols", XXFORMS_NAMESPACE)
-  val XXFORMS_ROWS_QNAME = QName("rows", XXFORMS_NAMESPACE)
-  val XXFORMS_GROUP_QNAME = QName("group", XXFORMS_NAMESPACE)
-  val XXFORMS_ELEMENT_QNAME = QName("element", XXFORMS_NAMESPACE)
-  val XXFORMS_EXTERNAL_EVENTS_QNAME = QName("external-events", XXFORMS_NAMESPACE)
+  val XFORMS_FILENAME_QNAME = xformsQName("filename")
+  val XFORMS_MEDIATYPE_QNAME = xformsQName("mediatype")
+  val XXFORMS_SIZE_QNAME = xxformsQName("size")
+  val XXFORMS_TITLE_QNAME = xxformsQName("title")
+  val XXFORMS_ALT_QNAME = xxformsQName("alt")
+  val XXFORMS_MAXLENGTH_QNAME = xxformsQName("maxlength")
+  val XXFORMS_PATTERN_QNAME = xxformsQName("pattern")
+  val XXFORMS_AUTOCOMPLETE_QNAME = xxformsQName("autocomplete")
+  val XXFORMS_COLS_QNAME = xxformsQName("cols")
+  val XXFORMS_ROWS_QNAME = xxformsQName("rows")
+  val XXFORMS_GROUP_QNAME = xxformsQName("group")
+  val XXFORMS_ELEMENT_QNAME = xxformsQName("element")
+  val XXFORMS_EXTERNAL_EVENTS_QNAME = xxformsQName("external-events")
 
   val CONSTRAINT_LEVEL_ATTRIBUTE_NAME = "level"
   val RELEVANT_ATTRIBUTE_NAME = "relevant"
@@ -191,49 +195,49 @@ object XFormsNames {
   val REQUIRED_QNAME = QName(REQUIRED_ATTRIBUTE_NAME)
   val TYPE_QNAME = QName("type")
   val CONSTRAINT_QNAME = QName("constraint")
-  val XXFORMS_DEFAULT_QNAME = QName("default", XXFORMS_NAMESPACE)
-  val XXFORMS_DEFAULTS_QNAME = QName("defaults", XXFORMS_NAMESPACE)
-  val XXFORMS_DEFERRED_QNAME = QName("deferred", XXFORMS_NAMESPACE)
-  val XXFORMS_UPDATE_REPEATS_QNAME = QName("update-repeats", XXFORMS_NAMESPACE)
+  val XXFORMS_DEFAULT_QNAME = xxformsQName("default")
+  val XXFORMS_DEFAULTS_QNAME = xxformsQName("defaults")
+  val XXFORMS_DEFERRED_QNAME = xxformsQName("deferred")
+  val XXFORMS_UPDATE_REPEATS_QNAME = xxformsQName("update-repeats")
 
   val VALIDATION_QNAME = QName("validation")
-  val XFORMS_VALIDATION_QNAME = QName("validation", XFORMS_NAMESPACE)
+  val XFORMS_VALIDATION_QNAME = xformsQName("validation")
 
-  val XFORMS_TYPE_QNAME = QName("type", XFORMS_NAMESPACE)
-  val XFORMS_RELEVANT_QNAME = QName("relevant", XFORMS_NAMESPACE)
-  val XFORMS_REQUIRED_QNAME = QName("required", XFORMS_NAMESPACE)
+  val XFORMS_TYPE_QNAME = xformsQName("type")
+  val XFORMS_RELEVANT_QNAME = xformsQName("relevant")
+  val XFORMS_REQUIRED_QNAME = xformsQName("required")
 
-  val XXFORMS_READONLY_ATTRIBUTE_QNAME = QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE)
-  val XXFORMS_INDEX_QNAME = QName("index", XXFORMS_NAMESPACE)
+  val XXFORMS_READONLY_ATTRIBUTE_QNAME = xxformsQName(READONLY_ATTRIBUTE_NAME)
+  val XXFORMS_INDEX_QNAME = xxformsQName("index")
 
-  val XXFORMS_UUID_QNAME = QName("uuid", XXFORMS_NAMESPACE)
-  val XXFORMS_STATIC_STATE_QNAME = QName("static-state", XXFORMS_NAMESPACE)
-  val XXFORMS_DYNAMIC_STATE_QNAME = QName("dynamic-state", XXFORMS_NAMESPACE)
-  val XXFORMS_INITIAL_DYNAMIC_STATE_QNAME = QName("initial-dynamic-state", XXFORMS_NAMESPACE)
-  val XXFORMS_ACTION_QNAME = QName("action", XXFORMS_NAMESPACE)
-  val XXFORMS_SERVER_EVENTS_QNAME = QName("server-events", XXFORMS_NAMESPACE)
+  val XXFORMS_UUID_QNAME = xxformsQName("uuid")
+  val XXFORMS_STATIC_STATE_QNAME = xxformsQName("static-state")
+  val XXFORMS_DYNAMIC_STATE_QNAME = xxformsQName("dynamic-state")
+  val XXFORMS_INITIAL_DYNAMIC_STATE_QNAME = xxformsQName("initial-dynamic-state")
+  val XXFORMS_ACTION_QNAME = xxformsQName("action")
+  val XXFORMS_SERVER_EVENTS_QNAME = xxformsQName("server-events")
 
-  val XFORMS_PARAM_QNAME = QName("param", XFORMS_NAMESPACE)
-  val XFORMS_BODY_QNAME = QName("body", XFORMS_NAMESPACE)
+  val XFORMS_PARAM_QNAME = xformsQName("param")
+  val XFORMS_BODY_QNAME = xformsQName("body")
 
-  val XFORMS_MODEL_QNAME = QName("model", XFORMS_NAMESPACE)
-  val XFORMS_INSTANCE_QNAME = QName("instance", XFORMS_NAMESPACE)
-  val XFORMS_SUBMISSION_QNAME = QName("submission", XFORMS_NAMESPACE)
-  val XFORMS_HEADER_QNAME = QName("header", XFORMS_NAMESPACE)
+  val XFORMS_MODEL_QNAME = xformsQName("model")
+  val XFORMS_INSTANCE_QNAME = xformsQName("instance")
+  val XFORMS_SUBMISSION_QNAME = xformsQName("submission")
+  val XFORMS_HEADER_QNAME = xformsQName("header")
 
-  val XXFORMS_EVENT_QNAME = QName("event", XXFORMS_NAMESPACE)
-  val XXFORMS_EVENTS_QNAME = QName("events", XXFORMS_NAMESPACE)
-  val XXFORMS_PROPERTY_QNAME = QName("property", XXFORMS_NAMESPACE)
-  val LABEL_QNAME = QName("label", XFORMS_NAMESPACE)
-  val HELP_QNAME = QName("help", XFORMS_NAMESPACE)
-  val HINT_QNAME = QName("hint", XFORMS_NAMESPACE)
-  val ALERT_QNAME = QName("alert", XFORMS_NAMESPACE)
-  val XFORMS_NAME_QNAME = QName("name", XFORMS_NAMESPACE)
-  val XFORMS_VALUE_QNAME = QName("value", XFORMS_NAMESPACE)
-  val XFORMS_COPY_QNAME = QName("copy", XFORMS_NAMESPACE)
-  val XFORMS_ITEMSET_QNAME = QName("itemset", XFORMS_NAMESPACE)
-  val XFORMS_ITEM_QNAME = QName("item", XFORMS_NAMESPACE)
-  val XFORMS_CHOICES_QNAME = QName("choices", XFORMS_NAMESPACE)
+  val XXFORMS_EVENT_QNAME = xxformsQName("event")
+  val XXFORMS_EVENTS_QNAME = xxformsQName("events")
+  val XXFORMS_PROPERTY_QNAME = xxformsQName("property")
+  val LABEL_QNAME = xformsQName("label")
+  val HELP_QNAME = xformsQName("help")
+  val HINT_QNAME = xformsQName("hint")
+  val ALERT_QNAME = xformsQName("alert")
+  val XFORMS_NAME_QNAME = xformsQName("name")
+  val XFORMS_VALUE_QNAME = xformsQName("value")
+  val XFORMS_COPY_QNAME = xformsQName("copy")
+  val XFORMS_ITEMSET_QNAME = xformsQName("itemset")
+  val XFORMS_ITEM_QNAME = xformsQName("item")
+  val XFORMS_CHOICES_QNAME = xformsQName("choices")
 
   val XFORMS_SUBMIT_REPLACE_ALL = "all"
   val XFORMS_SUBMIT_REPLACE_INSTANCE = "instance"
@@ -241,86 +245,86 @@ object XFormsNames {
   val XFORMS_SUBMIT_REPLACE_NONE = "none"
 
   val XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance"
-  val XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME = QName(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME, XXFORMS_NAMESPACE)
+  val XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME = xxformsQName(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME)
 
   val XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME = "external-events"
 
-  val ENCRYPT_ITEM_VALUES = QName("encrypt-item-values", XXFORMS_NAMESPACE)
+  val ENCRYPT_ITEM_VALUES = xxformsQName("encrypt-item-values")
   val XFORMS_FULL_APPEARANCE_QNAME = QName("full")
   val XFORMS_COMPACT_APPEARANCE_QNAME = QName("compact")
   val XFORMS_MINIMAL_APPEARANCE_QNAME = QName("minimal")
 
   val XFORMS_MODAL_APPEARANCE_QNAME = QName("modal")
-  val XXFORMS_MODAL_QNAME = QName("modal", XXFORMS_NAMESPACE)
+  val XXFORMS_MODAL_QNAME = xxformsQName("modal")
 
   val LEVEL_QNAME = QName("level")
 
   // This appearance is designed to be used internally when a text/html mediatype is encountered on <textarea>
-  val XXFORMS_RICH_TEXT_APPEARANCE_QNAME = QName("richtext", XXFORMS_NAMESPACE)
-  val XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = QName("autocomplete", XXFORMS_NAMESPACE)
+  val XXFORMS_RICH_TEXT_APPEARANCE_QNAME = xxformsQName("richtext")
+  val XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = xxformsQName("autocomplete")
 
-  val XXFORMS_FIELDSET_APPEARANCE_QNAME = QName("fieldset", XXFORMS_NAMESPACE)
-  val XXFORMS_INTERNAL_APPEARANCE_QNAME = QName("internal", XXFORMS_NAMESPACE)
-  val XXFORMS_TEXT_APPEARANCE_QNAME = QName("text", XXFORMS_NAMESPACE)
-  val XXFORMS_DOWNLOAD_APPEARANCE_QNAME = QName("download", XXFORMS_NAMESPACE)
-  val XXFORMS_PLACEHOLDER_APPEARANCE_QNAME = QName("placeholder", XXFORMS_NAMESPACE)
+  val XXFORMS_FIELDSET_APPEARANCE_QNAME = xxformsQName("fieldset")
+  val XXFORMS_INTERNAL_APPEARANCE_QNAME = xxformsQName("internal")
+  val XXFORMS_TEXT_APPEARANCE_QNAME = xxformsQName("text")
+  val XXFORMS_DOWNLOAD_APPEARANCE_QNAME = xxformsQName("download")
+  val XXFORMS_PLACEHOLDER_APPEARANCE_QNAME = xxformsQName("placeholder")
 
   // See: https://github.com/orbeon/orbeon-forms/issues/418
   val XXFORMS_SEPARATOR_APPEARANCE_QNAME = QName("xxforms-separator")
 
-  val XXFORMS_LEFT_APPEARANCE_QNAME = QName("left", XXFORMS_NAMESPACE)
+  val XXFORMS_LEFT_APPEARANCE_QNAME = xxformsQName("left")
 
-  val XXFORMS_TARGET_QNAME = QName("target", XXFORMS_NAMESPACE)
-  val XXFORMS_UPLOADS_QNAME = QName("uploads", XXFORMS_NAMESPACE)
-  val XXFORMS_XINCLUDE = QName("xinclude", XXFORMS_NAMESPACE)
-  val XXFORMS_RESPONSE_URL_TYPE = QName("response-url-type", XXFORMS_NAMESPACE)
+  val XXFORMS_TARGET_QNAME = xxformsQName("target")
+  val XXFORMS_UPLOADS_QNAME = xxformsQName("uploads")
+  val XXFORMS_XINCLUDE = xxformsQName("xinclude")
+  val XXFORMS_RESPONSE_URL_TYPE = xxformsQName("response-url-type")
 
-  val XXFORMS_ORDER_QNAME = QName("order", XXFORMS_NAMESPACE)
+  val XXFORMS_ORDER_QNAME = xxformsQName("order")
 
-  val XXFORMS_CALCULATE_QNAME = QName("calculate", XXFORMS_NAMESPACE)
-  val XXFORMS_USERNAME_QNAME = QName("username", XXFORMS_NAMESPACE)
-  val XXFORMS_PASSWORD_QNAME = QName("password", XXFORMS_NAMESPACE)
-  val XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME = QName("preemptive-authentication", XXFORMS_NAMESPACE)
-  val XXFORMS_DOMAIN_QNAME = QName("domain", XXFORMS_NAMESPACE)
-  val XXFORMS_SHARED_QNAME = QName("shared", XXFORMS_NAMESPACE)
-  val XXFORMS_CACHE_QNAME = QName("cache", XXFORMS_NAMESPACE)
-  val XXFORMS_TIME_TO_LIVE_QNAME = QName("ttl", XXFORMS_NAMESPACE)
-  val XXFORMS_VALIDATION_QNAME = QName("validation", XXFORMS_NAMESPACE)
-  val XXFORMS_EXPOSE_XPATH_TYPES_QNAME = QName("expose-xpath-types", XXFORMS_NAMESPACE)
-  val XXFORMS_EXCLUDE_RESULT_PREFIXES = QName("exclude-result-prefixes", XXFORMS_NAMESPACE)
-  val XXFORMS_CUSTOM_MIPS_QNAME = QName("custom-mips", XXFORMS_NAMESPACE)
-  val XXFORMS_RELEVANT_ATTRIBUTE_QNAME = QName("relevant-attribute", XXFORMS_NAMESPACE_SHORT)
+  val XXFORMS_CALCULATE_QNAME = xxformsQName("calculate")
+  val XXFORMS_USERNAME_QNAME = xxformsQName("username")
+  val XXFORMS_PASSWORD_QNAME = xxformsQName("password")
+  val XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME = xxformsQName("preemptive-authentication")
+  val XXFORMS_DOMAIN_QNAME = xxformsQName("domain")
+  val XXFORMS_SHARED_QNAME = xxformsQName("shared")
+  val XXFORMS_CACHE_QNAME = xxformsQName("cache")
+  val XXFORMS_TIME_TO_LIVE_QNAME = xxformsQName("ttl")
+  val XXFORMS_VALIDATION_QNAME = xxformsQName("validation")
+  val XXFORMS_EXPOSE_XPATH_TYPES_QNAME = xxformsQName("expose-xpath-types")
+  val XXFORMS_EXCLUDE_RESULT_PREFIXES = xxformsQName("exclude-result-prefixes")
+  val XXFORMS_CUSTOM_MIPS_QNAME = xxformsQName("custom-mips")
+  val XXFORMS_RELEVANT_ATTRIBUTE_QNAME = xxformsQName("relevant-attribute")
   val XXFORMS_ANNOTATE_QNAME = QName("annotate", XXFORMS_NAMESPACE_SHORT)
 
-  val XXFORMS_INSTANCE_QNAME = QName("instance", XXFORMS_NAMESPACE)
-  val XXFORMS_SHOW_PROGRESS_QNAME = QName("show-progress", XXFORMS_NAMESPACE)
-  val XXFORMS_ALLOW_DUPLICATES_QNAME = QName("allow-duplicates", XXFORMS_NAMESPACE)
-  val XXFORMS_OPEN_QNAME = QName("open", XXFORMS_NAMESPACE)
+  val XXFORMS_INSTANCE_QNAME = xxformsQName("instance")
+  val XXFORMS_SHOW_PROGRESS_QNAME = xxformsQName("show-progress")
+  val XXFORMS_ALLOW_DUPLICATES_QNAME = xxformsQName("allow-duplicates")
+  val XXFORMS_OPEN_QNAME = xxformsQName("open")
 
   // XForms 2.0 standardizes the xf:property element
-  val XFORMS_PROPERTY_QNAME = QName("property", XFORMS_NAMESPACE)
-  val XXFORMS_CONTEXT_QNAME = QName("context", XXFORMS_NAMESPACE)
+  val XFORMS_PROPERTY_QNAME = xformsQName("property")
+  val XXFORMS_CONTEXT_QNAME = xxformsQName("context")
 
-  val XXFORMS_REFRESH_ITEMS_QNAME = QName("refresh-items", XXFORMS_NAMESPACE)
-  val EXCLUDE_WHITESPACE_TEXT_NODES_QNAME = QName("exclude-whitespace-text-nodes", XXFORMS_NAMESPACE)
-  val XXFORMS_REPEAT_INDEXES_QNAME = QName("repeat-indexes", XXFORMS_NAMESPACE)
+  val XXFORMS_REFRESH_ITEMS_QNAME = xxformsQName("refresh-items")
+  val EXCLUDE_WHITESPACE_TEXT_NODES_QNAME = xxformsQName("exclude-whitespace-text-nodes")
+  val XXFORMS_REPEAT_INDEXES_QNAME = xxformsQName("repeat-indexes")
   val XXFORMS_REPEAT_STARTINDEX_QNAME = QName("startindex")
-  val XXFORMS_DND_QNAME = QName("dnd", XXFORMS_NAMESPACE)
-  val XXFORMS_DEFERRED_UPDATES_QNAME = QName("deferred-updates", XXFORMS_NAMESPACE)
-  val XXFORMS_WHITESPACE_QNAME = QName("whitespace", XXFORMS_NAMESPACE)
+  val XXFORMS_DND_QNAME = xxformsQName("dnd")
+  val XXFORMS_DEFERRED_UPDATES_QNAME = xxformsQName("deferred-updates")
+  val XXFORMS_WHITESPACE_QNAME = xxformsQName("whitespace")
 
-  val XXFORMS_FORMAT_QNAME = QName("format", XXFORMS_NAMESPACE)
-  val XXFORMS_UNFORMAT_QNAME = QName("unformat", XXFORMS_NAMESPACE)
+  val XXFORMS_FORMAT_QNAME = xxformsQName("format")
+  val XXFORMS_UNFORMAT_QNAME = xxformsQName("unformat")
 
-  val XXFORMS_UPDATE_QNAME = QName("update", XXFORMS_NAMESPACE)
+  val XXFORMS_UPDATE_QNAME = xxformsQName("update")
   val XFORMS_FULL_UPDATE = "full"
 
-  val XXFORMS_XFORMS11_SWITCH_QNAME = QName("xforms11-switch", XXFORMS_NAMESPACE)
+  val XXFORMS_XFORMS11_SWITCH_QNAME = xxformsQName("xforms11-switch")
 
-  val XFORMS_INTEGER_QNAME = QName("integer", XFORMS_NAMESPACE)
+  val XFORMS_INTEGER_QNAME = xformsQName("integer")
 
-  val XFORMS_STRING_QNAME = QName("string", XFORMS_NAMESPACE)
-  val XFORMS_BASE64BINARY_QNAME = QName("base64Binary", XFORMS_NAMESPACE)
+  val XFORMS_STRING_QNAME = xformsQName("string")
+  val XFORMS_BASE64BINARY_QNAME = xformsQName("base64Binary")
 
   val XS_STRING_EXPLODED_QNAME = {
 
@@ -334,15 +338,15 @@ object XFormsNames {
   }
   val XFORMS_STRING_EXPLODED_QNAME = XFORMS_STRING_QNAME.clarkName
 
-  val XXFORMS_EVENT_MODE_QNAME = QName("events-mode", XXFORMS_NAMESPACE)
-  val XXFORMS_VALIDATION_MODE_QNAME = QName("validation-mode", XXFORMS_NAMESPACE)
+  val XXFORMS_EVENT_MODE_QNAME = xxformsQName("events-mode")
+  val XXFORMS_VALIDATION_MODE_QNAME = xxformsQName("validation-mode")
 
   val STATIC_STATE_PROPERTIES_QNAME = QName("properties")
 
   val SELECTED_QNAME = QName("selected")
   val CASEREF_QNAME = QName("caseref")
 
-  val XXFORMS_MULTIPLE_QNAME = QName("multiple", XXFORMS_NAMESPACE)
+  val XXFORMS_MULTIPLE_QNAME = xxformsQName("multiple")
 
   // TODO: Move.
   val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"

@@ -14,12 +14,13 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.event.{EventHandlerImpl, XFormsEventHandler, XFormsEventTarget}
+import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.event.{XFormsEventHandler, XFormsEventTarget}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
-class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandlerImpl) extends XFormsEventHandler with XFormsObject {
+class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler) extends XFormsEventHandler with XFormsObject {
 
   val getEffectiveId = XFormsId.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
   def container = parent.container

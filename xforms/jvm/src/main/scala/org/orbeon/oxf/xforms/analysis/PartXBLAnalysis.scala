@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.{Document, Element}
+import org.orbeon.dom.Document
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
@@ -139,24 +139,6 @@ trait PartXBLAnalysis extends TransientState {
   def clearShadowTree(existingComponent: ComponentControl): Unit = {
     assert(! isTopLevel)
     existingComponent.removeConcreteBinding()
-  }
-
-  // For the given bound node prefixed id, remove the current shadow tree and create a new one
-  // NOTE: Can be used only in a sub-part, as this mutates the tree.
-  // Can return `None` if the binding does not have a template.
-  def createOrUpdateShadowTreeForDynamic(existingComponent: ComponentControl, elemInSource: Element): Unit = {
-
-    assert(! isTopLevel)
-
-    if (existingComponent.bindingOpt.isDefined)
-      existingComponent.removeConcreteBinding()
-
-    val abstractBinding =
-      existingComponent.part.metadata.findAbstractBindingByPrefixedId(existingComponent.prefixedId) getOrElse
-        (throw new IllegalStateException)
-
-    ElementAnalysisTreeBuilder.setConcreteBinding(existingComponent, abstractBinding, elemInSource)(getIndentedLogger)
-    analyzeSubtree(existingComponent)
   }
 
   override def freeTransientState(): Unit = {

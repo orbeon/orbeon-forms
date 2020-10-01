@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
@@ -305,7 +306,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
           withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
             removeDynamicShadowTree(componentControl)
-            createOrUpdateStaticShadowTree(componentControl, Some(elemInSource))
+            createOrUpdateStaticShadowTree(componentControl, elemInSource.some)
             componentControl.recreateNestedContainer()
             updateDynamicShadowTree(componentControl)
           }
@@ -466,11 +467,10 @@ object XXFormsDynamicControl {
 
     val doc             = componentControl.containingDocument
     val staticComponent = componentControl.staticControl
-    val part            = staticComponent.part
 
     // Update the shadow tree
     // Can return `None` if the binding does not have a template.
-    part.createOrUpdateShadowTreeForDynamic(staticComponent, elemInSource getOrElse staticComponent.element)
+    ElementAnalysisTreeBuilder.createOrUpdateStaticShadowTree(staticComponent, elemInSource)
 
     doc.addControlStructuralChange(componentControl.prefixedId)
   }

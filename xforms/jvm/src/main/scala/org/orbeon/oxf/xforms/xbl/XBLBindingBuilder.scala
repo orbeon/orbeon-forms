@@ -81,7 +81,7 @@ object XBLBindingBuilder {
     controlPrefixedId : String,
     containerScope    : Scope)(implicit
     indentedLogger    : IndentedLogger
-  ): Option[(ConcreteBinding, Option[Global])] =
+  ): Option[(ConcreteBinding, Option[Global], Document)] =
     for (rawShadowTree <- generateRawShadowTree(partAnalysis, controlElement, abstractBinding)(indentedLogger))
       yield
         createScopeAndConcreteBinding(
@@ -193,7 +193,7 @@ object XBLBindingBuilder {
     def generateRawShadowTree(
       partAnalysis    : PartAnalysisImpl,
       boundElement    : Element,
-      abstractBinding : AbstractBinding)(
+      abstractBinding : AbstractBinding)(implicit
       indentedLogger  : IndentedLogger
     ): Option[Document] =
       abstractBinding.templateElementOpt map {
@@ -231,7 +231,7 @@ object XBLBindingBuilder {
       containerScope         : Scope,
       abstractBinding        : AbstractBinding,
       rawShadowTree          : Document
-    ): (ConcreteBinding, Option[Global]) = {
+    ): (ConcreteBinding, Option[Global], Document) = {
 
       // New prefix corresponds to bound element prefixed id
       //val newPrefix = boundControlPrefixedId + COMPONENT_SEPARATOR
@@ -254,31 +254,18 @@ object XBLBindingBuilder {
           ignoreRoot = true
         )
 
-      // Annotate event handlers and implementation models
-      def annotateByElement(element: Element) =
-        annotateSubtreeByElement(
-          partAnalysis,
-          boundElement,
-          element,
-          newInnerScope,
-          outerScope,
-          XXBLScope.Inner,
-          newInnerScope
-        )
-
-      val annotatedHandlers = abstractBinding.handlers      map annotateByElement
-      val annotatedModels   = abstractBinding.modelElements map annotateByElement
-
       // Remember concrete binding information
+
+      require(
+        abstractBinding.commonBinding.bindingElemId.isDefined,
+        s"missing id on XBL binding for ${abstractBinding.bindingElement.toDebugString}"
+      )
+
       val newConcreteBinding =
         ConcreteBinding(
           newInnerScope,
-          annotatedHandlers,
-          annotatedModels,
           templateTree,
-          compactShadowTree,
-          boundElement.attributes map { att => att.getQName -> att.getValue } toMap)(
-          abstractBinding
+          boundElement.attributes map { att => att.getQName -> att.getValue } toMap
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl
@@ -290,7 +277,7 @@ object XBLBindingBuilder {
       // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
       // TODO: should do this here, in order to include only the scripts and resources actually used
 
-      (newConcreteBinding, globalOpt)
+      (newConcreteBinding, globalOpt, compactShadowTree)
     }
 
     // Annotate a subtree and return a template and compact tree

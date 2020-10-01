@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{SelectionControl, 
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLBindingBuilder}
+import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
@@ -33,14 +33,19 @@ object ElementAnalysisTreeBuilder {
   type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) => ElementAnalysis
 
   // Recursively build this element's children and its descendants
-  def buildAllElemDescendants(parentElem: WithChildrenTrait, builder: Builder): Unit =
+  def buildAllElemDescendants(
+    parentElem     : WithChildrenTrait,
+    builder        : Builder,
+    children       : Option[Seq[(Element, Scope)]] = None)(implicit // allow explicit children so we can force processing of lazy bindings
+    indentedLogger : IndentedLogger
+  ): Unit =
     parentElem.addChildren( // TODO: consider have children add themselves to the parent?
       {
         // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
         var precedingElem: Option[ElementAnalysis] = None
 
         // Build and collect the children
-        for ((childElement, childContainerScope) <- childrenElements(parentElem))
+        for ((childElement, childContainerScope) <- children getOrElse childrenElements(parentElem))
           yield builder(parentElem, precedingElem, childElement, childContainerScope) match {
             // The element has children
             case newControl: WithChildrenTrait =>
@@ -55,34 +60,24 @@ object ElementAnalysisTreeBuilder {
       }
     )
 
-  // Set the component's binding
-  // Might not create the binding if the binding does not have a template.
-  // Also called indirectly by `XXFormsDynamicControl`.
-  def setConcreteBinding(
-    e              : ComponentControl,
-    abstractBinding: AbstractBinding,
-    elemInSource   : Element)(implicit
-    indentedLogger : IndentedLogger
-  ): Unit = {
+  // For the given bound node prefixed id, remove the current shadow tree and create a new one
+  // NOTE: Can be used only in a sub-part, as this mutates the tree.
+  def createOrUpdateStaticShadowTree(existingComponent: ComponentControl, elemInSource: Option[Element]): Unit = {
 
-    assert(! e.hasConcreteBinding)
+    assert(! existingComponent.part.isTopLevel)
 
-    XBLBindingBuilder.createConcreteBindingFromElem(
-      e.part,
-      abstractBinding,
-      elemInSource,
-      e.prefixedId,
-      e.containerScope
-    ) foreach { case (newBinding, globalOpt) =>
+    if (existingComponent.hasConcreteBinding)
+      existingComponent.removeConcreteBinding()
 
-      globalOpt foreach { global =>
-        e.part.abstractBindingsWithGlobals += abstractBinding // TODO: indexing; to know if globals have been processed already
-        e.part.allGlobals += global                           // TODO: indexing
-      }
-
-      e.setConcreteBinding(newBinding)
-    }
+    existingComponent.rootElem = elemInSource getOrElse existingComponent.element
+    existingComponent.part.analyzeSubtree(existingComponent)
   }
+
+  def componentChildrenForBindingUpdate(
+    e              : ComponentControl)(implicit
+    indentedLogger : IndentedLogger
+  ): Seq[(Element, Scope)] =
+    componentChildren(e, honorLazy = false)
 
   private object Private {
 
@@ -90,70 +85,116 @@ object ElementAnalysisTreeBuilder {
     val ModelChildrenToKeep  = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
 
     // Return all the children to consider, including relevant shadow tree elements
-    def findXblRelevantChildrenElements(e: ComponentControl): Seq[(Element, Scope)] =
-      e.bindingOpt map { binding =>
+    //
+    // This also:
+    //
+    // - create the new scope if needed
+    // - indexes globals
+    // - sets the `ConcreteBinding` on the control
+    //
+    def componentChildren(
+      e              : ComponentControl,
+      honorLazy      : Boolean)(implicit
+      indentedLogger : IndentedLogger
+    ): Seq[(Element, Scope)] =
+      if (! e.hasLazyBinding || ! honorLazy) {
 
-        def annotateChild(child: Element) = {
-          // Inner scope in effect for the component element itself (NOT the shadow tree's scope)
-          val innerScope = e.containerScope
+        val abstractBinding =
+          e.part.metadata.findAbstractBindingByPrefixedId(e.prefixedId) getOrElse
+            (throw new IllegalStateException)
 
-          // Outer scope in effect for the component element itself
-          def outerScope =
-            if (innerScope.isTopLevelScope)
-              innerScope
-            else {
-              // Search in ancestor parts too
-              val controlId = e.containerScope.fullPrefix.init
-              val controlAnalysis =
-                ElementAnalysis.ancestorsAcrossPartsIterator(e, includeSelf = false) find
-                  (_.prefixedId == controlId) getOrElse
-                  (throw new IllegalStateException)
+        XBLBindingBuilder.createConcreteBindingFromElem(
+          e.part,
+          abstractBinding,
+          e.rootElem,
+          e.prefixedId,
+          e.containerScope
+        ) match {
+          case Some((concreteBinding, globalOpt, compactShadowTree)) =>
 
-              controlAnalysis.scope
+            globalOpt foreach { global =>
+              e.part.abstractBindingsWithGlobals += abstractBinding // TODO: indexing; to know if globals have been processed already
+              e.part.allGlobals += global                           // TODO: indexing
             }
 
-          // Children elements have not been annotated earlier (because they are nested within the bound element)
-          XBLBindingBuilder.annotateSubtreeByElement(
-            e.part,
-            e.element,            // bound element
-            child,                // child tree to annotate
-            innerScope,           // handler's inner scope is the same as the component's
-            outerScope,           // handler's outer scope is the same as the component's
-            if (e.scope == innerScope) XXBLScope.Inner else XXBLScope.Outer,
-            binding.innerScope    // handler is within the current component (this determines the prefix of ids)
-          )
+            e.setConcreteBinding(concreteBinding)
+
+            val scopesForDirectlyNestedChildren: (Scope, Scope, XXBLScope) = {
+
+              val innerScope = e.containerScope
+
+              // Outer scope in effect for the component element itself
+              val outerScope =
+                if (innerScope.isTopLevelScope)
+                  innerScope
+                else {
+                  // Search in ancestor parts too
+                  val controlId = e.containerScope.fullPrefix.init
+                  val controlAnalysis =
+                    ElementAnalysis.ancestorsAcrossPartsIterator(e, includeSelf = false) find
+                      (_.prefixedId == controlId) getOrElse
+                      (throw new IllegalStateException)
+
+                  controlAnalysis.scope
+                }
+
+              (innerScope, outerScope, if (e.scope == innerScope) XXBLScope.Inner else XXBLScope.Outer)
+            }
+
+            def annotateChild(innerScope: Scope, outerScope: Scope, containerScope: XXBLScope)(child: Element): Element =
+              XBLBindingBuilder.annotateSubtreeByElement(
+                e.part,
+                e.element,            // bound element
+                child,                // child tree to annotate
+                innerScope,
+                outerScope,
+                containerScope,
+                concreteBinding.innerScope
+              )
+
+            // Directly nested handlers (if enabled)
+            def directlyNestedHandlers =
+              if (e.commonBinding.modeHandlers)
+                e.element.elements            filter
+                  EventHandler.isEventHandler map
+                  (annotateChild _).tupled(scopesForDirectlyNestedChildren)
+              else
+                Nil
+
+            // Directly nested LHHA (if enabled)
+            def directlyNestedLHHA =
+              if (e.commonBinding.modeLHHA)
+                e.element.elements                                     filter
+                  (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
+                  (annotateChild _).tupled(scopesForDirectlyNestedChildren)
+              else
+                Nil
+
+            val scopesForImplementationChildren =
+              (concreteBinding.innerScope, e.part.scopeForPrefixedId(e.prefixedId), XXBLScope.Inner)
+
+            val annotatedHandlers = abstractBinding.handlers      map (annotateChild _).tupled(scopesForImplementationChildren)
+            val annotatedModels   = abstractBinding.modelElements map (annotateChild _).tupled(scopesForImplementationChildren)
+
+            val elems =
+              directlyNestedHandlers ++
+                directlyNestedLHHA   ++
+                annotatedHandlers    ++
+                annotatedModels      :+
+                compactShadowTree.getRootElement
+
+            elems map ((_, concreteBinding.innerScope))
+
+          case None =>
+            Nil // no template found for the binding
         }
+      } else
+        Nil // lazy binding, don't do anything yet
 
-        // Directly nested handlers (if enabled)
-        def directlyNestedHandlers =
-          if (e.commonBinding.modeHandlers)
-            e.element.elements filter
-              EventHandler.isEventHandler map
-                annotateChild
-          else
-            Nil
-
-        // Directly nested LHHA (if enabled)
-        def directlyNestedLHHA =
-          if (e.commonBinding.modeLHHA)
-            e.element.elements filter
-              (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
-                annotateChild
-          else
-            Nil
-
-        val elems =
-          directlyNestedHandlers ++
-            directlyNestedLHHA   ++
-            binding.handlers     ++
-            binding.models :+ binding.compactShadowTree.getRootElement
-
-        elems map ((_, binding.innerScope))
-
-      } getOrElse
-        Nil
-
-    def childrenElements(e: WithChildrenTrait): Seq[(Element, Scope)] = {
+    def childrenElements(
+      e              : WithChildrenTrait)(implicit
+      indentedLogger : IndentedLogger
+    ): Seq[(Element, Scope)] = {
 
       import ControlAnalysisFactory.isVariable
       import EventHandler.isAction
@@ -189,7 +230,7 @@ object ElementAnalysisTreeBuilder {
             case (e, s) if isAction(e.getQName) || isVariable(e.getQName) => (e, s)
           }
         case e: ComponentControl =>
-          findXblRelevantChildrenElements(e)
+          componentChildren(e, honorLazy = true)
         case _ =>
           allChildren
       }

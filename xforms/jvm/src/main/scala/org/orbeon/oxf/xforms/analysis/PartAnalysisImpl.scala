@@ -138,10 +138,6 @@ class PartAnalysisImpl(
             (throw new IllegalStateException)
 
         componentControl.commonBinding = abstractBinding.commonBinding
-
-        if (! componentControl.hasLazyBinding)
-          ElementAnalysisTreeBuilder.setConcreteBinding(componentControl, abstractBinding, controlElement)(getIndentedLogger)
-
         index(componentControl)
         componentControl
       case Some(elementAnalysis) =>
@@ -152,8 +148,8 @@ class PartAnalysisImpl(
     }
   }
 
-  // Analyze a subtree of controls (for `xxf:dynamic`)
-  def analyzeSubtree(container: WithChildrenTrait): Unit = {
+  // Analyze a subtree of controls (for `xxf:dynamic` and components with lazy bindings)
+  def analyzeSubtree(container: ComponentControl): Unit = {
 
     implicit val logger = getIndentedLogger
     withDebug("performing static analysis of subtree", Seq("prefixed id" -> container.prefixedId)) {
@@ -164,8 +160,11 @@ class PartAnalysisImpl(
       val models        = m.Buffer[Model]()
       val attributes    = m.Buffer[AttributeControl]()
 
-      // Rebuild children
-      ElementAnalysisTreeBuilder.buildAllElemDescendants(container, build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
+      ElementAnalysisTreeBuilder.buildAllElemDescendants(
+        container,
+        build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)),
+        ElementAnalysisTreeBuilder.componentChildrenForBindingUpdate(container).some // explicit children
+      )
 
       // Attach LHHA
       for (lhha <- lhhas)

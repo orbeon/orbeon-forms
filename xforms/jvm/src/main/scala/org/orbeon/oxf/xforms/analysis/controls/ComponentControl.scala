@@ -24,13 +24,13 @@ class ComponentControl(
       element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
   var commonBinding: CommonBinding = null // TODO: pass via constructor
+  var rootElem: Element = element // default, can be updated by `xxf:dynamic`
 
-  // The `ConcreteBinding` is mutable in some cases when used from `xxf:dynamic`
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)
 
   def hasConcreteBinding: Boolean                 = _concreteBindingOpt.isDefined
   def bindingOpt        : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! part.isTopLevel)
-  def bindingOrThrow    : ConcreteBinding         = _concreteBindingOpt getOrElse (throw new IllegalStateException)
+  def bindingOrThrow    : ConcreteBinding         = bindingOpt getOrElse (throw new IllegalStateException)
 
   def setConcreteBinding(concreteBinding: ConcreteBinding): Unit = {
     assert(! hasConcreteBinding)
@@ -45,9 +45,7 @@ class ComponentControl(
     bindingOpt foreach { binding =>
       // Remove all descendants only, keeping the current control
       part.deindexTree(this, self = false)
-
       part.deregisterScope(binding.innerScope)
-
       _concreteBindingOpt = None
     }
   }

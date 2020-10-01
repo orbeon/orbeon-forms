@@ -41,13 +41,17 @@ object Extensions {
     def idOrNull: String      = e.attributeValue(IdQName)
     def idOrThrow: String     = idOpt getOrElse (throw new IllegalArgumentException)
 
-    def resolveStringQName(qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
+    def resolveStringQName(qNameString: String, unprefixedIsNoNamespace: Boolean): Option[QName] =
       Extensions.resolveQName(e.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace)
 
-    def resolveAttValueQName(attName: QName, unprefixedIsNoNamespace: Boolean): QName =
+    def resolveStringQNameOrThrow(qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
+      Extensions.resolveQName(e.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace) getOrElse
+        (throw new IllegalArgumentException)
+
+    def resolveAttValueQName(attName: QName, unprefixedIsNoNamespace: Boolean): Option[QName] =
       resolveStringQName(e.attributeValue(attName), unprefixedIsNoNamespace)
 
-    def resolveAttValueQName(attName: String, unprefixedIsNoNamespace: Boolean): QName =
+    def resolveAttValueQName(attName: String, unprefixedIsNoNamespace: Boolean): Option[QName] =
       resolveStringQName(e.attributeValue(attName), unprefixedIsNoNamespace)
 
     def copyMissingNamespacesByPrefix(sourceElem: Option[Element], prefixesToFilter: Set[String] = Set.empty): Element = {
@@ -165,53 +169,45 @@ object Extensions {
     * @param namespaces              prefix -> URI mappings
     * @param qNameStringOrig         QName to analyze
     * @param unprefixedIsNoNamespace if true, an unprefixed value is in no namespace; if false, it is in the default namespace
-    * @return a QName object or null if not found
     */
   def resolveQName(
     namespaces              : Map[String, String],
     qNameStringOrig         : String,
     unprefixedIsNoNamespace : Boolean
-  ): QName = {
+  ): Option[QName] =
+    qNameStringOrig.trimAllToOpt map { qNameString =>
 
-    if (qNameStringOrig eq null)
-      return null
+      val (localName, prefix, namespaceURI) =
+        qNameString.indexOf(':') match {
+          case 0 =>
+            throw new IllegalArgumentException(s"Empty prefix for QName: `$qNameString`")
+          case -1 =>
+            val prefix = ""
+            (
+              qNameString,
+              prefix,
+              if (unprefixedIsNoNamespace) "" else namespaces.getOrElse(prefix, "")
+            )
+          case colonIndex =>
+            val prefix = qNameString.substring(0, colonIndex)
+            (
+              qNameString.substring(colonIndex + 1),
+              prefix,
+              namespaces.getOrElse(prefix, throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
+            )
+        }
 
-    val qNameString = qNameStringOrig.trimAllToEmpty
-
-    if (qNameString.isEmpty)
-      return null
-
-    val (localName, prefix, namespaceURI) =
-      qNameString.indexOf(':') match {
-        case 0 =>
-          throw new IllegalArgumentException(s"Empty prefix for QName: `$qNameString`")
-        case -1 =>
-          val prefix = ""
-          (
-            qNameString,
-            prefix,
-            if (unprefixedIsNoNamespace) "" else namespaces.getOrElse(prefix, "")
-          )
-        case colonIndex =>
-          val prefix = qNameString.substring(0, colonIndex)
-          (
-            qNameString.substring(colonIndex + 1),
-            prefix,
-            namespaces.getOrElse(prefix, throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
-          )
-      }
-
-    QName(localName, Namespace(prefix, namespaceURI))
-  }
+      QName(localName, Namespace(prefix, namespaceURI))
+    }
 
   def resolveAttValueQNameJava(elem: Element, attributeQName: QName, unprefixedIsNoNamespace: Boolean): QName =
-    elem.resolveStringQName(elem.attributeValue(attributeQName), unprefixedIsNoNamespace)
+    elem.resolveStringQName(elem.attributeValue(attributeQName), unprefixedIsNoNamespace).orNull
 
   def resolveAttValueQNameJava(elem: Element, attributeName: String): QName =
-    elem.resolveStringQName(elem.attributeValue(attributeName), unprefixedIsNoNamespace = true)
+    elem.resolveStringQName(elem.attributeValue(attributeName), unprefixedIsNoNamespace = true).orNull
 
   def resolveTextValueQNameJava(elem: Element, unprefixedIsNoNamespace: Boolean): QName =
-    resolveQName(elem.allInScopeNamespacesAsStrings, elem.getStringValue, unprefixedIsNoNamespace)
+    resolveQName(elem.allInScopeNamespacesAsStrings, elem.getStringValue, unprefixedIsNoNamespace).orNull
 
   def createDocumentCopyParentNamespacesJava(elem: Element, detach: Boolean): Document =
     elem.createDocumentCopyParentNamespaces(detach)

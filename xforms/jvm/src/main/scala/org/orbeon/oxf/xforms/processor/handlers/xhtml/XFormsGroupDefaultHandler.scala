@@ -31,16 +31,16 @@ class XFormsGroupDefaultHandler(
   // Use explicit container element name if present, otherwise use default
   override def getContainingElementName =
     matched match {
-      case control: ContainerControl if control.elementQName ne null =>
-        control.elementQName.localName
+      case control: ContainerControl =>
+        control.elementQName map (_.localName) getOrElse super.getContainingElementName
       case _ =>
         super.getContainingElementName
     }
 
   override def getContainingElementQName =
     matched match {
-      case control: ContainerControl if control.elementQName ne null =>
-        control.elementQName.qualifiedName
+      case control: ContainerControl=>
+        control.elementQName map (_.qualifiedName) getOrElse super.getContainingElementQName
       case _ =>
         super.getContainingElementQName
     }

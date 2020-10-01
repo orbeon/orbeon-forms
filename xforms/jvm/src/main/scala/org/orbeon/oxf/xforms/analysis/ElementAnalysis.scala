@@ -501,5 +501,5 @@ object ElementAnalysis {
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
-    attSet(element, qName) map (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
+    attSet(element, qName) flatMap (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
 }

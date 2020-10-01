@@ -150,7 +150,7 @@ class StaticBind(
   }
 
   val dataType: Option[QName] =
-    typeMIPOpt map (_.datatype) map
+    typeMIPOpt map (_.datatype) flatMap
       (Extensions.resolveQName(namespaceMapping.mapping, _, unprefixedIsNoNamespace = true))
 
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {

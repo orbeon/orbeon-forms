@@ -235,10 +235,12 @@ object ControlAnalysisFactory {
 
     // Extension attributes depend on the name of the element
     override protected val allowedExtensionAttributes =
-      if ((elementQName ne null) && Set("td", "th")(elementQName.localName))
-        Set(QName("rowspan"), QName("colspan"))
-      else
-        Set.empty[QName]
+      elementQName match {
+        case Some(elementQName) if Set("td", "th")(elementQName.localName) =>
+          Set(QName("rowspan"), QName("colspan"))
+        case _ =>
+          Set.empty
+      }
 
     override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
   }

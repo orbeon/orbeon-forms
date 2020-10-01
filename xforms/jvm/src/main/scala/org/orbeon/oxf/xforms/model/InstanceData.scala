@@ -232,7 +232,7 @@ object InstanceData {
     }
     node match {
       case elem: Element =>
-        elem.resolveAttValueQName(XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false) // TODO: should pass true?
+        elem.resolveAttValueQName(XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false).orNull // TODO: should pass true?
       case _ =>
         null
     }

@@ -64,10 +64,9 @@ class XFormsMessageAction extends XFormsAction {
     val containingDocument = actionContext.containingDocument
 
     val levelQName =
-      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) match {
-        case Some(_) => actionContext.element.resolveAttValueQName(XFormsNames.LEVEL_QNAME, unprefixedIsNoNamespace = true)
-        case None    => ModalQName // "The default is "modal" if the attribute is not specified."
-      }
+      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap
+        (_ => actionContext.element.resolveAttValueQName(XFormsNames.LEVEL_QNAME, unprefixedIsNoNamespace = true)) getOrElse
+        ModalQName // "The default is "modal" if the attribute is not specified."
 
     // Get message value
     val messageValue =
@@ -80,7 +79,6 @@ class XFormsMessageAction extends XFormsAction {
         defaultHTML = false,
         null
       ) getOrElse ""
-
     ExtensionLevels.get(levelQName) match {
       case Some(fn) =>
         fn(containingDocument.indentedLogger, messageValue)

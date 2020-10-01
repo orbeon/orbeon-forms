@@ -59,7 +59,7 @@ trait BindingLoader extends Logging {
         val urlMappings = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
-          property.value.toString.tokenizeToSet map
+          property.value.toString.tokenizeToSet flatMap
             (Extensions.resolveQName(property.namespaces, _, unprefixedIsNoNamespace = true))
 
         def pathsForQNames(qNames: Set[QName]) =

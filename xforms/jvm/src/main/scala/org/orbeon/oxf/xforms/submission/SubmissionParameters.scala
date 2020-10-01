@@ -104,26 +104,32 @@ object SubmissionParameters {
       )
 
     def filterQualifiedName(s: String) =
-      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true).localName
+      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true) map (_.localName)
 
     val resolvedReplace =
       staticSubmission.avtReplaceOpt    flatMap
-        stringAvtTrimmedOpt             map
+        stringAvtTrimmedOpt             flatMap
         filterQualifiedName             map // so that `xxf:binary` becomes `binary`
         ReplaceType.withNameInsensitive getOrElse
         ReplaceType.All
 
-    val resolvedMethod = {
+    val resolvedMethodClarkName = {
       val resolvedMethodQName =
         staticSubmission.avtMethod flatMap stringAvtTrimmedOpt getOrElse "get"
 
-      Extensions.resolveQName(
-        staticSubmission.namespaceMapping.mapping,
-        resolvedMethodQName,
-        unprefixedIsNoNamespace = true
-      ).clarkName
+      val methodQName =
+        Extensions.resolveQName(
+          staticSubmission.namespaceMapping.mapping,
+          resolvedMethodQName,
+          unprefixedIsNoNamespace = true
+        ) getOrElse
+          QName("get")
+
+      methodQName.clarkName
     }
-    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethod)
+
+    // TODO: We pass a Clark name, but we don't process this correctly!
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -166,7 +172,7 @@ object SubmissionParameters {
     val resolvedXxfRelevantAtt: Option[QName] =
       if (serialize)
         staticSubmission.avtXxfRelevantAttOpt flatMap
-          stringAvtTrimmedOpt                 map (
+          stringAvtTrimmedOpt                 flatMap (
             Extensions.resolveQName(
               staticSubmission.namespaceMapping.mapping,
               _,
@@ -237,7 +243,7 @@ object SubmissionParameters {
     SubmissionParameters(
       refContext                     = refContext,
       replaceType                    = resolvedReplace,
-      xformsMethod                   = resolvedMethod,
+      xformsMethod                   = resolvedMethodClarkName,
       httpMethod                     = actualHttpMethod,
       mediatypeOpt                   = resolvedMediatypeOpt,
       serializationOpt               = serializationOpt,

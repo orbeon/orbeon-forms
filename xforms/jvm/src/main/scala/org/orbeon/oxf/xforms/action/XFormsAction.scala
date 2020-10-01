@@ -114,7 +114,7 @@ object XFormsAction {
 
         // Get and check attributes
         name =
-         Option(element.resolveAttValueQName(NAME_QNAME, unprefixedIsNoNamespace = true)) map (_.clarkName) getOrElse
+         element.resolveAttValueQName(NAME_QNAME, unprefixedIsNoNamespace = true) map (_.clarkName) getOrElse
             (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
         value = VariableAnalysis.valueOrSelectAttribute(element) match {

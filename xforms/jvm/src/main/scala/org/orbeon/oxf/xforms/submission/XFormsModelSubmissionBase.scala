@@ -35,7 +35,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 abstract class XFormsModelSubmissionBase
@@ -169,7 +168,7 @@ object XFormsModelSubmissionBase {
             decodeSimpleQuery(token).headOption match {
               case Some((name, value)) =>
                 name -> {
-                  value.trimAllToOpt map
+                  value.trimAllToOpt flatMap
                     (Extensions.resolveQName(namespaceContext, _, unprefixedIsNoNamespace = true)) getOrElse
                     QName(name, XXFORMS_NAMESPACE_SHORT)
                 }

@@ -163,7 +163,7 @@ case class AbstractBinding(
   def supportAVTs       : Boolean = templateElementOpt exists (_.attributeValue(XXBL_AVT_QNAME) == "true")
 
   private def transformQNameOption = templateElementOpt flatMap
-    (e => Option(e.resolveAttValueQName(XXBL_TRANSFORM_QNAME, unprefixedIsNoNamespace = true)))
+    (_.resolveAttValueQName(XXBL_TRANSFORM_QNAME, unprefixedIsNoNamespace = true))
 
   private def templateRootOption = templateElementOpt map { e =>
     if (e.jElements.size != 1)
@@ -229,19 +229,19 @@ object AbstractBinding {
 
     val handlers =
       for {
-        handlersElement <- Option(bindingElem.element(XBL_HANDLERS_QNAME)).toSeq
+        handlersElement <- bindingElem.elementOpt(XBL_HANDLERS_QNAME).toList
         handlerElement  <- handlersElement.elements(XBL_HANDLER_QNAME)
       } yield
         handlerElement
 
     val modelElements =
       for {
-        implementationElement <- Option(bindingElem.element(XBL_IMPLEMENTATION_QNAME)).toSeq
+        implementationElement <- bindingElem.elementOpt(XBL_IMPLEMENTATION_QNAME).toList
         modelElement          <- implementationElement.elements(XFORMS_MODEL_QNAME)
       } yield
         modelElement
 
-    val global = Option(bindingElem.element(XXBL_GLOBAL_QNAME)) map
+    val global = bindingElem.elementOpt(XXBL_GLOBAL_QNAME) map
       (_.createDocumentCopyParentNamespaces(detach = true))
 
     val selectors =

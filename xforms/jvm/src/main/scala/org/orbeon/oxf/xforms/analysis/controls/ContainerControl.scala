@@ -36,6 +36,7 @@ class ContainerControl(
 ) with ViewTrait
   with WithChildrenTrait {
 
-  // For <xf:group xxf:element="xh:div">. Can be null.
-  val elementQName: QName = element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)
+  // For `<xf:group xxf:element="xh:div">`
+  val elementQName: Option[QName] =
+    element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)
 }

@@ -230,7 +230,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
 
     def controllerPropertyQName(name: String, default: Option[QName]) =
-      Option(configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true)) orElse
+      configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true) orElse
         Option(properties.getQName(name, default.orNull))
 
     val defaultMatcher         = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
@@ -637,7 +637,7 @@ object PageFlowControllerProcessor {
   def compilePattern(e: Element, path: String, default: QName) =
     RegexpMatcher.compilePattern(
       path,
-      glob = ! RegexpQNames(Option(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true)) getOrElse default)
+      glob = ! RegexpQNames(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true) getOrElse default)
     )
 
   def createElementWithText(name: String, text: String): Element =

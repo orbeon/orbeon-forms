@@ -61,10 +61,19 @@ object PropertyStore {
 
       if (propertyElement.attributeValueOpt("as").isDefined) {
 
-        val typeQName = propertyElement.resolveAttValueQName("as", unprefixedIsNoNamespace = true)
+        val typeQName =
+          propertyElement.resolveAttValueQName("as", unprefixedIsNoNamespace = true) getOrElse (
+            throw new ValidationException(
+              s"Missing `as` attribute value",
+              propertyElement.getData.asInstanceOf[LocationData]
+            )
+          )
 
         if (! Private.SupportedTypes.contains(typeQName))
-          throw new ValidationException(s"Invalid `as` attribute: ${typeQName.qualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
+          throw new ValidationException(
+            s"Invalid `as` attribute: ${typeQName.qualifiedName}",
+            propertyElement.getData.asInstanceOf[LocationData]
+          )
 
         val name = propertyElement.attributeValue("name")
 
@@ -77,7 +86,14 @@ object PropertyStore {
         val builder =
           propertyElement.attributeValueOpt("processor-name") match {
             case Some(_) =>
-              val processorQName = propertyElement.resolveAttValueQName("processor-name", unprefixedIsNoNamespace = true)
+              val processorQName =
+                propertyElement.resolveAttValueQName("processor-name", unprefixedIsNoNamespace = true) getOrElse (
+                  throw new ValidationException(
+                    s"Missing `processor-name` attribute value",
+                    propertyElement.getData.asInstanceOf[LocationData]
+                  )
+                )
+
               namedPropertySets.getOrElseUpdate(processorQName, mutable.ListBuffer[PropertyParams]())
             case None =>
               globalPropertyDefs
@@ -119,7 +135,8 @@ object PropertyStore {
     def convertDate   (value: String, element: Element) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 
     def convertQName(value: String, element: Element): QName =
-      element.resolveAttValueQName("value", unprefixedIsNoNamespace = true)
+      element.resolveAttValueQName("value", unprefixedIsNoNamespace = true) getOrElse
+        (throw new ValidationException("QName value not found ", null))
 
     def convertURI(value: String, element: Element): URI =
       try {

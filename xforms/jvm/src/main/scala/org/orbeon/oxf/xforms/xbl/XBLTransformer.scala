@@ -20,8 +20,8 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
@@ -226,7 +226,7 @@ object XBLTransformer {
           val equalIndex = currentValue.indexOf('=')
           if (equalIndex == -1) {
             // No a=b pair, just a single QName
-            val valueQName = currentElem.resolveStringQName(currentValue, unprefixedIsNoNamespace = true)
+            val valueQName = currentElem.resolveStringQNameOrThrow(currentValue, unprefixedIsNoNamespace = true)
             if (valueQName.namespace.uri != Namespaces.XBL) {
               // This is not xbl:text, copy the attribute
               val attributeValue = boundElement.attributeValue(valueQName)
@@ -240,11 +240,11 @@ object XBLTransformer {
             // a=b pair
             val leftSideQName = {
               val leftSide = currentValue.substring(0, equalIndex)
-              currentElem.resolveStringQName(leftSide, unprefixedIsNoNamespace = true)
+              currentElem.resolveStringQNameOrThrow(leftSide, unprefixedIsNoNamespace = true)
             }
             val rightSideQName = {
               val rightSide = currentValue.substring(equalIndex + 1)
-              currentElem.resolveStringQName(rightSide, unprefixedIsNoNamespace = true)
+              currentElem.resolveStringQNameOrThrow(rightSide, unprefixedIsNoNamespace = true)
             }
 
             val isLeftSideXBLText  = leftSideQName.namespace.uri  == Namespaces.XBL

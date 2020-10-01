@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLEl
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.Namespaces
 
 
 object XHTMLOutput {
@@ -34,8 +35,8 @@ object XHTMLOutput {
     locally {
       val isHTMLDocument = xfcd.staticState.isHTMLDocument
 
-      import org.orbeon.xforms.XFormsNames.{XBL_NAMESPACE_URI, XFORMS_NAMESPACE_URI => XF, XXFORMS_NAMESPACE_URI => XXF}
       import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
+      import org.orbeon.xforms.XFormsNames.{XFORMS_NAMESPACE_URI => XF, XXFORMS_NAMESPACE_URI => XXF}
 
       if (isHTMLDocument) {
         register(classOf[XHTMLHeadHandler], XH, "head")
@@ -56,7 +57,7 @@ object XHTMLOutput {
       if (isHTMLDocument) {
         register(classOf[NullHandler], XF)
         register(classOf[NullHandler], XXF)
-        register(classOf[NullHandler], XBL_NAMESPACE_URI)
+        register(classOf[NullHandler], Namespaces.XBL)
       }
     }
 

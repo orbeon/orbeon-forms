@@ -20,13 +20,13 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
+import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
@@ -227,7 +227,7 @@ object XBLTransformer {
           if (equalIndex == -1) {
             // No a=b pair, just a single QName
             val valueQName = currentElem.resolveStringQName(currentValue, unprefixedIsNoNamespace = true)
-            if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
+            if (valueQName.namespace.uri != Namespaces.XBL) {
               // This is not xbl:text, copy the attribute
               val attributeValue = boundElement.attributeValue(valueQName)
               if (attributeValue ne null)
@@ -247,8 +247,8 @@ object XBLTransformer {
               currentElem.resolveStringQName(rightSide, unprefixedIsNoNamespace = true)
             }
 
-            val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI
-            val isRightSideXBLText = rightSideQName.namespace.uri == XBL_NAMESPACE_URI
+            val isLeftSideXBLText  = leftSideQName.namespace.uri  == Namespaces.XBL
+            val isRightSideXBLText = rightSideQName.namespace.uri == Namespaces.XBL
 
             val (rightSideValue, namespaceElement) =
               if (! isRightSideXBLText) {

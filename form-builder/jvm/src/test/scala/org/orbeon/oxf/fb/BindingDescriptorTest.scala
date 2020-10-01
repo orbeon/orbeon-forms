@@ -16,7 +16,6 @@ package org.orbeon.oxf.fb
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants._
@@ -24,7 +23,10 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.Namespaces
+import org.orbeon.xforms.XFormsNames._
 import org.scalatest.funspec.AnyFunSpecLike
+
 import scala.collection.compat._
 
 class BindingDescriptorTest
@@ -106,7 +108,7 @@ class BindingDescriptorTest
 
   val XF  = XFORMS_NAMESPACE_URI
   val XS  = XSD_URI
-  val XBL = XBL_NAMESPACE_URI
+  val XBL = Namespaces.XBL
   val FR  = "http://orbeon.org/oxf/xml/form-runner"
   val FB  = "http://orbeon.org/oxf/xml/form-builder"
 

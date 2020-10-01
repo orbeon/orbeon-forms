@@ -382,8 +382,8 @@ trait BindingLoader extends Logging {
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement <- xblElement.elements(XBL_BINDING_QNAME).to(List)
-      _              <- Option(bindingElement.attributeValue(ELEMENT_QNAME))
+      bindingElement <- xblElement.elements(XBL_BINDING_QNAME).toList
+      _              <- bindingElement.attributeValueOpt(ELEMENT_QNAME)
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)
   }

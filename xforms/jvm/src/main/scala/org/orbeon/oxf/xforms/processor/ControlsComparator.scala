@@ -14,9 +14,8 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
+import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
@@ -25,7 +24,8 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLEl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.RepeatSeparator
-import org.orbeon.xforms.{CrossPlatformSupport, rpc}
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{CrossPlatformSupport, Namespaces, rpc}
 import shapeless.syntax.typeable._
 
 import scala.collection.{immutable => i}
@@ -372,7 +372,7 @@ class ControlsComparator(
       // Swallow XForms elements that are unknown
       register(classOf[NullHandler], XFORMS_NAMESPACE_URI)
       register(classOf[NullHandler], XXFORMS_NAMESPACE_URI)
-      register(classOf[NullHandler], XBL_NAMESPACE_URI)
+      register(classOf[NullHandler], Namespaces.XBL)
 
       controller
     }

@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
 import org.orbeon.xforms.Constants.DocumentId
+import org.orbeon.xforms.Namespaces
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.{Attributes, Locator}
 import shapeless.syntax.typeable._
 
@@ -100,7 +101,7 @@ abstract class XFormsAnnotatorBase(
         isXForms                   = isXForms,
         isXXForms                  = isXXForms,
         isEXForms                  = isEXForms,
-        isXBL                      = uri == XBL_NAMESPACE_URI,
+        isXBL                      = uri == Namespaces.XBL,
         isXFormsOrBuiltinExtension = isXForms || isXXForms || isEXForms,
         isXHTML                    = uri == XHTML_NAMESPACE_URI,
         isFullUpdate               = atts.getValue(XXFORMS_UPDATE_QNAME.namespace.uri, XXFORMS_UPDATE_QNAME.localName) == XFORMS_FULL_UPDATE

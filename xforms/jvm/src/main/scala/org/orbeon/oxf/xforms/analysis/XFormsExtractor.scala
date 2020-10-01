@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{Constants, CrossPlatformSupport, XXBLScope}
+import org.orbeon.xforms.{Constants, CrossPlatformSupport, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
@@ -247,7 +247,7 @@ class XFormsExtractor(
     val isXForms            = uri == XFORMS_NAMESPACE_URI
     val isXXForms           = uri == XXFORMS_NAMESPACE_URI
     val isEXForms           = uri == EXFORMS_NAMESPACE_URI
-    val isXBL               = uri == XBL_NAMESPACE_URI
+    val isXBL               = uri == Namespaces.XBL
     val isXXBL              = uri == XXBL_NAMESPACE_URI // for xxbl:global
 
     val staticId            = attributes.getValue("", "id")

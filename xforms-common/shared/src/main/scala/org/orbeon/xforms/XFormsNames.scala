@@ -29,6 +29,7 @@ object XFormsNames {
   def xformsQName   (name: String): QName = QName(name, XFORMS_NAMESPACE)
   def xxformsQName  (name: String): QName = QName(name, XXFORMS_NAMESPACE)
   def xmlEventsQName(name: String): QName = QName(name, XML_EVENTS_NAMESPACE)
+  def xblQName      (name: String): QName = QName(name, XBL_NAMESPACE)
 
   val XFORMS_PREFIX = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX = "xf"
@@ -106,19 +107,18 @@ object XFormsNames {
 
   // XBL
   val XBL_PREFIX = "xbl"
-  val XBL_NAMESPACE_URI = Namespaces.XBL
-  val XBL_NAMESPACE = Namespace(XBL_PREFIX, XBL_NAMESPACE_URI)
-  val XBL_XBL_QNAME = QName("xbl", XBL_NAMESPACE)
-  val XBL_BINDING_QNAME = QName("binding", XBL_NAMESPACE)
-  val XBL_SCRIPT_QNAME = QName("script", XBL_NAMESPACE)
-  val XBL_RESOURCES_QNAME = QName("resources", XBL_NAMESPACE)
-  val XBL_STYLE_QNAME = QName("style", XBL_NAMESPACE)
-  val XBL_TEMPLATE_QNAME = QName("template", XBL_NAMESPACE)
-  val XBL_HANDLERS_QNAME = QName("handlers", XBL_NAMESPACE)
-  val XBL_HANDLER_QNAME = QName("handler", XBL_NAMESPACE)
-  val XBL_IMPLEMENTATION_QNAME = QName("implementation", XBL_NAMESPACE)
+  val XBL_NAMESPACE            = Namespace(XBL_PREFIX, Namespaces.XBL)
+  val XBL_XBL_QNAME            = xblQName("xbl")
+  val XBL_BINDING_QNAME        = xblQName("binding")
+  val XBL_SCRIPT_QNAME         = xblQName("script")
+  val XBL_RESOURCES_QNAME      = xblQName("resources")
+  val XBL_STYLE_QNAME          = xblQName("style")
+  val XBL_TEMPLATE_QNAME       = xblQName("template")
+  val XBL_HANDLERS_QNAME       = xblQName("handlers")
+  val XBL_HANDLER_QNAME        = xblQName("handler")
+  val XBL_IMPLEMENTATION_QNAME = xblQName("implementation")
 
-  val ELEMENT_QNAME = QName("element")
+  val ELEMENT_QNAME  = QName("element")
   val INCLUDES_QNAME = QName("includes")
 
   // XBL extensions

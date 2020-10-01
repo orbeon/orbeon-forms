@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{BindTree, DependencyAnalyzer, Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
@@ -293,8 +293,8 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
       if (bindTree.model.part.staticState.isCalculateDependencies) {
-        bindTree.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, Model.Calculate))
-        bindTree.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, Model.Default))
+        bindTree.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, ModelDefs.Calculate))
+        bindTree.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, ModelDefs.Default))
       }
     }
 

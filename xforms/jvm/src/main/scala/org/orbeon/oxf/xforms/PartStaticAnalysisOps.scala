@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import analysis.ElementAnalysis
-import analysis.model.Model
+import analysis.model.{Model, ModelDefs}
 import org.orbeon.dom.Element
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.xforms.xbl.Scope

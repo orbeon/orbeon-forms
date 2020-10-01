@@ -17,8 +17,8 @@ import java.{util => ju}
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Required, Type}
+import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -48,9 +48,9 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
     }
 
   // Current MIP state
-  private var _relevant = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
-  private var _readonly = Model.DEFAULT_READONLY // move to public var once all callers are Scala
-  private var _required = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
+  private var _relevant = ModelDefs.DEFAULT_RELEVANT // move to public var once all callers are Scala
+  private var _readonly = ModelDefs.DEFAULT_READONLY // move to public var once all callers are Scala
+  private var _required = ModelDefs.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
   private var _invalidTypeValidation: StaticBind#MIP = null
   private var _requiredValidation: StaticBind#MIP    = null

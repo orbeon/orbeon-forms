@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}

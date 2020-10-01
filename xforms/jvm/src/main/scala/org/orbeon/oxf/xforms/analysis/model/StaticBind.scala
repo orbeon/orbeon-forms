@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
@@ -109,7 +109,7 @@ class StaticBind(
   } with MIP
 
   class WhitespaceMIP(val id: String, val policy: Policy) extends {
-    val name  = Model.Whitespace.name
+    val name  = ModelDefs.Whitespace.name
     val level = ValidationLevel.ErrorLevel
   } with MIP
 
@@ -294,8 +294,8 @@ class StaticBind(
   def getXPathMIPs(mipName: String): List[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
 
   // TODO: Support multiple relevant, readonly, and required MIPs.
-  def firstXPathMIP(mip: Model.XPathMIP): Option[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
-  def hasXPathMIP  (mip: Model.XPathMIP): Boolean          = firstXPathMIP(mip).isDefined
+  def firstXPathMIP(mip: ModelDefs.XPathMIP): Option[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
+  def hasXPathMIP  (mip: ModelDefs.XPathMIP): Boolean          = firstXPathMIP(mip).isDefined
 
   override def freeTransientState(): Unit = {
 

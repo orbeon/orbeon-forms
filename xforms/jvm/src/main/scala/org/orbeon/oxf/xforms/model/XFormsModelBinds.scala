@@ -25,9 +25,9 @@ import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
-import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData

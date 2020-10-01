@@ -75,7 +75,7 @@ object DependencyAnalyzer {
   //
   def determineEvaluationOrder(
     tree : BindTree,
-    mip  : Model.StringMIP // `Model.Calculate` or `Model.Default`.
+    mip  : ModelDefs.StringMIP // `Model.Calculate` or `Model.Default`.
   ): List[StaticBind] = {
 
     if (Logger.isDebugEnabled)

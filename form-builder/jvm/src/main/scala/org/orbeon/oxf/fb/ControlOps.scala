@@ -31,8 +31,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.Model.{ComputedMIP, MIP}
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{ComputedMIP, MIP}
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -56,7 +56,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   self: GridOps => // funky dependency, to resolve at some point
 
-  private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
+  private val MIPsToRewrite = ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
 
   private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v => v.localName -> v) toMap
@@ -433,14 +433,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       val isDefault =
         mip match {
-          case Model.Relevant   => trimmed == TrueExpr
-          case Model.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
-          case Model.Required   => trimmed == FalseExpr
-          case Model.Constraint => trimmed.isEmpty
-          case Model.Calculate  => trimmed.isEmpty
-          case Model.Default    => trimmed.isEmpty
-          case Model.Type       => isTypeString(trimmed)
-          case Model.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
+          case ModelDefs.Relevant   => trimmed == TrueExpr
+          case ModelDefs.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
+          case ModelDefs.Required   => trimmed == FalseExpr
+          case ModelDefs.Constraint => trimmed.isEmpty
+          case ModelDefs.Calculate  => trimmed.isEmpty
+          case ModelDefs.Default    => trimmed.isEmpty
+          case ModelDefs.Type       => isTypeString(trimmed)
+          case ModelDefs.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
         }
 
       ! isDefault option trimmed
@@ -471,18 +471,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           value
         case None =>
           mip match {
-            case Model.Relevant   => TrueExpr
-            case Model.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
-            case Model.Required   => FalseExpr
-            case Model.Calculate  => ""
-            case Model.Default    => ""
-            case Model.Whitespace => Whitespace.Policy.Preserve.entryName
+            case ModelDefs.Relevant   => TrueExpr
+            case ModelDefs.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
+            case ModelDefs.Required   => FalseExpr
+            case ModelDefs.Calculate  => ""
+            case ModelDefs.Default    => ""
+            case ModelDefs.Whitespace => Whitespace.Policy.Preserve.entryName
           }
       }
     }
 
   private def hasCalculate(bindElem: NodeInfo): Boolean =
-    bindElem.attValueOpt(Model.Calculate.name).isDefined
+    bindElem.attValueOpt(ModelDefs.Calculate.name).isDefined
 
   // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
   // expressions and types could use it. So for now the mapping is never garbage collected.
@@ -573,7 +573,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     )
 
   // Return `(attQName, elemQName)`
-  def mipToFBMIPQNames(mip: Model.MIP): (QName, QName) =
+  def mipToFBMIPQNames(mip: ModelDefs.MIP): (QName, QName) =
     RewrittenMIPs.get(mip) match {
       case Some(qn) => qn        -> qn
       case None     => mip.aName -> mip.eName

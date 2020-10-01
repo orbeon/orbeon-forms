@@ -24,8 +24,8 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -436,7 +436,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val builtinTypeString = builtinTypeStringOpt.get
 
           // If a builtin type, we just have a local name
-          val nsURI = Model.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
+          val nsURI = ModelDefs.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min

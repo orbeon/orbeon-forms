@@ -18,7 +18,7 @@ import java.{util => ju}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs}
 import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.JavaConverters._

@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs, Submission}
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._

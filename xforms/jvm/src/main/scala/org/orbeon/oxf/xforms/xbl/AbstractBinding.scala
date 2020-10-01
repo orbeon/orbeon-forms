@@ -56,7 +56,7 @@ case class InlineBindingRef(
 object CommonBindingBuilder {
 
   def apply(
-    bindingElem                 : Element,
+    bindingElem                 : Element, // `<xbl:binding>`
     bindingElemNamespaceMapping : NamespaceMapping,
     directName                  : Option[QName],
     cssName                     : Option[String],
@@ -112,6 +112,7 @@ object CommonBindingBuilder {
     ) toMap
 
     CommonBinding(
+      bindingElemId               = bindingElem.idOpt,
       bindingElemNamespaceMapping = bindingElemNamespaceMapping,
       directName                  = directName,
       cssName                     = cssName,
@@ -145,7 +146,6 @@ case class AbstractBinding(
   bindingElement   : Element,
   path             : Option[String],
   lastModified     : Long,
-  bindingId        : Option[String],
   scripts          : Seq[HeadElement],
   styles           : Seq[HeadElement],
   handlers         : Seq[Element],
@@ -212,15 +212,13 @@ object AbstractBinding {
     )
 
   def fromBindingElement(
-    bindingElem  : Element,
+    bindingElem  : Element, // `<xbl:binding>`
     path         : Option[String],
     lastModified : Long,
     scripts      : Seq[HeadElement]
   ): AbstractBinding = {
 
     assert(bindingElem ne null)
-
-    val bindingId = bindingElem.idOpt
 
     val styles =
       for {
@@ -263,7 +261,6 @@ object AbstractBinding {
       bindingElem,
       path,
       lastModified,
-      bindingId,
       scripts,
       styles,
       handlers,

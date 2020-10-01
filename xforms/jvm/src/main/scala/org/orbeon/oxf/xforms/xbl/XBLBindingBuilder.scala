@@ -198,7 +198,7 @@ object XBLBindingBuilder {
     ): Option[Document] =
       abstractBinding.templateElementOpt map {
         templateElement =>
-          withDebug("generating raw XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
+          withDebug("generating raw XBL shadow content", Seq("binding id" -> abstractBinding.commonBinding.bindingElemId.orNull)) {
 
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
@@ -368,7 +368,7 @@ object XBLBindingBuilder {
       abstractBinding.global map { globalDocument =>
 
         val (globalTemplateTree, globalCompactShadowTree) =
-          withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
+          withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.commonBinding.bindingElemId.orNull)) {
 
             val topLevelScopeForGlobals = partAnalysis.startScope
 

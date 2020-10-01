@@ -31,7 +31,7 @@ case class ConcreteBinding(
   boundElementAtts  : Map[QName, String] // attributes on the bound element                                       [runtime functions]
 ) {
   require(
-    abstractBinding.bindingId.isDefined,
+    abstractBinding.commonBinding.bindingElemId.isDefined,
     s"missing id on XBL binding for ${abstractBinding.bindingElement.toDebugString}"
   )
 }

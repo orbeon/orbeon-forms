@@ -414,7 +414,7 @@ object FormRunnerMetadata {
 
                 SingleControlValue(c.getValue, selectedLabel) // TODO
 
-              case c: XFormsValueComponentControl if c.staticControl.bindingOrThrow.abstractBinding.commonBinding.modeSelection =>
+              case c: XFormsValueComponentControl if c.staticControl.commonBinding.modeSelection =>
 
                 val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
 

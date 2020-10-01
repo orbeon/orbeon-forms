@@ -18,7 +18,7 @@ import java.{lang => jl}
 import cats.data.NonEmptyList
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
-import shapeless.syntax.typeable.typeableOps
+import shapeless.syntax.typeable._
 
 
 object AjaxRequest {

@@ -23,7 +23,6 @@ import org.orbeon.oxf.util.IndentedLogger
 
 object CrossPlatformSupport extends CrossPlatformSupportTrait {
 
-
   def properties: PropertySet = ???
 
   def externalContext: ExternalContext = ???

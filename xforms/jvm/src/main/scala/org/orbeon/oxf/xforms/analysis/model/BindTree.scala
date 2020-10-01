@@ -15,9 +15,6 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XXBLScope
 
 import scala.collection.compat._
 import scala.collection.{mutable => m}
@@ -70,29 +67,30 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     bindsById.values foreach model.part.unmapScopeIds
 
   // Add a new bind
-  def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
-
-    assert(! model.part.isTopLevel)
-
-    // First annotate tree
-    val annotatedTree =
-      XBLBindingBuilder.annotateSubtree(
-        model.part,
-        None,
-        rawBindElement.createDocumentCopyParentNamespaces(detach = false),
-        model.scope,
-        model.scope,
-        XXBLScope.Inner,
-        model.containerScope,
-        hasFullUpdate = false,
-        ignoreRoot = false
-      )
-
-    // Add new bind to parent
-    bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)
-
-    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
-  }
+  // 2020-10-01: No usages!
+//  def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
+//
+//    assert(! model.part.isTopLevel)
+//
+//    // First annotate tree
+//    val annotatedTree =
+//      XBLBindingBuilder.annotateSubtree(
+//        model.part,
+//        None,
+//        rawBindElement.createDocumentCopyParentNamespaces(detach = false),
+//        model.scope,
+//        model.scope,
+//        XXBLScope.Inner,
+//        model.containerScope,
+//        hasFullUpdate = false,
+//        ignoreRoot = false
+//      )
+//
+//    // Add new bind to parent
+//    bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)
+//
+//    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
+//  }
 
   // Remove an existing bind
   def removeBind(bind: StaticBind): Unit = {

@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
@@ -324,7 +324,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
       val staticModel = partAnalysis.getModel(modelPrefixedId)
 
-      staticModel.rebuildBinds(modelElement)
+      XBLBindingBuilder.rebuildBinds(staticModel, modelElement)
 
       // Q: When should we best notify the concrete model that its binds need build? Since at this point, we
       // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are

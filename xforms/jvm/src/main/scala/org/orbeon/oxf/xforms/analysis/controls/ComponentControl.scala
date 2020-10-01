@@ -47,7 +47,6 @@ class ComponentControl(
       part.deindexTree(this, self = false)
 
       part.deregisterScope(binding.innerScope)
-      part.removeBinding(prefixedId)
 
       _concreteBindingOpt = None
     }

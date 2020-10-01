@@ -80,7 +80,6 @@ object ElementAnalysisTreeBuilder {
         e.part.allGlobals += global                           // TODO: indexing
       }
 
-      e.part.addBinding(e.prefixedId, newBinding)             // TODO: indexing
       e.setConcreteBinding(newBinding)
     }
   }

@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, RepeatControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -31,6 +31,7 @@ import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
+import shapeless.syntax.typeable.typeableOps
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}
@@ -405,7 +406,11 @@ trait ContainerResolver {
     // TODO: Handle https://github.com/orbeon/orbeon-forms/issues/3853. Unclear. For `xxf:dynamic`, `self.prefixedId`
     // is the prefixed id of the `xxf:dynamic` in the outer scope. So we can't just use `getPartAnalysis`. Use parent
     // part if any?
-    val bindingIdOpt = containingDocument.staticOps.getBinding(self.prefixedId) flatMap (_.abstractBinding.commonBinding.bindingElemId)
+    val bindingIdOpt =
+      containingDocument.staticOps.findControlAnalysis(self.prefixedId) flatMap
+        (_.narrowTo[ComponentControl])                                  flatMap
+        (_.commonBinding.bindingElemId)
+    
     if (bindingIdOpt.contains(staticOrAbsoluteId))
       return containingDocument.findControlByEffectiveId(effectiveId).toList
 

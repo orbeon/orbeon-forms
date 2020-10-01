@@ -44,7 +44,6 @@ trait PartGlobalOps {
   def keyboardHandlers: Seq[EventHandler]
 
   // XBL
-  def getBinding(prefixedId: String): Option[ConcreteBinding]
   def getGlobals: collection.Seq[Global]
   def allBindingsMaybeDuplicates: Iterable[AbstractBinding]
 

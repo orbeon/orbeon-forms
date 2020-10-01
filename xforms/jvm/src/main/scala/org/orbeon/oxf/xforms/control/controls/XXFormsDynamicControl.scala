@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -38,6 +38,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.w3c.dom.Node.ELEMENT_NODE
+import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
 import scala.collection.generic.Growable
@@ -412,12 +413,13 @@ object XXFormsDynamicControl {
       // Find first element whose prefixed id has a binding and return the mapping prefixedId -> element
       val all =
         for {
-          ancestor   <- ancestorsFromRoot
-          id         = ancestor.id
+          ancestor         <- ancestorsFromRoot
+          id               = ancestor.id
           if id.nonEmpty
-          prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          _          <- partAnalysis.getBinding(prefixedId)
-          if ! (isNodeLHHA && ancestor == node.getParent)
+          prefixedId       = partAnalysis.startScope.prefixedIdForStaticId(id)
+          control          <- partAnalysis.findControlAnalysis(prefixedId)
+          componentControl <- control.narrowTo[ComponentControl]
+          if componentControl.hasConcreteBinding && ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId -> unsafeUnwrapElement(ancestor)
 

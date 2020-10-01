@@ -21,14 +21,13 @@ import org.orbeon.xforms.xbl.Scope
 // NOTE: 2018-02-23: This is only created if the `AbstractBinding` has a template. Wondering if we should support components with
 // no templates (or creating an empty template in that case) so that we don't have to special-case bindings without templates.
 case class ConcreteBinding(
-  abstractBinding   : AbstractBinding,   //                                                                       [namespaceMapping, bindingId]
-  innerScope        : Scope,             // each binding defines a new scope
-  outerScope        : Scope,             // this binding's outer scope                                            [FIXME: unused]
-  handlers          : Seq[Element],      // annotated event handler elements                                      [FIXME: ElementAnalysisTreeBuilder only]
-  models            : Seq[Element],      // annotated implementation model elements                               [FIXME: ElementAnalysisTreeBuilder only]
-  templateTree      : SAXStore,          // template with relevant markup for output, including XHTML when needed [XXFormsComponentHandler]
-  compactShadowTree : Document,          // without full content, only the XForms controls                        [FIXME: ElementAnalysisTreeBuilder only]
-  boundElementAtts  : Map[QName, String] // attributes on the bound element                                       [runtime functions]
+  innerScope        : Scope,               // each binding defines a new scope
+  handlers          : Seq[Element],        // annotated event handler elements                                      [FIXME: ElementAnalysisTreeBuilder only]
+  models            : Seq[Element],        // annotated implementation model elements                               [FIXME: ElementAnalysisTreeBuilder only]
+  templateTree      : SAXStore,            // template with relevant markup for output, including XHTML when needed [XXFormsComponentHandler]
+  compactShadowTree : Document,            // without full content, only the XForms controls                        [FIXME: ElementAnalysisTreeBuilder only]
+  boundElementAtts  : Map[QName, String])( // attributes on the bound element                                       [runtime functions]
+  abstractBinding   : AbstractBinding      // only for `require` below, not part of `case class`
 ) {
   require(
     abstractBinding.commonBinding.bindingElemId.isDefined,

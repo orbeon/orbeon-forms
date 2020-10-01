@@ -272,14 +272,13 @@ object XBLBindingBuilder {
       // Remember concrete binding information
       val newConcreteBinding =
         ConcreteBinding(
-          abstractBinding,
           newInnerScope,
-          outerScope,
           annotatedHandlers,
           annotatedModels,
           templateTree,
           compactShadowTree,
-          boundElement.attributes map { att => att.getQName -> att.getValue } toMap
+          boundElement.attributes map { att => att.getQName -> att.getValue } toMap)(
+          abstractBinding
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl

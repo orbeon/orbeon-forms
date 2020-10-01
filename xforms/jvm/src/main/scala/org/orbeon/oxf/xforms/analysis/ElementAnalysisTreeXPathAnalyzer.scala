@@ -83,7 +83,7 @@ object ElementAnalysisTreeXPathAnalyzer {
     def computeBasicContextAnalysis(e: ElementAnalysis): Option[XPathAnalysis] = {
 
       def findInScopeContext: Option[XPathAnalysis] =
-        ElementAnalysis.getClosestAncestorInScopeModel(e, ScopeModel(e.scope, e.model)) match {
+        ElementAnalysis.getClosestAncestorInScopeModel(e, (e.scope, e.model)) match {
           case Some(ancestor: ElementAnalysis) =>
             // There is an ancestor in the same scope with same model, use its analysis as base
             ancestor.getChildrenContext

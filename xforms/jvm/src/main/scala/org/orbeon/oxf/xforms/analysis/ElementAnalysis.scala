@@ -471,8 +471,8 @@ object ElementAnalysis {
   /**
    * Return the first ancestor with a binding analysis that is in the same scope/model.
    */
-  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel): Option[ElementAnalysis] =
-    ancestorsIterator(start, includeSelf = false) find (e => ScopeModel(e.scope, e.model) == scopeModel)
+  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: (Scope, Option[Model])): Option[ElementAnalysis] =
+    ancestorsIterator(start, includeSelf = false) find (e => (e.scope, e.model) == scopeModel)
 
   /**
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.

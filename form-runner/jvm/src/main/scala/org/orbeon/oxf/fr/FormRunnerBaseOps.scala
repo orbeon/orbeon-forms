@@ -292,7 +292,7 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
     val logger              = ProcessorImpl.logger
-    val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
+    val captchaPropertyName = "oxf.fr.detail.captcha" :: app :: form :: Nil mkString "."
     val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
     captchaPropertyOpt match {
       case None => Array.empty

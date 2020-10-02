@@ -808,6 +808,11 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .dependsOn(commonJS)
   .dependsOn(domJS)
   .settings(commonScalaJsSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.xml" %%% "sax"% "2.0.2"
+    )
+  )
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtWeb)

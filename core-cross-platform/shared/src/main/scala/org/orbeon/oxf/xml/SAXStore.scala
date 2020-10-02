@@ -44,7 +44,7 @@ private object SAXStore {
   val StartPrefixMapping   : Byte = 0x0A
   val Comment              : Byte = 0x0B
 
-  val InitialSize         : Int  = 10
+  val InitialSize          : Int  = 10
 }
 
 final class SAXStore

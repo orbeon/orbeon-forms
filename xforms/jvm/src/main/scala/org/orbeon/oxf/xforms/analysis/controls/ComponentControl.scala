@@ -38,6 +38,7 @@ class ComponentControl(
   }
 
   // Remove the component's binding
+  // Used by `xxf:dynamic`
   def removeConcreteBinding(): Unit = {
 
     assert(hasConcreteBinding)

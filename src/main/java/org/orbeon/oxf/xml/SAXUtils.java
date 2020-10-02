@@ -71,6 +71,7 @@ public class SAXUtils {
     /**
      * Convert an Object to a String and generate SAX characters events.
      */
+    // LEGACY
     public static void objectToCharacters(Object o, ContentHandler contentHandler) {
         try {
             char[] charValue = (o == null) ? null : o.toString().toCharArray();
@@ -88,6 +89,7 @@ public class SAXUtils {
      * @param newClasses    new classes to append
      * @return              new attributes
      */
+    // Used by handlers/annotator
     public static AttributesImpl appendToClassAttribute(Attributes attributes, String newClasses) {
         final String oldClassAttribute = attributes.getValue("class");
         final String newClassAttribute = oldClassAttribute == null ? newClasses : oldClassAttribute + ' ' + newClasses;
@@ -101,6 +103,7 @@ public class SAXUtils {
      * @param attributeName     attribute name
      * @param attributeValue    value to set or append
      */
+    // Used by handlers
     public static void addOrAppendToAttribute(AttributesImpl attributes, String attributeName, String attributeValue) {
 
         final int oldAttributeIndex = attributes.getIndex(attributeName);
@@ -117,6 +120,7 @@ public class SAXUtils {
         }
     }
 
+    // Used by handlers/annotator
     public static AttributesImpl addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
         boolean replaced = false;
@@ -143,6 +147,7 @@ public class SAXUtils {
         return newAttributes;
     }
 
+    // Used by handlers
     public static AttributesImpl removeAttribute(Attributes attributes, String uri, String localname) {
         final AttributesImpl newAttributes = new AttributesImpl();
         for (int i = 0; i < attributes.getLength(); i++) {

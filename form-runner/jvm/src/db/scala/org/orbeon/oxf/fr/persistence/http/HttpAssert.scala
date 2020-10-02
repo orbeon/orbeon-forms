@@ -83,7 +83,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion === resultFormVersion)
         // Check stage
-        val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage)
+        val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage.apply(_, ""))
         assert(expectedStage === resultStage)
 
       case ExpectedCode(expectedCode) =>

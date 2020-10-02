@@ -130,8 +130,9 @@
                 <xsl:template match="/">
                     <forms>
                         <xsl:choose>
+                            <!-- Unless we have `?all-versions=true`, only keep the highest version per app/form -->
+                            <!-- We should probably filter in SQL, but it makes the query very complex, so for now we do it in XSLT -->
                             <xsl:when test="doc('input:request-description')/*/all-versions = 'false'">
-                                <!-- NOTE: We should probably filter in SQL, but it makes the query very complex. So we do it in XSLT for now. -->
                                 <xsl:for-each-group select="/*/row" group-by="concat(application-name, '|', form-name)">
                                     <xsl:variable name="max-form-version" select="max(current-group()/form-version/xs:integer(.))"/>
                                     <xsl:apply-templates select="current-group()[form-version = $max-form-version]"/>

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import cats.syntax.option._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
@@ -20,7 +21,6 @@ import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.{Attributes, Locator}
-import shapeless.syntax.typeable._
 
 abstract class XFormsAnnotatorBase(
   templateReceiver  : XMLReceiver,
@@ -34,7 +34,12 @@ abstract class XFormsAnnotatorBase(
   private var _documentLocator: Locator = null
   def documentLocator = _documentLocator
 
-  protected val templateSAXStoreOpt: Option[SAXStore] = templateReceiver.narrowTo[SAXStore]
+  // `templateReceiver.narrowTo[SAXStore]` used to work
+  protected val templateSAXStoreOpt: Option[SAXStore] =
+    templateReceiver match {
+      case store: SAXStore => store.some
+      case _               => None
+    }
 
   def isInXBLBinding: Boolean
   def isInPreserve: Boolean

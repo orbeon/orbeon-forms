@@ -11,20 +11,20 @@ val DefaultOrbeonEdition          = "CE"
 // Scala libraries for Scala.js only
 val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"
-val ScribeVersion                 = "2.7.10"
-val PerfolationVersion            = "1.1.5"
+val ScribeVersion                 = "2.7.13"
+val PerfolationVersion            = "1.1.7"
 
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
 val CirceVersion                  = "0.13.0"
-val EnumeratumVersion             = "1.6.0"
-val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.4"
+val EnumeratumVersion             = "1.6.1"
+val EnumeratumCirceVersion        = "1.6.1"
+val ShapelessVersion              = "2.3.6"
 val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
-val AutowireVersion               = "0.2.6"
+val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.4"

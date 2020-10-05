@@ -1201,9 +1201,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
-
-            <operations>Operations</operations>
-
             <custom-operations>Define custom operations for this form</custom-operations>
             <operation-label>Label</operation-label>
             <predefined-label>Predefined</predefined-label>
@@ -2499,10 +2496,8 @@
             <delete>Supprimer</delete>
         </dialog-permissions>
         <dialog-workflow>
-            <label>Workflow et Permissions</label>
-
-            <operations>Opérations</operations>
-
+          <label>Workflow et Permissions</label>
+	  
             <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
             <operation-label>Libellé</operation-label>
             <predefined-label>Prédéfini</predefined-label>
@@ -3810,8 +3805,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -5118,8 +5111,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -6418,8 +6409,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
-
-            <operations todo="true">[Operations]</operations>
 
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
@@ -7720,8 +7709,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
-
-            <operations todo="true">[Operations]</operations>
 
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
@@ -9025,8 +9012,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -10326,8 +10311,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -11606,8 +11589,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow en bevoegdheden</label>
-
-            <operations>Bewerkingen</operations>
 
             <custom-operations>Definieer aangepaste bewerkingen voor dit form</custom-operations>
             <operation-label>Label</operation-label>
@@ -12915,8 +12896,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -14223,8 +14202,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
-
-            <operations todo="true">[Operations]</operations>
 
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>

@@ -22,6 +22,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
+// For `OrbeonClientTest`
 @js.native
 trait DocumentTrait extends js.Object {
 
@@ -45,10 +46,6 @@ trait DocumentTrait extends js.Object {
 }
 
 @js.native
-@JSGlobal("ORBEON.xforms.Document")
-object Document extends DocumentTrait
-
-@js.native
 trait InitTrait extends js.Object {
   def initializeGlobals()                   : Unit = js.native
   def _range(control: html.Element)         : Unit = js.native
@@ -60,6 +57,7 @@ trait InitTrait extends js.Object {
 @JSGlobal("ORBEON.xforms.Init")
 object Init extends InitTrait
 
+// For `OrbeonClientTest`
 @js.native
 trait AjaxServerTrait extends js.Object {
   def allEventsProcessedP(): js.Promise[Unit] = js.native
@@ -152,7 +150,6 @@ object Events extends js.Object {
   def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`
 }
 
-@JSGlobal("ORBEON.util.Property")
 @js.native
 class Property[T] extends js.Object {
   def get(): T = js.native

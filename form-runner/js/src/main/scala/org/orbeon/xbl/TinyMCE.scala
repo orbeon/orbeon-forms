@@ -14,7 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.TinyMce._
-import org.orbeon.xforms.facade._
+import org.orbeon.xforms.DocumentAPI
+import org.orbeon.xforms.facade.{XBL, XBLCompanion, Events}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.raw
@@ -60,7 +61,7 @@ object TinyMCE {
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tabindex = tinyMceDiv.getAttribute("tabindex")
         myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
-        val xformsValue = Document.getValue(serverValueOutputId).get
+        val xformsValue = DocumentAPI.getValue(serverValueOutputId).get
         onInit(() => {
           // Send value to the server on blur
           myEditor.on("blur", (_) => clientToServer())
@@ -126,7 +127,7 @@ object TinyMCE {
           tinymceInitialized &&              // Don't update value until TinyMCE is fully initialized
           ! hasFocus()                       // Heuristic: if TinyMCE has focus, users might still be editing so don't update
         if (doUpdate) {
-          val newServerValue = Document.getValue(serverValueOutputId).get
+          val newServerValue = DocumentAPI.getValue(serverValueOutputId).get
           myEditor.setContent(newServerValue)
         }
       }

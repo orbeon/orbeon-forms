@@ -531,7 +531,7 @@ div.orbeon.orbeon-portlet-div {
 
         .xforms-tabbable-appearance-left > .tabs-left {
             display: grid; // tried with `flex` but didn't manage to make things work nicely (kind of with `min-width` though)
-            grid-template-columns: 15   0px auto; // arbitrary for now, to fit all existing tab labels in English
+            grid-template-columns: max-content 1fr;
 
             &> .nav-tabs {
                 grid-row: 1;
@@ -773,26 +773,9 @@ div.orbeon.orbeon-portlet-div {
                     vertical-align: top;
                 }
 
-                // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
-                &.gu-mirror {
-                    .fb-action-buttons {
-                        display: none;
-                    }
-                }
-
                 .fb-action-options, .fb-action-buttons {
                     display: table-cell;
                     padding-bottom: 5px;
-                }
-
-                .fb-action-grab {
-                    display: inline-block;
-                    opacity: 0.1;
-                }
-
-                &.xforms-dnd-moves .fb-action-grab {
-                    cursor: move;
-                    opacity: 0.5;
                 }
             }
         }
@@ -813,6 +796,26 @@ div.orbeon.orbeon-portlet-div {
             .select2-container {
                 display: block;
             }
+        }
+    }
+
+    .xbl-fr-dnd-repeat {
+
+        // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
+        .gu-mirror {
+            .fb-action-buttons {
+                display: none;
+            }
+        }
+
+        .fb-action-grab {
+            display: inline-block;
+            opacity: 0.1;
+        }
+
+        .xforms-dnd-moves .fb-action-grab {
+            cursor: move;
+            opacity: 0.5;
         }
     }
 

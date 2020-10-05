@@ -13,17 +13,20 @@
   -->
 <p:config
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:processor name="oxf:session-invalidator"/>
 
     <p:processor name="oxf:redirect">
-        <p:input name="data">
-            <redirect-url>
-                <path-info>/fr/logout-done</path-info>
+        <p:input name="data" transform="oxf:unsafe-xslt" href="aggregate('dummy')">
+            <redirect-url xsl:version="2.0">
+                <path-info>
+                    <xsl:text>/fr/logout-done?source=</xsl:text>
+                    <xsl:value-of select="p:get-request-parameter('source')"/>
+                </path-info>
             </redirect-url>
         </p:input>
     </p:processor>
-
 
 </p:config>

@@ -1233,6 +1233,35 @@
             <stage-name>Stage Name</stage-name>
             <default-stage>Default</default-stage>
 
+            <operations>
+                <label>Operations</label>
+                <item>
+                    <label>Fill new form</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>List and search data</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access data for editing</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access data for viewing</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access PDF/TIFF</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
+
         </dialog-workflow>
         <xbl-control-settings>
             <field-width>Field width</field-width>

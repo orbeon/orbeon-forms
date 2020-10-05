@@ -27,6 +27,7 @@
                 float: right;
                 cursor: move;
                 opacity: 0.25;
+                padding-left: 5px;
             }
 
             .active i.fr-tabbable-grab {
@@ -60,6 +61,7 @@
 
     .fr-tabbable-add {
         padding: 0 5px;
+        margin: 10px;
         button {
             width: 100%;
         }
@@ -72,13 +74,13 @@
         padding: 10px;
     }
 
-    .xforms-tabbable-appearance-left {
+    .xforms-tabbable-appearance-left > .tabs-left {
 
-        .nav-tabs {
+        &> .nav-tabs {
             margin-right: 0;
         }
 
-        .tab-content {
+        &> .tab-content {
             border: 1px solid #ddd;
             border-left: none;
 

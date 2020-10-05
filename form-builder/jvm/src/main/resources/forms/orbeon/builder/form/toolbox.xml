@@ -332,7 +332,7 @@
                                 <xf:output value="$form-resources/dialog-workflow/label"/>
                             </xf:label>
                             <xf:action event="DOMActivate">
-                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-workflow-dialog"/>
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="fb-workflow20201-dialog"/>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </xf:trigger>

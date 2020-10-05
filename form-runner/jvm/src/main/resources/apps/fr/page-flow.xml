@@ -216,8 +216,8 @@
     <!-- Login / logout -->
     <page
         path="/fr/auth"
-        model="authentication/auth.xpl"
-        default-submission="authentication/auth-parameters.xml">
+        model="authentication/redirect.xpl"
+        default-submission="authentication/redirect-data.xml">
         <setvalue ref="/redirect-url/path-info" parameter="source"/>
     </page>
     <page

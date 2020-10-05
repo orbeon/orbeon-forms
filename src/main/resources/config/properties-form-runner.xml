@@ -91,8 +91,8 @@
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles.split"                value=",|\s+"/>
     <property as="xs:boolean" name="oxf.fr.authentication.user-menu.enable"                     value="false"/>
-    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.login"                  value="/fr/auth?source={xxf:get-request-path()}"/>
-    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout"/>
+    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.login"                  value="/fr/auth?source={(xxf:get-request-parameter('source'), xxf:get-request-path())[1]}"/>
+    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout?source={xxf:get-request-path()}"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"               value=""/>
 
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>

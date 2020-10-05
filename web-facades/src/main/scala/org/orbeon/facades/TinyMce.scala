@@ -17,17 +17,20 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
+import scala.scalajs.js.annotation.JSGlobal
+import scala.util.control.NonFatal
 
 object TinyMce {
 
-  @JSGlobalScope
-  @js.native
-  private object TinyMceGlobalScope extends js.Object {
-    val TINYMCE_CUSTOM_CONFIG: js.UndefOr[TinyMceConfig] = js.native
-  }
+  // Since Scala.js 1.0, the method we used before didn't work when `TINYMCE_CUSTOM_CONFIG` is missing
+  val TinyMceCustomConfig: js.UndefOr[TinyMceConfig] =
+    try {
+      js.Dynamic.global.TINYMCE_CUSTOM_CONFIG.asInstanceOf[TinyMceConfig]
+    } catch {
+      case NonFatal(_) => js.undefined
+    }
 
-  val TinyMceCustomConfig = TinyMceGlobalScope.TINYMCE_CUSTOM_CONFIG
+  TinyMceCustomConfig.toOption
 
   @js.native
   @JSGlobal("tinymce")

@@ -18,8 +18,8 @@ import autowire._
 import org.orbeon.builder.facade.JQueryTooltip._
 import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -28,11 +28,9 @@ import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportTopLevel
 
 object ControlLabelHintTextEditor {
 
-  @JSExportTopLevel("ORBEON.builder.controlAdded")
   val controlAdded: JQueryCallback = $.Callbacks(flags = "")
 
   locally {

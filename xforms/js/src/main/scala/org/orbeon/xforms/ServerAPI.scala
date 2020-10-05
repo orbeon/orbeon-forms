@@ -20,10 +20,9 @@ import org.scalajs.dom
 import org.scalajs.dom.raw
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.server.Server")
+@JSExportTopLevel("OrbeonServerApi")
 object ServerAPI {
 
   @JSExport
@@ -62,7 +61,19 @@ object ServerAPI {
     }
 
     // Don't use `eval` as `Content-Security-Policy` header might block it
-    global.selectDynamic(functionName).asInstanceOf[js.Function].call(
+    val globalObject: js.Dynamic = {
+      import js.Dynamic.{global => g}
+      if (js.typeOf(g.global) != "undefined" && (g.global.Object eq g.Object)) {
+        // Node.js environment detected
+        g.global
+      } else {
+        // In all other well-known environment, we can use the global `this`
+        js.special.fileLevelThis.asInstanceOf[js.Dynamic]
+      }
+    }
+
+    globalObject.selectDynamic(functionName).asInstanceOf[js.Function].call(
+
       thisArg = getElementOrNull(observerId),
       new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
       rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`

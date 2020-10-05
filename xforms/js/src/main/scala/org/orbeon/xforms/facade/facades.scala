@@ -64,7 +64,7 @@ trait AjaxServerTrait extends js.Object {
 }
 
 @js.native
-@JSGlobal("ORBEON.xforms.server.AjaxServer")
+@JSGlobal("ORBEON.xforms.AjaxServerResponse")
 object AjaxServer extends AjaxServerTrait {
   def handleResponseDom(
     responseXML  : dom.Document,
@@ -150,6 +150,7 @@ object Events extends js.Object {
   def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`
 }
 
+@JSGlobal("ORBEON.util.Property")
 @js.native
 class Property[T] extends js.Object {
   def get(): T = js.native

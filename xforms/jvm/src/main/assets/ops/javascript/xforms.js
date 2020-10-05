@@ -29,17 +29,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
     var $ = ORBEON.jQuery;
 
-    /**
-     * Shortcuts
-     */
     var YD = YAHOO.util.Dom;
-    var OD;
-    _.defer(function() {
-        OD = ORBEON.util.Dom;
-    });
 
     /**
      * Functions we add to the awesome Underscore.js
+     *
+     * 2020-10-05: Probably no longer relevant!
      */
     _.mixin({
 
@@ -1084,7 +1079,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
 
                 function checkAjaxReceived() {
-                    if (ORBEON.xforms.server.AjaxServer.hasEventsToProcess()) {
+                    if (ORBEON.xforms.AjaxClient.hasEventsToProcess()) {
                         // Wait another 100 ms
                         setTimeout(checkAjaxReceived, 100);
                     } else {
@@ -1165,8 +1160,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              * @return {void}
              */
             click: function(id) {
-                var element = OD.get(id);
-                var button = element.tagName.toLowerCase() == "button" ? element : OD.getElementByTagName(element, "button");
+                var element = ORBEON.util.Dom.get(id);
+                var button = element.tagName.toLowerCase() == "button" ? element : ORBEON.util.Dom.getElementByTagName(element, "button");
                 button.click();
             }
         }
@@ -1179,10 +1174,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
     // Define packages
     ORBEON.xforms = ORBEON.xforms || {};
-    ORBEON.xforms.action = {};
-    ORBEON.xforms.control = {};
-    ORBEON.xforms.server = {};
-    ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};
 
     ORBEON.xforms.Controls = {
 
@@ -1370,7 +1361,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
-            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest(control.id)) {
+            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.AjaxFieldChangeTracker.hasChangedIdsRequest(control.id)) {
                 // User has modified the value of this control since we sent our request so don't try to update it
                 // 2017-03-29: Added `force` attribute to handle https://github.com/orbeon/orbeon-forms/issues/3130 as we
                 // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
@@ -2069,7 +2060,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (neighbor == null) {
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
-                ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedOrImmediatelyP().then(
+                ORBEON.xforms.AjaxClient.currentAjaxResponseProcessedOrImmediatelyP().then(
                     function() { yuiDialog.center(); }
                 );
             } else {
@@ -2374,7 +2365,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         focus: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                 event.preventDefault();
                 return;
             }
@@ -2404,8 +2395,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.Globals.currentFocusControlElement = newFocusControlElement;
 
                     // Fire events
-                    ORBEON.xforms.server.AjaxServer.fireEvent(
-                        new ORBEON.xforms.server.AjaxServer.Event(
+                    ORBEON.xforms.AjaxClient.fireEvent(
+                        new ORBEON.xforms.AjaxEvent(
                             {
                                 "targetId"   : newFocusControlElement.id,
                                 "eventName"  : "xforms-focus",
@@ -2423,7 +2414,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         blurEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         blur: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                 event.preventDefault();
                 return;
             }
@@ -2443,8 +2434,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     if (relatedControl == null) {
                         ORBEON.xforms.Globals.currentFocusControlId      = null;
                         ORBEON.xforms.Globals.currentFocusControlElement = null;
-                        var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xxforms-blur");
-                        ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                        var event = new ORBEON.xforms.AjaxEvent(null, control.id, null, "xxforms-blur");
+                        ORBEON.xforms.AjaxClient.fireEvent(event);
                     }
                 }
             }
@@ -2507,9 +2498,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                     // Fire change event if the control has a value
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                    if (! _.isUndefined(controlCurrentValue)) {
-                        var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, controlCurrentValue, "xxforms-value");
-                        ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    if (! _.isUndefined(controlCurrentValue)) {		    
+                        var event = new ORBEON.xforms.AjaxEvent(null, target.id, controlCurrentValue, "xxforms-value");
+                        ORBEON.xforms.AjaxClient.fireEvent(event);
                     }
                 }
             }
@@ -2519,7 +2510,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keydown: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                 event.preventDefault();
                 return;
             }
@@ -2540,7 +2531,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         keypressEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keypress: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                 event.preventDefault();
                 return;
             }
@@ -2557,11 +2548,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         // browser will use to dispatch a `change` event in the future. Also see issue #1207.
                         $(target).blur().focus();
                         // Send a value change and DOM activate
-                        var valueEvent    = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value");
-                        var activateEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "DOMActivate")
+                        var valueEvent    = new ORBEON.xforms.AjaxEvent(null, control.id, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value");
+                        var activateEvent = new ORBEON.xforms.AjaxEvent(null, control.id, null, "DOMActivate")
 
-                        ORBEON.xforms.server.AjaxServer.fireEvent(valueEvent);
-                        ORBEON.xforms.server.AjaxServer.fireEvent(activateEvent);
+                        ORBEON.xforms.AjaxClient.fireEvent(valueEvent);
+                        ORBEON.xforms.AjaxClient.fireEvent(activateEvent);
 
                         // This prevents Chrome/Firefox from dispatching a 'change' event on event, making them more
                         // like IE, which in this case is more compliant to the spec.
@@ -2573,7 +2564,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         input: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                event.preventDefault();
                return;
             }
@@ -2582,8 +2573,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (target != null) {
                 // Incremental control: treat keypress as a value change event
                 if ($(target).is('.xforms-incremental')) {
-                    ORBEON.xforms.server.AjaxServer.fireEvent(
-                        new ORBEON.xforms.server.AjaxServer.Event(
+                    ORBEON.xforms.AjaxClient.fireEvent(
+                        new ORBEON.xforms.AjaxEvent(
                             {
                                 "targetId"   : target.id,
                                 "eventName"  : "xxforms-value",
@@ -2702,7 +2693,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         clickEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         click: function (event) {
 
-            if (ORBEON.xforms.Globals.modalProgressPanelShown) {
+            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
                 event.preventDefault();
                 return;
             }
@@ -2730,11 +2721,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // focus event on those, and for buttons on Safari which does not dispatch the focus
                     // event for buttons.
                     ORBEON.xforms.Events.focus(event);
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "DOMActivate");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    var event = new ORBEON.xforms.AjaxEvent(null, target.id, null, "DOMActivate");
+                    ORBEON.xforms.AjaxClient.fireEvent(event);
 
                     if ($(target).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
-                        ORBEON.util.Utils.displayModalProgressPanel();
+                        ORBEON.xforms.XFormsUi.displayModalProgressPanel();
                     }
                     handled = true;
                 }
@@ -2744,13 +2735,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // Update classes right away to give user visual feedback
                 ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
-                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
-                ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                var event = new ORBEON.xforms.AjaxEvent(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
+                ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
             } else if (target != null && $(target).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
                 // Click on remove icon in upload control
-                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, "", "xxforms-value");
-                ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                var event = new ORBEON.xforms.AjaxEvent(null, target.id, "", "xxforms-value");
+                ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
             } else if (target != null && $(target).is('.xforms-help')) {
                 // Help image
@@ -2759,8 +2750,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                 if (ORBEON.util.Properties.helpHandler.get()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xforms-help");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    var event = new ORBEON.xforms.AjaxEvent(null, control.id, null, "xforms-help");
+                    ORBEON.xforms.AjaxClient.fireEvent(event);
                 } else {
                     // If the servers tells us there are no event handlers for xforms-help in the page,
                     // we can avoid a round trip and show the help right away
@@ -2783,8 +2774,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // First check clickable group
                 if ($(node).is('.xforms-activable')) {
                     var form = ORBEON.xforms.Controls.getForm(node);
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    var event = new ORBEON.xforms.AjaxEvent(form, node.id, null, "DOMActivate");
+                    ORBEON.xforms.AjaxClient.fireEvent(event);
                     break;
                 }
 
@@ -2800,8 +2791,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                             var targetId = sibling.id.substring("repeat-begin-".length);
                             targetId += targetId.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                             targetId += delimiterCount;
-                            var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
-                            ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                            var event = new ORBEON.xforms.AjaxEvent(form, targetId, null, "xxforms-repeat-activate");
+                            ORBEON.xforms.AjaxClient.fireEvent(event);
                             foundRepeatBegin = true;
                             break;
                         } else if ($(sibling).is('.xforms-repeat-delimiter')) {
@@ -2858,8 +2849,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             var rangeControl = document.getElementById(this.id).parentNode;
 
             var value = offset / 200;
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, rangeControl.id, String(value), "xxforms-value");
-            ORBEON.xforms.server.AjaxServer.fireEvent(event);
+            var event = new ORBEON.xforms.AjaxEvent(null, rangeControl.id, String(value), "xxforms-value");
+            ORBEON.xforms.AjaxClient.fireEvent(event);
         },
 
         /**
@@ -2870,8 +2861,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (! ORBEON.xforms.Globals.maskDialogCloseEvents) {
                 var dialogId = me;
                 var dialog = document.getElementById(dialogId);
-                var event = new ORBEON.xforms.server.AjaxServer.Event(null, dialog.id, null, "xxforms-dialog-close");
-                ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                var event = new ORBEON.xforms.AjaxEvent(null, dialog.id, null, "xxforms-dialog-close");
+                ORBEON.xforms.AjaxClient.fireEvent(event);
             }
         },
 
@@ -2912,8 +2903,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     current = current.parentNode;
                 }
                 if (! foundDropDownParent) {
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(null, yuiDialog.id, null, "xxforms-dialog-close");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    var event = new ORBEON.xforms.AjaxEvent(null, yuiDialog.id, null, "xxforms-dialog-close");
+                    ORBEON.xforms.AjaxClient.fireEvent(event);
                 }
             }
         },
@@ -3290,7 +3281,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
     };
 
     YAHOO.util.Event.throwErrors = true;
-    ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     ORBEON.onJavaScriptLoaded.fire();
 
 })();

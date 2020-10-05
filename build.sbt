@@ -2,7 +2,6 @@ import sbt.Keys._
 import org.orbeon.sbt.OrbeonSupport
 import org.orbeon.sbt.OrbeonSupport._
 import org.orbeon.sbt.OrbeonWebappPlugin
-import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 // For our GitHub packages
@@ -17,6 +16,7 @@ val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.13"
 val PerfolationVersion            = "1.1.7"
+val ScalaJsStubsVersion           = "1.0.0" // can be different from Scala.js version
 
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
@@ -30,9 +30,9 @@ val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
-val RosHttpVersion                = "2.1.0"
+val RosHttpVersion                = "3.0.0"
 val ScalaLoggingVersion           = "3.9.4"
-val Log4sVersion                  = "1.8.2"
+val Log4sVersion                  = "1.8.3-SNAPSHOT"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
@@ -369,7 +369,7 @@ lazy val commonScalaJvmSettings = Seq(
 
 lazy val commonScalaJsSettings = Seq(
 
-  packageJSDependencies / skip    := false,
+  packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
 
   Compile / scalaJSUseMainModuleInitializer := true,
@@ -378,8 +378,7 @@ lazy val commonScalaJsSettings = Seq(
   scalacOptions ++= {
     if (scalaJSVersion.startsWith("0.6."))
       List(
-        "-P:scalajs:sjsDefinedByDefault",
-        "-P:scalajs:suppressExportDeprecations" // see https://www.scala-js.org/news/2018/11/29/announcing-scalajs-0.6.26/
+        "-P:scalajs:sjsDefinedByDefault"
       )
     else
       Nil
@@ -444,7 +443,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (unmanagedJars / includeFilter).value,
       (unmanagedJars / excludeFilter).value
     ),
-    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided,
+    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % ScalaJsStubsVersion % Provided,
     libraryDependencies += "org.slf4j"              %  "slf4j-api"     % Slf4jVersion,
     libraryDependencies += "org.slf4j"              %  "slf4j-log4j12" % Slf4jVersion
   )
@@ -461,6 +460,7 @@ lazy val commonJS  = common.js
 //    zonesFilter := {(z: String) => z == "America/Los_Angeles"} // Q: See if/how we do this filtering
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.0.0" % Test // for now, get the whole database
   )
+  .enablePlugins(JSDependenciesPlugin)
 
 // Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
@@ -566,6 +566,7 @@ lazy val formRunnerJS = formRunner.js
     webFacades
   )
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -626,6 +627,7 @@ lazy val formBuilderJS = formBuilder.js
     formRunnerJS
   )
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -694,6 +696,7 @@ lazy val xformsJS = xforms.js
   .dependsOn(commonJS % "test->test;compile->compile")
   .dependsOn(xformsCommonJS)
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -742,6 +745,7 @@ lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(domJS)
   .dependsOn(coreCrossPlatformJS)
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
   .settings(commonSettings: _*)
@@ -759,6 +763,7 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   .dependsOn(commonJS % "test->test;compile->compile")
   .dependsOn(dom.js)
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
 
 lazy val fileScanExample = (project in file("file-scan-example"))
   .dependsOn(xformsJVM)
@@ -785,6 +790,7 @@ lazy val webFacades = (project in file("web-facades"))
   .dependsOn(commonJS)
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings: _*)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
     name := "orbeon-web-facades",
 
@@ -811,6 +817,7 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .dependsOn(commonJS)
   .dependsOn(domJS)
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "org.xml" %%% "sax"% "2.0.2"

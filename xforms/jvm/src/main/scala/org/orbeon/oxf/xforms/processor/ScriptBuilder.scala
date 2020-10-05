@@ -267,7 +267,7 @@ object ScriptBuilder {
         // Initial modal xf:message to run if present
         if (messagesToRun.nonEmpty) {
           val quotedMessages = messagesToRun map (m => s""""${m.message.escapeJavaScript}"""")
-          quotedMessages.addString(sb, "ORBEON.xforms.action.Message.showMessages([", ",", "]);")
+          quotedMessages.addString(sb, "ORBEON.xforms.Message.showMessages([", ",", "]);")
         }
 
         // Initial dialogs to open
@@ -295,7 +295,7 @@ object ScriptBuilder {
           val details = ServerError.errorsAsHTMLElem(errorsToShow).toString.escapeJavaScript
           val formId  = XFormsUtils.getNamespacedFormId(containingDocument)
 
-          sb append s"""ORBEON.xforms.server.AjaxServer.showError("$title", "$details", "$formId");"""
+          sb append s"""ORBEON.xforms.AjaxServer.showError("$title", "$details", "$formId");"""
         }
 
         sb append " }"

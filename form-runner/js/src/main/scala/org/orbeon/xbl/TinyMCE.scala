@@ -14,9 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.TinyMce._
-import org.orbeon.xforms.DocumentAPI
-import org.orbeon.xforms.facade.{XBL, XBLCompanion, Events}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.xforms.facade.{Events, Properties, XBL, XBLCompanion}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom
 import org.scalajs.dom.raw
 import org.scalajs.jquery.JQueryEventObject

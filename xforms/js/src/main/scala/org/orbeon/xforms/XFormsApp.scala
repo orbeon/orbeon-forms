@@ -14,13 +14,45 @@
 package org.orbeon.xforms
 
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global => g}
 
 // Scala.js starting point for XForms
 object XFormsApp extends App {
 
-  // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
   def onOrbeonApiLoaded(): Unit = {
-    Upload
+
+    // By this point, `window.ORBEON` is already defined by our jQuery wrapper
+    val orbeonDyn = g.window.ORBEON
+
+    // `window.ORBEON.common` *should not* already exist, but this doesn't hurt
+    if (js.isUndefined(orbeonDyn.common))
+      orbeonDyn.common = new js.Object
+
+    orbeonDyn.common.MarkupUtils = js.Dynamic.global.OrbeonMarkupUtils
+    orbeonDyn.common.StringUtils = js.Dynamic.global.OrbeonStringUtils
+
+    // We know that `window.ORBEON.xforms` already exists
+    val xformsDyn = orbeonDyn.xforms
+
+    xformsDyn.Message                = js.Dynamic.global.OrbeonMessage
+    xformsDyn.Page                   = js.Dynamic.global.OrbeonPage
+    xformsDyn.ServerValueStore       = js.Dynamic.global.OrbeonServerValueStore
+    xformsDyn.ServerApi              = js.Dynamic.global.OrbeonServerApi
+    xformsDyn.AjaxEvent              = js.Dynamic.global.OrbeonAjaxEvent
+    xformsDyn.Language               = js.Dynamic.global.OrbeonLanguage
+    xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient
+    xformsDyn.Globals                = js.Dynamic.global.OrbeonGlobals
+    xformsDyn.XFormsUi               = js.Dynamic.global.OrbeonXFormsUi
+    xformsDyn.InitSupport            = js.Dynamic.global.OrbeonInitSupport
+    xformsDyn.RpcClient              = js.Dynamic.global.OrbeonRpcClient
+    xformsDyn.AjaxFieldChangeTracker = js.Dynamic.global.OrbeonAjaxFieldChangeTracker
+
+    // Public API
+    xformsDyn.Document               = DocumentAPI
+
+    // Register XBL components
+    org.orbeon.xforms.Upload
     org.orbeon.xbl.Date
   }
 

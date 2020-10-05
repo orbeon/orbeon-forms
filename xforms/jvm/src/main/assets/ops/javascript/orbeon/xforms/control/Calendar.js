@@ -44,8 +44,8 @@
         $(inputHolder).val(formattedDate);
       }
       value = Controls.getCurrentValue(control);
-      changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, value, "xxforms-value");
-      return ORBEON.xforms.server.AjaxServer.fireEvent(changeEvent);
+      changeEvent = new ORBEON.xforms.AjaxEvent(null, control.id, value, "xxforms-value");
+      return ORBEON.xforms.AjaxClient.fireEvent(changeEvent);
     };
     if (YAHOO.env.ua.webkit && YAHOO.env.ua.mobile) {
       initUnder = function(node) {
@@ -96,8 +96,8 @@
         })(), true) >= 0;
         if (isDateOrTimeInput) {
           value = Controls.getCurrentValue(event.control);
-          changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, event.control.id, value, "xxforms-value");
-          return ORBEON.xforms.server.AjaxServer.fireEvent(changeEvent);
+          changeEvent = new ORBEON.xforms.AjaxEvent(null, event.control.id, value, "xxforms-value");
+          return ORBEON.xforms.AjaxClient.fireEvent(changeEvent);
         }
       });
       return Controls.valueChange.subscribe(function(event) {

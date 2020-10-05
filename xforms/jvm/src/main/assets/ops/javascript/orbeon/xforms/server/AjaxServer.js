@@ -13,13 +13,11 @@
  */
 (function() {
 
-    ORBEON.xforms.server.AjaxServer = {};
+    // 2020-10-05: xforms.js comes first. It defindes `ORBEON.xforms` already.
+
+    ORBEON.xforms.AjaxServerResponse = {};
 
     var $ = ORBEON.jQuery;
-    var AjaxServer  = ORBEON.xforms.server.AjaxServer;
-    var Controls    = ORBEON.xforms.Controls;
-    var Properties  = ORBEON.util.Properties;
-    var Globals     = ORBEON.xforms.Globals;
 
     function childrenWithLocalName(node, name) {
         var result = [];
@@ -37,7 +35,7 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, formID, ignoreErrors) {
+    ORBEON.xforms.AjaxServerResponse.handleResponseDom = function(responseXML, formID, ignoreErrors) {
 
         try {
             var responseRoot = responseXML.documentElement;
@@ -957,7 +955,7 @@
                                     documentElement.innerHTML = innerHTML;
                                     ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
                                     // Special case for https://github.com/orbeon/orbeon-forms/issues/3707
-                                    Controls.fullUpdateEvent.fire({control: documentElement});
+                                    ORBEON.xforms.Controls.fullUpdateEvent.fire({control: documentElement});
                                 } else {
                                     // Insertion between delimiters
                                     function insertBetweenDelimiters(prefix) {
@@ -1096,7 +1094,7 @@
 
                         // Notification event if the type changed
                         _.each(recreatedInputs, function(documentElement, controlId) {
-                            Controls.typeChangedEvent.fire({control: documentElement});
+                            ORBEON.xforms.Controls.typeChangedEvent.fire({control: documentElement});
                         });
                     }
 
@@ -1193,7 +1191,7 @@
                                     var serverEventsElement = childNode;
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
 
-                                    AjaxServer.createDelayedServerEvent(serverEvents, 0, true, false, formID);
+                                    ORBEON.xforms.AjaxClient.createDelayedServerEvent(serverEvents, 0, true, false, formID);
 
                                     break;
                                 }
@@ -1202,7 +1200,7 @@
                                     var pollElement = childNode;
                                     var delayOrNull = ORBEON.util.Dom.getAttribute(pollElement, "delay");
 
-                                    AjaxServer.createDelayedPollEvent(_.isNull(delayOrNull) ? undefined : parseInt(delayOrNull), formID);
+                                    ORBEON.xforms.AjaxClient.createDelayedPollEvent(_.isNull(delayOrNull) ? undefined : parseInt(delayOrNull), formID);
 
                                     break;
                                 }
@@ -1302,7 +1300,7 @@
                                 // Display modal message
                                 case "message": {
                                     var messageElement = childNode;
-                                    ORBEON.xforms.action.Message.execute(messageElement);
+                                    ORBEON.xforms.Message.execute(messageElement);
                                     break;
                                 }
 
@@ -1366,7 +1364,7 @@
                                         return $(paramElement).text();
                                     });
                                     var args = [formID, functionName, targetId, observerId].concat(paramValues);
-                                    ORBEON.xforms.server.Server.callUserScript.apply(ORBEON.xforms.server.Server, args);
+                                    ORBEON.xforms.ServerApi.callUserScript.apply(ORBEON.xforms.ServerApi, args);
                                     break;
                                 }
 
@@ -1425,7 +1423,7 @@
                         if (exception) details += " (" + ORBEON.common.MarkupUtils.escapeXmlMinimal(exception) + ")";
                         details += "</li>";
                     });
-                    AjaxServer.showError("Non-fatal error", details, formID, ignoreErrors);
+                    ORBEON.xforms.AjaxClient.showError("Non-fatal error", details, formID, ignoreErrors);
                     details += "</ul>";
                 }
             });
@@ -1437,7 +1435,7 @@
             }
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            AjaxServer.logAndShowError(e, formID, ignoreErrors);
+            ORBEON.xforms.AjaxClient.logAndShowError(e, formID, ignoreErrors);
             // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         }
     };

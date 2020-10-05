@@ -14,13 +14,11 @@
 package org.orbeon.builder
 
 import org.scalajs.dom
+import org.scalajs.jquery.JQueryCallback
 
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+import scala.scalajs.js
 
-
-@JSExportTopLevel("ORBEON.builder.private.API")
-@JSExportAll
-object FormBuilderPrivateAPI {
+object FormBuilderPrivateAPI extends js.Object {
 
   def updateLocationDocumentId(documentId: String): Unit = {
 
@@ -33,4 +31,6 @@ object FormBuilderPrivateAPI {
     )
   }
 
+  def controlAdded: JQueryCallback =
+    ControlLabelHintTextEditor.controlAdded
 }

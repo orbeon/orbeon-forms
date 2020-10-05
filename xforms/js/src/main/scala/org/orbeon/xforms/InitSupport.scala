@@ -37,7 +37,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.InitSupport")
+@JSExportTopLevel("OrbeonInitSupport")
 object InitSupport {
 
   import Private._

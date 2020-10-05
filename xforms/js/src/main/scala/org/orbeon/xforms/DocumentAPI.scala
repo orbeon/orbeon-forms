@@ -19,18 +19,15 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
 
-@JSExportTopLevel("ORBEON.xforms.Document")
-object DocumentAPI {
+object DocumentAPI extends js.Object {
 
   import Private._
 
   // Dispatch an event defined by the properties on a JavaScript object
   // This is the method we document officially as of 2015-10 for JavaScript callers.
   // Q: Can we type `eventObject`?
-  @JSExport
   def dispatchEvent(eventObject: js.Dictionary[js.Any]): Unit =
     AjaxClient.fireEvent(new AjaxEvent(eventObject))
 
@@ -39,7 +36,6 @@ object DocumentAPI {
   // considered a backward compatibility method for older JavaScript code. It doesn't
   // support all the parameters.
   @deprecated("use `dispatchEvent(eventObject: js.Object)` instead", "Orbeon Forms 2016.1")
-  @JSExport
   def dispatchEvent(
     targetId     : String,
     eventName    : String,
@@ -68,7 +64,6 @@ object DocumentAPI {
   }
 
   // Return the value of an XForms control
-  @JSExport
   def getValue(
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Form] = js.undefined
@@ -76,7 +71,6 @@ object DocumentAPI {
       Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
   // Set the value of an XForms control
-  @JSExport
   def setValue(
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
@@ -105,7 +99,6 @@ object DocumentAPI {
     )
   }
 
-  @JSExport
   def focus(
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Form] = js.undefined

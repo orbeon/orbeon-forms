@@ -18,7 +18,7 @@ import org.scalajs.dom.html
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.Page")
+@JSExportTopLevel("OrbeonPage")
 object Page {
 
   import Private._

@@ -42,10 +42,10 @@ object JSDateUtils {
 
   def dateToISOStringUsingLocalTimezone(date: js.Date): String = {
 
-    def pad2(n: Int): String =
-      if (n < 10) {
+    def pad2(n: Double): String =
+      if (n < 10)
         "0" + n
-      } else
+      else
         n.toString
 
     date.getFullYear.toString + '-' + pad2(date.getMonth + 1) + '-' + pad2(date.getDate)

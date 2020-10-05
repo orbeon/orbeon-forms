@@ -22,7 +22,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.collection.{mutable => m}
 
-@JSExportTopLevel("ORBEON.xforms.Language")
+@JSExportTopLevel("OrbeonLanguage")
 object Language {
 
   import Private._

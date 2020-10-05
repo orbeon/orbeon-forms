@@ -16,7 +16,7 @@ package org.orbeon.xforms
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.Globals")
+@JSExportTopLevel("OrbeonGlobals")
 @JSExportAll
 object Globals {
 

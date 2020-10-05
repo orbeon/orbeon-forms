@@ -19,7 +19,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
 import scala.collection.compat._
 
-@JSExportTopLevel("ORBEON.common.StringUtils")
+@JSExportTopLevel("OrbeonStringUtils")
 object StringUtils {
 
   // TODO: Move to StringOps.

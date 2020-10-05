@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils.StringOps
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.common.MarkupUtils") // AjaxServer.js/xforms.js, remove when possible
+@JSExportTopLevel("OrbeonMarkupUtils") // AjaxServer.js/xforms.js, remove when possible
 object MarkupUtils {
 
   @JSExport // AjaxServer.js/xforms.js, remove when possible

@@ -21,18 +21,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global => g}
-import scala.scalajs.js.annotation.JSExportTopLevel
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
 
 
 // Progressively migrate contents of xforms.js here
+@JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 
-  @JSExportTopLevel("ORBEON.xforms.Globals.modalProgressPanelShown") // 2020-04-27: 6 JavaScript usages
+  @JSExport // 2020-04-27: 6 JavaScript usages
   var modalProgressPanelShown: Boolean = false
 
-  @JSExportTopLevel("ORBEON.util.Utils.displayModalProgressPanel") // 2020-04-27: 1 JavaScript usage
+  @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =
     if (! modalProgressPanelShown) {
 

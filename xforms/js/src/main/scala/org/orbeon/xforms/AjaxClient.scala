@@ -31,10 +31,11 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSExportTopLevel
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 
 
+@JSExportTopLevel("OrbeonAjaxClient")
 object AjaxClient {
 
   import Private._
@@ -51,12 +52,12 @@ object AjaxClient {
   // Used by `OrbeonClientTest`
   // This uses a JavaScript `Promise` as the API is used across Scala.js compilation contexts and Scala
   // classes cannot go through that boundary.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.allEventsProcessedP")
+  @JSExport
   def allEventsProcessedP(): js.Promise[Unit] =
     allEventsProcessedF("response processed as `js.Promise`").map(_ => ()).toJSPromise
 
   // 2020-05-05: Used by dialog centering only.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.currentAjaxResponseProcessedOrImmediatelyP")
+  @JSExport
   def currentAjaxResponseProcessedOrImmediatelyP(): js.Promise[Unit] =
     if (EventQueue.ajaxRequestInProgress)
       callbackF(ajaxResponseProcessed, forCurrentEventQueue = false, "current response processed as `js.Promise`").map(_ => ()).toJSPromise
@@ -70,7 +71,7 @@ object AjaxClient {
       Future.unit
 
   // 2020-04-28: Only used by legacy autocomplete
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.addAjaxResponseProcessed")
+  @JSExport
   def addAjaxResponseProcessed(fn: js.Function0[js.Any]): Unit =
     ajaxResponseProcessed.add(_ => fn.apply())
 
@@ -172,7 +173,7 @@ object AjaxClient {
 
   // Create a timer which after the specified delay will fire a server event
   // 2020-07-21: Only for upload response
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedServerEvent")
+  @JSExport
   def createDelayedServerEvent(
     encodedEvent : String,
     delay        : Double, // for JavaScript caller
@@ -200,7 +201,7 @@ object AjaxClient {
       form.addDiscardableTimerId(timerId)
   }
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.createDelayedPollEvent")
+  @JSExport
   def createDelayedPollEvent(
     delay  : js.UndefOr[Double],
     formId : String
@@ -218,7 +219,7 @@ object AjaxClient {
   def hasShowProgressEvent: Boolean =
     EventQueue.eventsReversed exists (_.showProgress)
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.fireEvent")
+  @JSExport
   def fireEvent(event: AjaxEvent): Unit = {
 
     // - `event.incremental == true` for `focus` and `keyup` event processing only.
@@ -236,7 +237,7 @@ object AjaxClient {
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
   // This is to prevent the UI from becoming totally unusable after an error.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.logAndShowError")
+  @JSExport
   def logAndShowError(e: AnyRef, formId: String, ignoreErrors: Boolean): Unit = {
 
     // Because we catch errors in JavaScript right now in AjaxServer.js, and in JavaScript any object can be thrown,
@@ -262,7 +263,7 @@ object AjaxClient {
   }
 
   // Display the error panel and shows the specified detailed message in the detail section of the panel.
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.showError")
+  @JSExport
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
     Events.errorEvent.fire(
       new js.Object {

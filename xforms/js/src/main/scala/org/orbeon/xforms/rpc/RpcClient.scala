@@ -22,7 +22,7 @@ import scala.scalajs.js.URIUtils
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
 
-@JSExportTopLevel("ORBEON.xforms.rpc.Client")
+@JSExportTopLevel("OrbeonRpcClient")
 object RpcClient
   extends autowire.Client[Json, Decoder, Encoder]
      with JsonSerializers {

@@ -22,12 +22,9 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 
-@JSExportTopLevel("ORBEON.fr.private.API")
-@JSExportAll
-object FormRunnerPrivateAPI {
+object FormRunnerPrivateAPI extends js.Object {
 
   private val ListenerSuffix = ".orbeon-beforeunload"
   private val ListenerEvents = s"beforeunload$ListenerSuffix"
@@ -43,11 +40,11 @@ object FormRunnerPrivateAPI {
     Page.findFormByUuid(uuid) foreach (_.isFormDataSafe = safe)
 
     if (safe)
-      $(global).off(
+      $(global.window).off(
         ListenerEvents
       )
     else
-      $(global).on(
+      $(global.window).on(
         ListenerEvents,
         ((_: JQueryEventObject) => Message): js.Function
       )

@@ -13,19 +13,18 @@
   */
 package org.orbeon.xforms
 
+import enumeratum._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
-import enumeratum._
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.HashChangeEvent
 
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.JSExport
 
-@JSExportTopLevel("ORBEON.xforms.StateHandling")
 object StateHandling {
 
   import Private._

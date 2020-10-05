@@ -17,12 +17,12 @@ import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms._
 import org.scalajs.dom.html
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
-@JSExportTopLevel("ORBEON.fr.API")
-@JSExportAll
-object FormRunnerAPI {
+
+object FormRunnerAPI extends js.Object {
 
   def findControlsByName(
     controlName : String,
@@ -44,11 +44,11 @@ object FormRunnerAPI {
     formElem    : js.UndefOr[html.Form] = js.undefined
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
+
+  val wizard: FormRunnerWizardAPI.type = FormRunnerWizardAPI
 }
 
-@JSExportTopLevel("ORBEON.fr.API.wizard")
-@JSExportAll
-object FormRunnerWizardAPI {
+object FormRunnerWizardAPI extends js.Object {
 
   def focus(
     controlName   : String,

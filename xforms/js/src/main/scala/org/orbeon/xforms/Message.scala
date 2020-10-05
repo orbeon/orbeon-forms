@@ -24,7 +24,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.Dynamic.{newInstance => jsnew}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("ORBEON.xforms.action.Message")
+@JSExportTopLevel("OrbeonMessage")
 @JSExportAll
 object Message {
 

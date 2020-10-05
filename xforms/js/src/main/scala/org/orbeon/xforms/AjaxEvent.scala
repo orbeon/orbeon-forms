@@ -81,7 +81,7 @@ object AjaxEvent {
     )
 }
 
-@JSExportTopLevel("ORBEON.xforms.server.AjaxServer.Event")
+@JSExportTopLevel("OrbeonAjaxEvent")
 class AjaxEvent(args: js.Any*) extends js.Object {
 
   require(args.nonEmpty)

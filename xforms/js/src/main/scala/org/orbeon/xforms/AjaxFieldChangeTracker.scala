@@ -17,7 +17,7 @@ import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.raw.UIEvent
 
-import scala.scalajs.js.annotation.JSExportTopLevel
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 //
 // This tracks changes to fields so that user-modified fields do not get overwritten by
@@ -25,6 +25,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 //
 // See https://github.com/orbeon/orbeon-forms/issues/1732
 //
+@JSExportTopLevel("OrbeonAjaxFieldChangeTracker")
 object AjaxFieldChangeTracker {
 
   import Private._
@@ -36,7 +37,7 @@ object AjaxFieldChangeTracker {
       onInput _
     )
 
-  @JSExportTopLevel("ORBEON.xforms.server.AjaxServer.hasChangedIdsRequest")
+  @JSExport
   def hasChangedIdsRequest(controlId: String): Boolean =
     changedControlIds.contains(controlId)
 

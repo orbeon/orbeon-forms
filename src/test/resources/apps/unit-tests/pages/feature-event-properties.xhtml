@@ -18,7 +18,7 @@
         <xh:script type="text/javascript">
             <![CDATA[
                 ORBEON.jQuery(function() {
-                    var AjaxServer = ORBEON.xforms.server.AjaxServer;
+                    var AjaxServer = ORBEON.xforms.AjaxClient;
                     AjaxServer.beforeSendingEvent.add(function(event, addProperties) {
                         if (event.eventName == 'DOMActivate' && event.targetId == 'send-event')
                             addProperties({p1: 'v1', p2: 'v2'});

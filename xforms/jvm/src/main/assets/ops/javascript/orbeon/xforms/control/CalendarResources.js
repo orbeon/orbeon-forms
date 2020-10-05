@@ -13,6 +13,9 @@
  */
 (function() {
 
+    ORBEON.xforms         = ORBEON.xforms         || {};
+    ORBEON.xforms.control = ORBEON.xforms.control || {};
+
     ORBEON.xforms.control.CalendarResources = {
         "pt": {
             properties: {

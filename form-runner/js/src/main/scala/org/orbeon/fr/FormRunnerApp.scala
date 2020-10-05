@@ -16,6 +16,9 @@ package org.orbeon.fr
 import org.orbeon.xbl
 import org.orbeon.xforms.{App, XFormsApp}
 
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global => g}
+
 // Scala.js starting point for Form Runner
 object FormRunnerApp extends App {
 
@@ -23,9 +26,25 @@ object FormRunnerApp extends App {
 
     XFormsApp.onOrbeonApiLoaded()
 
+    val orbeonDyn = g.window.ORBEON
+
+    val frDyn = {
+      if (js.isUndefined(orbeonDyn.fr))
+        orbeonDyn.fr = new js.Object
+      orbeonDyn.fr
+    }
+
+    frDyn.API = FormRunnerAPI
+
+    val frPrivateDyn = {
+      if (js.isUndefined(frDyn.`private`))
+        frDyn.`private` = new js.Object
+      frDyn.`private`
+    }
+
+    frPrivateDyn.API = FormRunnerPrivateAPI
+
     // Register XBL components
-    xbl.Grid
-    xbl.Repeater
     xbl.DndRepeat
     xbl.Tabbable
     xbl.Number

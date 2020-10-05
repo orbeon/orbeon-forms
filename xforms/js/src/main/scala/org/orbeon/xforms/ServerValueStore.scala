@@ -20,7 +20,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 // Store for values as we think they are known to the server
-@JSExportTopLevel("ORBEON.xforms.ServerValueStore")
+@JSExportTopLevel("OrbeonServerValueStore")
 object ServerValueStore {
 
   private case class ControlValue(controlElem: raw.Element, value: String)

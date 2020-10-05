@@ -61,7 +61,7 @@ class OrbeonClientTest extends AsyncFunSpec {
       OrbeonWindow(
         window       = window,
         documentAPI  = ORBEON.xforms.Document.asInstanceOf[facade.DocumentTrait],
-        ajaxServer   = ORBEON.xforms.server.AjaxServer.asInstanceOf[AjaxServerTrait]
+        ajaxServer   = ORBEON.xforms.AjaxClient.asInstanceOf[AjaxServerTrait]
       )
     }
   }

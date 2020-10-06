@@ -819,7 +819,7 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .enablePlugins(JSDependenciesPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.xml" %%% "sax"% "2.0.2"
+      "org.xml" %%% "sax"% "2.0.2.2-SNAPSHOT"
     )
   )
 

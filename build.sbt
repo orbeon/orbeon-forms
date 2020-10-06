@@ -35,7 +35,7 @@ val ScalaCollectionCompatVersion  = "2.2.0"
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
 val Slf4jVersion                  = "1.7.30"
-val HttpComponentsVersion         = "4.5.12"
+val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.7"
 val FlyingSaucerVersion           = "9.1.20"

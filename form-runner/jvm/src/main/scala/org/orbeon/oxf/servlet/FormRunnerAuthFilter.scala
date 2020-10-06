@@ -56,6 +56,7 @@ object FormRunnerAuthFilter {
 
   import scala.collection.JavaConverters._
 
+  // TODO: FIXME: This is a ScalaLogging logger! Use log4s or slf4j
   private val logger = Logger("org.orbeon.filter.form-runner-auth")
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {

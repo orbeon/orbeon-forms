@@ -53,7 +53,7 @@ object APISupport {
     implicit ctx : EmbeddingContextWithResponse
   ): Unit = {
 
-    Logger.debug("proxying page for path = `{}`", path)
+    Logger.debug(s"proxying page for path = `$path`")
 
     val url = formRunnerURL(baseURL, path, embeddable = true)
 
@@ -161,7 +161,7 @@ object APISupport {
 
   def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
 
-    Logger.debug("proxying resource for URL = `{}`", requestDetails.url)
+    Logger.debug(s"proxying resource for URL = `${requestDetails.url}`")
 
     val res = connectURL(requestDetails)
 
@@ -201,7 +201,7 @@ object APISupport {
   // Call the Orbeon service at the other end
   def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse) = {
 
-    Logger.debug("calling service for URL = `{}`", requestDetails.url)
+    Logger.debug(s"calling service for URL = `${requestDetails.url}`")
 
     val cx = connectURL(requestDetails)
 

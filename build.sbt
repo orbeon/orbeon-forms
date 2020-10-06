@@ -938,6 +938,7 @@ lazy val root = (project in file("."))
   .settings(
     // TEMP: override so that root project doesn't search under src
     ThisProject / sourceDirectory := baseDirectory.value / "root", // until we have a more standard layout
-    publishArtifact               := false,
+    publish := {},
+    publishLocal := {},
     crossScalaVersions            := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
   )

@@ -5,6 +5,10 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
+// For our GitHub packages
+resolvers += Resolver.githubPackages("orbeon")
+githubOwner       in ThisBuild := "orbeon"
+
 val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 

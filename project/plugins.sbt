@@ -5,6 +5,7 @@ addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"            % "0.9.0")
 addSbtPlugin     ("com.typesafe.sbt"    % "sbt-less"                 % "1.1.2")
 addSbtPlugin     ("com.typesafe.sbt"    % "sbt-uglify"               % "2.0.0")
 //addSbtPlugin     ("net.virtual-void"    % "sbt-dependency-graph"     % "0.9.2")
+addSbtPlugin     ("com.codecommit"      % "sbt-github-packages"      % "0.5.2")
 addCompilerPlugin("org.scalamacros"     % "paradise"                 % "2.1.1" cross CrossVersion.full)
 
 // Apparently needed for sbt-web

@@ -16,7 +16,6 @@ val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
-val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
@@ -358,9 +357,9 @@ lazy val commonSettings = Seq(
 
 lazy val commonScalaJvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.scalatestplus" %%% "scalatestplus-junit"   % ScalaTestPlusVersion % Test,
-    "org.scalatestplus" %%% "scalatestplus-mockito" % ScalaTestPlusVersion % Test,
-    "org.scalatestplus" %%% "scalatestplus-selenium" % ScalaTestPlusVersion % Test
+    "org.scalatestplus" %%% "junit-4-12"     % "3.2.2.0" % Test,
+    "org.scalatestplus" %%% "mockito-1-10"   % "3.1.0.0" % Test,
+    "org.scalatestplus" %%% "selenium-3-141" % "3.2.2.0" % Test
   )
 )
 

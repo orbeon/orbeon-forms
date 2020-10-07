@@ -132,7 +132,7 @@ object Multipart {
     require(uploadContext ne null)
     require(headerEncoding ne null)
 
-    val servletFileUpload = new ServletFileUpload(new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory))
+    val servletFileUpload = new ServletFileUpload(new DiskFileItemFactory(maxMemorySize, NetUtils.getTemporaryDirectory))
 
     servletFileUpload.setHeaderEncoding(headerEncoding)
 

@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.*;
 import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -33,10 +34,8 @@ import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.datatypes.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -151,7 +150,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     final ExternalContext.Request request = getRequest(pipelineContext);
 
                                     if (context.bodyFileItem == null) {
-                                        final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+                                        final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), NetUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
                                         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                                             public void contextDestroyed(boolean success) {
                                                 fileItem.delete();

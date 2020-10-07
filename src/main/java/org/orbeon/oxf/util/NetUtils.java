@@ -57,6 +57,10 @@ public class NetUtils {
         PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
     }
 
+    public static File getTemporaryDirectory() {
+        return new File(System.getProperty("java.io.tmpdir")).getAbsoluteFile();
+    }
+
     /**
      * Return true if the document was modified since the given date, based on the If-Modified-Since
      * header. If the request method was not "GET", or if no valid lastModified value was provided,
@@ -536,7 +540,7 @@ public class NetUtils {
     public static FileItem prepareFileItem(int scope, Logger logger) {
         // We use the commons file upload utilities to save a file
         if (fileItemFactory == null)
-            fileItemFactory = new DiskFileItemFactory(0, SystemUtils.getTemporaryDirectory());
+            fileItemFactory = new DiskFileItemFactory(0, getTemporaryDirectory());
         final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
         // Make sure the file is deleted appropriately
         if (scope == REQUEST_SCOPE) {

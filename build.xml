@@ -165,7 +165,7 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
+            -libraryjars ${java.home}/jmods(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
@@ -233,7 +233,7 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
+            -libraryjars ${java.home}/jmods(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
@@ -303,7 +303,7 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
-            -libraryjars ${java.home}/lib/rt.jar(java/**.class)
+            -libraryjars ${java.home}/jmods(java/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 

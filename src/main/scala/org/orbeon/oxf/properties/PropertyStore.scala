@@ -130,7 +130,7 @@ object PropertyStore {
       SupportedTypes.get(typ) map (_(stringValue, element)) orNull
 
     def convertString (value: String, element: Element) = value
-    def convertInteger(value: String, element: Element) = new jl.Integer(value)
+    def convertInteger(value: String, element: Element) = jl.Integer.valueOf(value)
     def convertBoolean(value: String, element: Element) = jl.Boolean.valueOf(value)
     def convertDate   (value: String, element: Element) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 

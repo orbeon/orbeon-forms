@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{util => ju}
+import java.{util => ju, lang => jl}
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
@@ -169,7 +169,7 @@ object XPathUtils {
   // IMPORTANT: If the XPath expressions select an empty node set, return `null`!
   // 26 usages
   def selectIntegerValue(node: odom.Node, expr: String): Integer =
-    Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map (new java.lang.Integer(_)) orNull
+    Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map jl.Integer.valueOf orNull
 
   // 1 caller from SQL interpreter, implication is that expressions must return xs:boolean
   def selectBooleanValue(

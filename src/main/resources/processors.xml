@@ -628,10 +628,6 @@
         <class name="org.orbeon.oxf.processor.sql.SQLOutputProcessor"/>
     </processor>
 
-    <processor name="oxf:saxon7">
-        <instantiation name="oxf:builtin-saxon"/>
-    </processor>
-
     <processor name="oxf:saxon8">
         <instantiation name="oxf:builtin-saxon"/>
     </processor>

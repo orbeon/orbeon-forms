@@ -40,8 +40,7 @@ object FormRunnerAuth {
     userRoles  : UserRolesFacade,
     session    : ExternalContext.Session,
     getHeader  : String => List[String]
-  ): List[(String, Array[String])] = {
-
+  ): List[(String, Array[String])] =
     getCredentialsUseSession(userRoles, session, getHeader) match {
       case Some(credentials) =>
         val result = CredentialsSupport.toHeaders(credentials)
@@ -52,7 +51,6 @@ object FormRunnerAuth {
         Logger.warn(s"not setting credentials headers because credentials are not found")
         Nil
     }
-  }
 
   private object Private {
 

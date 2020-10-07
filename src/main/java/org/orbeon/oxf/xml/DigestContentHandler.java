@@ -21,11 +21,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.Source;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
 import java.nio.Buffer;
+import java.nio.charset.*;
 import java.security.MessageDigest;
 
 /**
@@ -54,7 +51,7 @@ public class DigestContentHandler implements XMLReceiver {
      * ( Costing us a full second in the 50thread/512MB test. )
      * The solution, of course, is just to use get the appropriate Charset and hold on to it.
      */
-    private static final Charset utf16BECharset = Charset.forName("UTF-16BE");
+    private static final Charset utf16BECharset = StandardCharsets.UTF_16BE;
     /**
      * Encoder has state and therefore cannot be shared across threads.
      */
@@ -146,16 +143,16 @@ public class DigestContentHandler implements XMLReceiver {
     public void setDocumentLocator(Locator locator) {
     }
 
-    public void startDocument() throws SAXException {
+    public void startDocument() {
         ((Buffer) charBuff).clear(); // cast: see #4682
         ((Buffer) byteBuff).clear(); // cast: see #4682
         charEncoder.reset();
     }
 
-    public void endDocument() throws SAXException {
+    public void endDocument() {
     }
 
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+    public void startPrefixMapping(String prefix, String uri) {
 
         digest.update((byte) ((NAMESPACE_CODE >> 24) & 0xff));
         digest.update((byte) ((NAMESPACE_CODE >> 16) & 0xff));
@@ -169,8 +166,7 @@ public class DigestContentHandler implements XMLReceiver {
         digest.update((byte) 0);
     }
 
-    public void endPrefixMapping(String prefix)
-            throws SAXException {
+    public void endPrefixMapping(String prefix) {
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
@@ -219,7 +215,7 @@ public class DigestContentHandler implements XMLReceiver {
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
     }
 
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
 
         digest.update((byte) ((TEXT_CODE >> 24) & 0xff));
         digest.update((byte) ((TEXT_CODE >> 16) & 0xff));
@@ -232,11 +228,10 @@ public class DigestContentHandler implements XMLReceiver {
         digest.update((byte) 0);
     }
 
-    public void ignorableWhitespace(char ch[], int start, int length)
-            throws SAXException {
+    public void ignorableWhitespace(char[] ch, int start, int length) {
     }
 
-    public void processingInstruction(String target, String data) throws SAXException {
+    public void processingInstruction(String target, String data) {
 
         digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 24) & 0xff));
         digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 16) & 0xff));
@@ -254,28 +249,28 @@ public class DigestContentHandler implements XMLReceiver {
         digest.update((byte) 0);
     }
 
-    public void skippedEntity(String name) throws SAXException {
+    public void skippedEntity(String name) {
     }
 
-    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+    public void startDTD(String name, String publicId, String systemId) {
     }
 
-    public void endDTD() throws SAXException {
+    public void endDTD() {
     }
 
-    public void startEntity(String name) throws SAXException {
+    public void startEntity(String name) {
     }
 
-    public void endEntity(String name) throws SAXException {
+    public void endEntity(String name) {
     }
 
-    public void startCDATA() throws SAXException {
+    public void startCDATA() {
     }
 
-    public void endCDATA() throws SAXException {
+    public void endCDATA() {
     }
 
-    public void comment(char[] ch, int start, int length) throws SAXException {
+    public void comment(char[] ch, int start, int length) {
 
         // We do consider comments significant for the purpose of digesting. But should this be an option?
 

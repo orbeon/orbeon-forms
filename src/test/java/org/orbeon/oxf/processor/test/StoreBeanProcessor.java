@@ -11,6 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+package org.orbeon.oxf.processor.test;
 
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
@@ -19,9 +20,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.xml.XPathUtils;
 
-public class StoreBean extends SimpleProcessor {
+public class StoreBeanProcessor extends SimpleProcessor {
 
-    public StoreBean() {
+    public StoreBeanProcessor() {
     }
 
     public void start(PipelineContext pipelineContext) {

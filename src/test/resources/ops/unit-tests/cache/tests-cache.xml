@@ -626,10 +626,7 @@
                 <set-request href="request1.xml"/>
 
                 <!-- First, store a JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -660,10 +657,7 @@
                 </assert>
 
                 <!-- Store again the same JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -690,10 +684,7 @@
                 </assert>
 
                 <!-- Store a different JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -727,10 +718,7 @@
                 </assert>
 
                 <!-- Store again the first JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -785,10 +773,7 @@
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
                 <!-- Check with different key -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house2</key>
@@ -884,10 +869,7 @@
                 <set-request href="request1.xml"/>
 
                 <!-- First, store a JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -921,10 +903,7 @@
                 </assert>
 
                 <!-- Store again the same JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -954,10 +933,7 @@
                 </assert>
 
                 <!-- Store a different JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -996,10 +972,7 @@
                 </assert>
 
                 <!-- Store again the first JavaBean into the request scope -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house1</key>
@@ -1064,10 +1037,7 @@
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
                 <!-- Check with different key -->
-                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <config sourcepath="oxf:/ops/unit-tests/cache" class="StoreBean"/>
-                    </input>
+                <processor name="oxf:test-store-bean" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="bean-config">
                         <bean-config>
                             <key>house2</key>

@@ -90,7 +90,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
     public int length(String key) {
-        return new Long(getFile(key).length()).intValue();
+        return Long.valueOf(getFile(key).length()).intValue();
     }
 
     protected File getFile(String key) {

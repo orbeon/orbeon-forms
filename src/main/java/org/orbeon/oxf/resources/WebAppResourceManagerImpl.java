@@ -113,7 +113,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
             // the WAR itself.
             return 0;
         } else {
-            return new Long(new File(realPath).length()).intValue();
+            return Long.valueOf(new File(realPath).length()).intValue();
         }
     }
 

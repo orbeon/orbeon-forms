@@ -88,13 +88,13 @@ trait LiferayAPI {
   // ]
   //
   def getUserOrganizations(userId: Long): List[OrganizationFacade] =
-    getUserOrganizationsMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[OrganizationFacade]].asScala.to(List)
+    getUserOrganizationsMethod.invoke(null, jl.Long.valueOf(userId)).asInstanceOf[ju.List[OrganizationFacade]].asScala.to(List)
 
   def getUserGroupRoles(userId: Long): List[UserGroupRoleFacade] =
-    getUserGroupRolesMethod.invoke(null, new jl.Long(userId)).asInstanceOf[ju.List[UserGroupRoleFacade]].asScala.to(List)
+    getUserGroupRolesMethod.invoke(null, jl.Long.valueOf(userId)).asInstanceOf[ju.List[UserGroupRoleFacade]].asScala.to(List)
 
   def hasUserGroupRoleMethod(userId: Long, organizationGroupId: Long, roleName: String): Boolean =
-    hasUserGroupRoleMethod.invoke(null, new jl.Long(userId), new jl.Long(organizationGroupId), roleName).asInstanceOf[jl.Boolean]
+    hasUserGroupRoleMethod.invoke(null, jl.Long.valueOf(userId), jl.Long.valueOf(organizationGroupId), roleName).asInstanceOf[jl.Boolean]
 
   private[liferay] type OrganizationFacade = {
     def getName        : String

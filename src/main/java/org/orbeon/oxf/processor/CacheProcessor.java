@@ -133,19 +133,19 @@ public class CacheProcessor extends ProcessorImpl {
                 state.validity = null;
             } else if (validity.validity.length() == 0) {
                 // No duration specified
-                state.validity = new Long(0);
+                state.validity = Long.valueOf(0);
             } else if (validity.validity.startsWith("P")) {
                 // Duration specified
                 try {
                     long currentTime = new Date().getTime();
                     long length = (long) (((DurationValue) DurationValue.makeDuration(validity.validity)).getLengthInSeconds() * 1000.0);
-                    state.validity = new Long(currentTime - (currentTime % length));
+                    state.validity = Long.valueOf(currentTime - (currentTime % length));
                 } catch (Exception e) {
                     throw new ValidationException("Can't parse duration: " + validity.validity, validity.locationData);
                 }
             } else {
                 // Validity is a date
-                state.validity = new Long(DateUtilsUsingSaxon.parseISODateOrDateTime(validity.validity));
+                state.validity = Long.valueOf(DateUtilsUsingSaxon.parseISODateOrDateTime(validity.validity));
             }
         }
         return state;

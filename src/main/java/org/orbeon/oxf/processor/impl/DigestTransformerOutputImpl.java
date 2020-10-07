@@ -102,7 +102,7 @@ public abstract class DigestTransformerOutputImpl extends CacheableTransformerOu
                     if (digestValidity != null && Arrays.equals(state.digest, digestValidity.digest)) {
                         state.validity = digestValidity.lastModified;
                     } else {
-                        final Long currentValidity = new Long(System.currentTimeMillis());
+                        final Long currentValidity = Long.valueOf(System.currentTimeMillis());
                         cache.add(outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
                         state.validity = currentValidity;
                     }

@@ -86,7 +86,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Create combined validity for (transformer type, config)
                     final Object typeValidity = transformerFactory == null
-                            ? getInputValidity(context, typeInput) : new Long(0);
+                            ? getInputValidity(context, typeInput) : Long.valueOf(0);
                     final Object configValidity = getInputValidity(context, configInput);
                     final Object combinedInputValidity = typeValidity == null || configValidity == null ? null
                             : Arrays.asList(typeValidity, configValidity);

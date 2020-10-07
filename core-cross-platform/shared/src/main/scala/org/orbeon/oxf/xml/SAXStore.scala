@@ -214,7 +214,7 @@ final class SAXStore
 
   def getAttributesCount: Int = attributeCount
 
-  def getValidity: AnyRef = new jl.Long(eventBuffer.hashCode * charBuffer.hashCode * intBuffer.hashCode)
+  def getValidity: AnyRef = jl.Long.valueOf(eventBuffer.hashCode * charBuffer.hashCode * intBuffer.hashCode)
 
   @throws[SAXException]
   def replay(xmlReceiver: XMLReceiver): Unit =

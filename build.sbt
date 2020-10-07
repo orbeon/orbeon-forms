@@ -901,6 +901,7 @@ lazy val orbeonWarJS = orbeonWar.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+      "io.monix"               %%% "monix"          % "3.2.2",
       "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided
     ),
 

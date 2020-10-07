@@ -6,7 +6,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 // For our GitHub packages
 resolvers += Resolver.githubPackages("orbeon")
-githubOwner       in ThisBuild := "orbeon"
+ThisBuild / githubOwner := "orbeon"
 
 val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
@@ -152,8 +152,7 @@ ThisBuild / version                     := orbeonVersionFromProperties.value
 ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
-
-traceLevel in ThisBuild := 0
+ThisBuild / traceLevel                  := 0
 
 // Give a .js or .jvm project's base directory, return the shared assets directory
 def sharedAssetsDir(baseDirectory: File) =
@@ -939,7 +938,7 @@ lazy val root = (project in file("."))
   .settings(
     // TEMP: override so that root project doesn't search under src
     ThisProject / sourceDirectory := baseDirectory.value / "root", // until we have a more standard layout
-    publish := {},
-    publishLocal := {},
+    publish                       := {},
+    publishLocal                  := {},
     crossScalaVersions            := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
   )

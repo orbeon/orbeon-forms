@@ -27,10 +27,7 @@
     description="XForms XPath Analysis"
     edition="pe">
 
-    <test description="Simple xf:bind dependencies" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple xf:bind dependencies" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -265,10 +262,7 @@
         </output>
     </test>
 
-    <test description="MIP xf:bind dependencies" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="MIP xf:bind dependencies" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -518,10 +512,7 @@
         </output>
     </test>
 
-    <test description="Rejection of unsupported attributes" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Rejection of unsupported attributes" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -634,10 +625,7 @@
         </output>
     </test>
 
-    <test description="Rejection of unsupported expressions" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Rejection of unsupported expressions" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -748,10 +736,7 @@
         </output>
     </test>
 
-    <test description="Handling of parent:: and ancestor:: axes" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Handling of parent:: and ancestor:: axes" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1007,10 +992,7 @@
         </output>
     </test>
 
-    <test description="Dependencies on other nodes" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Dependencies on other nodes" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1137,10 +1119,7 @@
         </output>
     </test>
 
-    <test description="Simple model variable accessed by view" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple model variable accessed by view" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1198,10 +1177,7 @@
         </output>
     </test>
 
-    <test description="Simple model variables with 2 models" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple model variables with 2 models" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1286,10 +1262,7 @@
         </output>
     </test>
 
-    <test description="Model variables" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Model variables" name="oxf:xforms-xpath-analysis">
         <input name="form" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml"/>
         <output name="analysis">
             <root scope="" prefixed-id="#document" model-prefixed-id="model1" binding="false" value="false">
@@ -1562,10 +1535,7 @@
         </output>
     </test>
 
-    <test description="Simple xxf:instance function within models" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple xxf:instance function within models" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1632,10 +1602,7 @@
         </output>
     </test>
 
-    <test description="Complex cross-models instance references" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Complex cross-models instance references" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -1965,10 +1932,7 @@
         </output>
     </test>
 
-    <test description="Basic xf:var/xxf:value" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Basic xf:var/xxf:value" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -2162,10 +2126,7 @@
         </output>
     </test>
 
-    <test description="XBL xf:var/xxf:value" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="XBL xf:var/xxf:value" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -2346,10 +2307,7 @@
         </output>
     </test>
 
-    <test description="Expression both returning a node and using the node value in predicate" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Expression both returning a node and using the node value in predicate" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -2407,10 +2365,7 @@
         </output>
     </test>
 
-    <test description="Binding depending on variable scoped in parent container" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Binding depending on variable scoped in parent container" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -2476,10 +2431,7 @@
         </output>
     </test>
 
-    <test description="Top-level model with no instance" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Top-level model with no instance" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -2502,10 +2454,7 @@
         </output>
     </test>
 
-    <test description="XBL with no local model" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="XBL with no local model" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -2619,12 +2568,9 @@
         </output>
     </test>
 
-    <test description="PO example: analysis" name="oxf:java">
+    <test description="PO example: analysis" name="oxf:xforms-xpath-analysis">
         <!-- NOTE: As of 2012-08-07, there is an extra value dependency on the value instance('po')/items/item/total
              following the fix for #331. It doesn't seem like this dependency should be there. -->
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
         <input name="form" href="forms/po.xhtml"/>
         <output name="analysis">
             <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
@@ -3485,10 +3431,7 @@
         </output>
     </test>
 
-    <test description="Simple use of last() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple use of last() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -3527,10 +3470,7 @@
         </output>
     </test>
 
-    <test description="Simple use of xxf:context() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple use of xxf:context() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -3695,10 +3635,7 @@
         </output>
     </test>
 
-    <test description="context() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="context() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -3942,10 +3879,7 @@
         </output>
     </test>
 
-    <test description="Simple use of xxf:repeat-current() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple use of xxf:repeat-current() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -4119,10 +4053,7 @@
         </output>
     </test>
 
-    <test description="Simple use of xxf:serialize() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple use of xxf:serialize() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -4199,11 +4130,8 @@
         </output>
     </test>
 
-    <test description="Expressions containing AtomicMappingExpression such as a/count(b) or a/sum(b)" name="oxf:java">
+    <test description="Expressions containing AtomicMappingExpression such as a/count(b) or a/sum(b)" name="oxf:xforms-xpath-analysis">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315523&group_id=168&atid=350207 -->
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -4372,10 +4300,7 @@
         </output>
     </test>
 
-    <test description="Logging of paths containing attributes" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Logging of paths containing attributes" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -4414,10 +4339,7 @@
         </output>
     </test>
 
-    <test description="Simple use of position() function" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple use of position() function" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -4500,10 +4422,7 @@
         </output>
     </test>
 
-    <test description="Bind referring to model variables" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Bind referring to model variables" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -4602,10 +4521,7 @@
         </output>
     </test>
 
-    <test description="Control binding using @bind attribute" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Control binding using @bind attribute" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -4736,10 +4652,7 @@
         </output>
     </test>
 
-    <test description="Basic LHHA analysis" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Basic LHHA analysis" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -4977,10 +4890,7 @@
         </output>
     </test>
 
-    <test description="LHHA analysis with nested outputs" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="LHHA analysis with nested outputs" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5102,10 +5012,7 @@
         </output>
     </test>
 
-    <test description="Constant variable" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Constant variable" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5165,10 +5072,7 @@
         </output>
     </test>
 
-    <test description="LHHA referring to model variable" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="LHHA referring to model variable" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5230,10 +5134,7 @@
         </output>
     </test>
 
-    <test description="External LHHA preceding control and using variable" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="External LHHA preceding control and using variable" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5323,10 +5224,7 @@
         </output>
     </test>
 
-    <test description="External LHHA positioning and evaluation context" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="External LHHA positioning and evaluation context" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5598,10 +5496,7 @@
         </output>
     </test>
 
-    <test description="Simple itemset" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Simple itemset" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -5676,10 +5571,7 @@
         </output>
     </test>
 
-    <test description="Complex itemset" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Complex itemset" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -5806,10 +5698,7 @@
         </output>
     </test>
 
-    <test description="Variable scope within XBL" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Variable scope within XBL" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -5974,10 +5863,7 @@
         </output>
     </test>
 
-    <test description="Label output in different scope" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Label output in different scope" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -6053,10 +5939,7 @@
         </output>
     </test>
 
-    <test description="Bind with name attribute" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Bind with name attribute" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -6189,10 +6072,7 @@
         </output>
     </test>
 
-    <test description="xxf:instance id resolution across XBL scopes" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="xxf:instance id resolution across XBL scopes" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
@@ -6875,10 +6755,7 @@
         </output>
     </test>
 
-    <test description="Nested model between variables" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="Nested model between variables" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>
@@ -6967,10 +6844,7 @@
         </output>
     </test>
 
-    <test description="xxf:r()" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="xxf:r()" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xml:lang="{xxf:instance('fr-language-instance')}">
                 <xh:head>
@@ -7114,10 +6988,7 @@
         </output>
     </test>
 
-    <test description="xxf:lang()" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="xxf:lang()" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xml:lang="{xxf:instance('fr-language-instance')}">
                 <xh:head>
@@ -7198,10 +7069,7 @@
         </output>
     </test>
 
-    <test description="xxf:format-message()" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="xxf:format-message()" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html xml:lang="{xxf:instance('fr-language-instance')}">
                 <xh:head>
@@ -7270,10 +7138,7 @@
     </test>
 
     <!-- Map functions don't support PathMap yet so this test is disabled as of 2017-06-28. -->
-    <test description="#3293: Map functions" name="oxf:java" exclude="true">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="#3293: Map functions" name="oxf:xforms-xpath-analysis" exclude="true">
         <input name="form">
             <xh:html xmlns:map="http://www.w3.org/2005/xpath-functions/map">
                 <xh:head>

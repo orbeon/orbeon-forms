@@ -620,6 +620,10 @@
         <class name="org.orbeon.oxf.processor.SessionTraceProcessor"/>
     </processor>
 
+    <processor name="oxf:xforms-xpath-analysis">
+        <class name="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+    </processor>
+
     <processor name="oxf:sql-input">
         <class name="org.orbeon.oxf.processor.sql.SQLInputProcessor"/>
     </processor>

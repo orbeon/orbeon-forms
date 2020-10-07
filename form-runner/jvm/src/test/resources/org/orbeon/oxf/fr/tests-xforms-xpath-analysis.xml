@@ -27,10 +27,7 @@
     description="Form Runner XPath Analysis"
     edition="pe">
 
-    <test description="fr:dataset() rewriting" name="oxf:java">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
+    <test description="fr:dataset() rewriting" name="oxf:xforms-xpath-analysis">
         <input name="form">
             <xh:html>
                 <xh:head>

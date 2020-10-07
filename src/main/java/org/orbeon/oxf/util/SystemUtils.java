@@ -64,21 +64,26 @@ public class SystemUtils {
      */
     public static void gatherSystemPaths(final Collection c) {
         final String bootcp = System.getProperty("sun.boot.class.path");
-        gatherPaths(c, bootcp);
+        if (bootcp != null) {
+            gatherPaths(c, bootcp);
+        }
+        // 2020-10-07: This is no longe supported with Java 9 and newer.
         final String extDirProp = System.getProperty("java.ext.dirs");
-        final File[] extDirs = pathToFiles(extDirProp);
-        for (int i = 0; i < extDirs.length; i++) {
-            final File[] jars = extDirs[i].listFiles();
-            if (jars != null) { // jars can be null when java.ext.dirs points to a non-existant directory
-                for (int j = 0; j < jars.length; j++) {
-                    final File fil = jars[j];
-                    final String fnam = fil.toString();
-                    final int fnamLen = fnam.length();
-                    if (fnamLen < 5) continue;
-                    if (fnam.regionMatches(true, fnamLen - 4, ".jar", 0, 4)) {
-                        c.add(fil);
-                    } else if (fnam.regionMatches(true, fnamLen - 4, ".zip", 0, 4)) {
-                        c.add(fil);
+        if (extDirProp != null) {
+            final File[] extDirs = pathToFiles(extDirProp);
+            for (int i = 0; i < extDirs.length; i++) {
+                final File[] jars = extDirs[i].listFiles();
+                if (jars != null) { // jars can be null when java.ext.dirs points to a non-existant directory
+                    for (int j = 0; j < jars.length; j++) {
+                        final File fil = jars[j];
+                        final String fnam = fil.toString();
+                        final int fnamLen = fnam.length();
+                        if (fnamLen < 5) continue;
+                        if (fnam.regionMatches(true, fnamLen - 4, ".jar", 0, 4)) {
+                            c.add(fil);
+                        } else if (fnam.regionMatches(true, fnamLen - 4, ".zip", 0, 4)) {
+                            c.add(fil);
+                        }
                     }
                 }
             }

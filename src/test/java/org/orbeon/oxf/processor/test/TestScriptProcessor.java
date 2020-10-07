@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.test;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
+import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -22,6 +23,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -30,6 +33,9 @@ import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.datatypes.LocationData;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -184,10 +190,47 @@ public class TestScriptProcessor extends ProcessorImpl {
 
     private void handleTouchCommand(ExecutionContext executionContext, Element commandElement) {
         String urlAttributeValue = commandElement.attributeValue("url");
-        File file = JavaProcessor.getFileFromURL(urlAttributeValue, (LocationData) commandElement.getData());
+        File file = getFileFromURL(urlAttributeValue, (LocationData) commandElement.getData());
         boolean result = file.setLastModified(System.currentTimeMillis());
         if (!result)
             throw new OXFException("Setting last modified date on file '" + file.toString() + "' failed.");
+    }
+
+    /**
+     * Return a File object based on an URL string that can be relative to the specified
+     * LocationData. The protocols supported are "oxf:" and "file:". If the file doesn't exist, an
+     * exception is thrown.
+     */
+    private static File getFileFromURL(String urlString, LocationData locationData) {
+        URL sourcePathURL = (locationData != null && locationData.file() != null)
+            ? URLFactory.createURL(locationData.file(), urlString)
+            : URLFactory.createURL(urlString);
+
+        // Make sure the protocol is oxf: or file:
+        if (sourcePathURL.getProtocol().equals("file")) {
+            String fileName = sourcePathURL.getFile();
+            File file = new File(fileName);
+            if (!file.exists()) {
+                // Try to decode only if we cannot find the file
+                try {
+                    fileName = URLDecoder.decode(fileName, CharsetNames.Utf8());
+                } catch (UnsupportedEncodingException e) {
+                    // Should not happen
+                    throw new ValidationException(e, locationData);
+                }
+                file = new File(fileName);
+                if (!file.exists())
+                    throw new ValidationException("Invalid sourcepath attribute: cannot find resource for URL: " + urlString, locationData);
+            }
+            return file;
+        } else if (sourcePathURL.getProtocol().equals("oxf")) {
+            // Get real path to source path
+            String path = sourcePathURL.getFile();
+            return new File(ResourceManagerWrapper.instance().getRealPath(path));
+        } else {
+            throw new ValidationException("Invalid sourcepath attribute: '" + urlString
+                    + "'. The Java processor only supports the oxf: and file: protocols for the sourcepath attribute.", locationData);
+        }
     }
 
     private void handleWaitCommand(ExecutionContext executionContext, Element commandElement) {

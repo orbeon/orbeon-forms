@@ -23,7 +23,6 @@
     <xi:include href="tests-transformations.xml"/>
     <xi:include href="converters/tests-converters.xml"/>
     <xi:include href="tests-page-flow.xml"/>
-    <xi:include href="tests-java.xml"/>
     <xi:include href="tests-sql.xml"/>
     <xi:include href="tests-email.xml"/>
     <xi:include href="tests-matchers.xml"/>

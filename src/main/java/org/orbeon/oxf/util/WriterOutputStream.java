@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.*;
@@ -67,11 +68,11 @@ public class WriterOutputStream extends OutputStream {
 
     private void decode() throws IOException {
         CoderResult result;
-        inputBuffer.flip();
+        ((Buffer) inputBuffer).flip(); // cast: see #4682
         do {
             result = decoder.decode(inputBuffer, outputBuffer, false);
             writer.write(outputBufferArray, 0, outputBuffer.position());
-            outputBuffer.clear();
+            ((Buffer) outputBuffer).clear(); // cast: see #4682
         } while (!result.isUnderflow());
         inputBuffer.compact();
     }

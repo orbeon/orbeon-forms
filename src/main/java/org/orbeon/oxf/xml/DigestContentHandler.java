@@ -25,6 +25,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.nio.Buffer;
 import java.security.MessageDigest;
 
 /**
@@ -88,7 +89,7 @@ public class DigestContentHandler implements XMLReceiver {
         }
 
         // Make ready for read
-        charBuff.flip();
+        ((Buffer) charBuff).flip(); // cast: see #4682
 
         final CoderResult cr = charEncoder.encode(charBuff, byteBuff, true);
         try {
@@ -96,7 +97,7 @@ public class DigestContentHandler implements XMLReceiver {
             if (cr.isError()) cr.throwException();
 
             // Make ready for read
-            byteBuff.flip();
+            ((Buffer) byteBuff).flip(); // cast: see #4682
 
             final byte[] byts = byteBuff.array();
             final int len = byteBuff.remaining();
@@ -111,8 +112,8 @@ public class DigestContentHandler implements XMLReceiver {
             throw new OXFException(e);
         } finally {
             // Make ready for write
-            charBuff.clear();
-            byteBuff.clear();
+            ((Buffer) charBuff).clear(); // cast: see #4682
+            ((Buffer) byteBuff).clear(); // cast: see #4682
         }
     }
 
@@ -146,8 +147,8 @@ public class DigestContentHandler implements XMLReceiver {
     }
 
     public void startDocument() throws SAXException {
-        charBuff.clear();
-        byteBuff.clear();
+        ((Buffer) charBuff).clear(); // cast: see #4682
+        ((Buffer) byteBuff).clear(); // cast: see #4682
         charEncoder.reset();
     }
 

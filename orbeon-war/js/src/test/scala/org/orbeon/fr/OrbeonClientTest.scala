@@ -13,14 +13,13 @@
   */
 package org.orbeon.fr
 
-import fr.hmil.roshttp.HttpRequest
-import fr.hmil.roshttp.response.SimpleHttpResponse
 import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.oxf.util.FutureUtils._
 import org.orbeon.xforms.facade.AjaxServerTrait
 import org.orbeon.xforms.{InitSupport, facade}
 import org.scalajs.dom
+import org.scalajs.dom.experimental._
 import org.scalajs.dom.raw.Window
 import org.scalatest.funspec.AsyncFunSpec
 
@@ -30,8 +29,18 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.|
 import scala.util.Try
+
+
+// 2020-10-06: Fetch API is not supported by JSDOM out of the box. We use `node-fetch` as
+// implementation.
+@js.native
+@JSImport("node-fetch", JSImport.Namespace)
+object NodeFetch extends js.Function2[RequestInfo, RequestInit, js.Promise[Response]] {
+  def apply(arg1: RequestInfo, arg2: RequestInit): js.Promise[Response] = js.native
+}
 
 class OrbeonClientTest extends AsyncFunSpec {
 
@@ -121,8 +130,29 @@ class OrbeonClientTest extends AsyncFunSpec {
   def simpleServerRequest(
     urlToLoad     : String,
     sessionCookie : Option[String] = None
-  ): Future[SimpleHttpResponse] = {
-    HttpRequest(urlToLoad).withHeaders(sessionCookie.toList map ("Cookie" -> _): _*).send() filter (_.statusCode == 200)
+  ): Future[Response] = {
+
+    val fetchPromise =
+      NodeFetch(
+        urlToLoad,
+        new RequestInit {
+          var method         : js.UndefOr[HttpMethod]         = HttpMethod.GET
+          var body           : js.UndefOr[BodyInit]           = js.undefined
+          var headers        : js.UndefOr[HeadersInit]        = sessionCookie map (c => js.defined(js.Dictionary("Cookie" -> c))) getOrElse js.undefined
+          var referrer       : js.UndefOr[String]             = js.undefined
+          var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
+          var mode           : js.UndefOr[RequestMode]        = js.undefined
+          var credentials    : js.UndefOr[RequestCredentials] = js.undefined
+          var cache          : js.UndefOr[RequestCache]       = js.undefined
+          var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
+          var integrity      : js.UndefOr[String]             = js.undefined
+          var keepalive      : js.UndefOr[Boolean]            = js.undefined
+          var signal         : js.UndefOr[AbortSignal]        = js.undefined
+          var window         : js.UndefOr[Null]               = null
+        }
+      )
+
+    fetchPromise.toFuture filter (_.status == 200)
   }
 
   def loadDocumentViaJSDOM(
@@ -164,10 +194,8 @@ class OrbeonClientTest extends AsyncFunSpec {
 
       simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res =>
 
-        // https://github.com/hmil/RosHTTP/issues/68
         val setCookieHeaders =
-          res.headers.asInstanceOf[fr.hmil.roshttp.util.HeaderMap[Any]].get("Set-Cookie").toList flatMap
-            (_.asInstanceOf[js.Array[String]].to(List))
+          res.headers.get("Set-Cookie").toList
 
         val HeaderStart = s"JSESSIONID=$serverPrefix~"
 

@@ -30,7 +30,6 @@ val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
-val RosHttpVersion                = "3.0.0"
 val ScalaLoggingVersion           = "3.9.4"
 val Log4sVersion                  = "1.8.3-SNAPSHOT"
 val ScalaCollectionCompatVersion  = "2.2.0"
@@ -902,7 +901,6 @@ lazy val orbeonWarJS = orbeonWar.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "fr.hmil"                %%% "roshttp"        % RosHttpVersion    % Test,
       "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided
     ),
 

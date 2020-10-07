@@ -1190,7 +1190,15 @@
                     <xf:var name="new-visible"             value="$global-operations = ('*', 'create') and not($singleton-limit-reached)"/>
                     <xf:var name="view-enabled"            value="count($documents-selected)  = 1 and $documents-can-view"/>
                     <xf:var name="delete-enabled"          value="count($documents-selected) != 0 and $documents-can-delete"/>
-                    <xf:var name="duplicate-enabled"       value="count($documents-selected) != 0 and $documents-can-view and $new-visible"/>
+                    <xf:var name="duplicate-enabled"       value="count($documents-selected) != 0 and
+                                                                  $documents-can-view             and
+                                                                  $new-visible                    and
+                                                                  (: None of the selected documents is auto-saved :)
+                                                                  count (
+                                                                      for $selection in xxf:split(instance('fr-selection-instance'))
+                                                                      return if (substring-before($selection, '/') = 'draft') then 1 else ()
+                                                                  ) = 0
+                                                                  "/>
 
                     <xf:var name="enabled"                 value="instance('fr-summary-triggers-instance')/enabled"/>
                     <xf:var name="disabled"                value="instance('fr-summary-triggers-instance')/disabled"/>

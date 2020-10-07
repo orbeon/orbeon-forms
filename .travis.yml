@@ -1,8 +1,8 @@
-dist: trusty
+dist: xenial
 sudo: required
 language: java
 jdk:
-- oraclejdk8
+- openjdk11
 node_js:
 - node
 env:

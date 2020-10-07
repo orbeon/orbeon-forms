@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 trait ControlXPathSupport {

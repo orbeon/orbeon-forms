@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.compat._
 import scala.collection.mutable
 

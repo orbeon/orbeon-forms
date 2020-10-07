@@ -30,7 +30,7 @@ import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object XBLTransformer {
 

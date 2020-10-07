@@ -24,7 +24,7 @@ import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.compat._
@@ -346,8 +346,6 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     val servletReqHeaders =
       findServletRequest(request).toList flatMap APISupport.requestHeaders
-
-    import collection.JavaConverters._
 
     def portletRequestHeadersIt =
       for {

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.xinclude
 
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.saxon.om.Item
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ControlBindingSupport {
 

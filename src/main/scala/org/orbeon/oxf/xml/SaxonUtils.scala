@@ -29,7 +29,7 @@ import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.scaxon.Implicits
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 object SaxonUtils {

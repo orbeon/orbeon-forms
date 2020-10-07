@@ -74,7 +74,7 @@ object DndRepeat {
                     jSibling.is(IsDndItemSelector)                || // regular case
                     jSibling.next().is(IsRepeatDelimiterSelector)    // at the end of the repeat when there is an empty `<span>` (unclear, see Actions Editor)
                   )                              &&
-                  ! dragState.exists(_.excludedTargets.exists(_ eq sibling))
+                  (! dragState.exists(_.excludedTargets.exists(_ eq sibling)))
               }
             }
           )

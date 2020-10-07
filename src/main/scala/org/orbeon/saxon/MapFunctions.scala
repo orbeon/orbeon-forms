@@ -87,7 +87,7 @@ class MapGet extends MapFunction {
 
     implicit val ctx = context
 
-    val map = itemsArgumentOpt(0).iterator flatMap collectMapValues next()
+    val map = itemsArgumentOpt(0).iterator.flatMap(collectMapValues).next()
     val key = SaxonUtils.fixStringValue(itemArgument(1).asInstanceOf[AtomicValue]) // enforced by signature
 
     map.getOrElse(key, EmptySequence.getInstance) match {

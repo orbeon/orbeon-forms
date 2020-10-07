@@ -40,7 +40,7 @@ class XXFormsResource extends XFormsFunction {
 
     val resourceKeyArgument = stringArgument(0)
     val instanceArgumentOpt = stringArgumentOpt(1)
-    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it.iterator).next())
+    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
 
     def findInstance = instanceArgumentOpt match {
       case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)

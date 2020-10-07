@@ -26,7 +26,7 @@ import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * xf:input control

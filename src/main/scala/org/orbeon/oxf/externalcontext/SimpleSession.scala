@@ -5,7 +5,7 @@ import java.{util => ju}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Session, SessionListener, SessionScope}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{immutable => i}
 
 class SimpleSession(sessionId: String) extends Session {

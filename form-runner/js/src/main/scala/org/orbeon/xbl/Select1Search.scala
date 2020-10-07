@@ -139,7 +139,7 @@ private class Select1SearchCompanion extends XBLCompanion {
     var mutationObservers: List[MutationObserver] = Nil
 
     // TODO: not specific to the autocomplete, should be moved to a utility class
-    def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
+    def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
       val observer = new MutationObserver((_, _) => listener())
       mutationObservers = observer :: mutationObservers
 

@@ -50,7 +50,7 @@ import java.net.URI
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 /**

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import java.util.{List => JList, Map => JMap}
 
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}

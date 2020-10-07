@@ -15,7 +15,7 @@ package org.orbeon.oxf.cache
 
 import org.junit.Test
 import java.util.concurrent.locks.{ReentrantLock, Lock}
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import concurrent.{Await, Future}
 import concurrent.duration._
 import concurrent.ExecutionContext.Implicits.global

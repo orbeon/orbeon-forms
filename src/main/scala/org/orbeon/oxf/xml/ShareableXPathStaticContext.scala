@@ -14,7 +14,7 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{QNameValue, SequenceType}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.

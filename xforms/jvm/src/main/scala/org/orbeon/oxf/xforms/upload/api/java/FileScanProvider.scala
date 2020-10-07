@@ -18,7 +18,7 @@ import _root_.java.{util => ju}
 import org.orbeon.oxf.xforms.upload.api
 import org.orbeon.oxf.xforms.upload.api.java
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.util.Try
 import scala.collection.compat._

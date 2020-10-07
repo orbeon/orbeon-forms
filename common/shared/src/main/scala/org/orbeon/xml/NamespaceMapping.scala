@@ -15,7 +15,7 @@ package org.orbeon.xml
 
 import java.{util => ju}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
   require((hash ne null) && (mapping ne null))

@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs}
 import org.orbeon.saxon.om.NodeInfo
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
 
 trait PartControlsAnalysis extends TransientState {

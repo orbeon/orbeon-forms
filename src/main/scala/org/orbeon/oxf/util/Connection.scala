@@ -38,7 +38,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.compat._
 import scala.util.control.NonFatal
 
@@ -206,7 +206,7 @@ object Connection extends ConnectionTrait {
     buildConnectionHeadersCapitalizedIfNeeded(
       url                      = url,
       hasCredentials           = hasCredentials,
-      customHeaders            = Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
+      customHeaders            = (Option(customHeadersOrNull) map (_.asScala.iterator map { case (k, v) => k -> v.toList } toMap)) getOrElse EmptyHeaders,
       headersToForward         = valueAs[Set](headersToForward),
       cookiesToForward         = cookiesToForwardFromProperty,
       getHeader                = getHeader)(

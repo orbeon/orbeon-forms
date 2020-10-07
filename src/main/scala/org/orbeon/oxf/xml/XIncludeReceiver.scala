@@ -27,7 +27,7 @@ import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 // Streaming XInclude processing

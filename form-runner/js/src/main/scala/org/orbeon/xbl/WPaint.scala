@@ -62,8 +62,8 @@ object WPaint {
             }
         } else {
             wpaintElA.removeClass("xforms-hidden")
-            wpaintElA.css("width" , imageEl.width()  + "px")
-            wpaintElB.css("padding-top", (imageEl.height() / imageEl.width() * 100) + "%")
+            wpaintElA.css("width" , imageEl.width().toString + "px")
+            wpaintElB.css("padding-top", (imageEl.height() / imageEl.width() * 100).toString + "%")
             // tabindex="-1" allows div to have the focus, used to send change on blur
             wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
             wpaintElB.append(wpaintElC)
@@ -86,8 +86,8 @@ object WPaint {
       // Test canvas support, see http://stackoverflow.com/a/2746983/5295
       private def canvasSupported: Boolean = {
         val testCanvas = document.createElement("canvas").asInstanceOf[Dynamic]
-        ! js.isUndefined(testCanvas.getContext) &&
-        ! js.isUndefined(testCanvas.getContext("2d"))
+        (! js.isUndefined(testCanvas.getContext)) &&
+          (! js.isUndefined(testCanvas.getContext("2d")))
       }
 
       // Send the image data from wPaint to the server, which will put it in <annotation>

@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
 
 // Represent the XPath binding of an XForms object (control, action, etc.)

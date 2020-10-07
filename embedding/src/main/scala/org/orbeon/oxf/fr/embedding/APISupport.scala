@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, PathUtils}
 import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable
 import scala.util.matching.Regex
 

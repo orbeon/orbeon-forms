@@ -24,7 +24,7 @@ import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathVaria
 import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.util.control.NonFatal
 import scala.collection.compat._

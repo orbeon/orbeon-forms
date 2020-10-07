@@ -25,7 +25,7 @@ import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class FormRunnerFunctionsTest
   extends DocumentTestBase

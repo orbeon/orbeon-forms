@@ -43,10 +43,8 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
-import java.io.File
-import java.net.URI
 import java.{util => ju}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase

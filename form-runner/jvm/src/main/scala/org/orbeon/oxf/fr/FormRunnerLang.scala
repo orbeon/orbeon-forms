@@ -25,7 +25,7 @@ import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {

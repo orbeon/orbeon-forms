@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import java.util.{Collections => JCollections}
 import ControlLocalSupport._
 import org.orbeon.oxf.xforms.state.ControlState
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ControlLocalSupport {
 

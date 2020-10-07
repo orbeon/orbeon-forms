@@ -24,7 +24,7 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * XForms property() function.

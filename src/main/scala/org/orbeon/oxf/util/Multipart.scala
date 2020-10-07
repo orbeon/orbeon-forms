@@ -32,7 +32,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import shapeless.syntax.typeable._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
 import scala.util.control.NonFatal
 

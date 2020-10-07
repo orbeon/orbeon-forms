@@ -36,7 +36,7 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
 
 /**

@@ -19,7 +19,7 @@ import org.orbeon.oxf.http.Headers._
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 class AuthorizerTest extends AnyFunSpecLike with MockitoSugar {

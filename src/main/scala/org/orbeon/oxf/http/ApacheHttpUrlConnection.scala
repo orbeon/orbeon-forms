@@ -20,7 +20,7 @@ import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 // Expose `ApacheHttpClient` as `HttpURLConnection`
@@ -91,7 +91,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
     withConnection(_.headers.get(Headers.capitalizeCommonOrSplitHeader(name)) flatMap (_.lastOption) orNull)
 
   override def getHeaderFields =
-    withConnection(_.headers mapValues (_.asJava) asJava)
+    withConnection(_.headers.mapValues(_.asJava).toMap.asJava)
 
   override def getResponseCode =
     withConnection(_.statusCode)

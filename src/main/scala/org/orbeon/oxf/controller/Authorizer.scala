@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 object Authorizer extends Logging {
@@ -154,7 +154,7 @@ object Authorizer extends Logging {
             url             = newURL,
             credentials     = None,
             content         = content,
-            headers         = allHeaders,
+            headers         = allHeaders.toMap,
             loadState       = true,
             saveState       = true,
             logBody         = false)(

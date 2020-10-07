@@ -9,7 +9,7 @@ import nl.captcha.backgrounds.GradiatedBackgroundProducer
 import nl.captcha.text.renderer.ColoredEdgesWordRenderer
 import org.orbeon.oxf.util.Base64
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object SimpleCaptcha {
 

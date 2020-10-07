@@ -17,7 +17,7 @@ import java.{lang => jl, util => ju}
 import javax.portlet.PortletRequest
 import javax.servlet.http.HttpServletRequest
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Success, Try}
 import scala.collection.compat._
 

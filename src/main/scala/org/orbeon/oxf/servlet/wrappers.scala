@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Request wrapper for forwarding a request which simulates a server-side redirect.
 class ForwardServletRequestWrapper(

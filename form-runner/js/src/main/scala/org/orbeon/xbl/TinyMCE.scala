@@ -106,7 +106,7 @@ object TinyMCE {
       }
 
       // TinyMCE got the focus
-      private def onFocus(event: js.Dynamic) {
+      private def onFocus(event: js.Dynamic): Unit = {
         // From the perspective of the XForms engine, the focus is on the XBL component
         event.target = containerElem
         // Forward to the "XForms engine"
@@ -124,7 +124,7 @@ object TinyMCE {
       def serverToClient(): Unit = {
         val doUpdate =
           tinymceInitialized &&              // Don't update value until TinyMCE is fully initialized
-          ! hasFocus()                       // Heuristic: if TinyMCE has focus, users might still be editing so don't update
+            (! hasFocus())                   // Heuristic: if TinyMCE has focus, users might still be editing so don't update
         if (doUpdate) {
           val newServerValue = DocumentAPI.getValue(serverValueOutputId).get
           myEditor.setContent(newServerValue)

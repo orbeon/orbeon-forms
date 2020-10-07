@@ -22,8 +22,8 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.tinytree.TinyTree
 
-import scala.collection.JavaConverters._
-import scala.collection._
+import scala.jdk.CollectionConverters._
+
 
 // The idea of this is to provide simple path navigation operations on Saxon nodes, without creating
 // full XPath expressions, as those need to be compiled, cached, and run, and can be very complex.

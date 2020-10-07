@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}
 import sbinary.Operations._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Immutable representation of the dynamic state
 case class DynamicState(

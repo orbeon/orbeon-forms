@@ -25,7 +25,7 @@ import org.orbeon.saxon.value._
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.{dom => odom}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.compat._
 
 // These are older XPath utilities used by XPL. Don't expand on this as it's kept mostly for legacy purposes.

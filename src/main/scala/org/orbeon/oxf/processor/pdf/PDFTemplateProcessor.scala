@@ -42,7 +42,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**
@@ -159,7 +159,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     "image"   -> handleImage
   )
 
-  def handleElements(context: ElementContext, statements: Seq[Element]): Unit =
+  def handleElements(context: ElementContext, statements: Iterable[Element]): Unit =
     // Iterate through statements
     for (element <- statements) {
 
@@ -423,7 +423,7 @@ object PDFTemplateProcessor {
     pageNumber      : Int,
     variables       : Map[String, ValueRepresentation],
     element         : Element,
-    contextSeq      : Seq[Item],
+    contextSeq      : scala.collection.Seq[Item],
     contextPosition : Int,
     offsetX         : Float,
     offsetY         : Float,
@@ -460,7 +460,7 @@ object PDFTemplateProcessor {
         null
       ).asInstanceOf[NodeInfo]
 
-    def evaluate(xpath: String): Seq[Item] =
+    def evaluate(xpath: String): scala.collection.Seq[Item] =
       XPathCache.evaluate(
         contextSeq.asJava,
         contextPosition,

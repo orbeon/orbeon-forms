@@ -23,7 +23,7 @@ import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet

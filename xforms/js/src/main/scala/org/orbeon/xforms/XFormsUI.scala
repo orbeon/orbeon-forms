@@ -48,7 +48,7 @@ object XFormsUI {
         }
 
       val timerIdOpt =
-        if (Utils.isIOS && Utils.getZoomLevel() != 1.0) {
+        if (Utils.isIOS() && Utils.getZoomLevel() != 1.0) {
           Utils.resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {

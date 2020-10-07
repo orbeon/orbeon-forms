@@ -28,7 +28,7 @@ object CollectionUtils {
   // The caller can specify the type of the resulting values, e.g.:
   // - combineValues[String, AnyRef, Array]
   // - combineValues[String, String, List]
-  def combineValues[Key, U, T[_]](parameters: Seq[(Key, U)])(implicit cbf: Factory[U, T[U]]): Seq[(Key, T[U])] = {
+  def combineValues[Key, U, T[_]](parameters: Iterable[(Key, U)])(implicit cbf: Factory[U, T[U]]): List[(Key, T[U])] = {
     val result = mutable.LinkedHashMap[Key, mutable.Builder[U, T[U]]]()
 
     for ((name, value) <- parameters)

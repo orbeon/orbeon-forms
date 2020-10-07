@@ -17,7 +17,7 @@ import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class WSRP2UtilsTest extends AnyFunSpec {
 

@@ -44,7 +44,7 @@ class ArraySize extends ArrayFunction {
 
     implicit val ctx = context
 
-    (itemsArgumentOpt(0).iterator flatMap collectArrayValues next()).size
+    itemsArgumentOpt(0).iterator.flatMap(collectArrayValues).next().size
   }
 }
 
@@ -59,7 +59,7 @@ class ArrayGet extends ArrayFunction {
 
     implicit val ctx = context
 
-    val vector = itemsArgumentOpt(0).iterator flatMap collectArrayValues next()
+    val vector = itemsArgumentOpt(0).iterator.flatMap(collectArrayValues).next()
     val index  = longArgumentOpt(1).get.toInt // unlikely, but will lose precision if out of `Int` range
 
     vector(index - 1) match {
@@ -81,7 +81,7 @@ class ArrayPut extends ArrayFunction {
 
     implicit val ctx = context
 
-    val vector = itemsArgumentOpt(0).iterator flatMap collectArrayValues next()
+    val vector = itemsArgumentOpt(0).iterator.flatMap(collectArrayValues).next()
     val index  = longArgumentOpt(1).get.toInt // unlikely, but will lose precision if out of `Int` range
     val value = itemsArgument(2)
 
@@ -103,7 +103,7 @@ class ArrayAppend extends ArrayFunction {
 
     implicit val ctx = context
 
-    val vector = itemsArgumentOpt(0).iterator flatMap collectArrayValues next()
+    val vector = itemsArgumentOpt(0).iterator.flatMap(collectArrayValues).next()
     val value = itemsArgument(1)
 
     createValue(

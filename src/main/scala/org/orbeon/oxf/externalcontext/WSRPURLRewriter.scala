@@ -145,7 +145,7 @@ object WSRPURLRewriter {
 
   val BaseTag                       = "wsrp_rewrite"
   val StartTag                      = BaseTag + '?'
-  val EndTag                        = '/' + BaseTag
+  val EndTag                        = "/" + BaseTag
   val PrefixTag                     = BaseTag + '_'
 
   val URLTypeParam                  = "wsrp-urlType"

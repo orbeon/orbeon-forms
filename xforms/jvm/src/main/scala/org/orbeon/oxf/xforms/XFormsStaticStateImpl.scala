@@ -43,7 +43,7 @@ import org.orbeon.xforms.{Namespaces, XXBLScope}
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.Try
 

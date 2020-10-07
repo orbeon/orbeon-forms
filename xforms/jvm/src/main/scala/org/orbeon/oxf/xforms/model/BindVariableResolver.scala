@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Implement bind variable resolution, taking an optional context bind node as starting point
 object BindVariableResolver {

@@ -26,7 +26,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.xforms.XFormsNames
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class XFormsAnnotatorTest
   extends DocumentTestBase

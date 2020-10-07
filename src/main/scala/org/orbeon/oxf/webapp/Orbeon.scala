@@ -22,7 +22,7 @@ import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerIm
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 // Orbeon web app initialization

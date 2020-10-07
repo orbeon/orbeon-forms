@@ -23,7 +23,7 @@ import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 

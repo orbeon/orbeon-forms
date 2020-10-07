@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /*
  * Portlet-specific implementation of ExternalContext.

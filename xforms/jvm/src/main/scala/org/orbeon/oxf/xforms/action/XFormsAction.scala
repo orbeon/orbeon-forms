@@ -25,7 +25,7 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 abstract class XFormsAction extends Logging {
 

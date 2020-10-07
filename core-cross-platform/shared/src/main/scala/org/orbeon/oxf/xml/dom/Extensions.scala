@@ -88,7 +88,7 @@ object Extensions {
       e.createCopy.copyMissingNamespacesByPrefix(e.parentElemOpt)
 
     def getNamespaceContextNoDefault: Map[String, String] =
-      e.allInScopeNamespacesAsStrings.filterKeys(_ != "")
+      e.allInScopeNamespacesAsStrings.filter(_._1.nonEmpty)
 
     /**
     * Visit the `Element`'s descendants.

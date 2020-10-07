@@ -17,8 +17,10 @@ import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms._
 import org.scalajs.dom.html
 
+import scala.collection.compat._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
+import scala.jdk.CollectionConverters._
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
@@ -44,7 +46,7 @@ object FormRunnerAPI extends js.Object {
     formElem    : js.UndefOr[html.Form] = js.undefined
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
-
+  
   val wizard: FormRunnerWizardAPI.type = FormRunnerWizardAPI
 }
 

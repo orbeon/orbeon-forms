@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // For backward compatibility
 class OrbeonServletDelegate extends OrbeonServlet

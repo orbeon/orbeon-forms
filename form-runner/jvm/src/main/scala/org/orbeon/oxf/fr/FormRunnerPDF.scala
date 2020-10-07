@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait FormRunnerPDF {
 

@@ -55,5 +55,5 @@ object NodeConversions {
   import org.orbeon.scaxon.SimplePath._
 
   implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToNodeInfoSeq(e).head
-  implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) / *
+  implicit def elemToNodeInfoSeq(e: Elem): scala.collection.Seq[NodeInfo] = elemToDocumentInfo(e) / *
 }

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.saxon.om._
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_INSERT, target, properties, bubbles = true, cancelable = false)

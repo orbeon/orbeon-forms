@@ -37,7 +37,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * This processor allows sending emails. It supports multipart messages and inline as well as out-of-line attachments.

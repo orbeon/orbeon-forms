@@ -54,7 +54,7 @@ class FormRunnerAuthFilter extends Filter {
 
 object FormRunnerAuthFilter {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   // TODO: FIXME: This is a ScalaLogging logger! Use log4s or slf4j
   private val logger = Logger("org.orbeon.filter.form-runner-auth")

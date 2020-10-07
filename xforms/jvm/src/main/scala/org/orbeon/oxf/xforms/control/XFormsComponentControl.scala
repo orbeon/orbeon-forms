@@ -36,7 +36,7 @@ import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // A component control with native support for a value
 class XFormsValueComponentControl(

@@ -20,7 +20,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.fr.embedding.APISupport._
 import org.orbeon.oxf.fr.embedding.FormRunnerMode
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable.Seq
 import scala.collection.compat._
 

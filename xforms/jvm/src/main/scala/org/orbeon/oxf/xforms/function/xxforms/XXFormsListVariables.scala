@@ -19,7 +19,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class XXFormsListVariables extends XFormsFunction {
 

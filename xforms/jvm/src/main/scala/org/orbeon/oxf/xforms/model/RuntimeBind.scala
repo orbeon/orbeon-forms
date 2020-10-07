@@ -19,7 +19,7 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
 
 class RuntimeBind(

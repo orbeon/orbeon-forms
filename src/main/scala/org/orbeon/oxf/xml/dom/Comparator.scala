@@ -60,12 +60,12 @@ object Comparator {
   }
 
   // Only keep the nodes we care about
-  private def filterOut(l: Seq[Node]) = l collect {
-    case n@(_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
+  private def filterOut(l: scala.collection.Seq[Node]) = l collect {
+    case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) => n
     case t: Text if t.getText.nonAllBlank => t
   }
 
-  private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String => String) =
+  private def compareTwoNodeSeqs(left: collection.Seq[Node], right: collection.Seq[Node])(normalizeText: String => String) =
     left.lengthCompare(right.size) == 0 && (left.zip(right) forall { case (n1, n2) => compareTwoNodes(n1, n2)(normalizeText) })
 
   private def compareTwoNodes(left: Node, right: Node)(normalizeText: String => String): Boolean =

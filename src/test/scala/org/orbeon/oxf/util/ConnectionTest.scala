@@ -26,7 +26,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 class ConnectionTest

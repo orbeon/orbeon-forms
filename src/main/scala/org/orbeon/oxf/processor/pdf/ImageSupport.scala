@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ImageMetadata
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object ImageSupport {
 

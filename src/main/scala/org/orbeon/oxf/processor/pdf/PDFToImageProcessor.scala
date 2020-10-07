@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.XMLReceiver
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // This processor converts a PDF, provided as a binary document on its `data` input, into an image (possibly a
 // multi-page TIFF image) on its `data` output. It is configurable via its `config` input.

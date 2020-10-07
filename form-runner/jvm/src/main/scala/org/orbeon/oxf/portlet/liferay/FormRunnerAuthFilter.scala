@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.{PortletSessionImpl, RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.CollectionUtils
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.compat._
 
 class AddOrbeonAuthHeadersFilter

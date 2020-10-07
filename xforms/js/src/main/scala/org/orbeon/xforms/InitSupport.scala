@@ -320,7 +320,7 @@ object InitSupport {
     def pageContainsFormsMarkupF: Future[Unit] =
       pageContainsFormsMarkupPromise.future
 
-    def allFormElems: Seq[html.Form] =
+    def allFormElems: Iterable[html.Form] =
       dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
 
     def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =

@@ -35,7 +35,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(

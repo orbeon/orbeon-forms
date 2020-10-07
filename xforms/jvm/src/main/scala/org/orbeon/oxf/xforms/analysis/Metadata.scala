@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 
 /**

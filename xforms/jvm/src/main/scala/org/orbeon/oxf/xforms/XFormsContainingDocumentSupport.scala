@@ -53,7 +53,7 @@ import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}

@@ -28,7 +28,7 @@ import org.orbeon.xforms.CrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**

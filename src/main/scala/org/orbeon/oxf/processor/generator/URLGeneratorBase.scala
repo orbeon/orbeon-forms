@@ -19,7 +19,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
 import org.orbeon.oxf.xml.dom.Comparator
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.compat._
 
 object URLGeneratorBase {

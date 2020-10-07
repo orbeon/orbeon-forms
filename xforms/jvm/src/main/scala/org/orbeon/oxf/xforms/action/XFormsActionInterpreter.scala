@@ -37,7 +37,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.{Breaks, NonFatal}
 
 // Execute a top-level XForms action and the included nested actions if any.

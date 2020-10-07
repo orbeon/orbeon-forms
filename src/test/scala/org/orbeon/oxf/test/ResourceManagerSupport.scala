@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, PipelineUtils}
 import org.orbeon.oxf.xml.XMLParsing
 import org.scalatest.{BeforeAndAfter, Suite}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 trait ResourceManagerSupport extends Suite with BeforeAndAfter {

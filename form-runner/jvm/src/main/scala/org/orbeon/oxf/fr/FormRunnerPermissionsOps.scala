@@ -27,7 +27,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait FormRunnerPermissionsOps {
 

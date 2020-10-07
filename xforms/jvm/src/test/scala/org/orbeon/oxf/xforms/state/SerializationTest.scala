@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 

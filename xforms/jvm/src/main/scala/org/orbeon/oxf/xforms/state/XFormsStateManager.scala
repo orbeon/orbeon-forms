@@ -27,8 +27,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
 import org.orbeon.xforms.CrossPlatformSupport
 
-import scala.collection.JavaConverters._
-import scala.util.{Failure, Success, Try}
+import scala.jdk.CollectionConverters._
 
 object XFormsStateManager extends XFormsStateLifecycle {
 

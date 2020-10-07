@@ -25,7 +25,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class ServletEmbeddingContext(
   val namespace  : String,

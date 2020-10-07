@@ -33,7 +33,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.time._
 import org.scalatestplus.selenium.WebBrowser
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser with Matchers {

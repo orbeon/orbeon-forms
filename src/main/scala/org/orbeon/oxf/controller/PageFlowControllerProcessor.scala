@@ -39,7 +39,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xml.dom.Extensions._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 // Orbeon Forms application controller
@@ -293,7 +293,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
           Nil
       }
 
-    val explicitRoutes: Seq[RouteElement] =
+    val explicitRoutes: Iterable[RouteElement] =
       for (e <- topLevelElements filter (e => Set("files", "page", "service")(e.getName)))
         yield e.getName match {
           case "files" =>

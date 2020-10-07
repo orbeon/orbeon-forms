@@ -23,7 +23,7 @@ import com.drew.metadata.png.PngDirectory
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 // Functions to extract image metadata from a stream

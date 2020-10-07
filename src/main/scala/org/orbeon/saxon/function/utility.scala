@@ -57,7 +57,7 @@ class ProcessTemplate extends DefaultFunctionSupport {
 
     val templateArgument  = stringArgument(0)
     val langArgument      = stringArgument(1)
-    val templateParamsOpt = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it.iterator).next())
+    val templateParamsOpt = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
@@ -65,7 +65,7 @@ class ProcessTemplate extends DefaultFunctionSupport {
 
           val javaNamedParamsIt = params.iterator map {
             case (key, value) =>
-              val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
+              val javaParamOpt = asScalaIterator(Value.asIterator(value)).map(Value.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull
           }
 

@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet
 
 import javax.portlet.filter.PortletRequestWrapper
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait RequestPrependHeaders extends PortletRequestWrapper {
 

@@ -41,7 +41,7 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 
 import java.net.URI
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal

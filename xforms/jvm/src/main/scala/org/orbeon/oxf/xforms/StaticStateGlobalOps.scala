@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{immutable => i}
 
 // Global operations on parts including top-level part and descendant parts

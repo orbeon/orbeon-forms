@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml
 
 import java.{util => ju}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // Better implementation of SAX NamespaceSupport/NamespaceSupport2
 //

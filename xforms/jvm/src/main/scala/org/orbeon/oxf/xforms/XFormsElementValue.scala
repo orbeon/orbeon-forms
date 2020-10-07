@@ -30,7 +30,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 object XFormsElementValue {

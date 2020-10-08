@@ -368,7 +368,7 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
+    collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true).map(_.holder).asJava
 
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
@@ -381,7 +381,7 @@ trait FormRunnerPersistence {
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
-          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false)._1
+          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false).map(_.holder)
         case _ =>
           Nil
       }
@@ -405,14 +405,20 @@ trait FormRunnerPersistence {
     filenames flatMap (_.trimAllToOpt) asJava
   }
 
+  case class AttachmentWithHolder(
+    fromPath          : String,
+    toPath            : String,
+    holder            : NodeInfo
+  )
+
   def collectAttachments(
     data             : DocumentInfo,
     fromBasePath     : String,
     toBasePath       : String,
     forceAttachments : Boolean
-  ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
+  ): List[AttachmentWithHolder] = {
     for {
-      holder        <- data descendant Node
+      holder        <- data.descendant(Node).toList
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
@@ -433,9 +439,9 @@ trait FormRunnerPersistence {
       val afterURL =
         toBasePath + filename
 
-      (holder, beforeURL, afterURL)
+      AttachmentWithHolder(beforeURL, afterURL, holder)
     }
-  ).unzip3
+  }
 
   def putWithAttachments(
     data              : DocumentInfo,
@@ -455,18 +461,14 @@ trait FormRunnerPersistence {
     val migratedData = migrate(data)
 
     // Find all instance nodes containing file URLs we need to upload
-    val attachments     = collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
-    val migratedHolders = attachments._1.toList
-    val beforeURLs      = attachments._2.toList
-    val afterURLs       = attachments._3.toList
+    val attachmentsWithHolder  = collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
 
     def updateHolder(holder: NodeInfo, afterURL: String): Unit =
       setvalue(holder, afterURL)
 
     def saveAllAttachments(): Unit = {
 
-      val holdersURLs = migratedHolders.zip(beforeURLs.zip(afterURLs))
-      holdersURLs foreach { case (migratedHolder, (beforeURL, afterURL)) =>
+      attachmentsWithHolder.foreach { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
         // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
         val holderCopy   = TransformerUtils.extractAsMutableDocument(migratedHolder).rootElement
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
@@ -477,8 +479,7 @@ trait FormRunnerPersistence {
           "username"       -> username,
           "password"       -> password,
           "form-version"   -> formVersion)
-        ) map { doneEvent =>
-
+        ).foreach { _ =>
           updateHolder(migratedHolder, afterURL)
         }
       }
@@ -517,8 +518,9 @@ trait FormRunnerPersistence {
     // - https://github.com/orbeon/orbeon-forms/issues/606
     // - https://github.com/orbeon/orbeon-forms/issues/3084
     // - https://github.com/orbeon/orbeon-forms/issues/3301
-    beforeURLs.zip(afterURLs).foreach {
-      case (beforeURL, afterURL) =>
+
+    attachmentsWithHolder.foreach {
+      case AttachmentWithHolder(beforeURL, afterURL, _) =>
         val holder = {
           scaxon.XPath.evalOne(
             item       = data,
@@ -530,7 +532,11 @@ trait FormRunnerPersistence {
         updateHolder(holder, afterURL)
     }
 
-    (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
+    (
+      attachmentsWithHolder.map(_.fromPath),
+      attachmentsWithHolder.map(_.toPath),
+      versionOpt map (_.toInt) getOrElse 1
+    )
   }
 
   def userOwnsLeaseOrNoneRequired: Boolean =

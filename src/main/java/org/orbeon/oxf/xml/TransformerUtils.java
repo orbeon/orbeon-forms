@@ -492,15 +492,6 @@ public class TransformerUtils {
         }
     }
 
-    /**
-     * Intended to be used in IntelliJ Data Views, so we can more easily view the value of `NodeInfo` while debugging.
-     */
-    public static String tinyTreeToPrettyString(NodeInfo nodeInfo) {
-        final Document document = tinyTreeToDom4j(nodeInfo);
-        final NodeOps nodeOps = new NodeOps(document);
-        return nodeOps.serializeToString(XMLWriter.PrettyFormat());
-    }
-
     public static DocumentWrapper extractAsMutableDocument(NodeInfo elementOrDocument) {
         return new DocumentWrapper(tinyTreeToDom4j(elementOrDocument), null, XPath.GlobalConfiguration());
     }

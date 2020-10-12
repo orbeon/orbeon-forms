@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.xerces;
 
-import orbeon.apache.xerces.parsers.XIncludeAwareParserConfiguration;
+import org.orbeon.apache.xerces.parsers.XIncludeAwareParserConfiguration;
 import org.orbeon.oxf.xml.XMLParsing;
 
 import java.util.Map;
@@ -34,7 +34,7 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
         // Set XInclude feature
         if (parserConfiguration.handleXInclude) {
             super.setFeature(XINCLUDE_FEATURE, true);
-            fXIncludeHandler = new orbeon.apache.xerces.xinclude.XIncludeHandler();
+            fXIncludeHandler = new org.orbeon.apache.xerces.xinclude.XIncludeHandler();
             setProperty(XINCLUDE_HANDLER, fXIncludeHandler);
             addCommonComponent(fXIncludeHandler);
         } else {

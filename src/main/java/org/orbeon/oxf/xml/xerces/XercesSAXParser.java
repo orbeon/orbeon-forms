@@ -3,8 +3,8 @@ package org.orbeon.oxf.xml.xerces;
 import org.orbeon.oxf.xml.XMLParsing;
 
 /*
-* An improvement over orbeon.apache.xerces.parsers.SAXParser.  Every time
-* orbeon.apache.xerces.parsers.SAXParser is constructed it looks in
+* An improvement over org.orbeon.apache.xerces.parsers.SAXParser.  Every time
+* org.orbeon.apache.xerces.parsers.SAXParser is constructed it looks in
 * META-INF/services/orbeon.apache.xerces.xni.parser.XMLParserConfiguration to figure out what
 * config to use.  Pbms with this are
 *
@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.XMLParsing;
 *   which OPS creates SAX parsers this accumulates quickly and consequently we start losing processor time to the
 *   garbage collector.
 */
-class XercesSAXParser extends orbeon.apache.xerces.parsers.SAXParser {
+class XercesSAXParser extends org.orbeon.apache.xerces.parsers.SAXParser {
 
     static final String[] RECOGNIZED_FEATURES = { NOTIFY_BUILTIN_REFS };
     static final String[] RECOGNIZED_PROPERTIES = { SYMBOL_TABLE, XMLGRAMMAR_POOL };

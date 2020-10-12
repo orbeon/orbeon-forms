@@ -61,7 +61,7 @@ public class FileSerializer extends ProcessorImpl {
     static {
         try {
             // Create factory
-            DocumentBuilderFactory documentBuilderFactory = (DocumentBuilderFactory) Class.forName("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
+            DocumentBuilderFactory documentBuilderFactory = (DocumentBuilderFactory) Class.forName("org.orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
             // Configure factory
             documentBuilderFactory.setNamespaceAware(true);
         }

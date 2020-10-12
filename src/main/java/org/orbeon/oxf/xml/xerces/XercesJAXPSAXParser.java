@@ -3,7 +3,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000-2005 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2005 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -19,7 +19,7 @@
  *    distribution.
  *
  * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
+ *    if any, must include the following acknowledgment:
  *       "This product includes software developed by the
  *        Apache Software Foundation (http://www.apache.org/)."
  *    Alternately, this acknowledgment may appear in the software itself,
@@ -27,7 +27,7 @@
  *
  * 4. The names "Xerces" and "Apache Software Foundation" must
  *    not be used to endorse or promote products derived from this
- *    software without prior written permission. For written 
+ *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
  * 5. Products derived from this software may not be called "Apache",
@@ -50,16 +50,16 @@
  *
  * This software consists of voluntary contributions made by many
  * individuals on behalf of the Apache Software Foundation and was
- * originally based on software copyright (c) 1999, Sun Microsystems, Inc., 
- * http://www.sun.com.  For more information on the Apache Software 
+ * originally based on software copyright (c) 1999, Sun Microsystems, Inc.,
+ * http://www.sun.com.  For more information on the Apache Software
  * Foundation, please see <http://www.apache.org/>.
  */
 
 package org.orbeon.oxf.xml.xerces;
 
-import orbeon.apache.xerces.impl.Constants;
-import orbeon.apache.xerces.jaxp.JAXPConstants;
-import orbeon.apache.xerces.util.SAXMessageFormatter;
+import org.orbeon.apache.xerces.impl.Constants;
+import org.orbeon.apache.xerces.jaxp.JAXPConstants;
+import org.orbeon.apache.xerces.util.SAXMessageFormatter;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
@@ -68,7 +68,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.util.Map;
 
 /**
- * The only real difference between this class and orbeon.apache.xerces.jaxp.SAXParserImpl is that this class
+ * The only real difference between this class and org.orbeon.apache.xerces.jaxp.SAXParserImpl is that this class
  * constructs an instance of org.orbeon.oxf.xml.XercesSAXParser instead of org.apache.xerces.parsers.SAXParser. For why
  * this is an improvement see XercesSAXParser.
  *
@@ -205,9 +205,9 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser {
      */
     public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
         if (JAXPConstants.JAXP_SCHEMA_LANGUAGE.equals(name)) {
-            // JAXP 1.2 support            
+            // JAXP 1.2 support
             if (JAXPConstants.W3C_XML_SCHEMA.equals(value)) {
-                //None of the properties will take effect till the setValidating(true) has been called                                                        
+                //None of the properties will take effect till the setValidating(true) has been called
                 if (isValidating()) {
                     schemaLanguage = JAXPConstants.W3C_XML_SCHEMA;
                     xmlReader.setFeature(Constants.XERCES_FEATURE_PREFIX +

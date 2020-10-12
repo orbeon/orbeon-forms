@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xerces.impl.Constants;
-import orbeon.apache.xerces.impl.XMLEntityManager;
-import orbeon.apache.xerces.impl.XMLErrorReporter;
-import orbeon.apache.xerces.xni.parser.XMLInputSource;
+import org.orbeon.apache.xerces.impl.Constants;
+import org.orbeon.apache.xerces.impl.XMLEntityManager;
+import org.orbeon.apache.xerces.impl.XMLErrorReporter;
+import org.orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -90,7 +90,7 @@ public class XMLParsing {
         try {
             // Create factory
             documentBuilderFactory = (DocumentBuilderFactory) Class.forName
-                    ("orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
+                    ("org.orbeon.apache.xerces.jaxp.DocumentBuilderFactoryImpl").newInstance();
 
             // Configure factory
             documentBuilderFactory.setNamespaceAware(true);

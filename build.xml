@@ -134,7 +134,7 @@
                 <!-- Don't expose any services -->
                 <exclude name="META-INF/**"/>
             </zipfileset>
-            <rule pattern="org.apache.**" result="orbeon.apache.@1"/>
+            <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
         </jarjar>
         <!-- MSV fat JAR -->
         <jarjar jarfile="lib/msv-20081113-orbeon.jar">

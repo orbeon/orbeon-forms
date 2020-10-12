@@ -156,8 +156,16 @@ trait NumberSupport[Binding] {
     def fractionDigitsFromValidationOrProp(binding: Binding)(implicit params: NumberConfig): Option[Int] =
       validationFractionDigitsOpt(binding) orElse propertyFractionDigitsOpt(binding)
 
-    def formatNumber(decimal: Long Either scala.BigDecimal, pictureString: String): String =
-      new DecimalFormat(pictureString, DefaultDecimalFormatSymbols).format(decimal.fold(identity, identity))
+    def formatNumber(decimal: Long Either scala.BigDecimal, pictureString: String): String = {
+      val decimalFormat = new DecimalFormat(pictureString, DefaultDecimalFormatSymbols)
+      decimal match {
+        case Left(decimalLong)        =>
+          decimalFormat.format(decimalLong)
+        case Right(decimalBigDecimal) =>
+          // Pass a `java.math.BigDecimal` to `java/text/DecimalFormat.java`
+          decimalFormat.format(decimalBigDecimal.bigDecimal)
+      }
+    }
 
     def pictureString(precision: Int, group: Boolean, zeroes: Boolean): String =
       (if (group) IntegerPictureWithGrouping else IntegerPictureWithoutGrouping) + {

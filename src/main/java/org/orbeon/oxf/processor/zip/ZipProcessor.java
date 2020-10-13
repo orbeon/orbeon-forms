@@ -67,7 +67,7 @@ public class ZipProcessor extends ProcessorImpl {
 
                             // Get the file name, store it
                             @Override
-                            public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
+                            public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
                                 if ("file".equals(localName)) {
                                     name = atts.getValue("name");
                                     uri = new StringBuilder();
@@ -82,14 +82,14 @@ public class ZipProcessor extends ProcessorImpl {
 
                             // Get the URI to the file, store it
                             @Override
-                            public void characters(char ch[], int start, int length) throws SAXException {
+                            public void characters(char ch[], int start, int length) {
                                 if (uri != null)
                                     uri.append(ch, start, length);
                             }
 
                             // Process file
                             @Override
-                            public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
+                            public void endElement(String namespaceURI, String localName, String qName) {
                                 try {
                                     if ("file".equals(localName)) {
                                         zipOutputStream.putNextEntry(new ZipEntry(name));

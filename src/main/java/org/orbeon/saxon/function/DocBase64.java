@@ -86,7 +86,7 @@ public class DocBase64 extends FunctionSupportJava {
             final SAXSource source = (SAXSource) resolver.resolve(href, baseURI);
             final XMLReader xmlReader = source.getXMLReader();
             xmlReader.setContentHandler(new XMLReceiverAdapter() {
-                public void characters(char ch[], int start, int length) throws SAXException {
+                public void characters(char ch[], int start, int length) {
                     // Append Base64-encoded text only
                     sb.append(ch, start, length);
                 }

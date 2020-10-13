@@ -111,7 +111,7 @@ public class CacheProcessor extends ProcessorImpl {
                     final CachedValidity cachedValidity = new CachedValidity();
                     readInputAsSAX(context, input, new XMLReceiverAdapter() {
                         Locator locator;
-                        public void characters(char[] chars, int start, int length) throws SAXException {
+                        public void characters(char[] chars, int start, int length) {
                             // Save location in case we need to use to signal an error
                             if (cachedValidity.locationData == null)
                                 cachedValidity.locationData = XmlLocationData.apply(locator);

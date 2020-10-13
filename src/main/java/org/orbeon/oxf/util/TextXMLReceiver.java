@@ -31,7 +31,7 @@ public class TextXMLReceiver extends XMLReceiverAdapter {
         this.writer = writer;
     }
 
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char ch[], int start, int length) {
         try {
             writer.write(ch, start, length);
         } catch (IOException e) {

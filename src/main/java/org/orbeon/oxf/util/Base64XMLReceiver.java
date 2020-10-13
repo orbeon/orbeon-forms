@@ -40,7 +40,7 @@ public class Base64XMLReceiver extends XMLReceiverAdapter {
         this.os = os;
     }
 
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char ch[], int start, int length) {
         inputCharCount += length;
         try {
             int newStart = start;

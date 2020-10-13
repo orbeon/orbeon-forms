@@ -41,37 +41,15 @@ import org.xml.sax.{InputSource, XMLReader}
 import scala.util.Try
 import scala.util.control.NonFatal
 
-object XPath {
+object XPath extends XPathTrait {
 
-  // Marker for XPath function context
-  trait FunctionContext
-
-  // To report timing information
-  type Reporter = (String, Long) => Unit
-
-  // To resolve a variable
-  // Used by `ShareableXPathStaticContext`
-  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
+  type SaxonConfiguration = Configuration
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
   // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
   // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
   // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  private val xpathContextDyn = new DynamicVariable[FunctionContext]
-
-  def withFunctionContext[T](functionContext: FunctionContext)(thunk: => T): T = {
-    xpathContextDyn.withValue(functionContext) {
-      thunk
-    }
-  }
-
-  // Compiled expression with source information
-  case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
-
-  def makeStringExpression(expression: String): String =  "string((" + expression + ")[1])"
-  def makeBooleanExpression(expression: String): String =  "boolean(" + expression + ")"
-
   private val GlobalNamePool = new NamePool
 
   // HACK: We can't register new converters directly, so we register an external object model, even though this is
@@ -290,9 +268,6 @@ object XPath {
       setStackFrameMap(map, numberOfExternalVariables)
     }
   }
-
-  // Return the currently scoped function context if any
-  def functionContext: Option[FunctionContext] = xpathContextDyn.value
 
   // Return either a NodeInfo for nodes, a native Java value for atomic values, or null
   // 4 callers

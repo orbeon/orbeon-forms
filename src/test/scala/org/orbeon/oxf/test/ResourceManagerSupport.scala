@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.XMLProcessorRegistry
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, PipelineUtils}
+import org.orbeon.oxf.util.{IndentedLogger, Log4jSupport, LoggerFactory, PipelineUtils}
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.scalatest.{BeforeAndAfter, Suite}
 
@@ -50,7 +50,7 @@ object ResourceManagerSupport {
   locally {
 
     // Avoid Log4j warning telling us no appender could be found
-    LoggerFactory.initBasicLogger()
+    Log4jSupport.initBasicLogger()
 
     // Setup resource manager
     val properties = System.getProperties
@@ -71,7 +71,7 @@ object ResourceManagerSupport {
     org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml")
 
     // Initialize logger
-    LoggerFactory.initLogger()
+    Log4jSupport.initLogger()
 
     // Run processor registry so we can use XPL
     val registry = new XMLProcessorRegistry

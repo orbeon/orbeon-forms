@@ -22,7 +22,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, PipelineUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.{XMLConstants, XMLParsing}
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLConstants}
 import org.orbeon.scaxon.NodeConversions
 
 object Transform {
@@ -45,7 +45,7 @@ object Transform {
 
   def contentAsDOM4J(path: String)(implicit logger: IndentedLogger): Document = {
     debug("reading content", List("path" -> path))
-    rm.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
+    rm.getContentAsDOM4J(path, ParserConfiguration.XIncludeOnly, false)
   }
 
   // Transform a document

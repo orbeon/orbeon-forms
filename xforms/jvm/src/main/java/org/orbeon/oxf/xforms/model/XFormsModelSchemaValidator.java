@@ -51,6 +51,7 @@ import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
 import org.orbeon.oxf.xforms.schema.SchemaDependencies;
 import org.orbeon.oxf.xforms.schema.SchemaInfo;
 import org.orbeon.oxf.xforms.schema.SchemaKey;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
@@ -585,10 +586,10 @@ public class XFormsModelSchemaValidator {
             // instead of REDocumentDeclaration
             final Grammar grammar;
             if (schemaInfo == null || ! schemaInfo.dependencies().areIncludesUnchanged()) {
-                final InputSource is                        = XMLParsing.ENTITY_RESOLVER.resolveEntity("", absoluteSchemaURL);
+                final InputSource is                        = XMLParsing.EntityResolver().resolveEntity("", absoluteSchemaURL);
                 final SchemaDependencies dependencies       = new SchemaDependencies();
                 final MSVGrammarReaderController controller = new MSVGrammarReaderController(containingDocument, dependencies, Option.apply(absoluteSchemaURL));
-                final SAXParserFactory factory              = XMLParsing.getSAXParserFactory(XMLParsing.ParserConfiguration.XINCLUDE_ONLY);
+                final SAXParserFactory factory              = XMLParsing.getSAXParserFactory(ParserConfiguration.XIncludeOnly());
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
 
@@ -609,7 +610,7 @@ public class XFormsModelSchemaValidator {
         final SchemaDependencies dependencies = new SchemaDependencies();
         // TODO: Use SchemaDependencies to cache dependencies if any
         final MSVGrammarReaderController controller = new MSVGrammarReaderController(containingDocument, dependencies, Option.<String>apply(null));
-        final SAXParserFactory saxParserFactory = XMLParsing.getSAXParserFactory(XMLParsing.ParserConfiguration.PLAIN);
+        final SAXParserFactory saxParserFactory = XMLParsing.getSAXParserFactory(ParserConfiguration.Plain());
         final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
 
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);

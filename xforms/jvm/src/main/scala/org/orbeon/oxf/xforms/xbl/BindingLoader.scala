@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.XMLParsing
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.CrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
@@ -413,6 +413,6 @@ object BindingLoader extends BindingLoader {
 
   def contentAsDOM4J(path: String): Document = {
     debug("reading content", List("path" -> path))
-    rm.getContentAsDOM4J(path, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, false)
+    rm.getContentAsDOM4J(path, ParserConfiguration.XIncludeOnly, false)
   }
 }

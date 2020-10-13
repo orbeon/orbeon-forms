@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.processor.xinclude
 
-import scala.jdk.CollectionConverters._
+import org.orbeon.oxf.http.URIReferences
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer
 import org.orbeon.oxf.properties.PropertyStore
-import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration
+import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml._
-import ProcessorImpl._
-import URIProcessorOutputImpl.URIReferences
+
+import scala.jdk.CollectionConverters._
 
 /**
  * XInclude processor.
@@ -61,7 +62,13 @@ class XIncludeProcessor extends ProcessorImpl {
             Map.empty[String, Boolean]
 
         // URL resolver is initialized with a parser configuration which can be configured to support external entities or not.
-        val parserConfiguration = new ParserConfiguration(false, false, ! (configurationAttributes.get("external-entities") contains false))
+        val parserConfiguration =
+          ParserConfiguration(
+            validating       = false,
+            handleXInclude   = false,
+            externalEntities = ! (configurationAttributes.get("external-entities") contains false)
+          )
+
         val uriResolver = new TransformerURIResolver(self, pipelineContext, INPUT_CONFIG, parserConfiguration)
 
         /**

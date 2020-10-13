@@ -38,7 +38,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
+import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, ParserConfiguration, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -311,8 +311,8 @@ private object PersistenceProxyProcessor {
             filter      = (_, _, _, atts) =>
               atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
           ),
-          XMLParsing.ParserConfiguration.PLAIN,
-          true
+          ParserConfiguration.Plain,
+          handleLexical = true
         )
       }
     }

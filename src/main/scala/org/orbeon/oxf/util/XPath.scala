@@ -24,7 +24,7 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLParsing}
+import org.orbeon.oxf.xml.{ParserConfiguration, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
@@ -164,7 +164,7 @@ object XPath {
     override def getStyleParser : XMLReader = getParser
 
     private def getParser =
-      XMLParsing.newSAXParser(XMLParsing.ParserConfiguration.PLAIN).getXMLReader
+      XMLParsing.newSAXParser(ParserConfiguration.Plain).getXMLReader
 
     // These are called if the parser came from `getSourceParser` or `getStyleParser`
     override def reuseSourceParser(parser: XMLReader): Unit = ()
@@ -396,7 +396,7 @@ object XPath {
         // NOTE: We might use TransformerURIResolver/ExternalContext in the future (ThreadLocal)
         val url = URLFactory.createURL(if (base == "") null else base, href)
         new SAXSource(
-          XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN),
+          XMLParsing.newXMLReader(ParserConfiguration.Plain),
           new InputSource(url.openStream)
         )
       } catch {

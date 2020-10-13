@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.http.URIReferences
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
-import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferences
 import org.orbeon.oxf.processor.transformer.{TransformerURIResolver, XPathProcessor}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}

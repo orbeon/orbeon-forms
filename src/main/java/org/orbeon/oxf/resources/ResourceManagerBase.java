@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
@@ -59,17 +60,17 @@ public abstract class ResourceManagerBase implements ResourceManager {
         return lch.getDocument();
     }
 
-    public org.orbeon.dom.Document getContentAsDOM4J(String key, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public org.orbeon.dom.Document getContentAsDOM4J(String key, ParserConfiguration parserConfiguration, boolean handleLexical) {
         final LocationSAXContentHandler lch = new LocationSAXContentHandler();
         getContentAsSAX(key, lch, parserConfiguration, handleLexical);
         return lch.getDocument();
     }
 
     public void getContentAsSAX(final String key, XMLReceiver handler) {
-        getContentAsSAX(key, handler, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, true);
+        getContentAsSAX(key, handler, ParserConfiguration.XIncludeOnly(), true);
     }
 
-    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
         InputStream inputStream = null;
         final Locator[] locator = new Locator[1];
         try {

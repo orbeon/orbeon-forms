@@ -18,12 +18,12 @@ import java.{lang => jl}
 import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
-import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.http.{BasicCredentials, URIReferences}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.URIProcessorOutputImpl.{URIReferences, URIReferencesState}
+import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
@@ -124,7 +124,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
         processorOutput,
         pipelineContext,
         InputAnnotatedDocument,
-        XMLParsing.ParserConfiguration.PLAIN
+        ParserConfiguration.Plain
       )
 
     // Read and try to cache the complete XForms+XHTML document with annotations

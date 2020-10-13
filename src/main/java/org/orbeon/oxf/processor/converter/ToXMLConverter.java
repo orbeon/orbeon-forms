@@ -17,13 +17,14 @@ import org.apache.commons.fileupload.FileItem;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.ParserConfiguration;
+import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -43,15 +44,17 @@ public class ToXMLConverter extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Read config input
-                final XMLParsing.ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XMLParsing.ParserConfiguration>() {
-                    public XMLParsing.ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                final ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<ParserConfiguration>() {
+                    public ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
 
                         final Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
 
-                        return new XMLParsing.ParserConfiguration(
-                                ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING),
-                                ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE),
-                                ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", URLGenerator.DEFAULT_EXTERNAL_ENTITIES));
+                        return ParserConfiguration.apply(
+                            ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING),
+                            ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE),
+                            ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", URLGenerator.DEFAULT_EXTERNAL_ENTITIES),
+                            null
+                        );
                     }
                 });
 

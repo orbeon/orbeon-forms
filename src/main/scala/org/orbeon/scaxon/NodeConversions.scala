@@ -17,7 +17,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Attribute, Document, Element}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.{TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.oxf.xml.{ParserConfiguration, TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 
 import scala.xml.Elem
@@ -26,7 +26,7 @@ import scala.xml.Elem
 object NodeConversions {
 
   def elemToSAX(e: Elem, xmlReceiver: XMLReceiver): Unit =
-    XMLParsing.stringToSAX(e.toString, "", xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, true)
+    XMLParsing.stringToSAX(e.toString, "", xmlReceiver, ParserConfiguration.Plain, handleLexical = true)
 
   def elemToDom4j(e: Elem): Document =
     IOSupport.readDom4j(e.toString)

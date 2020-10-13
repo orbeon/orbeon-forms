@@ -201,6 +201,22 @@ object BasicCredentials {
     )
 }
 
+case class URIReference(context: String, spec: String, credentials: BasicCredentials) {
+  override def toString: String = "[" + context + ", " + spec + ", " + credentials + "]"
+}
+
+class URIReferences {
+
+  private var references: List[URIReference] = Nil
+
+  def addReference(context: String, spec: String, credentials: BasicCredentials): Unit =
+    references ::= URIReference(context, spec, credentials)
+
+  import scala.jdk.CollectionConverters._
+
+  def getReferences: java.util.List[URIReference] = references.asJava
+}
+
 trait HttpResponse {
   def statusCode   : Int
   def headers      : Map[String, List[String]]

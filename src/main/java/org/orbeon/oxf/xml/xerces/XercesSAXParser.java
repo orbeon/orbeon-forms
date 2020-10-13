@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xml.xerces;
 
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.ParserConfiguration;
 
 /*
 * An improvement over org.orbeon.apache.xerces.parsers.SAXParser.  Every time
@@ -23,7 +23,7 @@ class XercesSAXParser extends org.orbeon.apache.xerces.parsers.SAXParser {
     static final String[] RECOGNIZED_FEATURES = { NOTIFY_BUILTIN_REFS };
     static final String[] RECOGNIZED_PROPERTIES = { SYMBOL_TABLE, XMLGRAMMAR_POOL };
 
-    public static OrbeonParserConfiguration makeConfig(XMLParsing.ParserConfiguration parserConfiguration) {
+    public static OrbeonParserConfiguration makeConfig(ParserConfiguration parserConfiguration) {
         final OrbeonParserConfiguration result = new OrbeonParserConfiguration(parserConfiguration);
 
         result.addRecognizedFeatures(RECOGNIZED_FEATURES);
@@ -33,7 +33,7 @@ class XercesSAXParser extends org.orbeon.apache.xerces.parsers.SAXParser {
         return result;
     }
 
-    public XercesSAXParser(XMLParsing.ParserConfiguration parserConfiguration) {
+    public XercesSAXParser(ParserConfiguration parserConfiguration) {
         super(makeConfig(parserConfiguration));
     }
 }

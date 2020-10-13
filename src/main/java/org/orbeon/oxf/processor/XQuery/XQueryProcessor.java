@@ -20,10 +20,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.xqj.SaxonXQDataSource;
 import org.xml.sax.SAXException;
 
@@ -221,7 +218,7 @@ public class XQueryProcessor extends ProcessorImpl {
                             }
                             if (SaxonXQDataSource.class.isInstance(xqs)) {
                                 // For Saxon: setup a URI resolver to support the "input:" scheme
-                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLParsing.ParserConfiguration.PLAIN);
+                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, ParserConfiguration.Plain());
                                 ((SaxonXQDataSource) xqs).getConfiguration().setURIResolver(resolver);
                             }
                             XQConnection conn;

@@ -19,12 +19,15 @@ import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.http.HttpMethod;
+import org.orbeon.oxf.http.URIReference;
+import org.orbeon.oxf.http.URIReferences;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLParsing;
 
@@ -162,13 +165,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
     protected CacheKey getURIKey(PipelineContext pipelineContext, URIReference uriReference) {
 
         try {
-            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec);
+            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec());
             if (inputName != null) {
                 // input: URIs
                 return ProcessorImpl.getInputKey(pipelineContext, processorImpl.getInputByName(inputName));
             } else {
                 // Other URIs
-                final String keyString = buildURIUsernamePasswordString(URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm(), uriReference.credentials);
+                final String keyString = buildURIUsernamePasswordString(URLFactory.createURL(uriReference.context(), uriReference.spec()).toExternalForm(), uriReference.credentials());
                 return new InternalCacheKey(processorImpl, "urlReference", keyString);
             }
         } catch (Exception e) {
@@ -188,13 +191,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
      */
     protected Object getURIValidity(PipelineContext pipelineContext, URIReference uriReference) {
         try {
-            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec);
+            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec());
             if (inputName != null) {
                 // input: URIs
                 return ProcessorImpl.getInputValidity(pipelineContext, processorImpl.getInputByName(inputName));
             } else {
 
-                final URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
+                final URL url = URLFactory.createURL(uriReference.context(), uriReference.spec());
                 if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                     // oxf: URLs
                     final String key = url.getFile();
@@ -209,8 +212,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.credentials);
-                    return state.getLastModified(urlString, uriReference.credentials);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.credentials());
+                    return state.getLastModified(urlString, uriReference.credentials());
 
                 } else  {
                     // Other URLs
@@ -257,24 +260,6 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         return config;
     }
 
-    public static class URIReference {
-
-        public final String context;
-        public final String spec;
-        public final BasicCredentials credentials;
-
-        public URIReference(String context, String spec, BasicCredentials credentials) {
-            this.context = context;
-            this.spec = spec;
-            this.credentials = credentials;
-        }
-
-        @Override
-        public String toString() {
-            return "[" + context + ", " + spec + ", " + credentials + "]";
-        }
-    }
-
     private static class DocumentInfo {
         public SAXStore saxStore;
         public Long lastModified;
@@ -307,38 +292,6 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         public SAXStore getDocument(String urlString, BasicCredentials credentials) {
             final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.saxStore;
-        }
-    }
-
-    /**
-     * This is the object that must be associated with the configuration input and cached. Users can
-     * derive from this and store their own configuration inside.
-     */
-    public static class URIReferences {
-
-        private List<URIReference> references;
-
-        /**
-         * Add a URL reference.
-         *
-         * @param context           optional context (can be null)
-         * @param spec              URL spec
-         * @param credentials       optional credentials
-         */
-        public void addReference(String context, String spec, BasicCredentials credentials) {
-            if (references == null)
-                references = new ArrayList<URIReference>();
-
-            references.add(new URIReference(context, spec, credentials));
-        }
-
-        /**
-         * Get URI references.
-         *
-         * @return  references or null if none
-         */
-        public List<URIReference> getReferences() {
-            return references;
         }
     }
 
@@ -425,7 +378,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     connectionResult,
                     true,
                     is -> {
-                        XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, XMLParsing.ParserConfiguration.PLAIN, true);
+                        XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, ParserConfiguration.Plain(), true);
                         return null;
                     }
                 );

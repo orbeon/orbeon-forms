@@ -284,7 +284,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
 
                     final Transformer transformer = transformerHandler.getTransformer();
-                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
+                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, ParserConfiguration.Plain());
                     transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
                     if (smartOutputLocation)
@@ -650,7 +650,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         });
                         final TransformerURIResolver uriResolver
-                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
+                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, ParserConfiguration.Plain());
                         templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, createXSLTConfiguration(), errorListener, uriResolver);
                         uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;

@@ -16,7 +16,7 @@ package org.orbeon.saxon.function;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xml.FunctionSupportJava;
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.StaticContext;
@@ -77,7 +77,7 @@ public class DocBase64 extends FunctionSupportJava {
         try {
 
             // Use resolver as it does a series of tasks for us, and use "binary" mode
-            final TransformerURIResolver resolver = new TransformerURIResolver(null, PipelineContext.get(), null, XMLParsing.ParserConfiguration.PLAIN, "binary");
+            final TransformerURIResolver resolver = new TransformerURIResolver(null, PipelineContext.get(), null, ParserConfiguration.Plain(), "binary");
 
             final StringBuilder sb = new StringBuilder(1024);
 

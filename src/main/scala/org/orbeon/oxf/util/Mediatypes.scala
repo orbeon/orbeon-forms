@@ -18,7 +18,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLParsing}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ParserConfiguration, XMLParsing}
 import org.xml.sax.Attributes
 
 import scala.collection.mutable.ListBuffer
@@ -31,7 +31,7 @@ object Mediatypes {
 
     val list = {
       val ch = new MimeTypesContentHandler
-      XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false)
+      XMLParsing.urlToSAX("oxf:/oxf/mime-types.xml", ch, ParserConfiguration.Plain, handleLexical = false)
       ch.resultAsList
     }
 

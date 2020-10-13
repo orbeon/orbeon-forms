@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon}
-import org.orbeon.oxf.xml.XMLParsing
+import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.IOSupport
 
 import scala.util.Try
@@ -171,7 +171,7 @@ private object PEVersion {
         val path = System.getProperty("user.home").dropTrailingSlash + "/.orbeon/license.xml"
 
         useAndClose(new FileInputStream(new File(path))) { is =>
-          IOSupport.readDom4j(is, path, XMLParsing.ParserConfiguration.PLAIN)
+          IOSupport.readDom4j(is, path, ParserConfiguration.Plain)
         }
       }
 

@@ -24,8 +24,8 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.XPath;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.IOSupport;
@@ -72,7 +72,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Document dataDocument = readInputAsOrbeonDom(pipelineContext, INPUT_DATA);
 
                     // Create XQuery configuration (depends on attributes input)
-                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
+                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, ParserConfiguration.Plain());
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
                     final Configuration configuration = XPath.newConfiguration();
                     {

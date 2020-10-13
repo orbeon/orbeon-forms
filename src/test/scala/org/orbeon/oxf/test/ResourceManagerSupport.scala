@@ -19,7 +19,7 @@ import org.orbeon.oxf.processor.XMLProcessorRegistry
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, PipelineUtils}
-import org.orbeon.oxf.xml.XMLParsing
+import org.orbeon.oxf.xml.ParserConfiguration
 import org.scalatest.{BeforeAndAfter, Suite}
 
 import scala.jdk.CollectionConverters._
@@ -76,7 +76,7 @@ object ResourceManagerSupport {
     // Run processor registry so we can use XPL
     val registry = new XMLProcessorRegistry
     val processorsXML = "processors.xml"
-    val doc = ResourceManagerWrapper.instance.getContentAsDOM4J(processorsXML, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, true)
+    val doc = ResourceManagerWrapper.instance.getContentAsDOM4J(processorsXML, ParserConfiguration.XIncludeOnly, true)
     val config = PipelineUtils.createDOMGenerator(doc, processorsXML, DOMGenerator.ZeroValidity, processorsXML)
 
     PipelineUtils.connect(config, "data", registry, "config")

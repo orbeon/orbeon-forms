@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.processor.impl;
 
+import org.orbeon.oxf.http.URIReferences;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 /**
  * This special input is able to handle dependencies on URLs.
@@ -33,9 +34,9 @@ public abstract class DependenciesProcessorInput extends DelegatingProcessorInpu
                     @Override
                     protected void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                         final boolean[] foundInCache = new boolean[] { false };
-                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<URIProcessorOutputImpl.URIReferences>() {
+                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<URIReferences>() {
                             @Override
-                            public URIProcessorOutputImpl.URIReferences read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+                            public URIReferences read(PipelineContext pipelineContext, ProcessorInput processorInput) {
                                 // Read the input directly into the output
                                 readInputAsSAX(pipelineContext, processorInput, xmlReceiver);
 
@@ -81,5 +82,5 @@ public abstract class DependenciesProcessorInput extends DelegatingProcessorInpu
      * @param pipelineContext   current context
      * @return                  URI references
      */
-    protected abstract URIProcessorOutputImpl.URIReferences getURIReferences(PipelineContext pipelineContext);
+    protected abstract URIReferences getURIReferences(PipelineContext pipelineContext);
 }

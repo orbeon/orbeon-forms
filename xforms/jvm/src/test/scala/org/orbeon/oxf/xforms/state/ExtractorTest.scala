@@ -17,7 +17,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.WhitespaceMatching
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
-import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
+import org.orbeon.oxf.xml.ParserConfiguration._
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents._
@@ -71,7 +71,7 @@ class ExtractorTest
         WhitespaceMatching.defaultHTMLPolicy,
         WhitespaceMatching.htmlPolicyMatcher
       ),
-      XINCLUDE_ONLY,
+      XIncludeOnly,
       false
     )
 

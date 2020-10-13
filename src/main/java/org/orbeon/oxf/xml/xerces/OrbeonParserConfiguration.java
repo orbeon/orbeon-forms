@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.xerces;
 
 import org.orbeon.apache.xerces.parsers.XIncludeAwareParserConfiguration;
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.ParserConfiguration;
 
 import java.util.Map;
 import java.util.Set;
@@ -25,14 +25,14 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
 
     private boolean externalEntities;
 
-    public OrbeonParserConfiguration(XMLParsing.ParserConfiguration parserConfiguration) {
+    public OrbeonParserConfiguration(ParserConfiguration parserConfiguration) {
         super(null, null, null);
-        this.externalEntities = parserConfiguration.externalEntities;
+        this.externalEntities = parserConfiguration.externalEntities();
 
         // Set validation feature
-        super.setFeature(VALIDATION, parserConfiguration.validating);
+        super.setFeature(VALIDATION, parserConfiguration.validating());
         // Set XInclude feature
-        if (parserConfiguration.handleXInclude) {
+        if (parserConfiguration.handleXInclude()) {
             super.setFeature(XINCLUDE_FEATURE, true);
             fXIncludeHandler = new org.orbeon.apache.xerces.xinclude.XIncludeHandler();
             setProperty(XINCLUDE_HANDLER, fXIncludeHandler);

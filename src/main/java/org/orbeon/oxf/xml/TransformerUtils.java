@@ -19,16 +19,16 @@ import org.orbeon.dom.io.XMLWriter;
 import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.dom.Node.NodeOps;
 import org.orbeon.io.CharsetNames;
+import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -362,14 +362,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(ParserConfiguration.Plain());
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = dom4jResult;
             }
             try {
-                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -389,7 +389,7 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(ParserConfiguration.Plain());
                 xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
@@ -424,14 +424,14 @@ public class TransformerUtils {
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(ParserConfiguration.Plain());
                 xmlReceiver = new XIncludeReceiver(null, identityHandler, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = identityHandler;
             }
             try {
-                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical);
             } finally {
                 if (resolver != null)
                     resolver.destroy();
@@ -448,7 +448,7 @@ public class TransformerUtils {
         try {
             final TransformerURIResolver resolver;
             if (handleXInclude) {
-                resolver = new TransformerURIResolver(XMLParsing.ParserConfiguration.PLAIN);
+                resolver = new TransformerURIResolver(ParserConfiguration.Plain());
             } else {
                 resolver = null;
             }

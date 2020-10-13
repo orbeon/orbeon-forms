@@ -13,13 +13,10 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.ParserConfiguration;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.w3c.dom.Node;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
 
 /**
  * This is the main interface a resource manager must implement.
@@ -52,7 +49,7 @@ public interface ResourceManager {
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments  @return  a document element
      */
-    org.orbeon.dom.Document getContentAsDOM4J(String key, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical);
+    org.orbeon.dom.Document getContentAsDOM4J(String key, ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an
@@ -72,7 +69,7 @@ public interface ResourceManager {
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical);
+    void getContentAsSAX(String key, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Returns a binary input stream for the specified key. The key could point

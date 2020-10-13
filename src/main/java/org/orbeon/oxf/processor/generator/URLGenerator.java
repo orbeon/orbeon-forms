@@ -24,10 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.http.BasicCredentials;
-import org.orbeon.oxf.http.HttpMethod;
-import org.orbeon.oxf.http.HttpStatusCodeException;
-import org.orbeon.oxf.http.StatusCode;
+import org.orbeon.oxf.http.*;
 import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -127,7 +124,7 @@ public class URLGenerator extends ProcessorImpl {
         String encoding,
         boolean forceEncoding,
         boolean ignoreConnectionEncoding,
-        XMLParsing.ParserConfiguration parserConfiguration,
+        ParserConfiguration parserConfiguration,
         boolean handleLexical,
         String mode,
         scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues,
@@ -173,7 +170,7 @@ public class URLGenerator extends ProcessorImpl {
         private scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues;
         private String forwardHeaders;
         private List<String> readHeaders;
-        private XMLParsing.ParserConfiguration parserConfiguration = null;
+        private ParserConfiguration parserConfiguration = null;
         private boolean handleLexical = DEFAULT_HANDLE_LEXICAL;
 
         private String mode;
@@ -190,13 +187,13 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
-            this.parserConfiguration = XMLParsing.ParserConfiguration.PLAIN;
+            this.parserConfiguration = ParserConfiguration.Plain();
             this.tidyConfig = new TidyConfig(null);
         }
 
         public Config(URL url, boolean handleXInclude) {
             this.url = url;
-            this.parserConfiguration = new XMLParsing.ParserConfiguration(DEFAULT_VALIDATING, handleXInclude, DEFAULT_EXTERNAL_ENTITIES);
+            this.parserConfiguration = ParserConfiguration.apply(DEFAULT_VALIDATING, handleXInclude, DEFAULT_EXTERNAL_ENTITIES, null);
             this.tidyConfig = new TidyConfig(null);
         }
 
@@ -214,7 +211,7 @@ public class URLGenerator extends ProcessorImpl {
               String encoding,
               boolean forceEncoding,
               boolean ignoreConnectionEncoding,
-              XMLParsing.ParserConfiguration parserConfiguration,
+              ParserConfiguration parserConfiguration,
               boolean handleLexical,
               String mode,
               scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues,
@@ -250,7 +247,7 @@ public class URLGenerator extends ProcessorImpl {
             // and then cache all individually-included documents. Or, store the non-XInclude-processed document in
             // cache. Either way, it's complicated. So we disable conditional GET if XInclude is enabled for now. This
             // could be easier if we had a real HTTP client document cache.
-            this.enableConditionalGET = enableConditionalGET && ! parserConfiguration.handleXInclude;
+            this.enableConditionalGET = enableConditionalGET && ! parserConfiguration.handleXInclude();
 
             // Authentication
             this.username = username;
@@ -289,7 +286,7 @@ public class URLGenerator extends ProcessorImpl {
             return tidyConfig;
         }
 
-        public XMLParsing.ParserConfiguration getParserConfiguration() {
+        public ParserConfiguration getParserConfiguration() {
             return parserConfiguration;
         }
 
@@ -365,7 +362,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config config;
-        public List<URIProcessorOutputImpl.URIReference> uriReferences;
+        public List<URIReference> uriReferences;
     }
 
     @Override
@@ -471,7 +468,7 @@ public class URLGenerator extends ProcessorImpl {
 
                             // Create configuration
                             final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                    ignoreConnectionEncoding, new XMLParsing.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
+                                    ignoreConnectionEncoding, ParserConfiguration.apply(validating, handleXInclude, externalEntities, null), handleLexical, mode,
                                     headerNameValues, forwardHeaders, readHeaders,
                                     cacheUseLocalCache, enableConditionalGET,
                                     username, password, preemptiveAuth, domain,
@@ -561,7 +558,7 @@ public class URLGenerator extends ProcessorImpl {
                                     configURIReferences.uriReferences = null;
                                 } else if (mode.equals("xml")) {
                                     // XML mode
-                                    final URIProcessorOutputImpl.URIReferences uriReferences = new URIProcessorOutputImpl.URIReferences();
+                                    final URIReferences uriReferences = new URIReferences();
                                     handler.readXML(pipelineContext, output, uriReferences);
                                     configURIReferences.uriReferences = uriReferences.getReferences();
                                 } else if (mode.equals("text")) {
@@ -633,8 +630,8 @@ public class URLGenerator extends ProcessorImpl {
                 outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
                 // Handle dependencies if any
                 if (configURIReferences.uriReferences != null) {
-                    for (URIProcessorOutputImpl.URIReference uriReference : configURIReferences.uriReferences) {
-                        outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
+                    for (URIReference uriReference : configURIReferences.uriReferences) {
+                        outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context(), uriReference.spec()).toExternalForm());
                     }
                 }
                 return new CompoundOutputCacheKey(getProcessorClass(), name, outputKeys);
@@ -665,8 +662,8 @@ public class URLGenerator extends ProcessorImpl {
 
                 // Handle dependencies if any
                 if (configURIReferences.uriReferences != null) {
-                    for (URIProcessorOutputImpl.URIReference uriReference: configURIReferences.uriReferences) {
-                        validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, URLFactory.createURL(uriReference.context, uriReference.spec), null));
+                    for (URIReference uriReference: configURIReferences.uriReferences) {
+                        validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, URLFactory.createURL(uriReference.context(), uriReference.spec()), null));
                     }
                 }
                 return validities;
@@ -780,7 +777,7 @@ public class URLGenerator extends ProcessorImpl {
         void destroy() throws IOException;
         void readHTML(XMLReceiver xmlReceiver) throws IOException;
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
-        void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException;
+        void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIReferences uriReferences) throws IOException;
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
         void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException;
     }
@@ -893,8 +890,8 @@ public class URLGenerator extends ProcessorImpl {
             BinaryTextSupport.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
-            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIReferences uriReferences) throws IOException {
+            final ParserConfiguration parserConfiguration = ParserConfiguration.apply(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
@@ -1054,11 +1051,11 @@ public class URLGenerator extends ProcessorImpl {
             BinaryTextSupport.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode(), null, headersToPropagate);
         }
 
-        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIReferences uriReferences) throws IOException {
             openConnection();
             checkStatusCode();
 
-            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+            final ParserConfiguration parserConfiguration = ParserConfiguration.apply(config.getParserConfiguration(), uriReferences);
             try {
                 final XMLReader reader = XMLParsing.newXMLReader(parserConfiguration);
                 reader.setContentHandler(xmlReceiver);
@@ -1145,8 +1142,8 @@ public class URLGenerator extends ProcessorImpl {
             BinaryTextSupport.readText(System.in, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
-            final XMLParsing.ParserConfiguration parserConfiguration = new XMLParsing.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIReferences uriReferences) throws IOException {
+            final ParserConfiguration parserConfiguration = ParserConfiguration.apply(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 XMLParsing.readerToSAX(new InputStreamReader(System.in, getExternalEncoding()), config.getURL().toExternalForm(),

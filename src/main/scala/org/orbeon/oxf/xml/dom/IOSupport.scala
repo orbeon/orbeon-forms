@@ -17,7 +17,7 @@ import java.io.{InputStream, Reader, StringReader}
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.{SAXReader, XMLWriter}
-import org.orbeon.oxf.xml.XMLParsing
+import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
 
 
 object IOSupport {
@@ -43,20 +43,20 @@ object IOSupport {
     createSAXReader.read(reader, uriString)
 
   def readDom4j(xmlString: String): Document =
-    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(new StringReader(xmlString))
+    createSAXReader(ParserConfiguration.Plain).read(new StringReader(xmlString))
 
-  def readDom4j(is: InputStream, uri: String, parserConfiguration: XMLParsing.ParserConfiguration): Document =
+  def readDom4j(is: InputStream, uri: String, parserConfiguration: ParserConfiguration): Document =
     createSAXReader(parserConfiguration).read(is, uri)
 
   def readDom4j(is: InputStream): Document =
-    createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(is)
+    createSAXReader(ParserConfiguration.Plain).read(is)
 
   private object Private {
 
-    def createSAXReader(parserConfiguration: XMLParsing.ParserConfiguration): SAXReader =
+    def createSAXReader(parserConfiguration: ParserConfiguration): SAXReader =
       new SAXReader(XMLParsing.newXMLReader(parserConfiguration))
 
     def createSAXReader: SAXReader =
-      createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY)
+      createSAXReader(ParserConfiguration.XIncludeOnly)
   }
 }

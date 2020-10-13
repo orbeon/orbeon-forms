@@ -53,7 +53,7 @@ class MSVGrammarReaderController(
       }
 
     dependencies.addInclude(url)
-    XMLParsing.ENTITY_RESOLVER.resolveEntity("", url.toString)
+    XMLParsing.EntityResolver.resolveEntity("", url.toString)
   }
 
   def warning(locators: Array[Locator], message: String): Unit = {

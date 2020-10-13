@@ -136,7 +136,7 @@ object RequestReader {
       (metadataWriter, metadataFilter)
     }
 
-    val source     = new SAXSource(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN), new InputSource(inputStream))
+    val source     = new SAXSource(XMLParsing.newXMLReader(ParserConfiguration.Plain), new InputSource(inputStream))
     val dataWriter = new StringBuilderWriter()
 
     val resultReceiver = metadataWriterAndReceiver match {

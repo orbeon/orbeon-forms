@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.fr.persistence.relational.rest.RequestReader
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.JXQName._
-import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
+import org.orbeon.oxf.xml.ParserConfiguration._
 import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents._
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -35,7 +35,7 @@ class FormRunnerFilterReceiverTest extends ResourceManagerTestBase with Assertio
         RequestReader.isMetadataElement
       )
 
-    XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/fr/form-with-metadata.xhtml", metadataFilter, XINCLUDE_ONLY, false)
+    XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/fr/form-with-metadata.xhtml", metadataFilter, XIncludeOnly, false)
 
     val XMLLang    = JXQName("http://www.w3.org/XML/1998/namespace" -> "lang")
     val Operations = JXQName("operations")

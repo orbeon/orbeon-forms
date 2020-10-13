@@ -117,7 +117,7 @@ object ProcessorSupport {
   def getDocumentSource(d: Document): DocumentSource = {
     val lds = new LocationDocumentSource(d)
     val rdr = lds.getXMLReader
-    rdr.setErrorHandler(XMLParsing.ERROR_HANDLER)
+    rdr.setErrorHandler(XMLParsing.ErrorHandler)
     lds
   }
 

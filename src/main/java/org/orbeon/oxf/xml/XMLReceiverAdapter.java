@@ -21,57 +21,57 @@ import org.xml.sax.SAXException;
  * Adapter for XMLReceiver. Methods don't do anything but can be overridden.
  */
 public class XMLReceiverAdapter implements XMLReceiver {
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
     }
 
-    public void endDocument() throws SAXException {
+    public void endDocument() {
     }
 
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
     }
 
-    public void endPrefixMapping(String prefix) throws SAXException {
+    public void endPrefixMapping(String prefix) {
     }
 
-    public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+    public void ignorableWhitespace(char[] ch, int start, int length) {
     }
 
-    public void processingInstruction(String target, String data) throws SAXException {
+    public void processingInstruction(String target, String data) {
     }
 
     public void setDocumentLocator(Locator locator) {
     }
 
-    public void skippedEntity(String name) throws SAXException {
+    public void skippedEntity(String name) {
     }
 
-    public void startDocument() throws SAXException {
+    public void startDocument() {
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
     }
 
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+    public void startPrefixMapping(String prefix, String uri) {
     }
 
-    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+    public void startDTD(String name, String publicId, String systemId) {
     }
 
-    public void endDTD() throws SAXException {
+    public void endDTD() {
     }
 
-    public void startEntity(String name) throws SAXException {
+    public void startEntity(String name) {
     }
 
-    public void endEntity(String name) throws SAXException {
+    public void endEntity(String name) {
     }
 
-    public void startCDATA() throws SAXException {
+    public void startCDATA() {
     }
 
-    public void endCDATA() throws SAXException {
+    public void endCDATA() {
     }
 
-    public void comment(char[] ch, int start, int length) throws SAXException {
+    public void comment(char[] ch, int start, int length) {
     }
 }

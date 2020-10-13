@@ -157,7 +157,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
-                    XMLParsing.stringToSAX((String) value, "", resultStore, XMLParsing.ParserConfiguration.PLAIN, true);
+                    XMLParsing.stringToSAX((String) value, "", resultStore, ParserConfiguration.Plain(), true);
                 } else {
                     throw new OXFException("Unknown value type: " + value.getClass().getName());
                 }

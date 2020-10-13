@@ -185,7 +185,6 @@ In addition, this product includes the following software:
 
 - [Barcode4j](http://barcode4j.sourceforge.net/)
 - [Bootstrap](https://getbootstrap.com/)
-- Castor
 - [CodeMirror](https://codemirror.net/)
 - dom4j
 - [Ehcache](https://www.ehcache.org/)

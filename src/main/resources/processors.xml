@@ -612,10 +612,6 @@
         <class name="org.orbeon.oxf.processor.test.CacheViewProcessor"/>
     </processor>
 
-    <processor name="oxf:test-store-bean">
-        <class name="org.orbeon.oxf.processor.test.StoreBeanProcessor"/>
-    </processor>
-
     <processor name="oxf:pipeline-trace">
         <class name="org.orbeon.oxf.processor.SessionTraceProcessor"/>
     </processor>
@@ -650,10 +646,6 @@
 
     <processor name="oxf:portlet-preferences">
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
-    </processor>
-
-    <processor name="oxf:bean-generator">
-        <class name="org.orbeon.oxf.processor.generator.BeanGenerator"/>
     </processor>
 
     <processor name="oxf:sax-debugger">

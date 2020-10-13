@@ -13,9 +13,6 @@
   */
 package org.orbeon.saxon.function
 
-import java.io.StringReader
-
-import org.exolab.castor.mapping.Mapping
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.scope.ScopeGenerator
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
@@ -23,9 +20,6 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
-import org.xml.sax.InputSource
-
-import scala.util.control.NonFatal
 
 object ScopeFunctionSupport {
 
@@ -63,16 +57,7 @@ object ScopeFunctionSupport {
         // NOTE: This can be a `StringValueWithEquals`
         SingletonIterator.makeIterator(v)
       case Some(v) =>
-        val saxStore =
-          try {
-            // We don't have any particular mappings to pass to serialize objects
-            val mapping = new Mapping
-            mapping.loadMapping(new InputSource(new StringReader("<mapping/>")))
-            ScopeGenerator.getSAXStore(v, mapping, contentTypeOpt.orNull, keyForLogging)
-          } catch {
-            case NonFatal(t) =>
-              throw new OXFException(t)
-          }
+        val saxStore = ScopeGenerator.getSAXStore(v, contentTypeOpt.orNull, keyForLogging)
         // Convert to DocumentInfo
         val documentInfo = TransformerUtils.saxStoreToTinyTree(xpathContext.getConfiguration, saxStore)
         SingletonIterator.makeIterator(documentInfo)

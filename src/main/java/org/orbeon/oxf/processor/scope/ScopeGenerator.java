@@ -13,35 +13,28 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Marshaller;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.BinaryTextSupport;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom.IOSupport;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.ParserAdapter;
 
 import javax.xml.transform.dom.DOMSource;
-import java.io.StringReader;
 
 public class ScopeGenerator extends ScopeProcessorBase {
 
     private static SAXStore nullDocumentSAXStore;
 
-    public static final String INPUT_MAPPING = "mapping";
 
     public ScopeGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, ScopeProcessorBase.ScopeConfigNamespaceUri()));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_MAPPING)); // optional
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -99,16 +92,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 // Just get SAXStore from ScopeStore
                                 state.saxStore = contextStore.getSaxStore();
                             } else {
-                                // Get mappings if present
-                                final Mapping mapping;
-                                if (getConnectedInputs().get(INPUT_MAPPING) == null) {
-                                    mapping = new Mapping();
-                                    mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
-                                } else {
-                                    mapping = readMapping(pipelineContext);
-                                }
-
-                                state.saxStore = getSAXStore(value, mapping, config.isTextPlain() ? ScopeProcessorBase.TextPlain() : null, config.key());
+                                state.saxStore = getSAXStore(value, config.isTextPlain() ? ScopeProcessorBase.TextPlain() : null, config.key());
                             }
                         } else {
                             // Store empty document
@@ -135,7 +119,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
         return output;
     }
 
-    public static SAXStore getSAXStore(Object value, Mapping mapping, String contentType, String key) throws SAXException {
+    public static SAXStore getSAXStore(Object value, String contentType, String key) throws SAXException {
         if (ScopeProcessorBase.TextPlain().equals(contentType)) {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
@@ -147,11 +131,11 @@ public class ScopeGenerator extends ScopeProcessorBase {
             }
             return result;
         } else {
-            return getSAXStore(value, mapping);
+            return getSAXStore(value);
         }
     }
 
-    private static SAXStore getSAXStore(Object value, Mapping mapping) {
+    private static SAXStore getSAXStore(Object value) {
         final SAXStore resultStore;
         if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
@@ -175,50 +159,12 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     // Consider the String containing a document to parse
                     XMLParsing.stringToSAX((String) value, "", resultStore, XMLParsing.ParserConfiguration.PLAIN, true);
                 } else {
-                    // Consider the object a JavaBean
-                    readBean(value, mapping, resultStore);
+                    throw new OXFException("Unknown value type: " + value.getClass().getName());
                 }
             }
         }
 
         return resultStore;
-    }
-
-    private static void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {
-        try {
-            contentHandler.startDocument();
-
-            // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLParsing.newSAXParser(XMLParsing.ParserConfiguration.PLAIN).getParser());
-            adapter.setContentHandler(contentHandler);
-            Marshaller marshaller = new Marshaller(adapter);
-            marshaller.setMarshalAsDocument(false);
-            marshaller.setMapping(mapping);
-
-            // Serialize with Castor
-            marshaller.marshal(bean);
-
-            contentHandler.endDocument();
-
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    protected Mapping readMapping(PipelineContext pipelineContext) {
-        return readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MAPPING),
-            new CacheableInputReader<Mapping>() {
-                public Mapping read(PipelineContext context, ProcessorInput input) {
-                    try {
-                        Document mappingDocument = readInputAsOrbeonDom(context, input);
-                        Mapping mapping = new Mapping();
-                        mapping.loadMapping(new InputSource(new StringReader(IOSupport.domToStringJava(mappingDocument))));
-                        return mapping;
-                    } catch (Exception e) {
-                        throw new OXFException(e);
-                    }
-                }
-            });
     }
 
     public void reset(PipelineContext context) {

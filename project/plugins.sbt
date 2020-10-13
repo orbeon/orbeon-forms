@@ -17,7 +17,7 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 // For artifacts published locally
 // https://github.com/sbt/sbt-uglify/pull/23
-resolvers += Resolver.file("ivy-local", file("ivy-local"))(Resolver.ivyStylePatterns)
+//resolvers += Resolver.file("ivy-local", file("ivy-local"))(Resolver.ivyStylePatterns)
 
 // Needed for sbt-cross
 //addSbtPlugin     ("org.scala-native"    % "sbt-cross"            % "0.1.0-SNAPSHOT")

@@ -23,10 +23,8 @@ import org.xml.sax.SAXParseException
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
-object OrbeonLocationException {
-  /**
-   * Return all the LocationData information for that throwable
-   */
+object OrbeonLocationException extends OrbeonLocationExceptionTrait {
+
   def getAllLocationData(throwable: Throwable): List[LocationData] =
     Exceptions.causesIterator(throwable).toList.reverse flatMap getLocationData
 
@@ -55,11 +53,5 @@ object OrbeonLocationException {
         List(BasicLocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
       case _ =>
         Nil
-    }
-
-  def wrapException(throwable: Throwable, locationData: LocationData): ValidationException =
-    throwable match {
-      case t: ValidationException => Option(locationData) foreach t.addLocationData; t
-      case t                      => new ValidationException(t, locationData)
     }
 }

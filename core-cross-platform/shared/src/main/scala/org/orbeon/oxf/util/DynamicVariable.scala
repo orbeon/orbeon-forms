@@ -14,24 +14,24 @@ package org.orbeon.oxf.util
  */
 class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = true) {
 
-  protected val threadLocal =
+  protected val threadLocal: ThreadLocal[Option[T]] =
     if (isInheritable)
       new InheritableThreadLocal[Option[T]] {
-        override def initialValue = initial
+        override def initialValue: Option[T] = initial
       }
     else
       new ThreadLocal[Option[T]] {
-        override def initialValue = initial
+        override def initialValue: Option[T] = initial
       }
 
-  def value = threadLocal.get match {
-    case some @ Some(value) => some
+  def value: Option[T] = threadLocal.get match {
+    case some @ Some(_) => some
     case None =>
       threadLocal.remove() // because get above creates the ThreadLocal if missing
       None
   }
 
-  def value_=(value: T) = threadLocal set Some(value)
+  def value_=(value: T): Unit = threadLocal set Some(value)
 
   def withValue[S](value: T)(thunk: => S): S = {
 
@@ -47,5 +47,5 @@ class DynamicVariable[T](initial: => Option[T] = None, isInheritable: Boolean = 
       }
   }
 
-  override def toString: String = "DynamicVariable(" + value + ")"
+  override def toString: String = s"DynamicVariable($value)"
 }

@@ -1,9 +1,9 @@
 package org.orbeon.oxf.xml
 
-import java.util.{List => JList}
-import javax.xml.transform.{Source, SourceLocator}
+import java.{util => ju}
 
-import org.orbeon.oxf.util.XPath._
+import javax.xml.transform.{Source, SourceLocator}
+import org.orbeon.oxf.util.XPath.VariableResolver
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr._
@@ -32,7 +32,7 @@ class ShareableXPathStaticContext(
 
   // Add function library
   setDefaultFunctionLibrary()
-  getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
+  getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[ju.List[FunctionLibrary]].add(0, functionLibrary)
 
   // This should be unused as we handle global variables differently
   private val stackFrameMap = config.makeSlotManager

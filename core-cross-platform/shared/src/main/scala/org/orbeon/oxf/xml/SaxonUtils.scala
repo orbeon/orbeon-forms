@@ -15,9 +15,9 @@ package org.orbeon.oxf.xml
 
 import java.net.URI
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
 import org.orbeon.saxon.functions.DeepEqual
@@ -87,7 +87,7 @@ object SaxonUtils {
   //@XPathFunction
   def makeNCName(name: String, keepFirstIfPossible: Boolean): String = {
 
-    require(StringUtils.isNotBlank(name), "name must not be blank or empty")
+    require(name.nonAllBlank, "name must not be blank or empty")
 
     val name10Checker = Name10Checker.getInstance
     if (name10Checker.isValidNCName(name)) {

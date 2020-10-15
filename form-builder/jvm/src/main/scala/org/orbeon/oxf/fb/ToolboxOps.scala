@@ -472,9 +472,10 @@ object ToolboxOps {
   private val FormBuilderClipboardSessionAttributeName = "orbeon-form-builder-clipboard"
 
   def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    NetUtils.getExternalContext.getRequest.getSession(true).getAttribute(FormBuilderClipboardSessionAttributeName) collect {
-      case s: SAXStore => TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, s).rootElement
-    }
+    Option(NetUtils.getExternalContext) flatMap
+      (_.getRequest.getSession(true).getAttribute(FormBuilderClipboardSessionAttributeName)) collect {
+        case s: SAXStore => TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, s).rootElement
+      }
 
   // Returns an `<xcv>` root elementBaseOps.scala
   def readXcvFromClipboardAndClone(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {

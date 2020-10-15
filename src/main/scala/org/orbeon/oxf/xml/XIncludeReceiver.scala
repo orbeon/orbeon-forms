@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 // Streaming XInclude processing
-// NOTE: Does not support: <xi:fallback>, encoding, accept, or accept-language attributes.
+// NOTE: Does not support: `<xi:fallback>`, `encoding`, `accept`, or `accept-language` attributes.
 class XIncludeReceiver(
     pipelineContext: PipelineContext,
     val parent     : Option[XIncludeReceiver],
@@ -182,7 +182,8 @@ class XIncludeReceiver(
                 null)
 
             // Each resulting object is output through the next level of processing
-            for (item <- result.asScala)
+            // TODO: Use Saxon to stream the result?
+            for (item <- result.asScala) // contains `String`, `Boolean`, but `NodeInfo` wrappers
               XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, XmlLocationData(outputLocator))
 
           case Some(xpointer) =>
@@ -273,7 +274,7 @@ class XIncludeReceiver(
       super.endPrefixMapping(prefix)
 }
 
-object XIncludeReceiver {
+private object XIncludeReceiver {
   val Logger = LoggerFactory.createLogger(classOf[XIncludeReceiver])
   val XPointerPattern = """xpath\((.*)\)""".r
 }

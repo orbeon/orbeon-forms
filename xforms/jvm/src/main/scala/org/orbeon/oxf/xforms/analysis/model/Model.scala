@@ -46,21 +46,22 @@ class Model(
 
   override lazy val model = this.some
 
-  override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
-    PathMapXPathAnalysis(
-      partAnalysis              = part,
-      xpathString               = PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-      namespaceMapping          = null,
-      baseAnalysis              = None,
-      inScopeVariables          = Map.empty,
-      pathMapContext            = null,
-      scope                     = scope,
-      defaultInstancePrefixedId = defaultInstancePrefixedId.some,
-      locationData              = locationData,
-      element                   = element,
-      avt                       = false
-    )
-  }
+  override def getChildrenContext: Option[XPathAnalysis] =
+    defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
+      PathMapXPathAnalysis(
+        partAnalysis              = part,
+        xpathString               = PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+        namespaceMapping          = null,
+        baseAnalysis              = None,
+        inScopeVariables          = Map.empty,
+        pathMapContext            = null,
+        scope                     = scope,
+        defaultInstancePrefixedId = defaultInstancePrefixedId.some,
+        locationData              = locationData,
+        element                   = element,
+        avt                       = false
+      )
+    }
 
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
   override def indexedElements: Iterator[ElementAnalysis] =

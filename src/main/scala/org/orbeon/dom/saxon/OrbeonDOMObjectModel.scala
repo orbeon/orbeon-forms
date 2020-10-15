@@ -27,6 +27,7 @@ import org.orbeon.saxon.value.{SingletonNode, Value}
   */
 // Wrap Orbeon DOM documents as instances of the Saxon NodeInfo interface.
 // This started as a Saxon object model for DOM4J and got converted to Scala to support the Orbeon DOM based on DOM4J.
+// Used by `XPath`.
 object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
 
   val getIdentifyingURI = "http://orbeon.org/oxf/xml/dom"

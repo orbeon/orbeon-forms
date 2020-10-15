@@ -50,6 +50,7 @@ object XPath {
   type Reporter = (String, Long) => Unit
 
   // To resolve a variable
+  // Used by `ShareableXPathStaticContext`
   type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
 
   // Context accessible during XPath evaluation

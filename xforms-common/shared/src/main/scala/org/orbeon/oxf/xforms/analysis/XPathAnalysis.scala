@@ -52,29 +52,30 @@ object XPathAnalysis {
 
     require(xpathString ne null)
 
-    val dependentInstances = Set.empty[String]
-    val dependentModels = Set.empty[String]
-    val returnablePaths = MapSet.empty[String, String]
-    val valueDependentPaths = MapSet.empty[String, String]
+    val dependentInstances  : Set[String] = Set.empty
+    val dependentModels     : Set[String] = Set.empty
+    val returnablePaths     : MapSet[String, String] = MapSet.empty
+    val valueDependentPaths : MapSet[String, String] = MapSet.empty
 
-    def makeValuesDependencies = this
+    def makeValuesDependencies: XPathAnalysis = this
   }
 
   // Some kind of combination that makes sense (might not exactly match the combined PathMap)
-  def combineXPathStrings(s1: String, s2: String) = "(" + s1 + ") | (" + s2 + ")"
+  def combineXPathStrings(s1: String, s2: String): String = "(" + s1 + ") | (" + s2 + ")"
 }
 
 object NegativeAnalysis {
   def apply(xpathString: String): XPathAnalysis =
     new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
-      def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+      def combine(other: XPathAnalysis): XPathAnalysis =
+        NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
     }
 }
 
 object StringAnalysis {
 
   private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
-    def combine(other: XPathAnalysis) = other
+    def combine(other: XPathAnalysis): XPathAnalysis = other
   }
 
   def apply(): XPathAnalysis = ConstantAnalysis

@@ -378,7 +378,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     connectionResult,
                     true,
                     is -> {
-                        XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, ParserConfiguration.Plain(), true);
+                        XMLParsing.inputStreamToSAX(is, connectionResult.url(), documentSAXStore, ParserConfiguration.Plain(), true, null);
                         return null;
                     }
                 );

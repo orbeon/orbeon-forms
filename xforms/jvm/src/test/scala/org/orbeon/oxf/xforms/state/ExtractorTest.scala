@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.state
 
+import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.WhitespaceMatching
 import org.orbeon.xforms.XXBLScope
@@ -45,7 +48,17 @@ class ExtractorTest
       (level, uri, localname, _) => ! ElementsToExclude(localname)
     )
 
-    XMLParsing.urlToSAX(
+    def urlToSAX(
+      urlString   : String,
+      xmlReceiver : XMLReceiver
+    ): Unit =
+      useAndClose(URLFactory.createURL(urlString).openStream) { is =>
+        useAndClose(new TransformerURIResolver(XIncludeOnly)) { resolver =>
+          XMLParsing.inputStreamToSAX(is, urlString, xmlReceiver, XIncludeOnly, handleLexical = false, resolver)
+        }
+      }
+
+    urlToSAX(
       url,
       new WhitespaceXMLReceiver(
         new XFormsAnnotator(
@@ -70,9 +83,7 @@ class ExtractorTest
         ),
         WhitespaceMatching.defaultHTMLPolicy,
         WhitespaceMatching.htmlPolicyMatcher
-      ),
-      XIncludeOnly,
-      false
+      )
     )
 
     import JXQName._

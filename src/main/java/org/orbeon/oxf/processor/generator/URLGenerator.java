@@ -29,6 +29,7 @@ import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
@@ -895,8 +896,19 @@ public class URLGenerator extends ProcessorImpl {
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-                XMLParsing.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
-                        xmlReceiver, parserConfiguration, config.isHandleLexical());
+                final TransformerURIResolver resolver = new TransformerURIResolver(parserConfiguration);
+                try {
+                    XMLParsing.readerToSAX(
+                        new InputStreamReader(inputStream, getExternalEncoding()),
+                        config.getURL().toExternalForm(),
+                        xmlReceiver,
+                        parserConfiguration,
+                        config.isHandleLexical(),
+                        resolver
+                    );
+                } finally {
+                    resolver.close();
+                }
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
                 ResourceManagerWrapper.instance().getContentAsSAX(getKey(),
@@ -1146,8 +1158,19 @@ public class URLGenerator extends ProcessorImpl {
             final ParserConfiguration parserConfiguration = ParserConfiguration.apply(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
-                XMLParsing.readerToSAX(new InputStreamReader(System.in, getExternalEncoding()), config.getURL().toExternalForm(),
-                        xmlReceiver, parserConfiguration, config.isHandleLexical());
+                final TransformerURIResolver resolver = new TransformerURIResolver(parserConfiguration);
+                try {
+                    XMLParsing.readerToSAX(
+                        new InputStreamReader(System.in, getExternalEncoding()),
+                        config.getURL().toExternalForm(),
+                        xmlReceiver,
+                        parserConfiguration,
+                        config.isHandleLexical(),
+                        resolver
+                    );
+                } finally {
+                    resolver.close();
+                }
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
                 ResourceManagerWrapper.instance().getContentAsSAX(getKey(),

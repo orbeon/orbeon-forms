@@ -312,7 +312,8 @@ private object PersistenceProxyProcessor {
               atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
           ),
           ParserConfiguration.Plain,
-          handleLexical = true
+          handleLexical = true,
+          null
         )
       }
     }

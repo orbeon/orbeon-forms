@@ -160,7 +160,7 @@ public class TransformerURIResolver implements URIResolver {
      * This is useful when a resolver is used for example by a Saxon PreparedStylesheet and we can't remove the
      * reference PreparedStylesheet has on the resolver.
      */
-    public void destroy() {
+    public void close() {
         if (destroyPipelineContext)
             pipelineContext.destroy(true);
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.resources;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.ParserConfiguration;
@@ -75,12 +76,24 @@ public abstract class ResourceManagerBase implements ResourceManager {
         final Locator[] locator = new Locator[1];
         try {
             inputStream = getContentAsStream(key);
-            XMLParsing.inputStreamToSAX(inputStream, OXFHandler.PROTOCOL + ":" + key, new ForwardingXMLReceiver(xmlReceiver) {
-                public void setDocumentLocator(Locator loc) {
-                    locator[0] = loc;
-                    super.setDocumentLocator(loc);
-                }
-            }, parserConfiguration, handleLexical);
+            final TransformerURIResolver resolver = new TransformerURIResolver(parserConfiguration);
+            try {
+                XMLParsing.inputStreamToSAX(
+                    inputStream,
+                    OXFHandler.PROTOCOL + ":" + key,
+                    new ForwardingXMLReceiver(xmlReceiver) {
+                        public void setDocumentLocator(Locator loc) {
+                            locator[0] = loc;
+                            super.setDocumentLocator(loc);
+                        }
+                    },
+                    parserConfiguration,
+                    handleLexical,
+                    resolver
+                );
+            } finally {
+                resolver.close();
+            }
         } catch (ValidationException ve) {
             throw ve;
         } catch (ResourceNotFoundException rnfe) {

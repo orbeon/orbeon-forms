@@ -479,7 +479,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         // Make sure we don't keep stale references to URI resolver objects
                         transformer.setURIResolver(null);
-                        transformerURIResolver.destroy();
+                        transformerURIResolver.close();
                     }
 
                     // Check whether some errors were added
@@ -652,7 +652,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         final TransformerURIResolver uriResolver
                                 = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, ParserConfiguration.Plain());
                         templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, createXSLTConfiguration(), errorListener, uriResolver);
-                        uriResolver.destroy();
+                        uriResolver.close();
                         templatesInfo.transformerClass = transformerClass;
                         templatesInfo.systemId = topStylesheetXMLReceiver.getSystemId();
                     }

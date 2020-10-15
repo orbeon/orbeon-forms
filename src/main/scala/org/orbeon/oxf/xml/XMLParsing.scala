@@ -17,9 +17,9 @@ import java.io.{InputStream, Reader, StringReader}
 import java.{util => ju}
 
 import javax.xml.parsers._
+import javax.xml.transform.URIResolver
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource
-import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
@@ -32,7 +32,6 @@ import org.w3c.dom.Document
 import org.xml.sax._
 
 
-
 // 2020-10-13: Some of the methods here should be moved out. There is legacy processor support, as well as
 // conversion functions.
 object XMLParsing {
@@ -43,10 +42,12 @@ object XMLParsing {
   val ErrorHandler   = new XMLParsing.ErrorHandler
 
   // 2020-10-13: 1 external call in `MSVValidationProcessor`
+  // FIXME: This can have `handleXInclude = true` and use Xerces XInclude.
   def createSAXParserFactory(parserConfiguration: ParserConfiguration): XercesSAXParserFactoryImpl =
     new XercesSAXParserFactoryImpl(parserConfiguration)
 
   // 2020-10-13: 2 external calls in `XFormsModelSchemaValidator`
+  // FIXME: This can have `handleXInclude = true` and use Xerces XInclude.
   def getSAXParserFactory(parserConfiguration: ParserConfiguration): SAXParserFactory =
     synchronized {
       val key = parserConfiguration.getKey
@@ -59,12 +60,12 @@ object XMLParsing {
     }
 
   // 2020-10-13: 1 external call in `XPath`
+  // NOTE: Does NOT pass `handleXInclude = true`.
   def newSAXParser(parserConfiguration: ParserConfiguration): SAXParser =
-    synchronized {
-      getSAXParserFactory(parserConfiguration).newSAXParser
-    }
+    getSAXParserFactory(parserConfiguration).newSAXParser
 
   // 2020-10-13: 7 external calls
+  // FIXME: May have `handleXInclude = true` which can use Xerces XInclude.
   def newXMLReader(parserConfiguration: ParserConfiguration): XMLReader = {
     val saxParser = newSAXParser(parserConfiguration)
     val xmlReader = saxParser.getXMLReader
@@ -78,7 +79,7 @@ object XMLParsing {
   //
   // @return Reader initialized with the proper encoding
   //
-  // 2020-10-13: 1 external call
+  // 2020-10-13: 1 external call in `SubmissionUtils`
   def getReaderFromXMLInputStream(inputStream: InputStream): Reader = {
     // Create a Xerces XMLInputSource
     val inputSource = new XMLInputSource(null, null, null, inputStream, null)
@@ -106,71 +107,57 @@ object XMLParsing {
    * @param parserConfiguration parser configuration
    * @param handleLexical       whether the XML parser must output SAX LexicalHandler events, including comments
    */
-  //  2020-10-13: 2 external callers
+  // 2020-10-13: 2 external callers
+  // NOTE: Do NOT pass `handleXInclude = true`.
   def stringToSAX(
     xml                 : String,
     urlString           : String,
     xmlReceiver         : XMLReceiver,
     parserConfiguration : ParserConfiguration,
     handleLexical       : Boolean
-  ): Unit = {
-    if (StringUtils.trimAllToEmpty(xml) == "") try {
+  ): Unit =
+    if (StringUtils.trimAllToEmpty(xml) == "") {
       xmlReceiver.startDocument()
       xmlReceiver.endDocument()
-    } catch {
-      case e: SAXException =>
-        throw new OXFException(e)
-    }
-    else readerToSAX(new StringReader(xml), urlString, xmlReceiver, parserConfiguration, handleLexical)
-  }
+    } else
+      readerToSAX(new StringReader(xml), urlString, xmlReceiver, parserConfiguration, handleLexical, null)
 
-  // Read a URL into SAX events.
-  //
-  // TODO: We shouldn't have `URL` handling here.
-  // 2020-10-13: 3 non-test external callers
-  def urlToSAX(
-    urlString          : String,
-    xmlReceiver        : XMLReceiver,
-    parserConfiguration: ParserConfiguration,
-    handleLexical      : Boolean
-  ): Unit = {
-    val url = URLFactory.createURL(urlString)
-    useAndClose(url.openStream) { is =>
-      val inputSource = new InputSource(is)
-      inputSource.setSystemId(urlString)
-      inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical)
-    }
-  }
-
-  //  2020-10-13: 5 external callers
+  // 2020-10-13: 9 external callers
+  // NOTE: This will use our own XInclude implementation.
+  // TODO: Only tests use XInclude.
   def inputStreamToSAX(
     inputStream         : InputStream,
     urlString           : String,
     xmlReceiver         : XMLReceiver,
     parserConfiguration : ParserConfiguration,
-    handleLexical       : Boolean
+    handleLexical       : Boolean,
+    resolver            : TransformerURIResolver // must be closed by caller if needed.
   ): Unit = {
     val inputSource = new InputSource(inputStream)
     inputSource.setSystemId(urlString)
-    inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical)
+    inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical, resolver)
   }
 
   // 2020-10-13: 2 external calls in `URLGenerator`
+  // NOTE: This will use our own XInclude implementation.
+  // NOTE: Internal caller does NOT pass `handleXInclude = true`.
+  // TODO: URLGenerator may pass `handleXInclude = true`.
   def readerToSAX(
     reader              : Reader,
     urlString           : String,
     xmlReceiver         : XMLReceiver,
     parserConfiguration : ParserConfiguration,
-    handleLexical       : Boolean
+    handleLexical       : Boolean,
+    resolver            : TransformerURIResolver // must be closed by caller if needed.
   ): Unit = {
     val inputSource = new InputSource(reader)
     inputSource.setSystemId(urlString)
-    inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical)
+    inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical, resolver)
   }
 
   // Return whether the given string contains well-formed XML.
   //
-  //  2020-10-13: 1 external caller
+  // 2020-10-13: 1 external caller
   def isWellFormedXML(xmlString: String): Boolean = {
     // Empty string is never well-formed XML
     if (xmlString.trimAllToOpt.isEmpty)
@@ -218,6 +205,9 @@ object XMLParsing {
 
   class EntityResolver extends org.xml.sax.EntityResolver {
     def resolveEntity(publicId: String, systemId: String): InputSource = {
+      // 2020-10-13: Thought we might just not support external entities at all. But
+      // some of our tests fail if we just remove this.
+      // TODO: Remove dependency on `URLFactory`?
       val is = new InputSource
       is.setSystemId(systemId)
       is.setPublicId(publicId)
@@ -259,33 +249,30 @@ object XMLParsing {
     val parserFactories = new ju.HashMap[String, SAXParserFactory]
 
     def inputSourceToSAX(
-      inputSource: InputSource,
-      _xmlReceiver: XMLReceiver,
-      _parserConfiguration: ParserConfiguration,
-      handleLexical: Boolean
+      inputSource         : InputSource,
+      xmlReceiver         : XMLReceiver,
+      parserConfiguration : ParserConfiguration,
+      handleLexical       : Boolean,
+      resolver            : TransformerURIResolver
     ): Unit = {
-      var xmlReceiver = _xmlReceiver
-      var parserConfiguration =_parserConfiguration
-      // Insert XInclude processor if needed
-      val resolver =
-        if (parserConfiguration.handleXInclude) {
-          parserConfiguration =
-            new ParserConfiguration(
-              parserConfiguration.validating,
-              false,
-              parserConfiguration.externalEntities,
-              parserConfiguration.uriReferences
-            )
-          val resolver = new TransformerURIResolver(ParserConfiguration.Plain)
-          xmlReceiver = new XIncludeReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver)
-          resolver
-        } else
-          null
+
+      val (newXmlReceiver, newParserConfiguration) =
+        if (parserConfiguration.handleXInclude && (resolver ne null))
+          (
+            new XIncludeReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver),
+            parserConfiguration.copy(handleXInclude = false)
+          )
+        else
+          (
+            xmlReceiver,
+            parserConfiguration
+          )
+
       try {
-        val xmlReader = newSAXParser(parserConfiguration).getXMLReader
-        xmlReader.setContentHandler(xmlReceiver)
+        val xmlReader = newSAXParser(newParserConfiguration).getXMLReader
+        xmlReader.setContentHandler(newXmlReceiver)
         if (handleLexical)
-          xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver)
+          xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, newXmlReceiver)
         xmlReader.setEntityResolver(EntityResolver)
         xmlReader.setErrorHandler(ErrorHandler)
         xmlReader.parse(inputSource)
@@ -294,7 +281,7 @@ object XMLParsing {
           throw new ValidationException(e.getMessage, XmlLocationData.apply(e))
         case e: Exception =>
           throw new OXFException(e)
-      } finally if (resolver != null) resolver.destroy()
+      }
     }
 
     //

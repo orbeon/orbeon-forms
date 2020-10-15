@@ -14,7 +14,10 @@
 package org.orbeon.oxf.xml
 
 import org.junit.Test
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.persistence.relational.rest.RequestReader
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xml.JXQName._
 import org.orbeon.oxf.xml.ParserConfiguration._
@@ -35,7 +38,17 @@ class FormRunnerFilterReceiverTest extends ResourceManagerTestBase with Assertio
         RequestReader.isMetadataElement
       )
 
-    XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/fr/form-with-metadata.xhtml", metadataFilter, XIncludeOnly, false)
+    def urlToSAX(
+      urlString   : String,
+      xmlReceiver : XMLReceiver
+    ): Unit =
+      useAndClose(URLFactory.createURL(urlString).openStream) { is =>
+        useAndClose(new TransformerURIResolver(XIncludeOnly)) { resolver =>
+          XMLParsing.inputStreamToSAX(is, urlString, xmlReceiver, XIncludeOnly, handleLexical = false, resolver)
+        }
+      }
+
+    urlToSAX("oxf:/org/orbeon/oxf/fr/form-with-metadata.xhtml", metadataFilter)
 
     val XMLLang    = JXQName("http://www.w3.org/XML/1998/namespace" -> "lang")
     val Operations = JXQName("operations")

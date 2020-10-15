@@ -369,10 +369,10 @@ public class TransformerUtils {
                 xmlReceiver = dom4jResult;
             }
             try {
-                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical, null);
             } finally {
                 if (resolver != null)
-                    resolver.destroy();
+                    resolver.close();
             }
         }
         return dom4jResult.getDocument();
@@ -399,7 +399,7 @@ public class TransformerUtils {
                 sourceToSAX(source, xmlReceiver);
             } finally {
                 if (resolver != null)
-                    resolver.destroy();
+                    resolver.close();
             }
         }
         return dom4jResult.getDocument();
@@ -431,10 +431,10 @@ public class TransformerUtils {
                 xmlReceiver = identityHandler;
             }
             try {
-                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical);
+                XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical, null);
             } finally {
                 if (resolver != null)
-                    resolver.destroy();
+                    resolver.close();
             }
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
@@ -465,7 +465,7 @@ public class TransformerUtils {
                 }
             } finally {
                 if (resolver != null)
-                    resolver.destroy();
+                    resolver.close();
             }
         } catch (TransformerException e) {
             throw new OXFException(e);

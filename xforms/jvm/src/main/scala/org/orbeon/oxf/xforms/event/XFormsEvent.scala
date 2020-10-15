@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.SaxonUtilsDependsOnXPath
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.saxon.om._
 import org.orbeon.xforms.XFormsId
@@ -110,9 +110,9 @@ abstract class XFormsEvent(
     // empty node-set is returned."
 
     def handleOneLevel(any: Any): SequenceIterator = any match {
-      case s: Seq[_]       => listIterator(s map SaxonUtils.anyToItemIfNeeded)
+      case s: Seq[_]       => listIterator(s map SaxonUtilsDependsOnXPath.anyToItemIfNeeded)
       case e: Either[_, _] => e.fold(handleOneLevel, handleOneLevel)
-      case other           => itemIterator(SaxonUtils.anyToItemIfNeeded(other))
+      case other           => itemIterator(SaxonUtilsDependsOnXPath.anyToItemIfNeeded(other))
     }
 
     allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator

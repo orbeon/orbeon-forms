@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
@@ -45,7 +45,7 @@ class ImageMetadata extends DefaultFunctionSupport {
       IOUtils.useAndClose(is) { _ =>
         stringArgument(1) match {
           case "mediatype" => findImageMediatype(is) map stringToStringValue
-          case name        => findKnownMetadata(is, MetadataType.withName(name)) map SaxonUtils.anyToItem
+          case name        => findKnownMetadata(is, MetadataType.withName(name)) map SaxonUtilsDependsOnXPath.anyToItem
         }
       }
 

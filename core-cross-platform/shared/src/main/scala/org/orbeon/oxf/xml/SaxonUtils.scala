@@ -16,7 +16,6 @@ package org.orbeon.oxf.xml
 import java.net.URI
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
@@ -53,17 +52,6 @@ object SaxonUtils {
       case v: StringValue => new StringValueWithEquals(v.getStringValueCS).asInstanceOf[V] // we know it's ok...
       case v              => v
     }
-
-  // Convert a Java object to a Saxon Item using the Saxon API
-  val anyToItem: Any => Item = new StandardObjectConverter(new SaxonXQDataFactory {
-    def getConfiguration: Configuration = util.XPath.GlobalConfiguration
-  }).convertToItem(_: Any)
-
-  // Convert a Java object to a Saxon Item but keep unchanged if already an Item
-  val anyToItemIfNeeded: Any => Item = {
-    case i: Item => i
-    case a       => anyToItem(a)
-  }
 
   // Effective boolean value of the iterator
   def effectiveBooleanValue(iterator: SequenceIterator): Boolean =

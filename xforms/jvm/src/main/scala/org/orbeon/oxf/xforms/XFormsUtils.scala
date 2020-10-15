@@ -326,9 +326,6 @@ object XFormsUtils {
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Node]
   }
 
-  def maybeAVT(attributeValue: String): Boolean =
-    attributeValue.indexOf('{') != -1
-
   def getNamespacedFormId(containingDocument: XFormsContainingDocument): String =
     namespaceId(containingDocument, "xforms-form")
 }

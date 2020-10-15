@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttributeControl}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
@@ -291,7 +292,7 @@ object XFormsElementValue {
             val currentAttributeName = currentAttribute.getName
             val currentAttributeValue = currentAttribute.getValue
             val resolvedValue =
-              if (hostLanguageAVTs && XFormsUtils.maybeAVT(currentAttributeValue)) {
+              if (hostLanguageAVTs && XMLUtils.maybeAVT(currentAttributeValue)) {
                 // This is an AVT, use attribute control to produce the output
                 val attributeControl = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue, element.getName)
 

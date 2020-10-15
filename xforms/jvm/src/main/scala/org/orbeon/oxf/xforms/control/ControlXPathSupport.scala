@@ -19,8 +19,9 @@ import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.xml.NamespaceMapping
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -45,7 +46,7 @@ trait ControlXPathSupport {
 
     assert(isRelevant)
 
-    if (! XFormsUtils.maybeAVT(attributeValue))
+    if (! XMLUtils.maybeAVT(attributeValue))
       // Definitely not an AVT
       attributeValue
     else {

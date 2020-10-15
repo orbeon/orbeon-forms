@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
@@ -286,7 +285,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                             if ("".equals(currentAttributeURI) || XMLConstants.XML_URI().equals(currentAttributeURI)) {
                                 // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                                 final String attributeValue = attributes.getValue(i);
-                                if (XFormsUtils.maybeAVT(attributeValue)) {
+                                if (XMLUtils.maybeAVT(attributeValue)) {
                                     // This is an AVT
                                     final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
 
@@ -480,7 +479,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if ("".equals(currentAttributeURI) || XMLConstants.XML_URI().equals(currentAttributeURI)) {
                     // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                     final String attributeValue = attributes.getValue(i);
-                    if (XFormsUtils.maybeAVT(attributeValue)) {
+                    if (XMLUtils.maybeAVT(attributeValue)) {
                         // This is an AVT
                         return true;
                     }

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.Item
@@ -299,7 +300,7 @@ class XFormsActionInterpreter(
       return null
 
     // Whether this can't be an AVT
-    if (XFormsUtils.maybeAVT(attributeValue)) {
+    if (XMLUtils.maybeAVT(attributeValue)) {
       // We have to go through AVT evaluation
 
       val bindingContext = actionXPathContext.getCurrentBindingContext

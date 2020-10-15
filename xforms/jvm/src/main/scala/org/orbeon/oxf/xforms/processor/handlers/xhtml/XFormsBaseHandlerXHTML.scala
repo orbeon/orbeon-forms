@@ -203,7 +203,7 @@ abstract class XFormsBaseHandlerXHTML (
     // @class
     val evaluatedClassValueOpt =
       Option(controlAttributes.getValue("class")) flatMap { classValue =>
-        if (!XFormsUtils.maybeAVT(classValue)) {
+        if (! XMLUtils.maybeAVT(classValue)) {
           // Definitely not an AVT
           Some(classValue)
         } else {

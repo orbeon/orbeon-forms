@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.oxf.{util => u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
@@ -340,7 +340,7 @@ trait ProcessInterpreter extends Logging {
 
   // TODO
   def evaluateValueTemplate(valueTemplate: String): String =
-    if (! XFormsUtils.maybeAVT(valueTemplate))
+    if (! XMLUtils.maybeAVT(valueTemplate))
       valueTemplate
     else
       evalValueTemplate(

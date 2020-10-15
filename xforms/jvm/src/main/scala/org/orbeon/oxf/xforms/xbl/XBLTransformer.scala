@@ -20,9 +20,10 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms.PartAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
-import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -318,8 +319,9 @@ object XBLTransformer {
       if (supportAVTs) {
         for (att <- currentElem.attributes) {
           val attValue = att.getValue
-          if (XFormsUtils.maybeAVT(attValue)) {
+          if (XMLUtils.maybeAVT(attValue)) {
             val newValue = XPathCache.evaluateAsAvt(
+
               boundElementInfo,
               attValue,
               NamespaceMapping(currentElem.allInScopeNamespacesAsStrings),

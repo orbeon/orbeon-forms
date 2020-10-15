@@ -19,10 +19,10 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
@@ -191,7 +191,7 @@ abstract class ElementAnalysis(
     )
 
   final lazy val nonRelevantExtensionAttributes =
-    extensionAttributes map { case (k, v) => k -> (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
+    extensionAttributes map { case (k, v) => k -> (if (XMLUtils.maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
   final var contextAnalysis: Option[XPathAnalysis] = None

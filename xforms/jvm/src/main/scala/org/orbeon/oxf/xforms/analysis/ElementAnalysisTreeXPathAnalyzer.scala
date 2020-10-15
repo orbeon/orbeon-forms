@@ -17,12 +17,12 @@ import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
-import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
+import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLUtils}
 import org.orbeon.xforms.XFormsNames._
 
 import scala.collection.mutable
@@ -189,7 +189,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                       for {
                         attribute <- element.attributes
                         attributeValue = attribute.getValue
-                        if XFormsUtils.maybeAVT(attributeValue)
+                        if XMLUtils.maybeAVT(attributeValue)
                       } locally {
                         // not supported just yet
                         combinedAnalysis = NegativeAnalysis(attributeValue)

@@ -18,10 +18,10 @@ import java.net.{URI, URISyntaxException}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -283,7 +283,7 @@ class XFormsExtractor(
         Option(attributes.getValue(XML_URI, "lang")) match {
           case some @ Some(xmlLangAttribute) =>
             some -> (
-              if (XFormsUtils.maybeAVT(xmlLangAttribute))
+              if (XMLUtils.maybeAVT(xmlLangAttribute))
                 Option(staticId)
               else
                 parentElementDetails.xmlLangAvtIdOpt
@@ -345,7 +345,7 @@ class XFormsExtractor(
       elementStack.head.xmlLangOpt foreach { xmlLang =>
         val newXMLLang =
           elementStack.head.xmlLangAvtIdOpt match {
-            case Some(xmlLangAvtId) if XFormsUtils.maybeAVT(xmlLang) =>
+            case Some(xmlLangAvtId) if XMLUtils.maybeAVT(xmlLang) =>
               // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
               // xml:lang containing the id of the control that evaluates the runtime value.
               "#" + xmlLangAvtId

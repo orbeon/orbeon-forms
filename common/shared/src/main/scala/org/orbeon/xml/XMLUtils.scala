@@ -3,6 +3,9 @@ package org.orbeon.oxf.xml
 
 object XMLUtils {
 
+  def maybeAVT(attributeValue: String): Boolean =
+    attributeValue.indexOf('{') != -1
+
   def prefixFromQName(qName: String): String = {
     val colonIndex = qName.indexOf(':')
     if (colonIndex == -1)

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUt
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.{SaxonUtils, XMLUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
@@ -397,7 +397,7 @@ object ItemsetSupport {
               attributeValue        : String,
               elemEffectiveId       : String
             ): Option[(QName, String)] =
-              if (! XFormsUtils.maybeAVT(attributeValue)) {
+              if (! XMLUtils.maybeAVT(attributeValue)) {
                 Some(attributeName -> attributeValue)
               } else {
                 val currentBindingContext = contextStack.getCurrentBindingContext

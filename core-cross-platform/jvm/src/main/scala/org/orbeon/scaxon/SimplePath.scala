@@ -16,11 +16,11 @@ package org.orbeon.scaxon
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.Token
+import org.orbeon.saxon.`type`.Type // moved in Saxon 10
+import org.orbeon.saxon.expr.Token // moved in Saxon 10
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
-import org.orbeon.saxon.tinytree.TinyTree
+import org.orbeon.saxon.tinytree.TinyTree // moved in Saxon 10
 
 import scala.jdk.CollectionConverters._
 

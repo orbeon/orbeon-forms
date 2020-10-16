@@ -33,7 +33,7 @@ trait XPathTrait {
 
   // To resolve a variable
   // Used by `ShareableXPathStaticContext`
-  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
+  type VariableResolver
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller

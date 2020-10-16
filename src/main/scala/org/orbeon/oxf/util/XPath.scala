@@ -44,6 +44,7 @@ import scala.util.control.NonFatal
 object XPath extends XPathTrait {
 
   type SaxonConfiguration = Configuration
+  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller

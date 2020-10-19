@@ -40,6 +40,28 @@ sealed trait LangRef
 case class LiteralLangRef(lang: String)      extends LangRef
 case class AVTLangRef(att: AttributeControl) extends LangRef
 
+// TODO: What's needed for construction?
+trait Metadata {
+  def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
+}
+
+// TODO: What's needed for construction vs other?
+trait PartAnalysisImpl {
+
+  def isTopLevel: Boolean
+
+  def getIndentedLogger: IndentedLogger // in `PartAnalysis`
+  def getModel: Model // PartGlobalOps
+  def getModel(prefixedId: String): Model // PartModelAnalysis
+  def getDefaultModelForScope(scope: Scope): Option[Model] // PartModelAnalysis
+  def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl // PartGlobalOps
+  def containingScope(prefixedId: String): Scope // PartGlobalOps
+  def scopeForPrefixedId(prefixedId: String): Scope // PartGlobalOps
+  def metadata: Metadata // in `PartAnalysis`
+  def elementInParent: Option[ElementAnalysis] // in `PartAnalysis`
+  def getEventHandlers(observerPrefixedId: String): List[EventHandler]
+}
+
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
@@ -198,12 +220,6 @@ abstract class ElementAnalysis(
   final var bindingAnalysis: Option[XPathAnalysis] = None
   final var valueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
   // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
-
-  /**
-   * Return the context within which children elements or values evaluate. This is the element binding if any, or the
-   * element context if there is no binding.
-   */
-  def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) bindingAnalysis else contextAnalysis
 
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 

@@ -81,7 +81,7 @@ class StaticBind(
     }
 
     // Default to negative, analyzeXPath() can change that
-    var analysis: XPathAnalysis = NegativeAnalysis(expression)
+    var analysis: XPathAnalysis = new NegativeAnalysis(expression)
   }
 
   object XPathMIP {

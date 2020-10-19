@@ -31,52 +31,23 @@ abstract class XPathAnalysis {
 
   def returnableInstances: Iterable[String] = returnablePaths.map.keys
 
-  // Combine this analysis with another one and return a new analysis
-  def combine(other: XPathAnalysis): XPathAnalysis
-
-  // Convert this analysis into the same analysis, where values have become dependencies
-  def makeValuesDependencies: XPathAnalysis
-
   def freeTransientState(): Unit = ()
 }
 
-/**
- * Represent a path into an instance.
- */
-case class InstancePath(instancePrefixedId: String, path: String)
+// Constant analysis, positive or negative
+sealed abstract class ConstantXPathAnalysis(val xpathString: String, val figuredOutDependencies: Boolean)
+  extends XPathAnalysis {
 
-object XPathAnalysis {
+  require(xpathString ne null)
 
-  // Constant analysis, positive or negative
-  abstract class ConstantXPathAnalysis(val xpathString: String, val figuredOutDependencies: Boolean) extends XPathAnalysis {
-
-    require(xpathString ne null)
-
-    val dependentInstances  : Set[String] = Set.empty
-    val dependentModels     : Set[String] = Set.empty
-    val returnablePaths     : MapSet[String, String] = MapSet.empty
-    val valueDependentPaths : MapSet[String, String] = MapSet.empty
-
-    def makeValuesDependencies: XPathAnalysis = this
-  }
-
-  // Some kind of combination that makes sense (might not exactly match the combined PathMap)
-  def combineXPathStrings(s1: String, s2: String): String = "(" + s1 + ") | (" + s2 + ")"
+  val dependentInstances  : Set[String] = Set.empty
+  val dependentModels     : Set[String] = Set.empty
+  val returnablePaths     : MapSet[String, String] = MapSet.empty
+  val valueDependentPaths : MapSet[String, String] = MapSet.empty
 }
 
-object NegativeAnalysis {
-  def apply(xpathString: String): XPathAnalysis =
-    new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
-      def combine(other: XPathAnalysis): XPathAnalysis =
-        NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
-    }
-}
+class NegativeAnalysis(xpathString: String)
+  extends ConstantXPathAnalysis(xpathString, figuredOutDependencies = false)
 
-object StringAnalysis {
-
-  private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
-    def combine(other: XPathAnalysis): XPathAnalysis = other
-  }
-
-  def apply(): XPathAnalysis = ConstantAnalysis
-}
+object StringAnalysis
+  extends ConstantXPathAnalysis("'CONSTANT'", figuredOutDependencies = true)

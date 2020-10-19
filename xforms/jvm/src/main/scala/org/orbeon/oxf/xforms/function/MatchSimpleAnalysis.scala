@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+import org.orbeon.oxf.xforms.analysis.{ConstantXPathAnalysis, ElementAnalysis, PathMapXPathAnalysis}
 import org.orbeon.saxon.expr.PathMap
-import org.orbeon.oxf.xforms.analysis.{PathMapXPathAnalysis, ElementAnalysis}
-import org.orbeon.oxf.xforms.analysis.XPathAnalysis.ConstantXPathAnalysis
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+
 
 trait MatchSimpleAnalysis {
+
   def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
     case Some(element) if element.bindingAnalysis.isDefined && element.bindingAnalysis.get.figuredOutDependencies =>
       // Clone the PathMap first because the nodes returned must belong to this PathMap

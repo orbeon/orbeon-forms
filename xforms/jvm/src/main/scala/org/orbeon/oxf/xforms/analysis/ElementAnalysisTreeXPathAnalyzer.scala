@@ -17,7 +17,8 @@ import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.XPath.CompiledExpression
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysisBuilder.buildInstanceString
+import org.orbeon.oxf.xforms.{MapSet, XFormsProperties}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
@@ -84,13 +85,13 @@ object ElementAnalysisTreeXPathAnalyzer {
 
       def findInScopeContext: Option[XPathAnalysis] =
         ElementAnalysis.getClosestAncestorInScopeModel(e, (e.scope, e.model)) match {
-          case Some(ancestor: ElementAnalysis) =>
+          case Some(ancestor) =>
             // There is an ancestor in the same scope with same model, use its analysis as base
-            ancestor.getChildrenContext
+            getChildrenContext(ancestor)
           case None =>
             // We are top-level in a scope/model combination
             e.model match {
-              case Some(containingModel) => containingModel.getChildrenContext // ask model
+              case Some(containingModel) => getChildrenContext(containingModel) // ask model
               case None                  => None // no model
             }
         }
@@ -165,7 +166,7 @@ object ElementAnalysisTreeXPathAnalyzer {
               // NOTE: We do allow @context and/or @model on LHHA element, which can change the context
 
               // The subtree can only contain HTML elements interspersed with xf:output. HTML elements may have AVTs.
-              var combinedAnalysis: XPathAnalysis = StringAnalysis()
+              var combinedAnalysis: XPathAnalysis = StringAnalysis
 
               e.element.visitDescendants(
                 new VisitorListener {
@@ -184,7 +185,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                         ) with ValueTrait with OptionalSingleNode with ViewTrait
                       ElementAnalysisTreeXPathAnalyzer.analyzeXPath(outputAnalysis)
                       if (outputAnalysis.valueAnalysis.isDefined)
-                        combinedAnalysis = combinedAnalysis combine outputAnalysis.valueAnalysis.get
+                        combinedAnalysis = combineXPathAnalysis(combinedAnalysis, outputAnalysis.valueAnalysis.get)
                     } else if (hostLanguageAVTs) {
                       for {
                         attribute <- element.attributes
@@ -192,7 +193,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                         if XMLUtils.maybeAVT(attributeValue)
                       } locally {
                         // not supported just yet
-                        combinedAnalysis = NegativeAnalysis(attributeValue)
+                        combinedAnalysis = new NegativeAnalysis(attributeValue)
                       }
                     }
                   }
@@ -208,18 +209,18 @@ object ElementAnalysisTreeXPathAnalyzer {
             }
           } else {
             // Value of LHHA is 100% static and analysis is constant
-            StringAnalysis().some
+            StringAnalysis.some
           }
         case e: StaticBind =>
           // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
           e.typeMIPOpt orElse e.nonPreserveWhitespaceMIPOpt match {
-            case Some(_) if e.hasBinding => analyzeXPath(e, e.getChildrenContext, "string(.)").some // TODO: function to create `string()`
+            case Some(_) if e.hasBinding => analyzeXPath(e, getChildrenContext(e), "string(.)").some // TODO: function to create `string()`
             case _                       => None
           }
 
         case _: Model                                    => None
         case e: OutputControl if e.staticValue.isDefined => None
-        case e: AttributeControl                         => analyzeXPath(e, e.getChildrenContext, e.attributeValue, avt = true).some
+        case e: AttributeControl                         => analyzeXPath(e, getChildrenContext(e), e.attributeValue, avt = true).some
         case e: VariableAnalysisTrait =>
 
           valueOrSequenceElement(e.element) match {
@@ -254,9 +255,9 @@ object ElementAnalysisTreeXPathAnalyzer {
               val valueXPathAnalysis =
                 VariableAnalysis.valueOrSelectAttribute(valueElement) match {
                   case Some(value) =>
-                    analyzeXPath(valueElementAnalysis, valueElementAnalysis.getChildrenContext, value).some
+                    analyzeXPath(valueElementAnalysis, getChildrenContext(valueElementAnalysis), value).some
                   case None =>
-                    Some(StringAnalysis()) // TODO: store constant value?
+                    Some(StringAnalysis) // TODO: store constant value?
                 }
 
               valueXPathAnalysis
@@ -265,14 +266,14 @@ object ElementAnalysisTreeXPathAnalyzer {
               // No nested `xxf:value` element
 
               valueOrSelectAttribute(e.element) match {
-                case Some(value) => analyzeXPath(e, e.getChildrenContext, value).some
-                case _           => StringAnalysis().some // TODO: store constant value?
+                case Some(value) => analyzeXPath(e, getChildrenContext(e), value).some
+                case _           => StringAnalysis.some // TODO: store constant value?
               }
           }
         case e: ValueTrait =>
           val subExpression =
             if (e.value.isDefined) "string((" + e.value.get + ")[1])" else "string(.)" // TODO: function to create `string()`
-          analyzeXPath(e, e.getChildrenContext, subExpression).some
+          analyzeXPath(e, getChildrenContext(e), subExpression).some
         case _ =>
           None
       }
@@ -328,7 +329,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
       // Analyze and remember if figured out
-      analyzeXPathWithCompiledExpression(bind, bind.getChildrenContext, allBindVariablesInScope, mip.compiledExpression) match {
+      analyzeXPathWithCompiledExpression(bind, getChildrenContext(bind), allBindVariablesInScope, mip.compiledExpression) match {
         case valueAnalysis if valueAnalysis.figuredOutDependencies => mip.analysis = valueAnalysis
         case _ => // NOP
       }
@@ -381,7 +382,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
       // TODO: operate on nested ElementAnalysis instead of Element
 
-      var combinedAnalysis: XPathAnalysis = StringAnalysis()
+      var combinedAnalysis: XPathAnalysis = StringAnalysis
 
       e.element.visitDescendants(
         new VisitorListener {
@@ -404,15 +405,16 @@ object ElementAnalysisTreeXPathAnalyzer {
 
               nestedElementOpt foreach { nestedElement =>
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
-                  part      = e.part,
-                  index     = e.index, // wrong
-                  element   = nestedElement,
-                  parent    = Some(itemElementAnalysis),
-                  preceding = None,
-                  scope     = itemElementAnalysis.getChildElementScope(nestedElement)
+                  part        = e.part,
+                  index       = e.index, // wrong
+                  element     = nestedElement,
+                  parent      = Some(itemElementAnalysis),
+                  preceding   = None,
+                  scope       = itemElementAnalysis.getChildElementScope(nestedElement),
+                  staticValue = None
                 )
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(nestedAnalysis)
-                combinedAnalysis = combinedAnalysis combine nestedAnalysis.valueAnalysis.get
+                combinedAnalysis = combineXPathAnalysis(combinedAnalysis, nestedAnalysis.valueAnalysis.get)
               }
             }
 
@@ -435,7 +437,11 @@ object ElementAnalysisTreeXPathAnalyzer {
                 //
                 // See also #289 https://github.com/orbeon/orbeon-forms/issues/289 (closed)
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
-                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.bindingAnalysis.get.makeValuesDependencies
+                combinedAnalysis =
+                  combineXPathAnalysis(
+                    combinedAnalysis,
+                    makeValuesDependencies(itemElementAnalysis.bindingAnalysis.get)
+                  )
 
                 processElement(LABEL_QNAME, required = true)
                 processElement(XFORMS_VALUE_QNAME, required = false)
@@ -450,7 +456,11 @@ object ElementAnalysisTreeXPathAnalyzer {
 
                 // Analyze container and add as a value dependency (see above)
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
-                combinedAnalysis = combinedAnalysis combine itemElementAnalysis.bindingAnalysis.get.makeValuesDependencies
+                combinedAnalysis =
+                  combineXPathAnalysis(
+                    combinedAnalysis,
+                    makeValuesDependencies(itemElementAnalysis.bindingAnalysis.get)
+                  )
 
                 processElement(LABEL_QNAME, required = false) // label is optional on xf:choices
 
@@ -488,7 +498,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       xpathString      : String,
       avt              : Boolean
     ): XPathAnalysis =
-      PathMapXPathAnalysis(
+      PathMapXPathAnalysisBuilder(
         partAnalysis              = e.part,
         xpathString               = xpathString,
         namespaceMapping          = e.part.metadata.getNamespaceMapping(e.prefixedId).orNull,
@@ -509,7 +519,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       expression       : CompiledExpression
     ): XPathAnalysis = {
       val defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)
-      PathMapXPathAnalysis(
+      PathMapXPathAnalysisBuilder(
         partAnalysis              = e.part,
         compiledExpression        = expression,
         baseAnalysis              = contextAnalysis,
@@ -520,5 +530,83 @@ object ElementAnalysisTreeXPathAnalyzer {
         element                   = e.element
       )
     }
+
+    def combineXPathAnalysis(xpa1: XPathAnalysis, xpa2: XPathAnalysis): XPathAnalysis =
+      xpa1 match {
+        case na: NegativeAnalysis =>
+          new NegativeAnalysis(combineXPathStrings(na.xpathString, xpa2.xpathString))
+        case StringAnalysis =>
+          xpa2
+        case pmxpa: PathMapXPathAnalysis =>
+          if (! pmxpa.figuredOutDependencies || ! xpa2.figuredOutDependencies)
+            // Either side is negative, return a constant negative with the combined expression
+            new NegativeAnalysis(combineXPathStrings(pmxpa.xpathString, xpa2.xpathString))
+          else
+            xpa2 match {
+              case _: ConstantXPathAnalysis =>
+                // Other is constant positive analysis, so just return this
+                pmxpa
+              case other: PathMapXPathAnalysis =>
+                // Both are PathMap analysis so actually combine
+                new PathMapXPathAnalysis(
+                  combineXPathStrings(pmxpa.xpathString, other.xpathString),
+                  {
+                    val newPathmap = pmxpa.pathmap.get.clone
+                    newPathmap.addRoots(other.pathmap.get.clone.getPathMapRoots)
+                    Some(newPathmap)
+                  },
+                  true,
+                  pmxpa.valueDependentPaths combine other.valueDependentPaths,
+                  pmxpa.returnablePaths combine other.returnablePaths,
+                  pmxpa.dependentModels ++ other.dependentModels,
+                  pmxpa.dependentInstances ++ other.dependentInstances
+                )
+              case _ =>
+                throw new IllegalStateException // should not happen
+            }
+      }
+
+    // Convert the `XPathAnalysis` into the same analysis but where values have become dependencies
+    def makeValuesDependencies(xpa: XPathAnalysis): XPathAnalysis =
+      xpa match {
+        case cxpa: ConstantXPathAnalysis => cxpa
+        case pmxpa: PathMapXPathAnalysis =>
+          new PathMapXPathAnalysis(
+            xpathString            = pmxpa.xpathString,
+            pathmap                = Some(pmxpa.pathmap.get.clone),
+            figuredOutDependencies = true,
+            valueDependentPaths    = pmxpa.valueDependentPaths combine pmxpa.returnablePaths,
+            returnablePaths        = MapSet.empty[String, String],
+            dependentModels        = pmxpa.dependentModels,
+            dependentInstances     = pmxpa.dependentInstances
+          )
+      }
+
+    // Some kind of combination that makes sense (might not exactly match the combined PathMap)
+    def combineXPathStrings(s1: String, s2: String): String = "(" + s1 + ") | (" + s2 + ")"
+
+    // Return the context within which children elements or values evaluate. This is the element binding if any, or the
+    // element context if there is no binding.
+    def getChildrenContext(e: ElementAnalysis): Option[XPathAnalysis] =
+      e match {
+        case m: Model =>
+          m.defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
+            PathMapXPathAnalysisBuilder(
+              partAnalysis              = m.part,
+              xpathString               = buildInstanceString(defaultInstancePrefixedId),
+              namespaceMapping          = null,
+              baseAnalysis              = None,
+              inScopeVariables          = Map.empty,
+              pathMapContext            = null,
+              scope                     = m.scope,
+              defaultInstancePrefixedId = defaultInstancePrefixedId.some,
+              locationData              = m.locationData,
+              element                   = m.element,
+              avt                       = false
+            )
+          }
+        case e =>
+          if (e.hasBinding) e.bindingAnalysis else e.contextAnalysis
+      }
   }
 }

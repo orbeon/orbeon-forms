@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.xforms.XFormsNames.XXFORMS_VALIDATION_MODE_QNAME
 import org.orbeon.saxon.om.Item
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 trait SingleNodeTrait extends ElementAnalysis {
@@ -26,7 +26,7 @@ trait SingleNodeTrait extends ElementAnalysis {
   // item or not is a property of the control type, not of a specific instance of concrete control. So we place this
   // here instead of in concrete controls. This also helps Form Builder, which sometimes needs to test whether
   // a binding is allowed without having access to a concrete control.
-  def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)
+  def isAllowedBoundItem(item: Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
 
   val explicitValidation: Boolean = Option(element.attributeValue(XXFORMS_VALIDATION_MODE_QNAME)) match {
     case Some("explicit") => true

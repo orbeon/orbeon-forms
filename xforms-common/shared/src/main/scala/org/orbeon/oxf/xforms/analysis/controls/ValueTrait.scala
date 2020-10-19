@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.saxon.om.Item
 
 /**
@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.Item
  */
 trait ValueTrait extends ElementAnalysis with SingleNodeTrait {
 
-  override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedValueBoundItem(item)
+  override def isAllowedBoundItem(item: Item): Boolean = StaticDataModel.isAllowedValueBoundItem(item)
 
   // TODO: Move value handling from ElementAnalysis to here? Need base trait to handle value controls, variables, and LHHA.
 }

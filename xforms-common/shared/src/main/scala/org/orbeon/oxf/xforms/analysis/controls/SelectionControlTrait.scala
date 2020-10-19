@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
@@ -108,7 +108,7 @@ trait SelectionControlTrait
 
   override def isAllowedBoundItem(item: om.Item): Boolean =
     if (useCopy)
-      DataModel.isAllowedBoundItem(item)
+      StaticDataModel.isAllowedBoundItem(item)
     else
       super.isAllowedBoundItem(item)
 

@@ -563,7 +563,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -621,7 +621,7 @@ lazy val formBuilderJS = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -692,7 +692,7 @@ lazy val xformsJS = xforms.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),

@@ -15,6 +15,14 @@ package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.saxon.om
 
+
+trait ItemsetListener {
+  def startLevel(itemNode: ItemNode): Unit
+  def endLevel(): Unit
+  def startItem(itemNode: ItemNode, first: Boolean): Unit
+  def endItem(itemNode: ItemNode): Unit
+}
+
 trait ItemContainer {
 
   protected var _parent: ItemContainer = null

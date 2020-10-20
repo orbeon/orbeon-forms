@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFo
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyGetter
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
-import org.orbeon.oxf.xforms.itemset.Itemset
+import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.XFormsStateManager
@@ -146,7 +146,7 @@ trait XFormsSupport extends MockitoSugar {
 
   def getItemset(controlEffectiveId: String): String = {
     val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
-    select1.getItemset.asJSON(None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
+    ItemsetSupport.asJSON(select1.getItemset, None, select1.mustEncodeValues, select1.staticControl.excludeWhitespaceTextNodesForCopy, null)
   }
 
   def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {

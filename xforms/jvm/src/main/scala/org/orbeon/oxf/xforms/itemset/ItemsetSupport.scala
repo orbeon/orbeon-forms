@@ -15,122 +15,42 @@ package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.{Element, QName, Text}
+import org.orbeon.dom.{Element, Namespace, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
+import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
+import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
+import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{SaxonUtils, XMLUtils}
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLReceiver, XMLUtils}
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.xml.sax.SAXException
 
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable.ListBuffer
 import scala.util.control.NonFatal
 
 
 object ItemsetSupport {
 
-  def isSelected(
-    isMultiple                 : Boolean,
-    dataValue                  : Item.Value[om.NodeInfo],
-    itemValue                  : Item.Value[om.Item],
-    compareAtt                 : om.NodeInfo => Boolean,
-    excludeWhitespaceTextNodes : Boolean
-  ): Boolean =
-    if (isMultiple)
-      compareMultipleItemValues(dataValue, itemValue)
+  def getAttributeName(name: QName): String =
+    if (name.namespace == Namespace.EmptyNamespace)
+      name.localName
+    else if (name.namespace == XFormsNames.XXFORMS_NAMESPACE)
+      "xxforms-" + name.localName
     else
-      compareSingleItemValues(dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes)
-
-  def partitionAttributes(items: List[om.Item]): (List[om.NodeInfo], List[om.Item]) = {
-
-    val hasAtt = items exists {
-      case att: om.NodeInfo if att.isAttribute => true
-      case _                                   => false
-    }
-
-    if (hasAtt) {
-      val l = ListBuffer[om.NodeInfo]()
-      val r = ListBuffer[om.Item]()
-
-      items foreach {
-        case att: om.NodeInfo if att.isAttribute => l += att
-        case other                               => r += other
-      }
-
-      (l.result, r.result)
-    } else {
-      (Nil, items)
-    }
-  }
-
-  def compareSingleItemValues(
-    dataValue                  : Item.Value[om.Item],
-    itemValue                  : Item.Value[om.Item],
-    compareAtt                 : om.NodeInfo => Boolean,
-    excludeWhitespaceTextNodes : Boolean
-  ): Boolean =
-    (dataValue, itemValue) match {
-      case (Left(dataValue), Left(itemValue)) =>
-        dataValue == itemValue
-      case (Right(dataXPathItems), Right(itemXPathItems)) =>
-
-        val (attItems, otherItems) = partitionAttributes(itemXPathItems)
-
-        def compareContent =
-          SaxonUtils.deepCompare(
-            config                     = XPath.GlobalConfiguration,
-            it1                        = dataXPathItems.iterator,
-            it2                        = otherItems.iterator,
-            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
-          )
-
-        (attItems forall compareAtt) && compareContent
-
-      case _ =>
-        // Mixing and matching `xf:copy` and `xf:value` is not supported for now
-        false
-    }
-
-  def compareMultipleItemValues(
-    dataValue : Item.Value[om.NodeInfo],
-    itemValue : Item.Value[om.Item]
-  ): Boolean =
-    (dataValue, itemValue) match {
-      case (Left(dataValue), Left(trimmedItemValue)) =>
-        val trimmedControlValue = dataValue.trimAllToEmpty
-
-        if (trimmedControlValue.isEmpty)
-          trimmedItemValue.isEmpty // special case
-        else
-          trimmedControlValue.splitTo[scala.Iterator]() contains trimmedItemValue
-      case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
-        allDataItems exists { oneDataXPathItem =>
-          SaxonUtils.deepCompare(
-            config                     = XPath.GlobalConfiguration,
-            it1                        = Iterator(oneDataXPathItem),
-            it2                        = Iterator(firstItemXPathItem),
-            excludeWhitespaceTextNodes = false
-          )
-        }
-      case (Right(_), Right(Nil)) =>
-        // Itemset construction doesn't ever produce an empty `List[om.Item]` for multiple selection
-        false
-      case _ =>
-        // Mixing and matching `xf:copy` and `xf:value` is not supported
-        false
-    }
+      throw new IllegalStateException("Invalid attribute on item: " + name.localName)
 
   def findMultipleItemValues(
     dataValue : Item.Value[om.NodeInfo],
@@ -456,6 +376,204 @@ object ItemsetSupport {
         contextStack.setBinding(savedBindingContext)
         result
     }
+  }
+
+  // xxx ItemsetSupport, XFS1Handler
+  def streamAsHTML(lhhaValue: LHHAValue, locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
+    if (lhhaValue.label.nonAllBlank) {
+      if (lhhaValue.isHTML)
+        streamHTMLFragment(xmlReceiver, lhhaValue.label, locationData, "")
+      else
+        text(lhhaValue.label)
+    }
+
+  // xxx XFS1Control
+  def htmlValue(lhhaValue: LHHAValue, locationData: LocationData): String =
+    if (lhhaValue.isHTML)
+      getEscapedHTMLValue(locationData, lhhaValue.label)
+    else
+      lhhaValue.label.escapeXmlMinimal
+
+  def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
+    htmlValue(lhhaValue, locationData).escapeJavaScript
+
+  def javaScriptValue(item: Item.ValueNode, encode: Boolean, locationData: LocationData): String =
+    item.externalValue(encode).escapeJavaScript
+
+  // Return the list of items as a JSON tree with hierarchical information
+  def asJSON(
+    itemset                    : Itemset,
+    controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
+    encode                     : Boolean,
+    excludeWhitespaceTextNodes : Boolean,
+    locationData               : LocationData
+  ): String = {
+
+    val sb = new StringBuilder
+    // Array of top-level items
+    sb.append("[")
+    try {
+      itemset.visit(new ItemsetListener {
+
+        def startItem(itemNode: ItemNode, first: Boolean): Unit = {
+          if (! first)
+            sb.append(',')
+
+          // Start object
+          sb.append("{")
+
+          // Item LHH and value
+          sb.append(""""label":"""")
+          sb.append(javaScriptValue(itemNode.label, locationData))
+          sb.append('"')
+
+          itemNode match {
+            case item: Item.ValueNode =>
+              item.help map (javaScriptValue(_, locationData)) foreach { h =>
+                sb.append(""","help":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              item.hint map (javaScriptValue(_, locationData)) foreach { h =>
+                sb.append(""","hint":"""")
+                sb.append(h)
+                sb.append('"')
+              }
+              sb.append(""","value":"""")
+              sb.append(javaScriptValue(item, encode))
+              sb.append('"')
+            case _ =>
+          }
+
+          // Item attributes if any
+          val attributes = itemNode.attributes
+          if (attributes.nonEmpty) {
+            sb.append(""","attributes":{""")
+
+            val nameValues =
+              for {
+                (name, value) <- attributes
+                escapedName   = getAttributeName(name).escapeJavaScript
+                escapedValue  = value.escapeJavaScript
+              } yield
+                s""""$escapedName":"$escapedValue""""
+
+            sb.append(nameValues mkString ",")
+
+            sb.append('}')
+          }
+
+          // Handle selection
+          itemNode match {
+            case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) =>
+              isSelected(itemset.multiple, dataValue, item.value, compareAtt, excludeWhitespaceTextNodes)
+            } => sb.append(""","selected":true""")
+            case _ =>
+          }
+
+          // Start array of children items
+          if (itemNode.hasChildren)
+            sb.append(""","children":[""")
+        }
+
+        def endItem(itemNode: ItemNode): Unit = {
+          // End array of children items
+          if (itemNode.hasChildren)
+            sb.append(']')
+
+          // End object
+          sb.append("}")
+        }
+
+        def startLevel(itemNode: ItemNode): Unit = ()
+        def endLevel(): Unit = ()
+      })
+    } catch {
+      case e: SAXException =>
+        throw new ValidationException("Error while creating itemset tree", e, locationData)
+    }
+    sb.append("]")
+
+    sb.toString
+  }
+
+  // Return the list of items as an XML tree
+  def asXML(
+    itemset                    : Itemset,
+    configuration              : Configuration,
+    controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
+    excludeWhitespaceTextNodes : Boolean,
+    locationData               : LocationData
+  ): om.DocumentInfo = {
+
+    val treeBuilder = new TinyBuilder
+    val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
+    identity.setResult(treeBuilder)
+
+    implicit val xmlReceiver: XMLReceiver = identity
+
+    withDocument {
+      withElement("itemset") {
+        if (itemset.hasChildren) {
+          itemset.visit(new ItemsetListener {
+
+            def startLevel(itemNode: ItemNode): Unit =
+              openElement("choices")
+
+            def endLevel(): Unit =
+              closeElement("choices")
+
+            def startItem(itemNode: ItemNode, first: Boolean): Unit = {
+
+              val itemAttributes =
+                itemNode match {
+                  case item: Item.ValueNode if controlValue exists { case (dataValue, compareAtt) =>
+                    isSelected(itemset.multiple, dataValue, item.value, compareAtt, excludeWhitespaceTextNodes)
+                  } =>
+                    List("selected" -> "true")
+                  case _ =>
+                    Nil
+                }
+
+              // TODO: Item attributes if any
+
+              openElement("item", atts = itemAttributes)
+
+              withElement("label") {
+                streamAsHTML(itemNode.label, locationData)
+              }
+
+              itemNode match {
+                case item: Item.ValueNode =>
+                  item.help foreach { h =>
+                    withElement("help") {
+                      streamAsHTML(h, locationData)
+                    }
+                  }
+
+                  item.hint foreach { h =>
+                    withElement("hint") {
+                      streamAsHTML(h, locationData)
+                    }
+                  }
+
+                  val itemExternalValue = item.externalValue(encode = false)
+                  withElement("value") {
+                    if (itemExternalValue.nonEmpty)
+                      text(itemExternalValue)
+                  }
+                case _ =>
+              }
+            }
+
+            def endItem(itemNode: ItemNode): Unit =
+              closeElement("item")
+          })
+        }
+      }
+    }
+
+    treeBuilder.getCurrentRoot.asInstanceOf[om.DocumentInfo]
   }
 
   private def getChildElementValue(

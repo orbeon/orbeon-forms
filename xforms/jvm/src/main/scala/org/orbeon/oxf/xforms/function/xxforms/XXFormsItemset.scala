@@ -17,10 +17,12 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import shapeless.syntax.typeable._
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 
 
 class XXFormsItemset extends XFormsFunction {
@@ -49,20 +51,23 @@ class XXFormsItemset extends XFormsFunction {
 
         if (format == "json")
           // Return a string
-          itemset.asJSON(
+          ItemsetSupport.asJSON(
+            itemset                    = itemset,
             controlValue               = controlValueForSelection,
             encode                     = select1Control.mustEncodeValues,
             excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
             locationData               = control.getLocationData
           ): om.Item
-        else
+        else {
           // Return an XML document
-          itemset.asXML(
+          ItemsetSupport.asXML(
+            itemset                    = itemset,
             configuration              = ctx.getConfiguration,
             controlValue               = controlValueForSelection,
             excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
             locationData               = control.getLocationData
           ): om.Item
+        }
       }
 
     jsonOrXMLOpt.orNull

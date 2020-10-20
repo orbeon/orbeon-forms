@@ -58,7 +58,7 @@ object XFormsSelect1Handler {
     itemNode match {
       case item: Item.ValueNode =>
         dataValueFromControl(control) exists { case (dataValue, excludeWhitespaceTextNodes) =>
-          ItemsetSupport.isSelected(
+          StaticItemsetSupport.isSelected(
             isMultiple                 = isMultiple,
             dataValue                  = dataValue,
             itemValue                  = item.value,
@@ -273,7 +273,7 @@ object XFormsSelect1Handler {
     for {
       (attQName, attValue) <- item.attributes
       if attQName != XFormsNames.CLASS_QNAME // `class` is handled separately
-      attributeName = Itemset.getAttributeName(attQName)
+      attributeName = ItemsetSupport.getAttributeName(attQName)
     } locally {
       spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attValue)
     }
@@ -460,7 +460,7 @@ class XFormsSelect1Handler(
           } locally {
             if (selectedFound)
               ch.text(" - ")
-            currentItem.label.streamAsHTML(control.getLocationData)
+            ItemsetSupport.streamAsHTML(currentItem.label, control.getLocationData)
             selectedFound = true
           }
         }

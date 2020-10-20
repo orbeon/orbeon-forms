@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableCo
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -116,7 +116,7 @@ class XFormsSelect1Control(
       if (! isStaticReadonly)
         findSelectedItem map (_.externalValue(mustEncodeValues)) orNull
       else
-        findSelectedItem map (_.label.htmlValue(getLocationData)) orNull // external value is the label
+        findSelectedItem map (i => ItemsetSupport.htmlValue(i.label, getLocationData)) orNull // external value is the label
     )
   }
 
@@ -127,7 +127,7 @@ class XFormsSelect1Control(
   def findSelectedItem: Option[Item.ValueNode] =
     boundItemOpt map getCurrentItemValueFromData flatMap { current =>
       getItemset.ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {
-        case (item, itemValue) if ItemsetSupport.compareSingleItemValues(
+        case (item, itemValue) if StaticItemsetSupport.compareSingleItemValues(
           dataValue                  = current,
           itemValue                  = itemValue,
           compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
@@ -183,7 +183,7 @@ class XFormsSelect1Control(
               case Right(v) =>
 
                 // If the deselected value contains attributes, remove all of those from the bound node
-                val (atts, other) = ItemsetSupport.partitionAttributes(v)
+                val (atts, other) = StaticItemsetSupport.partitionAttributes(v)
 
                 if (atts.nonEmpty)
                   XFormsAPI.delete(
@@ -245,7 +245,7 @@ class XFormsSelect1Control(
       case (result @ (selected, deselected), (item, itemValue)) =>
 
         val itemWasSelected =
-          ItemsetSupport.compareSingleItemValues(
+          StaticItemsetSupport.compareSingleItemValues(
             dataValue                  = dataValue,
             itemValue                  = itemValue,
             compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
@@ -336,7 +336,7 @@ class XFormsSelect1Control(
       val itemset = getItemset
       if (itemset ne null) {
 
-        val result = itemset.asJSON(None, mustEncodeValues, staticControl.excludeWhitespaceTextNodesForCopy, getLocationData)
+        val result = ItemsetSupport.asJSON(itemset, None, mustEncodeValues, staticControl.excludeWhitespaceTextNodesForCopy, getLocationData)
         if (result.nonEmpty)
           ch.text(result)
       }

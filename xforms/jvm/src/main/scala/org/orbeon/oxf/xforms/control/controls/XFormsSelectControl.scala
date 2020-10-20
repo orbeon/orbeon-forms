@@ -21,14 +21,13 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
-import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 
 import scala.collection.compat._
 import scala.collection.{mutable, Set => CSet}
-
 import org.orbeon.scaxon.SimplePath._
 
 class XFormsSelectControl(
@@ -190,7 +189,7 @@ object XFormsSelectControl {
   ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
     def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
-      values exists (ItemsetSupport.compareSingleItemValues(_, value, _ => true, excludeWhitespaceTextNodes))
+      values exists (StaticItemsetSupport.compareSingleItemValues(_, value, _ => true, excludeWhitespaceTextNodes))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
     val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)

@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
-import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
 
@@ -56,9 +54,6 @@ sealed trait ItemNodeImpl {
 
   require(attributes ne null)
 
-  def javaScriptLabel(locationData: LocationData): String =
-    label.javaScriptValue(locationData)
-
   def classAttribute: Option[String] =
     attributes find (_._1 == XFormsNames.CLASS_QNAME) map (_._2)
 }
@@ -88,15 +83,6 @@ sealed trait ItemLeafImpl {
         case Left(v)  => v
         case Right(_) => position.toString
       }
-
-  def javaScriptValue(encode: Boolean): String =
-    externalValue(encode).escapeJavaScript
-
-  def javaScriptHelp(locationData: LocationData): Option[String] =
-    help map (_.javaScriptValue(locationData))
-
-  def javaScriptHint(locationData: LocationData): Option[String] =
-    hint map (_.javaScriptValue(locationData))
 
   def iterateLHHA: Iterator[(String, LHHAValue)] =
     Iterator(

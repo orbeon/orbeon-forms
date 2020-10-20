@@ -32,5 +32,6 @@ class VariableControl(
   with WithChildrenTrait
   with VariableAnalysisTrait {
 
-  override def isAllowedBoundItem(item: Item): Boolean = StaticDataModel.isAllowedValueBoundItem(item)
+  override def isAllowedBoundItem(item: Item): Boolean =
+    StaticDataModel.isAllowedValueBoundItem(item)
 }

@@ -15,8 +15,10 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{SelectionControl, TriggerControl, ValueControl}
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
@@ -86,6 +88,36 @@ object ElementAnalysisTreeBuilder {
     indentedLogger : IndentedLogger
   ): Seq[(Element, Scope)] =
     componentChildren(e, honorLazy = false)
+
+  // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
+  def hasStaticValue(lhhaElement: Element): Boolean = {
+
+    val SearchExpression =
+      """
+        not(
+          exists(
+            descendant-or-self::*[@ref or @nodeset or @bind or @value] |
+            descendant::*[@*[contains(., '{')]]
+          )
+        )
+      """
+
+    XPathCache.evaluateSingle(
+      contextItem        = new DocumentWrapper(
+        lhhaElement.getDocument,
+        null,
+        XPath.GlobalConfiguration
+      ).wrap(lhhaElement),
+      xpathString        = SearchExpression,
+      namespaceMapping   = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      variableToValueMap = null,
+      functionLibrary    = null,
+      functionContext    = null,
+      baseURI            = null,
+      locationData       = ElementAnalysis.createLocationData(lhhaElement),
+      reporter           = null
+    ).asInstanceOf[Boolean]
+  }
 
   private object Private {
 

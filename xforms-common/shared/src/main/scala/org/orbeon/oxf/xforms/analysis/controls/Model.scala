@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import cats.syntax.option._
 import org.orbeon.dom._
-import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
+import org.orbeon.oxf.xforms.analysis.controls.{OptionalSingleNode, VariableAnalysisTrait, ViewTrait}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.analysis.{EventHandler, _}
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 
@@ -73,40 +74,53 @@ trait ModelInstances {
   // TODO: instances on which MIPs depend
 }
 
+class ModelVariable(
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, scope)
+//  with WithChildrenTrait
+  with VariableAnalysisTrait
+
 trait ModelVariables {
 
   self: Model =>
 
   // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
-  override lazy val inScopeVariables = Map.empty[String, VariableTrait]
+//  override lazy val inScopeVariables = Map.empty[String, VariableTrait]
+//
+//  // Handle variables
+//  val variablesSeq: Seq[VariableAnalysisTrait] = {
+//
+//    // NOTE: For now, all top-level variables in a model are visible first, then only are binds variables visible.
+//    // In the future, we might want to change that to use document order between variables and binds, but some
+//    // more thinking is needed wrt the processing model.
+//
+//    val someSelf = self.some
+//
+//    // Iterate and resolve all variables in order
+//    var preceding: Option[VariableAnalysisTrait] = None
+//
+//    val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName))
+//
+//    for {
+//      variableElement <- variableElements
+//      analysis: VariableAnalysisTrait = {
+//        val result = new ElementAnalysis(part, index /* would be wrong */, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
+//        preceding = result.some
+//        result
+//      }
+//    } yield
+//      analysis
+//  }
+//
+//  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
-  // Get *:variable/*:var elements
-  private val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName))
-
-  // Handle variables
-  val variablesSeq: Seq[VariableAnalysisTrait] = {
-
-    // NOTE: For now, all top-level variables in a model are visible first, then only are binds variables visible.
-    // In the future, we might want to change that to use document order between variables and binds, but some
-    // more thinking is needed wrt the processing model.
-
-    val someSelf = self.some
-
-    // Iterate and resolve all variables in order
-    var preceding: Option[VariableAnalysisTrait] = None
-
-    for {
-      variableElement <- variableElements
-      analysis: VariableAnalysisTrait = {
-        val result = new ElementAnalysis(part, index /* would be wrong */, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
-        preceding = result.some
-        result
-      }
-    } yield
-      analysis
-  }
-
-  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
+  lazy val variablesSeq: Seq[VariableAnalysisTrait] = children collect { case v: VariableAnalysisTrait => v }
+  lazy val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
   def freeVariablesTransientState(): Unit =
     for (variable <- variablesSeq)

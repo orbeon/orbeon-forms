@@ -354,7 +354,11 @@ import org.orbeon.xforms.xbl.Scope
     val factory =
       part.metadata.findAbstractBindingByPrefixedId(scope.prefixedIdForStaticId(controlElement.idOrNull)) match {
         case Some(abstractBinding) => ComponentFactories.get(abstractBinding.modeValue, abstractBinding.modeLHHA)
-        case None                  => ControlOrActionFactory(controlElement)
+        case None                  =>
+          if (parent.exists(_.localName == "model") && isVariable(controlElement.getQName))
+            Some(new ModelVariable(_, _, _, _, _, _))
+          else
+            ControlOrActionFactory(controlElement)
       }
 
     factory map (_(part, index, controlElement, parent, preceding, scope))

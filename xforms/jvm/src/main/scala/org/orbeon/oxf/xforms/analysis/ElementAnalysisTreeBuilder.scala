@@ -211,7 +211,7 @@ object ElementAnalysisTreeBuilder {
           }
         case _: Model =>
           allChildren collect {
-            case t @ (e, _) if isAction(e.getQName) || ModelChildrenToKeep(e.getQName) => t
+            case t @ (e, _) if isAction(e.getQName) || isVariable(e.getQName) || ModelChildrenToKeep(e.getQName) => t
           }
         case _: Submission | _: VariableControl =>
           allChildren collect {

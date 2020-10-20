@@ -61,7 +61,7 @@ object XXFormsLang {
     // Only add the dependency if xml:lang is not a literal
     avtLangAnalysis foreach {
       case analysis: PathMapXPathAnalysis =>
-        // There is a pathmap for the xml:lang AVT, so add the new roots
+        // There is a pathmap for the `xml:lang` AVT, so add the new roots
         pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)
         //pathMap.findFinalNodes // FIXME: needed?
         //pathMap.updateFinalNodes(finalNodes)

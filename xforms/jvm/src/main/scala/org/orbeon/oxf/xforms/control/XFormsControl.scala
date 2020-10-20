@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
@@ -102,7 +102,7 @@ class XFormsControl(
     part.scopeForPrefixedId(prefixedId)
 
   // Resolve an object relative to this control
-  final def resolve(staticId: String, contextItem: Option[Item] = None): Option[XFormsObject] =
+  final def resolve(staticId: String, contextItem: Option[om.Item] = None): Option[XFormsObject] =
     container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem)
 
   final def getChildElementScope(element: Element): Scope =

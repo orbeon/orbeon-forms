@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.model.StaticDataModel
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 
 class VariableControl(
@@ -32,6 +32,6 @@ class VariableControl(
   with WithChildrenTrait
   with VariableAnalysisTrait {
 
-  override def isAllowedBoundItem(item: Item): Boolean =
+  override def isAllowedBoundItem(item: om.Item): Boolean =
     StaticDataModel.isAllowedValueBoundItem(item)
 }

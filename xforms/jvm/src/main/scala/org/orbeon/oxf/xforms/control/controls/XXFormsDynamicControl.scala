@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
@@ -118,7 +118,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
   }
 
-  private def updateSubTree(create: Boolean, boundElem: VirtualNode): Unit =
+  private def updateSubTree(create: Boolean, boundElem: om.VirtualNode): Unit =
     if (create || fullUpdateChange) {
       // Document has changed and needs to be fully recreated
       processFullUpdate(create, boundElem)
@@ -132,7 +132,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         processXBLUpdates()
     }
 
-  private def processFullUpdate(create: Boolean, boundElem: VirtualNode): Unit = {
+  private def processFullUpdate(create: Boolean, boundElem: om.VirtualNode): Unit = {
     fullUpdateChange = false
     xblChanges.clear()
     bindChanges.clear()
@@ -208,14 +208,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         ListenerResult.Stop
       }
 
-      def recordChanges(findChange: NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[NodeInfo]): ListenerResult = {
+      def recordChanges(findChange: om.NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[om.NodeInfo]): ListenerResult = {
         val newChanges = nodes flatMap (findChange(_))
         changes ++= newChanges
         if (newChanges.nonEmpty) ListenerResult.Stop else ListenerResult.NextListener
       }
 
-      def changeListener(record: Seq[NodeInfo] => ListenerResult): MirrorEventListener = {
-        case insert: XFormsInsertEvent              => record(insert.insertedNodes collect { case n: NodeInfo => n })
+      def changeListener(record: Seq[om.NodeInfo] => ListenerResult): MirrorEventListener = {
+        case insert: XFormsInsertEvent              => record(insert.insertedNodes collect { case n: om.NodeInfo => n })
         case delete: XFormsDeleteEvent              => record(delete.deletedNodes)
         case valueChanged: XXFormsValueChangedEvent => record(List(valueChanged.node))
         case _                                      => ListenerResult.NextListener
@@ -339,9 +339,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     bindChanges.clear()
    }
 
-  private def getBoundElement: Option[VirtualNode] =
+  private def getBoundElement: Option[om.VirtualNode] =
     bindingContext.singleNodeOpt match {
-      case Some(node: VirtualNode) if node.getNodeKind == ELEMENT_NODE => Some(node)
+      case Some(node: om.VirtualNode) if node.getNodeKind == ELEMENT_NODE => Some(node)
       case _                                                           => None
     }
 
@@ -384,7 +384,7 @@ object XXFormsDynamicControl {
       }
 
   // Find whether the given node is a bind element or attribute and return the associated model id -> element mapping
-  def findBindChange(node: NodeInfo): Option[(String, Element)] = {
+  def findBindChange(node: om.NodeInfo): Option[(String, Element)] = {
 
     val XF = XFORMS_NAMESPACE_URI
 
@@ -399,7 +399,7 @@ object XXFormsDynamicControl {
   }
 
   // Find whether a change occurred in a descendant of a top-level XBL binding
-  def findXBLChange(partAnalysis: PartAnalysis, node: NodeInfo): Option[(String, Element)] = {
+  def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
 
     if (node.getNodeKind == SaxonType.NAMESPACE)
       None // can't find ancestors of namespace nodes with dom4j

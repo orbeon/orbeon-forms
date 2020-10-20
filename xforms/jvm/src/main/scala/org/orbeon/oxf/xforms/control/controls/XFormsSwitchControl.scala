@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 
 /**
@@ -44,7 +44,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
   // Initial local state
   setLocal(new XFormsSwitchControlLocal)
 
-  private var _caserefBinding: Option[Item] = None
+  private var _caserefBinding: Option[om.Item] = None
 
   // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
@@ -85,7 +85,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     // See https://github.com/orbeon/orbeon-forms/issues/3496
   }
 
-  private def evaluateCaseRefBinding: Option[Item] =
+  private def evaluateCaseRefBinding: Option[om.Item] =
     staticControl.caseref flatMap { caseref =>
 
       val caserefItem =

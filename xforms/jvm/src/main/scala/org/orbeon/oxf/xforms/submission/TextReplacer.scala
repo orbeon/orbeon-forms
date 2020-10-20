@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.DataModel._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 
 /**
  * Handle replace="text".
@@ -114,7 +114,7 @@ object TextReplacer {
             xpathString  = targetRef,
             reporter     = containingDocument.getRequestStats.addXPathStat
           ) match {
-            case n: NodeInfo => n
+            case n: om.NodeInfo => n
             case _           => throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
           }
         case None =>

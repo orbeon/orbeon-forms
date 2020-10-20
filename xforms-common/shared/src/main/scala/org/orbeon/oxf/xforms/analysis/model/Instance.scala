@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable._
@@ -66,7 +66,7 @@ class Instance(
   // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
   // instances of a given form. This is useful in particular for component i18n resource instances.
-  lazy val constantContent: Option[DocumentInfo] =
+  lazy val constantContent: Option[om.DocumentInfo] =
     readonly && useInlineContent option {
 
       // An instance within `xf:implementation` has a `ComponentControl` grandparent
@@ -111,7 +111,7 @@ class Instance(
   // Doing so allows for sharing of constant instances globally, among uses of an `AbstractBinding` and
   // among multiple instances of a given form. This is useful in particular for component i18n resource
   // instances, for example.
-  def inlineContent: DocumentInfo =
+  def inlineContent: om.DocumentInfo =
     constantContent getOrElse extractInlineContent
 }
 
@@ -222,7 +222,7 @@ object Instance {
     readonly              : Boolean,
     exposeXPathTypes      : Boolean,
     removeInstanceData    : Boolean
-  ): DocumentInfo = {
+  ): om.DocumentInfo = {
 
     require(! (readonly && exposeXPathTypes)) // we can't expose types on readonly instances at the moment
 

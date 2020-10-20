@@ -61,16 +61,24 @@ object ElementAnalysisTreeBuilder {
     )
 
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
-  // NOTE: Can be used only in a sub-part, as this mutates the tree.
+  // Can be used only in a sub-part, as this mutates the tree.
+  // Used by `xxf:dynamic`.
   def createOrUpdateStaticShadowTree(existingComponent: ComponentControl, elemInSource: Option[Element]): Unit = {
 
     assert(! existingComponent.part.isTopLevel)
 
     if (existingComponent.hasConcreteBinding)
-      existingComponent.removeConcreteBinding()
+      removeConcreteBinding(part, existingComponent)
 
     existingComponent.rootElem = elemInSource getOrElse existingComponent.element
     existingComponent.part.analyzeSubtree(existingComponent)
+  }
+
+  // Can be used only in a sub-part, as this mutates the tree.
+  // Used by `XFormsComponentControl`.
+  def clearShadowTree(part: PartAnalysisImpl, existingComponent: ComponentControl): Unit = {
+    assert(! part.isTopLevel)
+    removeConcreteBinding(part, existingComponent)
   }
 
   def componentChildrenForBindingUpdate(
@@ -233,6 +241,20 @@ object ElementAnalysisTreeBuilder {
           componentChildren(e, honorLazy = true)
         case _ =>
           allChildren
+      }
+    }
+
+    // Remove the component's binding
+    // Used by `xxf:dynamic`
+    def removeConcreteBinding(part: PartAnalysisImpl, existingComponent: ComponentControl): Unit = {
+
+      assert(! part.isTopLevel && existingComponent.hasConcreteBinding)
+
+      existingComponent.bindingOpt foreach { binding =>
+        // Remove all descendants only, keeping the current control
+        part.deindexTree(existingComponent, self = false)
+        part.deregisterScope(binding.innerScope)
+        existingComponent.clearBinding()
       }
     }
   }

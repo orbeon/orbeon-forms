@@ -37,19 +37,8 @@ class ComponentControl(
     _concreteBindingOpt = concreteBinding.some
   }
 
-  // Remove the component's binding
-  // Used by `xxf:dynamic`
-  def removeConcreteBinding(): Unit = {
-
-    assert(hasConcreteBinding)
-
-    bindingOpt foreach { binding =>
-      // Remove all descendants only, keeping the current control
-      part.deindexTree(this, self = false)
-      part.deregisterScope(binding.innerScope)
-      _concreteBindingOpt = None
-    }
-  }
+  def clearBinding(): Unit =
+    _concreteBindingOpt = None
 
   // Only support binding if the control defines it has a binding
   override def hasBinding: Boolean = commonBinding.modeBinding && super.hasBinding

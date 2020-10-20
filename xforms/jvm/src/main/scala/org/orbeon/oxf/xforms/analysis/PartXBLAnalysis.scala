@@ -136,11 +136,6 @@ trait PartXBLAnalysis extends TransientState {
 
   def getGlobals = allGlobals
 
-  def clearShadowTree(existingComponent: ComponentControl): Unit = {
-    assert(! isTopLevel)
-    existingComponent.removeConcreteBinding()
-  }
-
   override def freeTransientState(): Unit = {
     super.freeTransientState()
     metadata.commitBindingIndex()

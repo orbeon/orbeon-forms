@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
@@ -327,7 +327,7 @@ class XFormsComponentControl(
         destroyNestedContainer()
       }
 
-      staticControl.part.clearShadowTree(staticControl)
+      ElementAnalysisTreeBuilder.clearShadowTree(staticControl.part, staticControl)
       containingDocument.addControlStructuralChange(prefixedId)
     }
   }

@@ -26,7 +26,7 @@ import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xml.NamespaceMapping

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.util
+import java.{util => ju, lang => jl}
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -26,6 +26,7 @@ import org.orbeon.saxon.om._
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.Breaks.{break, breakable}
+
 
 /**
  * Instances of this class are used to annotate XForms instance nodes with MIPs and other information.
@@ -43,10 +44,10 @@ object InstanceData {
     if (instanceData ne ReadonlyLocalInstanceData) {
       // only register ourselves if we are not a readonly node
       if (instanceData.bindNodes eq null)
-        instanceData.bindNodes = util.Collections.singletonList(bindNode)
+        instanceData.bindNodes = ju.Collections.singletonList(bindNode)
       else if (instanceData.bindNodes.size == 1) {
         val oldBindNode = instanceData.bindNodes.get(0)
-        instanceData.bindNodes = new util.ArrayList[BindNode](4) // hoping that situations where many binds point to same node are rare
+        instanceData.bindNodes = new ju.ArrayList[BindNode](4) // hoping that situations where many binds point to same node are rare
         instanceData.bindNodes.add(oldBindNode)
         instanceData.bindNodes.add(bindNode)
       }
@@ -87,7 +88,7 @@ object InstanceData {
 
   def getInheritedRelevant(nodeInfo: NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNode])
-      getInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""))
+      getInheritedRelevant(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       ModelDefs.DEFAULT_RELEVANT
     else
@@ -135,7 +136,7 @@ object InstanceData {
 
   def getInheritedReadonly(nodeInfo: NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNode])
-      getInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""))
+      getInheritedReadonly(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       true // Default for non-mutable nodes is to be read-only
     else
@@ -310,7 +311,7 @@ object InstanceData {
 
   def getLocalInstanceData(nodeInfo: NodeInfo, forUpdate: Boolean): InstanceData =
     if (nodeInfo.isInstanceOf[VirtualNode])
-      getLocalInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""))
+      getLocalInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if ((nodeInfo ne null) && ! forUpdate)
       ReadonlyLocalInstanceData
     else if ((nodeInfo ne null) && forUpdate)
@@ -336,7 +337,7 @@ object InstanceData {
 
   private def createNewInstanceData(nodeInfo: NodeInfo): InstanceData =
     if (nodeInfo.isInstanceOf[VirtualNode])
-      createNewInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""))
+      createNewInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else
       throw new OXFException("Cannot create InstanceData on non-VirtualNode NodeInfo.")
 
@@ -372,7 +373,7 @@ class InstanceData private () {
   private var locationData: LocationData = null
 
   // Point back to binds that impacted this node
-  private var bindNodes: util.List[BindNode] = null
+  private var bindNodes: ju.List[BindNode] = null
 
   // Types set by schema or binds
   private var bindType: QName = null
@@ -385,11 +386,11 @@ class InstanceData private () {
   private var requireDefaultValue = false
 
   // Annotations (used only for multipart submission as of 2010-12)
-  private var transientAnnotations: util.Map[String, String] = null
+  private var transientAnnotations: ju.Map[String, String] = null
 
-  def getBindNodes: util.List[BindNode] =
+  def getBindNodes: ju.List[BindNode] =
     if (bindNodes eq null)
-      util.Collections.emptyList[BindNode]
+      ju.Collections.emptyList[BindNode]
     else
       bindNodes
 
@@ -448,12 +449,12 @@ class InstanceData private () {
       bindType
 
   def getInvalidBindIds: String = {
-    var sb: java.lang.StringBuilder = null
+    var sb: jl.StringBuilder = null
     if ((bindNodes ne null) && ! bindNodes.isEmpty) {
       for (bindNode <- bindNodes.asScala) {
         if (bindNode.valid != ModelDefs.DEFAULT_VALID) {
           if (sb eq null)
-            sb = new java.lang.StringBuilder
+            sb = new jl.StringBuilder
           else if (sb.length > 0)
             sb.append(' ')
           sb.append(bindNode.parentBind.staticId)
@@ -468,7 +469,7 @@ class InstanceData private () {
 
   private def setTransientAnnotation(name: String, value: String): Unit = {
     if (transientAnnotations eq null)
-      transientAnnotations = new util.HashMap[String, String]
+      transientAnnotations = new ju.HashMap[String, String]
     transientAnnotations.put(name, value)
   }
 

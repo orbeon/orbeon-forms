@@ -17,6 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatestplus.junit.AssertionsForJUnit
 

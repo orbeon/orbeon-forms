@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.dom.Support
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
 
 // Processor to replace or add resources based on properties

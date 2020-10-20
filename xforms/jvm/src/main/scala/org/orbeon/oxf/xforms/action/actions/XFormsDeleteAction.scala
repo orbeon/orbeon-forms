@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.scaxon.NodeInfoConversions
 
 import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
@@ -222,7 +223,7 @@ object XFormsDeleteAction extends Logging {
     indentedLogger   : IndentedLogger
 ): Option[DeletionDescriptor] = {
 
-    val nodeToRemove   = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CannotDeleteReadonlyMessage)
+    val nodeToRemove   = NodeInfoConversions.unwrapNode(nodeInfoToRemove) getOrElse (throw new IllegalArgumentException(CannotDeleteReadonlyMessage))
     val parentNodeInfo = nodeInfoToRemove.getParent // obtain *before* deletion
     val parentElement  = nodeToRemove.getParent
 

@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 
 import scala.jdk.CollectionConverters._

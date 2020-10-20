@@ -27,10 +27,8 @@ import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xml.NamespaceMapping
@@ -162,7 +160,12 @@ object InstanceMirror {
 
     val inScope = ancestors intersect List(referenceNode) nonEmpty
 
-    def namespaces = NamespaceMapping(unsafeUnwrapElement(referenceNode).getNamespaceContextNoDefault)
+    def namespaces =
+      NamespaceMapping(
+        NodeInfoConversions.unwrapElement(referenceNode)
+          .getOrElse(throw new IllegalArgumentException)
+          .getNamespaceContextNoDefault
+      )
 
     inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNode], namespaces)
   }
@@ -360,7 +363,7 @@ object InstanceMirror {
                   case Match(_, matchingParentNode) =>
 
                     val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
-                    val newParentNode = XFormsUtils.getNodeFromNodeInfo(matchingParentNode, "")
+                    val newParentNode = NodeInfoConversions.unwrapNode(matchingParentNode) getOrElse (throw new IllegalArgumentException)
 
                     body(newParentNode) match {
                       case (Some(nodeToRemove: Node), result) =>
@@ -385,7 +388,7 @@ object InstanceMirror {
                 case newParentElement: Element =>
                   // Find the attribute  by name (as attributes are unique for a given QName)
                   val removedAttribute =
-                    XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
+                    NodeInfoConversions.unwrapAttribute(removedNodeInfo) getOrElse (throw new IllegalArgumentException)
 
                   newParentElement.attribute(removedAttribute.getQName) match {
                     case newAttribute: Attribute => (Some(newAttribute), Stop)
@@ -409,7 +412,7 @@ object InstanceMirror {
                 case newParentElement: Element =>
                   // Element removed had a parent element
                   val removedElement =
-                    XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
+                    NodeInfoConversions.unwrapElement(removedNodeInfo).getOrElse(throw new IllegalArgumentException)
 
                   // If we can identify the position
                   val content = newParentElement.jContent

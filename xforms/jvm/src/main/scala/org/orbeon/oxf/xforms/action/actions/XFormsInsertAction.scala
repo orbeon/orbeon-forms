@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, Instance
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.saxon.om.{Axis, Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.xforms.XFormsNames
 import shapeless.syntax.typeable._
 
@@ -187,7 +188,7 @@ object XFormsInsertAction {
 
       insertLocation match {
         case Left(_) =>
-          val insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CannotInsertReadonlyMessage)
+          val insertLocationNode = NodeInfoConversions.unwrapNode(insertLocationNodeInfo) getOrElse (throw new IllegalArgumentException(CannotInsertReadonlyMessage))
           val insertLocationNodeDocumentOpt = insertLocationNode.documentOpt
 
           val (insertedNodes, beforeAfterInto) =
@@ -271,7 +272,7 @@ object XFormsInsertAction {
           (insertLocationIndexWithinParentBeforeUpdate, insertedNodes, beforeAfterInto)
         case Right(insertContextNodeInfo) =>
 
-          val insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CannotInsertReadonlyMessage)
+          val insertLocationNode = NodeInfoConversions.unwrapNode(insertContextNodeInfo) getOrElse (throw new IllegalArgumentException(CannotInsertReadonlyMessage))
           val insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstanceOpt, doDispatch)
 
           // Normalize text nodes if needed to respect XPath 1.0 constraint

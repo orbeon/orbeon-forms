@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, VirtualNode}
 import org.orbeon.scaxon.Implicits.stringToStringValue
-import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
 

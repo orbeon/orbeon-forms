@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.XFormsNames
 import org.scalatest.funspec.AnyFunSpecLike
 

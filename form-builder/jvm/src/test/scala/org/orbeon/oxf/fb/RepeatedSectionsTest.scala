@@ -19,8 +19,10 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class RepeatedSectionsTest
   extends DocumentTestBase

@@ -31,7 +31,7 @@ import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
+import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpec
 

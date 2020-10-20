@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel

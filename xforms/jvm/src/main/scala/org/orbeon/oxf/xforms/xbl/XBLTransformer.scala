@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
@@ -308,7 +308,7 @@ object XBLTransformer {
           for (nodeInfo <- nodeInfos.asScala) {
             val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
             if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
-              val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
+              val currentAttribute = unwrapAttribute(currentNodeInfo) getOrElse (throw new IllegalArgumentException)
               setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, Option(currentAttribute.getParent))
             }
           }

@@ -14,11 +14,11 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.dom.{Attribute, Document, Element}
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{ParserConfiguration, TransformerUtils, XMLParsing, XMLReceiver}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.saxon.om
 
 import scala.xml.Elem
 
@@ -34,26 +34,17 @@ object NodeConversions {
   def elemToDom4jElem(e: Elem): Element =
     IOSupport.readDom4j(e.toString).getRootElement
 
-  def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
+  def elemToDocumentInfo(e: Elem, readonly: Boolean = true): om.DocumentInfo =
     if (readonly)
       TransformerUtils.stringToTinyTree(util.XPath.GlobalConfiguration, e.toString, false, false)
     else
       new DocumentWrapper(elemToDom4j(e), null, util.XPath.GlobalConfiguration)
 
-  def nodeInfoToElem(nodeInfo: NodeInfo): Elem =
+  def nodeInfoToElem(nodeInfo: om.NodeInfo): Elem =
     scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))
-
-  def unsafeUnwrapElement(nodeInfo: NodeInfo): Element =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
-
-  def unsafeUnwrapDocument(nodeInfo: NodeInfo): Document =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
-
-  def unsafeUnwrapAttribute(nodeInfo: NodeInfo): Attribute =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Attribute]
 
   import org.orbeon.scaxon.SimplePath._
 
-  implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToNodeInfoSeq(e).head
-  implicit def elemToNodeInfoSeq(e: Elem): scala.collection.Seq[NodeInfo] = elemToDocumentInfo(e) / *
+  implicit def elemToNodeInfo(e: Elem): om.NodeInfo = elemToNodeInfoSeq(e).head
+  implicit def elemToNodeInfoSeq(e: Elem): scala.collection.Seq[om.NodeInfo] = elemToDocumentInfo(e) / *
 }

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
+import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsInstanceSupport}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
@@ -388,9 +388,9 @@ class XFormsComponentControl(
 
       // Create new doc rooted at reference node
       val doc =
-        Instance.extractDocument(
+        XFormsInstanceSupport.extractDocument(
           element               = unsafeUnwrapElement(referenceNode.get),
-          excludeResultPrefixes = Set(),
+          excludeResultPrefixes = Set.empty,
           readonly              = false,
           exposeXPathTypes      = mirrorInstance.exposeXPathTypes,
           removeInstanceData    = true

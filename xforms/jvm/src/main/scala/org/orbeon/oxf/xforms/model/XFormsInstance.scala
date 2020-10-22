@@ -469,7 +469,7 @@ object XFormsInstance extends Logging {
     )
 
   def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean): DocumentInfo = doc match {
-    case Left(dom4jDocument) => wrapDocument(dom4jDocument, exposeXPathTypes)
+    case Left(dom4jDocument) => XFormsInstanceSupport.wrapDocument(dom4jDocument, exposeXPathTypes)
     case Right(documentInfo) => documentInfo
   }
 
@@ -477,7 +477,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
-      wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
+      XFormsInstanceSupport.wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
@@ -491,7 +491,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       documentInfo // the optimal case: no copy of the cached document is needed
     else
-      wrapDocument(TransformerUtils.tinyTreeToDom4j(documentInfo), exposeXPathTypes)
+      XFormsInstanceSupport.wrapDocument(TransformerUtils.tinyTreeToDom4j(documentInfo), exposeXPathTypes)
   }
 
   // Restore an instance on the model, given InstanceState

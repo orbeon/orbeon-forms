@@ -414,8 +414,23 @@ trait XFormsModelInstances {
 
   // Set instance and associated information if everything went well
   // NOTE: No XInclude supported to read instances with `@src` for now
-  private def setInlineInstance(instance: Instance): Unit =
-    indexInstance(XFormsInstance(selfModel, instance, instance.inlineContent))
+  private def setInlineInstance(instance: Instance): Unit = {
+
+    assert(instance.useInlineContent)
+
+
+    val inlineContent =
+      instance.constantContent getOrElse
+        XFormsInstanceSupport.extractDocument(
+          instance.inlineRootElemOpt.get, // FIXME: `get`
+          instance.excludeResultPrefixes,
+          instance.readonly,
+          instance.exposeXPathTypes,
+          removeInstanceData = false
+        )
+
+    indexInstance(XFormsInstance(selfModel, instance, inlineContent))
+  }
 
   protected def loadInitialInstance(instance: Instance): Unit =
     withDebug("loading instance", List("instance id" -> instance.staticId)) {

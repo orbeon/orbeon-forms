@@ -14,25 +14,23 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.datatypes.ExtendedLocationData
-import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element, QName}
-import org.orbeon.oxf.common.{ValidationException, Version}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.util.{Logging, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
-import org.orbeon.oxf.xforms.model.InstanceDataOps
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable._
+
+
 
 /**
  * Static analysis of an XForms instance.
@@ -63,10 +61,11 @@ class Instance(
       Option(element)
     )
 
-  // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
-  // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
-  // instances of a given form. This is useful in particular for component i18n resource instances.
-  lazy val constantContent: Option[om.DocumentInfo] =
+  // Get constant inline content from `CommonBinding` if possible, otherwise extract from element.
+  // Doing so allows for sharing of constant instances globally, among uses of a `CommonBinding` and
+  // among multiple instances of a given form. This is useful in particular for component i18n resource
+  // instances.
+  lazy val constantContent: Option[StaticXPath.DocumentNodeInfoType] =
     readonly && useInlineContent option {
 
       // An instance within `xf:implementation` has a `ComponentControl` grandparent
@@ -103,23 +102,10 @@ class Instance(
             )
           )
 
-          new ThrowawayInstance(element).inlineContent
+          // FIXME: `get`
+          Instance.extractReadonlyDocument(inlineRootElemOpt.get, excludeResultPrefixes)
       }
     }
-
-  // Get constant inline content from `AbstractBinding` if possible, otherwise extract from element.
-  // Doing so allows for sharing of constant instances globally, among uses of an `AbstractBinding` and
-  // among multiple instances of a given form. This is useful in particular for component i18n resource
-  // instances, for example.
-  def inlineContent: om.DocumentInfo =
-    constantContent getOrElse extractInlineContent
-}
-
-// Used to gather instance metadata from AbstractBinding
-class ThrowawayInstance(val element: Element) extends InstanceMetadata {
-  def extendedLocationData = ElementAnalysis.createLocationData(element)
-  def partExposeXPathTypes = false
-  def inlineContent = extractInlineContent
 }
 
 // Separate trait that can also be used by AbstractBinding to extract instance metadata
@@ -133,7 +119,7 @@ trait InstanceMetadata {
   import Instance._
 
   val readonly         = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
-  val cache            = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
+  val cache            = element.attributeValue(XXFORMS_CACHE_QNAME) == "true"
   val timeToLive       = Instance.timeToLiveOrDefault(element)
   val handleXInclude   = false
 
@@ -167,15 +153,10 @@ trait InstanceMetadata {
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
 
   // Inline root element if any
-  private val root = element.elements headOption
-  private def hasInlineContent = root.isDefined
-
-  // Create inline instance document if any
-  def inlineContent: DocumentInfo
-
-  // Extract the inline content into a new document (mutable or not)
-  protected def extractInlineContent: DocumentInfo =
-    extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
+  // TODO: When not needed, we should not keep a reference on this.
+  // TODO: When needed, wwe should just keep a detached template.
+  val inlineRootElemOpt: Option[Element] = element.elements.headOption
+  private def hasInlineContent = inlineRootElemOpt.isDefined
 
   // Don't allow more than one child element
   if (element.elements.size > 1)
@@ -187,13 +168,13 @@ trait InstanceMetadata {
   private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
   private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)
 
-  // @src always wins, @resource always loses
+  // `@src` always wins, `@resource` always loses
   val useInlineContent = src.isEmpty && hasInlineContent
   val useExternalContent = src.isDefined || ! hasInlineContent && resource.isDefined
 
   val (instanceSource, dependencyURL) =
     (if (useInlineContent) None else src orElse resource) match {
-      case someSource @ Some(source) if ProcessorImpl.isProcessorOutputScheme(source) =>
+      case someSource @ Some(source) if Instance.isProcessorOutputScheme(source) =>
         someSource -> None // input:* doesn't add a URL dependency, but is handled by the pipeline engine
       case someSource @ Some(_) =>
         someSource -> someSource
@@ -208,63 +189,41 @@ trait InstanceMetadata {
 
 object Instance {
 
+  def isProcessorOutputScheme(uri: String): Boolean =
+    uri.startsWith(ProcessorOutputScheme) &&
+      ! uri.startsWith(ProcessorOutputScheme + "/")
+
   def timeToLiveOrDefault(element: Element): Long =
     element.attributeValueOpt(XXFORMS_TIME_TO_LIVE_QNAME) flatMap (_.trimAllToOpt) map (_.toLong) getOrElse -1L
 
-  // Extract the document starting at the given root element
-  // This always creates a copy of the original sub-tree
-  //
-  // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
-  // @exposeXPathTypes if true, use a TypedDocumentWrapper
-  def extractDocument(
+  def extractReadonlyDocument(
     element               : Element,
-    excludeResultPrefixes : Set[String],
-    readonly              : Boolean,
-    exposeXPathTypes      : Boolean,
-    removeInstanceData    : Boolean
-  ): om.DocumentInfo = {
-
-    require(! (readonly && exposeXPathTypes)) // we can't expose types on readonly instances at the moment
-
-    // Extract a document and adjust namespaces if requested
-    // NOTE: Should implement exactly as per XSLT 2.0
-    // NOTE: Should implement namespace fixup, the code below can break serialization
-    def extractDocument =
-      excludeResultPrefixes match {
-        case prefixes if prefixes("#all") =>
-          // Special #all
-          Document(element.createCopy)
-        case prefixes if prefixes.nonEmpty =>
-          // List of prefixes
-          element.createDocumentCopyParentNamespaces(detach = false, prefixesToFilter = prefixes)
-        case _ =>
-          // No exclusion
-          element.createDocumentCopyParentNamespaces(detach = false)
-      }
-
-    if (readonly)
-      TransformerUtils.dom4jToTinyTree(XPath.GlobalConfiguration, extractDocument, false)
-    else
-      wrapDocument(
-        if (removeInstanceData)
-          InstanceDataOps.removeRecursively(extractDocument)
-        else
-          extractDocument,
-        exposeXPathTypes
-      )
+    excludeResultPrefixes : Set[String]
+  ): StaticXPath.DocumentNodeInfoType = {
+    StaticXPath.orbeonDomToTinyTree(extractDocHandlePrefixes(element, excludeResultPrefixes))
+//    TransformerUtils.dom4jToTinyTree(
+//      XPath.GlobalConfiguration,
+//      extractDocHandlePrefixes(element, excludeResultPrefixes),
+//      false
+//    )
   }
 
-  def wrapDocument(document: Document, exposeXPathTypes: Boolean): DocumentWrapper =
-    if (exposeXPathTypes)
-      new TypedDocumentWrapper(
-        document.normalizeTextNodes,
-        null,
-        XPath.GlobalConfiguration
-      )
-    else
-      new DocumentWrapper(
-        document.normalizeTextNodes,
-        null,
-        XPath.GlobalConfiguration
-      )
+  // Extract a document and adjust namespaces if requested
+  // NOTE: Should implement exactly as per XSLT 2.0
+  // NOTE: Should implement namespace fixup, the code below can break serialization
+  def extractDocHandlePrefixes(element: Element, excludeResultPrefixes : Set[String]): Document =
+    excludeResultPrefixes match {
+      case prefixes if prefixes("#all") =>
+        // Special #all
+        Document(element.createCopy)
+      case prefixes if prefixes.nonEmpty =>
+        // List of prefixes
+        element.createDocumentCopyParentNamespaces(detach = false, prefixesToFilter = prefixes)
+      case _ =>
+        // No exclusion
+        element.createDocumentCopyParentNamespaces(detach = false)
+    }
+
+  // Copy this here as we don't want a dependency on the processor stuff
+  private val ProcessorOutputScheme = "output:"
 }

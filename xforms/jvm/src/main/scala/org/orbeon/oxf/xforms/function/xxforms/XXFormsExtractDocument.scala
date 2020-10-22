@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
@@ -41,7 +41,7 @@ class XXFormsExtractDocument extends XFormsFunction {
         case _                        => return null
       }
 
-    Instance.extractDocument(
+    XFormsInstanceSupport.extractDocument(
       rootElement,
       stringOptionToSet(excludeResultPrefixes),
       readonly,

@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
+import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -99,6 +99,17 @@ object CommonBindingBuilder {
       (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
       (if (modeExternalValue) List(EventNames.XXFormsValue) else Nil)
 
+    // 2020-10-20: Only used to extract:
+    //
+    // - `readonly`
+    // - `useInlineContent`
+    // - `excludeResultPrefixes`
+    //
+    class ThrowawayInstance(val element: Element) extends InstanceMetadata {
+      def extendedLocationData = ElementAnalysis.createLocationData(element)
+      def partExposeXPathTypes = false
+    }
+
     // Constant instance DocumentInfo by model and instance index
     // We use the indexes because at this time, no id annotation has taken place yet
     val constantInstances: Map[(Int, Int), DocumentInfo] = (
@@ -108,7 +119,7 @@ object CommonBindingBuilder {
         im      = new ThrowawayInstance(i)
         if im.readonly && im.useInlineContent
       } yield
-        (mi, ii) -> im.inlineContent
+        (mi, ii) -> Instance.extractReadonlyDocument(im.inlineRootElemOpt.get, im.excludeResultPrefixes)
     ) toMap
 
     CommonBinding(

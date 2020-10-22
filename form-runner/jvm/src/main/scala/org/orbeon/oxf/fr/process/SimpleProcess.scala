@@ -22,8 +22,8 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
@@ -102,7 +102,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
       // on `update`.
       formInstance.update(
         instanceCaching = formInstance.instanceCaching,
-        documentInfo    = Instance.wrapDocument(rollbackContent.data, formInstance.exposeXPathTypes),
+        documentInfo    = XFormsInstanceSupport.wrapDocument(rollbackContent.data, formInstance.exposeXPathTypes),
         readonly        = formInstance.readonly
       )
 

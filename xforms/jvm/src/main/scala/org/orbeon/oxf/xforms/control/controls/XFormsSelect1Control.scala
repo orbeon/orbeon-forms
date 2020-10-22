@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControl
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
 import org.orbeon.oxf.xforms.control._

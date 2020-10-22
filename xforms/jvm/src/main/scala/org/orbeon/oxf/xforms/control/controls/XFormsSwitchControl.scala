@@ -19,11 +19,11 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
+import org.orbeon.oxf.xforms.analysis.controls.{CaseControl, SwitchControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils}
@@ -105,7 +105,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
         )
 
       caserefItem collect {
-        case item if DataModel.isAllowedValueBoundItem(item) => item
+        case item if StaticDataModel.isAllowedValueBoundItem(item) => item
       }
 
       // TODO: deferred event dispatch for xforms-binding-error EXCEPT upon restoring state???
@@ -189,7 +189,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       // "by performing a setvalue action if the caseref attribute is specified and indicates a node. If the
       // node is readonly or if the toggle action does not indicate a case in the switch, then no value change
       // occurs and therefore no change of the selected case occurs"
-      _caserefBinding flatMap (item => DataModel.isWritableItem(item).left.toOption) foreach { writableNode =>
+      _caserefBinding flatMap (item => StaticDataModel.isWritableItem(item).left.toOption) foreach { writableNode =>
 
         val newValue = caseValue(caseControlToSelect.staticControl)
 

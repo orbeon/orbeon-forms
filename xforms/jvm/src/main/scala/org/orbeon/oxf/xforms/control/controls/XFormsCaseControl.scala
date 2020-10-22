@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CaseControl
+import org.orbeon.oxf.xforms.analysis.controls.CaseControl
 import org.orbeon.oxf.xforms.control.{VisibilityTrait, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 

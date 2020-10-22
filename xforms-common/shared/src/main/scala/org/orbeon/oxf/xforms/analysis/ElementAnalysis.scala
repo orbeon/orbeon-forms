@@ -35,6 +35,9 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.control.Breaks
 
+import org.orbeon.saxon.functions.FunctionLibrary
+
+
 // xml:lang reference
 sealed trait LangRef
 case class LiteralLangRef(lang: String)      extends LangRef
@@ -45,10 +48,18 @@ trait Metadata {
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
 }
 
+trait StaticState {
+  def functionLibrary: FunctionLibrary
+}
+
 // TODO: What's needed for construction vs other?
 trait PartAnalysisImpl {
 
+  def staticState: StaticState
+
   def isTopLevel: Boolean
+  def startScope                    : Scope
+  def isExposeXPathTypes: Boolean
 
   def getIndentedLogger: IndentedLogger // in `PartAnalysis`
   def getModel: Model // PartGlobalOps
@@ -60,6 +71,8 @@ trait PartAnalysisImpl {
   def metadata: Metadata // in `PartAnalysis`
   def elementInParent: Option[ElementAnalysis] // in `PartAnalysis`
   def getEventHandlers(observerPrefixedId: String): List[EventHandler]
+
+  def unmapScopeIds(control: ElementAnalysis): Unit
 }
 
 /**

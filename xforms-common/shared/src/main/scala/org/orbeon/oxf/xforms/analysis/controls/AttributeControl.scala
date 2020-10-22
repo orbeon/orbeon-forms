@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CoreControl
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._

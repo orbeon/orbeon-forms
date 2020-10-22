@@ -168,7 +168,7 @@ class PartAnalysisImpl(
 
       // Attach LHHA
       for (lhha <- lhhas)
-        lhha.attachToControl()
+        LHHAAnalysisBuilder.attachToControl(partAnalysis, lhha)
 
       // Register event handlers
       registerEventHandlers(eventHandlers)
@@ -239,7 +239,7 @@ class PartAnalysisImpl(
 
       // Attach LHHA
       for (lhha <- lhhas)
-        lhha.attachToControl()
+        LHHAAnalysisBuilder.attachToControl(partAnalysis, lhha)
 
       // Register event handlers
       registerEventHandlers(eventHandlers)

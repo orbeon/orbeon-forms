@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsElementValue
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
+import org.orbeon.oxf.xforms.analysis.controls.ValueControl
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer

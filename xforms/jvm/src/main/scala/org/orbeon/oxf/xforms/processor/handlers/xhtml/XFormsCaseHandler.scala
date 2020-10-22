@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SwitchControl
+import org.orbeon.oxf.xforms.analysis.controls.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}

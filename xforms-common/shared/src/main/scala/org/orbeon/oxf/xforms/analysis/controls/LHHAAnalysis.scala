@@ -21,15 +21,18 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 
 class LHHAAnalysis(
-  part              : PartAnalysisImpl,
-  index             : Int,
-  element           : Element,
-  parent            : Option[ElementAnalysis],
-  preceding         : Option[ElementAnalysis],
-  scope             : Scope,
-  val staticValue   : Option[String],
-  val isPlaceholder : Boolean,
-  val containsHTML  : Boolean
+  part                          : PartAnalysisImpl,
+  index                         : Int,
+  element                       : Element,
+  parent                        : Option[ElementAnalysis],
+  preceding                     : Option[ElementAnalysis],
+  scope                         : Scope,
+  val staticValue               : Option[String],
+  val isPlaceholder             : Boolean,
+  val containsHTML              : Boolean,
+  val hasLocalMinimalAppearance : Boolean,
+  val hasLocalFullAppearance    : Boolean,
+  val hasLocalLeftAppearance    : Boolean
 ) extends ElementAnalysis(part, index, element, parent, preceding, scope)
    with OptionalSingleNode
    with AppearanceTrait {

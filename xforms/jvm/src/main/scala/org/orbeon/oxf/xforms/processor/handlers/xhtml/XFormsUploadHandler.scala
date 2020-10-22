@@ -15,10 +15,9 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.UploadControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.UploadControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
@@ -28,7 +27,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax._
+
 
 /**
  * Handle xf:upload.

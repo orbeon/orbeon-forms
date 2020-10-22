@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
+import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler

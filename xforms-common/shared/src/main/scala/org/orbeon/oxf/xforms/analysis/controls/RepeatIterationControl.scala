@@ -17,15 +17,20 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class RepeatIterationControl(
-  part     : PartAnalysisImpl,
-  index    : Int,
-  element  : Element,
-  parent   : Option[ElementAnalysis],
-  preceding: Option[ElementAnalysis],
-  scope    : Scope
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
 
   override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE

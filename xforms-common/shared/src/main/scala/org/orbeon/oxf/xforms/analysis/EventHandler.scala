@@ -22,6 +22,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{EventNames, XFormsId}
+import org.orbeon.xml.NamespaceMapping
 
 
 /**
@@ -31,19 +32,27 @@ import org.orbeon.xforms.{EventNames, XFormsId}
  * XPath analysis, which is unused here).
  */
 class EventHandler(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
+  part              : PartAnalysisImpl,
+  index             : Int,
+  element           : Element,
+  parent            : Option[ElementAnalysis],
+  preceding         : Option[ElementAnalysis],
+  staticId          : String,
+  prefixedId        : String,
+  namespaceMapping  : NamespaceMapping,
+  scope             : Scope,
+  containerScope    : Scope
 ) extends ElementAnalysis(
   part,
   index,
   element,
   parent,
   preceding,
-  scope
+  staticId,
+  prefixedId,
+  namespaceMapping,
+  scope,
+  containerScope
 ) with ActionTrait {
 
   import EventHandler._
@@ -127,9 +136,6 @@ class EventHandler(
     // This must run only once
     assert(_observersPrefixedIds eq null)
     assert(_targetPrefixedIds eq null)
-
-    // Logging
-    implicit val logger: IndentedLogger = part.getIndentedLogger
 
     def unknownTargetId(id: String) = {
       warn("unknown id", Seq("id" -> id))

@@ -326,7 +326,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
       val staticModel = partAnalysis.getModel(modelPrefixedId)
 
-      XBLBindingBuilder.rebuildBinds(staticModel, modelElement)
+      XBLBindingBuilder.rebuildBinds(partAnalysis, staticModel, modelElement)
 
       // Q: When should we best notify the concrete model that its binds need build? Since at this point, we
       // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are

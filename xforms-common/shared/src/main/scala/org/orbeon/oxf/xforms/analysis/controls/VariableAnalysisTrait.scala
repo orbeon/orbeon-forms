@@ -3,14 +3,16 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
  */
-trait VariableAnalysisTrait extends ElementAnalysis with VariableTrait {
+trait VariableAnalysisTrait
+  extends ElementAnalysis
+     with WithChildrenTrait
+     with VariableTrait {
 
   variableSelf =>
 
@@ -27,15 +29,11 @@ trait VariableAnalysisTrait extends ElementAnalysis with VariableTrait {
   val valueElement: Element = VariableAnalysis.valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
   val expressionStringOpt: Option[String] = VariableAnalysis.valueOrSelectAttribute(valueElement)
 
-  val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
-    VariableAnalysis.valueOrSequenceElement(variableSelf.element) match {
+  // `lazy` because the children are evaluated after the container
+  lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
+    children.find(_.localName == "value") match {
       case Some(valueElem) =>
-        val valueElemStaticId = valueElem.idOrNull
-        val valueElemPrefixedId = XFormsId.getRelatedEffectiveId(variableSelf.prefixedId, valueElemStaticId)
-        val valueElemNamespaces = part.metadata.getNamespaceMapping(valueElemPrefixedId).orNull
-        val valueElemScope = part.scopeForPrefixedId(valueElemPrefixedId) // xxx require that `mapScopeIds` has taken place
-
-        (true, valueElemScope, valueElemNamespaces, valueElemStaticId)
+        (true, valueElem.scope, valueElem.localName, valueElem.staticId)
       case None =>
         (false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
     }

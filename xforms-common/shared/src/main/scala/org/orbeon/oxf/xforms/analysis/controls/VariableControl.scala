@@ -18,18 +18,22 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class VariableControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ElementAnalysis(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with ViewTrait
   with OptionalSingleNode
-  with WithChildrenTrait
   with VariableAnalysisTrait {
 
   override def isAllowedBoundItem(item: om.Item): Boolean =

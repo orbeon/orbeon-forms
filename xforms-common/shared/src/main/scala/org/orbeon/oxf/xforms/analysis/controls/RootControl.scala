@@ -19,20 +19,22 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, EventNames}
+import org.orbeon.xml.NamespaceMapping
 
 /**
  * Single root container for a part, whether top-level or a nested part.
  */
 class RootControl(
-  part    : PartAnalysisImpl,
-  index   : Int,
-  element : Element,
-  scope   : Scope
-) extends ContainerControl(part, index, element, None, None, scope) {
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, None, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {
 
-  override val staticId       = Constants.DocumentId
-  override val prefixedId     = part.startScope.fullPrefix + staticId
-  override def containerScope = part.startScope
 
   override lazy val lang: Option[LangRef] = {
 

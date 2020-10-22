@@ -116,18 +116,21 @@ class PartAnalysisImpl(
     val controlStaticId = controlElement.idOpt getOrElse
       (throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName, locationData))
 
-    // Prefixed id
     val controlPrefixedId = containerScope.fullPrefix + controlStaticId
 
     // Create new control if possible
     val elementAnalysisOpt =
       ControlAnalysisFactory.create(
-        part           = partAnalysis,
-        index          = controlAnalysisMap.size + 1,
-        controlElement = controlElement,
-        parent         = parent.some,
-        preceding      = preceding,
-        scope          = scopeForPrefixedId(controlPrefixedId)
+        part              = partAnalysis,
+        index             = controlAnalysisMap.size + 1,
+        controlElement    = controlElement,
+        parent            = parent.some,
+        preceding         = preceding,
+        controlStaticId   = controlStaticId,
+        controlPrefixedId = controlPrefixedId,
+        namespaceMapping  = partAnalysis.metadata.getNamespaceMapping(controlPrefixedId).orNull,
+        scope             = scopeForPrefixedId(controlPrefixedId),
+        containerScope    = containerScope
       )
 
     elementAnalysisOpt match {

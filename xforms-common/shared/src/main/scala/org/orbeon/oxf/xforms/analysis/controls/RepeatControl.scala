@@ -19,15 +19,20 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class RepeatControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with AppearanceTrait { // for separator appearance
 
   val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)

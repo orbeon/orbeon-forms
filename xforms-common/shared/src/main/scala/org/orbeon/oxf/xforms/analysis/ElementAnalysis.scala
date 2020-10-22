@@ -43,48 +43,22 @@ sealed trait LangRef
 case class LiteralLangRef(lang: String)      extends LangRef
 case class AVTLangRef(att: AttributeControl) extends LangRef
 
-// TODO: What's needed for construction?
-trait Metadata {
-  def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
-}
-
-trait StaticState {
-  def functionLibrary: FunctionLibrary
-}
-
-// TODO: What's needed for construction vs other?
-trait PartAnalysisImpl {
-
-  def staticState: StaticState
-
-  def isTopLevel: Boolean
-  def startScope                    : Scope
-  def isExposeXPathTypes: Boolean
-
-  def getIndentedLogger: IndentedLogger // in `PartAnalysis`
-  def getModel: Model // PartGlobalOps
-  def getModel(prefixedId: String): Model // PartModelAnalysis
-  def getDefaultModelForScope(scope: Scope): Option[Model] // PartModelAnalysis
-  def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl // PartGlobalOps
-  def containingScope(prefixedId: String): Scope // PartGlobalOps
-  def scopeForPrefixedId(prefixedId: String): Scope // PartGlobalOps
-  def metadata: Metadata // in `PartAnalysis`
-  def elementInParent: Option[ElementAnalysis] // in `PartAnalysis`
-  def getEventHandlers(observerPrefixedId: String): List[EventHandler]
-
-  def unmapScopeIds(control: ElementAnalysis): Unit
-}
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
 abstract class ElementAnalysis(
-  val part      : PartAnalysisImpl,
-  val index     : Int, // index of the element in the view
-  val element   : Element,
-  val parent    : Option[ElementAnalysis],
-  val preceding : Option[ElementAnalysis],
-  val scope     : Scope
+  val part              : PartAnalysisImpl,
+  val index             : Int, // index of the element in the view
+  val element           : Element,
+  val parent            : Option[ElementAnalysis],
+  val preceding         : Option[ElementAnalysis],
+  val staticId          : String,
+  val prefixedId        : String,
+  val namespaceMapping  : NamespaceMapping,
+  val scope             : Scope,
+  val containerScope    : Scope
+//  val model             : Option[Model]
 ) extends ElementEventHandlers
      with ElementRepeats {
 
@@ -96,7 +70,7 @@ abstract class ElementAnalysis(
 
   implicit def logger: IndentedLogger = part.getIndentedLogger
 
-  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
+  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when it
   // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
   // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
   lazy val model: Option[Model] =
@@ -107,7 +81,7 @@ abstract class ElementAnalysis(
         val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
         val localModel = part.getModel(localModelPrefixedId)
         if (localModel eq null)
-          throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
+          throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", ElementAnalysis.createLocationData(element))
 
         Some(localModel)
       case _ =>
@@ -183,20 +157,10 @@ abstract class ElementAnalysis(
   // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
   //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
 
-  // Only overridden by `RootControl`
-  // TODO: pass during construction?
-  def containerScope: Scope = part.containingScope(prefixedId)
-
   final def getChildElementScope(childElement: Element): Scope = {
     val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)
     part.scopeForPrefixedId(childPrefixedId)
   }
-
-  // Ids
-  val staticId  : String = element.idOrNull
-  val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
-
-  final val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   // Location
   val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
@@ -228,13 +192,13 @@ abstract class ElementAnalysis(
   final lazy val nonRelevantExtensionAttributes =
     extensionAttributes map { case (k, v) => k -> (if (XMLUtils.maybeAVT(v)) "" else v) } // all blank values for AVTs
 
+  val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
+
   // XPath analysis
   final var contextAnalysis: Option[XPathAnalysis] = None
   final var bindingAnalysis: Option[XPathAnalysis] = None
   final var valueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
   // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
-
-  val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   def freeTransientState(): Unit = {
     contextAnalysis foreach (_.freeTransientState())

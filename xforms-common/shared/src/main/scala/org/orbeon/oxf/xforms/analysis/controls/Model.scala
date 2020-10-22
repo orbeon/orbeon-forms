@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.analysis.{EventHandler, _}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
 
@@ -28,13 +29,17 @@ import scala.collection.mutable
  * Static analysis of an XForms model <xf:model> element.
  */
 class Model(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  elem      : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ElementAnalysis(part, index, elem, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  elem             : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(part, index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with WithChildrenTrait
   with ModelInstances
   with ModelVariables
@@ -74,14 +79,17 @@ trait ModelInstances {
 }
 
 class ModelVariable(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ElementAnalysis(part, index, element, parent, preceding, scope)
-//  with WithChildrenTrait
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with VariableAnalysisTrait
 
 trait ModelVariables {
@@ -185,7 +193,7 @@ trait ModelBinds {
 
   // For `xxf:dynamic`
   def replaceBinds(bindElements: => Seq[Element]): Unit = {
-    _bindTree().destroy()
+
     _bindTree = new LazyConstant(
       new BindTree(
         selfModel,

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable._
 
 
@@ -36,19 +37,27 @@ import shapeless.syntax.typeable._
  * Static analysis of an XForms instance.
  */
 class Instance(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
 ) extends ElementAnalysis(
   part,
   index,
   element,
   parent,
   preceding,
-  scope
+  staticId,
+  prefixedId,
+  namespaceMapping,
+  scope,
+  containerScope
 ) with InstanceMetadata with Logging {
 
   def partExposeXPathTypes: Boolean = part.isExposeXPathTypes

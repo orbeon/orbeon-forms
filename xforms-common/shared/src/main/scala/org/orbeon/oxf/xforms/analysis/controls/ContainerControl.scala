@@ -18,21 +18,30 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class ContainerControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
 ) extends ElementAnalysis(
   part,
   index,
   element,
   parent,
   preceding,
-  scope
+  staticId,
+  prefixedId,
+  namespaceMapping,
+  scope,
+  containerScope
 ) with ViewTrait
   with WithChildrenTrait {
 

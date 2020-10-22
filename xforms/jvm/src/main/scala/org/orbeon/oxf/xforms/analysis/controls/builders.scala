@@ -28,19 +28,17 @@ import scala.annotation.tailrec
 object OutputControlBuilder {
 
   def apply(
-    part            : PartAnalysisImpl,
-    index           : Int,
-    element         : Element,
-    parent          : Option[ElementAnalysis],
-    preceding       : Option[ElementAnalysis],
-    scope           : Scope
+    part              : PartAnalysisImpl,
+    index             : Int,
+    element           : Element,
+    parent            : Option[ElementAnalysis],
+    preceding         : Option[ElementAnalysis],
+    staticId          : String,
+    prefixedId        : String,
+    namespaceMapping  : NamespaceMapping,
+    scope             : Scope,
+    containerScope    : Scope
   ): OutputControl = {
-
-    // TODO: This All this could be passed at construction
-    val staticId  : String = element.idOrNull
-    val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
-    val containerScope: Scope = part.containingScope(prefixedId)
-    val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
     // TODO: Duplication in trait
     val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
@@ -60,7 +58,11 @@ object OutputControlBuilder {
       element,
       parent,
       preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
       scope,
+      containerScope,
       isImageMediatype,
       isHtmlMediatype,
       isDownloadAppearance,
@@ -77,19 +79,17 @@ object LHHAAnalysisBuilder {
   val HelpAppearanceProperty  = "help.appearance"
 
   def apply(
-    part            : PartAnalysisImpl,
-    index           : Int,
-    element         : Element,
-    parent          : Option[ElementAnalysis],
-    preceding       : Option[ElementAnalysis],
-    scope           : Scope
+    part              : PartAnalysisImpl,
+    index             : Int,
+    element           : Element,
+    parent            : Option[ElementAnalysis],
+    preceding         : Option[ElementAnalysis],
+    staticId          : String,
+    prefixedId        : String,
+    namespaceMapping  : NamespaceMapping,
+    scope             : Scope,
+    containerScope    : Scope,
   ): LHHAAnalysis = {
-
-    // TODO: This All this could be passed at construction
-    val staticId  : String = element.idOrNull
-    val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
-    val containerScope: Scope = part.containingScope(prefixedId)
-    val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
     // TODO: Duplication in trait
     val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
@@ -135,7 +135,11 @@ object LHHAAnalysisBuilder {
       element,
       parent,
       preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
       scope,
+      containerScope,
       staticValue,
       isPlaceholder,
       containsHTML(element),
@@ -232,12 +236,16 @@ object LHHAAnalysisBuilder {
 object SelectionControlBuilder {
 
   def apply(
-    part            : PartAnalysisImpl,
-    index           : Int,
-    element         : Element,
-    parent          : Option[ElementAnalysis],
-    preceding       : Option[ElementAnalysis],
-    scope           : Scope
+    part             : PartAnalysisImpl,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope
   ): SelectionControl = {
 
     val locationData = ElementAnalysis.createLocationData(element)
@@ -271,12 +279,6 @@ object SelectionControlBuilder {
         locationData       = locationData,
         reporter           = null
       ).asInstanceOf[Boolean]
-
-    // TODO: This All this could be passed at construction
-    val staticId  : String = element.idOrNull
-    val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
-    val containerScope: Scope = part.containingScope(prefixedId)
-    val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
     val isMultiple = element.getName == "select"
 
@@ -335,7 +337,11 @@ object SelectionControlBuilder {
       element,
       parent,
       preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
       scope,
+      containerScope,
       staticItemset,
       useCopy,
       mustEncodeValues
@@ -483,19 +489,18 @@ object SelectionControlBuilder {
 object CaseControlBuilder {
 
   def apply(
-    part      : PartAnalysisImpl,
-    index     : Int,
-    element   : Element,
-    parent    : Option[ElementAnalysis],
-    preceding : Option[ElementAnalysis],
-    scope     : Scope
+    part             : PartAnalysisImpl,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope,
   ): CaseControl = {
 
-    // TODO: This All this could be passed at construction
-    val staticId  : String = element.idOrNull
-    val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
-    val containerScope: Scope = part.containingScope(prefixedId)
-    val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
     val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
 
     val valueExpression =
@@ -525,7 +530,11 @@ object CaseControlBuilder {
       element,
       parent,
       preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
       scope,
+      containerScope,
       valueExpression,
       valueLiteral
     )

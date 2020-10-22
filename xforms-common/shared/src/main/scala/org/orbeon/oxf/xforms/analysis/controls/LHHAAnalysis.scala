@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class LHHAAnalysis(
   part                          : PartAnalysisImpl,
@@ -26,14 +27,18 @@ class LHHAAnalysis(
   element                       : Element,
   parent                        : Option[ElementAnalysis],
   preceding                     : Option[ElementAnalysis],
+  staticId                      : String,
+  prefixedId                    : String,
+  namespaceMapping              : NamespaceMapping,
   scope                         : Scope,
+  containerScope                : Scope,
   val staticValue               : Option[String],
   val isPlaceholder             : Boolean,
   val containsHTML              : Boolean,
   val hasLocalMinimalAppearance : Boolean,
   val hasLocalFullAppearance    : Boolean,
   val hasLocalLeftAppearance    : Boolean
-) extends ElementAnalysis(part, index, element, parent, preceding, scope)
+) extends ElementAnalysis(part, index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
    with AppearanceTrait {
 

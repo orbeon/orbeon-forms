@@ -18,9 +18,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.StaticDataModel
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class OutputControl(
   part                    : PartAnalysisImpl,
@@ -28,16 +29,20 @@ class OutputControl(
   element                 : Element,
   parent                  : Option[ElementAnalysis],
   preceding               : Option[ElementAnalysis],
+  staticId                : String,
+  prefixedId              : String,
+  namespaceMapping        : NamespaceMapping,
   scope                   : Scope,
+  containerScope          : Scope,
   val isImageMediatype    : Boolean,
   val isHtmlMediatype     : Boolean,
   val isDownloadAppearance: Boolean,
   val staticValue         : Option[String]
-) extends ValueControl(part, index, element, parent, preceding, scope)
+) extends ValueControl(part, index, element, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
      with OptionalSingleNode {
 
   // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
-  override def isAllowedBoundItem(item: Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
+  override def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
 
   override protected val allowedExtensionAttributes: Set[QName] =
     (isImageMediatype set XXFORMS_ALT_QNAME) ++ (isDownloadAppearance set XXFORMS_TARGET_QNAME)

@@ -162,9 +162,9 @@ object XBLBindingBuilder {
   }
 
   // For `xxf:dynamic`
-  def rebuildBinds(model: Model, rawModelElement: Element): Unit = {
+  def rebuildBinds(part: PartAnalysisImpl, model: Model, rawModelElement: Element): Unit = {
 
-    assert(! model.part.isTopLevel)
+    assert(! part.isTopLevel)
 
     def annotateSubTree(rawElement: Element) = {
       val annotatedTree =
@@ -183,6 +183,7 @@ object XBLBindingBuilder {
       annotatedTree
     }
 
+    model.bindTree.bindsById.values foreach part.unmapScopeIds
     model.replaceBinds(rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
   }
 

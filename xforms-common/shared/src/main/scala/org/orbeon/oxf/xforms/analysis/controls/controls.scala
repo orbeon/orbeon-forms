@@ -10,6 +10,7 @@ import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 
 private object ExternalEvents {
@@ -28,37 +29,49 @@ private object ExternalEvents {
 }
 
 abstract class CoreControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ElementAnalysis(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ViewTrait
      with StaticLHHASupport
 
 
 abstract class ValueControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends CoreControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends CoreControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ValueTrait
      with WithChildrenTrait
      with FormatTrait
 
 class InputValueControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends ValueControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
   override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
   override val externalEvents = externalEventsDef
@@ -70,11 +83,15 @@ class SelectionControl(
   element              : Element,
   parent               : Option[ElementAnalysis],
   preceding            : Option[ElementAnalysis],
+  staticId             : String,
+  prefixedId           : String,
+  namespaceMapping     : NamespaceMapping,
   scope                : Scope,
+  containerScope       : Scope,
   val staticItemset    : Option[Itemset],
   val useCopy          : Boolean,
   val mustEncodeValues : Option[Boolean]
-) extends InputValueControl(part, index, element, parent, preceding, scope)
+) extends InputValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with SelectionControlTrait {
 
   def hasStaticItemset: Boolean = staticItemset.isDefined
@@ -83,13 +100,17 @@ class SelectionControl(
 }
 
 class TriggerControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends CoreControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends CoreControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with TriggerAppearanceTrait
      with WithChildrenTrait {
@@ -100,13 +121,17 @@ class TriggerControl(
 }
 
 class UploadControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends InputValueControl(part, index, element, parent, preceding, scope) {
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends InputValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
 
   val multiple: Boolean = element.attributeValueOpt(XXFORMS_MULTIPLE_QNAME) contains "true"
 
@@ -117,30 +142,38 @@ class UploadControl(
 }
 
 class InputControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends InputValueControl(part, index, element, parent, preceding, scope) {
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends InputValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override protected val allowedExtensionAttributes = Set(
     XXFORMS_SIZE_QNAME,
     XXFORMS_TITLE_QNAME,
     XXFORMS_MAXLENGTH_QNAME,
-    XXFORMS_PATTERN_QNAME,  // HTML 5 forms attribute
+    XXFORMS_PATTERN_QNAME, // HTML 5 forms attribute
     XXFORMS_AUTOCOMPLETE_QNAME
   )
 }
 
 class SecretControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends InputValueControl(part, index, element, parent, preceding, scope) {
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends InputValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override protected val allowedExtensionAttributes = Set(
     XXFORMS_SIZE_QNAME,
     XXFORMS_MAXLENGTH_QNAME,
@@ -149,13 +182,17 @@ class SecretControl(
 }
 
 class TextareaControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends InputValueControl(part, index, element, parent, preceding, scope) {
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends InputValueControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override protected val allowedExtensionAttributes = Set(
     XXFORMS_MAXLENGTH_QNAME,
     XXFORMS_COLS_QNAME,
@@ -164,13 +201,17 @@ class TextareaControl(
 }
 
 class SwitchControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport
      with AppearanceTrait {
@@ -188,10 +229,14 @@ class CaseControl(
   element             : Element,
   parent              : Option[ElementAnalysis],
   preceding           : Option[ElementAnalysis],
+  staticId            : String,
+  prefixedId          : String,
+  namespaceMapping    : NamespaceMapping,
   scope               : Scope,
+  containerScope      : Scope,
   val valueExpression : Option[String],
   val valueLiteral    : Option[String]
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport {
 
@@ -199,13 +244,17 @@ class CaseControl(
 }
 
 class GroupControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport {
 
@@ -222,13 +271,17 @@ class GroupControl(
 }
 
 class DialogControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends ContainerControl(part, index, element, parent, preceding, scope)
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with OptionalSingleNode
    with StaticLHHASupport {
 

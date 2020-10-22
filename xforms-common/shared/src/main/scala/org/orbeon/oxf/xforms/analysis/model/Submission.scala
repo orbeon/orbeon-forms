@@ -20,21 +20,30 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl, WithCh
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 class Submission(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
+  part             : PartAnalysisImpl,
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
 ) extends ElementAnalysis(
   part,
   index,
   element,
   parent,
   preceding,
-  scope
+  staticId,
+  prefixedId,
+  namespaceMapping,
+  scope,
+  containerScope
 ) with WithChildrenTrait {
 
   // `resource` has precedence over `action`

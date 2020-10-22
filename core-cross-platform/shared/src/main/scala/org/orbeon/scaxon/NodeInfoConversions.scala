@@ -16,19 +16,20 @@ package org.orbeon.scaxon
 import org.orbeon.dom
 import org.orbeon.saxon.om
 import shapeless.syntax.typeable._
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 
 
 object NodeInfoConversions {
 
   def unsafeUnwrapElement(nodeInfo: om.NodeInfo): dom.Element =
-    nodeInfo.narrowTo[om.VirtualNode].getUnderlyingNode.asInstanceOf[dom.Element]
+    nodeInfo.asInstanceOf[VirtualNodeType].getUnderlyingNode.asInstanceOf[dom.Element]
 
   def unwrapElement(nodeInfo: om.NodeInfo): Option[dom.Element] =
-    nodeInfo.narrowTo[om.VirtualNode] flatMap (_.getUnderlyingNode.cast[dom.Element])
+    nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Element])
 
   def unwrapAttribute(nodeInfo: om.NodeInfo): Option[dom.Attribute] =
-    nodeInfo.narrowTo[om.VirtualNode] flatMap (_.getUnderlyingNode.cast[dom.Attribute])
+    nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Attribute])
 
   def unwrapNode(nodeInfo: om.NodeInfo): Option[dom.Node] =
-    nodeInfo.narrowTo[om.VirtualNode] flatMap (_.getUnderlyingNode.cast[dom.Node])
+    nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Node])
 }

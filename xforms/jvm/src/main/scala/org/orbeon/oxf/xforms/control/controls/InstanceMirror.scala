@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
@@ -26,7 +27,9 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent,
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
@@ -52,7 +55,7 @@ object InstanceMirror {
 
   sealed trait NodeMatcherResult
   object NodeMatcherResult {
-    case class  Match(instance: XFormsInstance, node: NodeInfo) extends NodeMatcherResult
+    case class  Match(instance: XFormsInstance, node: om.NodeInfo) extends NodeMatcherResult
     case object Continue                                        extends NodeMatcherResult
     case object NonRelevant                                     extends NodeMatcherResult
   }
@@ -61,7 +64,7 @@ object InstanceMirror {
   import NodeMatcherResult._
 
   // (sourceInstance, sourceNode, siblingIndexOpt) => Option[(destinationInstance, destinationNode)]
-  type NodeMatcher = (XFormsInstance, NodeInfo, Option[Int]) => NodeMatcherResult
+  type NodeMatcher = (XFormsInstance, om.NodeInfo, Option[Int]) => NodeMatcherResult
 
   def addListener(observer: ListenersTrait, listener: EventListener): Unit =
     for (eventName <- MutationEvents)
@@ -102,13 +105,13 @@ object InstanceMirror {
     def apply(event: XFormsEvent): Unit = f(event)
   }
 
-  case class InstanceDetails(id: String, root: VirtualNode, namespaces: NamespaceMapping)
+  case class InstanceDetails(id: String, root: VirtualNodeType, namespaces: NamespaceMapping)
 
   // Find outer instance details when the change occurs within an instance containing an XHTML+XForms document. This
   // is used by xxf:dynamic.
   def findOuterInstanceDetailsDynamic(
     container : XBLContainer,
-    outerNode : NodeInfo,
+    outerNode : om.NodeInfo,
     into      : Boolean
   ): Option[InstanceDetails] = {
     // In "into" mode, use ancestor-or-self because outerNode passed is the containing node (node into which other
@@ -126,7 +129,7 @@ object InstanceMirror {
     val findInstanceExpr = "(" + axis + "::xf:instance)[1]"
 
     Option(evalOne(outerNode, findInstanceExpr, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING)) collect {
-      case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
+      case instanceWrapper: VirtualNodeType if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
 
         val element = instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
         val instanceId = element.idOrThrow
@@ -143,9 +146,9 @@ object InstanceMirror {
   // Find outer instance details when the change occurs in a single instance. This is used by XBL.
   def findOuterInstanceDetailsXBL(
     innerInstance : XFormsInstance,
-    referenceNode : VirtualNode)(
+    referenceNode : VirtualNodeType)(
     container     : XBLContainer,
-    outerNode     : NodeInfo,
+    outerNode     : om.NodeInfo,
     into          : Boolean
   ): Option[InstanceDetails] = {
 
@@ -167,15 +170,15 @@ object InstanceMirror {
           .getNamespaceContextNoDefault
       )
 
-    inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNode], namespaces)
+    inScope option InstanceDetails(innerInstance.getId, referenceNode.parentUnsafe.asInstanceOf[VirtualNodeType], namespaces)
   }
 
   // Find the inner instance node from a node in an outer instance
   def toInnerInstanceNode(
-    boundElem                : NodeInfo,
+    boundElem                : om.NodeInfo,
     partAnalysis             : PartAnalysis,
     container                : XBLContainer,
-    findOuterInstanceDetails : (XBLContainer, NodeInfo, Boolean) => Option[InstanceDetails]
+    findOuterInstanceDetails : (XBLContainer, om.NodeInfo, Boolean) => Option[InstanceDetails]
   ): NodeMatcher = {
 
     (_, outerNode, siblingIndexOpt) => {
@@ -207,7 +210,7 @@ object InstanceMirror {
                 }
 
                 evalOne(innerInstance.documentInfo, innerPath) match {
-                  case newNode: VirtualNode => Match(innerInstance, newNode)
+                  case newNode: VirtualNodeType => Match(innerInstance, newNode)
                   case _                    => throw new IllegalStateException
                 }
               case _ =>
@@ -224,7 +227,7 @@ object InstanceMirror {
   }
 
   // Get the path of the node given an optional node position within its parent
-  private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
+  private def getNodePath(node: om.NodeInfo, siblingIndexOpt: Option[Int]) = {
     siblingIndexOpt match {
       case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE =>
         SaxonUtils.buildNodePath(node.parentUnsafe) :+ s"node()[${siblingIndex + 1}]"
@@ -236,7 +239,7 @@ object InstanceMirror {
   // Find the outer node in an inline instance from a node in an inner instance
   def toOuterInstanceNodeDynamic(
       outerInstance : XFormsInstance,
-      outerElem     : NodeInfo,
+      outerElem     : om.NodeInfo,
       partAnalysis  : PartAnalysis
   ): NodeMatcher = {
 
@@ -250,10 +253,10 @@ object InstanceMirror {
         namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
         variables  = Map("sourceId" -> stringToStringValue(innerInstance.getId))
       ) match {
-        case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
+        case instanceWrapper: VirtualNodeType if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
           // Outer xf:instance found
           innerNode match {
-            case _: DocumentInfo =>
+            case _: DocumentNodeInfoType =>
               // Root element replaced
               Match(outerInstance, instanceWrapper) ensuring siblingIndexOpt.isEmpty
             case _ =>
@@ -263,7 +266,7 @@ object InstanceMirror {
 
               // Find destination node in inline instance in original doc
               evalOne(instanceWrapper, path) match {
-                case newNode: VirtualNode => Match(outerInstance, newNode)
+                case newNode: VirtualNodeType => Match(outerInstance, newNode)
                 case _                    => throw new IllegalStateException
               }
           }
@@ -273,7 +276,7 @@ object InstanceMirror {
 
   def toOuterInstanceNodeXBL(
     outerInstance : XFormsInstance,
-    outerNode     : NodeInfo,
+    outerNode     : om.NodeInfo,
     partAnalysis  : PartAnalysis
   ): NodeMatcher = {
 
@@ -290,7 +293,7 @@ object InstanceMirror {
       else {
         // Apply path to find node in outer instance
         Option(evalOne(outerNode, relativePath)) match {
-          case Some(newNode: NodeInfo) => Match(outerInstance, newNode)
+          case Some(newNode: om.NodeInfo) => Match(outerInstance, newNode)
           case _                       => Continue
         }
       }

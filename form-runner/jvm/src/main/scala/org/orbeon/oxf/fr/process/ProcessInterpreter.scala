@@ -302,7 +302,7 @@ trait ProcessInterpreter extends Logging {
 
   def evaluateBoolean(expr: String, item: Item = xpathContext): Boolean =
     evaluateOne(
-      expr = u.XPath.makeBooleanExpression(expr),
+      expr = u.StaticXPath.makeBooleanExpression(expr),
       item = item
     ).asInstanceOf[BooleanValue].getBooleanValue
 
@@ -312,7 +312,7 @@ trait ProcessInterpreter extends Logging {
     mapping : NamespaceMapping = ProcessInterpreter.StandardNamespaceMapping
   ): String =
     evaluateOne(
-      expr    = u.XPath.makeStringExpression(expr),
+      expr    = u.StaticXPath.makeStringExpression(expr),
       item    = item,
       mapping = mapping
     ).getStringValue

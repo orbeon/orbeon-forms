@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
@@ -169,7 +169,7 @@ class XFormsStaticStateImpl(
   private lazy val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
     staticStateDocument.nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>
       name -> {
-        val maybeAVT = XFormsUtils.maybeAVT(rawPropertyValue)
+        val maybeAVT = XMLUtils.maybeAVT(rawPropertyValue)
         topLevelPart.defaultModel match {
           case Some(model) if isInline && maybeAVT =>
             Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))

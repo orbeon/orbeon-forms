@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
+import org.orbeon.dom.Document
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -21,35 +22,15 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.xml.NamespaceMapping
 
-trait XPathTrait {
+trait StaticXPathTrait {
 
+  // These types are temporary indirections while we have two incompatible versions of Saxon (9.1 and 10)
   type SaxonConfiguration
+  type DocumentNodeInfoType
+  type VirtualNodeType
 
-  // Marker for XPath function context
-  trait FunctionContext
-
-  // To report timing information
-  type Reporter = (String, Long) => Unit
-
-  // To resolve a variable
   // Used by `ShareableXPathStaticContext`
-//  type VariableResolver
-
-  // Context accessible during XPath evaluation
-  // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
-  // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
-  // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
-  // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  private val xpathContextDyn = new DynamicVariable[FunctionContext]
-
-  def withFunctionContext[T](functionContext: FunctionContext)(thunk: => T): T = {
-    xpathContextDyn.withValue(functionContext) {
-      thunk
-    }
-  }
-
-  // Return the currently scoped function context if any
-  def functionContext: Option[FunctionContext] = xpathContextDyn.value
+  type VariableResolver
 
   // Compiled expression with source information
   case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
@@ -58,9 +39,6 @@ trait XPathTrait {
   def makeBooleanExpression(expression: String): String =  "boolean(" + expression + ")"
 
   val GlobalConfiguration: SaxonConfiguration
-
-  // New mutable configuration sharing the same name pool and converters, for use by mutating callers
-//  def newConfiguration: SaxonConfiguration
 
   // Create and compile an expression
   def compileExpression(
@@ -71,4 +49,6 @@ trait XPathTrait {
     avt              : Boolean)(implicit
     logger           : IndentedLogger
   ): CompiledExpression
+
+  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType
 }

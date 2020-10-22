@@ -20,6 +20,7 @@ import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
+import org.orbeon.oxf.util.StaticXPath.{makeBooleanExpression, makeStringExpression}
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.functions.FunctionLibrary

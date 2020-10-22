@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysisBuilder.buildInstanceString
 import org.orbeon.oxf.xforms.{MapSet, XFormsProperties}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
@@ -405,13 +406,18 @@ object ElementAnalysisTreeXPathAnalyzer {
 
               nestedElementOpt foreach { nestedElement =>
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
-                  part        = e.part,
-                  index       = e.index, // wrong
-                  element     = nestedElement,
-                  parent      = Some(itemElementAnalysis),
-                  preceding   = None,
-                  scope       = itemElementAnalysis.getChildElementScope(nestedElement),
-                  staticValue = None
+                  part                      = e.part,
+                  index                     = e.index, // wrong
+                  element                   = nestedElement,
+                  parent                    = Some(itemElementAnalysis),
+                  preceding                 = None,
+                  scope                     = itemElementAnalysis.getChildElementScope(nestedElement),
+                  staticValue               = None,
+                  isPlaceholder             = false,
+                  containsHTML              = false,
+                  hasLocalMinimalAppearance = false,
+                  hasLocalFullAppearance    = false,
+                  hasLocalLeftAppearance    = false
                 )
                 ElementAnalysisTreeXPathAnalyzer.analyzeXPath(nestedAnalysis)
                 combinedAnalysis = combineXPathAnalysis(combinedAnalysis, nestedAnalysis.valueAnalysis.get)
@@ -602,7 +608,8 @@ object ElementAnalysisTreeXPathAnalyzer {
               defaultInstancePrefixedId = defaultInstancePrefixedId.some,
               locationData              = m.locationData,
               element                   = m.element,
-              avt                       = false
+              avt                       = false)(
+              logger                    = null // only used for warnings
             )
           }
         case e =>

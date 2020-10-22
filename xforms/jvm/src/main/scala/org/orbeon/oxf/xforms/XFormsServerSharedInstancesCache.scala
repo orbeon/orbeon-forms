@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.model.XFormsInstance._
-import org.orbeon.saxon.om.{DocumentInfo, VirtualNode}
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -28,7 +28,7 @@ object XFormsServerSharedInstancesCache {
 
   import Private._
 
-  type InstanceLoader = (String, Boolean) => DocumentInfo
+  type InstanceLoader = (String, Boolean) => DocumentNodeInfoType
 
   // Try to find instance content in the cache but do not attempt to load it if not found
   def findContentOrNull(
@@ -36,7 +36,7 @@ object XFormsServerSharedInstancesCache {
       instanceCaching : InstanceCaching,
       readonly        : Boolean)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentInfo =
+  ): DocumentNodeInfoType =
     find(instanceCaching)(indentedLogger) map
       (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) orNull
 
@@ -47,7 +47,7 @@ object XFormsServerSharedInstancesCache {
       readonly        : Boolean,
       loadInstance    : InstanceLoader)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentInfo = {
+  ): DocumentNodeInfoType = {
 
     // Add an entry to the cache
     def add(instanceContent: InstanceContent, timeToLive: Long): Unit = {
@@ -61,7 +61,7 @@ object XFormsServerSharedInstancesCache {
     }
 
     // Load and cache new instance content
-    def loadAndCache(): Option[DocumentInfo] = {
+    def loadAndCache(): Option[DocumentNodeInfoType] = {
       // Note that this method is not synchronized. Scenario: if the method is synchronized, the resource URI may
       // reach an XForms page which itself needs to load a shared resource. The result would be a deadlock.
       // Without synchronization, what can happen is that two concurrent requests load the same URI at the same
@@ -72,7 +72,7 @@ object XFormsServerSharedInstancesCache {
 
       val instanceContent = loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
       // NOTE: load() must always returns a TinyTree because we don't want to put in cache a mutable document
-      assert(! instanceContent.isInstanceOf[VirtualNode], "load() must return a TinyTree")
+      assert(! instanceContent.isInstanceOf[VirtualNodeType], "load() must return a TinyTree")
 
       add(InstanceContent(instanceContent), instanceCaching.timeToLive)
       instanceContent.some
@@ -112,11 +112,11 @@ object XFormsServerSharedInstancesCache {
     val ConstantValidity                      = 0L
     val SharedInstanceKeyType                 = XFormsSharedInstancesCacheName
 
-    case class InstanceContent(documentInfo: DocumentInfo) { require(! documentInfo.isInstanceOf[VirtualNode]) }
+    case class InstanceContent(documentInfo: DocumentNodeInfoType) { require(! documentInfo.isInstanceOf[VirtualNodeType]) }
     case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
 
     // Find instance content in cache
-    def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
+    def find(instanceCaching: InstanceCaching)(implicit logger: IndentedLogger): Option[DocumentNodeInfoType] = {
 
       val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
       val cacheKey = createCacheKey(instanceCaching)

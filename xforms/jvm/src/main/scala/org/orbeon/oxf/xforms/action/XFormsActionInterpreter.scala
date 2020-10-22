@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -230,7 +230,7 @@ class XFormsActionInterpreter(
         actionElement   = actionElement,
         nodeset         = contextNodeset,
         position        = contextPosition,
-        xpathExpression = XPath.makeBooleanExpression(conditionAttribute)
+        xpathExpression = StaticXPath.makeBooleanExpression(conditionAttribute)
       )
 
     if (! conditionResult.head.asInstanceOf[BooleanValue].effectiveBooleanValue) {

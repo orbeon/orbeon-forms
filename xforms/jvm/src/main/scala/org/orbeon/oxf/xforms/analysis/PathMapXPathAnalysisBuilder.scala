@@ -19,7 +19,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance

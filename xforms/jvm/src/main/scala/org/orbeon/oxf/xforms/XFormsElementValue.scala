@@ -24,15 +24,16 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttributeControl}
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om.Item
-import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
+import org.orbeon.saxon.om
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 object XFormsElementValue {
 
@@ -255,7 +256,7 @@ object XFormsElementValue {
               // Return given source effective id, so we have a source effective id for resolution of index(), etc.
               sourceEffectiveId
 
-            override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)
+            override def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
           }
         val isHTMLMediatype = !defaultHTML && LHHAAnalysis.isHTML(element) || defaultHTML && !LHHAAnalysis.isPlainText(element)
         withBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element)) { bindingContext =>

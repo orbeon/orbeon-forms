@@ -14,27 +14,32 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.dom.Document
+import org.orbeon.saxon.expr.{Literal, XPathContext}
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om.{GroundedValue, StructuredQName}
+import org.orbeon.saxon.om.{GroundedValue, StructuredQName, TreeInfo}
+import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
 
-object XPath extends XPathTrait {
+object StaticXPath extends StaticXPathTrait {
 
-  type SaxonConfiguration = Configuration
+  type SaxonConfiguration   = Configuration
+  type DocumentNodeInfoType = TreeInfo
+  type VirtualNodeType      = VirtualNode
+
   type VariableResolver = (StructuredQName, XPathContext) => GroundedValue
 
   val GlobalConfiguration: SaxonConfiguration = ???
-
-  def newConfiguration: SaxonConfiguration = ???
 
   def compileExpression(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     locationData     : LocationData,
     functionLibrary  : FunctionLibrary,
-    avt:              Boolean)(implicit
+    avt              : Boolean)(implicit
     logger           : IndentedLogger
   ): CompiledExpression = ???
+
+  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = ???
 }

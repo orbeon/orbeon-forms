@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLSupport
 import org.orbeon.oxf.xml.XMLReceiver

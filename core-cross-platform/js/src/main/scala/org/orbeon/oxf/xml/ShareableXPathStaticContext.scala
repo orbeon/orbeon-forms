@@ -3,7 +3,7 @@ package org.orbeon.oxf.xml
 import java.{util => ju}
 
 import org.orbeon.oxf.util.CoreUtils.PipeOps
-import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, StaticXPath}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.instruct.SlotManager
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -85,7 +85,7 @@ class ShareableXPathStaticContext(
         context.getController.getUserData(
           classOf[ShareableXPathStaticContext].getName,
           "variableResolver"
-        ).asInstanceOf[XPath.VariableResolver]
+        ).asInstanceOf[StaticXPath.VariableResolver]
 
       variableResolver(qName, context)
     }

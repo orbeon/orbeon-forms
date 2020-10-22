@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms._
@@ -33,6 +33,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLReceiver, XMLUtils}
+import org.orbeon.saxon.om
+import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
@@ -397,7 +399,7 @@ object ItemsetSupport {
   def javaScriptValue(lhhaValue: LHHAValue, locationData: LocationData): String =
     htmlValue(lhhaValue, locationData).escapeJavaScript
 
-  def javaScriptValue(item: Item.ValueNode, encode: Boolean, locationData: LocationData): String =
+  def javaScriptValue(item: Item.ValueNode, encode: Boolean): String =
     item.externalValue(encode).escapeJavaScript
 
   // Return the list of items as a JSON tree with hierarchical information
@@ -500,7 +502,7 @@ object ItemsetSupport {
   // Return the list of items as an XML tree
   def asXML(
     itemset                    : Itemset,
-    configuration              : Configuration,
+    configuration              : StaticXPath.SaxonConfiguration,
     controlValue               : Option[(Item.Value[om.NodeInfo], om.NodeInfo => Boolean)],
     excludeWhitespaceTextNodes : Boolean,
     locationData               : LocationData

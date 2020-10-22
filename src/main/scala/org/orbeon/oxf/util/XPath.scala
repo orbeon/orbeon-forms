@@ -22,6 +22,7 @@ import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, GlobalDocumentNumberAllocator}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.oxf.xml.{ParserConfiguration, ShareableXPathStaticContext, XMLParsing}
@@ -41,17 +42,39 @@ import org.xml.sax.{InputSource, XMLReader}
 import scala.util.Try
 import scala.util.control.NonFatal
 
-object XPath extends XPathTrait {
+object XPath { // extends XPathTrait
 
   type SaxonConfiguration = Configuration
   type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
+
+  // Marker for XPath function context
+  trait FunctionContext
+
+  // To report timing information
+  type Reporter = (String, Long) => Unit
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
   // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
   // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
   // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  private val GlobalNamePool = new NamePool
+  private val xpathContextDyn = new DynamicVariable[FunctionContext]
+
+  def withFunctionContext[T](functionContext: FunctionContext)(thunk: => T): T = {
+    xpathContextDyn.withValue(functionContext) {
+      thunk
+    }
+  }
+
+  // Return the currently scoped function context if any
+  def functionContext: Option[FunctionContext] = xpathContextDyn.value
+
+  // Context accessible during XPath evaluation
+  // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
+  // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
+  // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
+  // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
+  private val GlobalNamePool = StaticXPath.GlobalNamePool
 
   // HACK: We can't register new converters directly, so we register an external object model, even though this is
   // not going to be used by Saxon as such. But Saxon tests for external object model when looking for a JPConverter,
@@ -133,6 +156,7 @@ object XPath extends XPathTrait {
   val GlobalConfiguration = new Configuration {
 
     super.setNamePool(GlobalNamePool)
+    super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
     super.registerExternalObjectModel(GlobalDataConverter)
     super.registerExternalObjectModel(OrbeonDOMObjectModel)
     super.getExtensionBinder("java").asInstanceOf[JavaExtensionLibrary]
@@ -147,20 +171,13 @@ object XPath extends XPathTrait {
       XMLParsing.newSAXParser(ParserConfiguration.Plain).getXMLReader
 
     // These are called if the parser came from `getSourceParser` or `getStyleParser`
-    override def reuseSourceParser(parser: XMLReader): Unit = ()
-    override def reuseStyleParser(parser: XMLReader) : Unit = ()
-
-    override def setNamePool(targetNamePool: NamePool): Unit =
-      throwException()
-
-    override def registerExternalObjectModel(model: ExternalObjectModel): Unit =
-      throwException()
-
-    override def setAllowExternalFunctions(allowExternalFunctions: Boolean): Unit =
-      throwException()
-
-    override def setConfigurationProperty(name: String, value: AnyRef): Unit =
-      throwException()
+    override def reuseSourceParser(parser: XMLReader)                          : Unit = ()
+    override def reuseStyleParser(parser: XMLReader)                           : Unit = ()
+    override def setNamePool(targetNamePool: NamePool)                         : Unit = throwException()
+    override def setDocumentNumberAllocator(allocator: DocumentNumberAllocator): Unit = throwException()
+    override def registerExternalObjectModel(model: ExternalObjectModel)       : Unit = throwException()
+    override def setAllowExternalFunctions(allowExternalFunctions: Boolean)    : Unit = throwException()
+    override def setConfigurationProperty(name: String, value: AnyRef)         : Unit = throwException()
 
     private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
   }
@@ -169,7 +186,7 @@ object XPath extends XPathTrait {
   def newConfiguration =
     new Configuration {
       setNamePool(GlobalNamePool)
-      setDocumentNumberAllocator(GlobalConfiguration.getDocumentNumberAllocator)
+      setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
       registerExternalObjectModel(GlobalDataConverter)
       registerExternalObjectModel(OrbeonDOMObjectModel)
     }

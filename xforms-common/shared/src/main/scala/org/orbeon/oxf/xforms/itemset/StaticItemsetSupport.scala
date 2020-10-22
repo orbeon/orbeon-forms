@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.itemset
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable.ListBuffer
+
 
 object StaticItemsetSupport {
 
@@ -73,7 +74,7 @@ object StaticItemsetSupport {
 
         def compareContent =
           SaxonUtils.deepCompare(
-            config                     = XPath.GlobalConfiguration,
+            config                     = StaticXPath.GlobalConfiguration,
             it1                        = dataXPathItems.iterator,
             it2                        = otherItems.iterator,
             excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
@@ -101,7 +102,7 @@ object StaticItemsetSupport {
       case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
         allDataItems exists { oneDataXPathItem =>
           SaxonUtils.deepCompare(
-            config                     = XPath.GlobalConfiguration,
+            config                     = StaticXPath.GlobalConfiguration,
             it1                        = Iterator(oneDataXPathItem),
             it2                        = Iterator(firstItemXPathItem),
             excludeWhitespaceTextNodes = false

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.model
 
+import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.tree.wrapper._
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.SimplePath._
 
@@ -57,11 +57,11 @@ object StaticDataModel {
    * - element nodes containing other elements
    * - items not backed by a mutable node (which are read-only)
    */
-  def isWritableItem(item: Item): VirtualNode Either Reason = item match {
-    case _: AtomicValue                            => Right(ReadonlyNodeReason)
-    case _: TreeInfo                               => Right(DisallowedNodeReason)
-    case node: VirtualNode if node.hasChildElement => Right(DisallowedNodeReason)
-    case node: VirtualNode                         => Left(node)
-    case _                                         => Right(ReadonlyNodeReason)
+  def isWritableItem(item: Item): VirtualNodeType Either Reason = item match {
+    case _: AtomicValue                                => Right(ReadonlyNodeReason)
+    case _: DocumentNodeInfoType                       => Right(DisallowedNodeReason)
+    case node: VirtualNodeType if node.hasChildElement => Right(DisallowedNodeReason)
+    case node: VirtualNodeType                         => Left(node)
+    case _                                             => Right(ReadonlyNodeReason)
   }
 }

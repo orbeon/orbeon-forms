@@ -31,7 +31,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
-import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA

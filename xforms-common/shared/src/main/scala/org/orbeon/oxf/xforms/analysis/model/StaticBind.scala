@@ -4,7 +4,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xml.dom.Extensions
@@ -63,15 +63,15 @@ class StaticBind(
   ) extends MIP {
 
     // Compile the expression right away
-    val compiledExpression: XPath.CompiledExpression = {
+    val compiledExpression: StaticXPath.CompiledExpression = {
 
       val booleanOrStringExpression =
         if (BooleanXPathMIPNames(name))
-          XPath.makeBooleanExpression(expression)
+          StaticXPath.makeBooleanExpression(expression)
         else
-          XPath.makeStringExpression(expression)
+          StaticXPath.makeStringExpression(expression)
 
-      XPath.compileExpression(
+      StaticXPath.compileExpression(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,

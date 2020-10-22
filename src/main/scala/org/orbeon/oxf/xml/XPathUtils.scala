@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{util => ju, lang => jl}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value._
@@ -181,7 +181,7 @@ object XPathUtils {
   ): Boolean =
     selectIteratorImpl(
       contextNode     = contextNode,
-      expr            = XPath.makeBooleanExpression(expr),
+      expr            = StaticXPath.makeBooleanExpression(expr),
       prefixes        = prefixes,
       functionLibrary = functionLibrary,
       functionContext = functionContext

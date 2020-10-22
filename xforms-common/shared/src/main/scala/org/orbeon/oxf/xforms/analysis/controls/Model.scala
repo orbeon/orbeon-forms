@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
@@ -29,7 +28,6 @@ import scala.collection.mutable
  * Static analysis of an XForms model <xf:model> element.
  */
 class Model(
-  part             : PartAnalysisImpl,
   index            : Int,
   elem             : Element,
   parent           : Option[ElementAnalysis],
@@ -39,17 +37,16 @@ class Model(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(part, index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with WithChildrenTrait
   with ModelInstances
   with ModelVariables
   with ModelSubmissions
   with ModelEventHandlers
+  with BindTree
   with ModelBinds {
 
   require(scope ne null)
-
-  override lazy val model = this.some
 
   // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
   override def indexedElements: Iterator[ElementAnalysis] =
@@ -67,8 +64,12 @@ trait ModelInstances {
   self: Model =>
 
   // Instance objects
-  lazy val instances: collection.Map[String, Instance] =
-    mutable.LinkedHashMap(children collect { case instance: Instance => instance.staticId -> instance }: _*)
+  // `lazy` because the children are evaluated after the container
+  lazy val instances: collection.Map[String, Instance] = {
+    val m = mutable.LinkedHashMap[String, Instance]()
+    m ++= children.iterator collect { case instance: Instance => instance.staticId -> instance }
+    m
+  }
 
   // General info about instances
   lazy val hasInstances = instances.nonEmpty
@@ -79,7 +80,6 @@ trait ModelInstances {
 }
 
 class ModelVariable(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -89,7 +89,7 @@ class ModelVariable(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with VariableAnalysisTrait
 
 trait ModelVariables {
@@ -126,7 +126,8 @@ trait ModelVariables {
 //
 //  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
-  lazy val variablesSeq: Seq[VariableAnalysisTrait] = children collect { case v: VariableAnalysisTrait => v }
+  // `lazy` because the children are evaluated after the container
+  lazy val variablesSeq: Iterable[VariableAnalysisTrait] = children collect { case v: VariableAnalysisTrait => v }
   lazy val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
 
   def freeVariablesTransientState(): Unit =
@@ -139,7 +140,8 @@ trait ModelSubmissions {
   self: Model =>
 
   // Submissions (they are all direct children)
-  lazy val submissions: Seq[Submission] = children collect { case s: Submission => s }
+  // `lazy` because the children are evaluated after the container
+  lazy val submissions: List[Submission] = children collect { case s: Submission => s } toList
 }
 
 trait ModelEventHandlers {
@@ -147,21 +149,15 @@ trait ModelEventHandlers {
   self: Model =>
 
   // Event handlers, including on submissions and within nested actions
-  lazy val eventHandlers: Seq[EventHandler] = descendants collect { case e: EventHandler => e } toList
+  lazy val eventHandlers: List[EventHandler] = descendants collect { case e: EventHandler => e } toList
 }
 
 trait ModelBinds {
 
   selfModel: Model =>
 
-  // FIXME: A bit unhappy with this. Laziness desired because of init order issues with the superclass. There has to be a simpler way!
-  private class LazyConstant[T](evaluate: => T) extends (() => T) {
-    private lazy val result = evaluate
-    def apply() = result
-  }
-
   // Q: Why do we pass isCustomMIP to BindTree? Init order issue?
-  private def isCustomMIP: QName => Boolean = {
+  def isCustomMIP: QName => Boolean = {
 
     import ElementAnalysis.attQNameSet
 
@@ -170,7 +166,7 @@ trait ModelBinds {
       ! qName.namespace.prefix.startsWith("xml") &&
       (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.namespace.uri))
 
-    Option(selfModel.element.attribute(XXFORMS_CUSTOM_MIPS_QNAME)) match {
+    selfModel.element.attributeOpt(XXFORMS_CUSTOM_MIPS_QNAME) match {
       case Some(_) =>
         // If the attribute is present, allow all specified QNames if valid, plus standard MIP QNames
         attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMIPsQNames filter canBeCustomMIP
@@ -180,57 +176,20 @@ trait ModelBinds {
     }
   }
 
-  private var _bindTree = //replaceBinds(selfModel.element.elements(XFORMS_BIND_QNAME))
-    new LazyConstant(
-      new BindTree(
-        selfModel,
-        selfModel.element.elements(XFORMS_BIND_QNAME),
-        isCustomMIP
-      )
-    )
-
-  def bindTree: BindTree = _bindTree()
-
   // For `xxf:dynamic`
   def replaceBinds(bindElements: => Seq[Element]): Unit = {
-
-    _bindTree = new LazyConstant(
-      new BindTree(
-        selfModel,
-        bindElements,
-        isCustomMIP
-      )
-    )
-    _bindTree() // here we can be eager
+    // TODO!
+    ???
+//    _bindTree =
+//      new BindTree(
+//        selfModel,
+//        isCustomMIP)(
+//        bindElements
+//      )
   }
-
-  def bindsById                             = _bindTree().bindsById
-  def bindsByName                           = _bindTree().bindsByName
-
-  def hasDefaultValueBind                   = _bindTree().hasDefaultValueBind
-  def hasCalculateBind                      = _bindTree().hasCalculateBind
-  def hasTypeBind                           = _bindTree().hasTypeBind
-  def hasRequiredBind                       = _bindTree().hasRequiredBind
-  def hasConstraintBind                     = _bindTree().hasConstraintBind
-  def hasNonPreserveWhitespace              = _bindTree().hasNonPreserveWhitespace
-
-  def mustRevalidate                        = _bindTree().mustRevalidate
-  def mustRecalculate                       = _bindTree().mustRecalculate
-
-  def bindInstances                         = _bindTree().bindInstances
-  def computedBindExpressionsInstances      = _bindTree().computedBindExpressionsInstances
-  def validationBindInstances               = _bindTree().validationBindInstances
 
   // TODO: use and produce variables introduced with xf:bind/@name
 
-  def topLevelBinds                         = _bindTree().topLevelBinds
-
-  def hasBinds                              = _bindTree().hasBinds
-  def containsBind(bindId: String)          = _bindTree().bindIds(bindId)
-
-  def figuredAllBindRefAnalysis             = _bindTree().figuredAllBindRefAnalysis
-  def recalculateOrder                      = _bindTree().recalculateOrder
-  def defaultValueOrder                     = _bindTree().defaultValueOrder
-
-  def freeBindsTransientState()             = _bindTree().freeBindsTransientState()
+  // TODO: rename one of the 2 so we don't need the indirection
+  def containsBind(bindId: String)          = bindIds(bindId)
 }

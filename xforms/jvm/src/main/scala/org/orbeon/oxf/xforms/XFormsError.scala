@@ -149,7 +149,7 @@ object XFormsError {
         case _                                    => false
       }
 
-    if (container.getPartAnalysis.isTopLevel         &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
+    if (container.getPartAnalysis.isTopLevelPart   &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
       container.getContainingDocument.initializing &&
       causesContainFatalError) {
       throw new OXFException(t)

@@ -27,26 +27,26 @@ object PartAnalysisDebugSupport {
 
   import Private._
 
-  def writePart(part: PartAnalysisImpl)(implicit receiver: XMLReceiver): Unit =
+  def writePart(partAnalysis: PartAnalysisRuntimeOps)(implicit receiver: XMLReceiver): Unit =
     withDocument {
-      recurse(part.controlAnalysisMap(part.startScope.prefixedIdForStaticId(Constants.DocumentId)))
+      partAnalysis.findControlAnalysis(partAnalysis.startScope.prefixedIdForStaticId(Constants.DocumentId)) foreach recurse
     }
 
-  def partAsXmlString(part: PartAnalysisImpl): String = {
-
-    implicit val identity: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
-    val result = new LocationDocumentResult
-    identity.setResult(result)
-
-    writePart(part)
-
-    result.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)
-  }
-
-  def printPartAsXml(part: PartAnalysisImpl): Unit =
-    println(partAsXmlString(part))
+  def printPartAsXml(partAnalysis: PartAnalysisRuntimeOps): Unit =
+    println(partAsXmlString(partAnalysis))
 
   private object Private {
+
+    def partAsXmlString(partAnalysis: PartAnalysisRuntimeOps): String = {
+
+      implicit val identity: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
+      val result = new LocationDocumentResult
+      identity.setResult(result)
+
+      writePart(partAnalysis)
+
+      result.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+    }
 
     def writeElementAnalysis(a: ElementAnalysis)(implicit receiver: XMLReceiver): Unit = {
 
@@ -70,10 +70,10 @@ object PartAnalysisDebugSupport {
     def writeModel(a: Model)(implicit receiver: XMLReceiver): Unit = {
 
       writeElementAnalysis(a)
-      a.children foreach recurse
+      a.children.iterator filterNot (_.isInstanceOf[StaticBind]) foreach recurse
 
-      for (variable <- a.variablesSeq)
-        recurse(variable)
+      a.variablesSeq foreach recurse
+
 
       if (a.topLevelBinds.nonEmpty)
         withElement("binds") {

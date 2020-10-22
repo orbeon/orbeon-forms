@@ -15,24 +15,25 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, XBLAssets}
+import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
 import org.orbeon.xforms.xbl.Scope
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{immutable => i}
+import scala.jdk.CollectionConverters._
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   // Start with top-level part only
-  private var parts = topLevelPart :: Nil
+  private var parts: List[PartAnalysis] = topLevelPart :: Nil
 
   // Add part to the list
-  def addPart(part: PartAnalysis) =
+  def addPart(part: NestedPartAnalysis): Unit =
     parts = part :: parts
 
   // Remove part from list
-  def removePart(part: PartAnalysis) =
+  def removePart(part: NestedPartAnalysis): Unit =
     parts = parts filterNot (_ eq part)
 
   // Find in all parts
@@ -47,14 +48,14 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     parts exists p
 
   // Collect in all parts
-  private def collectInPartsJ[T](get: PartAnalysis => java.util.Collection[T]) =
-    parts flatMap (part => get(part).asScala)
-
   private def collectInParts[T](get: PartAnalysis => Iterable[T]) =
     parts flatMap (part => get(part))
 
   private def collectInPartsReverse[T](get: PartAnalysis => Iterable[T]) =
     parts.reverse flatMap (part => get(part))
+
+  private def iterateInParts[T](get: PartAnalysis => Iterator[T]) =
+    parts.iterator flatMap (part => get(part))
 
   // Models
   def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))
@@ -66,6 +67,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def hasHandlerForEvent(eventName: String) = existsInParts(_.hasHandlerForEvent(eventName))
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean) = existsInParts(_.hasHandlerForEvent(eventName, includeAllEvents))
   def keyboardHandlers = collectInParts(_.keyboardHandlers)
+  def getEventHandlersForObserver(observerPrefixedId: String) = collectInParts(_.getEventHandlersForObserver(observerPrefixedId))
 
   def getMark(prefixedId: String) = findInPartsOpt(_.getMark(prefixedId))
 
@@ -81,7 +83,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
   def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull
 
-  def getGlobals = collectInParts(_.getGlobals)
+  def iterateGlobals = iterateInParts(_.iterateGlobals)
 
   def scriptsByPrefixedId = collectInParts(_.scriptsByPrefixedId) toMap
   def uniqueJsScripts = collectInParts(_.uniqueJsScripts)
@@ -112,10 +114,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def getAncestorRepeats(prefixedId: String): List[RepeatControl] =
     getControlAnalysis(prefixedId).ancestorRepeatsAcrossParts
-
-  def getAncestorOrSelfRepeats(startPrefixedId: String): Seq[String] =
-    (findControlAnalysis(startPrefixedId).toSeq collect
-      { case r: RepeatControl => r.prefixedId }) ++ getAncestorRepeatIds(startPrefixedId, None)
 
   /**
    * Find the closest common ancestor repeat given two prefixed ids. If the prefixed ids denote repeats, include them

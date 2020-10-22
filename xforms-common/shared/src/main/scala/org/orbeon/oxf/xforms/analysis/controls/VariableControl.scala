@@ -21,7 +21,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class VariableControl(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -31,7 +30,7 @@ class VariableControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with ViewTrait
   with OptionalSingleNode
   with VariableAnalysisTrait {

@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies, XPathDependencies}
+import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver

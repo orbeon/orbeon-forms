@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 
@@ -43,7 +43,7 @@ class RuntimeBind(
     import java.{util => ju}
 
     // @ref can be missing and defaults to the context item
-    val items: ju.List[Item] =
+    val items: ju.List[om.Item] =
       if (bindingContext.newBind)
         // Case where a @ref attribute is present -> a current nodeset is therefore available
         bindingContext.nodeset
@@ -70,7 +70,7 @@ class RuntimeBind(
     val bindNodes: Seq[BindNode] =
       if (itemsAsScala.nonEmpty) {
         // Only then does it make sense to create BindNodes
-        val childrenStaticBinds = staticBind.children
+        val childrenStaticBinds = staticBind.childrenBinds
         if (childrenStaticBinds.nonEmpty) {
           // There are children binds (and maybe MIPs)
           val result = new m.ArrayBuffer[BindNode](itemsSize)

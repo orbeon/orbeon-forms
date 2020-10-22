@@ -18,8 +18,9 @@ import org.orbeon.oxf.fr.library.FRComponentParam
 import org.orbeon.oxf.fr.{AppForm, XMLNames}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.PartAnalysis
+import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 import org.orbeon.oxf.xforms.xbl.XBLSupport
+
 
 object FormRunnerXblSupport extends XBLSupport {
 
@@ -29,10 +30,10 @@ object FormRunnerXblSupport extends XBLSupport {
   private val FormBuilderAppName = AppForm("orbeon", "builder")
 
   def keepElement(
-    partAnalysis  : PartAnalysis,
-    boundElement  : Element,
-    directNameOpt : Option[QName],
-    elem          : Element
+    partAnalysisCtx : PartAnalysisForXblSupport,
+    boundElement    : Element,
+    directNameOpt   : Option[QName],
+    elem            : Element
   ): Boolean = {
 
     def fromAttribute(paramName: QName) =
@@ -40,7 +41,7 @@ object FormRunnerXblSupport extends XBLSupport {
 
     def fromMetadataAndProperties(paramName: QName) =
       FRComponentParam.fromMetadataAndProperties(
-        partAnalysis  = partAnalysis,
+        partAnalysis  = partAnalysisCtx,
         directNameOpt = directNameOpt,
         paramName     = paramName
       ) map
@@ -60,7 +61,7 @@ object FormRunnerXblSupport extends XBLSupport {
       }
 
     def isDesignTime =
-      partAnalysis.ancestorIterator.lastOption()      flatMap
+      partAnalysisCtx.ancestorIterator.lastOption()      flatMap
         FRComponentParam.findConstantMetadataRootElem flatMap
         FRComponentParam.appFormFromMetadata          contains
         FormBuilderAppName

@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import cats.syntax.option._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.{AVTLangRef, ElementAnalysis, LiteralLangRef, PathMapXPathAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef, PathMapXPathAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
@@ -41,25 +42,27 @@ class XXFormsLang extends XFormsFunction {
 object XXFormsLang {
 
   def resolveXMLangHandleAVTs(containingDocument: XFormsContainingDocument, element: ElementAnalysis): Option[String] =
-    element.lang match {
-      case Some(LiteralLangRef(value)) =>
+    element.getLangUpdateIfUndefined match {
+      case LangRef.Literal(value) =>
         Some(value)
-      case Some(AVTLangRef(att)) =>
+      case LangRef.AVT(att) =>
         // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
         val attributeControl = containingDocument.getControlByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
         Option(attributeControl.getExternalValue())
-      case None =>
+      case _ =>
         None
     }
 
   def addXMLLangDependency(pathMap: PathMap): Unit = {
+
     // Dependency on language
-    val avtLangAnalysis = XFormsFunction.sourceElementAnalysis(pathMap).lang collect {
-      case ref: AVTLangRef => ref.att.valueAnalysis.get
+    val avtLangAnalysisOpt = XFormsFunction.sourceElementAnalysis(pathMap).getLangUpdateIfUndefined match {
+      case ref: LangRef.AVT => ref.att.valueAnalysis.get.some
+      case _ => None
     }
 
     // Only add the dependency if xml:lang is not a literal
-    avtLangAnalysis foreach {
+    avtLangAnalysisOpt foreach {
       case analysis: PathMapXPathAnalysis =>
         // There is a pathmap for the `xml:lang` AVT, so add the new roots
         pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)

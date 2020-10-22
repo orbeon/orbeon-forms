@@ -22,12 +22,12 @@ import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.analysis.model
+import org.orbeon.oxf.xforms.analysis.{PartAnalysis, PartAnalysisContextForTree, PartAnalysisContextImmutable, PartAnalysisContextMutable, PartAnalysisForXblSupport, model}
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.{PartAnalysis, function}
+import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
@@ -43,6 +43,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
+
 import scala.collection.compat._
 
 // The Form Runner function library
@@ -336,7 +337,7 @@ private object FormRunnerFunctions {
 
         def fromMetadataAndProperties: Option[AtomicValue] =
           FRComponentParam.fromMetadataAndProperties(
-            partAnalysis  = staticControl.part,
+            partAnalysis  = sourceComponent.container.partAnalysis,
             directNameOpt = staticControl.commonBinding.directName,
             paramName     = paramName
           )
@@ -370,7 +371,7 @@ private object FormRunnerFunctions {
       val metadataVersionOpt =
         for {
           sourceControl      <- XFormsFunction.context.container.associatedControlOpt
-          part               = sourceControl.staticControl.part
+          part               = sourceControl.container.partAnalysis
           metadata           <- FRComponentParam.findConstantMetadataRootElem(part)
           createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
         } yield
@@ -392,7 +393,7 @@ object FRComponentParam {
 
   import org.orbeon.scaxon.SimplePath._
 
-  def findConstantMetadataRootElem(part: PartAnalysis): Option[NodeInfo] = {
+  def findConstantMetadataRootElem(part: PartAnalysisForXblSupport): Option[NodeInfo] = {
 
     // Tricky: When asking for the instance, the instance might not yet have been indexed, while the
     // `ElementAnalysis` has been. So we get the element instead of using `findInstanceInScope`.
@@ -435,9 +436,9 @@ object FRComponentParam {
       AppForm(appName, formName)
 
   def fromMetadataAndProperties(
-    partAnalysis                : PartAnalysis,
-    directNameOpt               : Option[QName],
-    paramName                   : QName
+    partAnalysis  : PartAnalysisForXblSupport,
+    directNameOpt : Option[QName],
+    paramName     : QName
   ): Option[AtomicValue] = {
 
     def iterateMetadataInParts =

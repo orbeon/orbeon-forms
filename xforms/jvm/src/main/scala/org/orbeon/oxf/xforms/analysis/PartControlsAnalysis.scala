@@ -13,23 +13,28 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.{util => ju}
-
-import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.saxon.om
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
 
 trait PartControlsAnalysis extends TransientState {
 
-  self: PartAnalysisImpl =>
+  self =>
 
-  val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
-  protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
+  def staticStateDocument: StaticStateDocument
+  def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
+
+  // For deindexing
+  def metadata            : Metadata
+  def unmapScopeIds(control: ElementAnalysis): Unit
+  def deindexModel(model: Model): Unit
+  def deregisterEventHandler(eventHandler: EventHandler): Unit
+
+  val controlAnalysisMap     = LinkedHashMap[String, ElementAnalysis]()
+  val controlTypes = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
   def iterateControlsNoModels: Iterator[ElementAnalysis] =
     for (control <- controlAnalysisMap.valuesIterator if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
@@ -38,34 +43,9 @@ trait PartControlsAnalysis extends TransientState {
   // Special handling of attributes
   private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
 
-  protected def indexNewControl(
-    elementAnalysis : ElementAnalysis,
-    lhhas           : Buffer[LHHAAnalysis],
-    eventHandlers   : Buffer[EventHandler],
-    models          : Buffer[Model],
-    attributes      : Buffer[AttributeControl]
-  ): Unit = {
-    val controlName = elementAnalysis.localName
-
-    // Index by prefixed id
-    controlAnalysisMap += elementAnalysis.prefixedId -> elementAnalysis
-
-    // Index by type
-    val controlsMap = controlTypes.getOrElseUpdate(controlName, LinkedHashMap[String, ElementAnalysis]())
-    controlsMap += elementAnalysis.prefixedId -> elementAnalysis
-
-    // Register special controls
-    elementAnalysis match {
-      case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) => lhhas += lhha
-      case eventHandler: EventHandler                                                 => eventHandlers += eventHandler
-      case model: Model                                                                   => models        += model
-      case attribute: AttributeControl                                                    => attributes    += attribute
-      case _                                                                              =>
-    }
-  }
-
-  protected def analyzeCustomControls(attributes: Buffer[AttributeControl]): Unit =
+  def analyzeCustomControls(attributes: Buffer[AttributeControl]): Unit =
     if (attributes.nonEmpty) { // index attribute controls
+
       case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
 
       val triples =
@@ -88,19 +68,16 @@ trait PartControlsAnalysis extends TransientState {
       }
     }
 
-  def findControlAnalysis(prefixedId: String) =
-    controlAnalysisMap.get(prefixedId)
-
   def getControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId) orNull
 
-  def controlElement(prefixedId: String): Option[NodeInfo] =
+  def controlElement(prefixedId: String): Option[om.NodeInfo] =
     findControlAnalysis(prefixedId) map (control => staticStateDocument.documentWrapper.wrap(control.element))
 
   def hasAttributeControl(prefixedForAttribute: String) =
     _attributeControls.get(prefixedForAttribute).isDefined
 
-  def getAttributeControl(prefixedForAttribute: String, attributeName: String) =
+  def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl =
     _attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
 
   def hasControlByName(controlName: String) =
@@ -131,12 +108,6 @@ trait PartControlsAnalysis extends TransientState {
 
   def getTopLevelControls: List[ElementAnalysis] = List(controlTypes("root").values.head)
 
-  def getTopLevelControlElements: ju.List[Element] =
-    Seq(controlTypes("root").values.head.element) ++
-      (allGlobals map (_.compactShadowTree.getRootElement)) asJava
-
-  def hasControls = getTopLevelControlElements.size > 0
-
   override def freeTransientState(): Unit = {
     super.freeTransientState()
 
@@ -157,10 +128,10 @@ trait PartControlsAnalysis extends TransientState {
     unmapScopeIds(control)
 
     control match {
-      case model: Model              => deindexModel(model)
+      case model: Model          => deindexModel(model)
       case handler: EventHandler => deregisterEventHandler(handler)
-      case att: AttributeControl     => _attributeControls -= att.forPrefixedId
-      case _                         =>
+      case att: AttributeControl => _attributeControls -= att.forPrefixedId
+      case _                     =>
     }
 
     // NOTE: Can't update controlAppearances and _hasInputPlaceholder without checking all controls again, so for now leave that untouched
@@ -168,6 +139,7 @@ trait PartControlsAnalysis extends TransientState {
 
   // Remove the given control and its descendants
   def deindexTree(tree: ElementAnalysis, self: Boolean): Unit = {
+
     if (self) {
       deindexControl(tree)
       tree.removeFromParent()

@@ -9,31 +9,43 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 import scala.util.Try
 
 // Represent a static <xf:bind> element
 class StaticBind(
-  bindTree  : BindTree,
-  element   : Element,
-  parent    : ElementAnalysis,
-  preceding : Option[ElementAnalysis]
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope,
+  isTopLevelPart   : Boolean,
+  functionLibrary  : FunctionLibrary
 ) extends ElementAnalysis(
-  bindTree.model.part,
-  bindTree.model.index,
+  index,
   element,
-  Some(parent),
+  parent,
   preceding,
-  bindTree.model.scope
-) {
+  staticId,
+  prefixedId,
+  namespaceMapping,
+  scope,
+  containerScope
+) with WithChildrenTrait {
 
   staticBind =>
 
-  def parentBind: Option[StaticBind] = parent match {
-    case parentBind: StaticBind => Some(parentBind)
-    case _                      => None
+  def parentBind: Option[StaticBind] = parent collect {
+    case parentBind: StaticBind => parentBind
   }
 
   val ancestorBinds: List[StaticBind] = parentBind match {
@@ -42,6 +54,9 @@ class StaticBind(
   }
 
   val ancestorOrSelfBinds: List[StaticBind] = staticBind :: ancestorBinds
+
+  lazy val childrenBinds: List[StaticBind] = children.iterator collect { case b: StaticBind => b } toList
+  def childrenBindsIt: Iterator[StaticBind] = childrenBinds.iterator
 
   // Represent an individual MIP on an <xf:bind> element
   trait MIP {
@@ -75,9 +90,9 @@ class StaticBind(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,
-        functionLibrary  = part.staticState.functionLibrary,
+        functionLibrary  = functionLibrary,
         avt              = false
-      )
+      )(null) // TODO: pass a logger? Is passed down to `ShareableXPathStaticContext` for warnings only.
     }
 
     // Default to negative, analyzeXPath() can change that
@@ -95,7 +110,7 @@ class StaticBind(
       //    2015-04-06, we should also fail at this point. In short, this should probably be decided by an
       //    attribute  of xxf:dynamic. This should also allow providing feedback to the Form Builder user.
       // 2. When using Try, we should capture errors so that xxf:dynamic can report them.
-      if (part.isTopLevel)
+      if (isTopLevelPart)
         Some(new XPathMIP(id, name, level, expression))
       else
         Try(new XPathMIP(id, name, level, expression)).toOption
@@ -112,6 +127,12 @@ class StaticBind(
     val name  = ModelDefs.Whitespace.name
     val level = ValidationLevel.ErrorLevel
   } with MIP
+
+  val bindTree: BindTree = parent match {
+    case Some(bindTree: BindTree)     => bindTree
+    case Some(staticBind: StaticBind) => staticBind.bindTree
+    case _                            => throw new IllegalStateException
+  }
 
   // Globally remember binds ids
   bindTree.bindIds += staticId
@@ -256,10 +277,6 @@ class StaticBind(
     } yield
       id
 
-  // Create children binds
-  private var _children: Seq[StaticBind] = element.elements(XFORMS_BIND_QNAME) map (new StaticBind(bindTree, _, staticBind, None))// NOTE: preceding not handled for now
-  def children: Seq[StaticBind] = _children
-
   // Globally remember if we have seen these categories of binds
   bindTree.hasDefaultValueBind      ||= getXPathMIPs(Default.name).nonEmpty
   bindTree.hasCalculateBind         ||= getXPathMIPs(Calculate.name).nonEmpty
@@ -275,20 +292,20 @@ class StaticBind(
 
   def hasDefaultOrCalculateBind = getXPathMIPs(Default.name).nonEmpty || getXPathMIPs(Calculate.name).nonEmpty
 
-  def addBind(bindElement: Element, precedingId: Option[String]): Unit =
-    _children = _children :+ new StaticBind(bindTree, bindElement, staticBind, None)// NOTE: preceding not handled for now
+//  def addBind(bindElement: Element, precedingId: Option[String]): Unit =
+//    _children = _children :+ new StaticBind(bindTree, bindElement, staticBind, None)// NOTE: preceding not handled for now
 
-  def removeBind(bind: StaticBind): Unit = {
-    bindTree.bindIds -= bind.staticId
-    bindTree.bindsById -= bind.staticId
-    bind.nameOpt foreach { name =>
-      bindTree.bindsByName -= name
-    }
-
-    _children = _children filterNot (_ eq bind)
-
-    part.unmapScopeIds(bind)
-  }
+//  def removeBind(bind: StaticBind): Unit = {
+//    bindTree.bindIds -= bind.staticId
+//    bindTree.bindsById -= bind.staticId
+//    bind.nameOpt foreach { name =>
+//      bindTree.bindsByName -= name
+//    }
+//
+//    _children = _children filterNot (_ eq bind)
+//
+//    part.unmapScopeIds(bind)
+//  }
 
   // Used by PathMapXPathDependencies
   def getXPathMIPs(mipName: String): List[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
@@ -304,7 +321,7 @@ class StaticBind(
     for (mips <- allMIPNameToXPathMIP.values; mip <- mips)
       mip.analysis.freeTransientState()
 
-    for (child <- _children)
+    for (child <- children)
       child.freeTransientState()
   }
 }

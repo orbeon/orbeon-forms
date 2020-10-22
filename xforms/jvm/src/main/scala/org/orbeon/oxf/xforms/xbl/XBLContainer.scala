@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, RepeatControl}
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl}
@@ -25,7 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
@@ -106,7 +107,7 @@ class XBLContainer(
     new XBLContainer(associatedControl, self, concreteBinding.innerScope)
   }
 
-  def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: PartAnalysis): XBLContainer =
+  def createChildContainer(associatedControl: XFormsControl, childPartAnalysis: NestedPartAnalysis): XBLContainer =
     new XBLContainer(associatedControl, self, childPartAnalysis.startScope) {
       // Start with specific part
       override def partAnalysis = childPartAnalysis
@@ -208,7 +209,7 @@ trait ModelContainer {
     else
       Iterator.empty
 
-  def searchContainedModelsInScope(sourceEffectiveId: String, staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] = {
+  def searchContainedModelsInScope(sourceEffectiveId: String, staticId: String, contextItemOpt: Option[om.Item]): Option[XFormsObject] = {
 
     val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId): String
     val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
@@ -218,7 +219,7 @@ trait ModelContainer {
 
   // Performance: for some reason, with Scala 2.9.2 at least, using for (model <- models) { ... return ... } is much
   // slower than using an Iterator (profiler).
-  def searchContainedModels(staticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] =
+  def searchContainedModels(staticId: String, contextItemOpt: Option[om.Item]): Option[XFormsObject] =
     isRelevant && models.nonEmpty flatOption {
       models.iterator flatMap (_.findObjectById(staticId, contextItemOpt)) nextOption()
     }
@@ -357,7 +358,7 @@ trait ContainerResolver {
   def resolveObjectByIdInScope(
     sourceEffectiveId  : String,
     staticOrAbsoluteId : String,
-    contextItemOpt     : Option[Item] = None
+    contextItemOpt     : Option[om.Item] = None
   ): Option[XFormsObject] = {
     val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
@@ -377,14 +378,14 @@ trait ContainerResolver {
   def resolveObjectById(
     sourceEffectiveId  : String,
     staticOrAbsoluteId : String,
-    contextItemOpt     : Option[Item]
+    contextItemOpt     : Option[om.Item]
   ): XFormsObject =
     resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt, followIndexes = true).headOption.orNull
 
   def resolveObjectsById(
     sourceEffectiveId  : String,
     staticOrAbsoluteId : String,
-    contextItemOpt     : Option[Item],
+    contextItemOpt     : Option[om.Item],
     followIndexes      : Boolean
   ): List[XFormsObject] = {
 
@@ -430,7 +431,7 @@ trait ContainerResolver {
   private def resolveControlById(
     sourceEffectiveId  : String,
     staticOrAbsoluteId : String,
-    contextItemOpt     : Option[Item],
+    contextItemOpt     : Option[om.Item],
     followIndexes      : Boolean
   ): List[XFormsControl] =
     findSourceControlEffectiveId(sourceEffectiveId, contextItemOpt).toList flatMap { sourceControlEffectiveId =>
@@ -457,7 +458,7 @@ trait ContainerResolver {
 
   private def findSourceControlEffectiveId(
     sourceEffectiveId : String,
-    contextItemOpt    : Option[Item]
+    contextItemOpt    : Option[om.Item]
   ): Option[String] =
     searchContainedModels(XFormsId.getStaticIdFromId(sourceEffectiveId), contextItemOpt) match {
       case Some(_) =>
@@ -469,11 +470,11 @@ trait ContainerResolver {
     }
 
   // For Java callers
-  def getInstanceForNode(nodeInfo: NodeInfo): XFormsInstance =
+  def getInstanceForNode(nodeInfo: om.NodeInfo): XFormsInstance =
     instanceForNodeOpt(nodeInfo).orNull
 
   // Recursively find the instance containing the specified node
-  def instanceForNodeOpt(nodeInfo: NodeInfo): Option[XFormsInstance] =
+  def instanceForNodeOpt(nodeInfo: om.NodeInfo): Option[XFormsInstance] =
     isRelevant flatOption {
       allModels flatMap (_.findInstanceForNode(nodeInfo)) nextOption()
     }

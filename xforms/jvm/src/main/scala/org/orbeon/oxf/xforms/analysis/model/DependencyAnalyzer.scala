@@ -74,23 +74,23 @@ object DependencyAnalyzer {
   // NOTE: If a variable reference is not found, this behaves as if the variable reference was missing.
   //
   def determineEvaluationOrder(
-    tree : BindTree,
+    model : Model,
     mip  : ModelDefs.StringMIP // `Model.Calculate` or `Model.Default`.
   ): List[StaticBind] = {
 
     if (Logger.isDebugEnabled)
-      Logger.debug(s"analyzing ${mip.name} dependencies for model ${tree.model.staticId}")
+      Logger.debug(s"analyzing ${mip.name} dependencies for model ${model.staticId}")
 
-    val allBindsByName = tree.bindsByName
+    val allBindsByName = model.bindsByName
 
     val bindsWithMIPDetails = {
 
-      def iterateBinds(binds: Seq[StaticBind]): Iterator[StaticBind] =
-        binds.iterator flatMap (b => Iterator(b) ++ iterateBinds(b.children))
+      def iterateBinds(bindsIt: Iterator[StaticBind]): Iterator[StaticBind] =
+        bindsIt flatMap (b => Iterator(b) ++ iterateBinds(b.childrenBindsIt))
 
       val validBindNames = allBindsByName.keySet
 
-      val bindsIt   = iterateBinds(tree.topLevelBinds)
+      val bindsIt   = iterateBinds(model.topLevelBinds.iterator)
       val detailsIt = bindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
       detailsIt.toList

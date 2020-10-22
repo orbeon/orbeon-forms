@@ -20,9 +20,8 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.PartAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
+import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisContextForTree, PartAnalysisForXblSupport}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
@@ -43,10 +42,10 @@ object XBLTransformer {
   private object DefaultXblSupport extends XBLSupport {
 
     def keepElement(
-      partAnalysis  : PartAnalysis,
-      boundElement  : Element,
-      directNameOpt : Option[QName],
-      elem          : Element
+      partAnalysisCtx : PartAnalysisForXblSupport,
+      boundElement    : Element,
+      directNameOpt   : Option[QName],
+      elem            : Element
     ): Boolean =
       elem.attributeValueOpt(XXBLUseIfAttrQName) match {
         case Some(att) => boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
@@ -60,7 +59,7 @@ object XBLTransformer {
     * NOTE: This mutates `shadowTreeDocument`.
     */
   def transform(
-    partAnalysis          : PartAnalysisImpl, // for `XblSupport`
+    partAnalysisCtx       : PartAnalysisContextForTree, // for `XblSupport`
     xblSupport            : Option[XBLSupport],
     shadowTreeDocument    : Document,
     boundElement          : Element,
@@ -198,11 +197,11 @@ object XBLTransformer {
             setAttribute(resultingNodes, XXBL_SCOPE_QNAME, "outer", None)
           }
           true
-        } else if (! DefaultXblSupport.keepElement(partAnalysis, boundElement, directNameOpt, currentElem)) {
+        } else if (! DefaultXblSupport.keepElement(partAnalysisCtx, boundElement, directNameOpt, currentElem)) {
           // Skip this element
           currentElem.detach()
           false
-        } else if (xblSupport exists (! _.keepElement(partAnalysis, boundElement, directNameOpt, currentElem))) {
+        } else if (xblSupport exists (! _.keepElement(partAnalysisCtx, boundElement, directNameOpt, currentElem))) {
           // Skip this element
           currentElem.detach()
           false

@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+
 class RepeatIterationControl(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -30,7 +30,7 @@ class RepeatIterationControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
 
   override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE

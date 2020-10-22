@@ -9,10 +9,11 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsElementValue
+import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attQNameSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisImpl}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, StaticBind}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisContextForTree}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.saxon.expr.StringLiteral
@@ -28,7 +29,7 @@ import scala.annotation.tailrec
 object OutputControlBuilder {
 
   def apply(
-    part              : PartAnalysisImpl,
+    partAnalysisCtx   : PartAnalysisContextForTree,
     index             : Int,
     element           : Element,
     parent            : Option[ElementAnalysis],
@@ -53,7 +54,6 @@ object OutputControlBuilder {
         XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
     new OutputControl(
-      part,
       index,
       element,
       parent,
@@ -79,7 +79,7 @@ object LHHAAnalysisBuilder {
   val HelpAppearanceProperty  = "help.appearance"
 
   def apply(
-    part              : PartAnalysisImpl,
+    partAnalysisCtx   : PartAnalysisContextForTree,
     index             : Int,
     element           : Element,
     parent            : Option[ElementAnalysis],
@@ -88,7 +88,7 @@ object LHHAAnalysisBuilder {
     prefixedId        : String,
     namespaceMapping  : NamespaceMapping,
     scope             : Scope,
-    containerScope    : Scope,
+    containerScope    : Scope
   ): LHHAAnalysis = {
 
     // TODO: Duplication in trait
@@ -121,7 +121,7 @@ object LHHAAnalysisBuilder {
         case LHHA.Label | LHHA.Hint =>
           hasLocalMinimalAppearance || (
             ! hasLocalFullAppearance &&
-              part.staticState.staticStringProperty(
+              partAnalysisCtx.staticStringProperty(
                 if (lhhaType == LHHA.Hint) HintAppearanceProperty else LabelAppearanceProperty
               )
             .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
@@ -130,7 +130,6 @@ object LHHAAnalysisBuilder {
       }
 
     new LHHAAnalysis(
-      part,
       index,
       element,
       parent,
@@ -150,12 +149,12 @@ object LHHAAnalysisBuilder {
   }
 
   // Attach this LHHA to its target control if any
-  def attachToControl(part: PartAnalysisImpl, lhhaAnalysis: LHHAAnalysis): Unit = {
+  def attachToControl(partAnalysisCtx : PartAnalysisContextForTree, lhhaAnalysis: LHHAAnalysis): Unit = {
 
     val (targetControl, effectiveTargetControlOrPrefixedIdOpt) = {
 
       def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
-        part.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e}
+        partAnalysisCtx.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e}
 
       @tailrec
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
@@ -236,7 +235,7 @@ object LHHAAnalysisBuilder {
 object SelectionControlBuilder {
 
   def apply(
-    part             : PartAnalysisImpl,
+    partAnalysisCtx  : PartAnalysisContextForTree,
     index            : Int,
     element          : Element,
     parent           : Option[ElementAnalysis],
@@ -332,7 +331,6 @@ object SelectionControlBuilder {
         element.attributeValueOpt(ENCRYPT_ITEM_VALUES) map (_.toBoolean)
 
     new SelectionControl(
-      part,
       index,
       element,
       parent,
@@ -489,7 +487,7 @@ object SelectionControlBuilder {
 object CaseControlBuilder {
 
   def apply(
-    part             : PartAnalysisImpl,
+    partAnalysisCtx  : PartAnalysisContextForTree,
     index            : Int,
     element          : Element,
     parent           : Option[ElementAnalysis],
@@ -498,7 +496,7 @@ object CaseControlBuilder {
     prefixedId       : String,
     namespaceMapping : NamespaceMapping,
     scope            : Scope,
-    containerScope   : Scope,
+    containerScope   : Scope
   ): CaseControl = {
 
     val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
@@ -514,9 +512,9 @@ object CaseControlBuilder {
             xpathString      = StaticXPath.makeStringExpression(valueExpr),
             namespaceMapping = namespaceMapping,
             locationData     = locationData,
-            functionLibrary  = part.staticState.functionLibrary,
+            functionLibrary  = partAnalysisCtx.functionLibrary,
             avt              = false)(
-            logger           = null
+            logger           = null // TODO: pass a logger? Is passed down to `ShareableXPathStaticContext` for warnings only.
           )
 
         literal collect {
@@ -525,7 +523,6 @@ object CaseControlBuilder {
       }
 
     new CaseControl(
-      part,
       index,
       element,
       parent,
@@ -539,5 +536,85 @@ object CaseControlBuilder {
       valueLiteral
     )
   }
+}
 
+object InstanceBuilder {
+
+  def apply(
+    partAnalysisCtx  : PartAnalysisContextForTree,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope
+  ): Instance =
+    new Instance(
+      index,
+      element,
+      parent,
+      preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
+      scope,
+      containerScope,
+      partAnalysisCtx.staticBooleanProperty(ExposeXpathTypesProperty)
+    )
+}
+
+object StaticBindBuilder {
+
+  def apply(
+    partAnalysisCtx  : PartAnalysisContextForTree,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope
+  ): StaticBind =
+    new StaticBind(
+      index,
+      element,
+      parent,
+      preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
+      scope,
+      containerScope,
+      partAnalysisCtx.isTopLevelPart,
+      partAnalysisCtx.functionLibrary
+    )
+}
+
+object ComponentControlBuilder {
+
+  def apply(
+    partAnalysisCtx  : PartAnalysisContextForTree,
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope,
+    modeValue        : Boolean,
+    modeLHHA         : Boolean
+  ): ComponentControl =
+    (modeValue, modeLHHA) match {
+      case (false, false) => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart)                                                )
+      case (false, true)  => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with                          StaticLHHASupport)
+      case (true,  false) => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait                       )
+      case (true,  true)  => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait with StaticLHHASupport)
+    }
 }

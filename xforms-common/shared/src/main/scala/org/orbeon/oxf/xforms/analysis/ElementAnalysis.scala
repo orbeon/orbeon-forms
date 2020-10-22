@@ -16,39 +16,34 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, VariableAnalysisTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, RootControl, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
+import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.collection.mutable
-import scala.util.control.Breaks
-
-import org.orbeon.saxon.functions.FunctionLibrary
 
 
 // xml:lang reference
 sealed trait LangRef
-case class LiteralLangRef(lang: String)      extends LangRef
-case class AVTLangRef(att: AttributeControl) extends LangRef
+object LangRef {
+  case object Undefined                  extends LangRef
+  case object None                       extends LangRef
+  case class  Literal(lang: String)      extends LangRef
+  case class  AVT(att: AttributeControl) extends LangRef
+}
 
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
 abstract class ElementAnalysis(
-  val part              : PartAnalysisImpl,
   val index             : Int, // index of the element in the view
   val element           : Element,
   val parent            : Option[ElementAnalysis],
@@ -58,7 +53,6 @@ abstract class ElementAnalysis(
   val namespaceMapping  : NamespaceMapping,
   val scope             : Scope,
   val containerScope    : Scope
-//  val model             : Option[Model]
 ) extends ElementEventHandlers
      with ElementRepeats {
 
@@ -68,45 +62,17 @@ abstract class ElementAnalysis(
 
   require(element ne null)
 
-  implicit def logger: IndentedLogger = part.getIndentedLogger
+  var model: Option[Model] = None
+  var lang: LangRef = LangRef.Undefined
 
-  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when it
-  // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
-  // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
-  lazy val model: Option[Model] =
-    // Check for local @model attribute
-    element.attributeValue(XFormsNames.MODEL_QNAME) match {
-      case localModelStaticId: String =>
-        // Get model prefixed id and verify it belongs to this scope
-        val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
-        val localModel = part.getModel(localModelPrefixedId)
-        if (localModel eq null)
-          throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", ElementAnalysis.createLocationData(element))
-
-        Some(localModel)
-      case _ =>
-        // Use inherited model
-        closestAncestorInScope match {
-          case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
-          case None           => part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
-        }
-    }
-
-  // xml:lang, inherited from parent unless overridden locally
-  lazy val lang: Option[LangRef] =
-    element.attributeValueOpt(XML_LANG_QNAME) match {
-      case Some(v) => extractXMLLang(v)
-      case None    => parent flatMap (_.lang)
-    }
-
-  protected def extractXMLLang(lang: String): Some[LangRef] =
-    if (! lang.startsWith("#"))
-      Some(LiteralLangRef(lang))
-    else {
-      val staticId   = lang.substring(1)
-      val prefixedId = XFormsId.getRelatedEffectiveId(selfElement.prefixedId, staticId)
-      Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
-    }
+  def getLangUpdateIfUndefined: LangRef = lang match {
+    case LangRef.Undefined =>
+      val updated = parent map (_.getLangUpdateIfUndefined) getOrElse LangRef.None
+      lang = updated
+      updated
+    case existing =>
+      existing
+  }
 
   // Element local name
   def localName: String = element.getName
@@ -143,23 +109,6 @@ abstract class ElementAnalysis(
       case Some(preceding) => preceding.treeInScopeVariables
       case None => Map.empty
     }
-  }
-
-  // Definition of the various scopes:
-  //
-  // - Container scope: scope defined by the closest ancestor XBL binding. This scope is directly related to the
-  //   prefix of the prefixed id. E.g. <fr:foo id="my-foo"> defines a new scope `my-foo`. All children of `my-foo`,
-  //   including directly nested handlers, models, shadow trees, have the `my-foo` prefix.
-  //
-  // - Inner scope: this is the scope given this control if this control has `xxbl:scope='inner'`. It is usually the
-  //   same as the container scope, except for directly nested handlers.
-  //
-  // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
-  //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
-
-  final def getChildElementScope(childElement: Element): Scope = {
-    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)
-    part.scopeForPrefixedId(childPrefixedId)
   }
 
   // Location
@@ -211,18 +160,12 @@ trait ElementEventHandlers {
 
   selfElement: ElementAnalysis =>
 
-  import ElementAnalysis._
-  import ElementAnalysis.propagateBreaks.{break, breakable}
-
-  // Event handler information as a tuple:
-  // - whether the default action needs to run
-  // - all event handlers grouped by phase and observer prefixed id
-  type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
+  import ElementAnalysis.HandlerAnalysis
 
   // Cache for event handlers
   // Use an immutable map and @volatile so that update are published to other threads accessing this static state.
   // NOTE: We could use `AtomicReference` but we just get/set so there is no benefit to it.
-  @volatile private var handlersCache: Map[String, HandlerAnalysis] = Map()
+  @volatile private var handlersCache: Map[String, HandlerAnalysis] = Map.empty
 
   // Return event handler information for the given event name
   // We check the cache first, and if not found we compute the result and cache it.
@@ -238,140 +181,20 @@ trait ElementEventHandlers {
   //
   // Reasoning is great but the only way to know for sure what's best would be to run a solid performance test of the
   // options.
-  def handlersForEvent(eventName: String): HandlerAnalysis =
+  def handlersForEvent(eventName: String, findHandler: String => HandlerAnalysis): HandlerAnalysis =
     handlersCache.getOrElse(eventName, {
-      val result = handlersForEventImpl(eventName)
+      val result = findHandler(eventName)
       handlersCache += eventName -> result
       result
     })
-
-  private def handlersForObserver(observer: ElementAnalysis) =
-    observer.part.getEventHandlers(observer.prefixedId)
-
-  private def hasPhantomHandler(observer: ElementAnalysis) =
-    handlersForObserver(observer) exists (_.isPhantom)
-
-  // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  protected def relevantObserversFromLeafToRoot: List[ElementAnalysis] = {
-
-    def observersInAncestorParts =
-      part.elementInParent.toList flatMap (_.relevantObserversFromLeafToRoot)
-
-    def relevant(observer: ElementAnalysis) =
-      observer.scope == selfElement.scope || hasPhantomHandler(observer)
-
-    (ancestorsIterator(selfElement, includeSelf = true) filter relevant) ++: observersInAncestorParts
-  }
-
-  // Find all the handlers for the given event name if an event with that name is dispatched to this element.
-  // For all relevant observers, find the handlers which match by phase
-  private def handlersForEventImpl(eventName: String): HandlerAnalysis = {
-
-    // NOTE: For `phase == Target`, `observer eq element`.
-    def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
-
-      // We gather observers with `relevantObserversFromLeafToRoot` and either:
-      //
-      // - they have the same XBL scope
-      // - OR there is at least one phantom handler for that observer
-      //
-      // So if the scopes are different, we must require that the handler is a phantom handler
-      // (and therefore ignore handlers on that observer which are not phantom handlers).
-      val requirePhantomHandler = observer.scope != selfElement.scope
-
-      def matchesPhaseNameTarget(eventHandler: EventHandler) =
-        (
-          eventHandler.isCapturePhaseOnly && phase == Phase.Capture ||
-          eventHandler.isTargetPhase      && phase == Phase.Target  ||
-          eventHandler.isBubblingPhase    && phase == Phase.Bubbling
-        ) &&
-          eventHandler.isMatchByNameAndTarget(eventName, selfElement.prefixedId)
-
-      def matches(eventHandler: EventHandler) =
-        if (requirePhantomHandler)
-          eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
-        else
-          matchesPhaseNameTarget(eventHandler)
-
-      val relevantHandlers = handlersForObserver(observer) filter matches
-
-      // DOM 3:
-      //
-      // - `stopPropagation`: "Prevents other event listeners from being triggered but its effect must be deferred
-      //   until all event listeners attached on the Event.currentTarget have been triggered."
-      // - `preventDefault`: "the event must be canceled, meaning any default actions normally taken by the
-      //   implementation as a result of the event must not occur"
-      // - NOTE: DOM 3 introduces also stopImmediatePropagation
-      val propagate            = relevantHandlers forall (_.propagate == Propagate.Continue)
-      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction == Perform.Perform)
-
-      // See https://github.com/orbeon/orbeon-forms/issues/3844
-      def placeInnerHandlersFirst(handlers: List[EventHandler]): List[EventHandler] = {
-
-        def isHandlerInnerHandlerOfObserver(handler: EventHandler) =
-          handler.scope.parent contains observer.containerScope
-
-        val (inner, outer) =
-          handlers partition isHandlerInnerHandlerOfObserver
-
-        inner ::: outer
-      }
-
-      (propagate, performDefaultAction, placeInnerHandlersFirst(relevantHandlers))
-    }
-
-    var propagate = true
-    var performDefaultAction = true
-
-    def handlersForPhase(observers: List[ElementAnalysis], phase: Phase): Option[(Phase, Map[String, List[EventHandler]])] = {
-      val result = mutable.Map[String, List[EventHandler]]()
-      breakable {
-        for (observer <- observers) {
-
-          val (localPropagate, localPerformDefaultAction, handlersToRun) =
-            relevantHandlersForObserverByPhaseAndName(observer, phase)
-
-          propagate &= localPropagate
-          performDefaultAction &= localPerformDefaultAction
-          if (handlersToRun.nonEmpty)
-            result += observer.prefixedId -> handlersToRun
-
-          // Cancel propagation if requested
-          if (! propagate)
-            break()
-        }
-      }
-
-      if (result.nonEmpty)
-        Some(phase -> result.toMap)
-      else
-        None
-    }
-
-    val observersFromLeafToRoot = relevantObserversFromLeafToRoot
-
-    val captureHandlers =
-      handlersForPhase(observersFromLeafToRoot.reverse.init, Phase.Capture)
-
-    val targetHandlers =
-      if (propagate)
-        handlersForPhase(List(observersFromLeafToRoot.head), Phase.Target)
-      else
-        None
-
-    val bubblingHandlers =
-      if (propagate)
-        handlersForPhase(observersFromLeafToRoot.tail, Phase.Bubbling)
-      else
-        None
-
-    (performDefaultAction, Map.empty ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
-  }
 }
 
 trait ElementRepeats {
 
   element: ElementAnalysis =>
+
+  private def findElementInParentPart: Option[ElementAnalysis] =
+    (ElementAnalysis.ancestorsIterator(element, includeSelf = false) collectFirst { case r: RootControl => r.elementInParent }).flatten
 
   // This control's ancestor repeats, computed on demand
   lazy val ancestorRepeats: List[RepeatControl] =
@@ -383,7 +206,7 @@ trait ElementRepeats {
 
   // Same as ancestorRepeats but across parts
   lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
-    part.elementInParent match {
+    findElementInParentPart match {
       case Some(elementInParentPart) => ancestorRepeats ::: elementInParentPart.ancestorRepeatsAcrossParts
       case None                      => ancestorRepeats
     }
@@ -400,7 +223,10 @@ object ElementAnalysis {
 
   val CommonExtensionAttributes = Set(STYLE_QNAME, CLASS_QNAME, ROLE_QNAME)
 
-  val propagateBreaks = new Breaks
+  // Event handler information as a tuple:
+  // - whether the default action needs to run
+  // - all event handlers grouped by phase and observer prefixed id
+  type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
 
   /**
    * Return the closest preceding element in the same scope.
@@ -418,7 +244,7 @@ object ElementAnalysis {
       }
     }
 
-  abstract class IteratorBase(
+  class IteratorBase(
     start    : Option[ElementAnalysis],
     nextElem : ElementAnalysis => Option[ElementAnalysis]
   ) extends Iterator[ElementAnalysis] {
@@ -437,17 +263,21 @@ object ElementAnalysis {
    * Return an iterator over all the element's ancestors.
    */
   def ancestorsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
-    new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}
+    new IteratorBase(if (includeSelf) start.some else start.parent, _.parent)
 
   def ancestorsAcrossPartsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
-    (new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}) ++
-      (start.part.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
+    new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) flatMap {
+      case r: RootControl =>
+        Iterator(r) ++ (r.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
+      case e =>
+        Iterator(e)
+    }
 
   /**
    * Iterator over the element's preceding siblings.
    */
   def precedingSiblingIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
-    new IteratorBase(start.preceding, _.preceding) {}
+    new IteratorBase(start.preceding, _.preceding)
 
   /**
    * Return a list of ancestors in the same scope from leaf to root.

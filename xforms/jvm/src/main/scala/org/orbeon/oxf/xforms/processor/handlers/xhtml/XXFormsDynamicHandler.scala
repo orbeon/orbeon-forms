@@ -77,8 +77,8 @@ class XXFormsDynamicHandler(
           processShadowTree(controller, nested.template)
 
           // Add part globals for top-level part only (see comments in PartAnalysisImpl)
-          if (nested.partAnalysis.isTopLevel)
-            nested.partAnalysis.getGlobals foreach { global =>
+          if (nested.partAnalysis.isTopLevelPart)
+            nested.partAnalysis.iterateGlobals foreach { global =>
               XXFormsComponentHandler.processShadowTree(handlerContext.controller, global.templateTree)
             }
 

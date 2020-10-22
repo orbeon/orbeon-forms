@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.io.ByteArrayOutputStream
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
@@ -25,9 +23,9 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.{IOSupport, XmlExtendedLocationData}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
+import org.orbeon.saxon.expr.PathMap.PathMapArc
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
@@ -38,7 +36,6 @@ import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable.LinkedHashSet
 import scala.util.control.NonFatal
-import scala.xml._
 
 
 object PathMapXPathAnalysisBuilder {
@@ -47,7 +44,7 @@ object PathMapXPathAnalysisBuilder {
    * Create a new XPathAnalysis based on an initial XPath expression.
    */
   def apply(
-    partAnalysis              : PartAnalysis,
+    partAnalysisCtx           : PartAnalysisContextAfterTree,
     xpathString               : String,
     namespaceMapping          : NamespaceMapping,
     baseAnalysis              : Option[XPathAnalysis],
@@ -66,12 +63,12 @@ object PathMapXPathAnalysisBuilder {
         xpathString      = xpathString,
         namespaceMapping = namespaceMapping,
         locationData     = locationData,
-        functionLibrary  = partAnalysis.staticState.functionLibrary,
+        functionLibrary  = partAnalysisCtx.functionLibrary,
         avt              = avt
       )
 
     apply(
-      partAnalysis,
+      partAnalysisCtx,
       compiledExpression,
       baseAnalysis,
       inScopeVariables,
@@ -86,7 +83,7 @@ object PathMapXPathAnalysisBuilder {
    * Create a new XPathAnalysis based on an initial XPath expression.
    */
   def apply(
-    partAnalysis              : PartAnalysis,
+    partAnalysisCtx           : PartAnalysisContextAfterTree,
     compiledExpression        : CompiledExpression,
     baseAnalysis              : Option[XPathAnalysis],
     inScopeVariables          : Map[String, VariableTrait],
@@ -188,7 +185,7 @@ object PathMapXPathAnalysisBuilder {
               val expressions = stack.reverse
 
               // Start with first expression
-              extractInstancePrefixedId(partAnalysis, scope, expressions.head, defaultInstancePrefixedId) match {
+              extractInstancePrefixedId(partAnalysisCtx, scope, expressions.head, defaultInstancePrefixedId) match {
                 // First expression is instance() expression we can handle
                 case Right(Some(instancePrefixedId)) =>
                   // Continue with rest of expressions
@@ -213,7 +210,7 @@ object PathMapXPathAnalysisBuilder {
 
                     // Remember dependencies for this path
                     val instancePrefixedId = instancePath.instancePrefixedId
-                    val model = partAnalysis.getModelByInstancePrefixedId(instancePrefixedId)
+                    val model = partAnalysisCtx.getModelByInstancePrefixedId(instancePrefixedId)
                     if (model eq null)
                       throw new OXFException("Reference to invalid instance: " + instancePrefixedId)
                     dependentModels.add(model.prefixedId)
@@ -283,7 +280,7 @@ object PathMapXPathAnalysisBuilder {
   }
 
   private def extractInstancePrefixedId(
-    partAnalysis              : PartAnalysis,
+    partAnalysisCtx           : PartAnalysisContextAfterTree,
     scope                     : Scope,
     expression                : Expression,
     defaultInstancePrefixedId : Option[String]
@@ -334,7 +331,7 @@ object PathMapXPathAnalysisBuilder {
                   // NOTE: Absolute ids should also be supported. Right now search will fail with an
                   // absolute id. However, it is unlikely that literal absolute ids will be passed, so
                   // this is probably not a big deal.
-                  partAnalysis.findInstancePrefixedId(scope, originalInstanceId).orNull // can return `None`
+                  partAnalysisCtx.findInstancePrefixedId(scope, originalInstanceId).orNull // can return `None`
                 else if (originalInstanceId.indexOf(ComponentSeparator) != -1)
                   // HACK: datatable e.g. uses instance(prefixedId)!
                   originalInstanceId // TODO: warn: could be a non-existing instance id
@@ -561,9 +558,16 @@ object PathMapXPathAnalysisBuilder {
 
   def buildInstanceString(instanceId: String) = "instance('" + instanceId.replaceAll("'", "''") + "')"
 
-  /**
-   * Output the structure of the given pathmap to the standard output.
-   */
+
+//  import java.io.ByteArrayOutputStream
+//  import org.orbeon.io.CharsetNames
+//  import org.orbeon.oxf.xml.dom.IOSupport
+//  import org.orbeon.saxon.expr.PathMap.PathMapNode
+//  import scala.xml._
+//
+//  /**
+//   * Output the structure of the given pathmap to the standard output.
+//   */
 //  def dumpPathMap(configuration: Configuration, xpathString: String, pathmap: PathMap): Unit = {
 //
 //    val result =

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._
@@ -25,7 +26,9 @@ import scala.collection.mutable
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
 
-  self: PartAnalysisImpl =>
+  self =>
+
+  def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]
 
   import PartEventHandlerAnalysis._
 
@@ -40,7 +43,7 @@ trait PartEventHandlerAnalysis {
   def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
 
   // Register new event handlers
-  def registerEventHandlers(eventHandlers: Seq[EventHandler]): Unit = {
+  def registerEventHandlers(eventHandlers: Seq[EventHandler])(implicit logger: IndentedLogger): Unit = {
 
     val tuples =
       for {
@@ -141,7 +144,7 @@ trait PartEventHandlerAnalysis {
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
   }
 
-  def getEventHandlers(observerPrefixedId: String): List[EventHandler] =
+  def getEventHandlersForObserver(observerPrefixedId: String): List[EventHandler] =
     _handlersForObserver.getOrElse(observerPrefixedId, Nil)
 
   def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean =
@@ -163,6 +166,7 @@ trait PartEventHandlerAnalysis {
 }
 
 private object PartEventHandlerAnalysis {
+
   val ActionActionName  = "action"
   val ScriptActionName  = "script"
   val HandlerActionName = "handler"

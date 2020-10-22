@@ -22,7 +22,9 @@ import scala.collection.mutable
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {
 
-  self: PartAnalysisImpl =>
+  self =>
+
+  def startScope: Scope
 
   private[PartModelAnalysis] val modelsByScope             = mutable.LinkedHashMap[Scope, mutable.Buffer[Model]]()
   private[PartModelAnalysis] val modelsByPrefixedId        = mutable.LinkedHashMap[String, Model]()
@@ -76,7 +78,7 @@ trait PartModelAnalysis extends TransientState {
     prefixedIdIt.nextOption()
   }
 
-  protected def indexModel(model: Model): Unit = {
+  def indexModel(model: Model): Unit = {
     val models = modelsByScope.getOrElseUpdate(model.scope, mutable.Buffer[Model]())
     models += model
     modelsByPrefixedId += model.prefixedId -> model
@@ -85,7 +87,7 @@ trait PartModelAnalysis extends TransientState {
       modelByInstancePrefixedId += instance.prefixedId -> model
   }
 
-  protected def deindexModel(model: Model): Unit = {
+  def deindexModel(model: Model): Unit = {
     modelsByScope.get(model.scope) foreach (_ -= model)
     modelsByPrefixedId -= model.prefixedId
 

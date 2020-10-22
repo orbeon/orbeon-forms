@@ -26,7 +26,7 @@ class PathMapXPathAnalysis(
   val returnablePaths        : MapSet[String, String],
   val dependentModels        : collection.Set[String],
   val dependentInstances     : collection.Set[String]
-)  extends XPathAnalysis {
+) extends XPathAnalysis {
 
   override def freeTransientState(): Unit = pathmap = None
 }

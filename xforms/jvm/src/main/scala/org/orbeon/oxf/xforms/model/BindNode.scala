@@ -19,7 +19,7 @@ import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
@@ -29,7 +29,7 @@ import scala.collection.{breakOut, mutable}
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
-class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
+class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item) {
 
   import BindNode._
 
@@ -37,7 +37,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   val (node, hasChildrenElements) =
     item match {
-      case node: NodeInfo =>
+      case node: om.NodeInfo =>
         val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && node.hasChildElement
         InstanceData.addBindNode(node, this)
         // The last type wins
@@ -197,10 +197,10 @@ object BindNode {
 
   // Get all failed constraints for the highest level only, combining BindNodes if needed.
   // 2014-07-18: Used by XFormsSingleNodeControl only.
-  def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: NodeInfo) =
+  def failedValidationsForHighestLevelPrioritizeRequired(nodeInfo: om.NodeInfo) =
     failedValidationsForHighestLevel(nodeInfo) map prioritizeValidations
 
-  def failedValidationsForHighestLevel(nodeInfo: NodeInfo) =
+  def failedValidationsForHighestLevel(nodeInfo: om.NodeInfo) =
     collectFailedValidationsForHighestLevel(
       Option(InstanceData.getLocalInstanceData(nodeInfo, false))
       map (_.getBindNodes.asScala)
@@ -239,19 +239,19 @@ object BindNode {
 class BindIteration(
   parentBind                         : RuntimeBind,
   position                           : Int,
-  item                               : Item,
+  item                               : om.Item,
   childrenBindsHaveSingleNodeContext : Boolean,
-  childrenStaticBinds                : Seq[StaticBind]
+  childrenStaticBinds                : List[StaticBind]
 ) extends BindNode(parentBind, position, item) {
 
   require(childrenStaticBinds.nonEmpty)
 
-  def forStaticId = parentBind.staticId
-
   // Iterate over children and create children binds
-  val childrenBinds =
+  val childrenBinds: List[RuntimeBind] =
     for (staticBind <- childrenStaticBinds)
       yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
+
+  def forStaticId = parentBind.staticId
 
   def applyBinds(fn: BindNode => Unit): Unit =
     for (currentBind <- childrenBinds)

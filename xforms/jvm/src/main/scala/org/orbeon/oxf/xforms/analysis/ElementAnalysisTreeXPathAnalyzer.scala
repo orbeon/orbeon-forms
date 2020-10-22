@@ -25,7 +25,10 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLUtils}
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
 
@@ -34,21 +37,25 @@ object ElementAnalysisTreeXPathAnalyzer {
 
   import Private._
 
-  def analyzeXPath(e: ElementAnalysis): Unit = {
+  def analyzeXPath(
+    partAnalysisCtx : PartAnalysisContextAfterTree,
+    e               : ElementAnalysis)(implicit
+    logger          : IndentedLogger
+  ): Unit = {
 
-    e.contextAnalysis = computeContextAnalysis(e)
-    e.bindingAnalysis = computeBindingAnalysis(e)
-    e.valueAnalysis   = computeValueAnalysis(e)
+    e.contextAnalysis = computeContextAnalysis(partAnalysisCtx, e)
+    e.bindingAnalysis = computeBindingAnalysis(partAnalysisCtx, e)
+    e.valueAnalysis   = computeValueAnalysis(partAnalysisCtx, e)
 
     e match {
       case e: Model =>
         for (variable <- e.variablesSeq)
-          analyzeXPath(variable)
+          analyzeXPath(partAnalysisCtx, variable)
 
-        analyzeBindsXPath(e.bindTree)
+        analyzeBindsXPath(partAnalysisCtx, e)
 
       case e: SelectionControlTrait =>
-        e.itemsetAnalysis = computeItemsetAnalysis(e)
+        e.itemsetAnalysis = computeItemsetAnalysis(partAnalysisCtx, e)
       case _ =>
     }
   }
@@ -74,25 +81,50 @@ object ElementAnalysisTreeXPathAnalyzer {
 
   private object Private {
 
-    def computeContextAnalysis(e: ElementAnalysis): Option[XPathAnalysis] =
+    // Definition of the various scopes:
+    //
+    // - Container scope: scope defined by the closest ancestor XBL binding. This scope is directly related to the
+    //   prefix of the prefixed id. E.g. <fr:foo id="my-foo"> defines a new scope `my-foo`. All children of `my-foo`,
+    //   including directly nested handlers, models, shadow trees, have the `my-foo` prefix.
+    //
+    // - Inner scope: this is the scope given this control if this control has `xxbl:scope='inner'`. It is usually the
+    //   same as the container scope, except for directly nested handlers.
+    //
+    // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
+    //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
+
+    def getChildElementScope(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis, childElement: Element): Scope = {
+      val childPrefixedId =  XFormsId.getRelatedEffectiveId(e.prefixedId, childElement.idOrNull)
+      partAnalysisCtx.scopeForPrefixedId(childPrefixedId)
+    }
+
+    def computeContextAnalysis(
+      partAnalysisCtx: PartAnalysisContextAfterTree,
+      e              : ElementAnalysis)(implicit
+      logger         : IndentedLogger
+    ): Option[XPathAnalysis] =
       e match {
         case _: LHHAAnalysis                             => None // delegate to `computeValueAnalysis`
         case _: Model                                    => None
         case e: OutputControl if e.staticValue.isDefined => None // Q: Do we need to handle the context anyway?
-        case e                                           => computeBasicContextAnalysis(e)
+        case e                                           => computeBasicContextAnalysis(partAnalysisCtx, e)
       }
 
-    def computeBasicContextAnalysis(e: ElementAnalysis): Option[XPathAnalysis] = {
+    def computeBasicContextAnalysis(
+      partAnalysisCtx: PartAnalysisContextAfterTree,
+      e              : ElementAnalysis)(implicit
+      logger         : IndentedLogger
+    ): Option[XPathAnalysis] = {
 
       def findInScopeContext: Option[XPathAnalysis] =
         ElementAnalysis.getClosestAncestorInScopeModel(e, (e.scope, e.model)) match {
           case Some(ancestor) =>
             // There is an ancestor in the same scope with same model, use its analysis as base
-            getChildrenContext(ancestor)
+            getChildrenContext(partAnalysisCtx, ancestor)
           case None =>
             // We are top-level in a scope/model combination
             e.model match {
-              case Some(containingModel) => getChildrenContext(containingModel) // ask model
+              case Some(containingModel) => getChildrenContext(partAnalysisCtx, containingModel) // ask model
               case None                  => None // no model
             }
         }
@@ -100,28 +132,36 @@ object ElementAnalysisTreeXPathAnalyzer {
       e.context match {
         case Some(context) =>
           // @context attribute, use the overridden in-scope context
-          analyzeXPath(e, findInScopeContext, context).some
+          analyzeXPath(partAnalysisCtx, e, findInScopeContext, context).some
         case None =>
           // No `@context` attribute, use the original in-scope context
           findInScopeContext
       }
     }
 
-    def computeBindingAnalysis(e: ElementAnalysis): Option[XPathAnalysis] =
+    def computeBindingAnalysis(
+      partAnalysisCtx: PartAnalysisContextAfterTree,
+      e              : ElementAnalysis)(implicit
+      logger         : IndentedLogger
+    ): Option[XPathAnalysis] =
       e match {
         case _: LHHAAnalysis                                        => None // delegate to `computeValueAnalysis`
         case _: Model                                               => None
         case e: OutputControl if e.staticValue.isDefined            => None
         // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
         case e: ComponentControl if ! e.commonBinding.modeBinding   => e.contextAnalysis
-        case e                                                      => computeBasicBindingAnalysis(e.part, e)
+        case e                                                      => computeBasicBindingAnalysis(partAnalysisCtx, e)
       }
 
-    def computeBasicBindingAnalysis(part: PartAnalysisImpl, e: ElementAnalysis): Option[XPathAnalysis] =
+    def computeBasicBindingAnalysis(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      e               : ElementAnalysis)(implicit
+      logger          : IndentedLogger)
+    : Option[XPathAnalysis] =
       e.bind match {
         case Some(bindStaticId) =>
           // Use `@bind` analysis directly from model
-          val model = part.getModelByScopeAndBind(e.scope, bindStaticId)
+          val model = partAnalysisCtx.getModelByScopeAndBind(e.scope, bindStaticId)
           if (model eq null)
             throw new ValidationException(
               s"Reference to non-existing bind id `$bindStaticId`",
@@ -133,14 +173,18 @@ object ElementAnalysisTreeXPathAnalyzer {
           e.ref match {
             case Some(ref) =>
               // New binding expression
-              analyzeXPath(e, e.contextAnalysis, ref).some
+              analyzeXPath(partAnalysisCtx, e, e.contextAnalysis, ref).some
             case None =>
               // TODO: Return a binding anyway so that controls w/o their own binding also get updated.
               e.contextAnalysis
           }
       }
 
-    def computeValueAnalysis(e: ElementAnalysis): Option[XPathAnalysis] =
+    def computeValueAnalysis(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      e               : ElementAnalysis)(implicit
+      logger          : IndentedLogger
+    ): Option[XPathAnalysis] =
       e match {
         case e: LHHAAnalysis =>
           if (e.staticValue.isEmpty) {
@@ -148,10 +192,21 @@ object ElementAnalysisTreeXPathAnalyzer {
 
             // Delegate to concrete implementation
             val delegateAnalysis =
-              new ElementAnalysis(e.part, e.index /* wrong */, e.element, e.parent, e.preceding, e.scope)
-                with ValueTrait with OptionalSingleNode with ViewTrait
+              new ElementAnalysis(
+                -1,
+                e.element,
+                e.parent,
+                e.preceding,
+                e.staticId,
+                e.prefixedId,
+                e.namespaceMapping,
+                e.scope,
+                e.containerScope
+              ) with ValueTrait
+                with OptionalSingleNode
+                with ViewTrait
 
-            ElementAnalysisTreeXPathAnalyzer.analyzeXPath(delegateAnalysis)
+            ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, delegateAnalysis)
 
             if (e.ref.isDefined || e.value.isDefined) {
               // 1. E.g. <xf:label model="…" context="…" value|ref="…"/>
@@ -162,11 +217,11 @@ object ElementAnalysisTreeXPathAnalyzer {
               // Use value provided by the delegate
               delegateAnalysis.valueAnalysis
             } else {
-              // 2. E.g. <xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>
+              // 2. E.g. `<xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>`
 
-              // NOTE: We do allow @context and/or @model on LHHA element, which can change the context
+              // NOTE: We do allow `@context` and/or `@model` on LHHA element, which can change the context
 
-              // The subtree can only contain HTML elements interspersed with xf:output. HTML elements may have AVTs.
+              // The subtree can only contain HTML elements interspersed with `xf:output`. HTML elements may have AVTs.
               var combinedAnalysis: XPathAnalysis = StringAnalysis
 
               e.element.visitDescendants(
@@ -175,16 +230,25 @@ object ElementAnalysisTreeXPathAnalyzer {
                   def startElement(element: Element): Unit = {
                     if (element.getQName == XFORMS_OUTPUT_QNAME) {
                       // Add dependencies
+
+                      val staticId   = element.idOrNull
+                      val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
+
                       val outputAnalysis =
                         new ElementAnalysis(
-                          part               = e.part,
-                          index              = e.index, // wrong
+                          index              = -1,
                           element            = element,
                           parent             = delegateAnalysis.some,
                           preceding          = None,
-                          scope              = delegateAnalysis.getChildElementScope(element)
-                        ) with ValueTrait with OptionalSingleNode with ViewTrait
-                      ElementAnalysisTreeXPathAnalyzer.analyzeXPath(outputAnalysis)
+                          staticId           = staticId,
+                          prefixedId         = prefixedId,
+                          namespaceMapping   = partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw
+                          scope              = getChildElementScope(partAnalysisCtx, delegateAnalysis, element),
+                          containerScope     = e.containerScope
+                        ) with ValueTrait
+                          with OptionalSingleNode
+                          with ViewTrait
+                      ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, outputAnalysis)
                       if (outputAnalysis.valueAnalysis.isDefined)
                         combinedAnalysis = combineXPathAnalysis(combinedAnalysis, outputAnalysis.valueAnalysis.get)
                     } else if (hostLanguageAVTs) {
@@ -215,21 +279,34 @@ object ElementAnalysisTreeXPathAnalyzer {
         case e: StaticBind =>
           // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
           e.typeMIPOpt orElse e.nonPreserveWhitespaceMIPOpt match {
-            case Some(_) if e.hasBinding => analyzeXPath(e, getChildrenContext(e), "string(.)").some // TODO: function to create `string()`
+            case Some(_) if e.hasBinding => analyzeXPath(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), "string(.)").some // TODO: function to create `string()`
             case _                       => None
           }
 
         case _: Model                                    => None
         case e: OutputControl if e.staticValue.isDefined => None
-        case e: AttributeControl                         => analyzeXPath(e, getChildrenContext(e), e.attributeValue, avt = true).some
+        case e: AttributeControl                         => analyzeXPath(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.attributeValue, avt = true).some
         case e: VariableAnalysisTrait =>
 
           valueOrSequenceElement(e.element) match {
             case Some(valueElement) =>
               // Value is provided by nested `xxf:value`
 
+              val staticId   = valueElement.idOrNull
+              val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
+
               val valueElementAnalysis =
-                new ElementAnalysis(e.part, e.index /* wrong */, valueElement, e.some, None, e.valueScope) {
+                new ElementAnalysis(
+                  -1,
+                  valueElement,
+                  e.some,
+                  None,
+                  staticId,
+                  prefixedId,
+                  partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw
+                  e.valueScope,
+                  e.containerScope
+                ) {
 
                   nestedSelf =>
 
@@ -250,13 +327,13 @@ object ElementAnalysisTreeXPathAnalyzer {
                   }
                 }
 
-              ElementAnalysisTreeXPathAnalyzer.analyzeXPath(valueElementAnalysis)
+              ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, valueElementAnalysis)
 
               // Custom value analysis done here
               val valueXPathAnalysis =
                 VariableAnalysis.valueOrSelectAttribute(valueElement) match {
                   case Some(value) =>
-                    analyzeXPath(valueElementAnalysis, getChildrenContext(valueElementAnalysis), value).some
+                    analyzeXPath(partAnalysisCtx, valueElementAnalysis, getChildrenContext(partAnalysisCtx, valueElementAnalysis), value).some
                   case None =>
                     Some(StringAnalysis) // TODO: store constant value?
                 }
@@ -267,53 +344,62 @@ object ElementAnalysisTreeXPathAnalyzer {
               // No nested `xxf:value` element
 
               valueOrSelectAttribute(e.element) match {
-                case Some(value) => analyzeXPath(e, getChildrenContext(e), value).some
+                case Some(value) => analyzeXPath(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), value).some
                 case _           => StringAnalysis.some // TODO: store constant value?
               }
           }
         case e: ValueTrait =>
           val subExpression =
             if (e.value.isDefined) "string((" + e.value.get + ")[1])" else "string(.)" // TODO: function to create `string()`
-          analyzeXPath(e, getChildrenContext(e), subExpression).some
+          analyzeXPath(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), subExpression).some
         case _ =>
           None
       }
 
-    def analyzeBindsXPath(bindTree: BindTree): Unit = {
+    def analyzeBindsXPath(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      model           : Model)(implicit
+      logger          : IndentedLogger
+    ): Unit = {
       // Analyze all binds and return whether all of them were successfully analyzed
-      bindTree.figuredAllBindRefAnalysis = (bindTree.topLevelBinds map (analyzeXPathGather(bindTree, _))).foldLeft(true)(_ && _)
+      model.figuredAllBindRefAnalysis = (model.topLevelBinds map (analyzeXPathGather(partAnalysisCtx, model, _))).foldLeft(true)(_ && _)
 
       // Analyze all MIPs
       // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
-      bindTree.topLevelBinds foreach (analyzeBindMips(bindTree, _))
+      model.topLevelBinds foreach (analyzeBindMips(partAnalysisCtx, model, _))
 
-      if (! bindTree.figuredAllBindRefAnalysis) {
-        bindTree.bindInstances.clear()
-        bindTree.computedBindExpressionsInstances.clear()
-        bindTree.validationBindInstances.clear()
+      if (! model.figuredAllBindRefAnalysis) {
+        model.bindInstances.clear()
+        model.computedBindExpressionsInstances.clear()
+        model.validationBindInstances.clear()
         // keep bindAnalysis as those can be used independently from each other
       }
 
-      if (bindTree.model.part.staticState.isCalculateDependencies) {
-        bindTree.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, ModelDefs.Calculate))
-        bindTree.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(bindTree, ModelDefs.Default))
+      if (partAnalysisCtx.isCalculateDependencies) {
+        model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Calculate))
+        model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Default))
       }
     }
 
-    def analyzeBindMips(bindTree: BindTree, bind: StaticBind): Unit = {
+    def analyzeBindMips(partAnalysisCtx: PartAnalysisContextAfterTree, bindTree: BindTree, bind: StaticBind): Unit = {
       // Analyze local MIPs if there is a @ref
       bind.ref match {
         case Some(_) =>
           for (mips <- bind.allMIPNameToXPathMIP.values; mip <- mips)
-            analyzeMip(bindTree, bind, mip)
+            analyzeMip(partAnalysisCtx, bindTree, bind, mip)
         case None =>
       }
 
       // Analyze descendants
-      bind.children foreach (analyzeBindMips(bindTree, _))
+      bind.childrenBindsIt foreach (analyzeBindMips(partAnalysisCtx, bindTree, _))
     }
 
-    def analyzeMip(bindTree: BindTree, bind: StaticBind, mip: StaticBind#XPathMIP): Unit = {
+    def analyzeMip(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      bindTree        : BindTree,
+      bind            : StaticBind,
+      mip             : StaticBind#XPathMIP
+    ): Unit = {
 
       val allBindVariablesInScope = bindTree.allBindVariables
 
@@ -330,17 +416,22 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
       // Analyze and remember if figured out
-      analyzeXPathWithCompiledExpression(bind, getChildrenContext(bind), allBindVariablesInScope, mip.compiledExpression) match {
+      analyzeXPathWithCompiledExpression(partAnalysisCtx, bind, getChildrenContext(partAnalysisCtx, bind), allBindVariablesInScope, mip.compiledExpression) match {
         case valueAnalysis if valueAnalysis.figuredOutDependencies => mip.analysis = valueAnalysis
         case _ => // NOP
       }
     }
 
     // Return true if analysis succeeded
-    def analyzeXPathGather(bindTree: BindTree, bind: StaticBind): Boolean = {
+    def analyzeXPathGather(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      bindTree        : BindTree,
+      bind            : StaticBind)(implicit
+      logger          : IndentedLogger
+    ): Boolean = {
 
       // Analyze context/binding
-      ElementAnalysisTreeXPathAnalyzer.analyzeXPath(bind)
+      ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, bind)
 
       // If successful, gather derived information
       val refSucceeded =
@@ -373,13 +464,18 @@ object ElementAnalysisTreeXPathAnalyzer {
         }
 
       // Analyze children
-      val childrenSucceeded = (bind.children map (analyzeXPathGather(bindTree, _))).forall(identity)
+      // TODO: CHECK eagerness vs. `forall` short-circuit.
+      val childrenSucceeded = (bind.childrenBinds map (analyzeXPathGather(partAnalysisCtx, bindTree, _))).forall(identity)
 
       // Result
       refSucceeded && childrenSucceeded
     }
 
-    def computeItemsetAnalysis(e: SelectionControlTrait): Option[XPathAnalysis] = {
+    def computeItemsetAnalysis(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
+      e               : SelectionControlTrait)(implicit
+      logger          : IndentedLogger
+    ): Option[XPathAnalysis] = {
 
       // TODO: operate on nested ElementAnalysis instead of Element
 
@@ -392,10 +488,24 @@ object ElementAnalysisTreeXPathAnalyzer {
 
           def startElement(element: Element): Unit = {
 
+            val staticId   = element.idOrNull
+            val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
+
             // Make lazy as might not be used
             lazy val itemElementAnalysis =
-              new ElementAnalysis(e.part, e.index /* wrong */, element, stack.head.some, None, stack.head.getChildElementScope(element))
-                with ValueTrait with OptionalSingleNode with ViewTrait
+              new ElementAnalysis(
+                -1,
+                element,
+                stack.head.some,
+                None,
+                staticId,
+                prefixedId,
+                partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw
+                getChildElementScope(partAnalysisCtx, stack.head, element),
+                e.containerScope
+              ) with ValueTrait
+                with OptionalSingleNode
+                with ViewTrait
 
             def processElement(qName: QName, required: Boolean): Unit = {
 
@@ -405,13 +515,20 @@ object ElementAnalysisTreeXPathAnalyzer {
                 require(nestedElementOpt.isDefined)
 
               nestedElementOpt foreach { nestedElement =>
+
+                val staticId   = nestedElement.idOrNull
+                val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
+
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
-                  part                      = e.part,
-                  index                     = e.index, // wrong
+                  index                     = -1,
                   element                   = nestedElement,
                   parent                    = Some(itemElementAnalysis),
                   preceding                 = None,
-                  scope                     = itemElementAnalysis.getChildElementScope(nestedElement),
+                  staticId                  = staticId,
+                  prefixedId                = prefixedId,
+                  namespaceMapping          = partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw,
+                  scope                     = getChildElementScope(partAnalysisCtx, itemElementAnalysis, nestedElement),
+                  containerScope            = e.containerScope,
                   staticValue               = None,
                   isPlaceholder             = false,
                   containsHTML              = false,
@@ -419,7 +536,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                   hasLocalFullAppearance    = false,
                   hasLocalLeftAppearance    = false
                 )
-                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(nestedAnalysis)
+                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, nestedAnalysis)
                 combinedAnalysis = combineXPathAnalysis(combinedAnalysis, nestedAnalysis.valueAnalysis.get)
               }
             }
@@ -442,7 +559,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                 // expressions, but it must be done for itemsets.
                 //
                 // See also #289 https://github.com/orbeon/orbeon-forms/issues/289 (closed)
-                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
+                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, itemElementAnalysis)
                 combinedAnalysis =
                   combineXPathAnalysis(
                     combinedAnalysis,
@@ -461,7 +578,7 @@ object ElementAnalysisTreeXPathAnalyzer {
               case XFORMS_CHOICES_QNAME =>
 
                 // Analyze container and add as a value dependency (see above)
-                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(itemElementAnalysis)
+                ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, itemElementAnalysis)
                 combinedAnalysis =
                   combineXPathAnalysis(
                     combinedAnalysis,
@@ -490,24 +607,28 @@ object ElementAnalysisTreeXPathAnalyzer {
     }
 
     def analyzeXPath(
+      partAnalysisCtx : PartAnalysisContextAfterTree,
       e               : ElementAnalysis,
       contextAnalysis : Option[XPathAnalysis],
       xpathString     : String,
-      avt             : Boolean = false
+      avt             : Boolean = false)(implicit
+      logger          : IndentedLogger
     ): XPathAnalysis =
-      analyzeXPathWithStringExpression(e, contextAnalysis, e.inScopeVariables, xpathString, avt)
+      analyzeXPathWithStringExpression(partAnalysisCtx, e, contextAnalysis, e.inScopeVariables, xpathString, avt)
 
     def analyzeXPathWithStringExpression(
+      partAnalysisCtx  : PartAnalysisContextAfterTree,
       e                : ElementAnalysis,
       contextAnalysis  : Option[XPathAnalysis],
       inScopeVariables : Map[String, VariableTrait],
       xpathString      : String,
-      avt              : Boolean
+      avt              : Boolean)(implicit
+      logger           : IndentedLogger
     ): XPathAnalysis =
       PathMapXPathAnalysisBuilder(
-        partAnalysis              = e.part,
+        partAnalysisCtx           = partAnalysisCtx,
         xpathString               = xpathString,
-        namespaceMapping          = e.part.metadata.getNamespaceMapping(e.prefixedId).orNull,
+        namespaceMapping          = partAnalysisCtx.getNamespaceMapping(e.prefixedId).orNull,
         baseAnalysis              = contextAnalysis,
         inScopeVariables          = inScopeVariables,
         pathMapContext            = new SimplePathMapContext(e),
@@ -516,9 +637,10 @@ object ElementAnalysisTreeXPathAnalyzer {
         locationData              = e.locationData,
         element                   = e.element,
         avt                       = avt
-      )(e.logger)
+      )
 
     def analyzeXPathWithCompiledExpression(
+      partAnalysisCtx  : PartAnalysisContextAfterTree,
       e                : ElementAnalysis,
       contextAnalysis  : Option[XPathAnalysis],
       inScopeVariables : Map[String, VariableTrait],
@@ -526,7 +648,7 @@ object ElementAnalysisTreeXPathAnalyzer {
     ): XPathAnalysis = {
       val defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)
       PathMapXPathAnalysisBuilder(
-        partAnalysis              = e.part,
+        partAnalysisCtx           = partAnalysisCtx,
         compiledExpression        = expression,
         baseAnalysis              = contextAnalysis,
         inScopeVariables          = inScopeVariables,
@@ -593,12 +715,15 @@ object ElementAnalysisTreeXPathAnalyzer {
 
     // Return the context within which children elements or values evaluate. This is the element binding if any, or the
     // element context if there is no binding.
-    def getChildrenContext(e: ElementAnalysis): Option[XPathAnalysis] =
+    def getChildrenContext(
+      partAnalysisCtx: PartAnalysisContextAfterTree,
+      e              : ElementAnalysis
+    ): Option[XPathAnalysis] =
       e match {
         case m: Model =>
           m.defaultInstancePrefixedId map { defaultInstancePrefixedId => // instance('defaultInstanceId')
             PathMapXPathAnalysisBuilder(
-              partAnalysis              = m.part,
+              partAnalysisCtx           = partAnalysisCtx,
               xpathString               = buildInstanceString(defaultInstancePrefixedId),
               namespaceMapping          = null,
               baseAnalysis              = None,

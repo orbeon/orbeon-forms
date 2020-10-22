@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.Document
+import org.orbeon.dom
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.AbstractBinding
@@ -24,11 +25,17 @@ import org.orbeon.xforms.{Constants, XFormsId}
 
 import scala.collection.mutable
 
-case class Global(templateTree: SAXStore, compactShadowTree: Document)
+case class Global(templateTree: SAXStore, compactShadowTree: dom.Document)
 
 trait PartXBLAnalysis extends TransientState {
 
-  self: PartAnalysisImpl =>
+  self =>
+
+  def startScope: Scope
+  def metadata: Metadata
+  def staticStateDocument: StaticStateDocument
+
+  // TODO: This shouldn't be in this constructor!
 
   // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
   // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
@@ -37,6 +44,7 @@ trait PartXBLAnalysis extends TransientState {
 
   val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
   val allGlobals                  = mutable.ArrayBuffer[Global]()
+  def iterateGlobals: Iterator[Global] = allGlobals.iterator
 
   // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:
   // - deindex prefixed ids => Scope
@@ -51,7 +59,7 @@ trait PartXBLAnalysis extends TransientState {
   private[PartXBLAnalysis] val scopesById              = mutable.HashMap[String, Scope]()
   private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = mutable.HashMap[String, Scope]()
 
-  protected def initializeScopes(): Unit = {
+  def initializeScopes(): Unit = {
     // Add existing ids to scope map
     val prefix = startScope.fullPrefix
     metadata.idGenerator.add(Constants.DocumentId) // top-level is not added to the id generator until now
@@ -84,6 +92,7 @@ trait PartXBLAnalysis extends TransientState {
     scope
   }
 
+  // Used by `xxf:dynamic`
   def deregisterScope(scope: Scope): Unit =
     scopesById -= scope.scopeId
 
@@ -129,12 +138,6 @@ trait PartXBLAnalysis extends TransientState {
 
   def allBindingsMaybeDuplicates =
     metadata.allBindingsMaybeDuplicates
-
-  // Search scope in ancestor or self parts
-  def searchResolutionScopeByPrefixedId(prefixedId: String) =
-    ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
-
-  def getGlobals = allGlobals
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()

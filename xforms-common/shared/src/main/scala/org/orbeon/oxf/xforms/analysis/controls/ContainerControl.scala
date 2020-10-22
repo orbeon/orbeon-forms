@@ -21,7 +21,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class ContainerControl(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -32,7 +31,6 @@ class ContainerControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends ElementAnalysis(
-  part,
   index,
   element,
   parent,

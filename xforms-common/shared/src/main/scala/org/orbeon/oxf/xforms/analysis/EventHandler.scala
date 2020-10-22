@@ -32,7 +32,6 @@ import org.orbeon.xml.NamespaceMapping
  * XPath analysis, which is unused here).
  */
 class EventHandler(
-  part              : PartAnalysisImpl,
   index             : Int,
   element           : Element,
   parent            : Option[ElementAnalysis],
@@ -43,7 +42,6 @@ class EventHandler(
   scope             : Scope,
   containerScope    : Scope
 ) extends ElementAnalysis(
-  part,
   index,
   element,
   parent,
@@ -131,7 +129,7 @@ class EventHandler(
   def targetPrefixedIds: Set[String] = _targetPrefixedIds
 
   // Analyze the handler
-  def analyzeEventHandler(): Unit = {
+  def analyzeEventHandler()(implicit logger: IndentedLogger): Unit = {
 
     // This must run only once
     assert(_observersPrefixedIds eq null)

@@ -17,7 +17,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
@@ -35,6 +35,7 @@ import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node.ELEMENT_NODE
+import shapeless.syntax.typeable._
 
 import scala.jdk.CollectionConverters._
 
@@ -241,8 +242,12 @@ class XFormsComponentControl(
 
     if (staticControl.hasLazyBinding && ! staticControl.hasConcreteBinding) {
 
+      // We can only have a lazy binding in a nested part, but this is not expressed by types at this time
+      val nestedPartAnalysis = container.partAnalysis.cast[NestedPartAnalysis].getOrElse(throw new IllegalStateException)
+
       // Only update the static tree. The dynamic tree is created later.
-      XXFormsDynamicControl.createOrUpdateStaticShadowTree(this, None)
+      // This is only possible right now in a nested part, not the top-level part.
+      XXFormsDynamicControl.createOrUpdateStaticShadowTree(nestedPartAnalysis, this, None)
       assert(staticControl.hasConcreteBinding)
 
       // See https://github.com/orbeon/orbeon-forms/issues/4018
@@ -327,7 +332,10 @@ class XFormsComponentControl(
         destroyNestedContainer()
       }
 
-      ElementAnalysisTreeBuilder.clearShadowTree(staticControl.part, staticControl)
+      // We can only have a lazy binding in a nested part, but this is not expressed by types at this time
+      val nestedPartAnalysis = container.partAnalysis.cast[NestedPartAnalysis].getOrElse(throw new IllegalStateException)
+
+      ElementAnalysisTreeBuilder.clearShadowTree(nestedPartAnalysis, staticControl)
       containingDocument.addControlStructuralChange(prefixedId)
     }
   }

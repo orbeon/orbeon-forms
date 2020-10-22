@@ -10,22 +10,22 @@ import org.orbeon.xml.NamespaceMapping
 
 
 class ComponentControl(
-  part             : PartAnalysisImpl,
-  index            : Int,
-  element          : Element,
-  parent           : Option[ElementAnalysis],
-  preceding        : Option[ElementAnalysis],
-  staticId         : String,
-  prefixedId       : String,
-  namespaceMapping : NamespaceMapping,
-  scope            : Scope,
-  containerScope   : Scope
-) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+  index              : Int,
+  element            : Element,
+  parent             : Option[ElementAnalysis],
+  preceding          : Option[ElementAnalysis],
+  staticId           : String,
+  prefixedId         : String,
+  namespaceMapping   : NamespaceMapping,
+  scope              : Scope,
+  containerScope     : Scope,
+  val isTopLevelPart : Boolean
+) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with WithChildrenTrait
      with OptionalSingleNode { // binding could be mandatory, optional, or prohibited
 
   val hasLazyBinding: Boolean =
-    ! part.isTopLevel &&
+    ! isTopLevelPart &&
       element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
   var commonBinding: CommonBinding = null // TODO: pass via constructor
@@ -34,7 +34,7 @@ class ComponentControl(
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)
 
   def hasConcreteBinding: Boolean                 = _concreteBindingOpt.isDefined
-  def bindingOpt        : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! part.isTopLevel)
+  def bindingOpt        : Option[ConcreteBinding] = _concreteBindingOpt ensuring (_.isDefined || ! isTopLevelPart)
   def bindingOrThrow    : ConcreteBinding         = bindingOpt getOrElse (throw new IllegalStateException)
 
   def setConcreteBinding(concreteBinding: ConcreteBinding): Unit = {

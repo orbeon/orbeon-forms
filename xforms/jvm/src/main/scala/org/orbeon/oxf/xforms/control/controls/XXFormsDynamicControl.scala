@@ -17,8 +17,9 @@ import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, PartAnalysisImpl}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
@@ -65,7 +66,7 @@ import scala.collection.mutable
 class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
   extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-  case class Nested(container: XBLContainer, partAnalysis: PartAnalysisImpl, template: SAXStore, outerListener: EventListener)
+  case class Nested(container: XBLContainer, partAnalysis: NestedPartAnalysis, template: SAXStore, outerListener: EventListener)
 
   private var _nested: Option[Nested] = None
   def nested: Option[Nested] = _nested
@@ -296,6 +297,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   private def processXBLUpdates(): Unit = {
 
+    val partAnalysis = _nested.get.partAnalysis
+
     val tree = containingDocument.controls.getCurrentControlTree
 
     for ((prefixedId, elemInSource) <- groupChanges(xblChanges)) {
@@ -306,7 +309,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
           withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
             removeDynamicShadowTree(componentControl)
-            createOrUpdateStaticShadowTree(componentControl, elemInSource.some)
+            createOrUpdateStaticShadowTree(partAnalysis, componentControl, elemInSource.some)
             componentControl.recreateNestedContainer()
             updateDynamicShadowTree(componentControl)
           }
@@ -461,8 +464,10 @@ object XXFormsDynamicControl {
   }
 
   def createOrUpdateStaticShadowTree(
+    partAnalysis     : NestedPartAnalysis,
     componentControl : XFormsComponentControl,
-    elemInSource     : Option[Element]
+    elemInSource     : Option[Element])(implicit
+    logger           : IndentedLogger
   ): Unit = {
 
     val doc             = componentControl.containingDocument
@@ -470,7 +475,7 @@ object XXFormsDynamicControl {
 
     // Update the shadow tree
     // Can return `None` if the binding does not have a template.
-    ElementAnalysisTreeBuilder.createOrUpdateStaticShadowTree(staticComponent, elemInSource)
+    ElementAnalysisTreeBuilder.createOrUpdateStaticShadowTree(partAnalysis, staticComponent, elemInSource)
 
     doc.addControlStructuralChange(componentControl.prefixedId)
   }

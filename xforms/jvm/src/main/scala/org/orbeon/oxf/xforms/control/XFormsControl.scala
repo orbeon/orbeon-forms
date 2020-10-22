@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}

@@ -16,13 +16,14 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis._
 
-import scala.collection.compat._
 import scala.collection.{mutable => m}
 
 
-class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName => Boolean) {
+trait BindTree {
 
-  bindTree =>
+  bindTree: Model =>
+
+  def isCustomMIP: QName => Boolean
 
   // All bind ids
   val bindIds = new m.LinkedHashSet[String]
@@ -49,24 +50,11 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
   val computedBindExpressionsInstances = m.LinkedHashSet[String]() // instances to which computed binds apply
   val validationBindInstances          = m.LinkedHashSet[String]() // instances to which validation binds apply
 
-  // Create static binds hierarchy and yield top-level binds
-  val topLevelBinds: List[StaticBind] = {
-    // NOTE: For now, do as if binds follow all top-level variables
-    val preceding = model.variablesSeq.lastOption
-
-    val staticBinds =
-      for (bindElement <- bindElements)
-        yield new StaticBind(bindTree, bindElement, model, preceding)
-
-    staticBinds.to(List)
-  }
+  // `lazy` because the children are evaluated after the container
+  lazy val topLevelBinds: List[StaticBind] =
+    children collect { case sb: StaticBind => sb } toList
 
   def hasBinds: Boolean = topLevelBinds.nonEmpty
-
-  // Destroy the tree of binds
-  // For `xxf:dynamic`
-  def destroy(): Unit =
-    bindsById.values foreach model.part.unmapScopeIds
 
   // Add a new bind
   // 2020-10-01: No usages!
@@ -95,30 +83,31 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 //  }
 
   // Remove an existing bind
-  def removeBind(bind: StaticBind): Unit = {
-
-    assert(! model.part.isTopLevel)
-
-    bind.parent match {
-      case Some(parentBind: StaticBind) => parentBind.removeBind(bind)
-      case _ => throw new IllegalArgumentException // for now, cannot remove top-level binds
-    }
-
-    // TODO: update has*
-    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
-  }
+//  def removeBind(bind: StaticBind): Unit = {
+//
+//    assert(! model.part.isTopLevel)
+//
+//    bind.parent match {
+//      case Some(parentBind: StaticBind) => parentBind.removeBind(bind)
+//      case _ => throw new IllegalArgumentException // for now, cannot remove top-level binds
+//    }
+//
+//    // TODO: update has*
+//    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
+//  }
 
   // In-scope variable on binds include variables implicitly declared with bind/@name
   // Used by XPath analysis
   lazy val allBindVariables: Map[String, VariableTrait] =
-  model.variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
+  variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
 
   class BindAsVariable(val name: String, bind: StaticBind) extends VariableTrait {
     def variableAnalysis: Option[XPathAnalysis] = bind.bindingAnalysis
   }
 
   // Whether we figured out all XPath ref analysis
-  var figuredAllBindRefAnalysis: Boolean = ! hasBinds // default value sets to true if no binds
+  // NOTE: Don't eagerly call `hasBinds`. The default value can be `false` as we set it during analysis.
+  var figuredAllBindRefAnalysis: Boolean = false
 
   var recalculateOrder : Option[List[StaticBind]] = None
   var defaultValueOrder: Option[List[StaticBind]] = None

@@ -18,18 +18,21 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
-import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
+import org.orbeon.oxf.xforms.{PartGlobalOps, XFormsContainingDocument, XFormsContextStack}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.analysis.Phase
+import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
 import org.orbeon.xforms.runtime.XFormsObject
 
-import scala.util.control.NonFatal
+import scala.collection.mutable
+import scala.util.control.{Breaks, NonFatal}
+
 
 object Dispatch extends Logging {
 
@@ -40,7 +43,9 @@ object Dispatch extends Logging {
   def dispatchEvent(event: XFormsEvent): Unit = {
 
     val containingDocument = event.containingDocument
-    implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+    val staticOps          = containingDocument.staticOps
+
+    implicit val indentedLogger: IndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
 
     // Utility to help make sure we push and pop the event
     def withEvent[T](body: => T): T =
@@ -68,7 +73,7 @@ object Dispatch extends Logging {
           return
         }
 
-        staticTarget.handlersForEvent(event.name)
+        staticTarget.handlersForEvent(event.name, handlersForEventImpl(staticOps, staticTarget, _))
       }
 
       // Call native listeners on target if any
@@ -347,5 +352,125 @@ object Dispatch extends Logging {
       }
 
     resolvedObject map (_.asInstanceOf[XFormsEventHandler])
+  }
+
+  val propagateBreaks = new Breaks
+  import propagateBreaks.{break, breakable}
+
+  // Find all the handlers for the given event name if an event with that name is dispatched to this element.
+  // For all relevant observers, find the handlers which match by phase
+  private def handlersForEventImpl(ops: PartGlobalOps, e: ElementAnalysis, eventName: String): HandlerAnalysis = {
+
+    // NOTE: For `phase == Target`, `observer eq element`.
+    def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
+
+      // We gather observers with `relevantObserversFromLeafToRoot` and either:
+      //
+      // - they have the same XBL scope
+      // - OR there is at least one phantom handler for that observer
+      //
+      // So if the scopes are different, we must require that the handler is a phantom handler
+      // (and therefore ignore handlers on that observer which are not phantom handlers).
+      val requirePhantomHandler = observer.scope != e.scope
+
+      def matchesPhaseNameTarget(eventHandler: EventHandler) =
+        (
+          eventHandler.isCapturePhaseOnly && phase == Phase.Capture ||
+          eventHandler.isTargetPhase      && phase == Phase.Target  ||
+          eventHandler.isBubblingPhase    && phase == Phase.Bubbling
+        ) &&
+          eventHandler.isMatchByNameAndTarget(eventName, e.prefixedId)
+
+      def matches(eventHandler: EventHandler) =
+        if (requirePhantomHandler)
+          eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
+        else
+          matchesPhaseNameTarget(eventHandler)
+
+      val relevantHandlers = ops.getEventHandlersForObserver(observer.prefixedId) filter matches
+
+      // DOM 3:
+      //
+      // - `stopPropagation`: "Prevents other event listeners from being triggered but its effect must be deferred
+      //   until all event listeners attached on the Event.currentTarget have been triggered."
+      // - `preventDefault`: "the event must be canceled, meaning any default actions normally taken by the
+      //   implementation as a result of the event must not occur"
+      // - NOTE: DOM 3 introduces also stopImmediatePropagation
+      val propagate            = relevantHandlers forall (_.propagate == Propagate.Continue)
+      val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction == Perform.Perform)
+
+      // See https://github.com/orbeon/orbeon-forms/issues/3844
+      def placeInnerHandlersFirst(handlers: List[EventHandler]): List[EventHandler] = {
+
+        def isHandlerInnerHandlerOfObserver(handler: EventHandler) =
+          handler.scope.parent contains observer.containerScope
+
+        val (inner, outer) =
+          handlers partition isHandlerInnerHandlerOfObserver
+
+        inner ::: outer
+      }
+
+      (propagate, performDefaultAction, placeInnerHandlersFirst(relevantHandlers))
+    }
+
+    var propagate = true
+    var performDefaultAction = true
+
+    def handlersForPhase(observers: List[ElementAnalysis], phase: Phase): Option[(Phase, Map[String, List[EventHandler]])] = {
+      val result = mutable.Map[String, List[EventHandler]]()
+      breakable {
+        for (observer <- observers) {
+
+          val (localPropagate, localPerformDefaultAction, handlersToRun) =
+            relevantHandlersForObserverByPhaseAndName(observer, phase)
+
+          propagate &= localPropagate
+          performDefaultAction &= localPerformDefaultAction
+          if (handlersToRun.nonEmpty)
+            result += observer.prefixedId -> handlersToRun
+
+          // Cancel propagation if requested
+          if (! propagate)
+            break()
+        }
+      }
+
+      if (result.nonEmpty)
+        Some(phase -> result.toMap)
+      else
+        None
+    }
+
+    val observersFromLeafToRoot = relevantObserversAcrossPartsFromLeafToRoot(ops, e)
+
+    val captureHandlers =
+      handlersForPhase(observersFromLeafToRoot.reverse.init, Phase.Capture)
+
+    val targetHandlers =
+      if (propagate)
+        handlersForPhase(List(observersFromLeafToRoot.head), Phase.Target)
+      else
+        None
+
+    val bubblingHandlers =
+      if (propagate)
+        handlersForPhase(observersFromLeafToRoot.tail, Phase.Bubbling)
+      else
+        None
+
+    (performDefaultAction, Map.empty ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
+  }
+
+  // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
+  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartGlobalOps, e: ElementAnalysis): List[ElementAnalysis] = {
+
+    def hasPhantomHandler(observer: ElementAnalysis) =
+      ops.getEventHandlersForObserver(observer.prefixedId) exists (_.isPhantom)
+
+    def relevant(observer: ElementAnalysis) =
+      observer.scope == e.scope || hasPhantomHandler(observer)
+
+    (ancestorsAcrossPartsIterator(e, includeSelf = true) filter relevant).toList
   }
 }

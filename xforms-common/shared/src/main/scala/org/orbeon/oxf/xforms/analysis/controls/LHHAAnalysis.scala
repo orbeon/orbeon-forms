@@ -22,7 +22,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class LHHAAnalysis(
-  part                          : PartAnalysisImpl,
   index                         : Int,
   element                       : Element,
   parent                        : Option[ElementAnalysis],
@@ -38,7 +37,7 @@ class LHHAAnalysis(
   val hasLocalMinimalAppearance : Boolean,
   val hasLocalFullAppearance    : Boolean,
   val hasLocalLeftAppearance    : Boolean
-) extends ElementAnalysis(part, index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
+) extends ElementAnalysis(index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
    with AppearanceTrait {
 

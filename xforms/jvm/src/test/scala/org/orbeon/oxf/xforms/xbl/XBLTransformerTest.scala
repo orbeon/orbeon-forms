@@ -50,7 +50,7 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
         assertXMLDocumentsIgnoreNamespacesInScope(
           elemToDom4j(expected),
           XBLTransformer.transform(
-            partAnalysis          = null, // just for tests, we assume it's not going to be used
+            partAnalysisCtx       = null, // just for tests, we assume it's not going to be used
             xblSupport            = None,
             shadowTreeDocument    = elemToDom4j(shadow),
             boundElement          = elemToDom4jElem(bound),

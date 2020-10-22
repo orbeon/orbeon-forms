@@ -596,18 +596,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =
     FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, ctx.componentBindings)
 
-  // Find a given static control by name
-  def findStaticControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[ElementAnalysis] = {
-    val model = getFormModel
-    val part = model.staticModel.part
-    for {
-      controlId <- findControlIdByName(ctx.formDefinitionRootElem, controlName)
-      prefixedId = part.startScope.prefixedIdForStaticId(controlId)
-      control <- Option(part.getControlAnalysis(prefixedId))
-    } yield
-      control
-  }
-
   // Find the control by name (resolved from the top-level form model `fr-form-model`)
   def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
     val model = getFormModel
@@ -830,7 +818,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           xpathString      = xpathString,
           namespaceMapping = NamespaceMapping(att.parentUnsafe.namespaceMappings.toMap),
           locationData     = null,
-          functionLibrary  = inScopeContainingDocument.partAnalysis.staticState.functionLibrary,
+          functionLibrary  = inScopeContainingDocument.partAnalysis.functionLibrary,
           avt              = false
         )
 

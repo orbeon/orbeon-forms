@@ -16,14 +16,13 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class Submission(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -34,7 +33,6 @@ class Submission(
   scope            : Scope,
   containerScope   : Scope
 ) extends ElementAnalysis(
-  part,
   index,
   element,
   parent,

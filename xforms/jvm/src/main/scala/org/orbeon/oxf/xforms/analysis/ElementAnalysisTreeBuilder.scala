@@ -16,15 +16,17 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, Submission}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.XXBLScope
+import org.orbeon.xforms.{XFormsId, XFormsNames, XXBLScope}
 import org.orbeon.xforms.xbl.Scope
 
 
@@ -36,22 +38,23 @@ object ElementAnalysisTreeBuilder {
 
   // Recursively build this element's children and its descendants
   def buildAllElemDescendants(
-    parentElem     : WithChildrenTrait,
-    builder        : Builder,
-    children       : Option[Seq[(Element, Scope)]] = None)(implicit // allow explicit children so we can force processing of lazy bindings
-    indentedLogger : IndentedLogger
-  ): Unit =
+    partAnalysisCtx : PartAnalysisContextForTree,
+    parentElem      : WithChildrenTrait,
+    builder         : Builder,
+    children        : Option[Seq[(Element, Scope)]] = None)(implicit // allow explicit children so we can force processing of lazy bindings
+    indentedLogger  : IndentedLogger
+  ): Unit = {
     parentElem.addChildren( // TODO: consider have children add themselves to the parent?
       {
         // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
         var precedingElem: Option[ElementAnalysis] = None
 
         // Build and collect the children
-        for ((childElement, childContainerScope) <- children getOrElse childrenElements(parentElem))
+        for ((childElement, childContainerScope) <- children getOrElse childrenElements(partAnalysisCtx, parentElem))
           yield builder(parentElem, precedingElem, childElement, childContainerScope) match {
             // The element has children
             case newControl: WithChildrenTrait =>
-              buildAllElemDescendants(newControl, builder)
+              buildAllElemDescendants(partAnalysisCtx, newControl, builder)
               precedingElem = newControl.some
               newControl
             // The element does not have children
@@ -61,33 +64,89 @@ object ElementAnalysisTreeBuilder {
           }
       }
     )
+  }
+
+  def setModelOnElement(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis): Unit =
+    e match {
+      case m: Model =>
+        m.model = m.some
+      case e =>
+        e.model =
+          e.element.attributeValue(XFormsNames.MODEL_QNAME) match {
+            case localModelStaticId: String =>
+              // Get model prefixed id and verify it belongs to this scope
+              val localModelPrefixedId = e.scope.prefixedIdForStaticId(localModelStaticId)
+              val localModel = partAnalysisCtx.getModel(localModelPrefixedId)
+              if (localModel eq null)
+                throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", ElementAnalysis.createLocationData(e.element))
+
+              Some(localModel)
+            case _ =>
+              // Use inherited model
+              e.closestAncestorInScope match {
+                case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
+                case None           => partAnalysisCtx.getDefaultModelForScope(e.scope) // top-level control in a new scope, use default model id for scope
+              }
+          }
+    }
+
+  // This only sets the `lang` value on elements that have directly an `xml:lang`.
+  // Other elements will get their `lang` value lazily.
+  private def setLangOnElement(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis): Unit =
+    e.lang =
+      e.element.attributeValueOpt(XML_LANG_QNAME) match {
+        case Some(v) => extractXMLLang(partAnalysisCtx, e, v)
+        case None    => LangRef.Undefined
+      }
+
+  def setModelAndLangOnAllDescendants(partAnalysisCtx : PartAnalysisContextAfterTree, parentElem: WithChildrenTrait): Unit =
+    parentElem.descendants foreach { e =>
+      setModelOnElement(partAnalysisCtx, e)
+      setLangOnElement(partAnalysisCtx, e)
+    }
+
+  def extractXMLLang(partAnalysisCtx: PartAnalysisContextAfterTree, e: ElementAnalysis, lang: String): LangRef =
+    if (! lang.startsWith("#"))
+      LangRef.Literal(lang)
+    else {
+      val staticId   = lang.substring(1)
+      val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
+      LangRef.AVT(partAnalysisCtx.getAttributeControl(prefixedId, "xml:lang"))
+    }
 
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
   // Can be used only in a sub-part, as this mutates the tree.
   // Used by `xxf:dynamic`.
-  def createOrUpdateStaticShadowTree(existingComponent: ComponentControl, elemInSource: Option[Element]): Unit = {
+  def createOrUpdateStaticShadowTree(
+    partAnalysisCtx   : NestedPartAnalysis,
+    existingComponent : ComponentControl,
+    elemInSource      : Option[Element])(implicit
+    logger            : IndentedLogger
+  ): Unit = {
 
-    assert(! existingComponent.part.isTopLevel)
+    assert(! existingComponent.isTopLevelPart)
 
     if (existingComponent.hasConcreteBinding)
-      removeConcreteBinding(existingComponent.part, existingComponent)
+      removeConcreteBinding(partAnalysisCtx, existingComponent)
 
     existingComponent.rootElem = elemInSource getOrElse existingComponent.element
-    existingComponent.part.analyzeSubtree(existingComponent)
+
+    PartAnalysisBuilder.analyzeSubtree(partAnalysisCtx, existingComponent)
   }
 
   // Can be used only in a sub-part, as this mutates the tree.
   // Used by `XFormsComponentControl`.
-  def clearShadowTree(part: PartAnalysisImpl, existingComponent: ComponentControl): Unit = {
-    assert(! part.isTopLevel)
-    removeConcreteBinding(part, existingComponent)
+  def clearShadowTree(partAnalysisCtx: NestedPartAnalysis, existingComponent: ComponentControl): Unit = {
+    assert(! existingComponent.isTopLevelPart)
+    removeConcreteBinding(partAnalysisCtx, existingComponent)
   }
 
   def componentChildrenForBindingUpdate(
-    e              : ComponentControl)(implicit
-    indentedLogger : IndentedLogger
+    partAnalysisCtx : NestedPartAnalysis,
+    e               : ComponentControl)(implicit
+    indentedLogger  : IndentedLogger
   ): Seq[(Element, Scope)] =
-    componentChildren(e, honorLazy = false)
+    componentChildren(partAnalysisCtx, e, honorLazy = false)
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
   def hasStaticValue(lhhaElement: Element): Boolean = {
@@ -122,7 +181,7 @@ object ElementAnalysisTreeBuilder {
   private object Private {
 
     val RootChildrenToIgnore = Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)
-    val ModelChildrenToKeep  = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
+    val ModelChildrenToKeep  = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME, XFORMS_BIND_QNAME)
 
     // Return all the children to consider, including relevant shadow tree elements
     //
@@ -133,18 +192,19 @@ object ElementAnalysisTreeBuilder {
     // - sets the `ConcreteBinding` on the control
     //
     def componentChildren(
-      e              : ComponentControl,
-      honorLazy      : Boolean)(implicit
-      indentedLogger : IndentedLogger
+      partAnalysisCtx : PartAnalysisContextForTree,
+      e               : ComponentControl,
+      honorLazy       : Boolean)(implicit
+      indentedLogger  : IndentedLogger
     ): Seq[(Element, Scope)] =
       if (! e.hasLazyBinding || ! honorLazy) {
 
         val abstractBinding =
-          e.part.metadata.findAbstractBindingByPrefixedId(e.prefixedId) getOrElse
+          partAnalysisCtx.metadata.findAbstractBindingByPrefixedId(e.prefixedId) getOrElse
             (throw new IllegalStateException)
 
         XBLBindingBuilder.createConcreteBindingFromElem(
-          e.part,
+          partAnalysisCtx,
           abstractBinding,
           e.rootElem,
           e.prefixedId,
@@ -153,8 +213,8 @@ object ElementAnalysisTreeBuilder {
           case Some((concreteBinding, globalOpt, compactShadowTree)) =>
 
             globalOpt foreach { global =>
-              e.part.abstractBindingsWithGlobals += abstractBinding // TODO: indexing; to know if globals have been processed already
-              e.part.allGlobals += global                           // TODO: indexing
+              partAnalysisCtx.abstractBindingsWithGlobals += abstractBinding // TODO: indexing; to know if globals have been processed already
+              partAnalysisCtx.allGlobals += global                           // TODO: indexing
             }
 
             e.setConcreteBinding(concreteBinding)
@@ -183,7 +243,7 @@ object ElementAnalysisTreeBuilder {
 
             def annotateChild(innerScope: Scope, outerScope: Scope, containerScope: XXBLScope)(child: Element): Element =
               XBLBindingBuilder.annotateSubtreeByElement(
-                e.part,
+                partAnalysisCtx,
                 e.element,            // bound element
                 child,                // child tree to annotate
                 innerScope,
@@ -211,7 +271,7 @@ object ElementAnalysisTreeBuilder {
                 Nil
 
             val scopesForImplementationChildren =
-              (concreteBinding.innerScope, e.part.scopeForPrefixedId(e.prefixedId), XXBLScope.Inner)
+              (concreteBinding.innerScope, partAnalysisCtx.scopeForPrefixedId(e.prefixedId), XXBLScope.Inner)
 
             val annotatedHandlers = abstractBinding.handlers      map (annotateChild _).tupled(scopesForImplementationChildren)
             val annotatedModels   = abstractBinding.modelElements map (annotateChild _).tupled(scopesForImplementationChildren)
@@ -232,8 +292,9 @@ object ElementAnalysisTreeBuilder {
         Nil // lazy binding, don't do anything yet
 
     def childrenElements(
-      e              : WithChildrenTrait)(implicit
-      indentedLogger : IndentedLogger
+      partAnalysisCtx : PartAnalysisContextForTree,
+      e               : WithChildrenTrait)(implicit
+      indentedLogger  : IndentedLogger
     ): Seq[(Element, Scope)] = {
 
       import ControlAnalysisFactory.isVariable
@@ -269,8 +330,13 @@ object ElementAnalysisTreeBuilder {
           allChildren collect {
             case (e, s) if isAction(e.getQName) || isVariable(e.getQName) => (e, s)
           }
+        case e: StaticBind =>
+          // Q: `xf:bind` can also have nested `<xf:constraint>`, etc. Should those also be collected to `ElementAnalysis`?
+          allChildren collect {
+            case (e, s) if e.getQName == XFORMS_BIND_QNAME => (e, s)
+          }
         case e: ComponentControl =>
-          componentChildren(e, honorLazy = true)
+          componentChildren(partAnalysisCtx, e, honorLazy = true)
         case _ =>
           allChildren
       }
@@ -278,14 +344,14 @@ object ElementAnalysisTreeBuilder {
 
     // Remove the component's binding
     // Used by `xxf:dynamic`
-    def removeConcreteBinding(part: PartAnalysisImpl, existingComponent: ComponentControl): Unit = {
+    def removeConcreteBinding(partAnalysisCtx: NestedPartAnalysis, existingComponent: ComponentControl): Unit = {
 
-      assert(! part.isTopLevel && existingComponent.hasConcreteBinding)
+      assert(! existingComponent.isTopLevelPart && existingComponent.hasConcreteBinding)
 
       existingComponent.bindingOpt foreach { binding =>
         // Remove all descendants only, keeping the current control
-        part.deindexTree(existingComponent, self = false)
-        part.deregisterScope(binding.innerScope)
+        partAnalysisCtx.deindexTree(existingComponent, self = false)
+        partAnalysisCtx.deregisterScope(binding.innerScope)
         existingComponent.clearBinding()
       }
     }

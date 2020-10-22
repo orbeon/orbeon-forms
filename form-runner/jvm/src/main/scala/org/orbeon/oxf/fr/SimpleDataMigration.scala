@@ -114,7 +114,7 @@ object SimpleDataMigration {
 
           nestedElems ::: processLevel(
             parents = nestedElems,
-            binds   = bind.children,
+            binds   = bind.childrenBinds,
             path    = bindName :: path
           )
         }
@@ -126,7 +126,7 @@ object SimpleDataMigration {
     findFormBindsRoot(findEnclosingModel(enclosingModelAbsoluteId)).toList flatMap { bind =>
       processLevel(
         parents = List(dataRootElem),
-        binds   = bind.children,
+        binds   = bind.childrenBinds,
         path    = Nil
       )
     }
@@ -288,7 +288,7 @@ object SimpleDataMigration {
 
                   processLevel(
                     parents          = nodes,
-                    binds            = bind.children.to(List),
+                    binds            = bind.childrenBinds,
                     templateRootElem = newTemplateRootElem getOrElse templateRootElem,
                     path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
                   )
@@ -304,7 +304,7 @@ object SimpleDataMigration {
       findFormBindsRoot(enclosingModel).toList flatMap { bind =>
         processLevel(
           parents          = List(dataToMigrateRootElem),
-          binds            = bind.children.to(List),
+          binds            = bind.childrenBinds,
           templateRootElem = templateInstanceRootElem,
           path             = Nil
         )

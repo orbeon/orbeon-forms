@@ -75,17 +75,17 @@ object XBLBindingBuilder {
   //  Indexing of the result, OTOH, is done by the caller.
   //
   def createConcreteBindingFromElem(
-    partAnalysis      : PartAnalysisImpl,
+    partAnalysisCtx   : PartAnalysisContextForTree,
     abstractBinding   : AbstractBinding,
     controlElement    : Element,
     controlPrefixedId : String,
     containerScope    : Scope)(implicit
     indentedLogger    : IndentedLogger
   ): Option[(ConcreteBinding, Option[Global], Document)] =
-    for (rawShadowTree <- generateRawShadowTree(partAnalysis, controlElement, abstractBinding)(indentedLogger))
+    for (rawShadowTree <- generateRawShadowTree(partAnalysisCtx, controlElement, abstractBinding)(indentedLogger))
       yield
         createScopeAndConcreteBinding(
-          partAnalysis,
+          partAnalysisCtx,
           controlElement,
           controlPrefixedId,
           containerScope,
@@ -95,16 +95,16 @@ object XBLBindingBuilder {
 
   // From a raw non-control tree (handlers, models) rooted at an element, produce a full annotated tree.
   def annotateSubtreeByElement(
-    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
-    boundElement   : Element,
-    element        : Element,
-    innerScope     : Scope,
-    outerScope     : Scope,
-    startScope     : XXBLScope,
-    containerScope : Scope
+    partAnalysisCtx : PartAnalysisContextForTree, // for `Metadata` and `mapScopeIds`
+    boundElement    : Element,
+    element         : Element,
+    innerScope      : Scope,
+    outerScope      : Scope,
+    startScope      : XXBLScope,
+    containerScope  : Scope
   ): Element =
     annotateSubtree(
-      partAnalysis,
+      partAnalysisCtx,
       Some(boundElement),
       element.createDocumentCopyParentNamespaces(detach = false),
       innerScope,
@@ -117,24 +117,24 @@ object XBLBindingBuilder {
 
   // Annotate a tree
   def annotateSubtree(
-    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
-    boundElement   : Option[Element],  // for `xml:base` resolution
-    rawTree        : Document,
-    innerScope     : Scope,
-    outerScope     : Scope,
-    startScope     : XXBLScope,
-    containerScope : Scope,
-    hasFullUpdate  : Boolean,
-    ignoreRoot     : Boolean
+    partAnalysisCtx : PartAnalysisContextForTree, // for `Metadata` and `mapScopeIds`
+    boundElement    : Option[Element],      // for `xml:base` resolution
+    rawTree         : Document,
+    innerScope      : Scope,
+    outerScope      : Scope,
+    startScope      : XXBLScope,
+    containerScope  : Scope,
+    hasFullUpdate   : Boolean,
+    ignoreRoot      : Boolean
   ): Document =
     withDebug("annotating tree") {
 
       val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
-      val fullAnnotatedTree = annotateShadowTree(partAnalysis.metadata, rawTree, containerScope.fullPrefix)
+      val fullAnnotatedTree = annotateShadowTree(partAnalysisCtx.metadata, rawTree, containerScope.fullPrefix)
 
       TransformerUtils.writeDom4j(
         fullAnnotatedTree,
-        new ScopeExtractor(partAnalysis, None, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
+        new ScopeExtractor(partAnalysisCtx, None, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
       )
 
       fullAnnotatedTree
@@ -162,14 +162,14 @@ object XBLBindingBuilder {
   }
 
   // For `xxf:dynamic`
-  def rebuildBinds(part: PartAnalysisImpl, model: Model, rawModelElement: Element): Unit = {
+  def rebuildBinds(partAnalysisCtx : NestedPartAnalysis, model: Model, rawModelElement: Element): Unit = {
 
-    assert(! part.isTopLevel)
+    assert(! partAnalysisCtx.isTopLevelPart)
 
     def annotateSubTree(rawElement: Element) = {
       val annotatedTree =
         XBLBindingBuilder.annotateSubtree(
-          model.part,
+          partAnalysisCtx,
           None,
           rawElement.createDocumentCopyParentNamespaces(detach = false),
           model.scope,
@@ -183,7 +183,7 @@ object XBLBindingBuilder {
       annotatedTree
     }
 
-    model.bindTree.bindsById.values foreach part.unmapScopeIds
+    model.bindsById.values foreach partAnalysisCtx.unmapScopeIds
     model.replaceBinds(rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
   }
 
@@ -193,7 +193,7 @@ object XBLBindingBuilder {
 
     // Generate raw (non-annotated) shadow content for the given control id and XBL binding.
     def generateRawShadowTree(
-      partAnalysis    : PartAnalysisImpl,
+      partAnalysisCtx : PartAnalysisContextForTree,
       boundElement    : Element,
       abstractBinding : AbstractBinding)(implicit
       indentedLogger  : IndentedLogger
@@ -214,8 +214,8 @@ object XBLBindingBuilder {
 
             // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
             XBLTransformer.transform(
-              partAnalysis          = partAnalysis, // `XBLSupport` implementations use this
-              xblSupport            = partAnalysis.staticState.xblSupport,
+              partAnalysisCtx       = partAnalysisCtx, // `XBLSupport` implementations use this
+              xblSupport            = partAnalysisCtx.xblSupport,
               shadowTreeDocument    = shadowTreeDocument,
               boundElement          = boundElement,
               abstractBindingOpt    = abstractBinding.some,
@@ -227,7 +227,7 @@ object XBLBindingBuilder {
       }
 
     def createScopeAndConcreteBinding(
-      partAnalysis           : PartAnalysisImpl,
+      partAnalysisCtx        : PartAnalysisContextForTree,
       boundElement           : Element,
       boundControlPrefixedId : String,
       containerScope         : Scope,
@@ -238,14 +238,14 @@ object XBLBindingBuilder {
       // New prefix corresponds to bound element prefixed id
       //val newPrefix = boundControlPrefixedId + COMPONENT_SEPARATOR
 
-      val newInnerScope = partAnalysis.newScope(containerScope, boundControlPrefixedId)
+      val newInnerScope = partAnalysisCtx.newScope(containerScope, boundControlPrefixedId)
       // NOTE: Outer scope is not necessarily the container scope!
-      val outerScope = partAnalysis.scopeForPrefixedId(boundControlPrefixedId)
+      val outerScope = partAnalysisCtx.scopeForPrefixedId(boundControlPrefixedId)
 
       // Annotate control tree
       val (templateTree, compactShadowTree) =
         annotateAndExtractSubtree(
-          partAnalysis,
+          partAnalysisCtx,
           Some(boundElement),
           rawShadowTree,
           newInnerScope,
@@ -271,10 +271,10 @@ object XBLBindingBuilder {
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl
-      val globalsAlreadyProcessed = partAnalysis.abstractBindingsWithGlobals.exists(abstractBinding eq)
+      val globalsAlreadyProcessed = partAnalysisCtx.abstractBindingsWithGlobals.exists(abstractBinding eq)
       val globalOpt =
-        partAnalysis.isTopLevel && ! globalsAlreadyProcessed flatOption
-          processGlobalsIfPresent(partAnalysis, abstractBinding)
+        partAnalysisCtx.isTopLevelPart && ! globalsAlreadyProcessed flatOption
+          processGlobalsIfPresent(partAnalysisCtx, abstractBinding)
 
       // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
       // TODO: should do this here, in order to include only the scripts and resources actually used
@@ -284,15 +284,15 @@ object XBLBindingBuilder {
 
     // Annotate a subtree and return a template and compact tree
     def annotateAndExtractSubtree(
-      partAnalysis   : PartAnalysisImpl,
-      boundElement   : Option[Element], // for xml:base resolution
-      rawTree        : Document,
-      innerScope     : Scope,
-      outerScope     : Scope,
-      startScope     : XXBLScope,
-      containerScope : Scope,
-      hasFullUpdate  : Boolean,
-      ignoreRoot     : Boolean
+      partAnalysisCtx : PartAnalysisContextForTree,
+      boundElement    : Option[Element], // for xml:base resolution
+      rawTree         : Document,
+      innerScope      : Scope,
+      outerScope      : Scope,
+      startScope      : XXBLScope,
+      containerScope  : Scope,
+      hasFullUpdate   : Boolean,
+      ignoreRoot      : Boolean
     ): (SAXStore, Document) = withDebug("annotating and extracting tree") {
 
       val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
@@ -310,7 +310,7 @@ object XBLBindingBuilder {
             new XFormsAnnotator(
               templateOutput,
               new ScopeExtractor(
-                partAnalysis,
+                partAnalysisCtx,
                 Some(
                   new WhitespaceXMLReceiver(
                     extractorOutput,
@@ -324,7 +324,7 @@ object XBLBindingBuilder {
                 containerScope.fullPrefix,
                 baseURI
               ),
-              partAnalysis.metadata,
+              partAnalysisCtx.metadata,
               false
             ) {
               // Use prefixed id for marks and namespaces in order to avoid clashes between top-level
@@ -350,7 +350,7 @@ object XBLBindingBuilder {
     }
 
     def processGlobalsIfPresent(
-      partAnalysis    : PartAnalysisImpl,
+      partAnalysisCtx : PartAnalysisContextForTree,
       abstractBinding : AbstractBinding
     ): Option[Global] =
       abstractBinding.global map { globalDocument =>
@@ -358,18 +358,18 @@ object XBLBindingBuilder {
         val (globalTemplateTree, globalCompactShadowTree) =
           withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.commonBinding.bindingElemId.orNull)) {
 
-            val topLevelScopeForGlobals = partAnalysis.startScope
+            val topLevelScopeForGlobals = partAnalysisCtx.startScope
 
             annotateAndExtractSubtree(
-              partAnalysis   = partAnalysis,
-              boundElement   = None,
-              rawTree        = globalDocument,
-              innerScope     = topLevelScopeForGlobals,
-              outerScope     = topLevelScopeForGlobals,
-              startScope     = XXBLScope.Inner,
-              containerScope = topLevelScopeForGlobals,
-              hasFullUpdate  = hasFullUpdate(globalDocument),
-              ignoreRoot     = true
+              partAnalysisCtx = partAnalysisCtx,
+              boundElement    = None,
+              rawTree         = globalDocument,
+              innerScope      = topLevelScopeForGlobals,
+              outerScope      = topLevelScopeForGlobals,
+              startScope      = XXBLScope.Inner,
+              containerScope  = topLevelScopeForGlobals,
+              hasFullUpdate   = hasFullUpdate(globalDocument),
+              ignoreRoot      = true
             )
           }
 
@@ -399,16 +399,16 @@ object XBLBindingBuilder {
         false
 
     class ScopeExtractor(
-      partAnalysis : PartAnalysisImpl,    // for `Metadata` and `mapScopeIds`
-      xmlReceiver  : Option[XMLReceiver], // output of transformation or `None`
-      innerScope   : Scope,               // inner scope
-      outerScope   : Scope,               // outer scope, i.e. scope of the bound
-      startScope   : XXBLScope,           // scope of root element
-      prefix       : String,              // prefix of the ids within the new shadow tree
-      baseURI      : String               // base URI of new tree
+      partAnalysisCtx : PartAnalysisContextForTree, // for `Metadata` and `mapScopeIds`
+      xmlReceiver     : Option[XMLReceiver], // output of transformation or `None`
+      innerScope      : Scope,               // inner scope
+      outerScope      : Scope,               // outer scope, i.e. scope of the bound
+      startScope      : XXBLScope,           // scope of root element
+      prefix          : String,              // prefix of the ids within the new shadow tree
+      baseURI         : String               // base URI of new tree
     ) extends XFormsExtractor(
       xmlReceiverOpt               = xmlReceiver,
-      metadata                     = partAnalysis.metadata,
+      metadata                     = partAnalysisCtx.metadata,
       templateUnderConstructionOpt = None,
       baseURI                      = baseURI,
       startScope                   = startScope,
@@ -443,14 +443,14 @@ object XBLBindingBuilder {
               throw new OXFException("Duplicate id found for static id: " + staticId)
 
             // Index scope
-            partAnalysis.mapScopeIds(staticId, prefixedId, scope, ignoreIfPresent = false)
+            partAnalysisCtx.mapScopeIds(staticId, prefixedId, scope, ignoreIfPresent = false)
 
             // Index AVT `for` if needed
             if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
               val forStaticId = attributes.getValue("for")
               val forPrefixedId = prefix + forStaticId
 
-              partAnalysis.mapScopeIds(forStaticId, forPrefixedId, scope, ignoreIfPresent = true)
+              partAnalysisCtx.mapScopeIds(forStaticId, forPrefixedId, scope, ignoreIfPresent = true)
             }
           }
         }

@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analysis.PartAnalysis
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsReplaceEvent, XXFormsValueChangedEvent}

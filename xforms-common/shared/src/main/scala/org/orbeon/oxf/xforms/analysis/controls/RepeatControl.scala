@@ -22,7 +22,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class RepeatControl(
-  part             : PartAnalysisImpl,
   index            : Int,
   element          : Element,
   parent           : Option[ElementAnalysis],
@@ -32,7 +31,7 @@ class RepeatControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(part, index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with AppearanceTrait { // for separator appearance
 
   val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)

@@ -18,8 +18,8 @@ import scala.collection.compat._
 trait WithChildrenTrait extends ElementAnalysis {
 
   // This element's children (valid after build() has been called)
-  private var _children = Seq[ElementAnalysis]()
-  final def children: Seq[ElementAnalysis] = _children
+  private var _children = Vector[ElementAnalysis]()
+  final def children: Iterable[ElementAnalysis] = _children
 
   // NOTE: Should probably make it so that controls add themselves to their container upon creation
   final def addChildren(children: IterableOnce[ElementAnalysis]): Unit =
@@ -27,6 +27,9 @@ trait WithChildrenTrait extends ElementAnalysis {
 
   final def removeChild(child: ElementAnalysis): Unit =
     _children = _children filterNot (_ eq child)
+
+  final def descendantsOrSelf: Iterator[ElementAnalysis] =
+    Iterator(this) ++ descendants
 
   // All this element's descendants (valid after build() has been called)
   final def descendants: Iterator[ElementAnalysis] = {

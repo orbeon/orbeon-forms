@@ -18,16 +18,20 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 
 class AttributeControl(
-  part      : PartAnalysisImpl,
-  index     : Int,
-  element   : Element,
-  parent    : Option[ElementAnalysis],
-  preceding : Option[ElementAnalysis],
-  scope     : Scope
-) extends CoreControl(part, index, element, parent, preceding, scope)
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends CoreControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ValueTrait
      with OptionalSingleNode {
 

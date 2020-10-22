@@ -42,9 +42,10 @@ trait PartGlobalOps {
   def hasHandlerForEvent(eventName: String): Boolean
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean
   def keyboardHandlers: Seq[EventHandler]
+  def getEventHandlersForObserver(observerPrefixedId: String): List[EventHandler]
 
   // XBL
-  def getGlobals: collection.Seq[Global]
+  def iterateGlobals: Iterator[Global]
   def allBindingsMaybeDuplicates: Iterable[AbstractBinding]
 
   // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
@@ -64,15 +65,11 @@ trait PartGlobalOps {
   def uniqueJsScripts: List[ShareableScript]
 
   // Functions derived from getControlAnalysis
-  def getControlElement(prefixedId: String) = findControlAnalysis(prefixedId) map (_.element) orNull
   def hasBinding(prefixedId: String) = findControlAnalysis(prefixedId) exists (_.hasBinding)
 
   def getControlPosition(prefixedId: String): Option[Int] = findControlAnalysis(prefixedId) collect {
     case viewTrait: ViewTrait => viewTrait.index
   }
-
-  def isValueControl(effectiveId: String) =
-    findControlAnalysis(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 
   def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
     findControlAnalysis(prefixedId) foreach { controlAnalysis =>

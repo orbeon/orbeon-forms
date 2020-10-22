@@ -62,10 +62,7 @@ class XFormsStaticStateImpl(
   implicit val getIndentedLogger = Loggers.getIndentedLogger("analysis")
 
   // Create top-level part once `val`s are all initialized
-  val topLevelPart = new PartAnalysisImpl(this, None, startScope, metadata, staticStateDocument)
-
-  // Analyze top-level part
-  topLevelPart.analyze()
+  val topLevelPart: TopLevelPartAnalysis = PartAnalysisBuilder(this, None, startScope, metadata, staticStateDocument)
 
   // Properties
   // These are `lazy val`s because they depend on the default model being found, which is done when
@@ -285,11 +282,15 @@ object XFormsStaticStateImpl {
 
   // Create template and analyzed part for the given XForms document.
   // Used by `xxf:dynamic`.
-  def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope): (SAXStore, PartAnalysisImpl) =
+  def createPart(
+    staticState  : XFormsStaticState,
+    parent       : PartAnalysis,
+    formDocument : Document,
+    startScope   : Scope)(implicit
+    logger       : IndentedLogger
+  ): (SAXStore, NestedPartAnalysis) =
     createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) => {
-      val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
-      part.analyze()
-      part
+      PartAnalysisBuilder(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
     })
 
   // Extractor with prefix

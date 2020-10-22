@@ -33,7 +33,7 @@ trait VariableAnalysisTrait
   lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
     children.find(_.localName == "value") match {
       case Some(valueElem) =>
-        (true, valueElem.scope, valueElem.localName, valueElem.staticId)
+        (true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId)
       case None =>
         (false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
     }

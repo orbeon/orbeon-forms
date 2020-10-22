@@ -21,11 +21,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, StaticXPath}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -37,18 +36,17 @@ import shapeless.syntax.typeable._
  * Static analysis of an XForms instance.
  */
 class Instance(
-  part             : PartAnalysisImpl,
-  index            : Int,
-  element          : Element,
-  parent           : Option[ElementAnalysis],
-  preceding        : Option[ElementAnalysis],
-  staticId         : String,
-  prefixedId       : String,
-  namespaceMapping : NamespaceMapping,
-  scope            : Scope,
-  containerScope   : Scope
+  index                    : Int,
+  element                  : Element,
+  parent                   : Option[ElementAnalysis],
+  preceding                : Option[ElementAnalysis],
+  staticId                 : String,
+  prefixedId               : String,
+  namespaceMapping         : NamespaceMapping,
+  scope                    : Scope,
+  containerScope           : Scope,
+  val partExposeXPathTypes : Boolean
 ) extends ElementAnalysis(
-  part,
   index,
   element,
   parent,
@@ -59,8 +57,6 @@ class Instance(
   scope,
   containerScope
 ) with InstanceMetadata with Logging {
-
-  def partExposeXPathTypes: Boolean = part.isExposeXPathTypes
 
   override def extendedLocationData =
     XmlExtendedLocationData(
@@ -87,29 +83,29 @@ class Instance(
           val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == XFORMS_MODEL_QNAME.localName)
           val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == XFORMS_INSTANCE_QNAME.localName)
 
-          debug(
-            "getting readonly inline instance from abstract binding",
-            List(
-              "model id"       -> parent.get.staticId,
-              "instance id"    -> staticId,
-              "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
-              "binding name"   -> component.commonBinding.debugBindingName,
-              "model index"    -> modelIndex.toString,
-              "instance index" -> instanceIndex.toString
-            )
-          )
+//          debug(
+//            "getting readonly inline instance from abstract binding",
+//            List(
+//              "model id"       -> parent.get.staticId,
+//              "instance id"    -> staticId,
+//              "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
+//              "binding name"   -> component.commonBinding.debugBindingName,
+//              "model index"    -> modelIndex.toString,
+//              "instance index" -> instanceIndex.toString
+//            )
+//          ) // TODO: pass a logger?
 
           component.commonBinding.constantInstances((modelIndex, instanceIndex))
         case None =>
 
-          debug(
-            "getting readonly inline instance from top-level",
-            List(
-              "model id"       -> parent.get.staticId,
-              "instance id"    -> staticId,
-              "scope id"       -> scope.scopeId
-            )
-          )
+//          debug(
+//            "getting readonly inline instance from top-level",
+//            List(
+//              "model id"       -> parent.get.staticId,
+//              "instance id"    -> staticId,
+//              "scope id"       -> scope.scopeId
+//            )
+//          ) // TODO: pass a logger?
 
           // FIXME: `get`
           Instance.extractReadonlyDocument(inlineRootElemOpt.get, excludeResultPrefixes)
@@ -125,7 +121,6 @@ trait InstanceMetadata {
   def extendedLocationData: ExtendedLocationData
 
   import ElementAnalysis._
-  import Instance._
 
   val readonly         = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
   val cache            = element.attributeValue(XXFORMS_CACHE_QNAME) == "true"

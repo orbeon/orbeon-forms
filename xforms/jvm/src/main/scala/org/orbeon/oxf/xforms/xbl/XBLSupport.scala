@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.xforms.PartAnalysis
+import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 
 trait XBLSupport {
   def keepElement(
-    partAnalysis  : PartAnalysis,
-    boundElement  : Element,
-    directNameOpt : Option[QName],
-    elem          : Element
+    partAnalysisCtx : PartAnalysisForXblSupport,
+    boundElement    : Element,
+    directNameOpt   : Option[QName],
+    elem            : Element
   ): Boolean
 }

@@ -13,13 +13,10 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.xml.NamespaceMapping
-import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XPath._
+import org.orbeon.xml.NamespaceMapping
 
 import scala.util.control.NonFatal
 
@@ -39,17 +36,4 @@ object DataModel {
       case NonFatal(_) => false
     }
   }
-
-  // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
-  // Unused as of 2017-10-11
-  def isAllowedBoundItem(controlName: String, itemOption: Option[Item])(implicit ctx: FormBuilderDocContext): Boolean = {
-    for {
-      item    <- itemOption
-      control <- findStaticControlByName(controlName)
-      if control.isInstanceOf[SingleNodeTrait]
-      singleNodeTrait = control.asInstanceOf[SingleNodeTrait]
-    } yield
-      singleNodeTrait.isAllowedBoundItem(item)
-  } getOrElse
-    false
 }

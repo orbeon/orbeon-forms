@@ -22,7 +22,7 @@ private object SAXWriter {
 }
 
 /**
- * `SAXWriter` writes a DOM4J tree to a SAX ContentHandler.
+ * `SAXWriter` writes a document tree to a SAX `ContentHandler`.
  */
 class SAXWriter extends XMLReader {
 
@@ -56,16 +56,16 @@ class SAXWriter extends XMLReader {
       case n: ProcessingInstruction => writeProcessingInstruction(n)
       case n: Comment               => writeComment(n)
       case n: Document              => writeDocument(n)
-      case n: Namespace             => // NOP
+      case _: Namespace             => // NOP
       case n                        => throw new SAXException(s"Invalid node type: $n")
     }
 
   private def writeDocument(document: Document): Unit =
     if (document ne null) {
       createDocumentLocator(document) foreach contentHandler.setDocumentLocator
-      startDocument()
+      contentHandler.startDocument()
       writeContent(document, new NamespaceStack)
-      endDocument()
+      contentHandler.endDocument()
     }
 
   private def writeElement(element: Element): Unit =
@@ -109,14 +109,14 @@ class SAXWriter extends XMLReader {
 
   def setProperty(name: String, value: AnyRef): Unit =
     LexicalHandlerNames find (_ == name) match {
-      case Some(handlerName) => setLexicalHandler(value.asInstanceOf[LexicalHandler])
-      case None              => properties.put(name, value)
+      case Some(_) => setLexicalHandler(value.asInstanceOf[LexicalHandler])
+      case None    => properties.put(name, value)
     }
 
   def getProperty(name: String): AnyRef =
     LexicalHandlerNames find (_ == name) match {
-      case Some(handlerName) => getLexicalHandler
-      case None              => properties.get(name)
+      case Some(_) => getLexicalHandler
+      case None    => properties.get(name)
     }
 
   def parse(systemId: String): Unit =
@@ -149,9 +149,6 @@ class SAXWriter extends XMLReader {
     Some(locator)
   }
 
-  private def startDocument(): Unit = contentHandler.startDocument()
-  private def endDocument(): Unit   = contentHandler.endDocument()
-
   private def writeElement(element: Element, namespaceStack: NamespaceStack): Unit = {
     val stackSize = namespaceStack.size
     startPrefixMapping(element, namespaceStack)
@@ -163,13 +160,13 @@ class SAXWriter extends XMLReader {
 
   private def startPrefixMapping(element: Element, namespaceStack: NamespaceStack): Unit = {
     val elementNamespace = element.getNamespace
-    if ((elementNamespace ne null) && !isIgnoreableNamespace(elementNamespace, namespaceStack)) {
+    if ((elementNamespace ne null) && !isIgnorableNamespace(elementNamespace, namespaceStack)) {
       namespaceStack.push(elementNamespace)
       contentHandler.startPrefixMapping(elementNamespace.prefix, elementNamespace.uri)
     }
 
     for (namespace <- element.declaredNamespacesIterator)
-      if (! isIgnoreableNamespace(namespace, namespaceStack)) {
+      if (! isIgnorableNamespace(namespace, namespaceStack)) {
         namespaceStack.push(namespace)
         contentHandler.startPrefixMapping(namespace.prefix, namespace.uri)
       }
@@ -204,7 +201,7 @@ class SAXWriter extends XMLReader {
    *         Namespace.NO_NAMESPACE or Namespace.XML_NAMESPACE) or if the
    *         namespace has already been declared in the current scope
    */
-  private def isIgnoreableNamespace(namespace: Namespace, namespaceStack: NamespaceStack): Boolean =
+  private def isIgnorableNamespace(namespace: Namespace, namespaceStack: NamespaceStack): Boolean =
     if (namespace == Namespace.EmptyNamespace || namespace == Namespace.XMLNamespace) {
       true
     } else {

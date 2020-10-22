@@ -730,7 +730,8 @@ lazy val xformsJS = xforms.js
 lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-common"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-xforms-common"
+    name := "orbeon-xforms-common",
+    libraryDependencies += "com.chuusai" %% "shapeless" % ShapelessVersion,
   )
 
 lazy val xformsCommonJVM = xformsCommon.jvm
@@ -818,10 +819,10 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .enablePlugins(JSDependenciesPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.xml"    %%% "sax"    % "2.0.2.2-SNAPSHOT",
-      "org.orbeon" %%% "saxon"  % "10.0.0.3-SNAPSHOT",
-      "org.orbeon" %%% "xerces" % "2.11.0.1-SNAPSHOT",
-    )
+      "org.xml"    %%% "sax"       % "2.0.2.2-SNAPSHOT",
+      "org.orbeon" %%% "saxon"     % "10.0.0.5-SNAPSHOT",
+      "org.orbeon" %%% "xerces"    % "2.11.0.1-SNAPSHOT",
+      "com.chuusai" %% "shapeless" % ShapelessVersion,
   )
 
 lazy val core = (project in file("src"))

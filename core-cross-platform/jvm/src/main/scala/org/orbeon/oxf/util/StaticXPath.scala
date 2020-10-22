@@ -1,5 +1,7 @@
+package org.orbeon.oxf.util
+
 /**
- * Copyright (C) 2020 Orbeon, Inc.
+ * Copyright (C) 2007 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,9 +13,6 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.util
+class StaticXPath {
 
-
-object SecureUtils extends SecureUtilsTrait {
-    def randomHexId: String = ???
 }

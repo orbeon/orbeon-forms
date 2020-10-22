@@ -33,7 +33,7 @@ trait XPathTrait {
 
   // To resolve a variable
   // Used by `ShareableXPathStaticContext`
-  type VariableResolver
+//  type VariableResolver
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
@@ -60,7 +60,7 @@ trait XPathTrait {
   val GlobalConfiguration: SaxonConfiguration
 
   // New mutable configuration sharing the same name pool and converters, for use by mutating callers
-  def newConfiguration: SaxonConfiguration
+//  def newConfiguration: SaxonConfiguration
 
   // Create and compile an expression
   def compileExpression(

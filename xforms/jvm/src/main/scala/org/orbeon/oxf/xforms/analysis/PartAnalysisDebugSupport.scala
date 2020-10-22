@@ -140,11 +140,11 @@ object PartAnalysisDebugSupport {
               if (iterable.nonEmpty)
                 withElement(enclosingElemName) {
                   for (value <- iterable)
-                    element(elemName, text = PathMapXPathAnalysis.getDisplayPath(value))
+                    element(elemName, text = PathMapXPathAnalysisBuilder.getDisplayPath(value))
                 }
 
             def mapSetToSet(mapSet: MapSet[String, String]) =
-              mapSet map (entry => PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
+              mapSet map (entry => PathMapXPathAnalysisBuilder.buildInstanceString(entry._1) + "/" + entry._2)
 
             write(mapSetToSet(a.valueDependentPaths), "value-dependent",      "path")
             write(mapSetToSet(a.returnablePaths),     "returnable",           "path")

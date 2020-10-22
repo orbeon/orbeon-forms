@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.model.DataModel.Reason
+import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
 import org.orbeon.xforms.EventNames
 import shapeless.syntax.typeable._
 

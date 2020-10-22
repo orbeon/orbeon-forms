@@ -22,10 +22,10 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
-import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
@@ -269,9 +269,9 @@ object XFormsControl {
 
   // Whether the given item is allowed as a binding item for the given control
   // TODO: don't like pattern matching here and revisit hierarchy
-  def isAllowedBoundItem(control: XFormsControl, item: Item): Boolean = control.staticControl match {
+  def isAllowedBoundItem(control: XFormsControl, item: om.Item): Boolean = control.staticControl match {
     case singleNode: SingleNodeTrait => singleNode.isAllowedBoundItem(item)
-    case _: RepeatControl            => DataModel.isAllowedBoundItem(item)
+    case _: RepeatControl            => StaticDataModel.isAllowedBoundItem(item)
     case _                           => false
   }
 

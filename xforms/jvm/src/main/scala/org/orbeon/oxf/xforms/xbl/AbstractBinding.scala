@@ -22,13 +22,14 @@ import org.orbeon.oxf.processor.ProcessorSupport
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PipelineUtils
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
@@ -112,7 +113,7 @@ object CommonBindingBuilder {
 
     // Constant instance DocumentInfo by model and instance index
     // We use the indexes because at this time, no id annotation has taken place yet
-    val constantInstances: Map[(Int, Int), DocumentInfo] = (
+    val constantInstances: Map[(Int, Int), DocumentNodeInfoType] = (
       for {
         (m, mi) <- modelElements.zipWithIndex
         (i, ii) <- m.elements(XFORMS_INSTANCE_QNAME).zipWithIndex

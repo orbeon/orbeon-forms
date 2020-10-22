@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.model.DataModel._
+import org.orbeon.oxf.xforms.model.StaticDataModel._
 import org.orbeon.saxon.om
 
 /**

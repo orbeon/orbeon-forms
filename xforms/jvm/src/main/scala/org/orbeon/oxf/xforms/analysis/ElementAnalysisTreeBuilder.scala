@@ -70,7 +70,7 @@ object ElementAnalysisTreeBuilder {
     assert(! existingComponent.part.isTopLevel)
 
     if (existingComponent.hasConcreteBinding)
-      removeConcreteBinding(part, existingComponent)
+      removeConcreteBinding(existingComponent.part, existingComponent)
 
     existingComponent.rootElem = elemInSource getOrElse existingComponent.element
     existingComponent.part.analyzeSubtree(existingComponent)

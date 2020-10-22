@@ -426,7 +426,7 @@ class PathMapXPathDependencies(
 
   // For unit tests only
   def markValueChangedTest(instance: XFormsInstance, namespaces: Map[String, String], path: String): Unit = {
-    getOrCreateModelState(instance.model).markValueChangedForTests(instance, PathMapXPathAnalysis.getInternalPath(namespaces, path))
+    getOrCreateModelState(instance.model).markValueChangedForTests(instance, PathMapXPathAnalysisBuilder.getInternalPath(namespaces, path))
   }
 
   private case class UpdateResult(requireUpdate: Boolean, savedEvaluations: Int)

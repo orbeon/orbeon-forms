@@ -4,6 +4,7 @@ import org.orbeon.oxf.http.URIReferences
 
 
 object ParserConfiguration {
+
   val Plain       : ParserConfiguration = ParserConfiguration(validating = false, handleXInclude = false, externalEntities = false)
   val XIncludeOnly: ParserConfiguration = ParserConfiguration(validating = false, handleXInclude = true,  externalEntities = false)
 

@@ -17,7 +17,6 @@ import java.io.{InputStream, Reader, StringReader}
 import java.{util => ju}
 
 import javax.xml.parsers._
-import javax.xml.transform.URIResolver
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource
 import org.orbeon.oxf.common.{OXFException, ValidationException}

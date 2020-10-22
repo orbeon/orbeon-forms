@@ -45,5 +45,4 @@ object WhitelistObjectInputStream {
     "scala.Some",
     "scala.Option"
   )
-
 }

@@ -33,10 +33,8 @@ public class SystemHandler extends URLStreamHandler {
     public static final String OUTPUT_URL = "system:out";
     public static final String ERROR_URL = "system:err";
 
-    protected URLConnection openConnection(URL url) throws IOException {
+    protected URLConnection openConnection(URL url) {
         return new URLConnection(url) {
-
-            private String key;
 
             public void connect() { /* nop */
             }

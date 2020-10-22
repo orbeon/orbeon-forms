@@ -161,6 +161,7 @@ object XBLBindingBuilder {
     documentResult.getDocument
   }
 
+  // For `xxf:dynamic`
   def rebuildBinds(model: Model, rawModelElement: Element): Unit = {
 
     assert(! model.part.isTopLevel)

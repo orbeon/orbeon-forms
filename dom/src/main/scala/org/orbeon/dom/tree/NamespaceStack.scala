@@ -37,7 +37,7 @@ class NamespaceStack {
     * Caches the default namespace defined via xmlns=""
    */
   private var _defaultNamespace: Namespace = _
-  def getDefaultNamespace = {
+  def getDefaultNamespace: Namespace = {
     if (_defaultNamespace eq null)
       _defaultNamespace = findDefaultNamespace
 

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl, WithChildrenTrait}

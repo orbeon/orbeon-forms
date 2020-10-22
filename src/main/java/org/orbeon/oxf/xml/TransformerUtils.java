@@ -322,6 +322,7 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Document into a TinyTree.
      */
+    // Only used by `Instance`
     public static DocumentInfo dom4jToTinyTree(Configuration configuration, Document document, boolean location) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {

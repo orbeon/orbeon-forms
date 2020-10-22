@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.analysis._
 import scala.collection.compat._
 import scala.collection.{mutable => m}
 
+
 class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName => Boolean) {
 
   bindTree =>
@@ -63,6 +64,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
   def hasBinds: Boolean = topLevelBinds.nonEmpty
 
   // Destroy the tree of binds
+  // For `xxf:dynamic`
   def destroy(): Unit =
     bindsById.values foreach model.part.unmapScopeIds
 

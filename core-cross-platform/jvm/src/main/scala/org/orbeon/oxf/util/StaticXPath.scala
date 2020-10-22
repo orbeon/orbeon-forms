@@ -23,7 +23,6 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
-import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.XMLReader
 

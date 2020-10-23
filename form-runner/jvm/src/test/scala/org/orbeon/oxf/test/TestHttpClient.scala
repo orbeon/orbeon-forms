@@ -57,11 +57,10 @@ object TestHttpClient {
   private val RemoteAddr  = "127.0.0.1"
 
   private object ServerState {
-
     val Port             = 8080
     val Host             = "localhost"
     val ContextPath      = "/orbeon"
-    var OrbeonTokenValue = SecureUtils.randomHexId
+    val OrbeonTokenValue = SecureUtils.randomHexId
     val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() += (OrbeonTokenLower -> OrbeonTokenValue)
     val sessions         = mutable.HashMap[String, Session]()
   }

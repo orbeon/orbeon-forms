@@ -267,8 +267,10 @@ trait FormRunnerActions {
 
   def tryCaptcha(params: ActionParams): Try[Any] =
     Try {
-      if (showCaptcha)
-        dispatch(name = "fr-verify", targetId = "captcha")
+      if (showCaptcha) {
+        dispatch(name = "fr-verify", targetId = "fr-captcha")
+        dispatch(name = "fr-verify", targetId = "fr-view-component")
+      }
     }
 
   def trySendEmail(params: ActionParams): Try[Any] =

@@ -24,6 +24,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary"
     xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
@@ -94,6 +95,17 @@
                     targetid="{$target-name}"
                     xxbl:scope="outer"/>
 
+                <!-- So if the captcha is invalid, its error shows in the error summary. This is needed in addition -->
+                <!-- to the event we dispatch above as the captcha isn't inside the switch, as we don't want to have -->
+                <!-- one instance of the captcha per top-level section. -->
+                <xxf:setvisited
+                    control="fr-captcha"
+                    visited="true"
+                    recurse="true"/>
+
+            </xbl:handler>
+            <xbl:handler event="fr-verify" phase="target">
+                <xf:dispatch name="fr-verify" targetid="fr-captcha"/>
             </xbl:handler>
             <!-- For client-side API -->
             <xbl:handler event="fr-wizard-focus" phase="target">
@@ -1176,6 +1188,10 @@
                                     </xf:case>
                                 </xsl:for-each>
                             </xf:switch>
+                            <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $static-app, $static-form), '.')) = 'inside-wizard'">
+                                <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
+                                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($static-app, $static-form)}"/>
+                            </xsl:if>
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
                         <xh:div class="fr-wizard-other">

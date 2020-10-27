@@ -266,6 +266,8 @@ trait FormRunnerBaseOps {
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
+  //@XPathFunction
+  def isNewOrEditMode: Boolean = isNewOrEditMode(FormRunnerParams().mode)
 
   def optionFromMetadataOrProperties(
     metadataInstanceRootElem : NodeInfo,
@@ -285,15 +287,20 @@ trait FormRunnerBaseOps {
   }
 
   // Captcha support
+  //@XPathFunction
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
   def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
-    val logger              = ProcessorImpl.logger
-    val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
-    val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
+    val logger                   = ProcessorImpl.logger
+    val captchaPropertyPrefix    = "oxf.fr.detail.captcha"
+    val captchaPropertyShortName = captchaPropertyPrefix                :: app :: form :: Nil mkString "."
+    val captchaPropertyLongName  = captchaPropertyPrefix :: "component" :: app :: form :: Nil mkString "."
+    def property(name: String)   = properties.getPropertyOpt(name)
+    val captchaPropertyOpt       = property(captchaPropertyLongName) orElse
+                                   property(captchaPropertyShortName)
     captchaPropertyOpt match {
       case None => Array.empty
       case Some(captchaProperty) =>

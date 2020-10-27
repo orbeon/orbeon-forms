@@ -579,7 +579,7 @@ object StaticBindBuilder {
     namespaceMapping : NamespaceMapping,
     scope            : Scope,
     containerScope   : Scope
-  ): StaticBind =
+  ): StaticBind = {
     new StaticBind(
       index,
       element,
@@ -593,6 +593,7 @@ object StaticBindBuilder {
       partAnalysisCtx.isTopLevelPart,
       partAnalysisCtx.functionLibrary
     )
+  }
 }
 
 object ComponentControlBuilder {

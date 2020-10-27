@@ -645,10 +645,10 @@ class PathMapXPathDependencies(
     }
   }
 
-  def hasAnyCalculationBind(model: Model, instancePrefixedId: String) =
+  def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean =
     ! model.figuredAllBindRefAnalysis || model.computedBindExpressionsInstances.contains(instancePrefixedId)
 
-  def hasAnyValidationBind(model: Model, instancePrefixedId: String) =
+  def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean =
     ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean = {

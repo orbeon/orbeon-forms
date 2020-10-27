@@ -330,7 +330,7 @@ object ElementAnalysisTreeBuilder {
           allChildren collect {
             case (e, s) if isAction(e.getQName) || isVariable(e.getQName) => (e, s)
           }
-        case e: StaticBind =>
+        case _: StaticBind =>
           // Q: `xf:bind` can also have nested `<xf:constraint>`, etc. Should those also be collected to `ElementAnalysis`?
           allChildren collect {
             case (e, s) if e.getQName == XFORMS_BIND_QNAME => (e, s)

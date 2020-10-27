@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 
 import scala.util.Try
@@ -76,7 +76,7 @@ trait XFormsActions {
       val refParam = requiredParamByName(params, "setvalue", "ref")
       val refSeq   = if (all) evaluate(refParam) else Seq(evaluateOne(refParam))
       refSeq.foreach {
-        case nodeInfo: NodeInfo =>
+        case nodeInfo: om.NodeInfo =>
           val valueToSet = params.get(Some("value")) match {
             case None            => ""
             case Some(valueExpr) =>
@@ -95,11 +95,11 @@ trait XFormsActions {
   def tryInsert(params: ActionParams): Try[Any] =
     Try {
 
-      def paramAsNodes(name: String): List[NodeInfo] =
-        paramByName(params, name).toList flatMap (evaluate(_)) collect { case n: NodeInfo => n }
+      def paramAsNodes(name: String): List[om.NodeInfo] =
+        paramByName(params, name).toList flatMap (evaluate(_)) collect { case n: om.NodeInfo => n }
 
       insert(
-        origin = evaluate(requiredParamByName(params, "insert", "origin")) collect { case n: NodeInfo => n },
+        origin = evaluate(requiredParamByName(params, "insert", "origin")) collect { case n: om.NodeInfo => n },
         into   = paramAsNodes("into"),
         before = paramAsNodes("before"),
         after  = paramAsNodes("after")
@@ -109,6 +109,6 @@ trait XFormsActions {
   def tryDelete(params: ActionParams): Try[Any] =
     Try {
       val refParam = requiredParamByName(params, "delete", "ref")
-      delete(ref = evaluate(refParam) collect { case n: NodeInfo => n })
+      delete(ref = evaluate(refParam) collect { case n: om.NodeInfo => n })
     }
 }

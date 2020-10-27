@@ -15,14 +15,17 @@ package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.SAXWriter
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
-import org.orbeon.saxon.Configuration
+import org.orbeon.saxon.{Configuration, TransformerFactoryImpl}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.XMLReader
 
@@ -35,7 +38,24 @@ object StaticXPath extends StaticXPathTrait {
 
   type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
 
-  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = ???
+  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = {
+
+    val treeBuilder = new TinyBuilder
+
+    val handler =
+      new TransformerFactoryImpl(GlobalConfiguration).newTransformerHandler |!>
+        (_.setResult(treeBuilder))
+
+    val writer =
+      new SAXWriter                  |!>
+      (_.setContentHandler(handler)) |!>
+      (_.setLexicalHandler(handler)) |!>
+      (_.setDTDHandler(handler))
+
+    writer.write(doc)
+
+    treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+  }
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller

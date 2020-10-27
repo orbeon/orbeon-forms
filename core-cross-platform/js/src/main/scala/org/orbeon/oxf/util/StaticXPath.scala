@@ -15,10 +15,13 @@ package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Document
+import org.orbeon.dom.io.SAXWriter
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.saxon.expr.{Literal, XPathContext}
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om.{GroundedValue, StructuredQName, TreeInfo}
+import org.orbeon.saxon.jaxp.SaxonTransformerFactory
+import org.orbeon.saxon.om.{GroundedValue, StructuredQName, TreeInfo, TreeModel}
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
 
@@ -41,5 +44,23 @@ object StaticXPath extends StaticXPathTrait {
     logger           : IndentedLogger
   ): CompiledExpression = ???
 
-  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = ???
+  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = {
+
+    val treeBuilder = TreeModel.TINY_TREE.makeBuilder(GlobalConfiguration.makePipelineConfiguration)
+
+    val handler =
+      new SaxonTransformerFactory(GlobalConfiguration).newTransformerHandler |!>
+        (_.setResult(treeBuilder))
+
+    val writer =
+      new SAXWriter                  |!>
+      (_.setContentHandler(handler)) |!>
+      (_.setLexicalHandler(handler)) |!>
+      (_.setDTDHandler(handler))
+
+    writer.write(doc)
+
+    // Q: What if it's not a document but an element?
+    treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+  }
 }

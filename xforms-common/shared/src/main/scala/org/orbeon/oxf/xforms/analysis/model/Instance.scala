@@ -203,14 +203,10 @@ object Instance {
   def extractReadonlyDocument(
     element               : Element,
     excludeResultPrefixes : Set[String]
-  ): StaticXPath.DocumentNodeInfoType = {
-    StaticXPath.orbeonDomToTinyTree(extractDocHandlePrefixes(element, excludeResultPrefixes))
-//    TransformerUtils.dom4jToTinyTree(
-//      XPath.GlobalConfiguration,
-//      extractDocHandlePrefixes(element, excludeResultPrefixes),
-//      false
-//    )
-  }
+  ): StaticXPath.DocumentNodeInfoType =
+    StaticXPath.orbeonDomToTinyTree(
+      extractDocHandlePrefixes(element, excludeResultPrefixes)
+    )
 
   // Extract a document and adjust namespaces if requested
   // NOTE: Should implement exactly as per XSLT 2.0

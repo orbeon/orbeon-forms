@@ -55,9 +55,11 @@
         <fr:row>
             <fr:body/>
         </fr:row>
-        <fr:row>
-            <fr:captcha/>
-        </fr:row>
+        <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
+            <fr:row>
+                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}"/>
+            </fr:row>
+        </xsl:if>
 
         <!-- Error summary (if at bottom) -->
         <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
@@ -494,37 +496,6 @@
         </xh:span>
     </xsl:template>
 
-    <xsl:template match="fr:captcha" name="fr-captcha">
-        <xsl:if test="$has-captcha">
-            <xf:group id="fr-captcha-group" model="fr-persistence-model" ref=".[frf:showCaptcha()]" class="fr-captcha">
-                <xf:var name="captcha" value="instance('fr-persistence-instance')/captcha"/>
-                <!-- Success: remember the captcha passed, which also influences validity -->
-                <xf:action ev:event="fr-verify-done">
-                    <xf:setvalue ref="$captcha">true</xf:setvalue>
-                    <xf:recalculate model="fr-persistence-model"/>
-                    <xf:refresh/>
-                </xf:action>
-                <!-- Failure: load another challenge -->
-                <xf:action event="fr-verify-error">
-                    <xf:dispatch
-                        if="event('fr-error-code') != 'empty'"
-                        targetid="captcha"
-                        name="fr-reload"/>
-                </xf:action>
-                <!-- Captcha component -->
-                <xsl:element
-                    namespace="{$captcha-uri-name[1]}"
-                    name     ="{$captcha-uri-name[2]}"
-                >
-                    <xsl:attribute name="id">captcha</xsl:attribute>
-                    <xsl:attribute name="ref">$captcha</xsl:attribute>
-                    <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
-                    <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
-                </xsl:element>
-            </xf:group>
-        </xsl:if>
-    </xsl:template>
-
     <!-- Remove id elements on Form Builder templates -->
     <xsl:template match="@id | @bind" mode="filter-fb-template"/>
     <xsl:template match="@ref[not(normalize-space())] | @nodeset[not(normalize-space())]" mode="filter-fb-template">
@@ -844,7 +815,7 @@
             <fr:row>
                 <fr:error-summary
                     id="error-summary-control-{$position}"
-                    observer="fr-view-component fr-captcha-group"
+                    observer="fr-view-component fr-captcha"
                     model="fr-error-summary-model"
                     alerts-count-ref="counts/@alert"
                     errors-count-ref="counts/@error"

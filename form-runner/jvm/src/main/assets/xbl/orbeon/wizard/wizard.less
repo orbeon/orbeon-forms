@@ -145,6 +145,12 @@
         text-align: right;
     }
 
+    .xbl-fr-recaptcha {
+        // See `section.less`
+        padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding;
+        padding-right: @frSectionTitleLeftPadding - @frGridCellPadding;
+    }
+
     @media (max-width: 980px) {
         // Following #4211, we probably don't need to use `flex` as the markup order is already correct
         .flex();

@@ -68,8 +68,6 @@
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
 
     <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
-    <xsl:variable name="captcha-uri-name"     select="frf:captchaComponent($app, $form)"                                                               as="xs:string*"/>
-    <xsl:variable name="has-captcha"          select="exists($captcha-uri-name)"                                                                       as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
@@ -605,7 +603,7 @@
                 <!-- When the wizard is in use, we don't want to visit *all* controls. -->
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
                 <xxf:setvisited
-                    control="fr-captcha-group"
+                    control="fr-captcha"
                     visited="true"
                     recurse="true"/>
 

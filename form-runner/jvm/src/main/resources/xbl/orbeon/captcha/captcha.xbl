@@ -1,0 +1,99 @@
+<!--
+  Copyright (C) 2020 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:p="http://www.orbeon.com/oxf/pipeline"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding
+        id="fr-captcha"
+        element="fr|captcha">
+
+        <xbl:handlers>
+            <xbl:handler event="fr-verify" phase="target">
+                <xf:dispatch name="fr-verify" targetid="captcha"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:template match="/*">
+                    <xsl:variable
+                        name="captcha-namespace-name"
+                        select="p:split(@namespace-name)"
+                        as="xs:string*"/>
+                    <xsl:variable
+                        name="captcha-enabled"
+                        select="exists($captcha-namespace-name)"
+                        as="xs:boolean"/>
+                    <xf:group xxf:appearance="internal">
+                        <xsl:if test="$captcha-enabled">
+                            <xf:group ref=".[frf:isNewOrEditMode()]" class="fr-captcha">
+                                <xf:var
+                                    name="captcha"
+                                    value="xxf:instance('fr-persistence-instance')/captcha"/>
+                                <xf:var
+                                    name="captcha-valid"
+                                    value="$captcha = 'true'"/>
+                                <xf:var
+                                    name="captcha-visible"
+                                    value="
+                                        xxf:evaluate-avt(
+                                            xxf:property(
+                                                    string-join(
+                                                    ('oxf.fr.detail.captcha.visible', fr:app-name(), fr:form-name()),
+                                                    '.'
+                                                )
+                                            )
+                                        ) = 'true'"/>
+                                <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
+                                <xh:div class="{{if (not($captcha-visible) or $captcha-valid) then 'xforms-disabled' else ''}}">
+                                    <!-- Success: remember the captcha passed, which also influences validity -->
+                                    <xf:action event="fr-verify-done">
+                                        <xf:setvalue ref="$captcha">true</xf:setvalue>
+                                    </xf:action>
+                                    <!-- Failure: load another challenge -->
+                                    <xf:action event="fr-verify-error">
+                                        <xf:dispatch
+                                            if="event('fr-error-code') != 'empty'"
+                                            targetid="captcha"
+                                            name="fr-reload"/>
+                                    </xf:action>
+                                    <!-- Captcha component -->
+                                    <xsl:element
+                                        namespace="{$captcha-namespace-name[1]}"
+                                        name     ="{$captcha-namespace-name[2]}"
+                                    >
+                                        <xsl:attribute name="id">captcha</xsl:attribute>
+                                        <xsl:attribute name="ref">$captcha</xsl:attribute>
+                                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                                    </xsl:element>
+                                </xh:div>
+                            </xf:group>
+                        </xsl:if>
+                    </xf:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>
+

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 
+import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -445,7 +446,7 @@ object Dispatch extends Logging {
     val observersFromLeafToRoot = relevantObserversAcrossPartsFromLeafToRoot(ops, e)
 
     val captureHandlers =
-      handlersForPhase(observersFromLeafToRoot.reverse.init, Phase.Capture)
+      handlersForPhase(observersFromLeafToRoot.tail.reverse, Phase.Capture)
 
     val targetHandlers =
       if (propagate)
@@ -463,7 +464,7 @@ object Dispatch extends Logging {
   }
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartGlobalOps, e: ElementAnalysis): List[ElementAnalysis] = {
+  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartGlobalOps, e: ElementAnalysis): NonEmptyList[ElementAnalysis] = {
 
     def hasPhantomHandler(observer: ElementAnalysis) =
       ops.getEventHandlersForObserver(observer.prefixedId) exists (_.isPhantom)
@@ -471,6 +472,6 @@ object Dispatch extends Logging {
     def relevant(observer: ElementAnalysis) =
       observer.scope == e.scope || hasPhantomHandler(observer)
 
-    (ancestorsAcrossPartsIterator(e, includeSelf = true) filter relevant).toList
+    NonEmptyList(e, (ancestorsAcrossPartsIterator(e, includeSelf = false) filter relevant).toList)
   }
 }

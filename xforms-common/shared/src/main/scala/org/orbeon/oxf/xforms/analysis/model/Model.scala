@@ -76,36 +76,6 @@ trait ModelVariables {
 
   self: Model =>
 
-  // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
-//  override lazy val inScopeVariables = Map.empty[String, VariableTrait]
-//
-//  // Handle variables
-//  val variablesSeq: Seq[VariableAnalysisTrait] = {
-//
-//    // NOTE: For now, all top-level variables in a model are visible first, then only are binds variables visible.
-//    // In the future, we might want to change that to use document order between variables and binds, but some
-//    // more thinking is needed wrt the processing model.
-//
-//    val someSelf = self.some
-//
-//    // Iterate and resolve all variables in order
-//    var preceding: Option[VariableAnalysisTrait] = None
-//
-//    val variableElements = self.element.elements filter (e => ControlAnalysisFactory.isVariable(e.getQName))
-//
-//    for {
-//      variableElement <- variableElements
-//      analysis: VariableAnalysisTrait = {
-//        val result = new ElementAnalysis(part, index /* would be wrong */, variableElement, someSelf, preceding, scope) with VariableAnalysisTrait
-//        preceding = result.some
-//        result
-//      }
-//    } yield
-//      analysis
-//  }
-//
-//  val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
-
   // `lazy` because the children are evaluated after the container
   lazy val variablesSeq: Iterable[VariableAnalysisTrait] = children collect { case v: VariableAnalysisTrait => v }
   lazy val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap

@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xml.XMLUtils

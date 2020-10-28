@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
@@ -23,9 +23,11 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms.{Constants, XXBLScope}
+import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.mutable
@@ -85,6 +87,51 @@ object PartAnalysisBuilder {
       // NOTE: No XPath analysis in nested parts.
     }
   }
+
+  def rebuildBindTree(
+    partAnalysisCtx : NestedPartAnalysis,
+    model           : Model,
+    rawModelElement : Element)(implicit
+    logger          : IndentedLogger
+  ): Unit =
+    withDebug("performing static analysis of bind tree", Seq("prefixed id" -> model.prefixedId)) {
+
+      // Deindex the `StaticBind` tree
+      model.topLevelBinds foreach (partAnalysisCtx.deindexTree(_, self = true))
+      model.bindsById.values foreach partAnalysisCtx.unmapScopeIds
+      model.resetBinds()
+
+      val elemsWithScope = {
+
+        def annotateSubTree(rawElement: Element): Document =
+          XBLBindingBuilder.annotateSubtree(
+            partAnalysisCtx,
+            None,
+            rawElement.createDocumentCopyParentNamespaces(detach = false),
+            model.scope,
+            model.scope,
+            XXBLScope.Inner,
+            model.containerScope,
+            hasFullUpdate = false,
+            ignoreRoot = false
+          )
+
+        rawModelElement.elements(XFORMS_BIND_QNAME) map
+          (annotateSubTree(_).getRootElement)       map
+          (_ -> model.scope)
+      }
+
+      // Here we know there are no new models, event handlers, etc.
+      ElementAnalysisTreeBuilder.buildAllElemDescendants(
+        partAnalysisCtx,
+        model,
+        buildOne(partAnalysisCtx, _, _, _, _, indexNewControlOnly(partAnalysisCtx, _)),
+        elemsWithScope.some // explicit children
+      )
+
+      model.topLevelBinds foreach
+        (ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, _))
+    }
 
   // Analyze the entire tree of controls
   private def analyze(partAnalysisCtx: PartAnalysisContextAfterTree)(implicit logger: IndentedLogger): Unit =
@@ -210,13 +257,7 @@ object PartAnalysisBuilder {
     attributes      : mutable.Buffer[AttributeControl]
   ): Unit = {
 
-    // Index by prefixed id
-    partAnalysisCtx.controlAnalysisMap += elementAnalysis.prefixedId -> elementAnalysis
-
-    // Index by type
-    val controlName = elementAnalysis.localName
-    val controlsMap = partAnalysisCtx.controlTypes.getOrElseUpdate(controlName, mutable.LinkedHashMap[String, ElementAnalysis]())
-    controlsMap += elementAnalysis.prefixedId -> elementAnalysis
+    indexNewControlOnly(partAnalysisCtx, elementAnalysis)
 
     // Index special controls
     elementAnalysis match {
@@ -226,6 +267,20 @@ object PartAnalysisBuilder {
       case e: AttributeControl                                                      => attributes    += e
       case _                                                                        =>
     }
+  }
+
+  private def indexNewControlOnly(
+    partAnalysisCtx : PartAnalysisContextForTree,
+    elementAnalysis : ElementAnalysis
+  ): Unit = {
+
+    // Index by prefixed id
+    partAnalysisCtx.controlAnalysisMap += elementAnalysis.prefixedId -> elementAnalysis
+
+    // Index by type
+    val controlName = elementAnalysis.localName
+    val controlsMap = partAnalysisCtx.controlTypes.getOrElseUpdate(controlName, mutable.LinkedHashMap[String, ElementAnalysis]())
+    controlsMap += elementAnalysis.prefixedId -> elementAnalysis
   }
 
   // Builder that produces an `ElementAnalysis` for a known incoming Element

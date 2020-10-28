@@ -39,15 +39,4 @@ trait WithChildrenTrait extends ElementAnalysis {
 
     _children.iterator ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
   }
-
-  // Some elements can create and index elements which are not processed as descendants above. To enable de-indexing,
-  // they can override indexedElements to add elements to de-index.
-  // Overridden by `Model`
-  def indexedElements: Iterator[ElementAnalysis] = {
-
-    def nestedChildrenBuilderTraits =
-      _children.iterator collect { case child: WithChildrenTrait => child }
-
-    _children.iterator ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
-  }
 }

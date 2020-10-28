@@ -48,10 +48,6 @@ class Model(
 
   require(scope ne null)
 
-  // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
-  override def indexedElements: Iterator[ElementAnalysis] =
-    super.indexedElements ++ bindsById.valuesIterator
-
   override def freeTransientState(): Unit = {
     super.freeTransientState()
     freeVariablesTransientState()
@@ -174,18 +170,6 @@ trait ModelBinds {
         // Attribute not present: backward-compatible behavior
         canBeCustomMIP
     }
-  }
-
-  // For `xxf:dynamic`
-  def replaceBinds(bindElements: => Seq[Element]): Unit = {
-    // TODO!
-    ???
-//    _bindTree =
-//      new BindTree(
-//        selfModel,
-//        isCustomMIP)(
-//        bindElements
-//      )
   }
 
   // TODO: use and produce variables introduced with xf:bind/@name

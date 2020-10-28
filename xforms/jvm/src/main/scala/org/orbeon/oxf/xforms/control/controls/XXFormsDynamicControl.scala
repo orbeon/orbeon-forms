@@ -19,8 +19,8 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, NestedPartAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, NestedPartAnalysis, PartAnalysis, PartAnalysisBuilder}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
@@ -42,9 +42,9 @@ import org.orbeon.xforms.xbl.Scope
 import org.w3c.dom.Node.ELEMENT_NODE
 import shapeless.syntax.typeable._
 
-import scala.jdk.CollectionConverters._
 import scala.collection.generic.Growable
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 /**
  * xxf:dynamic control
@@ -329,7 +329,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
       val staticModel = partAnalysis.getModel(modelPrefixedId)
 
-      XBLBindingBuilder.rebuildBinds(partAnalysis, staticModel, modelElement)
+      PartAnalysisBuilder.rebuildBindTree(partAnalysis, staticModel, modelElement)
 
       // Q: When should we best notify the concrete model that its binds need build? Since at this point, we
       // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are

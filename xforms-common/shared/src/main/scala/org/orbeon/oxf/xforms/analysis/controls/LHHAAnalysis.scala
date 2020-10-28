@@ -39,6 +39,7 @@ class LHHAAnalysis(
   val hasLocalLeftAppearance    : Boolean
 ) extends ElementAnalysis(index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
+   with ViewTrait
    with AppearanceTrait {
 
   self =>

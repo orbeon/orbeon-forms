@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.ValueOrSequenceQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, Submission}
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
@@ -314,9 +315,13 @@ object ElementAnalysisTreeBuilder {
           allChildren collect {
             case t @ (e, _) if isAction(e.getQName) || isVariable(e.getQName) || ModelChildrenToKeep(e.getQName) => t
           }
-        case _: Submission | _: VariableControl =>
+        case _: Submission =>
           allChildren collect {
             case (e, s) if isAction(e.getQName) => (e, s)
+          }
+        case _: VariableAnalysisTrait =>
+          allChildren collect {
+            case (e, s) if isAction(e.getQName) || ValueOrSequenceQNames(e.getQName) => (e, s)
           }
         case _: SelectionControl =>
           allChildren collect {

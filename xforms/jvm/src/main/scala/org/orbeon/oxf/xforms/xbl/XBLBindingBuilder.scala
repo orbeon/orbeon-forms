@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
@@ -159,32 +158,6 @@ object XBLBindingBuilder {
     })
 
     documentResult.getDocument
-  }
-
-  // For `xxf:dynamic`
-  def rebuildBinds(partAnalysisCtx : NestedPartAnalysis, model: Model, rawModelElement: Element): Unit = {
-
-    assert(! partAnalysisCtx.isTopLevelPart)
-
-    def annotateSubTree(rawElement: Element) = {
-      val annotatedTree =
-        XBLBindingBuilder.annotateSubtree(
-          partAnalysisCtx,
-          None,
-          rawElement.createDocumentCopyParentNamespaces(detach = false),
-          model.scope,
-          model.scope,
-          XXBLScope.Inner,
-          model.containerScope,
-          hasFullUpdate = false,
-          ignoreRoot = false
-        )
-
-      annotatedTree
-    }
-
-    model.bindsById.values foreach partAnalysisCtx.unmapScopeIds
-    model.replaceBinds(rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
   }
 
   private object Private {

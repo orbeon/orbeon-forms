@@ -93,8 +93,8 @@ object ControlAnalysisFactory {
     XFORMS_VALUE_QNAME            -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ValueTrait with OptionalSingleNode),
     XFORMS_COPY_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with RequiredSingleNode),
     // Variable nested value
-    XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode),
-    XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode)
+    XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),
+    XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait)
   ) ++ variableFactory
 
   private val ControlFactory: PartialFunction[Element, ControlFactory] =

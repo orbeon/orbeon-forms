@@ -35,6 +35,34 @@ object PartAnalysisDebugSupport {
   def printPartAsXml(partAnalysis: PartAnalysisRuntimeOps): Unit =
     println(partAsXmlString(partAnalysis))
 
+  def printElementAnalysis(a: ElementAnalysis): Unit = {
+
+    implicit val identity: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
+    val result = new LocationDocumentResult
+    identity.setResult(result)
+
+    withDocument {
+      withElement("root") {
+        writeElementAnalysis(a)
+      }
+    }
+
+    println(result.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
+  }
+
+  def printXPathAnalysis(xpa: XPathAnalysis): Unit = {
+
+    implicit val identity: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
+    val result = new LocationDocumentResult
+    identity.setResult(result)
+
+    withDocument {
+      writeXPathAnalysis(xpa)
+    }
+
+    println(result.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
+  }
+
   private object Private {
 
     def partAsXmlString(partAnalysis: PartAnalysisRuntimeOps): String = {
@@ -70,10 +98,11 @@ object PartAnalysisDebugSupport {
     def writeModel(a: Model)(implicit receiver: XMLReceiver): Unit = {
 
       writeElementAnalysis(a)
-      a.children.iterator filterNot (_.isInstanceOf[StaticBind]) foreach recurse
+      a.children.iterator filterNot
+        (e => e.isInstanceOf[StaticBind] || e.isInstanceOf[VariableAnalysisTrait]) foreach
+        recurse
 
       a.variablesSeq foreach recurse
-
 
       if (a.topLevelBinds.nonEmpty)
         withElement("binds") {
@@ -127,6 +156,12 @@ object PartAnalysisDebugSupport {
           writeXPathAnalysis(analysis)
         }
       }
+    }
+
+    // Don't output nested value if any as everything is already contained in the enclosing variable
+    def writeVariableControl(a: VariableAnalysisTrait)(implicit receiver: XMLReceiver): Unit = {
+      writeElementAnalysis(a)
+      a.children filterNot (_.isInstanceOf[VariableValueTrait]) foreach recurse
     }
 
     def writeXPathAnalysis(xpa: XPathAnalysis)(implicit receiver: XMLReceiver): Unit =
@@ -188,6 +223,7 @@ object PartAnalysisDebugSupport {
           case a: Model                 => writeModel(a)
           case a: StaticBind            => writeStaticBind(a)
           case a: SelectionControlTrait => writeSelectionControl(a)
+          case a: VariableAnalysisTrait => writeVariableControl(a)
           case a: WithChildrenTrait     => writeChildrenBuilder(a)
           case a                        => writeElementAnalysis(a)
         }

@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, RootControl, VariableAnalysisTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, RootControl, VariableAnalysisTrait, VariableTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}

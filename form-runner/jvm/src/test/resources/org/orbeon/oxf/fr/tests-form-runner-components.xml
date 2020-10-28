@@ -651,11 +651,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <_>
-                                    <error id="|first-name-control|" position="116" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙1|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙2|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|note-control⊙3|" position="121" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
-                                    <error id="|last-name-control|" position="124" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
+                                    <error id="|first-name-control|" position="142" level="error" alert="Invalid first name" label="First name" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙1|" position="147" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙2|" position="147" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|note-control⊙3|" position="147" level="error" alert="Invalid note" label="Note" section-name="" required-empty="true"/>
+                                    <error id="|last-name-control|" position="150" level="error" alert="Invalid last name" label="Last name" section-name="" required-empty="true"/>
                                 </_>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">

@@ -283,7 +283,7 @@ lazy val DebugDatabaseTest = config("debug-db")   extend Test
 
 lazy val unmanagedJarsSettings = Seq(
 
-  unmanagedBase                      := (ThisBuild / baseDirectory).value / "lib",
+  unmanagedBase                     := (ThisBuild / baseDirectory).value / "lib",
 
   (Runtime / unmanagedJars)         := myFindUnmanagedJars(
     Runtime,
@@ -292,7 +292,7 @@ lazy val unmanagedJarsSettings = Seq(
     (unmanagedJars / excludeFilter).value
   ),
 
-  (Compile/ unmanagedJars)         := (Runtime / unmanagedJars).value ++ myFindUnmanagedJars(
+  (Compile / unmanagedJars)         := (Runtime / unmanagedJars).value ++ myFindUnmanagedJars(
     Compile,
     unmanagedBase.value,
     (unmanagedJars / includeFilter).value,
@@ -447,7 +447,8 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % ScalaAsyncVersion % Provided
+    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % ScalaAsyncVersion % Provided,
+    Compile / unmanagedJars := Nil
   )
 
 lazy val commonJVM = common.jvm
@@ -745,6 +746,10 @@ lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(coreCrossPlatformJS)
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
   .settings(commonSettings: _*)
@@ -823,7 +828,9 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
       "org.orbeon" %%% "saxon"     % "10.0.0.6-SNAPSHOT",
       "org.orbeon" %%% "xerces"    % "2.11.0.1-SNAPSHOT",
       "com.chuusai" %% "shapeless" % ShapelessVersion,
-    )
+    ),
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
   )
 
 lazy val core = (project in file("src"))

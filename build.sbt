@@ -823,6 +823,7 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
       "org.orbeon" %%% "saxon"     % "10.0.0.6-SNAPSHOT",
       "org.orbeon" %%% "xerces"    % "2.11.0.1-SNAPSHOT",
       "com.chuusai" %% "shapeless" % ShapelessVersion,
+    )
   )
 
 lazy val core = (project in file("src"))

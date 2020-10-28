@@ -60,7 +60,7 @@ before_script:
 - if [ "$TARGET" == "test-unit" ]; then sleep 10; fi
 - if [ "$TARGET" == "test-unit" ]; then docker run -it --network="host" --rm mysql:5.7 mysql --protocol=TCP --host=localhost --user root -e "CREATE USER 'orbeon'@'%' IDENTIFIED BY 'password'"; fi
 - if [ "$TARGET" == "test-unit" ]; then docker run -it --network="host" --rm mysql:5.7 mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'%' WITH GRANT OPTION"; fi
-- mkdir -p $HOME/.sbt/launchers/1.4.0/
-- curl -L -o $HOME/.sbt/launchers/1.4.0/sbt-launch.jar https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.4.0/sbt-launch.jar
+- mkdir -p $HOME/.sbt/launchers/1.4.1/
+- curl -L -o $HOME/.sbt/launchers/1.4.1/sbt-launch.jar https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.4.1/sbt-launch.jar
 script:
 - "ant $TARGET"

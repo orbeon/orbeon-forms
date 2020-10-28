@@ -1,32 +1,16 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.orbeon.dom._
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
-import org.orbeon.oxf.xforms.analysis.{EventHandler, _}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{NeverCustomMIPsURIs, StandardCustomMIPsQNames}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, WithChildrenTrait}
+import org.orbeon.xforms.XFormsNames.XXFORMS_CUSTOM_MIPS_QNAME
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
 
 
-/**
- * Static analysis of an XForms model <xf:model> element.
- */
 class Model(
   index            : Int,
   elem             : Element,

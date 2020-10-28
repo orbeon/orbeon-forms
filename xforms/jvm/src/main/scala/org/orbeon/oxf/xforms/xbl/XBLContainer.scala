@@ -309,7 +309,7 @@ trait ContainerResolver {
 
   // Check whether if the bind id can resolve in this scope
   def containsBind(bindId: String): Boolean =
-    partAnalysis.getModelsForScope(innerScope) exists (_.containsBind(bindId))
+    partAnalysis.getModelsForScope(innerScope) exists (_.bindIds(bindId))
 
   // Get object with the effective id specified within this container or descendant containers
   final def getObjectByEffectiveId(effectiveId: String): XFormsObject =

@@ -27,7 +27,6 @@ class Model(
   with ModelVariables
   with ModelSubmissions
   with ModelEventHandlers
-  with BindTree
   with ModelBinds {
 
   require(scope ne null)
@@ -38,6 +37,19 @@ class Model(
     freeBindsTransientState()
   }
 }
+
+class ModelVariable(
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+  with VariableAnalysisTrait
 
 trait ModelInstances {
 
@@ -58,19 +70,6 @@ trait ModelInstances {
   lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
   // TODO: instances on which MIPs depend
 }
-
-class ModelVariable(
-  index            : Int,
-  element          : Element,
-  parent           : Option[ElementAnalysis],
-  preceding        : Option[ElementAnalysis],
-  staticId         : String,
-  prefixedId       : String,
-  namespaceMapping : NamespaceMapping,
-  scope            : Scope,
-  containerScope   : Scope
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
-  with VariableAnalysisTrait
 
 trait ModelVariables {
 
@@ -102,7 +101,7 @@ trait ModelEventHandlers {
   lazy val eventHandlers: List[EventHandler] = descendants collect { case e: EventHandler => e } toList
 }
 
-trait ModelBinds {
+trait ModelBinds extends BindTree {
 
   selfModel: Model =>
 
@@ -126,8 +125,5 @@ trait ModelBinds {
     }
   }
 
-  // TODO: use and produce variables introduced with xf:bind/@name
-
-  // TODO: rename one of the 2 so we don't need the indirection
-  def containsBind(bindId: String)          = bindIds(bindId)
+  // TODO: use and produce variables introduced with `xf:bind/@name`
 }

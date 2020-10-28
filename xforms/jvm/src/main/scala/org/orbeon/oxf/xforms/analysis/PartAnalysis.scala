@@ -15,15 +15,13 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
 import org.orbeon.dom
-import org.orbeon.dom.Element
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -39,7 +37,6 @@ trait PartAnalysisContextImmutable {
   def parent              : Option[PartAnalysis] // `getControlAnalysis`
   def startScope          : Scope
   def metadata            : Metadata             // FIXME: not really immutable, check. `getNamespaceMapping`, `findAbstractBindingByPrefixedId`, `findAbstractBindingByPrefixedId`
-  def staticStateDocument : StaticStateDocument
 
   def scopeForPrefixedId(prefixedId: String): Scope
   def abstractBindingsWithGlobals: Iterable[AbstractBinding]
@@ -143,8 +140,7 @@ case class PartAnalysisContextImpl(
   protected val staticState: XFormsStaticState,
   parent                   : Option[PartAnalysis],
   startScope               : Scope,
-  metadata                 : Metadata,
-  staticStateDocument      : StaticStateDocument
+  metadata                 : Metadata
 ) extends PartAnalysis
      with TopLevelPartAnalysis
      with NestedPartAnalysis
@@ -161,7 +157,7 @@ case class PartAnalysisContextImpl(
    * cached, compute the mapping on the fly. Note that in this case, the resulting mapping is not added to the cache
    * as the mapping is considered transient and not sharable among pages.
    */
-  def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping = {
+  def getNamespaceMapping(prefix: String, element: dom.Element): NamespaceMapping = {
 
     val id = element.idOrThrow
     val prefixedId = if (prefix ne null) prefix + id else id

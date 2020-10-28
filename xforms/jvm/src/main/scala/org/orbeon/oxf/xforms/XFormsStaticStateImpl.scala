@@ -408,8 +408,6 @@ object XFormsStaticStateImpl {
 
     private def staticStateElement = xmlDocument.getRootElement
 
-    val documentWrapper = new DocumentWrapper(xmlDocument, null, XPath.GlobalConfiguration)
-
     // Pointers to nested elements
     def rootControl: Element = staticStateElement.element("root")
     def xblElements = rootControl.jElements(XBL_XBL_QNAME).asScala

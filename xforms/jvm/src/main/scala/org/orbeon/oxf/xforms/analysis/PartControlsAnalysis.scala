@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -24,7 +26,6 @@ trait PartControlsAnalysis extends TransientState {
 
   self =>
 
-  def staticStateDocument: StaticStateDocument
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
 
   // For deindexing
@@ -72,7 +73,10 @@ trait PartControlsAnalysis extends TransientState {
     controlAnalysisMap.get(prefixedId) orNull
 
   def controlElement(prefixedId: String): Option[om.NodeInfo] =
-    findControlAnalysis(prefixedId) map (control => staticStateDocument.documentWrapper.wrap(control.element))
+    findControlAnalysis(prefixedId) map { control =>
+      val wrapper = new DocumentWrapper(control.element.getDocument, null, XPath.GlobalConfiguration)
+      wrapper.wrap(control.element)
+    }
 
   def hasAttributeControl(prefixedForAttribute: String) =
     _attributeControls.get(prefixedForAttribute).isDefined

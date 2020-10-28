@@ -33,14 +33,6 @@ trait PartXBLAnalysis extends TransientState {
 
   def startScope: Scope
   def metadata: Metadata
-  def staticStateDocument: StaticStateDocument
-
-  // TODO: This shouldn't be in this constructor!
-
-  // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
-  // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
-  // all XBL components. They would then have to be properly scoped.
-  metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
 
   val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
   val allGlobals                  = mutable.ArrayBuffer[Global]()

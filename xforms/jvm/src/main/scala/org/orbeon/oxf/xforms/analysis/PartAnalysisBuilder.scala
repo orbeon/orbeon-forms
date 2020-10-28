@@ -45,8 +45,13 @@ object PartAnalysisBuilder {
     logger              : IndentedLogger
   ): T = {
 
-    val partAnalysisCtx = PartAnalysisContextImpl(staticState, parent, startScope, metadata, staticStateDocument)
-    analyze(partAnalysisCtx)
+    // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
+    // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
+    // all XBL components. They would then have to be properly scoped.
+    metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
+
+    val partAnalysisCtx = PartAnalysisContextImpl(staticState, parent, startScope, metadata)
+    analyze(partAnalysisCtx, staticStateDocument.rootControl)
 
     if (XFormsProperties.getDebugLogXPathAnalysis)
       PartAnalysisDebugSupport.printPartAsXml(partAnalysisCtx)
@@ -134,7 +139,10 @@ object PartAnalysisBuilder {
     }
 
   // Analyze the entire tree of controls
-  private def analyze(partAnalysisCtx: PartAnalysisContextAfterTree)(implicit logger: IndentedLogger): Unit =
+  private def analyze(
+    partAnalysisCtx : PartAnalysisContextAfterTree,
+    rootElem        : Element
+  )(implicit logger: IndentedLogger): Unit =
     withDebug("performing static analysis") {
 
       partAnalysisCtx.initializeScopes()
@@ -155,7 +163,7 @@ object PartAnalysisBuilder {
       val rootControlAnalysis =
         new RootControl(
           index            = 0,
-          element          = partAnalysisCtx.staticStateDocument.rootControl,
+          element          = rootElem,
           staticId         = Constants.DocumentId,
           prefixedId       = rootControlPrefixedId,
           namespaceMapping = partAnalysisCtx.getNamespaceMapping(rootControlPrefixedId).orNull,

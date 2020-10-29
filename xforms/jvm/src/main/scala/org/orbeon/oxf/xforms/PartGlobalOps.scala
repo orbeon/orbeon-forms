@@ -65,13 +65,13 @@ trait PartGlobalOps {
   def uniqueJsScripts: List[ShareableScript]
 
   // Functions derived from getControlAnalysis
-  def hasBinding(prefixedId: String) = findControlAnalysis(prefixedId) exists (_.hasBinding)
+  def hasBinding(prefixedId: String): Boolean = findControlAnalysis(prefixedId) exists (_.hasBinding)
 
   def getControlPosition(prefixedId: String): Option[Int] = findControlAnalysis(prefixedId) collect {
     case viewTrait: ViewTrait => viewTrait.index
   }
 
-  def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
+  def appendClasses(sb: java.lang.StringBuilder, prefixedId: String): Unit =
     findControlAnalysis(prefixedId) foreach { controlAnalysis =>
       val controlClasses = controlAnalysis.classes
       if (StringUtils.isNotEmpty(controlClasses)) {
@@ -83,11 +83,11 @@ trait PartGlobalOps {
 
   // LHHA
   def getLHH(prefixedId: String, lhha: LHHA): LHHAAnalysis =
-    collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha)) orNull
+    (collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha))).orNull
 
-  def getAlerts(prefixedId: String) =
+  def getAlerts(prefixedId: String): List[LHHAAnalysis] =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)).toList flatMap (_.alerts)
 
-  def hasLHHA(prefixedId: String, lhha: LHHA) =
+  def hasLHHA(prefixedId: String, lhha: LHHA): Boolean =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasLHHA(lhha))
 }

@@ -29,7 +29,7 @@ object Tabbable {
 
   val ActiveClass                  = "active"
 
-  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end)"
+  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end):not(.fr-tabbable-add)"
   val NavTabsSelector              = ".nav-tabs"
   val TabPaneSelector              = ".tab-pane"
   val TabContentSelector           = ".tab-content"

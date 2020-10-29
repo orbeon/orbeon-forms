@@ -76,8 +76,6 @@ trait PartEventHandlerAnalysis {
 
   private def gatherScripts(): Unit = {
 
-    import StaticScript._
-
     // Used to eliminate duplicates: we store a single copy of each ShareableScript per digest
     val shareableByDigest = mutable.LinkedHashMap[String, ShareableScript]()
 
@@ -98,7 +96,7 @@ trait PartEventHandlerAnalysis {
         else
           elem.getStringValue
 
-      StaticScript(
+      StaticScriptBuilder(
         prefixedId        = analysis.prefixedId,
         scriptType        = scriptType,
         body              = body,
@@ -108,7 +106,7 @@ trait PartEventHandlerAnalysis {
     }
 
     def elemHasScriptType(e: ElementAnalysis, scriptType: ScriptType, default: Option[ScriptType]) =
-      scriptTypeFromElem(e, default) contains scriptType
+      StaticScriptBuilder.scriptTypeFromElem(e, default) contains scriptType
 
     def findForActionIt(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
       controlTypes.get(action).toIterator.flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))

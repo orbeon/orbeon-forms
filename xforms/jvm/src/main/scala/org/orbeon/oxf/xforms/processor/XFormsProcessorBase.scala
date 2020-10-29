@@ -191,7 +191,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
             val staticState =
               XFormsStaticStateCache.findDocument(stage2CacheableState.staticStateDigest) match {
-                case Some((cachedState, _)) if cachedState.topLevelPart.metadata.bindingsIncludesAreUpToDate =>
+                case Some((cachedState, _)) if cachedState.topLevelPart.bindingsIncludesAreUpToDate =>
                   // Found static state in cache
                   cacheTracer.staticStateStatus(found = true, cachedState.digest)
                   cachedState
@@ -200,7 +200,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   // NOTE: In out of date case, could clone static state and reprocess instead?
 
                   other foreach { case (cachedState, _) =>
-                    cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava}")
+                    cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
                   }
 
                   val staticState =
@@ -307,7 +307,7 @@ private object XFormsProcessorBase {
       }
 
     val xblBindingDependencies =
-      for (include <- containingDocument.staticState.topLevelPart.metadata.bindingIncludes)
+      for (include <- containingDocument.staticState.topLevelPart.bindingIncludes)
         yield ("oxf:" + include, None)
 
     instanceDependencies ++ xmlSchemaDependencies ++ xblBindingDependencies
@@ -324,14 +324,14 @@ private object XFormsProcessorBase {
 
     val staticState =
       XFormsStaticStateCache.findDocument(staticStateBits.staticStateDigest) match {
-        case Some((cachedState, _)) if cachedState.topLevelPart.metadata.bindingsIncludesAreUpToDate =>
+        case Some((cachedState, _)) if cachedState.topLevelPart.bindingsIncludesAreUpToDate =>
           cacheTracer.staticStateStatus(found = true, cachedState.digest)
           cachedState
         case other =>
           // Not found static state in cache OR it is out of date, create and initialize static state object
 
           other foreach { case (cachedState, _) =>
-            cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.metadata.debugOutOfDateBindingsIncludesJava}")
+            cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
           }
 
           val newStaticState = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits)

@@ -19,13 +19,10 @@ import org.orbeon.oxf.xforms.AssetPath
 import scala.collection.compat._
 import scala.collection.mutable
 
-object XBLAssets {
 
-  sealed trait HeadElement
-  case   class ReferenceElement(src: String) extends HeadElement
-  case   class InlineElement(text: String)   extends HeadElement
+object XBLAssetsBuilder {
 
-  object HeadElement {
+  object HeadElementBuilder {
     def apply(e: Element): HeadElement = {
 
       val href    = e.attributeValue("href")
@@ -35,15 +32,15 @@ object XBLAssets {
 
       e.getName match {
         case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
-          ReferenceElement(href)
+          HeadElement.Reference(href)
         case "style" if (src ne null) && ((resType eq null) || resType == "text/css") =>
-          ReferenceElement(src)
+          HeadElement.Reference(src)
         case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") =>
-          ReferenceElement(src)
+          HeadElement.Reference(src)
         case "style" if src eq null  =>
-          InlineElement(e.getStringValue)
+          HeadElement.Inline(e.getStringValue)
         case "script" if src eq null =>
-          InlineElement(e.getStringValue)
+          HeadElement.Inline(e.getStringValue)
         case _ =>
           throw new IllegalArgumentException(
             s"Invalid element passed to HeadElement(): ${e.toDebugString}"
@@ -55,13 +52,13 @@ object XBLAssets {
   // All elements ordered in a consistent way: first by CSS name, then in the order in which they appear for that
   // given CSS name, removing duplicates
   //
-  // NOTE: We used to attempt to sort by binding QName, when all bindings were direct. The code was actually incorrect
-  // and "sorted" by <xbl:binding> instead (so no sorting). Now we wort by CSS name instead.
+  // NOTE: We used to attempt to sort by binding `QName`, when all bindings were direct. The code was actually incorrect
+  // and "sorted" by `<xbl:binding>` instead (so no sorting). Now we sort by CSS name instead.
   def orderedHeadElements(
-    bindings        : Iterable[AbstractBinding],
-    getHeadElements : AbstractBinding => Seq[HeadElement]
+    bindings        : Iterable[XBLAssets],
+    getHeadElements : XBLAssets => Seq[HeadElement]
   ): List[HeadElement] =
-    (bindings.to(List) sortBy (_.commonBinding.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
+    (bindings.toList sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
 
   // Output baseline, remaining, and inline resources
   def outputResources(
@@ -83,12 +80,12 @@ object XBLAssets {
     val xbl = headElements
 
     val builtinUsed: mutable.LinkedHashSet[String] = builtin.iterator.map(_.assetPath(minimal)).to(mutable.LinkedHashSet)
-    val xblUsed: List[String] = xbl.iterator.collect({ case e: ReferenceElement => e.src }).to(List)
+    val xblUsed: List[String] = xbl.iterator.collect({ case e: HeadElement.Reference => e.src }).to(List)
 
     // Output remaining resources if any, with no CSS class
     builtinUsed ++ xblUsed -- allBaseline foreach (s => outputElement(Some(s), None, None))
 
     // Output inline XBL resources
-    xbl collect { case e: InlineElement => outputElement(None, None, Option(e.text)) }
+    xbl collect { case e: HeadElement.Inline => outputElement(None, None, Option(e.text)) }
   }
 }

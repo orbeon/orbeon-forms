@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.util.LoggerFactory
 
+// TODO: Rename to for example XFormsEventNames
 object XFormsEvents {
 
   val LOGGING_CATEGORY = "event"

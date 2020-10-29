@@ -116,10 +116,10 @@ class XFormsAssetsTest extends AnyFunSpec{
       }"""
 
   describe(s"Updating assets") {
-    val assets = XFormsAssets.fromJsonString(BaselineAssets)
+    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets)
 
     val result =
-      XFormsAssets.updateAssets(
+      XFormsAssetsBuilder.updateAssets(
         assets,
         "/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css",
         """+/apps/fr/resources/scalajs/orbeon-form-runner.js
@@ -129,7 +129,7 @@ class XFormsAssetsTest extends AnyFunSpec{
       )
 
     it("must add and remove assets") {
-      assert(XFormsAssets.fromJsonString(ExpectedAssets) == result)
+      assert(XFormsAssetsBuilder.fromJsonString(ExpectedAssets) == result)
     }
   }
 }

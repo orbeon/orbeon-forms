@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import cats.syntax.option._
 import org.orbeon.dom
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
@@ -22,36 +21,31 @@ import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.mutable
 
 
-// Immutable part of the context
 trait PartAnalysisContextImmutable {
 
-  protected def staticState: XFormsStaticState
+  def parent: Option[PartAnalysis]
+  def startScope: Scope
+  def isTopLevelPart: Boolean
 
-  def parent              : Option[PartAnalysis] // `getControlAnalysis`
-  def startScope          : Scope
-  def metadata            : Metadata             // FIXME: not really immutable, check. `getNamespaceMapping`, `findAbstractBindingByPrefixedId`, `findAbstractBindingByPrefixedId`
+  def metadata: Metadata // NOTE: Using this will have side-effects like XBL registrations!
 
   def scopeForPrefixedId(prefixedId: String): Scope
-  def abstractBindingsWithGlobals: Iterable[AbstractBinding]
 
-  def isTopLevelPart: Boolean = startScope.isTopLevelScope
-  def ancestorIterator: Iterator[PartAnalysis]
-  def ancestorOrSelfIterator: Iterator[PartAnalysis]
-
-  def getNamespaceMapping(prefixedId: String)      = metadata.getNamespaceMapping(prefixedId)
-  def functionLibrary                              = staticState.functionLibrary
-  def staticBooleanProperty(name: String): Boolean = staticState.staticBooleanProperty(name)
-  def staticStringProperty (name: String): String  = staticState.staticStringProperty(name)
+  def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
+  def staticBooleanProperty(name: String): Boolean
+  def staticStringProperty (name: String): String
 }
 
 trait PartAnalysisContextMutable extends TransientState {
+
+  def functionLibrary: FunctionLibrary
 
   def controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis]
   def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]
@@ -59,7 +53,6 @@ trait PartAnalysisContextMutable extends TransientState {
   def initializeScopes(): Unit
   def newScope(parent: Scope, scopeId: String): Scope
   def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit
-  def xblSupport: Option[XBLSupport]
 
   def abstractBindingsWithGlobals: mutable.Buffer[AbstractBinding]
   def allGlobals: mutable.ArrayBuffer[Global]
@@ -73,9 +66,10 @@ trait PartAnalysisContextMutable extends TransientState {
 }
 
 trait PartAnalysisForXblSupport
-  extends PartAnalysisContextImmutable {
+  extends PartAnalysisContextImmutable
+     with PartAnalysisForStaticMetadataAndProperties{
 
-  def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
+  def xblSupport: Option[XBLSupport]
 }
 
 trait PartAnalysisContextForTree
@@ -84,6 +78,9 @@ trait PartAnalysisContextForTree
      with PartAnalysisForXblSupport
 
 trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
+
+  def isXPathAnalysis        : Boolean
+  def isCalculateDependencies: Boolean
 
   def indexModel(model: Model): Unit
   def registerEventHandlers(eventHandlers: Seq[EventHandler])(implicit logger: IndentedLogger): Unit
@@ -98,34 +95,7 @@ trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
-
-  def isXPathAnalysis         = staticState.isXPathAnalysis
-  def isCalculateDependencies = staticState.isCalculateDependencies
 }
-
-trait PartAnalysisRuntimeOps extends PartAnalysisContextImmutable with PartGlobalOps {
-
-  def hasControls: Boolean
-  def defaultModel: Option[Model]
-  def getModel(prefixedId: String): Model
-  def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
-  def getTopLevelControls: List[ElementAnalysis]
-  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
-  def controlElement(prefixedId: String): Option[om.NodeInfo]
-  def getNamespaceMapping(prefix: String, element: dom.Element): NamespaceMapping
-
-  def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping =
-    getNamespaceMapping(scope.prefixedIdForStaticId(id)) getOrElse
-      (throw new IllegalStateException(s"namespace mappings not cached for scope `$scope` on element with id `$id`"))
-}
-
-trait PartAnalysis
-  extends PartAnalysisContextImmutable
-     with PartAnalysisRuntimeOps
-     with PartAnalysisForXblSupport
-
-trait TopLevelPartAnalysis
-  extends PartAnalysis
 
 trait NestedPartAnalysis
   extends PartAnalysisContextAfterTree
@@ -136,11 +106,13 @@ trait NestedPartAnalysis
 }
 
 // Context for building the tree, including immutable and mutable parts
-case class PartAnalysisContextImpl(
+case class StaticPartAnalysisImpl(
   protected val staticState: XFormsStaticState,
   parent                   : Option[PartAnalysis],
   startScope               : Scope,
-  metadata                 : Metadata
+  metadata                 : Metadata,
+  xblSupport               : Option[XBLSupport],
+  functionLibrary          : FunctionLibrary
 ) extends PartAnalysis
      with TopLevelPartAnalysis
      with NestedPartAnalysis
@@ -149,8 +121,28 @@ case class PartAnalysisContextImpl(
      with PartControlsAnalysis
      with PartXBLAnalysis {
 
+  def isTopLevelPart: Boolean = startScope.isTopLevelScope
+  def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] = metadata.getNamespaceMapping(prefixedId)
+  def staticBooleanProperty(name: String): Boolean = staticState.staticBooleanProperty(name)
+  def staticStringProperty (name: String): String  = staticState.staticStringProperty(name)
+
+  def isXPathAnalysis: Boolean = staticState.isXPathAnalysis
+  def isCalculateDependencies: Boolean = staticState.isCalculateDependencies
+
   def hasControls: Boolean =
     getTopLevelControls.nonEmpty || (iterateGlobals map (_.compactShadowTree.getRootElement)).nonEmpty
+
+  def bindingIncludes: Set[String] =
+    metadata.bindingIncludes
+
+  def bindingsIncludesAreUpToDate: Boolean =
+    metadata.bindingsIncludesAreUpToDate
+
+  def debugOutOfDateBindingsIncludes: String =
+    metadata.debugOutOfDateBindingsIncludes
+
+  def baselineResources: (List[String], List[String]) =
+    metadata.baselineResources
 
   /**
    * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not
@@ -167,24 +159,6 @@ case class PartAnalysisContextImpl(
   }
 
   def getMark(prefixedId: String): Option[SAXStore#Mark] = metadata.getMark(prefixedId)
-  def xblSupport: Option[XBLSupport] = staticState.xblSupport
-
-  private def partAnalysisIterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] =
-    new Iterator[PartAnalysis] {
-
-      private[this] var theNext = start
-
-      def hasNext: Boolean = theNext.isDefined
-
-      def next(): PartAnalysis = {
-        val newResult = theNext.get
-        theNext = newResult.parent
-        newResult
-      }
-    }
-
-  def ancestorIterator      : Iterator[PartAnalysis] = partAnalysisIterator(parent)
-  def ancestorOrSelfIterator: Iterator[PartAnalysis] = partAnalysisIterator(this.some)
 
   override def freeTransientState(): Unit = super.freeTransientState()
 }

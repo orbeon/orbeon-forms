@@ -18,14 +18,13 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.AbstractBinding
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, XFormsId}
 
 import scala.collection.mutable
 
-case class Global(templateTree: SAXStore, compactShadowTree: dom.Document)
 
 trait PartXBLAnalysis extends TransientState {
 
@@ -128,8 +127,10 @@ trait PartXBLAnalysis extends TransientState {
   def scopeForPrefixedId(prefixedId: String): Scope =
     prefixedIdToXBLScopeMap.get(prefixedId).orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
-  def allBindingsMaybeDuplicates =
-    metadata.allBindingsMaybeDuplicates
+  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] =
+    metadata.allBindingsMaybeDuplicates map { binding =>
+      XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)
+    }
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()

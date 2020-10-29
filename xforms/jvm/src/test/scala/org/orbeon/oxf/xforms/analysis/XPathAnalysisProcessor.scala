@@ -28,6 +28,7 @@ class XPathAnalysisProcessor extends SimpleProcessor {
   def generateAnalysis(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
     val formDocument = readInputAsOrbeonDom(pipelineContext, "form")
     val staticState = XFormsStaticStateImpl.createFromDocument(formDocument)
-    staticState.writeAnalysis(xmlReceiver)
+
+    PartAnalysisDebugSupport.writePart(staticState.topLevelPart)(xmlReceiver)
   }
 }

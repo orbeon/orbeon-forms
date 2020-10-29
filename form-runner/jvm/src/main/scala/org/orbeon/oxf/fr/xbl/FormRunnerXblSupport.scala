@@ -61,7 +61,7 @@ object FormRunnerXblSupport extends XBLSupport {
       }
 
     def isDesignTime =
-      partAnalysisCtx.ancestorIterator.lastOption()      flatMap
+      partAnalysisCtx.ancestorIterator.lastOption()   flatMap
         FRComponentParam.findConstantMetadataRootElem flatMap
         FRComponentParam.appFormFromMetadata          contains
         FormBuilderAppName

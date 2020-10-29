@@ -18,7 +18,8 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
+import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
+import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.CrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
@@ -101,19 +102,20 @@ trait BindingLoader extends Logging {
         (baselineBindings, allCheckedPaths)
       }
 
-      def collectResourceBaselines(baselineBindings: List[AbstractBinding], allCheckedPaths: Set[String]) = {
+      def collectResourceBaselines(baselineBindings: Iterable[AbstractBinding], allCheckedPaths: Set[String]) = {
 
         debug("collecting resource baselines")
 
-        import XBLAssets._
-
-        def collectUniqueReferenceElements(getHeadElements : AbstractBinding => Seq[HeadElement]) =
-          (orderedHeadElements(baselineBindings, getHeadElements).iterator.collect{ case e: ReferenceElement => e.src }.to(mutable.LinkedHashSet).to(List))
+        def collectUniqueReferenceElements(getHeadElements : XBLAssets => Seq[HeadElement]) =
+          XBLAssetsBuilder.orderedHeadElements(
+            baselineBindings map (binding => XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)), // same in `allXblAssetsMaybeDuplicates`
+            getHeadElements
+          ).iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet).to(List)
 
         (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles), allCheckedPaths)
       }
 
-      lazy val lazyIndexAndBindings = readAndIndexBindings
+      lazy val lazyIndexAndBindings: (List[AbstractBinding], Set[String]) = readAndIndexBindings
 
       // If the original index is empty, force the evaluation of the library and baseline
       // https://github.com/orbeon/orbeon-forms/issues/3327
@@ -378,7 +380,7 @@ trait BindingLoader extends Logging {
 
     // Extract xbl:xbl/xbl:script
     // TODO: should do this differently, in order to include only the scripts and resources actually used
-    val scriptElements = xblElement.elements(XBL_SCRIPT_QNAME) map XBLAssets.HeadElement.apply
+    val scriptElements = xblElement.elements(XBL_SCRIPT_QNAME) map HeadElementBuilder.apply
 
     // Create binding for all xbl:binding[@element]
     for {

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, HeadElement, XBLAssets, XBLAssetsBuilder}
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.{immutable => i}
@@ -87,14 +87,15 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def scriptsByPrefixedId = collectInParts(_.scriptsByPrefixedId) toMap
   def uniqueJsScripts = collectInParts(_.uniqueJsScripts)
-  def allBindingsMaybeDuplicates: Iterable[AbstractBinding] = collectInParts(_.allBindingsMaybeDuplicates)
+
+  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] = collectInParts(_.allXblAssetsMaybeDuplicates)
 
   def baselineResources =
-    topLevelPart.metadata.baselineResources
+    topLevelPart.baselineResources
 
-  def bindingResources = {
-    val bindings = allBindingsMaybeDuplicates
-    (XBLAssets.orderedHeadElements(bindings, _.scripts), XBLAssets.orderedHeadElements(bindings, _.styles))
+  def bindingResources: (List[HeadElement], List[HeadElement]) = {
+    val bindings = allXblAssetsMaybeDuplicates
+    (XBLAssetsBuilder.orderedHeadElements(bindings, _.scripts), XBLAssetsBuilder.orderedHeadElements(bindings, _.styles))
   }
 
   /**

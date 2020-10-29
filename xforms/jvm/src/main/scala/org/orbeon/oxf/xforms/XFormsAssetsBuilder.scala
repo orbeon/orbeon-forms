@@ -14,33 +14,14 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.CrossPlatformSupport
 import spray.json._
 
 import scala.collection.compat._
 
-case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
 
-case class AssetPath(full: String, minOpt: Option[String]) {
-  def assetPath(tryMin: Boolean): String =
-    if (tryMin) minOpt getOrElse full else full
-}
-
-object AssetPath {
-
-  def apply(full: String, hasMin: Boolean): AssetPath =
-    AssetPath(full, hasMin option minFromFull(full))
-
-  def minFromFull(full: String): String =
-    findExtension(full) match {
-      case Some(ext) => full.substring(0, full.length - ext.length - 1) + ".min." + ext
-      case None      => throw new IllegalArgumentException
-    }
-}
-
-object XFormsAssets {
+object XFormsAssetsBuilder {
 
   val AssetsBaselineProperty = "oxf.xforms.assets.baseline"
 

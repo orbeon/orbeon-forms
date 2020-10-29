@@ -214,7 +214,7 @@ trait BindingMetadata extends Logging {
     bindingsPaths.iterator forall pathExistsAndIsUpToDate
   }
 
-  def debugOutOfDateBindingsIncludesJava: String = {
+  def debugOutOfDateBindingsIncludes: String = {
     implicit val rm = ResourceManagerWrapper.instance
     bindingsPaths.iterator filterNot pathExistsAndIsUpToDate mkString ", "
   }

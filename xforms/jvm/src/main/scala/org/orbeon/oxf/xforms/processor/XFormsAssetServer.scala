@@ -56,6 +56,24 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     requestPath match {
       case DynamicResourceRegex(_) =>
         serveDynamicResource(requestPath)
+
+      case BaselineResourcePath =>
+
+        def redirect(path: String): Unit = {
+          val pathWithContext = response.rewriteRenderURL(path)
+          response.sendRedirect(pathWithContext, isServerSide = false, isExitPortal = false)
+        }
+
+        val updatesParameterValue = externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
+        val updatesPropertyName   = updatesParameterValue.map(List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, _).mkString("."))
+        val updatesPropertyValue  = updatesPropertyName.map(CrossPlatformSupport.properties.getString)
+        val updates               = updatesPropertyValue.getOrElse("")
+        val assets                = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJSONProperty, excludesProp = "", updates)
+        val isMinimal             = XFormsProperties.isMinimalResources
+        val resources             = assets.js.map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+
+        AssetsAggregator.aggregate(resources, redirect, None, isCSS = false)
+
       case FormDynamicResourcesRegex(uuid) =>
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been

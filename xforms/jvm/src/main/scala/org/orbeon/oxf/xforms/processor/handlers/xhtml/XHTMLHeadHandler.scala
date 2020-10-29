@@ -21,8 +21,7 @@ import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.xbl.XBLAssets
-import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
+import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssetsBuilder}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -211,7 +210,7 @@ private object XHTMLHeadHandler {
         content foreach text
       }
 
-    XBLAssets.outputResources(
+    XBLAssetsBuilder.outputResources(
       outputElement = outputScriptElement,
       builtin       = assets.js,
       headElements  = headElements,
@@ -245,7 +244,7 @@ private object XHTMLHeadHandler {
         content foreach text
       }
 
-    XBLAssets.outputResources(
+    XBLAssetsBuilder.outputResources(
       outputElement = outputLinkOrStyleElement,
       builtin       = assets.css,
       headElements  = headElements,

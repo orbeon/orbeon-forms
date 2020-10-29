@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.analysis.{PartAnalysis, PartAnalysisContextForTree, PartAnalysisContextImmutable, PartAnalysisContextMutable, PartAnalysisForXblSupport, model}
+import org.orbeon.oxf.xforms.analysis.{PartAnalysis, PartAnalysisContextForTree, PartAnalysisContextImmutable, PartAnalysisContextMutable, PartAnalysisForStaticMetadataAndProperties, PartAnalysisForXblSupport, model}
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
@@ -393,7 +393,7 @@ object FRComponentParam {
 
   import org.orbeon.scaxon.SimplePath._
 
-  def findConstantMetadataRootElem(part: PartAnalysisForXblSupport): Option[NodeInfo] = {
+  def findConstantMetadataRootElem(part: PartAnalysisForStaticMetadataAndProperties): Option[NodeInfo] = {
 
     // Tricky: When asking for the instance, the instance might not yet have been indexed, while the
     // `ElementAnalysis` has been. So we get the element instead of using `findInstanceInScope`.
@@ -436,7 +436,7 @@ object FRComponentParam {
       AppForm(appName, formName)
 
   def fromMetadataAndProperties(
-    partAnalysis  : PartAnalysisForXblSupport,
+    partAnalysis  : PartAnalysisForStaticMetadataAndProperties,
     directNameOpt : Option[QName],
     paramName     : QName
   ): Option[AtomicValue] = {

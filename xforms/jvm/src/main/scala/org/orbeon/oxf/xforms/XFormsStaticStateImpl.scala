@@ -14,38 +14,32 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.dom.{Document, Element}
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.XBLSupport
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.`type`.BuiltInAtomicType
-import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.sxpath.XPathExpression
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Namespaces, XXBLScope}
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
 
 import scala.jdk.CollectionConverters._
-import scala.reflect.ClassTag
-import scala.util.Try
+
 
 class XFormsStaticStateImpl(
   val encodedState        : String,
@@ -62,7 +56,11 @@ class XFormsStaticStateImpl(
   implicit val getIndentedLogger = Loggers.getIndentedLogger("analysis")
 
   // Create top-level part once `val`s are all initialized
-  val topLevelPart: TopLevelPartAnalysis = PartAnalysisBuilder(this, None, startScope, metadata, staticStateDocument)
+  val topLevelPart: TopLevelPartAnalysis =
+    PartAnalysisBuilder(this, None, startScope, metadata, staticStateDocument)
+
+
+  def functionLibrary = topLevelPart.functionLibrary
 
   // Properties
   // These are `lazy val`s because they depend on the default model being found, which is done when
@@ -75,49 +73,11 @@ class XFormsStaticStateImpl(
   lazy val isInlineResources       = staticBooleanProperty(P.InlineResourcesProperty)
 
   lazy val assets: XFormsAssets =
-    XFormsAssets.updateAssets(
-      XFormsAssets.fromJSONProperty,
+    XFormsAssetsBuilder.updateAssets(
+      XFormsAssetsBuilder.fromJSONProperty,
       staticStringProperty(P.AssetsBaselineExcludesProperty),
       staticStringProperty(P.AssetsBaselineUpdatesProperty)
     )
-
-  private def loadClass[T : ClassTag](propertyName: String): Option[T] =
-    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap trimAllToOpt match {
-      case Some(className) =>
-
-        def tryFromScalaObject: Try[AnyRef] = Try {
-          Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
-        }
-
-        def fromJavaClass: AnyRef =
-          Class.forName(className).getDeclaredMethod("instance").invoke(null)
-
-        tryFromScalaObject getOrElse fromJavaClass match {
-          case instance: T => Some(instance)
-          case _ =>
-            throw new ClassCastException(
-              s"property `$propertyName` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
-            )
-        }
-      case None => None
-    }
-
-  // This is a bit tricky because during analysis, XPath expression require the function library. This means this
-  // property cannot use `nonDefaultPropertiesOnly` below, which collects all non-default properties and attempts to
-  // evaluates AVT properties, which themselves require finding the default model, which is not yet ready! So we
-  // use `staticStateDocument.nonDefaultProperties` instead.
-  lazy val functionLibrary: FunctionLibrary =
-    loadClass[FunctionLibrary](FunctionLibraryProperty) match {
-      case Some(library) =>
-        new FunctionLibraryList                         |!>
-          (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
-          (_.addFunctionLibrary(library))
-      case None =>
-        XFormsFunctionLibrary
-    }
-
-  lazy val xblSupport: Option[XBLSupport] =
-    loadClass[XBLSupport](XblSupportProperty)
 
   lazy val uploadMaxSize: MaximumSize =
     staticStringProperty(UploadMaxSizeProperty).trimAllToOpt flatMap
@@ -141,7 +101,7 @@ class XFormsStaticStateImpl(
           xpathString      = rawProperty,
           namespaceMapping = model.namespaceMapping,
           locationData     = null,
-          functionLibrary  = functionLibrary,
+          functionLibrary  = topLevelPart.functionLibrary,
           avt              = false
         )
 
@@ -169,7 +129,7 @@ class XFormsStaticStateImpl(
         val maybeAVT = XMLUtils.maybeAVT(rawPropertyValue)
         topLevelPart.defaultModel match {
           case Some(model) if isInline && maybeAVT =>
-            Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))
+            Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, topLevelPart.functionLibrary, avt = true))
           case None if isInline && maybeAVT =>
             throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
           case _ =>
@@ -201,9 +161,6 @@ class XFormsStaticStateImpl(
       if SupportedDocumentProperties(propertyName).propagateToClient
     } yield
       propertyName -> staticProperty(propertyName)
-
-  def writeAnalysis(implicit receiver: XMLReceiver): Unit =
-    PartAnalysisDebugSupport.writePart(topLevelPart)
 }
 
 object XFormsStaticStateImpl {
@@ -226,7 +183,7 @@ object XFormsStaticStateImpl {
     val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
 
     // Restore template
-    val template = staticStateDocument.template map AnnotatedTemplate.apply
+    val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
 
     // Restore metadata
     val metadata = Metadata(staticStateDocument, template)

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Global}
-import org.orbeon.oxf.xforms.xbl._
+import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
@@ -46,7 +46,7 @@ trait PartGlobalOps {
 
   // XBL
   def iterateGlobals: Iterator[Global]
-  def allBindingsMaybeDuplicates: Iterable[AbstractBinding]
+  def allXblAssetsMaybeDuplicates: Iterable[XBLAssets]
 
   // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
   def containingScope(prefixedId: String): Scope
@@ -60,9 +60,10 @@ trait PartGlobalOps {
   def hasAttributeControl(prefixedForAttribute: String): Boolean
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
 
-  // Client-side resources
+  // Client-side assets
   def scriptsByPrefixedId: Map[String, StaticScript]
   def uniqueJsScripts: List[ShareableScript]
+  def baselineResources: (List[String], List[String])
 
   // Functions derived from getControlAnalysis
   def hasBinding(prefixedId: String): Boolean = findControlAnalysis(prefixedId) exists (_.hasBinding)
@@ -74,7 +75,7 @@ trait PartGlobalOps {
   def appendClasses(sb: java.lang.StringBuilder, prefixedId: String): Unit =
     findControlAnalysis(prefixedId) foreach { controlAnalysis =>
       val controlClasses = controlAnalysis.classes
-      if (StringUtils.isNotEmpty(controlClasses)) {
+      if (controlClasses.nonAllBlank) {
         if (sb.length > 0)
           sb.append(' ')
         sb.append(controlClasses)

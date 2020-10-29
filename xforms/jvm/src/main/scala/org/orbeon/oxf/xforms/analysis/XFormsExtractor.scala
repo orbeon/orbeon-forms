@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -229,7 +229,7 @@ class XFormsExtractor(
               withElement(localName = "template") {
                 // NOTE: At this point, the template has just received endDocument(), so is no longer under under
                 // construction and can be serialized safely.
-                text(templateUnderConstruction.asBase64)
+                text(AnnotatedTemplateBuilder.asBase64(templateUnderConstruction))
               }
             }
         }

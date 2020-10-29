@@ -16,21 +16,29 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
-import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.{Constants, XXBLScope}
 import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
+import scala.util.Try
 
 
 object PartAnalysisBuilder {
@@ -45,12 +53,34 @@ object PartAnalysisBuilder {
     logger              : IndentedLogger
   ): T = {
 
+    // We use the parent's `FunctionLibrary` if present, for compatibility with the initial implementation
+    // which worked this way. That's also fairly reasonable. But what we could do at some point later is
+    // allow a nested part to override with with an explicit `xxf:function-library`.
+    val functionLibrary =
+      parent map
+      (_.functionLibrary) orElse
+        loadClass[FunctionLibrary](staticStateDocument, FunctionLibraryProperty) match {
+          case Some(library) =>
+            new FunctionLibraryList                         |!>
+              (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+              (_.addFunctionLibrary(library))
+          case None =>
+            XFormsFunctionLibrary
+        }
+
+    // Same thing here, we get the root's `XBLSupport` if present
+    val xblSupport =
+      (parent.iterator flatMap (_.ancestorOrSelfIterator)).lastOption() collect {
+        case impl: StaticPartAnalysisImpl => impl.xblSupport
+      } getOrElse
+        loadClass[XBLSupport](staticStateDocument, XblSupportProperty)
+
     // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
     // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
     // all XBL components. They would then have to be properly scoped.
     metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
 
-    val partAnalysisCtx = PartAnalysisContextImpl(staticState, parent, startScope, metadata)
+    val partAnalysisCtx = StaticPartAnalysisImpl(staticState, parent, startScope, metadata, xblSupport, functionLibrary)
     analyze(partAnalysisCtx, staticStateDocument.rootControl)
 
     if (XFormsProperties.getDebugLogXPathAnalysis)
@@ -58,6 +88,27 @@ object PartAnalysisBuilder {
 
     partAnalysisCtx
   }
+
+  private def loadClass[T : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
+    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap (_.trimAllToOpt) match {
+      case Some(className) =>
+
+        def tryFromScalaObject: Try[AnyRef] = Try {
+          Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
+        }
+
+        def fromJavaClass: AnyRef =
+          Class.forName(className).getDeclaredMethod("instance").invoke(null)
+
+        tryFromScalaObject getOrElse fromJavaClass match {
+          case instance: T => Some(instance)
+          case _ =>
+            throw new ClassCastException(
+              s"property `$propertyName` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
+            )
+        }
+      case None => None
+    }
 
   // Analyze a subtree of controls (for `xxf:dynamic` and components with lazy bindings)
   def analyzeSubtree(partAnalysisCtx: NestedPartAnalysis, container: ComponentControl)(implicit logger: IndentedLogger): Unit = {

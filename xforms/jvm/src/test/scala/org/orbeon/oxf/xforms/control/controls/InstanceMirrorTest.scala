@@ -92,7 +92,6 @@ class InstanceMirrorTest
             mirrorListener(
               toInnerInstanceNode(
                 outerInstance.rootElement,
-                document.staticState.topLevelPart,
                 document,
                 findOuterInstanceDetailsDynamic
               )

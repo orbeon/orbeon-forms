@@ -282,7 +282,6 @@ class XFormsComponentControl(
         newListenerWithCycleDetector(
           toInnerInstanceNode(
             referenceNode,
-            nestedContainer.partAnalysis,
             nestedContainer,
             findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)
           )
@@ -291,7 +290,7 @@ class XFormsComponentControl(
 
       val innerListener = toEventListener(
         newListenerWithCycleDetector(
-          toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)
+          toOuterInstanceNodeXBL(outerInstance, referenceNode)
         )
       )
 

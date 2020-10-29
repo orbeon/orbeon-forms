@@ -16,20 +16,19 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.analysis.PartAnalysis
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsReplaceEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
@@ -177,7 +176,6 @@ object InstanceMirror {
   // Find the inner instance node from a node in an outer instance
   def toInnerInstanceNode(
     boundElem                : om.NodeInfo,
-    partAnalysis             : PartAnalysis,
     container                : XBLContainer,
     findOuterInstanceDetails : (XBLContainer, om.NodeInfo, Boolean) => Option[InstanceDetails]
   ): NodeMatcher = {
@@ -240,8 +238,7 @@ object InstanceMirror {
   // Find the outer node in an inline instance from a node in an inner instance
   def toOuterInstanceNodeDynamic(
       outerInstance : XFormsInstance,
-      outerElem     : om.NodeInfo,
-      partAnalysis  : PartAnalysis
+      outerElem     : om.NodeInfo
   ): NodeMatcher = {
 
     (innerInstance, innerNode, siblingIndexOpt) =>
@@ -277,8 +274,7 @@ object InstanceMirror {
 
   def toOuterInstanceNodeXBL(
     outerInstance : XFormsInstance,
-    outerNode     : om.NodeInfo,
-    partAnalysis  : PartAnalysis
+    outerNode     : om.NodeInfo
   ): NodeMatcher = {
 
     (_, innerNode, siblingIndexOpt) =>

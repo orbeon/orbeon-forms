@@ -23,9 +23,9 @@ import org.orbeon.oxf.util.Base64
 case class AnnotatedTemplate(saxStore: SAXStore) {
   private lazy val asByteArray = toByteArray(saxStore)
   // Used to serialized into dynamic state
-  def asByteSeq = asByteArray.toSeq // this produces a WrappedArray and must not copy
+  def asByteSeq: Seq[Byte] = asByteArray.toSeq // this produces a WrappedArray and must not copy
   // Used to serialize into static state document
-  def asBase64 = Base64.encode(asByteArray, false)
+  def asBase64: String = Base64.encode(asByteArray, false)
 }
 
 object AnnotatedTemplate {

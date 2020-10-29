@@ -114,11 +114,11 @@ trait PartEventHandlerAnalysis {
     def findForScriptTypeIt(scriptType: ScriptType) =
       findForActionIt(ActionActionName,  scriptType, None) ++
       findForActionIt(HandlerActionName, scriptType, None) ++
-      findForActionIt(ScriptActionName,  scriptType, Some(JavaScriptScriptType)) map
+      findForActionIt(ScriptActionName,  scriptType, Some(ScriptType.JavaScript)) map
       (extractStaticScript(_, scriptType))
 
-    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).toList
-    val xpathScriptsIt = findForScriptTypeIt(XPathScriptType)
+    val jsScripts      = findForScriptTypeIt(ScriptType.JavaScript).toList
+    val xpathScriptsIt = findForScriptTypeIt(ScriptType.XPath)
 
     _scriptsByPrefixedId ++=
       jsScripts.iterator ++

@@ -28,8 +28,10 @@ case class StaticScript(
 )
 
 sealed trait ScriptType
-case object  JavaScriptScriptType extends ScriptType
-case object  XPathScriptType      extends ScriptType
+object ScriptType {
+  case object  JavaScript extends ScriptType
+  case object  XPath      extends ScriptType
+}
 
 case class ScriptInvocation(
   script              : StaticScript,

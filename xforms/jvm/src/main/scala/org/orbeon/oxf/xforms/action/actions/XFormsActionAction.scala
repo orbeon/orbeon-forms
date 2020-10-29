@@ -16,12 +16,10 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
-import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.xforms.XFormsNames
 
 /**
@@ -49,7 +47,7 @@ class XFormsActionAction extends XFormsAction {
       observerAncestorsOrSelfIterator(observer) find hasClientRepresentation
 
     actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
-      case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) =>
+      case Some(script @ StaticScript(_, ScriptType.JavaScript, paramExpressions, _)) =>
         // Evaluate script parameters if any and schedule the script to run
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
@@ -67,7 +65,7 @@ class XFormsActionAction extends XFormsAction {
             }
           )
         )
-      case Some(StaticScript(_, XPathScriptType, _, ShareableScript(_, _, body, _))) =>
+      case Some(StaticScript(_, ScriptType.XPath, _, ShareableScript(_, _, body, _))) =>
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
           actionElement,

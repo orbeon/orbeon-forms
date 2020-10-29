@@ -40,8 +40,8 @@ object StaticScriptBuilder {
 
   def scriptTypeFromMediatype(mediatype: String, default: Option[ScriptType]): Option[ScriptType] = mediatype match {
     case null => default
-    case TypeExtractor("javascript") => Some(JavaScriptScriptType)
-    case TypeExtractor("xpath") => Some(XPathScriptType)
+    case TypeExtractor("javascript") => Some(ScriptType.JavaScript)
+    case TypeExtractor("xpath") => Some(ScriptType.XPath)
     case _ => None
   }
 

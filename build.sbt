@@ -672,6 +672,7 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 lazy val xformsJVM = xforms.jvm
   .dependsOn(
     commonJVM,
+    xformsRuntimeJVM,
     xformsCommonJVM,
     core % "test->test;compile->compile"
   )
@@ -759,13 +760,11 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
-    commonJVM,
-    core % "test->test;compile->compile"
+    xformsCommonJVM
   )
 
 lazy val xformsRuntimeJS = xformsRuntime.js
-  .dependsOn(commonJS % "test->test;compile->compile")
-  .dependsOn(dom.js)
+  .dependsOn(xformsCommonJS)
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
 

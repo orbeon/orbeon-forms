@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.{Loggers, XFormsProperties}
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.scaxon.NodeConversions
@@ -53,7 +53,7 @@ class UploaderProcessor extends ProcessorImpl {
                   val sessionURL =
                     NetUtils.renameAndExpireWithSession(
                       RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE),
-                      XFormsServer.logger.logger
+                      Loggers.logger.logger
                     ).toURI.toString
 
                   (name, fileItem, sessionURL, size)

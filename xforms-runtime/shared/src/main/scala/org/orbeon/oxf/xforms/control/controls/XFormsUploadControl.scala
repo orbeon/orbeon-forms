@@ -22,13 +22,12 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, PathUtils, SecureUtils}
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{Loggers, XFormsUtils}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
@@ -263,9 +262,9 @@ object XFormsUploadControl {
         val file = new File(temporaryFilePath)
         if (file.exists) {
           if (file.delete())
-            XFormsServer.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
+            Loggers.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
           else
-            XFormsServer.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
+            Loggers.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
         }
       }
     }

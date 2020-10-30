@@ -32,11 +32,12 @@ import org.xml.sax.XMLReader
 
 object StaticXPath extends StaticXPathTrait {
 
-  type SaxonConfiguration   = Configuration
-  type DocumentNodeInfoType = DocumentInfo
-  type VirtualNodeType      = VirtualNode
+  type SaxonConfiguration      = Configuration
+  type DocumentNodeInfoType    = DocumentInfo
+  type VirtualNodeType         = VirtualNode
+  type ValueRepresentationType = ValueRepresentation
 
-  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
+  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentationType
 
   def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = {
 
@@ -53,6 +54,20 @@ object StaticXPath extends StaticXPathTrait {
       (_.setDTDHandler(handler))
 
     writer.write(doc)
+
+    treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+  }
+
+  val EmptyDocument: DocumentNodeInfoType = {
+
+    val treeBuilder = new TinyBuilder
+
+    val handler =
+      new TransformerFactoryImpl(GlobalConfiguration).newTransformerHandler |!>
+        (_.setResult(treeBuilder))
+
+    handler.startDocument()
+    handler.endDocument()
 
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
   }

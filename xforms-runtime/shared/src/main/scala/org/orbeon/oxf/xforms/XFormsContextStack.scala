@@ -20,16 +20,14 @@ import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
+import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
-import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -45,15 +43,6 @@ import scala.util.control.NonFatal
  */
 object XFormsContextStack {
 
-  private val DummyContext = {
-    val treeBuilder = new TinyBuilder
-    val identity = TransformerUtils.getIdentityTransformerHandler(XPath.GlobalConfiguration)
-    identity.setResult(treeBuilder)
-    identity.startDocument()
-    identity.endDocument()
-    treeBuilder.getCurrentRoot
-  }
-
   // If there is no XPath context defined at the root (in the case there is no default XForms model/instance
   // available), we should use an empty context. However, currently for non-relevance in particular we must not run
   // expressions with an empty context. To allow running expressions at the root of a container without models, we
@@ -61,7 +50,7 @@ object XFormsContextStack {
   // future, we should allow running expressions with no context, possibly after statically checking that they do not
   // depend on the context, as well as prevent evaluations within non-relevant content by other means.
   //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
-  private val DefaultContext = Collections.singletonList(DummyContext: Item)
+  private val DefaultContext = Collections.singletonList(StaticXPath.EmptyDocument: om.Item)
 
   /**
    * Return an empty context for the given model.
@@ -200,7 +189,7 @@ class XFormsContextStack {
   }
 
   // NOTE: This only scopes top-level model variables, but not binds-as-variables.
-  private def evaluateModelVariables(model: XFormsModel): Map[String, ValueRepresentation] = {
+  private def evaluateModelVariables(model: XFormsModel): Map[String, ValueRepresentationType] = {
     // TODO: Check dirty flag to prevent needless re-evaluation
     // All variables in the model are in scope for the nested binds and actions.
     val variables = model.staticModel.variablesSeq

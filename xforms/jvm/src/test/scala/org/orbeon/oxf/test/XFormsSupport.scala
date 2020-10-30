@@ -29,10 +29,9 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.itemset.{Itemset, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{Constants, EventNames}
@@ -76,7 +75,7 @@ trait XFormsSupport extends MockitoSugar {
     val actionInterpreter = mock[XFormsActionInterpreter]
     Mockito when actionInterpreter.containingDocument thenReturn doc
     Mockito when actionInterpreter.container thenReturn doc
-    Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger)
+    Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(Loggers.logger)
 
     // Resolve assuming target relative to the document
     Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString) thenAnswer new Answer[XFormsObject] {

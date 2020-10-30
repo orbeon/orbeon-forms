@@ -28,10 +28,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -61,7 +61,7 @@ object XFormsServer {
 
   import Private._
 
-  val logger = LoggerFactory.createLogger(classOf[XFormsServer])
+  val logger = Loggers.logger
 
   /**
     * Output an Ajax response for the regular Ajax mode.
@@ -550,10 +550,10 @@ class XFormsServer extends ProcessorImpl {
           case e: SessionExpiredException =>
             LifecycleLogger.eventAssumingRequest("xforms", e.message, Nil)
             // Don't log whole exception
-            XFormsServer.logger.info(e.message)
+            Loggers.logger.info(e.message)
             ClientEvents.errorDocument(e.message, e.code)(xmlReceiver)
           case NonFatal(t) =>
-            XFormsServer.logger.error(OrbeonFormatter.format(t))
+            Loggers.logger.error(OrbeonFormatter.format(t))
             ClientEvents.errorDocument(OrbeonFormatter.message(t), StatusCode.InternalServerError)(xmlReceiver)
         }
       }

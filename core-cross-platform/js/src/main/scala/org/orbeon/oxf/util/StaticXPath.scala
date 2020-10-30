@@ -27,11 +27,12 @@ import org.orbeon.saxon.utils.Configuration
 
 object StaticXPath extends StaticXPathTrait {
 
-  type SaxonConfiguration   = Configuration
-  type DocumentNodeInfoType = TreeInfo
-  type VirtualNodeType      = VirtualNode
+  type SaxonConfiguration      = Configuration
+  type DocumentNodeInfoType    = TreeInfo
+  type VirtualNodeType         = VirtualNode
+  type ValueRepresentationType = GroundedValue
 
-  type VariableResolver = (StructuredQName, XPathContext) => GroundedValue
+  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentationType
 
   val GlobalConfiguration: SaxonConfiguration = ???
 
@@ -59,6 +60,21 @@ object StaticXPath extends StaticXPathTrait {
       (_.setDTDHandler(handler))
 
     writer.write(doc)
+
+    // Q: What if it's not a document but an element?
+    treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+  }
+
+  val EmptyDocument: DocumentNodeInfoType = {
+
+    val treeBuilder = TreeModel.TINY_TREE.makeBuilder(GlobalConfiguration.makePipelineConfiguration)
+
+    val handler =
+      new SaxonTransformerFactory(GlobalConfiguration).newTransformerHandler |!>
+        (_.setResult(treeBuilder))
+
+    handler.startDocument()
+    handler.endDocument()
 
     // Q: What if it's not a document but an element?
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]

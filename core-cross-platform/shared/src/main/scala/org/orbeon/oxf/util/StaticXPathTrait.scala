@@ -25,6 +25,7 @@ trait StaticXPathTrait {
   type SaxonConfiguration
   type DocumentNodeInfoType
   type VirtualNodeType
+  type ValueRepresentationType
 
   // Used by `ShareableXPathStaticContext`
   type VariableResolver
@@ -48,4 +49,5 @@ trait StaticXPathTrait {
   ): CompiledExpression
 
   def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType
+  val EmptyDocument: DocumentNodeInfoType
 }

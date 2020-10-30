@@ -13,21 +13,25 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.util.IndentedLogger
-import collection.mutable.HashMap
-import processor.XFormsServer
+import org.log4s.Logger
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+
+import scala.collection.mutable
+
 
 // Global indented loggers
 object Loggers {
 
-  private val LoggersByCategory = new HashMap[String, IndentedLogger]
+  val logger: Logger = LoggerFactory.createLogger("org.orbeon.oxf.xforms.processor.XFormsServer")
+
+  private val LoggersByCategory = new mutable.HashMap[String, IndentedLogger]
 
   // Return an indented logger for the given category
   // FIXME: more than 1 thread access the returned indented logger, which is stateful -> Use threadLocal?
   def getIndentedLogger(category: String): IndentedLogger = synchronized {
 
     def newLogger = {
-      val logger = XFormsServer.logger
+      val logger = Loggers.logger
       val isDebugEnabled = logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(category)
       new IndentedLogger(logger, isDebugEnabled)
     }

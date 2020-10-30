@@ -43,7 +43,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
-import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
+import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{DynamicState, LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
@@ -535,8 +535,8 @@ trait ContainingDocumentLogging {
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
     loggersMap.getOrElseUpdate(loggingCategory,
       new IndentedLogger(
-        XFormsServer.logger,
-        XFormsServer.logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(loggingCategory),
+        Loggers.logger,
+        Loggers.logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(loggingCategory),
         indentation
       )
     )
@@ -591,7 +591,7 @@ trait ContainingDocumentRequest {
   private def isPortletContainerOrRemoteFromHeaders(headers: Map[String, List[String]]) =
     isPortletContainer || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
 
-  protected def initializeRequestInformation(): Unit =
+  protected[xforms] def initializeRequestInformation(): Unit =
     Option(CrossPlatformSupport.externalContext.getRequest) match {
       case Some(request) =>
         // Remember if filter provided separate deployment information
@@ -644,7 +644,7 @@ trait ContainingDocumentRequest {
         _isPortletContainerOrRemote = false
     }
 
-  protected def initializePathMatchers(): Unit =
+  protected[xforms] def initializePathMatchers(): Unit =
     _versionedPathMatchers =
       Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse
         ju.Collections.emptyList[PathMatcher]

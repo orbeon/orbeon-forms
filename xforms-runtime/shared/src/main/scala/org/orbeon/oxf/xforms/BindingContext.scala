@@ -19,11 +19,11 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 
 import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
@@ -64,7 +64,7 @@ case class BindingContext(
     controlElement : Element,
     locationData   : LocationData,
     variableName   : String,
-    variableValue  : ValueRepresentation,
+    variableValue  : ValueRepresentationType,
     scope          : Scope
   ) = {
     this(
@@ -86,7 +86,7 @@ case class BindingContext(
   }
 
   // Create a copy with a new variable in scope
-  def pushVariable(variableElement: ElementAnalysis, name: String, value: ValueRepresentation, scope: Scope): BindingContext = {
+  def pushVariable(variableElement: ElementAnalysis, name: String, value: ValueRepresentationType, scope: Scope): BindingContext = {
 
     def ancestorOrSelfInScope(scope: Scope) =
       new AncestorIterator(includeSelf = true) find (_.scope == scope) getOrElse (throw new IllegalStateException)
@@ -104,11 +104,11 @@ case class BindingContext(
   def getSingleItemOrNull: Item =
     singleItemOpt.orNull
 
-  def getInScopeVariables: ju.Map[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
+  def getInScopeVariables: ju.Map[String, ValueRepresentationType] = getInScopeVariables(scopeModelVariables = true)
 
-  def getInScopeVariables(scopeModelVariables: Boolean): ju.Map[String, ValueRepresentation] = {
+  def getInScopeVariables(scopeModelVariables: Boolean): ju.Map[String, ValueRepresentationType] = {
 
-    val tempVariablesMap = new ju.HashMap[String, ValueRepresentation]
+    val tempVariablesMap = new ju.HashMap[String, ValueRepresentationType]
 
     // Scope view variables in the same scope only
     for {
@@ -289,7 +289,7 @@ case class BindingContext(
 }
 
 // Hold a variable name/value
-case class VariableNameValue(name: String, value: ValueRepresentation)
+case class VariableNameValue(name: String, value: ValueRepresentationType)
 
 object BindingContext {
   // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context

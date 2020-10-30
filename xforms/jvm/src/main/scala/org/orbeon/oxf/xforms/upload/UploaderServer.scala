@@ -18,8 +18,7 @@ import java.util.ServiceLoader
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
-import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
-import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
+import org.orbeon.datatypes.MaximumSize
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.common.Version
@@ -48,73 +47,6 @@ import scala.util.control.NonFatal
 import scala.collection.compat._
 import shapeless.syntax.typeable._
 
-// Separate checking logic for sanity and testing
-trait UploadCheckerLogic {
-
-  def findAttachmentMaxSizeValidationMipFor(controlEffectiveId: String): Option[String]
-
-  def currentUploadSizeAggregate     : Option[Long]
-  def uploadMaxSizeProperty          : MaximumSize
-  def uploadMaxSizeAggregateProperty : MaximumSize
-
-  def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
-
-    def maximumSizeForControlOrDefault =
-      findAttachmentMaxSizeValidationMipFor(controlEffectiveId) flatMap
-        MaximumSize.unapply                                     getOrElse
-        uploadMaxSizeProperty
-
-    uploadMaxSizeAggregateProperty match {
-      case UnlimitedSize =>
-        // Aggregate size is not a factor so just use what we got for the control
-        maximumSizeForControlOrDefault
-      case LimitedSize(maximumAggregateSize) =>
-        // Aggregate size is a factor
-        currentUploadSizeAggregate match {
-          case Some(currentAggregateSize) =>
-
-            val remainingByAggregation = (maximumAggregateSize - currentAggregateSize) max 0L
-
-            if (remainingByAggregation == 0) {
-              LimitedSize(0)
-            } else {
-              maximumSizeForControlOrDefault match {
-                case UnlimitedSize                   => LimitedSize(remainingByAggregation)
-                case LimitedSize(remainingByControl) => LimitedSize(remainingByControl min remainingByAggregation)
-              }
-            }
-          case None =>
-            throw new IllegalArgumentException(s"missing `upload.max-size-aggregate-expression` property")
-        }
-    }
-  }
-}
-
-sealed trait AllowedMediatypes
-object AllowedMediatypes {
-
-  case object AllowedAnyMediatype                                    extends AllowedMediatypes
-  case class  AllowedSomeMediatypes(mediatypes: Set[MediatypeRange]) extends AllowedMediatypes {
-    require(! mediatypes(WildcardMediatypeRange))
-  }
-
-  def unapply(s: String): Option[AllowedMediatypes] = {
-
-    val mediatypeRanges =
-      s.splitTo[List](" ,") flatMap { token =>
-        token.trimAllToOpt
-      } flatMap { trimmed =>
-          MediatypeRange.unapply(trimmed)
-      }
-
-    if (mediatypeRanges.isEmpty)
-      None
-    else if (mediatypeRanges contains WildcardMediatypeRange)
-      Some(AllowedAnyMediatype)
-    else
-      Some(AllowedSomeMediatypes(mediatypeRanges.to(Set)))
-  }
-}
 
 object UploaderServer {
 

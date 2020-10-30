@@ -240,7 +240,7 @@ class XFormsInstance(
   def allowExternalEvent(eventName: String) = false
 
   // Write the instance document to the specified ContentHandler
-  def write(xmlReceiver: XMLReceiver) =
+  def write(xmlReceiver: XMLReceiver): Unit =
     TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
 
   // Log the instance
@@ -254,7 +254,7 @@ class XFormsInstance(
   }
 
   // Print the instance with extra annotation attributes to Console.out. For debug only.
-  def debugPrintOut() = {
+  def debugPrintOut(): Unit = {
     val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
     identityTransformerHandler.setResult(new StreamResult(Console.out))
     write(identityTransformerHandler)

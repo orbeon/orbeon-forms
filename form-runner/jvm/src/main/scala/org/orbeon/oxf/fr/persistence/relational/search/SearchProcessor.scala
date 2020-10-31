@@ -15,17 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchVersion
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
-import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo}
+import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.XMLReceiver
 
 class SearchProcessor
   extends ProcessorImpl
-    with SearchRequest
+    with SearchRequestParser
     with SearchLogic
     with SearchResult {
 
@@ -34,17 +35,15 @@ class SearchProcessor
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))
 
-  override def createOutput(name: String) =
+  override def createOutput(name: String): ProcessorOutput =
     addOutput(
       name, new CacheableTransformerOutputImpl(self, name) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          val version =
-            Version(None, httpRequest.getFirstHeader(OrbeonFormDefinitionVersionLower)) match {
-              case v @ Unspecified       => v
-              case v @ Specific(_)       => v
-              case Next | ForDocument(_) => throw HttpStatusCodeException(StatusCode.BadRequest)
-            }
+          val version = {
+            val formDefinitionVersionHeader = httpRequest.getFirstHeader(OrbeonFormDefinitionVersionLower)
+            SearchVersion(formDefinitionVersionHeader)
+          }
 
           val searchDocument = readInputAsTinyTree(
             pipelineContext,

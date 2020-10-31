@@ -16,11 +16,11 @@ package org.orbeon.oxf.fr.persistence.relational.search.adt
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RequestCommon, Version}
 
-case class Request(
+case class SearchRequest(
   provider        : Provider,
   app             : String,
   form            : String,
-  version         : Version,
+  version         : SearchVersion,
   username        : Option[String],
   group           : Option[String],
   pageSize        : Int,
@@ -29,8 +29,7 @@ case class Request(
   drafts          : Drafts,
   freeTextSearch  : Option[String],
   anyOfOperations : Option[List[Operation]]
-) extends
-  RequestCommon
+)
 
 sealed trait FilterType
 
@@ -40,7 +39,6 @@ object FilterType {
   case class  Exact     (filter: String)       extends FilterType
   case class  Token     (filter: List[String]) extends FilterType
 }
-
 
 case class Column(
   path           : String,

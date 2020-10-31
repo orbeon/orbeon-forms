@@ -25,13 +25,13 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
-trait SearchRequest {
+trait SearchRequestParser {
 
   val SearchPath = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
 
   def httpRequest = NetUtils.getExternalContext.getRequest
 
-  def parseRequest(searchDocument: DocumentInfo, version: Version): Request = {
+  def parseRequest(searchDocument: DocumentInfo, version: SearchVersion): SearchRequest = {
 
     if (Logger.debugEnabled)
       Logger.logDebug("search request", TransformerUtils.tinyTreeToString(searchDocument))
@@ -46,7 +46,7 @@ trait SearchRequest {
         val group           = httpRequest.credentials flatMap (_.group)
         val operationsElOpt = searchElement.child("operations").headOption
 
-        Request(
+        SearchRequest(
           provider       = Provider.withName(provider),
           app            = app,
           form           = form,

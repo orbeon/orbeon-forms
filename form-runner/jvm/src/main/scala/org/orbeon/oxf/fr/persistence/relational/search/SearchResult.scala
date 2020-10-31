@@ -14,19 +14,18 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, Request}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchRequest}
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 
-
-trait SearchResult extends SearchRequest {
+trait SearchResult extends SearchRequestParser {
 
   def outputResult(
-    request   : Request,
-    documents : List[Document],
-    count     : Int,
-    receiver  : XMLReceiver)
+                    request   : SearchRequest,
+                    documents : List[Document],
+                    count     : Int,
+                    receiver  : XMLReceiver)
   : Unit = {
 
     // Produce XML result

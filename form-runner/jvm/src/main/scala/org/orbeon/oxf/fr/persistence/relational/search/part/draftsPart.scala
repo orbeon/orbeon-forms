@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt._
 
 object draftsPart {
 
-  def apply(request: Request) =
+  def apply(request: SearchRequest) =
     request.drafts match {
       case IncludeDrafts => StatementPart("", Nil)
       case ExcludeDrafts => StatementPart(" AND c.draft = 'N'", Nil)

@@ -15,13 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import java.sql.Connection
 
-import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{FilterType, Request}
+import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{FilterType, SearchRequest}
 import org.orbeon.oxf.util.CoreUtils._
 
 object commonPart  {
 
-  def apply(request: Request, connection: Connection, versionNumber: Int) =
+  def apply(
+    request    : SearchRequest,
+    connection : Connection,
+    versionOpt : Option[Int]
+  ): StatementPart = {
+
     StatementPart(
       sql = {
         val columnFilterTables =
@@ -37,15 +42,17 @@ object commonPart  {
             |           FROM orbeon_i_current c
             |                $columnFilterTables
             |                $freeTextTable
-            |          WHERE c.app          = ?    AND
-            |                c.form         = ?    AND
-            |                c.form_version = ?
+            |          WHERE     c.app          = ?
+            |                AND c.form         = ?
+            |                ${ if (versionOpt.isDefined) "AND c.form_version = ?" else ""}
             |""".stripMargin
       },
-      setters = List(
-        _.setString(_, request.app),
-        _.setString(_, request.form),
-        _.setInt   (_, versionNumber)
-      )
+      setters = {
+        val appSetter        :        Setter  = _.setString(_, request.app)
+        val formSetter       :        Setter  = _.setString(_, request.form)
+        val versionSetterOpt : Option[Setter] = versionOpt.map(v => _.setInt   (_, v))
+        List(appSetter, formSetter) ++ versionSetterOpt
+      }
     )
+  }
 }

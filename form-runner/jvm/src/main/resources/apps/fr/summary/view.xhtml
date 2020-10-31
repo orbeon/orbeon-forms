@@ -104,6 +104,18 @@
                 name="has-pdf-template"
                 value="$source-form-attachments/pdf/xxf:trim() != ''"/>
 
+            <xf:var
+                name="requested-version"
+                as="xs:integer?"
+                value="xs:integer(xxf:get-request-parameter('form-version')[1][. castable as xs:integer])"/>
+
+            <xf:var
+                name="show-version-selector"
+                value="
+                    exists($requested-version) or
+                    xxf:property(string-join(('oxf.fr.summary.show-version-selector', $app, $form), '.'))
+                "/>
+
             <!-- NOTE: use xxf:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
                  improve submissions to handle conditional GET as well when using caching. -->
@@ -296,7 +308,7 @@
                 <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
                     <xf:property name="app"                        value="fr:app-name()"/>
                     <xf:property name="form"                       value="fr:form-name()"/>
-                    <xf:property name="restrict-to-latest-version" value="false()"/>
+                    <xf:property name="restrict-to-latest-version" value="not($show-version-selector)"/>
                     <xf:property name="all-forms"                  value="false()"/>
                 </xf:dispatch>
             </xf:action>
@@ -306,11 +318,6 @@
                 frf:sendError(404)
             </xf:action>
             <xf:action event="fr-versions-read" observer="fr-versioning-model">
-
-                <xf:var
-                    name="requested-version"
-                    as="xs:integer?"
-                    value="xs:integer(xxf:get-request-parameter('form-version')[1][. castable as xs:integer])"/>
 
                 <!-- 404 if requested version is not available -->
                 <xf:action if="exists($requested-version) and not(event('versions') = $requested-version)" type="xpath">
@@ -465,7 +472,7 @@
 
                 <xf:header>
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                    <xf:value value="fr:form-version()"/>
+                    <xf:value value="if ($show-version-selector) then fr:form-version() else 'all'"/>
                 </xf:header>
 
                 <!-- Set language upon submitting -->

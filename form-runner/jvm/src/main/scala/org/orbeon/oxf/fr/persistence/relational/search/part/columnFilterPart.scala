@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, Request}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, SearchRequest}
 
 object columnFilterPart {
 
-  def apply(request: Request): StatementPart =
+  def apply(request: SearchRequest): StatementPart =
     if (! request.columns.exists(_.filterType != FilterType.None))
         NilPart
     else

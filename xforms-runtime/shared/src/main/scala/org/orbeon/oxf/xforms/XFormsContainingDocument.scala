@@ -14,15 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option._
-import org.orbeon.oxf.common.{OrbeonLocationException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -72,7 +68,7 @@ class XFormsContainingDocument(
   val functionLibrary   : FunctionLibrary      = staticState.functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
   val xpathDependencies : XPathDependencies    =
-    if (Version.isPE && staticState.isXPathAnalysis)
+    if (CoreCrossPlatformSupport.isPE && staticState.isXPathAnalysis)
       new PathMapXPathDependencies(this)
     else
       new DumbXPathDependencies

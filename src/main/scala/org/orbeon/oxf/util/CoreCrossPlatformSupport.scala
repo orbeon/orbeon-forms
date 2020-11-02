@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.common.Version
+
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
+  def isPE: Boolean = Version.isPE
   def randomHexId: String = SecureUtils.randomHexId
 }

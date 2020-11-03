@@ -19,6 +19,7 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.xml.NamespaceMapping
 
+// TODO: Check what really belongs to the form compilation and split out the rest.
 trait StaticXPathTrait {
 
   // These types are temporary indirections while we have two incompatible versions of Saxon (9.1 and 10)

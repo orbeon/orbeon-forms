@@ -821,8 +821,10 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
   )
 
 lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm
-  .dependsOn(commonJVM)
-  .dependsOn(domJVM)
+  .dependsOn(
+    commonJVM,
+    domJVM
+  )
   .settings(
     libraryDependencies                ++= CoreLibraryDependencies
   )

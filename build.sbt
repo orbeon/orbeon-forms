@@ -752,6 +752,33 @@ lazy val xformsCommonJS = xformsCommon.js
     Compile / unmanagedClasspath := Nil
   )
 
+lazy val xformsCompiler = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-compiler"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-compiler",
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
+  )
+
+lazy val xformsCompilerJVM = xformsCompiler.jvm
+  .dependsOn(
+    xformsCommonJVM,
+    coreCrossPlatformJVM,
+    core
+  )
+
+lazy val xformsCompilerJS = xformsCompiler.js
+  .dependsOn(
+    xformsCommonJS,
+    coreCrossPlatformJS
+  )
+  .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
+
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
   .settings(commonSettings: _*)
   .settings(

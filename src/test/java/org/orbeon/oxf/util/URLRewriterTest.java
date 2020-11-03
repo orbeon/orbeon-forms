@@ -142,7 +142,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewrite() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
@@ -249,7 +249,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewriteForward() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
@@ -297,7 +297,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testResourceRewriteFilter() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
+        final List<PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request

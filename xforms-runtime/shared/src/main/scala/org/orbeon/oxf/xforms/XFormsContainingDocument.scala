@@ -16,27 +16,42 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option._
 import org.orbeon.oxf.common.{OrbeonLocationException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.logging.LifecycleLogger
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
-import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.xforms.{DelayedEvent, DeploymentType}
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.Seq
-import scala.util.control.NonFatal
+import scala.collection.{Seq, immutable}
 
+
+case class RequestInformation(
+  deploymentType             : DeploymentType,
+  requestMethod              : HttpMethod,
+  requestContextPath         : String,
+  requestPath                : String,
+  requestHeaders             : Map[String, List[String]],
+  requestParameters          : Map[String, List[String]],
+  containerType              : String,
+  containerNamespace         : String,
+  versionedPathMatchers      : List[PathMatcher],
+  isEmbedded                 : Boolean,
+  isPortletContainerOrRemote : Boolean
+)
 
 /**
  * Represents an XForms containing document.
@@ -131,23 +146,30 @@ class XFormsContainingDocument(
       processDueDelayedEvents(false)
     }
 
-  def restoreDynamicState(dynamicState: DynamicState): Unit = {
+  def restoreDynamicState(
+    sequence           : Long,
+    delayedEvents      : immutable.Seq[DelayedEvent],
+    pendingUploads     : Set[String],
+    lastAjaxResponse   : Option[SAXStore],
+    decodeControls     : List[ControlState],
+    focusedControl     : Option[String],
+    requestInformation : RequestInformation
+  ): Unit = {
 
-    this._sequence = dynamicState.sequence
+    this._sequence = sequence
 
     indentedLogger.logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", this._sequence.toString)
 
     // Restore request information
-    restoreRequestInformation(dynamicState)
-    restorePathMatchers(dynamicState)
+    restoreRequestInformation(requestInformation)
 
     // Restore other encoded objects
-    restoreDelayedEvents(dynamicState)
-    this.pendingUploads = dynamicState.decodePendingUploads
-    this._lastAjaxResponse = dynamicState.decodeLastAjaxResponse
+    restoreDelayedEvents(delayedEvents)
+    this.pendingUploads = pendingUploads
+    this._lastAjaxResponse = lastAjaxResponse
 
     XFormsAPI.withContainingDocument(this) {
-      Controls.withDynamicStateToRestore(dynamicState.decodeInstancesControls) {
+      Controls.withDynamicStateToRestore(decodeControls) {
 
         // Restore models state
         addAllModels()
@@ -160,7 +182,7 @@ class XFormsContainingDocument(
         controls.createControlTree(Controls.restoringControls)
 
         // Once the control tree is rebuilt, restore focus if needed
-        dynamicState.focusedControl foreach { focusedControl =>
+        focusedControl foreach { focusedControl =>
           controls.setFocusedControl(controls.getCurrentControlTree.findControl(focusedControl))
         }
       }
@@ -318,115 +340,4 @@ class XFormsContainingDocument(
    */
   def isUploadPendingFor(uploadControl: XFormsUploadControl): Boolean =
     pendingUploads.contains(uploadControl.getUploadUniqueId)
-}
-
-object XFormsContainingDocument {
-
-  /**
-   * Create an `XFormsContainingDocument` from an `XFormsStaticState` object.
-   *
-   * Used by `XFormsToXHTML` and tests.
-   *
-   * @param staticState     static state object
-   * @param uriResolver     for loading instances during initialization (and possibly more, such as schemas and `GET` submissions upon initialization)
-   * @param response        optional response for handling `replace="all"` during initialization
-   * @param mustInitialize  initialize document (`false` for testing only)
-   */
-  def apply(
-    staticState    : XFormsStaticState,
-    uriResolver    : Option[XFormsURIResolver],
-    response       : Option[ExternalContext.Response],
-    mustInitialize : Boolean
-  ): XFormsContainingDocument =
-    try {
-      val uuid = SecureUtils.randomHexId
-
-      // attempt to ignore `oxf:xforms-submission`
-      if (staticState.propertyMaybeAsExpression(NoUpdates).fold(_.toString != "true" , _ => true))
-        LifecycleLogger.eventAssumingRequest("xforms", "new form session", List("uuid" -> uuid))
-
-      val doc = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
-      implicit val logger = doc.indentedLogger
-      withDebug("initialization: creating new ContainingDocument (static state object provided).", List("uuid" -> uuid)) {
-
-        doc.initializeRequestInformation()
-        doc.initializePathMatchers()
-
-        if (mustInitialize)
-          doc.initialize(uriResolver, response)
-      }
-      doc
-    } catch {
-      case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "initializing XForms containing document".some))
-    }
-
-  /**
-   * Restore an `XFormsContainingDocument` from `XFormsState` only.
-   *
-   * Used by `XFormsStateManager`.
-   *
-   * @param xformsState    XFormsState containing static and dynamic state
-   * @param disableUpdates whether to disable updates (for recreating initial document upon browser back)
-   */
-  def apply(
-    xformsState     : XFormsState,
-    disableUpdates  : Boolean,
-    forceEncryption : Boolean)(
-    indentedLogger  : IndentedLogger
-  ): XFormsContainingDocument =
-    try {
-      // 1. Restore the static state
-      val staticState = findOrRestoreStaticState(xformsState, forceEncryption)(indentedLogger)
-
-      // 2. Restore the dynamic state
-      val dynamicState = xformsState.dynamicState getOrElse (throw new IllegalStateException)
-
-      val doc = new XFormsContainingDocument(staticState, dynamicState.uuid, disableUpdates)
-      implicit val logger = doc.indentedLogger
-      withDebug("initialization: restoring containing document") {
-        doc.restoreDynamicState(dynamicState)
-      }
-      doc
-    } catch {
-      case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "re-initializing XForms containing document".some))
-    }
-
-  private def findOrRestoreStaticState(
-    xformsState     : XFormsState,
-    forceEncryption : Boolean)(implicit
-    indentedLogger  : IndentedLogger
-  ): XFormsStaticState =
-    xformsState.staticStateDigest match {
-      case digestOpt @ Some(digest) =>
-        (XFormsStaticStateCache.findDocument(digest) match {
-          case Some((cachedState, _)) =>
-            // Found static state in cache
-            debug("found static state by digest in cache")
-            cachedState
-          case _ =>
-            // Not found static state in cache, create static state from input
-            debug("did not find static state by digest in cache")
-            val restoredStaticState =
-              withDebug("initialization: restoring static state") {
-                XFormsStaticStateImpl.restore(
-                  digest          = digestOpt,
-                  encodedState    = xformsState.staticState getOrElse (throw new IllegalStateException),
-                  forceEncryption = forceEncryption
-                )
-              }
-            // Store in cache
-            XFormsStaticStateCache.storeDocument(restoredStaticState)
-            restoredStaticState
-        }) ensuring (_.isServerStateHandling)
-      case digestOpt @ None =>
-        // Not digest provided, create static state from input
-        debug("did not find static state by digest in cache")
-        XFormsStaticStateImpl.restore(
-          digest          = digestOpt,
-          encodedState    = xformsState.staticState getOrElse (throw new IllegalStateException),
-          forceEncryption = forceEncryption
-        ) ensuring (_.isClientStateHandling)
-    }
 }

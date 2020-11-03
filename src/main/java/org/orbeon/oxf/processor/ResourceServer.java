@@ -20,6 +20,7 @@ import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Mediatypes;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PathMatcher;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -59,7 +60,7 @@ public class ResourceServer extends ProcessorImpl {
                     throw new OXFException("Missing configuration.");
             }
 
-            final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
+            final List<PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
             serveResource(urlString, URLRewriterUtils.isVersionedURL(urlString, pathMatchers));
         } catch (Exception e) {
             throw new OXFException(e);

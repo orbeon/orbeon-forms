@@ -56,10 +56,10 @@ public class URLRewriterUtils {
     public static final List<PathMatcher> EMPTY_PATH_MATCHER_LIST = Collections.emptyList();
 
     private static final PathMatcher MATCH_ALL_PATH_MATCHER;
-    public static final List<URLRewriterUtils.PathMatcher> MATCH_ALL_PATH_MATCHERS;
+    public static final List<PathMatcher> MATCH_ALL_PATH_MATCHERS;
 
     static {
-        MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/.*", null, true);
+        MATCH_ALL_PATH_MATCHER = new PathMatcher("/.*", null, true);
         MATCH_ALL_PATH_MATCHERS = Collections.singletonList(URLRewriterUtils.MATCH_ALL_PATH_MATCHER);
     }
 
@@ -237,7 +237,7 @@ public class URLRewriterUtils {
      * @param rewriteMode       rewrite mode
      * @return                  rewritten URL
      */
-    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<URLRewriterUtils.PathMatcher> pathMatchers, int rewriteMode) {
+    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<PathMatcher> pathMatchers, int rewriteMode) {
         if (pathMatchers != null && pathMatchers.size() > 0) {
             // We need to match the URL against the matcher
 
@@ -403,7 +403,7 @@ public class URLRewriterUtils {
         return SecureUtils.hmacString(Version.VersionNumber(), "hex");
     }
 
-    public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {
+    public static List<PathMatcher> getMatchAllPathMatcher() {
         if (isResourcesVersioned()) {
             return MATCH_ALL_PATH_MATCHERS;
         } else {
@@ -411,47 +411,24 @@ public class URLRewriterUtils {
         }
     }
 
-    public static class PathMatcher {
-        public final String regexp;
-        public final String mimeType;
-        public final boolean versioned;
-
-        public final Pattern pattern;
-
-        /**
-         * Construct from parameters.
-         *
-         * @param regexp    regexp pattern to match
-         * @param mimeType  mediatype
-         * @param versioned the resource is versioned
-         */
-        public PathMatcher(String regexp, String mimeType, boolean versioned) {
-            this.regexp = regexp;
-            this.mimeType = mimeType;
-            this.versioned = versioned;
-
-            this.pattern = Pattern.compile(regexp);
-        }
-    }
-
-    public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
-        for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
-            if (RegexpMatcher.jMatchResult(pathMatcher.pattern, absolutePathNoContext).matches())
+    public static boolean isVersionedURL(String absolutePathNoContext, List<PathMatcher> pathMatchers) {
+        for (final PathMatcher pathMatcher : pathMatchers) {
+            if (RegexpMatcher.jMatchResult(pathMatcher.pattern(), absolutePathNoContext).matches())
                 return true;
         }
 
         return false;
     }
 
-    public static List<URLRewriterUtils.PathMatcher> getPathMatchers() {
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
+    public static List<PathMatcher> getPathMatchers() {
+        final List<PathMatcher> pathMatchers = (List<PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
         return (pathMatchers != null) ? pathMatchers : URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
     }
 
     // Get path matchers from the pipeline context
     public static Callable<List<PathMatcher>> getPathMatchersCallable()  {
-        return new Callable<List<URLRewriterUtils.PathMatcher>>() {
-            public List<URLRewriterUtils.PathMatcher> call() throws Exception {
+        return new Callable<List<PathMatcher>>() {
+            public List<PathMatcher> call() throws Exception {
                 return URLRewriterUtils.getPathMatchers();
             }
         };

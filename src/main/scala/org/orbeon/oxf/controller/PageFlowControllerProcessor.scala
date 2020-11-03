@@ -14,7 +14,7 @@
 package org.orbeon.oxf.controller
 
 import java.util.regex.Pattern
-import java.util.{List => JList, Map => JMap}
+import java.{util => ju}
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
@@ -75,7 +75,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
     // actually know what a "resource" is.
     if (pageFlow.pathMatchers.nonEmpty) {
-      Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[URLRewriterUtils.PathMatcher]]) match {
+      Option(pc.getAttribute(PathMatchers).asInstanceOf[ju.List[PathMatcher]]) match {
         case Some(existingPathMatchers) =>
           // Add if we come after others (in case of nested page flows)
           val allMatchers = existingPathMatchers.asScala ++ pageFlow.pathMatchers
@@ -316,7 +316,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val pathMatchers = (
       routeElements
       collect { case files: FileElement if files.versioned => files }
-      map     (f => new URLRewriterUtils.PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+      map     (f => new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
     )
 
     // Compile the pipeline for the given page element
@@ -378,8 +378,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     globalInstancePassing     : String,
     epilogueURL               : Option[String],
     epilogueElement           : Element,
-    pageIdToPathInfo          : JMap[String, String],
-    pageIdToSetValuesDocument : JMap[String, Document]
+    pageIdToPathInfo          : ju.Map[String, String],
+    pageIdToSetValuesDocument : ju.Map[String, Document]
    ): ASTPipeline =
     new ASTPipeline {
 
@@ -620,7 +620,7 @@ object PageFlowControllerProcessor {
     notFoundRoute     : Option[PageOrServiceRoute],
     unauthorizedRoute : Option[PageOrServiceRoute],
     errorRoute        : Option[PageOrServiceRoute],
-    pathMatchers      : Seq[URLRewriterUtils.PathMatcher],
+    pathMatchers      : Seq[PathMatcher],
     file              : Option[String]
   )
 

@@ -18,8 +18,7 @@ import java.io._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.{Document, Namespace, QName}
-import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
-import org.orbeon.oxf.util.WhitelistObjectInputStream
+import org.orbeon.oxf.util.{PathMatcher, WhitelistObjectInputStream}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}

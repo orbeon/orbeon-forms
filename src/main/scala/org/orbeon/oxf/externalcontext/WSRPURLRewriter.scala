@@ -19,11 +19,11 @@ import java.{util => ju}
 
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.util.{NetUtils, PathUtils, StringConversions, URLRewriterUtils}
+import org.orbeon.oxf.util.{NetUtils, PathMatcher, PathUtils, StringConversions, URLRewriterUtils}
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
-  retrievePathMatchers : => ju.List[URLRewriterUtils.PathMatcher],
+  retrievePathMatchers : => ju.List[PathMatcher],
   request              : ExternalContext.Request,
   wsrpEncodeResources  : Boolean
 ) extends URLRewriter {
@@ -33,11 +33,11 @@ class WSRPURLRewriter(
   // We don't initialize the matchers right away, because when the rewriter is created, they may not be available.
   // Specifically. the rewriter is typically created along the ExternalContext and PipelineContext, before the PFC has
   // been able to place the matchers in the PipelineContext.
-  private var pathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
+  private var pathMatchers: ju.List[PathMatcher] = null
 
   // For Java callers, use Callable
   def this(
-    getPathMatchers     : Callable[ju.List[URLRewriterUtils.PathMatcher]],
+    getPathMatchers     : Callable[ju.List[PathMatcher]],
     request             : ExternalContext.Request,
     wsrpEncodeResources : Boolean
   ) = this(

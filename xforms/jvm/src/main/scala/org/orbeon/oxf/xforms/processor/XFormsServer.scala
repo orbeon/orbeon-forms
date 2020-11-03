@@ -48,6 +48,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -641,10 +642,10 @@ class XFormsServer extends ProcessorImpl {
               // State to set before running events
               locally {
                 // Set URL rewriter resource path information based on information in static state
-                if (containingDocument.getVersionedPathMatchers != null && containingDocument.getVersionedPathMatchers.size > 0) {
+                if (containingDocument.getVersionedPathMatchers.nonEmpty) {
                   // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission
                   // processor running in same pipeline)
-                  pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, containingDocument.getVersionedPathMatchers)
+                  pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, containingDocument.getVersionedPathMatchers.asJava)
                 }
 
                 // Set deployment mode into request (useful for epilogue)

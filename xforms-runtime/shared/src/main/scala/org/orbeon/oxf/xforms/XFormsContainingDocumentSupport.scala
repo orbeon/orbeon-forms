@@ -17,7 +17,6 @@ import java.util.concurrent.locks.Lock
 import java.{util => ju}
 import cats.Eval
 import cats.syntax.option._
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.OXFException
@@ -27,10 +26,8 @@ import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties._
@@ -44,7 +41,7 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
-import org.orbeon.oxf.xforms.state.{DynamicState, LockResponse, RequestParameters, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -54,7 +51,7 @@ import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
-import scala.collection.{immutable => i, mutable => m}
+import scala.collection.{immutable, immutable => i, mutable => m}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
@@ -557,120 +554,36 @@ trait ContainingDocumentRequest {
 
   def staticState : XFormsStaticState
 
-  private var _deploymentType             : DeploymentType = null
-  private var _requestMethod              : HttpMethod = null
-  private var _requestContextPath         : String = null
-  private var _requestPath                : String = null
-  private var _requestHeaders             : Map[String, List[String]] = null
-  private var _requestParameters          : Map[String, List[String]] = null
-  private var _containerType              : String = null
-  private var _containerNamespace         : String = null
-  private var _versionedPathMatchers      : ju.List[URLRewriterUtils.PathMatcher] = null
-  private var _isEmbedded                 : Boolean = false
-  private var _isPortletContainerOrRemote : Boolean = false
+  private var _requestInformation: RequestInformation = null
 
-  def getDeploymentType        = _deploymentType
-  def getRequestMethod         = _requestMethod
-  def getRequestContextPath    = _requestContextPath
-  def getRequestPath           = _requestPath
-  def getRequestHeaders        = _requestHeaders
-  def getRequestParameters     = _requestParameters
-  def getContainerType         = _containerType
-  def getContainerNamespace    = _containerNamespace // always "" for servlets.
-  def getVersionedPathMatchers = _versionedPathMatchers
+  def getDeploymentType        = _requestInformation.deploymentType
+  def getRequestMethod         = _requestInformation.requestMethod
+  def getRequestContextPath    = _requestInformation.requestContextPath
+  def getRequestPath           = _requestInformation.requestPath
+  def getRequestHeaders        = _requestInformation.requestHeaders
+  def getRequestParameters     = _requestInformation.requestParameters
+  def getContainerType         = _requestInformation.containerType
+  def getContainerNamespace    = _requestInformation.containerNamespace // always "" for servlets.
+  def getVersionedPathMatchers = _requestInformation.versionedPathMatchers
 
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
-  def isPortletContainer         = _containerType == "portlet"
-  def isEmbedded                 = _isEmbedded
-  def isServeInlineResources     = staticState.isInlineResources || _isPortletContainerOrRemote
+  def isPortletContainer         = _requestInformation.containerType == "portlet"
+  def isEmbedded                 = _requestInformation.isEmbedded
+  def isServeInlineResources     = staticState.isInlineResources || _requestInformation.isPortletContainerOrRemote
 
-  private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
-    Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
+  protected[xforms] def initializeRequestInformation(requestInformation: RequestInformation): Unit =
+    this._requestInformation = requestInformation
 
-  private def isPortletContainerOrRemoteFromHeaders(headers: Map[String, List[String]]) =
-    isPortletContainer || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
-
-  protected[xforms] def initializeRequestInformation(): Unit =
-    Option(CrossPlatformSupport.externalContext.getRequest) match {
-      case Some(request) =>
-        // Remember if filter provided separate deployment information
-
-        import OrbeonXFormsFilter._
-
-        val rendererDeploymentType =
-          request.getAttributesMap.get(RendererDeploymentAttributeName).asInstanceOf[String]
-
-        _deploymentType =
-          rendererDeploymentType match {
-            case "separate"   => DeploymentType.Separate
-            case "integrated" => DeploymentType.Integrated
-            case _            => DeploymentType.Standalone
-          }
-
-        _requestMethod = request.getMethod
-
-        // Try to get request context path
-        _requestContextPath = request.getClientContextPath("/")
-
-        // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
-        // NOTE: We used to have response.rewriteRenderURL() on this, but why?
-        _requestPath =
-          Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse
-          request.getRequestPath
-
-        _requestHeaders =
-          request.getHeaderValuesMap.asScala mapValues (_.toList) toMap
-
-        _isEmbedded = isEmbeddedFromHeaders(_requestHeaders)
-
-        _requestParameters =
-          request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap
-
-        _containerType = request.getContainerType
-        _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
-        _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
-      case None =>
-        // Special case when we run outside the context of a request
-        _deploymentType = DeploymentType.Standalone
-        _requestMethod = HttpMethod.GET
-        _requestContextPath = ""
-        _requestPath = "/"
-        _requestHeaders = Map.empty
-        _isEmbedded = false
-        _requestParameters = Map.empty
-        _containerType = "servlet"
-        _containerNamespace = ""
-        _isPortletContainerOrRemote = false
-    }
-
-  protected[xforms] def initializePathMatchers(): Unit =
-    _versionedPathMatchers =
-      Option(PipelineContext.get.getAttribute(PageFlowControllerProcessor.PathMatchers).asInstanceOf[ju.List[PathMatcher]]) getOrElse
-        ju.Collections.emptyList[PathMatcher]
-
-  protected def restoreRequestInformation(dynamicState: DynamicState): Unit =
-    dynamicState.deploymentType match {
-      case Some(_) =>
-        // Normal case where information below was previously serialized
-        _deploymentType             = (dynamicState.deploymentType map DeploymentType.withNameInsensitive orNull)
-        _requestMethod              = dynamicState.requestMethod.orNull
-        _requestContextPath         = dynamicState.requestContextPath.orNull
-        _requestPath                = dynamicState.requestPath.orNull
-        _requestHeaders             = dynamicState.requestHeaders.toMap
-        _isEmbedded                 = isEmbeddedFromHeaders(_requestHeaders)
-        _requestParameters          = dynamicState.requestParameters.toMap
-        _containerType              = dynamicState.containerType.orNull
-        _containerNamespace         = dynamicState.containerNamespace.orNull
-        _isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(_requestHeaders)
+  protected def restoreRequestInformation(requestInformationOpt: Option[RequestInformation]): Unit =
+    requestInformationOpt match {
+      case Some(requestInformation) =>
+        this._requestInformation = requestInformation
       case None =>
         // Use information from the request
         // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
         initializeRequestInformation()
     }
-
-  protected def restorePathMatchers(dynamicState: DynamicState): Unit =
-    _versionedPathMatchers = dynamicState.decodePathMatchers.asJava
 }
 
 trait ContainingDocumentDelayedEvents {
@@ -786,8 +699,8 @@ trait ContainingDocumentDelayedEvents {
     processRemainingBatchesRecursively()
   }
 
-  protected def restoreDelayedEvents(dynamicState: DynamicState): Unit =
-    _delayedEvents ++= dynamicState.decodeDelayedEvents
+  protected def restoreDelayedEvents(delayedEvents: immutable.Seq[DelayedEvent]): Unit =
+    _delayedEvents ++= delayedEvents // Q: Why `++=` and not just `=`?
 }
 
 trait ContainingDocumentClientState {

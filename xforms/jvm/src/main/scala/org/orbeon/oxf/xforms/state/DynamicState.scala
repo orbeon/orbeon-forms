@@ -16,18 +16,18 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
+import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}
 import sbinary.Operations._
 
-import scala.jdk.CollectionConverters._
+import scala.collection.immutable
+
 
 // Immutable representation of the dynamic state
 case class DynamicState(
@@ -51,14 +51,14 @@ case class DynamicState(
   delayedEvents       : Seq[Byte]
 ) {
   // Decode individual bits
-  def decodePathMatchers           = fromByteSeq[List[PathMatcher]](pathMatchers)
-  def decodePendingUploads         = fromByteSeq[Set[String]](pendingUploads)
-  def decodeLastAjaxResponse       = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
-  def decodeInstances              = fromByteSeq[List[InstanceState]](instances)
-  def decodeControls               = fromByteSeq[List[ControlState]](controls)
-  def decodeDelayedEvents          = fromByteSeq[List[DelayedEvent]](delayedEvents)
+  def decodePathMatchers     : List[PathMatcher]           = fromByteSeq[List[PathMatcher]](pathMatchers)
+  def decodePendingUploads   : Set[String]                 = fromByteSeq[Set[String]](pendingUploads)
+  def decodeLastAjaxResponse : Option[SAXStore]            = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
+  def decodeInstances        : List[InstanceState]         = fromByteSeq[List[InstanceState]](instances)
+  def decodeControls         : List[ControlState]          = fromByteSeq[List[ControlState]](controls)
+  def decodeDelayedEvents    : immutable.Seq[DelayedEvent] = fromByteSeq[List[DelayedEvent]](delayedEvents)
 
-  def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
+  def decodeInstancesControls: InstancesControls = InstancesControls(decodeInstances, decodeControls map (c => (c.effectiveId, c)) toMap)
 
   // Encode to a string representation
   def encodeToString(compress: Boolean, isForceEncryption: Boolean): String =
@@ -180,36 +180,6 @@ case class DynamicState(
 //  }
 }
 
-// Minimal immutable representation of a serialized control
-case class ControlState(
-  effectiveId : String,
-  visited     : Boolean,
-  keyValues   : Map[String, String]
-)
-
-// Minimal immutable representation of a serialized instance
-// If there is caching information, don't include the actual content
-case class InstanceState(
-  effectiveId      : String,
-  modelEffectiveId : String,
-  cachingOrContent : InstanceCaching Either String,
-  readonly         : Boolean,
-  modified         : Boolean,
-  valid            : Boolean
-) {
-
-  def this(instance: XFormsInstance) =
-    this(
-      instance.getEffectiveId,
-      instance.parent.getEffectiveId,
-      instance.instanceCaching.toLeft(instance.contentAsString),
-      instance.readonly,
-      instance.modified,
-      instance.valid)
-}
-
-case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState])
-
 object DynamicState {
 
   // Create a DynamicState from a document
@@ -263,7 +233,7 @@ object DynamicState {
       requestParameters   = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
       containerType       = Option(document.getContainerType),
       containerNamespace  = Option(document.getContainerNamespace),
-      pathMatchers        = toByteSeq(document.getVersionedPathMatchers.asScala.toList),
+      pathMatchers        = toByteSeq(document.getVersionedPathMatchers),
       focusedControl      = document.controls.getFocusedControl map (_.getEffectiveId),
       pendingUploads      = toByteSeq(document.getPendingUploads),
       lastAjaxResponse    = toByteSeq(document.lastAjaxResponse),

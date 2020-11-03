@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_SHORT
+import org.orbeon.xforms.XFormsNames.xxformsQName
 
 /**
  * 10.12 The message Element
@@ -31,10 +31,10 @@ private object XFormsMessageAction {
   val ModelessQName  = QName("modeless")
   val EphemeralQName = QName("ephemeral")
 
-  val LogDebugQName  = QName("log-debug", XXFORMS_NAMESPACE_SHORT)
-  val LogInfoQName   = QName("log-info",  XXFORMS_NAMESPACE_SHORT)
-  val LogWarnQName   = QName("log-warn",  XXFORMS_NAMESPACE_SHORT)
-  val LogErrorQName  = QName("log-error", XXFORMS_NAMESPACE_SHORT)
+  val LogDebugQName  = xxformsQName("log-debug")
+  val LogInfoQName   = xxformsQName("log-info")
+  val LogWarnQName   = xxformsQName("log-warn")
+  val LogErrorQName  = xxformsQName("log-error")
 
   val LogPrefix = "xf:message"
 

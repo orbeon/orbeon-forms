@@ -17,7 +17,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XFormsRevalidateEvent}
+import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
 

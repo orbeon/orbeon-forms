@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xml.XMLReceiverHelper
-
 import scala.collection.mutable
 
 trait XFormsContainerControl extends VisitableTrait {

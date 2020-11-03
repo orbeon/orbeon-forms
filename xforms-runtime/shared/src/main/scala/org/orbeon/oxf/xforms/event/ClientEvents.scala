@@ -21,7 +21,6 @@ import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.XFormsEvent._

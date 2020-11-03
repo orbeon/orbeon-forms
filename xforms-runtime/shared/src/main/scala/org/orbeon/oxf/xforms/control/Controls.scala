@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
-import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
+import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.{XFormsNames, XFormsId}
 
 import scala.jdk.CollectionConverters._

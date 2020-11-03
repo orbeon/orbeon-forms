@@ -3,7 +3,6 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 
 case class SecondPassParameters(

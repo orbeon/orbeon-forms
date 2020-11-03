@@ -18,10 +18,10 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.xforms.{Load, UrlType, XFormsNames}
+import org.orbeon.xforms.{UrlType, XFormsNames}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 

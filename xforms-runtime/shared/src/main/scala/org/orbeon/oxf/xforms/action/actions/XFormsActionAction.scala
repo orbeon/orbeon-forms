@@ -88,7 +88,7 @@ class XFormsActionAction extends XFormsAction {
           partAnalysis.findControlAnalysis(childPrefixedId) match {
             case Some(variable: VariableAnalysisTrait) =>
               // Scope variable
-              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
+              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), handleNonFatal = false)
               variablesCount += 1
             case Some(action: ActionTrait) =>
               // Run child action

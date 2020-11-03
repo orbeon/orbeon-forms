@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, HeadElement, XBLAssets, XBLAssetsBuilder}
+import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssets, XBLAssetsBuilder}
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.{immutable => i}

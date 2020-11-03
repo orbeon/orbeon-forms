@@ -13,21 +13,20 @@
   */
 package org.orbeon.oxf.xforms
 
-import java.{lang => jl, util => ju}
+import java.{util => ju}
 
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.XFormsNames._
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
-import scala.collection.compat._
+import scala.jdk.CollectionConverters._
 
 private class ControlIndex {
 
@@ -126,7 +125,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       val allControls = _controlIndex.effectiveIdsToControls.values
       if (state.isEmpty) {
         // Copy list because it can be modified concurrently as events are being dispatched and handled
-        val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.to(List)
+        val controlIds = _controlIndex.effectiveIdsToControls.keysIterator.toList
         updateValueControls(controlIds)
         dispatchRefreshEvents(controlIds, isInitial = true)
       } else {

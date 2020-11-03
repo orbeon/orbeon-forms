@@ -19,4 +19,5 @@ import org.orbeon.oxf.common.Version
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def isPE: Boolean = Version.isPE
   def randomHexId: String = SecureUtils.randomHexId
+  def getApplicationResourceVersion: Option[String] = Option(URLRewriterUtils.getApplicationResourceVersion)
 }

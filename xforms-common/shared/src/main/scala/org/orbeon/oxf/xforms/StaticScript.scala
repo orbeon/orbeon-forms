@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+
 case class ShareableScript(
   digest     : String,
   clientName : String,

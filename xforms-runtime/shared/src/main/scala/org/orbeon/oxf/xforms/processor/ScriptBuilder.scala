@@ -15,24 +15,26 @@ package org.orbeon.oxf.xforms.processor
 
 import io.circe.generic.auto._
 import io.circe.syntax._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.URLRewriterUtils
-import org.orbeon.oxf.util.URLRewriterUtils.{RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSION_NUMBER_PROPERTY, getApplicationResourceVersion}
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
-import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms.{EventNames, rpc}
 
-import scala.collection.compat._
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 
 object ScriptBuilder {
 
-  def quoteString(s: String) =
+  // TODO: Constants duplicated from URLRewriterUtils
+  val RESOURCES_VERSIONED_PROPERTY      = "oxf.resources.versioned"
+  val RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number"
+  val RESOURCES_VERSIONED_DEFAULT       = false
+
+  private def quoteString(s: String) =
     s""""${s.escapeJavaScript}""""
 
   def escapeJavaScriptInsideScript (js: String): String =
@@ -55,7 +57,7 @@ object ScriptBuilder {
 
   def gatherJavaScriptInitializations(startControl: XFormsControl, includeValue: Boolean): List[(String, Option[String])] = {
 
-    val controlsToInitialize = ListBuffer[(String, Option[String])]()
+    val controlsToInitialize = mutable.ListBuffer[(String, Option[String])]()
 
     Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
       case c: XFormsValueComponentControl =>
@@ -94,7 +96,7 @@ object ScriptBuilder {
 
     val dynamicProperties = {
 
-      def dynamicProperty(p: => Boolean, name: String, value: Any) =
+      def dynamicProperty[T](p: Boolean, name: String, value: T): Option[(String, T)] =
         p option (name -> value)
 
       // Heartbeat delay is dynamic because it depends on session duration
@@ -111,17 +113,21 @@ object ScriptBuilder {
 
       // Whether resources are versioned
       def resourcesVersionedOpt = dynamicProperty(
-        versionedResources != URLRewriterUtils.RESOURCES_VERSIONED_DEFAULT,
+        versionedResources != RESOURCES_VERSIONED_DEFAULT,
         RESOURCES_VERSIONED_PROPERTY,
         versionedResources
       )
 
       // Application version is not an XForms property but we want to expose it on the client
-      def resourcesVersionOpt = dynamicProperty(
-        versionedResources && (getApplicationResourceVersion ne null),
-        RESOURCES_VERSION_NUMBER_PROPERTY,
-        getApplicationResourceVersion
-      )
+      def resourcesVersionOpt =
+        CoreCrossPlatformSupport.getApplicationResourceVersion flatMap
+        (
+          dynamicProperty(
+            versionedResources,
+            RESOURCES_VERSION_NUMBER_PROPERTY,
+            _
+          )
+        )
 
       // Gather all dynamic properties that are defined
       List(heartbeatOpt, helpOpt, resourcesVersionedOpt, resourcesVersionOpt).flatten
@@ -183,7 +189,7 @@ object ScriptBuilder {
     val jsonString =
       rpc.Initializations(
         uuid                   = containingDocument.uuid,
-        namespacedFormId       = XFormsUtils.getNamespacedFormId(containingDocument),
+        namespacedFormId       = containingDocument.getNamespacedFormId,
         repeatTree             = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
         repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
         xformsServerPath       = rewriteResource("/xforms-server"),
@@ -193,7 +199,7 @@ object ScriptBuilder {
           for {
             (id, valueOpt) <- controlsToInitialize
           } yield
-            rpc.Control(namespaceId(containingDocument, id), valueOpt),
+            rpc.Control(containingDocument.namespaceId(id), valueOpt),
         listeners =
           (
             for {
@@ -210,12 +216,12 @@ object ScriptBuilder {
           } yield
           rpc.PollEvent(time - currentTime),
         userScripts =
-          for (script <- containingDocument.getScriptsToRun.to(List) collect { case Right(s) => s })
+          for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
             yield
               rpc.UserScript(
                 functionName = script.script.shared.clientName,
-                targetId     = namespaceId(containingDocument, script.targetEffectiveId),
-                observerId   = namespaceId(containingDocument, script.observerEffectiveId),
+                targetId     = containingDocument.namespaceId(script.targetEffectiveId),
+                observerId   = containingDocument.namespaceId(script.observerEffectiveId),
                 paramValues  = script.paramValues
               )
       ).asJson.noSpaces
@@ -272,10 +278,10 @@ object ScriptBuilder {
 
         // Initial dialogs to open
         for (dialogControl <- dialogsToOpen) {
-          val id       = namespaceId(containingDocument, dialogControl.getEffectiveId)
+          val id       = containingDocument.namespaceId(dialogControl.getEffectiveId)
           val neighbor = (
             dialogControl.neighborControlId
-            map (n => s""""${namespaceId(containingDocument, n)}"""")
+            map (n => s""""${containingDocument.namespaceId(n)}"""")
             getOrElse "null"
           )
 
@@ -285,7 +291,7 @@ object ScriptBuilder {
         // Initial setfocus if present
         // Seems reasonable to do this after dialogs as focus might be within a dialog
         focusElementIdOpt foreach { id =>
-          sb append s"""ORBEON.xforms.Controls.setFocus("${namespaceId(containingDocument, id)}");"""
+          sb append s"""ORBEON.xforms.Controls.setFocus("${containingDocument.namespaceId(id)}");"""
         }
 
         // Initial errors
@@ -293,7 +299,7 @@ object ScriptBuilder {
 
           val title   = "Non-fatal error"
           val details = ServerError.errorsAsHTMLElem(errorsToShow).toString.escapeJavaScript
-          val formId  = XFormsUtils.getNamespacedFormId(containingDocument)
+          val formId  = containingDocument.getNamespacedFormId
 
           sb append s"""ORBEON.xforms.AjaxServer.showError("$title", "$details", "$formId");"""
         }

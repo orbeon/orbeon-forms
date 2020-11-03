@@ -755,16 +755,27 @@ lazy val xformsCommonJS = xformsCommon.js
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-xforms-runtime"
+    name := "orbeon-xforms-runtime",
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
   )
 
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
-    xformsCommonJVM
+    xformsCommonJVM,
+    coreCrossPlatformJVM,
+    core
   )
 
 lazy val xformsRuntimeJS = xformsRuntime.js
-  .dependsOn(xformsCommonJS)
+  .dependsOn(
+    xformsCommonJS,
+    coreCrossPlatformJS
+  )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
 

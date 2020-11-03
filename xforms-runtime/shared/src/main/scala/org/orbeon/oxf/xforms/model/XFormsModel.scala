@@ -24,6 +24,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs, Submission}
@@ -109,7 +110,7 @@ class XFormsModel(
     findObjectById(XFormsId.getStaticIdFromId(effectiveId), None)
   }
 
-  def findObjectById(targetStaticId: String, contextItemOpt: Option[Item]): Option[XFormsObject] = {
+  def findObjectById(targetStaticId: String, contextItemOpt: Option[om.Item]): Option[XFormsObject] = {
 
     if (XFormsId.isEffectiveId(targetStaticId) || XFormsId.isAbsoluteId(targetStaticId))
       throw new OXFException(s"target id must be a static id: `$targetStaticId`")
@@ -263,8 +264,8 @@ trait XFormsModelVariables {
 
   selfModel: XFormsModel =>
 
-  private var topLevelVariables: Map[String, ValueRepresentation] = Map.empty
-  def getTopLevelVariables: Map[String, ValueRepresentation] = topLevelVariables
+  private var topLevelVariables: Map[String, ValueRepresentationType] = Map.empty
+  def getTopLevelVariables: Map[String, ValueRepresentationType] = topLevelVariables
 
   private val contextStack: XFormsContextStack = new XFormsContextStack(container)
   def getContextStack: XFormsContextStack = contextStack
@@ -272,10 +273,10 @@ trait XFormsModelVariables {
   def getVariable(variableName: String): SequenceIterator =
     Value.asIterator(topLevelVariables.get(variableName).orNull)
 
-  def unsafeGetVariableAsNodeInfo(variableName: String): NodeInfo =
-    getVariable(variableName).next().asInstanceOf[NodeInfo]
+  def unsafeGetVariableAsNodeInfo(variableName: String): om.NodeInfo =
+    getVariable(variableName).next().asInstanceOf[om.NodeInfo]
 
-  def setTopLevelVariables(topLevelVariables: Map[String, ValueRepresentation]): Unit =
+  def setTopLevelVariables(topLevelVariables: Map[String, ValueRepresentationType]): Unit =
     selfModel.topLevelVariables = topLevelVariables
 
   // Temporarily initialize the evaluation context to an empty context, so that handlers upon `xforms-model-construct` can work
@@ -293,7 +294,7 @@ trait XFormsModelVariables {
     defaultEvaluationContext = contextStack.getCurrentBindingContext
   }
 
-  val variableResolver: (StructuredQName, XPathContext) => ValueRepresentation =
+  val variableResolver: (StructuredQName, XPathContext) => ValueRepresentationType =
     (variableQName: StructuredQName, xpathContext: XPathContext) =>
       staticModel.bindsByName.get(variableQName.getLocalName) match {
         case Some(targetStaticBind) =>
@@ -399,7 +400,7 @@ trait XFormsModelInstances {
     }
   }
 
-  private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentInfo =
+  private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentNodeInfoType =
     SubmissionUtils.readTinyTree(
       model               = selfModel,
       resolvedAbsoluteUrl = new URI(

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
@@ -313,7 +314,7 @@ class PathMapXPathDependencies(
   def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo): Unit = {
 
     // Caller must only call this for a mutable node belonging to the given model
-    require(nodeInfo.isInstanceOf[VirtualNode])
+    require(nodeInfo.isInstanceOf[VirtualNodeType])
     require(model.findInstanceForNode(nodeInfo) exists (_.model eq model))
 
     getOrCreateModelState(model).markValueChanged(nodeInfo)

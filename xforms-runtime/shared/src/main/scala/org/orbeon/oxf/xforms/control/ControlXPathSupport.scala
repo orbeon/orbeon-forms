@@ -15,12 +15,12 @@ package org.orbeon.oxf.xforms.control
 
 import java.{util => ju}
 
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
@@ -87,9 +87,9 @@ trait ControlXPathSupport {
     xpathString        : String,
     contextItems       : Seq[om.Item],
     contextPosition    : Int,
-    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables,
-    functionContext    : FunctionContext                     = newFunctionContext
+    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
+    functionContext    : FunctionContext                         = newFunctionContext
   ): Option[String] = {
 
     assert(isRelevant)

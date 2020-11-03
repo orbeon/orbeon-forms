@@ -17,6 +17,7 @@ import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.analysis.controls.{FormatTrait, StaticLHHASupport, ValueTrait, ViewTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl._
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames._
@@ -158,8 +158,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   final protected def getValueUseFormat(
     format             : Option[String],
-    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables
+    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables
   ): Option[String] =
     format flatMap (valueWithSpecifiedFormat(_, namespaceMapping, variableToValueMap)) orElse valueWithDefaultFormat
 
@@ -169,9 +169,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   // Format value according to format attribute
   final protected def valueWithSpecifiedFormat(
     format             : String,
-    namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables,
-    functionContext    : FunctionContext                     = newFunctionContext
+    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
+    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
+    functionContext    : FunctionContext                         = newFunctionContext
   ): Option[String] = {
 
     assert(isRelevant)

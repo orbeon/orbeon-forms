@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.{util => ju, lang => jl}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om._
 import org.orbeon.saxon.om
 
 import scala.jdk.CollectionConverters._
@@ -87,8 +87,8 @@ object InstanceData {
     Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
   }
 
-    if (nodeInfo.isInstanceOf[VirtualNode])
   def getInheritedRelevant(nodeInfo: om.NodeInfo): Boolean =
+    if (nodeInfo.isInstanceOf[VirtualNodeType])
       getInheritedRelevant(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       ModelDefs.DEFAULT_RELEVANT
@@ -135,8 +135,8 @@ object InstanceData {
       existingInstanceData.getRequired
   }
 
-    if (nodeInfo.isInstanceOf[VirtualNode])
   def getInheritedReadonly(nodeInfo: om.NodeInfo): Boolean =
+    if (nodeInfo.isInstanceOf[VirtualNodeType])
       getInheritedReadonly(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       true // Default for non-mutable nodes is to be read-only
@@ -206,7 +206,7 @@ object InstanceData {
             return QName.apply(parts(1))
 
           // There is a prefix, resolve it
-          val namespaceNodes = nodeInfo.iterateAxis(Axis.NAMESPACE)
+          val namespaceNodes = nodeInfo.iterateAxis(AxisType.NAMESPACE)
           breakable {
             while (true) {
               val currentNamespaceNode = namespaceNodes.next.asInstanceOf[om.NodeInfo]
@@ -310,8 +310,8 @@ object InstanceData {
       createNewInstanceData(node)
   }
 
-    if (nodeInfo.isInstanceOf[VirtualNode])
   def getLocalInstanceData(nodeInfo: om.NodeInfo, forUpdate: Boolean): InstanceData =
+    if (nodeInfo.isInstanceOf[VirtualNodeType])
       getLocalInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if ((nodeInfo ne null) && ! forUpdate)
       ReadonlyLocalInstanceData
@@ -336,8 +336,8 @@ object InstanceData {
     }
   }
 
-    if (nodeInfo.isInstanceOf[VirtualNode])
   private def createNewInstanceData(nodeInfo: om.NodeInfo): InstanceData =
+    if (nodeInfo.isInstanceOf[VirtualNodeType])
       createNewInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else
       throw new OXFException("Cannot create InstanceData on non-VirtualNode NodeInfo.")

@@ -355,7 +355,7 @@ object XFormsInsertAction {
     if (node.getParent == null)
       return 0
 
-    val it = node.iterateAxis(Axis.PRECEDING_SIBLING)
+    val it = node.iterateAxis(StaticXPath.AxisType.PRECEDING_SIBLING)
     var result = 0
     var i = it.next()
     while (i ne null) {

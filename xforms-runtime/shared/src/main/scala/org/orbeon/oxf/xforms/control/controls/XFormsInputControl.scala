@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
@@ -160,7 +160,7 @@ class XFormsInputControl(
           containingDocument.getTypeInputFormat(valueType) +
           "', 'en', (), ()) else $v"
 
-        val variables = Map[String, ValueRepresentation]("v" -> stringToStringValue(value))
+        val variables = Map[String, ValueRepresentationType]("v" -> stringToStringValue(value))
 
         evaluateAsString(
           xpathString        = xpathExpression,

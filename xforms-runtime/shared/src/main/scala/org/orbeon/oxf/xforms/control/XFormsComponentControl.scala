@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentRootControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance, XFormsI
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
-import org.orbeon.saxon.om.{Item, VirtualNode}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
@@ -271,7 +270,7 @@ class XFormsComponentControl(
 
   // Attach a mirror listener if needed
   // Return the reference node if a listener was created
-  private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNode): Option[VirtualNode] =
+  private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNodeType): Option[VirtualNodeType] =
     _nestedContainerOpt map { nestedContainer =>
 
       val outerDocument = referenceNode.getDocumentRoot
@@ -391,7 +390,7 @@ class XFormsComponentControl(
       // Also support case where there is no binding, and in which case use the binding context. This is done
       // because Form Builder doesn't place a ref or bind on section template components as of 2013-01-17.
       val referenceNode = (if (modeBinding) boundItemOpt else contextForBinding) collect {
-        case node: VirtualNode if node.getNodeKind == ELEMENT_NODE => node
+        case node: VirtualNodeType if node.getNodeKind == ELEMENT_NODE => node
       }
 
       // Create new doc rooted at reference node

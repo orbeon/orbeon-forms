@@ -27,13 +27,13 @@ import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.CrossPlatformSupport
 
@@ -96,7 +96,7 @@ object SubmissionUtils {
       NetUtils.inputStreamToByteArray(is)
     }
 
-  def readTinyTree(model: XFormsModel, resolvedAbsoluteUrl: URI, handleXInclude: Boolean): DocumentInfo =
+  def readTinyTree(model: XFormsModel, resolvedAbsoluteUrl: URI, handleXInclude: Boolean): DocumentNodeInfoType =
     processGETConnection(model, resolvedAbsoluteUrl) { is =>
       TransformerUtils.readTinyTree(
         XPath.GlobalConfiguration,

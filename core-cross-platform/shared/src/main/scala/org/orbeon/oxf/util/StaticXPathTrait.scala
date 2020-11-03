@@ -26,6 +26,7 @@ trait StaticXPathTrait {
   type DocumentNodeInfoType
   type VirtualNodeType
   type ValueRepresentationType
+  type AxisType
 
   // Used by `ShareableXPathStaticContext`
   type VariableResolver

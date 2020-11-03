@@ -18,6 +18,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -29,7 +30,6 @@ import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFor
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
@@ -152,7 +152,7 @@ object XFormsModelSubmissionBase {
     relevantAttOpt    : Option[QName]
   ): Document =
     ref match {
-      case virtualNode: VirtualNode =>
+      case virtualNode: VirtualNodeType =>
 
         // "A node from the instance data is selected, based on attributes on the submission
         // element. The indicated node and all nodes for which it is an ancestor are considered for

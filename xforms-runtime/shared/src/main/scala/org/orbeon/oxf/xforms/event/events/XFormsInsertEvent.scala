@@ -14,12 +14,14 @@
 package org.orbeon.oxf.xforms.event.events
 
 import java.util.{List => JList}
+
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.saxon.om._
 import org.orbeon.saxon.om
+
 import scala.jdk.CollectionConverters._
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -44,12 +46,12 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
       )
     )
 
-  def insertedNodes       = property[Seq[NodeInfo]]("inserted-nodes").get
-  def originItems         = property[Seq[Item]]("origin-nodes").get
-  def insertLocationNode  = property[NodeInfo]("insert-location-node").get
+  def insertedNodes       = property[Seq[om.NodeInfo]]("inserted-nodes").get
+  def originItems         = property[Seq[om.Item]]("origin-nodes").get
+  def insertLocationNode  = property[om.NodeInfo]("insert-location-node").get
   def insertLocationIndex = property[Int]("insert-location-index").get
   def position            = property[String]("position").get
 
   // Whether this event was dispatched when the root element of an instance was replaced
-  def isRootElementReplacement = insertLocationNode.isInstanceOf[DocumentInfo]
+  def isRootElementReplacement = insertLocationNode.isInstanceOf[DocumentNodeInfoType]
 }

@@ -19,6 +19,7 @@ import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
@@ -26,7 +27,6 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
-import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
 import org.orbeon.saxon.om
 
 
@@ -37,15 +37,15 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   extends Replacer {
 
   // Unwrapped document set by `deserialize()`
-  private var _resultingDocumentOpt: Option[Document Either DocumentInfo] = None
-  def resultingDocumentOpt: Option[Either[Document, DocumentInfo]] = _resultingDocumentOpt
+  private var _resultingDocumentOpt: Option[Document Either DocumentNodeInfoType] = None
+  def resultingDocumentOpt: Option[Either[Document, DocumentNodeInfoType]] = _resultingDocumentOpt
 
   // For CacheableSubmission
-  private var wrappedDocumentInfo: Option[DocumentInfo] = None
+  private var wrappedDocumentInfo: Option[DocumentNodeInfoType] = None
   private var instanceCaching: Option[InstanceCaching] = None
 
   // CacheableSubmission: set fully wrapped resulting document info and caching info
-  def setCachedResult(wrappedDocumentInfo: DocumentInfo, instanceCaching: InstanceCaching): Unit = {
+  def setCachedResult(wrappedDocumentInfo: DocumentNodeInfoType, instanceCaching: InstanceCaching): Unit = {
     this.wrappedDocumentInfo = Option(wrappedDocumentInfo)
     this.instanceCaching     = Option(instanceCaching)
   }
@@ -89,7 +89,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     isJSON           : Boolean,
     connectionResult : ConnectionResult)(implicit
     logger           : IndentedLogger
-  ): Document Either DocumentInfo = {
+  ): Document Either DocumentNodeInfoType = {
     // Create resulting instance whether entire instance is replaced or not, because this:
     // 1. Wraps a Document within a DocumentInfo if needed
     // 2. Performs text nodes adjustments if needed
@@ -262,7 +262,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // Optimized insertion for instance root element replacement
           if (applyDefaults)
             newDocumentInfo match {
-              case node: VirtualNode =>
+              case node: VirtualNodeType =>
                 InstanceDataOps.setRequireDefaultValueRecursively(node.getUnderlyingNode.asInstanceOf[Node])
               case _ =>
             }

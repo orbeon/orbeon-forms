@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element}
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.analysis.model.Instance.{extractDocHandlePrefixes, extractReadonlyDocument}
 import org.orbeon.saxon.om
@@ -33,7 +34,7 @@ object XFormsInstanceSupport {
     readonly              : Boolean,
     exposeXPathTypes      : Boolean,
     removeInstanceData    : Boolean
-  ): om.DocumentInfo = {
+  ): DocumentNodeInfoType = {
 
     require(! (readonly && exposeXPathTypes)) // we can't expose types on readonly instances at the moment
 

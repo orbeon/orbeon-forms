@@ -17,11 +17,11 @@ import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.InstanceCaching
-import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.saxon.om
 
 import scala.util.control.NonFatal
@@ -124,9 +124,9 @@ class CacheableSubmission(submission: XFormsModelSubmission)
                       // load() requires an immutable TinyTree
                       // Since we forced readonly above, the result must also be a readonly instance
                       replacer.resultingDocumentOpt match {
-                        case Some(Right(_: VirtualNode))  => throw new IllegalStateException
-                        case Some(Right(documentInfo))    => documentInfo
-                        case _                            => throw new IllegalStateException
+                        case Some(Right(_: VirtualNodeType)) => throw new IllegalStateException
+                        case Some(Right(documentInfo))       => documentInfo
+                        case _                               => throw new IllegalStateException
                       }
                     case Failure(throwable) =>
                       throw new CacheableSubmission.ThrowableWrapper(throwable)

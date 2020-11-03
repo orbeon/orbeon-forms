@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysisTrait, VariableControl}
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
+import org.orbeon.oxf.xforms.analysis.controls.VariableControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, Variable}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om._
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.EmptySequence
 
@@ -46,9 +46,9 @@ class XFormsVariableControl(
   private var _bindingContextForChild: BindingContext = null
   private var _bindingContextForFollowing: BindingContext = null
 
-  private var _value: ValueRepresentation = null
+  private var _value: ValueRepresentationType = null
   // Previous value for refresh
-  private var _previousValue: ValueRepresentation = null
+  private var _previousValue: ValueRepresentationType = null
 
   final def valueOpt = Option(_value)
   def getVariableName = variable.staticVariable.name

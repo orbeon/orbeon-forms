@@ -36,6 +36,7 @@ object StaticXPath extends StaticXPathTrait {
   type DocumentNodeInfoType    = DocumentInfo
   type VirtualNodeType         = VirtualNode
   type ValueRepresentationType = ValueRepresentation
+  type AxisType                = Axis
 
   type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentationType
 

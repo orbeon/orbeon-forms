@@ -19,6 +19,7 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties
@@ -26,7 +27,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
-import org.orbeon.saxon.om._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.CrossPlatformSupport
 
@@ -42,7 +42,7 @@ trait SubmitResponseEvent extends XFormsEvent {
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
   // `event('response-body')` multiple times.
-  var cachedBody: Option[Option[String Either DocumentInfo]] = None
+  var cachedBody: Option[Option[String Either DocumentNodeInfoType]] = None
 
   override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
   override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
@@ -58,7 +58,7 @@ private object SubmitResponseEvent {
   // response or if there were no headers. Each element has a local name of header with no namespace URI and
   // two child elements, name and value, whose string contents are the name and value of the header,
   // respectively."
-  def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentInfo] =
+  def headersDocument(headersOpt: Option[Iterable[(String, immutable.Seq[String])]]): Option[DocumentNodeInfoType] =
     headersOpt filter (_.nonEmpty) map { headers =>
       val sb = new StringBuilder
       sb.append("<headers>")
@@ -85,7 +85,7 @@ private object SubmitResponseEvent {
   def body(e: SubmitResponseEvent): Option[AnyRef] = {
     implicit val logger = e.indentedLogger
 
-    def readOrReturn(cxr: ConnectionResult): Option[String Either DocumentInfo] =
+    def readOrReturn(cxr: ConnectionResult): Option[String Either DocumentNodeInfoType] =
       e.cachedBody getOrElse {
         val result = tryToReadBody(cxr)
         e.cachedBody = Some(result)
@@ -98,7 +98,7 @@ private object SubmitResponseEvent {
     }
   }
 
-  private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
+  private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
     // Log response details if not done already
     cxr.logResponseDetailsOnce(log4s.Error)
 

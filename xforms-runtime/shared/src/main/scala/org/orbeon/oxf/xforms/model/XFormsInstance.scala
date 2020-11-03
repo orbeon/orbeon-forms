@@ -22,6 +22,7 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util.Connection.isInternalPath
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.InstanceLoader
 import org.orbeon.oxf.xforms._
@@ -31,7 +32,6 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
@@ -104,7 +104,7 @@ class XFormsInstance(
   val parent                  : XFormsModel,              // concrete parent model
   val instance                : Instance,                 // static instance
   private var _instanceCaching: Option[InstanceCaching],  // information to restore cached instance content
-  private var _documentInfo   : DocumentInfo,             // fully wrapped document
+  private var _documentInfo   : DocumentNodeInfoType,     // fully wrapped document
   private var _readonly       : Boolean,                  // whether instance is readonly (can change upon submission)
   private var _modified       : Boolean,                  // whether instance was modified
   var valid                   : Boolean                   // whether instance was valid as of the last revalidation
@@ -113,7 +113,7 @@ class XFormsInstance(
   with XFormsEventTarget
   with Logging {
 
-  require(! (_readonly && _documentInfo.isInstanceOf[VirtualNode]))
+  require(! (_readonly && _documentInfo.isInstanceOf[VirtualNodeType]))
 
   requireNewIndex()
 
@@ -131,7 +131,7 @@ class XFormsInstance(
   def markModified() = _modified = true
 
   // Update the instance upon submission with instance replacement
-  def update(instanceCaching: Option[InstanceCaching], documentInfo: DocumentInfo, readonly: Boolean): Unit = {
+  def update(instanceCaching: Option[InstanceCaching], documentInfo: DocumentNodeInfoType, readonly: Boolean): Unit = {
     _instanceCaching = instanceCaching
     _documentInfo    = documentInfo
     _readonly        = readonly
@@ -152,7 +152,7 @@ class XFormsInstance(
   def model = parent
 
   // The instance root node
-  def root: DocumentInfo = _documentInfo
+  def root: DocumentNodeInfoType = _documentInfo
 
   // The instance root element as with the `instance()` function
   def rootElement: om.NodeInfo = DataModel.firstChildElement(_documentInfo)
@@ -227,8 +227,8 @@ class XFormsInstance(
   // If the instance is readonly, this returns `None`. Callers should use root() whenever possible.
   def underlyingDocumentOpt: Option[Document] =
     _documentInfo match {
-      case virtualNode: VirtualNode => Some(virtualNode.getUnderlyingNode.asInstanceOf[Document])
-      case _                        => None
+      case virtualNode: VirtualNodeType => Some(virtualNode.getUnderlyingNode.asInstanceOf[Document])
+      case _                            => None
     }
 
   // For state serialization
@@ -272,7 +272,7 @@ class XFormsInstance(
   // Replace the instance with the given document
   // This includes marking the structural change as well as dispatching events
   def replace(
-    newDocumentInfo : DocumentInfo,
+    newDocumentInfo : DocumentNodeInfoType,
     dispatch        : Boolean                 = true,
     instanceCaching : Option[InstanceCaching] = instanceCaching,
     isReadonly      : Boolean                 = readonly,
@@ -469,21 +469,21 @@ object XFormsInstance extends Logging {
       true
     )
 
-  def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean): DocumentInfo = doc match {
+  def createDocumentInfo(doc: Document Either DocumentNodeInfoType, exposeXPathTypes: Boolean): DocumentNodeInfoType = doc match {
     case Left(dom4jDocument) => XFormsInstanceSupport.wrapDocument(dom4jDocument, exposeXPathTypes)
     case Right(documentInfo) => documentInfo
   }
 
-  def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo =
+  def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType =
     if (readonly)
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
       XFormsInstanceSupport.wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
-  def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
+  def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {
     assert(
-      ! documentInfo.isInstanceOf[VirtualNode],
+      ! documentInfo.isInstanceOf[VirtualNodeType],
       "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree"
     )
 

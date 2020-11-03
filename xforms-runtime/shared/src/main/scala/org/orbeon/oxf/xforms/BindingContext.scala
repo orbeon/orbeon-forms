@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.saxon.om
 
 import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
@@ -33,14 +34,14 @@ case class BindingContext(
   parent                    : BindingContext,
   modelOpt                  : Option[XFormsModel],
   bind                      : RuntimeBind,
-  nodeset                   : ju.List[Item],
+  nodeset                   : ju.List[om.Item],
   position                  : Int,
   elementId                 : String,
   newBind                   : Boolean,
   controlElement            : Element,
   private val _locationData : LocationData,
   hasOverriddenContext      : Boolean,
-  contextItem               : Item,
+  contextItem               : om.Item,
   scope                     : Scope
 ) {
 
@@ -94,14 +95,14 @@ case class BindingContext(
     new BindingContext(this, ancestorOrSelfInScope(scope), variableElement.element, variableElement.locationData, name, value, scope)
   }
 
-  def singleItemOpt: Option[Item] =
+  def singleItemOpt: Option[om.Item] =
     ! nodeset.isEmpty option nodeset.get(position - 1)
 
-  def singleNodeOpt: Option[NodeInfo] =
-    singleItemOpt collect { case node: NodeInfo => node }
+  def singleNodeOpt: Option[om.NodeInfo] =
+    singleItemOpt collect { case node: om.NodeInfo => node }
 
   // TODO: remove
-  def getSingleItemOrNull: Item =
+  def getSingleItemOrNull: om.Item =
     singleItemOpt.orNull
 
   def getInScopeVariables: ju.Map[String, ValueRepresentationType] = getInScopeVariables(scopeModelVariables = true)
@@ -199,7 +200,7 @@ case class BindingContext(
     }
 
   // Get the current repeat sequence for the given repeat id
-  def repeatItems(repeatId: String): ju.List[Item] =
+  def repeatItems(repeatId: String): ju.List[om.Item] =
     new AncestorIterator(includeSelf = true) collectFirst {
       case binding if repeatId == binding.elementId && (binding.controlElement ne null) && binding.controlElement.getName == "repeat" =>
         binding.nodeset
@@ -210,7 +211,7 @@ case class BindingContext(
   // Obtain the single-node binding for an enclosing xf:group, xf:switch, or xf:repeat. It takes one mandatory string
   // parameter containing the id of an enclosing grouping XForms control. For xf:repeat, the context returned is the
   // context of the current iteration.
-  def contextForId(contextId: String): Item = {
+  def contextForId(contextId: String): om.Item = {
 
     def matchesContainer(binding: BindingContext) =
       (binding.controlElement ne null) &&
@@ -259,7 +260,7 @@ case class BindingContext(
     }
 
   // Get the current binding for the given model.
-  def currentNodeset(modelOpt: Option[XFormsModel]): ju.List[Item] =
+  def currentNodeset(modelOpt: Option[XFormsModel]): ju.List[om.Item] =
     modelOpt match {
       case Some(model) =>
         currentBindingContextForModel(modelOpt) match {
@@ -268,13 +269,13 @@ case class BindingContext(
           case None =>
             model.defaultInstanceOpt match {
               case Some(defaultInstance) =>
-                ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[Item])
+                ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[om.Item])
               case None =>
-                ju.Collections.emptyList[Item]
+                ju.Collections.emptyList[om.Item]
             }
         }
       case None =>
-        ju.Collections.emptyList[Item]
+        ju.Collections.emptyList[om.Item]
   }
 
   class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {

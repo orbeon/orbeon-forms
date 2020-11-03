@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping

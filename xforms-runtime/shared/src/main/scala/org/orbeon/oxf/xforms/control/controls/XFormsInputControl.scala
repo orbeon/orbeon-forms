@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -80,7 +81,7 @@ class XFormsInputControl(
     setExternalValue(updatedValue)
   }
 
-  override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = {
+  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
     // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date
     // formatted value

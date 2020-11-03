@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -161,7 +162,7 @@ class XFormsContextStack {
       case (Some(model), Some(defaultInstance)) =>
         // Push the default context if there is a model with an instance
         val defaultNode = defaultInstance.rootElement
-        val defaultNodeset = Collections.singletonList(defaultNode: Item)
+        val defaultNodeset = Collections.singletonList(defaultNode: om.Item)
         this.head =
           new BindingContext(
             parent               = parentBindingContext,
@@ -351,9 +352,9 @@ class XFormsContextStack {
       var isNewBind = false
       var bind: RuntimeBind = null
       var newPosition = 0
-      var newNodeset: util.List[Item] = null
+      var newNodeset: util.List[om.Item] = null
       var hasOverriddenContext = false
-      var contextItem: Item = null
+      var contextItem: om.Item = null
       if (bindId != null) {
         // Resolve the bind id to a nodeset
         // NOTE: For now, only the top-level models in a resolution scope are considered
@@ -370,7 +371,7 @@ class XFormsContextStack {
             // The bind attribute was valid for this scope, but no runtime object was found for the bind
             // This can happen e.g. if a nested bind is within a bind with an empty nodeset
             bind = null
-            newNodeset = java.util.Collections.emptyList[Item]
+            newNodeset = java.util.Collections.emptyList[om.Item]
             hasOverriddenContext = false
             contextItem = null
             isNewBind = true
@@ -381,7 +382,7 @@ class XFormsContextStack {
               throw new ValidationException(s"Reference to non-existing bind id: `$bindId`", locationData)
             // Default to an empty binding
             bind = null
-            newNodeset = java.util.Collections.emptyList[Item]
+            newNodeset = java.util.Collections.emptyList[om.Item]
             hasOverriddenContext = false
             contextItem = null
             isNewBind = true
@@ -519,14 +520,14 @@ class XFormsContextStack {
               case e: Exception =>
                 if (handleNonFatal) {
                   XFormsError.handleNonFatalXPathError(container, e, Some(expression))
-                  java.util.Collections.emptyList[Item]
+                  java.util.Collections.emptyList[om.Item]
                 } else
                   throw e
             }
           newNodeset = result
         } else {
           // Otherwise we consider we can't evaluate
-          newNodeset = java.util.Collections.emptyList[Item]
+          newNodeset = java.util.Collections.emptyList[om.Item]
         }
 
         // Restore optional context
@@ -632,10 +633,10 @@ class XFormsContextStack {
     }
   }
 
-  private def pushTemporaryContext(parent: BindingContext, base: BindingContext, contextItem: Item): Unit =
+  private def pushTemporaryContext(parent: BindingContext, base: BindingContext, contextItem: om.Item): Unit =
     this.head = updateBindingWithContextItem(parent, base, contextItem)
 
-  private def updateBindingWithContextItem(parent: BindingContext, base: BindingContext, contextItem: Item) =
+  private def updateBindingWithContextItem(parent: BindingContext, base: BindingContext, contextItem: om.Item) =
     new BindingContext(
       parent               = parent,
       modelOpt             = base.modelOpt,
@@ -660,7 +661,7 @@ class XFormsContextStack {
     val currentBindingContext = this.head
     val currentNodeset = currentBindingContext.nodeset
     // Set a new context item, although the context() function is never called on the iteration itself
-    var newContextItem: Item = null
+    var newContextItem: om.Item = null
     if (currentNodeset.size == 0)
       newContextItem = null
     else

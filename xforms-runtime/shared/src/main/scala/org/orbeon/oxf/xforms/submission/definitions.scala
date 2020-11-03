@@ -17,7 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 
 sealed trait ReplaceType extends EnumEntry with Lowercase
 
@@ -33,8 +33,8 @@ object ReplaceType extends Enum[ReplaceType] {
 }
 
 case class RefContext(
-  refNodeInfo                  : NodeInfo,
+  refNodeInfo                  : om.NodeInfo,
   refInstanceOpt               : Option[XFormsInstance],
-  submissionElementContextItem : Item,
+  submissionElementContextItem : om.Item,
   xpathContext                 : XPathContext
 )

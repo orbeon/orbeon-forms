@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.mutable
@@ -87,7 +88,7 @@ object SubmissionUtils {
   ): Option[Boolean] =
     stringAvtTrimmedOpt(value) map (_.toBoolean)
 
-  def dataNodeHash(node: NodeInfo): String =
+  def dataNodeHash(node: om.NodeInfo): String =
     SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
   def readByteArray(model: XFormsModel, resolvedAbsoluteUrl: URI): Array[Byte] =

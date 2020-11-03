@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, Variable}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.EmptySequence
 
 /**

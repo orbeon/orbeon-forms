@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 
 import scala.util.control.NonFatal
 
@@ -184,7 +184,7 @@ trait CalculateBindOps {
     }
 
     // Q: Can bindNode.node ever be null here?
-    def mustEvaluateNode(node: NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
+    def mustEvaluateNode(node: om.NodeInfo, defaultsStrategy: SomeDefaultsStrategy): Boolean =
       defaultsStrategy == AllDefaultsStrategy || (node ne null) && InstanceData.getRequireDefaultValue(node)
 
     def applyCalculatedBindsUseOrderIfNeeded(

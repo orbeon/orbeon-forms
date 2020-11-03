@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase.getRequestedSerialization
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsProperties}
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
 
@@ -500,8 +500,8 @@ class XFormsModelSubmission(
   def evaluateTargetRef(
     xpathContext                 : XPathCache.XPathContext,
     defaultReplaceInstance       : XFormsInstance,
-    submissionElementContextItem : Item
-  ): NodeInfo = {
+    submissionElementContextItem : om.Item
+  ): om.NodeInfo = {
     val destinationObject =
       if (staticSubmission.targetrefOpt.isEmpty) {
         // There is no explicit @targetref, so the target is implicitly the root element of either the instance
@@ -531,7 +531,7 @@ class XFormsModelSubmission(
       }
     // TODO: Also detect readonly node/ancestor situation
     destinationObject match {
-      case node: NodeInfo if node.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE => node
+      case node: om.NodeInfo if node.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE => node
       case _ => null
     }
   }

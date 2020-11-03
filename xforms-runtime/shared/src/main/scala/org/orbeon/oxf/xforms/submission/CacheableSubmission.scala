@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.saxon.om.VirtualNode
+import org.orbeon.saxon.om
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}

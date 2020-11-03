@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 
@@ -154,7 +155,7 @@ class XFormsInstance(
   def root: DocumentInfo = _documentInfo
 
   // The instance root element as with the `instance()` function
-  def rootElement: NodeInfo = DataModel.firstChildElement(_documentInfo)
+  def rootElement: om.NodeInfo = DataModel.firstChildElement(_documentInfo)
 
   def getId = instance.staticId
   def getPrefixedId = XFormsId.getPrefixedId(getEffectiveId)
@@ -309,7 +310,7 @@ class XFormsInstance(
       Dispatch.dispatchEvent(
         new XFormsInsertEvent(
           this,
-          Seq[NodeInfo](currentRoot).asJava,
+          Seq[om.NodeInfo](currentRoot).asJava,
           null,   // CHECK
           currentRoot.getDocumentRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
@@ -385,17 +386,17 @@ trait XFormsInstanceIndex {
       combineMappings(mappingsInSubtree(self.documentInfo))
     }
 
-  def updateIndexForInsert(nodes: Seq[NodeInfo]): Unit =
+  def updateIndexForInsert(nodes: Seq[om.NodeInfo]): Unit =
     if (idIndex ne null)
       for (node <- nodes)
         combineMappings(mappingsInSubtree(node))
 
-  def updateIndexForDelete(nodes: Seq[NodeInfo]): Unit =
+  def updateIndexForDelete(nodes: Seq[om.NodeInfo]): Unit =
     if (idIndex ne null)
       for (node <- nodes; (id, element) <- mappingsInSubtree(node))
         removeId(id, element)
 
-  def updateIndexForReplace(formerNode: NodeInfo, currentNode: NodeInfo): Unit =
+  def updateIndexForReplace(formerNode: om.NodeInfo, currentNode: om.NodeInfo): Unit =
     if (idIndex ne null) {
       if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
         // Don't use updateIndexForDelete, because formerNode.getParent will fail
@@ -415,13 +416,13 @@ trait XFormsInstanceIndex {
       addId(valueChangeEvent.newValue, parentElement)
     }
 
-  private def idsInSubtree(start: NodeInfo) =
+  private def idsInSubtree(start: om.NodeInfo) =
     if (start.getNodeKind == ATTRIBUTE_NODE)
       start self "id"
     else
       start descendantOrSelf * att "id"
 
-  private def mappingsInSubtree(start: NodeInfo) =
+  private def mappingsInSubtree(start: om.NodeInfo) =
     idsInSubtree(start) map (id => id.getStringValue -> unsafeUnwrapElement(id.parentUnsafe))
 
   private def removeId(id: String, parentElement: Element) = {

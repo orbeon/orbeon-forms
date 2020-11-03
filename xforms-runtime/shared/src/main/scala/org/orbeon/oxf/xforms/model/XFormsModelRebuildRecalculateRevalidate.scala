@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XXFormsInvalidEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 
 import scala.collection.{mutable => m}
 
@@ -41,7 +41,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
     containingDocument.xpathDependencies.markStructuralChange(selfModel, instanceOpt)
   }
 
-  def markValueChange(nodeInfo: NodeInfo, isCalculate: Boolean): Unit = {
+  def markValueChange(nodeInfo: om.NodeInfo, isCalculate: Boolean): Unit = {
     // Set the flags
     deferredActionContext.markValueChange(isCalculate)
     // Notify dependencies of the change

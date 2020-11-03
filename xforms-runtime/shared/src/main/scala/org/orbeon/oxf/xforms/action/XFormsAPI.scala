@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{Constants, UrlType}
@@ -72,7 +72,7 @@ object XFormsAPI {
 
   // xf:setvalue
   // @return the node whose value was set, if any
-  def setvalue(ref: Seq[NodeInfo], value: String): Option[(NodeInfo, Boolean)] =
+  def setvalue(ref: Seq[om.NodeInfo], value: String): Option[(om.NodeInfo, Boolean)] =
     ref.headOption map { nodeInfo =>
 
       def onSuccess(oldValue: String): Unit =
@@ -109,11 +109,11 @@ object XFormsAPI {
 
   // xf:insert
   // @return the inserted nodes
-  def insert[T <: Item](
+  def insert[T <: om.Item](
     origin                            : Seq[T],
-    into                              : Seq[NodeInfo] = Nil,
-    after                             : Seq[NodeInfo] = Nil,
-    before                            : Seq[NodeInfo] = Nil,
+    into                              : Seq[om.NodeInfo] = Nil,
+    after                             : Seq[om.NodeInfo] = Nil,
+    before                            : Seq[om.NodeInfo] = Nil,
     doDispatch                        : Boolean       = true,
     requireDefaultValues              : Boolean       = false,
     searchForInstance                 : Boolean       = true,
@@ -150,9 +150,9 @@ object XFormsAPI {
 
   // xf:delete
   def delete(
-    ref           : Seq[NodeInfo],
+    ref           : Seq[om.NodeInfo],
     doDispatch    : Boolean = true
-  ): Seq[NodeInfo] =
+  ): Seq[om.NodeInfo] =
     if (ref.nonEmpty) {
 
       val actionOpt = actionInterpreterDyn.value
@@ -175,7 +175,7 @@ object XFormsAPI {
   // - if the name hasn't changed, don't do anything
   // - if the node is an element, its content is placed back into the renamed element
   // NOTE: This should be implemented as a core XForms action (see also XQuery updates)
-  def rename(nodeInfo: NodeInfo, newName: QName): NodeInfo = {
+  def rename(nodeInfo: om.NodeInfo, newName: QName): om.NodeInfo = {
     require(nodeInfo ne null)
     require(Set(ELEMENT_NODE, ATTRIBUTE_NODE)(nodeInfo.getNodeKind.toShort))
 
@@ -197,21 +197,21 @@ object XFormsAPI {
   }
 
   // Move the given element before another element
-  def moveElementBefore(element: NodeInfo, other: NodeInfo) = {
+  def moveElementBefore(element: om.NodeInfo, other: om.NodeInfo) = {
     val inserted = insert(into = element parent *, before = other, origin = element)
     delete(element)
     inserted.head
   }
 
   // Move the given element after another element
-  def moveElementAfter(element: NodeInfo, other: NodeInfo) = {
+  def moveElementAfter(element: om.NodeInfo, other: om.NodeInfo) = {
     val inserted = insert(into = element parent *, after = other, origin = element)
     delete(element)
     inserted.head
   }
 
   // Move the given element into another element as the last element
-  def moveElementIntoAsLast(element: NodeInfo, other: NodeInfo) = {
+  def moveElementIntoAsLast(element: om.NodeInfo, other: om.NodeInfo) = {
     val inserted = insert(into = other, after = other / *, origin = element)
     delete(element)
     inserted.head
@@ -222,24 +222,24 @@ object XFormsAPI {
   // @return the new or existing attribute node
   // NOTE: Would be nice to return attribute (new or existing), but doInsert() is not always able to wrap the inserted
   // nodes.
-  def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
+  def ensureAttribute(element: om.NodeInfo, attName: QName, value: String): Unit =
     element /@ attName match {
       case Seq()        => insert(into = element, origin = attributeInfo(attName, value))
       case Seq(att, _*) => setvalue(att, value)
     }
 
   // NOTE: The value is by-name and used only if needed
-  def toggleAttribute(element: NodeInfo, attName: QName, value: => String, set: Boolean): Unit =
+  def toggleAttribute(element: om.NodeInfo, attName: QName, value: => String, set: Boolean): Unit =
     if (set)
       ensureAttribute(element, attName, value)
     else
       delete(element /@ attName)
 
-  def toggleAttribute(element: NodeInfo, attName: QName, value: Option[String]): Unit =
+  def toggleAttribute(element: om.NodeInfo, attName: QName, value: Option[String]): Unit =
     toggleAttribute(element, attName, value.get, value.isDefined)
 
   // Return an instance's root element in the current action context as per xxf:instance()
-  def instanceRoot(staticId: String): Option[NodeInfo] =
+  def instanceRoot(staticId: String): Option[om.NodeInfo] =
     XXFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
@@ -253,8 +253,8 @@ object XFormsAPI {
     inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
 
   def context[T](xpath: String)(body: => T): T = ???
-  def context[T](item: Item)(body: => T): T = ???
-  def event[T](attributeName: String): Seq[Item] = ???
+  def context[T](item: om.Item)(body: => T): T = ???
+  def event[T](attributeName: String): Seq[om.Item] = ???
 
   // The xf:dispatch action
   def dispatch(

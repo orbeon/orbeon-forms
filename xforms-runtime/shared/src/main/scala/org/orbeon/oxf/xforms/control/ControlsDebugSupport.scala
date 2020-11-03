@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 
 import scala.jdk.CollectionConverters._
@@ -47,9 +47,9 @@ object ControlsDebugSupport {
 
     def writeControl(control: XFormsControl)(content: => Unit = ())(implicit receiver: XMLReceiver): Unit = {
 
-      def itemToString(i: Item) = i match {
+      def itemToString(i: om.Item) = i match {
         case atomic: AtomicValue => atomic.getStringValue
-        case node: NodeInfo      => node.getDisplayName
+        case node: om.NodeInfo   => node.getDisplayName
         case _                   => throw new IllegalStateException
       }
 

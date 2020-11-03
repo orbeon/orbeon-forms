@@ -17,12 +17,12 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 // This implementation of dependencies simply says that everything must be updated all the time.
 class DumbXPathDependencies extends XPathDependencies {
-  def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) = ()
+  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo) = ()
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]) = ()
   def rebuildDone(model: XFormsModel) = ()
   def recalculateDone(model: XFormsModel) = ()

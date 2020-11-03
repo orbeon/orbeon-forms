@@ -20,21 +20,21 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 
 class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {
 
-  def this(target: XFormsEventTarget, binding: NodeInfo, requestedSerialization: String) = {
+  def this(target: XFormsEventTarget, binding: om.NodeInfo, requestedSerialization: String) = {
     this(target, EmptyGetter)
     bindingOpt = Option(binding)
     requestedSerializationOpt = Option(requestedSerialization)
   }
 
-  private var bindingOpt: Option[NodeInfo] = None
+  private var bindingOpt: Option[om.NodeInfo] = None
   private var requestedSerializationOpt: Option[String] = None
 
-  def submissionBodyAsString = property[NodeInfo]("submission-body") map (_.getStringValue) get
+  def submissionBodyAsString = property[om.NodeInfo]("submission-body") map (_.getStringValue) get
 
   override def lazyProperties = getters(this, XFormsSubmitSerializeEvent.Getters)
 }

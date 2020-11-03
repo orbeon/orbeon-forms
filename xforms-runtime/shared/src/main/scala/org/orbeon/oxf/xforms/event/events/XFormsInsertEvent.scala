@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 import scala.jdk.CollectionConverters._
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -27,9 +28,9 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
   def this(
     target              : XFormsEventTarget,
-    insertedNodes       : JList[NodeInfo],
-    originItems         : JList[Item],
-    insertLocationNode  : NodeInfo,
+    insertedNodes       : JList[om.NodeInfo],
+    originItems         : JList[om.Item],
+    insertLocationNode  : om.NodeInfo,
     position            : String,
     insertLocationIndex : Int
   ) = this(

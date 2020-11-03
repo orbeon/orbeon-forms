@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.state.ControlState
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import scala.jdk.CollectionConverters._
 
 trait ControlBindingSupport {
@@ -30,10 +30,10 @@ trait ControlBindingSupport {
   // NOTE: This is only used by `event('xxf:binding')` and `xxf:binding()`. Following
   // https://github.com/orbeon/orbeon-forms/issues/3829, we decide to return the binding even if the
   // control is non-relevant.
-  def bindingEvenIfNonRelevant: Seq[Item] = Nil
+  def bindingEvenIfNonRelevant: Seq[om.Item] = Nil
 
   // Find the control's binding context
-  final def contextForBinding: Option[Item] =
+  final def contextForBinding: Option[om.Item] =
     for {
       currentBinding <- Option(_bindingContext)
       parentBinding  <- Option(currentBinding.parent)

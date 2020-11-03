@@ -18,7 +18,7 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 
 // Represent an xf:range control.
 // NOTE: This should instead be implemented with an XBL component.
@@ -40,7 +40,7 @@ class XFormsRangeControl(
 
   override def hasJavaScriptInitialization = true
 
-  override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] =
+  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] =
     Option(convertFromExternalValue(externalValue))
 
   private def convertFromExternalValue(externalValue: String) = {

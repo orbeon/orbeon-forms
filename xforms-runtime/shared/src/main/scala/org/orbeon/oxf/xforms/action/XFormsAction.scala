@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 
@@ -46,7 +46,7 @@ abstract class XFormsAction extends Logging {
      actionElement: Element,
      actionScope: Scope,
      hasOverriddenContext: Boolean,
-     overriddenContext: Item): Unit = ()
+     overriddenContext: om.Item): Unit = ()
 
   // Resolve a control given the name of an AVT
   def resolveControlAvt(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {

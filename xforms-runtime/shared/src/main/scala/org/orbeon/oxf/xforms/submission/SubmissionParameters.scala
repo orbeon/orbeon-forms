@@ -10,7 +10,7 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.{CrossPlatformSupport, RelevanceHandling, UrlType}
@@ -300,7 +300,7 @@ object SubmissionParameters {
     val bindingContext = contextStack.getCurrentBindingContext
 
     RefContext(
-      refNodeInfo                  = bindingContext.getSingleItemOrNull.asInstanceOf[NodeInfo],
+      refNodeInfo                  = bindingContext.getSingleItemOrNull.asInstanceOf[om.NodeInfo],
       refInstanceOpt               = bindingContext.instance, // `None` if the document submitted is not part of an instance
       submissionElementContextItem = bindingContext.contextItem,
       xpathContext =

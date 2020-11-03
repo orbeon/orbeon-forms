@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import shapeless.syntax.typeable._
 
@@ -68,7 +68,7 @@ class XFormsRepeatControl(
   setLocal(new XFormsRepeatControlLocal)
 
   // The repeat's sequence binding
-  final override def bindingEvenIfNonRelevant: Seq[Item] =
+  final override def bindingEvenIfNonRelevant: Seq[om.Item] =
     Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
 
   def getStartIndex: Int = staticControl.startIndex
@@ -147,7 +147,7 @@ class XFormsRepeatControl(
 
     require(dndStart.size == 1 && dndEnd.size == 1, "DnD over repeat boundaries not supported yet")
 
-    val sourceNodes = bindingContext.nodeset.asScala.toList.narrowTo[List[NodeInfo]] getOrElse
+    val sourceNodes = bindingContext.nodeset.asScala.toList.narrowTo[List[om.NodeInfo]] getOrElse
       (throw new IllegalArgumentException("DnD can only apply to nodes"))
 
     NonEmptyList.fromList(sourceNodes) match {

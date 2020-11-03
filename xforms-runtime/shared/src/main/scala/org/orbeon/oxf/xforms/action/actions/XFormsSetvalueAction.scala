@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames
 
 import scala.util.{Failure, Success, Try}
@@ -57,7 +57,7 @@ class XFormsSetvalueAction extends XFormsAction {
 
     // Set the value on target node if possible
     contextStack.getCurrentBindingContext.getSingleItemOrNull match {
-      case node: NodeInfo =>
+      case node: om.NodeInfo =>
         // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
         // be written to. But because of the way we now handle errors in actions, we throw an exception instead
         // and action processing is interrupted.

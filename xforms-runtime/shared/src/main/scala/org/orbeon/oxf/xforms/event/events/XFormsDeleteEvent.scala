@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction.DeletionDescripto
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 
 class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false)
@@ -42,5 +42,5 @@ class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
   private var _deletionDescriptorsOpt: Option[Seq[DeletionDescriptor]] = None
   def deletionDescriptors = _deletionDescriptorsOpt.get
 
-  def deletedNodes  = property[Seq[NodeInfo]]("deleted-nodes").get
+  def deletedNodes  = property[Seq[om.NodeInfo]]("deleted-nodes").get
 }

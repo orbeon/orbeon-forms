@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -64,7 +64,7 @@ class PathMapXPathDependencies(
       }
     }
 
-    def markValueChanged(node: NodeInfo): Unit = {
+    def markValueChanged(node: om.NodeInfo): Unit = {
       // Only care about path changes if there is no structural change for this model, since structural changes
       // for now disable any more subtle path-based check.
       if (! hasStructuralChanges) {
@@ -72,7 +72,7 @@ class PathMapXPathDependencies(
         // Create instance/path combo
         val instance = containingDocument.instanceForNodeOpt(node).orNull // TODO: `Option`
 
-        def processNode(n: NodeInfo): Unit = {
+        def processNode(n: om.NodeInfo): Unit = {
           val path = createFingerprintedPath(n)
 
           val instanceKey  = ModelOrInstanceKey(instance)
@@ -310,7 +310,7 @@ class PathMapXPathDependencies(
   import RefreshState._
   import Stats._
 
-  def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo): Unit = {
+  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo): Unit = {
 
     // Caller must only call this for a mutable node belonging to the given model
     require(nodeInfo.isInstanceOf[VirtualNode])

@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps,
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
+import org.orbeon.saxon.om
 
 
 /**
@@ -276,7 +277,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         } else {
           // Generic insertion
           instanceToUpdate.markModified()
-          val newDocumentRootElement: Item = DataModel.firstChildElement(newDocumentInfo)
+          val newDocumentRootElement: om.Item = DataModel.firstChildElement(newDocumentInfo)
 
           // Perform the insertion
 

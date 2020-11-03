@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.saxon.om.{Item, VirtualNode}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.stringToStringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xml.NamespaceMapping
@@ -118,7 +119,7 @@ class XFormsValueComponentControl(
     setExternalValue(fromBinding getOrElse getValue)
   }
 
-  override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = {
+  override def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = {
 
     def fromBinding =
       staticControl.commonBinding.deserializeExternalValueOpt flatMap { deserializeExpr =>

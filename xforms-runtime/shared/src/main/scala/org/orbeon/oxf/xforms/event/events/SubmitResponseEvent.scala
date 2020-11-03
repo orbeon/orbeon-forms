@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.immutable
@@ -76,7 +77,7 @@ private object SubmitResponseEvent {
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
     }
 
-  def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = {
+  def headerElements(e: SubmitResponseEvent): Option[Seq[om.Item]] = {
     implicit val ctx = XPathContext(locationData = e.locationData)
     headersDocument(e.headers) map (evaluateKeepItems("/headers/header", _))
   }

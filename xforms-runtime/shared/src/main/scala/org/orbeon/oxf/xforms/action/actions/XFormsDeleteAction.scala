@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
 import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 
 import scala.jdk.CollectionConverters._
@@ -99,11 +99,11 @@ object XFormsDeleteAction extends Logging {
 
   private val CannotDeleteReadonlyMessage = "Cannot perform deletion in read-only instance."
 
-  case class DeletionDescriptor(parent: NodeInfo, nodeInfo: NodeInfo, index: Int)
+  case class DeletionDescriptor(parent: om.NodeInfo, nodeInfo: om.NodeInfo, index: Int)
 
   def doDeleteOne(
     containingDocument : XFormsContainingDocument,
-    nodeInfo           : NodeInfo,
+    nodeInfo           : om.NodeInfo,
     doDispatch         : Boolean)(implicit
     indentedLogger     : IndentedLogger
   ): Option[DeletionDescriptor] = {
@@ -121,7 +121,7 @@ object XFormsDeleteAction extends Logging {
 
   def doDelete(
     containingDocumentOpt : Option[XFormsContainingDocument],
-    collectionToUpdate    : Seq[Item],
+    collectionToUpdate    : Seq[om.Item],
     deleteIndexOpt        : Option[Int],
     doDispatch            : Boolean)(implicit
     indentedLogger        : IndentedLogger
@@ -154,7 +154,7 @@ object XFormsDeleteAction extends Logging {
 
   def doDeleteItems(
     containingDocumentOpt  : Option[XFormsContainingDocument],
-    itemsToDelete          : Seq[Item],
+    itemsToDelete          : Seq[om.Item],
     deleteIndexForEventOpt : Option[Int],
     doDispatch             : Boolean)(implicit
     indentedLogger         : IndentedLogger
@@ -163,7 +163,7 @@ object XFormsDeleteAction extends Logging {
     // Delete back to front and per DOM document
     // https://github.com/orbeon/orbeon-forms/issues/4492
 
-    val nodesToDelete = (itemsToDelete.iterator collect { case n: NodeInfo => n }).toList
+    val nodesToDelete = (itemsToDelete.iterator collect { case n: om.NodeInfo => n }).toList
 
     // `groupByKeepOrder` uses universal equality but it works because `==` is `equals()` is `isSameNodeInfo()`.
     // NOTE: `getDocumentRoot` can be `null`.
@@ -213,13 +213,13 @@ object XFormsDeleteAction extends Logging {
     instancesWithDescriptors flatMap (_._2)
   }
 
-  private object ReverseLocalOrderComparator extends ju.Comparator[NodeInfo] {
-    def compare(o1: NodeInfo, o2: NodeInfo): Int =
+  private object ReverseLocalOrderComparator extends ju.Comparator[om.NodeInfo] {
+    def compare(o1: om.NodeInfo, o2: om.NodeInfo): Int =
       -o1.compareOrder(o2)
   }
 
   private def doDeleteOneImpl(
-    nodeInfoToRemove : NodeInfo)(implicit
+    nodeInfoToRemove : om.NodeInfo)(implicit
     indentedLogger   : IndentedLogger
 ): Option[DeletionDescriptor] = {
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.SequenceExtent
 
 import scala.jdk.CollectionConverters._
@@ -27,7 +27,7 @@ object BindVariableResolver {
     modelBinds         : XFormsModelBinds,
     contextBindNodeOpt : Option[BindNode],
     targetStaticBind   : StaticBind
-  ): Option[Iterator[Item]] =
+  ): Option[Iterator[om.Item]] =
     resolveAncestorOrSelf(
       contextBindNodeOpt,
       targetStaticBind
@@ -42,7 +42,7 @@ object BindVariableResolver {
     }
 
   // Try to resolve an ancestor-or-self bind
-  def resolveAncestorOrSelf(contextBindNodeOpt: Option[BindNode], targetStaticBind: StaticBind): Option[NodeInfo] =
+  def resolveAncestorOrSelf(contextBindNodeOpt: Option[BindNode], targetStaticBind: StaticBind): Option[om.NodeInfo] =
     contextBindNodeOpt flatMap (findAncestorOrSelfWithName(_, targetStaticBind.nameOpt)) map (_.node)
 
   // Try to resolve a bind which is not an ancestor-or-self bind

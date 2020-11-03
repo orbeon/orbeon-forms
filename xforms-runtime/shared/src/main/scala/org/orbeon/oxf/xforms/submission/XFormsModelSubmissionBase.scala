@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.saxon.om
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -74,7 +75,7 @@ abstract class XFormsModelSubmissionBase
   }
 
   protected def createDocumentToSubmit(
-    currentNodeInfo   : NodeInfo,
+    currentNodeInfo   : om.NodeInfo,
     currentInstance   : Option[XFormsInstance],
     validate          : Boolean,
     relevanceHandling : RelevanceHandling,
@@ -144,7 +145,7 @@ object XFormsModelSubmissionBase {
   // - annotate with alerts if requested
   def prepareXML(
     xfcd              : XFormsContainingDocument,
-    ref               : NodeInfo,
+    ref               : om.NodeInfo,
     relevanceHandling : RelevanceHandling,
     namespaceContext  : Map[String, String],
     annotateWith      : Set[String],

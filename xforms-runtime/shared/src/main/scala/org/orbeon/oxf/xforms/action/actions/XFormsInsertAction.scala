@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
-import org.orbeon.saxon.om.{Axis, Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.xforms.XFormsNames
@@ -47,15 +47,15 @@ object XFormsInsertAction {
   def doInsert(
     containingDocumentOpt             : Option[XFormsContainingDocument],
     insertPosition                    : InsertPosition,
-    insertLocation                    : (NonEmptyList[NodeInfo], Int) Either NodeInfo,
-    originItemsOpt                    : Option[Seq[Item]],
+    insertLocation                    : (NonEmptyList[om.NodeInfo], Int) Either om.NodeInfo,
+    originItemsOpt                    : Option[Seq[om.Item]],
     doClone                           : Boolean,
     doDispatch                        : Boolean,
     requireDefaultValues              : Boolean,
     searchForInstance                 : Boolean,
     removeInstanceDataFromClonedNodes : Boolean)(implicit
     indentedLogger                    : IndentedLogger
-  ): util.List[NodeInfo] = {
+  ): util.List[om.NodeInfo] = {
 
     val insertLocationNodeInfo =
       insertLocation match {
@@ -109,7 +109,7 @@ object XFormsInsertAction {
             case Right(_) =>
               if (indentedLogger != null && indentedLogger.debugEnabled)
                 indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating")
-              return Collections.emptyList[NodeInfo]
+              return Collections.emptyList[om.NodeInfo]
           }
 
         case Some(originItems) =>
@@ -118,12 +118,12 @@ object XFormsInsertAction {
           if (originItems.isEmpty) {
             if (indentedLogger != null && indentedLogger.debugEnabled)
               indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating")
-            return Collections.emptyList[NodeInfo]
+            return Collections.emptyList[om.NodeInfo]
           }
           // "Each node in the origin node-set is cloned in the order it appears in the origin node-set."
           for (currentItem <- originItems.iterator)
             yield currentItem match {
-              case nodeInfo: NodeInfo =>
+              case nodeInfo: om.NodeInfo =>
                 // This is the regular case covered by XForms 1.1 / XPath 1.0
                 val sourceNode = XFormsUtils.getNodeFromNodeInfoConvert(nodeInfo)
                 if (doClone)
@@ -351,7 +351,7 @@ object XFormsInsertAction {
     insertedNodeInfos.asJava
   }
 
-  private def findNodeIndex(node: NodeInfo): Int = {
+  private def findNodeIndex(node: om.NodeInfo): Int = {
     if (node.getParent == null)
       return 0
 
@@ -489,7 +489,7 @@ class XFormsInsertAction extends XFormsAction {
     // Handle insert context (with @context attribute)
     val insertContextItem =
       actionContext.overriddenContext match {
-        case Some(nodeInfo: NodeInfo) =>
+        case Some(nodeInfo: om.NodeInfo) =>
           nodeInfo
         case Some(_) =>
           debug("xf:insert: overridden context is an empty nodeset or not a nodeset, terminating")
@@ -583,7 +583,7 @@ class XFormsInsertAction extends XFormsAction {
       }
 
     val insertLocation =
-      NonEmptyList.fromList(collectionToUpdate).map(_ -> insertionIndex).toLeft(insertContextItem.asInstanceOf[NodeInfo])
+      NonEmptyList.fromList(collectionToUpdate).map(_ -> insertionIndex).toLeft(insertContextItem.asInstanceOf[om.NodeInfo])
 
     XFormsInsertAction.doInsert(
       containingDocumentOpt             = containingDocument.some,

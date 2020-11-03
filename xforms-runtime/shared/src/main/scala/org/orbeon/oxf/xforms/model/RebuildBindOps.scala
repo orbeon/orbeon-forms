@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 
 import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
@@ -28,7 +28,7 @@ trait RebuildBindOps {
   final def topLevelBinds = _topLevelBinds
 
   final val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
-  final val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
+  final val iterationsForContextItem = m.HashMap[om.Item, List[BindIteration]]()
 
   // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
   def rebuild(): Unit =
@@ -84,7 +84,7 @@ trait RebuildBindOps {
   // From among the bind objects associated with the target bind element, if there exists a bind object created with
   // the same in-scope evaluation context node as the source object, then that bind object is the desired target bind
   // object. Otherwise, the IDREF resolution produced a null search result."
-  def resolveBind(bindId: String, contextItemOpt: Option[Item]): Option[RuntimeBind] =
+  def resolveBind(bindId: String, contextItemOpt: Option[om.Item]): Option[RuntimeBind] =
     singleNodeContextBinds.get(bindId) match {
       case some @ Some(_) =>
         // This bind has a single-node context (incl. top-level bind), so ignore context item and just return

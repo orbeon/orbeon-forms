@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
@@ -84,7 +85,7 @@ trait ControlXPathSupport {
   // 5 usages
   def evaluateAsString(
     xpathString        : String,
-    contextItems       : Seq[Item],
+    contextItems       : Seq[om.Item],
     contextPosition    : Int,
     namespaceMapping   : NamespaceMapping                    = getNamespaceMappings,
     variableToValueMap : ju.Map[String, ValueRepresentation] = bindingContext.getInScopeVariables,

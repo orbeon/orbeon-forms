@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
@@ -94,7 +94,7 @@ class XFormsActionInterpreter(
         handleNonFatal                 = false
       ) {
 
-        def runSingle(hasOverriddenContext: Boolean, contextItem: Item): Unit =
+        def runSingle(hasOverriddenContext: Boolean, contextItem: om.Item): Unit =
           runSingleIteration(
             actionAnalysis          = staticAction,
             actionQName             = staticAction.element.getQName,
@@ -146,7 +146,7 @@ class XFormsActionInterpreter(
     ifConditionAttribute    : Option[String],
     whileIterationAttribute : Option[String],
     hasOverriddenContext    : Boolean,
-    contextItem             : Item
+    contextItem             : om.Item
   ): Unit = {
 
     var whileIteration = 1
@@ -211,14 +211,14 @@ class XFormsActionInterpreter(
     actionName         : String,
     conditionAttribute : String,
     conditionType      : String,
-    contextItem        : Item
+    contextItem        : om.Item
   ): Boolean = {
     // Execute condition relative to the overridden context if it exists, or the in-scope context if not
     val (contextNodeset, contextPosition) =
       if (contextItem ne null)
         (ju.Collections.singletonList(contextItem), 1)
       else
-        (ju.Collections.emptyList[Item], 0)
+        (ju.Collections.emptyList[om.Item], 0)
 
     // Don't evaluate the condition if the context has gone missing
     if (contextNodeset.size == 0) { //  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
@@ -254,7 +254,7 @@ class XFormsActionInterpreter(
   // TODO: Pass `DynamicActionContext`.
   def evaluateAsString(
     actionElement   : Element,
-    nodeset         : ju.List[Item],
+    nodeset         : ju.List[om.Item],
     position        : Int,
     xpathExpression : String
   ): String =
@@ -274,10 +274,10 @@ class XFormsActionInterpreter(
   // TODO: Pass `DynamicActionContext`.
   def evaluateKeepItems(
     actionElement   : Element,
-    nodeset         : ju.List[Item],
+    nodeset         : ju.List[om.Item],
     position        : Int,
     xpathExpression : String
-  ): List[Item] =
+  ): List[om.Item] =
     XPathCache.evaluateKeepItems(
       contextItems       = nodeset,
       contextPosition    = position,

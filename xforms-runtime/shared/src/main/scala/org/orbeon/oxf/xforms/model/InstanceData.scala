@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.Breaks.{break, breakable}
@@ -39,7 +40,7 @@ import scala.util.control.Breaks.{break, breakable}
  */
 object InstanceData {
 
-  def addBindNode(nodeInfo: NodeInfo, bindNode: BindNode): Unit = {
+  def addBindNode(nodeInfo: om.NodeInfo, bindNode: BindNode): Unit = {
     val instanceData = getOrCreateInstanceData(nodeInfo, forUpdate = false)
     if (instanceData ne ReadonlyLocalInstanceData) {
       // only register ourselves if we are not a readonly node
@@ -63,7 +64,7 @@ object InstanceData {
     override def getLocationData: LocationData = null
   }
 
-  def setTransientAnnotation(nodeInfo: NodeInfo, name: String, value: String): Unit = {
+  def setTransientAnnotation(nodeInfo: om.NodeInfo, name: String, value: String): Unit = {
     val instanceData = getOrCreateInstanceData(nodeInfo, forUpdate = true)
     instanceData.setTransientAnnotation(name, value)
   }
@@ -76,18 +77,18 @@ object InstanceData {
       existingInstanceData.getTransientAnnotation(name)
   }
 
-  def collectAllClientCustomMIPs(nodeInfo: NodeInfo): Option[Predef.Map[String, String]] = {
+  def collectAllClientCustomMIPs(nodeInfo: om.NodeInfo): Option[Predef.Map[String, String]] = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     Option(existingInstanceData) map (_.collectAllClientCustomMIPs)
   }
 
-  def findCustomMip(nodeInfo: NodeInfo, mipName: String): Option[String] = {
+  def findCustomMip(nodeInfo: om.NodeInfo, mipName: String): Option[String] = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
   }
 
-  def getInheritedRelevant(nodeInfo: NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNode])
+  def getInheritedRelevant(nodeInfo: om.NodeInfo): Boolean =
       getInheritedRelevant(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       ModelDefs.DEFAULT_RELEVANT
@@ -118,7 +119,7 @@ object InstanceData {
       currentInstanceData.getLocalRelevant
   }
 
-  def getRequired(nodeInfo: NodeInfo): Boolean = {
+  def getRequired(nodeInfo: om.NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
       ModelDefs.DEFAULT_REQUIRED
@@ -134,8 +135,8 @@ object InstanceData {
       existingInstanceData.getRequired
   }
 
-  def getInheritedReadonly(nodeInfo: NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNode])
+  def getInheritedReadonly(nodeInfo: om.NodeInfo): Boolean =
       getInheritedReadonly(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if (nodeInfo ne null)
       true // Default for non-mutable nodes is to be read-only
@@ -158,7 +159,7 @@ object InstanceData {
     false
   }
 
-  def getValid(nodeInfo: NodeInfo): Boolean = {
+  def getValid(nodeInfo: om.NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
       ModelDefs.DEFAULT_VALID
@@ -174,13 +175,13 @@ object InstanceData {
       existingInstanceData.getValid
   }
 
-  def setBindType(nodeInfo: NodeInfo, `type`: QName): Unit =
+  def setBindType(nodeInfo: om.NodeInfo, `type`: QName): Unit =
     getOrCreateInstanceData(nodeInfo, forUpdate = true).bindType = `type`
 
   def setSchemaType(node: Node, `type`: QName): Unit =
     getOrCreateInstanceData(node).schemaType = `type`
 
-  def getType(nodeInfo: NodeInfo): QName = {
+  def getType(nodeInfo: om.NodeInfo): QName = {
 
     // Try schema or bind type
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
@@ -208,7 +209,7 @@ object InstanceData {
           val namespaceNodes = nodeInfo.iterateAxis(Axis.NAMESPACE)
           breakable {
             while (true) {
-              val currentNamespaceNode = namespaceNodes.next.asInstanceOf[NodeInfo]
+              val currentNamespaceNode = namespaceNodes.next.asInstanceOf[om.NodeInfo]
               if (currentNamespaceNode eq null)
                 break()
               val prefix = currentNamespaceNode.getLocalPart
@@ -239,7 +240,7 @@ object InstanceData {
     }
   }
 
-  def getInvalidBindIds(nodeInfo: NodeInfo): String = {
+  def getInvalidBindIds(nodeInfo: om.NodeInfo): String = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
       null
@@ -256,7 +257,7 @@ object InstanceData {
       instanceData.requireDefaultValue = false
   }
 
-  def getRequireDefaultValue(nodeInfo: NodeInfo): Boolean =
+  def getRequireDefaultValue(nodeInfo: om.NodeInfo): Boolean =
     getLocalInstanceData(nodeInfo, forUpdate = false).requireDefaultValue
 
   def removeInstanceData(node: Node): Unit =
@@ -273,7 +274,7 @@ object InstanceData {
     instanceData.schemaInvalid = true
   }
 
-  def clearStateForRebuild(nodeInfo: NodeInfo): Unit = {
+  def clearStateForRebuild(nodeInfo: om.NodeInfo): Unit = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false) // not really an update since for read-only nothing changes
     if (existingInstanceData ne null) {
       existingInstanceData.bindNodes = null
@@ -285,7 +286,7 @@ object InstanceData {
     }
   }
 
-  def clearSchemaState(nodeInfo: NodeInfo): Unit = {
+  def clearSchemaState(nodeInfo: om.NodeInfo): Unit = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData ne null) {
       existingInstanceData.schemaType = null
@@ -293,7 +294,7 @@ object InstanceData {
     }
   }
 
-  private def getOrCreateInstanceData(nodeInfo: NodeInfo, forUpdate: Boolean): InstanceData = {
+  private def getOrCreateInstanceData(nodeInfo: om.NodeInfo, forUpdate: Boolean): InstanceData = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate)
     if (existingInstanceData ne null)
       existingInstanceData
@@ -309,8 +310,8 @@ object InstanceData {
       createNewInstanceData(node)
   }
 
-  def getLocalInstanceData(nodeInfo: NodeInfo, forUpdate: Boolean): InstanceData =
     if (nodeInfo.isInstanceOf[VirtualNode])
+  def getLocalInstanceData(nodeInfo: om.NodeInfo, forUpdate: Boolean): InstanceData =
       getLocalInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else if ((nodeInfo ne null) && ! forUpdate)
       ReadonlyLocalInstanceData
@@ -335,8 +336,8 @@ object InstanceData {
     }
   }
 
-  private def createNewInstanceData(nodeInfo: NodeInfo): InstanceData =
     if (nodeInfo.isInstanceOf[VirtualNode])
+  private def createNewInstanceData(nodeInfo: om.NodeInfo): InstanceData =
       createNewInstanceData(unwrapNode(nodeInfo).getOrElse(throw new IllegalArgumentException))
     else
       throw new OXFException("Cannot create InstanceData on non-VirtualNode NodeInfo.")

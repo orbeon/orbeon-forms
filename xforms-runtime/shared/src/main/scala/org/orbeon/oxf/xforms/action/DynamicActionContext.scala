@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.action
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om
 
 case class DynamicActionContext(
   interpreter       : XFormsActionInterpreter,
   analysis          : ElementAnalysis,
-  overriddenContext : Option[Item]
+  overriddenContext : Option[om.Item]
 ) {
   def actionName         = analysis.localName
   def element            = analysis.element

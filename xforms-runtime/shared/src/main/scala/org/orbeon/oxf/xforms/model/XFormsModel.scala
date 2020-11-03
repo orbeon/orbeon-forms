@@ -346,13 +346,13 @@ trait XFormsModelInstances {
     Option(getInstance(instanceStaticId))
 
   // Return the XFormsInstance object containing the given node
-  def findInstanceForNode(nodeInfo: NodeInfo): Option[XFormsInstance] =
+  def findInstanceForNode(nodeInfo: om.NodeInfo): Option[XFormsInstance] =
     container.isRelevant flatOption { // NOTE: We shouldn't even be called if the parent control is not relevant.
       val documentInfo = nodeInfo.getDocumentRoot
       instancesIterator find (_.documentInfo.isSameNodeInfo(documentInfo))
     }
 
-  def getInstanceForNode(nodeInfo: NodeInfo): XFormsInstance =
+  def getInstanceForNode(nodeInfo: om.NodeInfo): XFormsInstance =
     findInstanceForNode(nodeInfo).orNull
 
   // Set an instance. The id of the instance must exist in the model.

@@ -53,7 +53,7 @@ class AssetsAggregator extends ProcessorImpl {
             }
             case class ReferenceElement(name: String, attributes: Attributes) extends HeadElement
             case class InlineElement   (name: String, attributes: Attributes) extends HeadElement {
-              var content = new StringBuilder
+              val content = new StringBuilder
               override def text = Some(content.toString)
             }
 

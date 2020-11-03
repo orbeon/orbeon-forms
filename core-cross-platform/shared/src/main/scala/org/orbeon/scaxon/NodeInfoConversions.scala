@@ -14,9 +14,12 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom
+import org.orbeon.dom.{Attribute, Namespace, Node, QName}
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
 import shapeless.syntax.typeable._
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
+import org.orbeon.oxf.xml.TransformerUtils
 
 
 object NodeInfoConversions {
@@ -32,4 +35,17 @@ object NodeInfoConversions {
 
   def unwrapNode(nodeInfo: om.NodeInfo): Option[dom.Node] =
     nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Node])
+
+  def getNodeFromNodeInfoConvert(nodeInfo: om.NodeInfo): Node =
+    nodeInfo match {
+      case vn: VirtualNodeType => vn.getUnderlyingNode.asInstanceOf[Node]
+      case _ =>
+        if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
+          Attribute(QName(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
+        else
+          StaticXPath.tinyTreeToOrbeonDom(if (nodeInfo.getParent.isInstanceOf[DocumentInfo]) nodeInfo.getParent
+        else
+          nodeInfo
+      )
+    }
 }

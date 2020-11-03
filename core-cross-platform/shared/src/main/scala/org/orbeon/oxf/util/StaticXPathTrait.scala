@@ -50,5 +50,6 @@ trait StaticXPathTrait {
   ): CompiledExpression
 
   def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType
+  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): Document
   val EmptyDocument: DocumentNodeInfoType
 }

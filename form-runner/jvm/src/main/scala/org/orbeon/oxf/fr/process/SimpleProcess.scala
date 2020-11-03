@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
@@ -88,7 +89,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
       inScopeContainingDocument.setTransientState(
         RollbackContent.getClass.getName,
         RollbackContent(
-          data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
+          data           = NodeInfoConversions.getNodeFromNodeInfoConvert(formInstance.root).deepCopy.asInstanceOf[Document], // ugly way to copy
           saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
           autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
         )

@@ -22,7 +22,7 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
@@ -101,7 +101,7 @@ object XFormsInsertAction {
               // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
               // node of the Node Set Binding node-set."
               val singleSourceNode =
-                XFormsUtils.getNodeFromNodeInfoConvert(collectionToUpdate.last)
+                NodeInfoConversions.getNodeFromNodeInfoConvert(collectionToUpdate.last)
 
               // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
 
@@ -125,7 +125,7 @@ object XFormsInsertAction {
             yield currentItem match {
               case nodeInfo: om.NodeInfo =>
                 // This is the regular case covered by XForms 1.1 / XPath 1.0
-                val sourceNode = XFormsUtils.getNodeFromNodeInfoConvert(nodeInfo)
+                val sourceNode = NodeInfoConversions.getNodeFromNodeInfoConvert(nodeInfo)
                 if (doClone)
                   sourceNode match {
                     case elem: Element => elem.createCopy

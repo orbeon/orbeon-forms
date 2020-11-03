@@ -66,6 +66,8 @@ object StaticXPath extends StaticXPathTrait {
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
   }
 
+  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): Document = ???
+
   val EmptyDocument: DocumentNodeInfoType = {
 
     val treeBuilder = om.TreeModel.TINY_TREE.makeBuilder(GlobalConfiguration.makePipelineConfiguration)

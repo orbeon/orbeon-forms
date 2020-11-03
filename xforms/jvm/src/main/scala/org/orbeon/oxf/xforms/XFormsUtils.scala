@@ -263,26 +263,6 @@ object XFormsUtils {
   }
 
   /**
-   * Return the underlying Node from the given NodeInfo, possibly converting it to a Dom4j Node. Changes to the returned Node may or may not
-   * reflect on the original, depending on its type.
-   *
-   * @param nodeInfo NodeInfo to process
-   * @return Node
-   */
-  def getNodeFromNodeInfoConvert(nodeInfo: NodeInfo): Node =
-    nodeInfo match {
-      case vn: VirtualNode => vn.getUnderlyingNode.asInstanceOf[Node]
-      case _ =>
-        if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
-          Attribute(QName(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
-        else
-          TransformerUtils.tinyTreeToDom4j(if (nodeInfo.getParent.isInstanceOf[DocumentInfo]) nodeInfo.getParent
-        else
-          nodeInfo
-      )
-    }
-
-  /**
    * Return the underlying Node from the given NodeInfo if possible. If not, throw an exception with the given error
    * message.
    *

@@ -24,11 +24,9 @@ import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 /**
  * Cache for shared and immutable XForms instances.
  */
-object XFormsServerSharedInstancesCache {
+object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCacheTrait {
 
   import Private._
-
-  type InstanceLoader = (String, Boolean) => DocumentNodeInfoType
 
   // Try to find instance content in the cache but do not attempt to load it if not found
   def findContentOrNull(

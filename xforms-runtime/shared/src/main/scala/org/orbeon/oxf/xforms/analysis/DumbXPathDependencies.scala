@@ -20,30 +20,31 @@ import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
+
 // This implementation of dependencies simply says that everything must be updated all the time.
 class DumbXPathDependencies extends XPathDependencies {
-  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo) = ()
-  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]) = ()
-  def rebuildDone(model: XFormsModel) = ()
-  def recalculateDone(model: XFormsModel) = ()
-  def revalidateDone(model: XFormsModel) = ()
-  def modelDestruct(model: XFormsModel) = ()
-  def refreshStart() = ()
-  def refreshDone() = ()
-  def bindingUpdateStart() = ()
-  def bindingUpdateDone() = ()
-  def afterInitialResponse() = ()
-  def beforeUpdateResponse() = ()
-  def afterUpdateResponse() = ()
-  def notifyComputeLHHA() = ()
-  def notifyOptimizeLHHA() = ()
-  def notifyComputeItemset() = ()
-  def notifyOptimizeItemset() = ()
-  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
-  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
-  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String) = true
-  def requireItemsetUpdate(control: SelectionControlTrait, controlPrefixedId: String) = true
+  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Unit = ()
+  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit = ()
+  def rebuildDone          (model: XFormsModel): Unit = ()
+  def recalculateDone      (model: XFormsModel): Unit = ()
+  def revalidateDone       (model: XFormsModel): Unit = ()
+  def modelDestruct        (model: XFormsModel): Unit = ()
+  def refreshStart         (): Unit = ()
+  def refreshDone          (): Unit = ()
+  def bindingUpdateStart   (): Unit = ()
+  def bindingUpdateDone    (): Unit = ()
+  def afterInitialResponse (): Unit = ()
+  def beforeUpdateResponse (): Unit = ()
+  def afterUpdateResponse  (): Unit = ()
+  def notifyComputeLHHA    (): Unit = ()
+  def notifyOptimizeLHHA   (): Unit = ()
+  def notifyComputeItemset (): Unit = ()
+  def notifyOptimizeItemset(): Unit = ()
+  def requireBindingUpdate (control: ElementAnalysis, controlEffectiveId: String) = true
+  def requireValueUpdate   (control: ElementAnalysis, controlEffectiveId: String) = true
+  def requireLHHAUpdate    (control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String) = true
+  def requireItemsetUpdate (control: SelectionControlTrait, controlPrefixedId: String) = true
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
-  def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
+  def hasAnyValidationBind (model: Model, instancePrefixedId: String) = true
 }

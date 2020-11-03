@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectionControlTrait}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -21,40 +20,40 @@ import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om
 
-// Interface to dependencies implementation.
+
 trait XPathDependencies {
 
-  def markValueChanged(model: XFormsModel, nodeInfo: om.NodeInfo)
-  def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance])
+  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo)
+  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance])
 
-  def rebuildDone(model: XFormsModel) // called even if no work was done during `doRebuild()`
-  def recalculateDone(model: XFormsModel)
-  def revalidateDone(model: XFormsModel)
-  def modelDestruct(model: XFormsModel)
+  def rebuildDone          (model: XFormsModel): Unit // called even if no work was done during `doRebuild()`
+  def recalculateDone      (model: XFormsModel): Unit
+  def revalidateDone       (model: XFormsModel): Unit
+  def modelDestruct        (model: XFormsModel): Unit
 
-  def refreshStart()
-  def refreshDone()
+  def refreshStart         ()                  : Unit
+  def refreshDone          ()                  : Unit
 
-  def bindingUpdateStart()
-  def bindingUpdateDone()
+  def bindingUpdateStart   ()                  : Unit
+  def bindingUpdateDone    ()                  : Unit
 
-  def afterInitialResponse()
-  def beforeUpdateResponse()
-  def afterUpdateResponse()
+  def afterInitialResponse ()                  : Unit
+  def beforeUpdateResponse ()                  : Unit
+  def afterUpdateResponse  ()                  : Unit
 
-  def notifyComputeLHHA()
-  def notifyOptimizeLHHA()
+  def notifyComputeLHHA    ()                  : Unit
+  def notifyOptimizeLHHA   ()                  : Unit
 
-  def notifyComputeItemset()
-  def notifyOptimizeItemset()
+  def notifyComputeItemset ()                  : Unit
+  def notifyOptimizeItemset()                  : Unit
 
-  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean
-  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean
-  def requireLHHAUpdate(control: ElementAnalysis, lhha: LHHA, controlEffectiveId: String): Boolean
-  def requireItemsetUpdate(control: SelectionControlTrait, controlEffectiveId: String): Boolean
+  def requireBindingUpdate (control: ElementAnalysis,                   controlEffectiveId: String): Boolean
+  def requireValueUpdate   (control: ElementAnalysis,                   controlEffectiveId: String): Boolean
+  def requireLHHAUpdate    (control: ElementAnalysis,       lhha: LHHA, controlEffectiveId: String): Boolean
+  def requireItemsetUpdate (control: SelectionControlTrait,             controlEffectiveId: String): Boolean
 
   def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
 
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
-  def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
+  def hasAnyValidationBind (model: Model, instancePrefixedId: String): Boolean
 }

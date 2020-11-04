@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -42,6 +41,8 @@ import scala.util.Try
 
 
 object PartAnalysisBuilder {
+
+  val XFormsFunctionLibraryClassName = "org.orbeon.oxf.xforms.library.XFormsFunctionLibrary"
 
   // Create and analyze an entire part, whether a top-level, immutable part or a nested, mutable part.
   def apply[T >: TopLevelPartAnalysis with NestedPartAnalysis](
@@ -58,22 +59,27 @@ object PartAnalysisBuilder {
     // allow a nested part to override with with an explicit `xxf:function-library`.
     val functionLibrary =
       parent map
-      (_.functionLibrary) orElse
-        loadClass[FunctionLibrary](staticStateDocument, FunctionLibraryProperty) match {
+      (_.functionLibrary) orElse {
+
+        // Load by reflection as we don't have the function library available at this level during compilation
+        val xformsFunctionLibrary = loadClassByName[FunctionLibrary](XFormsFunctionLibraryClassName)
+
+        loadClassFromProperty[FunctionLibrary](staticStateDocument, FunctionLibraryProperty) match {
           case Some(library) =>
             new FunctionLibraryList                         |!>
-              (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+              (_.addFunctionLibrary(xformsFunctionLibrary)) |!>
               (_.addFunctionLibrary(library))
           case None =>
-            XFormsFunctionLibrary
+            xformsFunctionLibrary
         }
+      }
 
     // Same thing here, we get the root's `XBLSupport` if present
     val xblSupport =
       (parent.iterator flatMap (_.ancestorOrSelfIterator)).lastOption() collect {
         case impl: StaticPartAnalysisImpl => impl.xblSupport
       } getOrElse
-        loadClass[XBLSupport](staticStateDocument, XblSupportProperty)
+        loadClassFromProperty[XBLSupport](staticStateDocument, XblSupportProperty)
 
     // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
     // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
@@ -89,25 +95,25 @@ object PartAnalysisBuilder {
     partAnalysisCtx
   }
 
-  private def loadClass[T : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
-    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap (_.trimAllToOpt) match {
-      case Some(className) =>
+  private def loadClassFromProperty[T : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
+    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap (_.trimAllToOpt) flatMap loadClassByName
 
-        def tryFromScalaObject: Try[AnyRef] = Try {
-          Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
-        }
+  private def loadClassByName[T : ClassTag](className: String): Option[T] = {
 
-        def fromJavaClass: AnyRef =
-          Class.forName(className).getDeclaredMethod("instance").invoke(null)
+      def tryFromScalaObject: Try[AnyRef] = Try {
+        Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
+      }
 
-        tryFromScalaObject getOrElse fromJavaClass match {
-          case instance: T => Some(instance)
-          case _ =>
-            throw new ClassCastException(
-              s"property `$propertyName` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
-            )
-        }
-      case None => None
+      def fromJavaClass: AnyRef =
+        Class.forName(className).getDeclaredMethod("instance").invoke(null)
+
+      tryFromScalaObject getOrElse fromJavaClass match {
+        case instance: T => Some(instance)
+        case _ =>
+          throw new ClassCastException(
+            s"property `$className` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
+          )
+      }
     }
 
   // Analyze a subtree of controls (for `xxf:dynamic` and components with lazy bindings)

@@ -20,12 +20,12 @@ import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging, NetUtils}
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}
+import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
@@ -313,7 +313,7 @@ object XFormsControl {
       }
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
-        if (! isStartElement || ! XFormsElementValue.VoidElements(localname)) {
+        if (! isStartElement || ! VoidElements(localname)) {
           // We serialize to HTML: don't close elements that just opened (will cover `<br>`, `<hr>`, etc.). Be sure not
           // to drop closing elements of other tags though!
           sb.append("</")

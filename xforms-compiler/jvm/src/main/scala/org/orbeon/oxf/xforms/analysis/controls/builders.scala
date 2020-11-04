@@ -8,9 +8,8 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsElementValue
+import org.orbeon.oxf.xforms.{XFormsStaticElementValue, XFormsStaticStateImpl}
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
 import org.orbeon.oxf.xforms.analysis.model.{Instance, StaticBind}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisContextForTree}
@@ -51,7 +50,7 @@ object OutputControlBuilder {
 
     val staticValue: Option[String] =
       (! isImageMediatype && ! isDownloadAppearance && ElementAnalysisTreeBuilder.hasStaticValue(element)) option
-        XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
+        XFormsStaticElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
     new OutputControl(
       index,
@@ -104,7 +103,7 @@ object LHHAAnalysisBuilder {
     //
     val staticValue: Option[String] =
       ElementAnalysisTreeBuilder.hasStaticValue(element) option
-        XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
+        XFormsStaticElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
     val lhhaType: LHHA =
       LHHA.withNameOption(element.getName) getOrElse
@@ -374,7 +373,7 @@ object SelectionControlBuilder {
                 val containsHTML = Array[Boolean](false)
 
                 val valueOpt =
-                  XFormsElementValue.getStaticChildElementValue(
+                  XFormsStaticElementValue.getStaticChildElementValue(
                     containerScope.fullPrefix,
                     lhhaElem,
                     isFull,
@@ -409,7 +408,7 @@ object SelectionControlBuilder {
 
                 val rawValue =
                   element.elementOpt(XFORMS_VALUE_QNAME) map (
-                    XFormsElementValue.getStaticChildElementValue(
+                    XFormsStaticElementValue.getStaticChildElementValue(
                       containerScope.fullPrefix,
                       _,
                       acceptHTML = false,

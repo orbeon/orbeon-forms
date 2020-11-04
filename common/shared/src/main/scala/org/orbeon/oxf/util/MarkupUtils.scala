@@ -149,6 +149,12 @@ object MarkupUtils {
     }
   }
 
+  val VoidElements = Set(
+    // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
+    "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr", // Legacy
+    "basefont", "frame", "isindex"
+  )
+
   private val CrRegex = """\r""".r
   private val RemoveDisallowedXmlCharactersRegex = """[\x00-\x08\x0B\x0C\x0E-\x1F]""".r
 

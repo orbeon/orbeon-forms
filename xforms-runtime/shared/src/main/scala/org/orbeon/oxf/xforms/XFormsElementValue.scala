@@ -31,52 +31,14 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 
-import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 
 object XFormsElementValue {
 
   /**
-   * Get the value of a child element known to have only static content.
-   *
-   * @param childElement element to evaluate (xf:label, etc.)
-   * @param acceptHTML   whether the result may contain HTML
-   * @param containsHTML whether the result actually contains HTML (null allowed)
-   * @return string containing the result of the evaluation
-   */
-  def getStaticChildElementValue(prefix: String, childElement: Element, acceptHTML: Boolean, containsHTML: Array[Boolean]): String = {
-
-    assert(childElement != null)
-
-    // No HTML found by default
-    if (containsHTML != null) containsHTML(0) = false
-
-    // Try to get inline value
-    val sb = new jl.StringBuilder(20)
-
-    // Visit the subtree and serialize
-    // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
-    // serialize it, which is not trivial because of the possible interleaved xf:output's. Furthermore, we
-    // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
-    // serialization.
-    childElement.visitDescendants(
-      new LHHAElementVisitorListener(prefix, acceptHTML, containsHTML, sb, childElement),
-      mutable = false
-    )
-    if (acceptHTML && containsHTML != null && !containsHTML(0)) {
-      // We went through the subtree and did not find any HTML
-      // If the caller supports the information, return a non-escaped string so we can optimize output later
-      sb.toString.unescapeXmlMinimal
-    } else {
-      // We found some HTML, just return it
-      sb.toString
-    }
-  }
-
-  /**
    * Get the value of an element by trying single-node binding, value attribute, linking attribute, and inline value
-   * (including nested XHTML and xf:output elements).
+   * (including nested XHTML and `xf:output` elements).
    *
    * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
    *
@@ -169,12 +131,6 @@ object XFormsElementValue {
     fromBinding orElse fromValueAtt getOrElse fromNestedContent
   }
 
-  val VoidElements = Set(
-    // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
-    "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr", // Legacy
-    "basefont", "frame", "isindex"
-  )
-
   private class LHHAElementVisitorListener private (
     prefix            : String,
     container         : XBLContainer,
@@ -189,28 +145,6 @@ object XFormsElementValue {
   ) extends VisitorListener {
 
     thisLHHAElementVisitorListener =>
-
-    // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
-    def this(
-      prefix       : String,
-      acceptHTML   : Boolean,
-      containsHTML : Array[Boolean],
-      sb           : jl.StringBuilder,
-      childElement : Element
-    ) {
-      this(
-        prefix            = prefix,
-        container         = null,
-        contextStack      = null,
-        sourceEffectiveId = null,
-        acceptHTML        = acceptHTML,
-        defaultHTML       = false,
-        containsHTML      = containsHTML,
-        sb                = sb,
-        childElement      = childElement,
-        hostLanguageAVTs  = false
-      )
-    }
 
     // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
     def this(
@@ -239,7 +173,7 @@ object XFormsElementValue {
 
     private var lastIsStart = false
 
-    override def startElement(element: Element) {
+    def startElement(element: Element): Unit = {
 
       implicit val ctxStack: XFormsContextStack = contextStack
 
@@ -258,7 +192,7 @@ object XFormsElementValue {
 
             override def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
           }
-        val isHTMLMediatype = !defaultHTML && LHHAAnalysis.isHTML(element) || defaultHTML && !LHHAAnalysis.isPlainText(element)
+        val isHTMLMediatype = ! defaultHTML && LHHAAnalysis.isHTML(element) || defaultHTML && ! LHHAAnalysis.isPlainText(element)
         withBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element)) { bindingContext =>
           outputControl.setBindingContext(
             bindingContext = bindingContext,
@@ -268,66 +202,67 @@ object XFormsElementValue {
             state          = None
           )
         }
-        if (outputControl.isRelevant) if (acceptHTML) if (isHTMLMediatype) {
-          if (containsHTML != null) containsHTML(0) = true // this indicates for sure that there is some nested HTML
-          sb.append(outputControl.getExternalValue())
-        }
-        else { // Mediatype is not HTML so we don't escape
-          sb.append(outputControl.getExternalValue().escapeXmlMinimal)
-        }
-        else if (isHTMLMediatype) { // HTML is not allowed here, better tell the user
-          throw new OXFException("HTML not allowed within element: " + childElement.getName)
-        }
-        else sb.append(outputControl.getExternalValue())
+        if (outputControl.isRelevant)
+          if (acceptHTML) {
+            if (isHTMLMediatype) {
+              if (containsHTML != null)
+                containsHTML(0) = true // this indicates for sure that there is some nested HTML
+              sb.append(outputControl.getExternalValue())
+            } else {
+              // Mediatype is not HTML so we don't escape
+              sb.append(outputControl.getExternalValue().escapeXmlMinimal)
+            }
+          } else if (isHTMLMediatype) {
+            // HTML is not allowed here, better tell the user
+            throw new OXFException("HTML not allowed within element: " + childElement.getName)
+          } else
+            sb.append(outputControl.getExternalValue())
       } else {
         // This is a regular element, just serialize the start tag to no namespace
         // If HTML is not allowed here, better tell the user
-        if (!acceptHTML) throw new OXFException("Nested XHTML or XForms not allowed within element: " + childElement.getName)
-        if (containsHTML != null) containsHTML(0) = true
+        if (!acceptHTML)
+          throw new OXFException("Nested XHTML or XForms not allowed within element: " + childElement.getName)
+        if (containsHTML != null)
+          containsHTML(0) = true
         sb.append('<')
         sb.append(element.getName)
-        val attributes = element.jAttributes
-        if (attributes.size > 0) {
-          for (attribute <- attributes.asScala) {
-            val currentAttribute = attribute.asInstanceOf[Attribute]
-            val currentAttributeName = currentAttribute.getName
-            val currentAttributeValue = currentAttribute.getValue
-            val resolvedValue =
-              if (hostLanguageAVTs && XMLUtils.maybeAVT(currentAttributeValue)) {
-                // This is an AVT, use attribute control to produce the output
-                val attributeControl = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue, element.getName)
+        for (attribute <- element.attributes) {
+          val currentAttributeName = attribute.getName
+          val currentAttributeValue = attribute.getValue
+          val resolvedValue =
+            if (hostLanguageAVTs && XMLUtils.maybeAVT(currentAttributeValue)) {
+              // This is an AVT, use attribute control to produce the output
+              val attributeControl = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue, element.getName)
 
-                withBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element)) { bindingContext =>
-                  attributeControl.setBindingContext(
-                    bindingContext = bindingContext,
-                    parentRelevant = true,
-                    update = false,
-                    restoreState = false,
-                    state = None
-                  )
-                }
-                attributeControl.getExternalValue()
-              } else if (currentAttributeName == "id") {
-                // This is an id, prefix if needed, but also add suffix
-                // https://github.com/orbeon/orbeon-forms/issues/4782
-                val it = ctxStack.getCurrentBindingContext.repeatPositions
-
-                if (it.isEmpty)
-                  prefix + currentAttributeValue
-                else
-                  XFormsId.fromEffectiveId(prefix + currentAttributeValue).copy(iterations = it.toList.reverse).toEffectiveId
-              } else {
-                // Simply use control value
-                currentAttributeValue
+              withBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element)) { bindingContext =>
+                attributeControl.setBindingContext(
+                  bindingContext = bindingContext,
+                  parentRelevant = true,
+                  update = false,
+                  restoreState = false,
+                  state = None
+                )
               }
-            // Only consider attributes in no namespace
-            if ("" == currentAttribute.getNamespaceURI) {
-              sb.append(' ')
-              sb.append(currentAttributeName)
-              sb.append("=\"")
-              if (resolvedValue != null) sb.append(resolvedValue.escapeXmlMinimal)
-              sb.append('"')
+              attributeControl.getExternalValue()
+            } else if (currentAttributeName == "id") {
+              // https://github.com/orbeon/orbeon-forms/issues/4782
+              val it = ctxStack.getCurrentBindingContext.repeatPositions
+	      
+              if (it.isEmpty)
+                prefix + currentAttributeValue
+              else
+                XFormsId.fromEffectiveId(prefix + currentAttributeValue).copy(iterations = it.toList.reverse).toEffectiveId
+            } else {
+              // Simply use control value
+              currentAttributeValue
             }
+          // Only consider attributes in no namespace
+          if ("" == attribute.getNamespaceURI) {
+            sb.append(' ')
+            sb.append(currentAttributeName)
+            sb.append("=\"")
+            if (resolvedValue != null) sb.append(resolvedValue.escapeXmlMinimal)
+            sb.append('"')
           }
         }
         sb.append('>')
@@ -335,11 +270,11 @@ object XFormsElementValue {
       }
     }
 
-    override def endElement(element: Element) {
+    def endElement(element: Element): Unit = {
       val elementName = element.getName
-      if ((!lastIsStart || ! VoidElements(elementName)) && !(element.getQName == XFormsNames.XFORMS_OUTPUT_QNAME)) {
+      if ((! lastIsStart || ! VoidElements(elementName)) && element.getQName != XFormsNames.XFORMS_OUTPUT_QNAME) {
         // This is a regular element, just serialize the end tag to no namespace
-        // UNLESS the element was just opened. This means we output <br>, not <br></br>, etc.
+        // UNLESS the element was just opened. This means we output `<br>`, not `<br></br>`, etc.
         sb.append("</")
         sb.append(elementName)
         sb.append('>')
@@ -347,7 +282,7 @@ object XFormsElementValue {
       lastIsStart = false
     }
 
-    override def text(text: Text) {
+    def text(text: Text): Unit = {
       sb.append(
         if (acceptHTML)
           text.getStringValue.escapeXmlMinimal

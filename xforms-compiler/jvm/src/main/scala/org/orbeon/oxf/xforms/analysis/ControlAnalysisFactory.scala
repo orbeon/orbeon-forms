@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.analysis.EventHandler.{isAction, isContainerAction, isEventHandler}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, ModelVariable, Submission}
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -100,7 +100,14 @@ object ControlAnalysisFactory {
   private val ControlFactory: PartialFunction[Element, ControlFactory] =
     { case e: Element if byQNameFactory.isDefinedAt(e.getQName) => byQNameFactory(e.getQName) }
 
-  private val ControlOrActionFactory = ControlFactory orElse XFormsActions.ActionFactory lift
+  private val ActionFactory: PartialFunction[Element, ControlFactory] = {
+    case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _, _, _, _, _)    with WithChildrenTrait
+    case e if isContainerAction(e.getQName)                      => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
+    case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _, _, _, _, _)
+    case e if isAction(e.getQName)                               => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait
+  }
+
+  private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 
   def create(
     partAnalysisCtx   : PartAnalysisContextForTree,

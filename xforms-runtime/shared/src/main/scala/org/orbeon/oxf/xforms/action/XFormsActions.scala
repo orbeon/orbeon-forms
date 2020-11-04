@@ -61,19 +61,6 @@ object XFormsActions {
     XBL_HANDLER_QNAME                       -> new XFormsActionAction
   )
 
-  // Return a factory for action analysis
-  val ActionFactory: PartialFunction[Element, ControlFactory] = {
-
-    val actionFactory: PartialFunction[Element, ControlFactory] = {
-      case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _, _, _, _, _)    with WithChildrenTrait
-      case e if isContainerAction(e.getQName)                      => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
-      case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _, _, _, _, _)
-      case e if isAction(e.getQName)                               => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait
-    }
-
-    actionFactory
-  }
-
   // Return the action with the QName, null if there is no such action
   def getAction(qName: QName): XFormsAction = Actions.get(qName) orNull
 }

@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Global}
-import org.orbeon.oxf.xforms.xbl.XBLAssets
+import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
@@ -64,6 +64,7 @@ trait PartGlobalOps {
   def scriptsByPrefixedId: Map[String, StaticScript]
   def uniqueJsScripts: List[ShareableScript]
   def baselineResources: (List[String], List[String])
+  def bindingResources: (List[HeadElement], List[HeadElement])
 
   // Functions derived from getControlAnalysis
   def hasBinding(prefixedId: String): Boolean = findControlAnalysis(prefixedId) exists (_.hasBinding)

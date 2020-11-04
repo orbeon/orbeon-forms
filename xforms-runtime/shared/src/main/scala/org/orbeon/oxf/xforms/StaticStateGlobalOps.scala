@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.analysis.{NestedPartAnalysis, PartAnalysis}
-import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssets, XBLAssetsBuilder}
+import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssets}
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.{immutable => i}
@@ -95,7 +95,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def bindingResources: (List[HeadElement], List[HeadElement]) = {
     val bindings = allXblAssetsMaybeDuplicates
-    (XBLAssetsBuilder.orderedHeadElements(bindings, _.scripts), XBLAssetsBuilder.orderedHeadElements(bindings, _.styles))
+    (XBLAssets.orderedHeadElements(bindings, _.scripts), XBLAssets.orderedHeadElements(bindings, _.styles))
   }
 
   /**

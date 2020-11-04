@@ -18,14 +18,13 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
-import org.orbeon.saxon.{Configuration, TransformerFactoryImpl}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tinytree.TinyBuilder
+import org.orbeon.saxon.{Configuration, TransformerFactoryImpl, om}
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.XMLReader
 
@@ -33,13 +32,45 @@ import org.xml.sax.XMLReader
 object StaticXPath extends StaticXPathTrait {
 
   type SaxonConfiguration      = Configuration
-  type DocumentNodeInfoType    = DocumentInfo
-  type VirtualNodeType         = VirtualNode
-  type ValueRepresentationType = ValueRepresentation
-  type AxisType                = Axis
+  type DocumentNodeInfoType    = om.DocumentInfo
+  type VirtualNodeType         = om.VirtualNode
+  type ValueRepresentationType = om.ValueRepresentation
+  type AxisType                = om.Axis
   type PathMapType             = PathMap
 
-  type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentationType
+  type VariableResolver = (om.StructuredQName, XPathContext) => ValueRepresentationType
+
+  // Context accessible during XPath evaluation
+  // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
+  // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
+  // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
+  // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
+  protected[util] val GlobalNamePool = new om.NamePool
+  protected[util] val GlobalDocumentNumberAllocator = new om.DocumentNumberAllocator
+
+  // Global Saxon configuration with a global name pool
+  // This configuration doesn't support creating parsers. It is only used for compiling expressions.
+  val GlobalConfiguration = new Configuration {
+
+    super.setNamePool(GlobalNamePool)
+    super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
+
+    // See https://github.com/orbeon/orbeon-forms/issues/3468
+    // We decide not to use a pool for now as creating a parser is fairly cheap
+    override def getSourceParser: XMLReader = ???
+    override def getStyleParser : XMLReader = ???
+
+    // These are called if the parser came from `getSourceParser` or `getStyleParser`
+    override def reuseSourceParser(parser: XMLReader)                             : Unit = ()
+    override def reuseStyleParser(parser: XMLReader)                              : Unit = ()
+    override def setNamePool(targetNamePool: om.NamePool)                         : Unit = throwException()
+    override def setDocumentNumberAllocator(allocator: om.DocumentNumberAllocator): Unit = throwException()
+    override def registerExternalObjectModel(model: om.ExternalObjectModel)       : Unit = throwException()
+    override def setAllowExternalFunctions(allowExternalFunctions: Boolean)       : Unit = throwException()
+    override def setConfigurationProperty(name: String, value: AnyRef)            : Unit = throwException()
+
+    private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
+  }
 
   def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = {
 
@@ -74,38 +105,6 @@ object StaticXPath extends StaticXPathTrait {
     handler.endDocument()
 
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
-  }
-
-  // Context accessible during XPath evaluation
-  // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
-  // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
-  // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
-  // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  protected[util] val GlobalNamePool = new NamePool
-  protected[util] val GlobalDocumentNumberAllocator = new DocumentNumberAllocator
-
-  // Global Saxon configuration with a global name pool
-  // This configuration doesn't support creating parsers. It is only used for compiling expressions.
-  val GlobalConfiguration = new Configuration {
-
-    super.setNamePool(GlobalNamePool)
-    super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
-
-    // See https://github.com/orbeon/orbeon-forms/issues/3468
-    // We decide not to use a pool for now as creating a parser is fairly cheap
-    override def getSourceParser: XMLReader = ???
-    override def getStyleParser : XMLReader = ???
-
-    // These are called if the parser came from `getSourceParser` or `getStyleParser`
-    override def reuseSourceParser(parser: XMLReader)                          : Unit = ()
-    override def reuseStyleParser(parser: XMLReader)                           : Unit = ()
-    override def setNamePool(targetNamePool: NamePool)                         : Unit = throwException()
-    override def setDocumentNumberAllocator(allocator: DocumentNumberAllocator): Unit = throwException()
-    override def registerExternalObjectModel(model: ExternalObjectModel)       : Unit = throwException()
-    override def setAllowExternalFunctions(allowExternalFunctions: Boolean)    : Unit = throwException()
-    override def setConfigurationProperty(name: String, value: AnyRef)         : Unit = throwException()
-
-    private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
   }
 
   // Create and compile an expression

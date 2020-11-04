@@ -17,14 +17,13 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.jdk.CollectionConverters._
@@ -161,7 +160,7 @@ class XFormsAnnotatorTest
           XPathCache.evaluate(
           contextItem        = docWrapper,
           xpathString        = s"//xxf:attribute[@for = '$elemName']",
-          namespaceMapping   = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+          namespaceMapping   = BasicNamespaceMapping.Mapping,
           variableToValueMap = null,
           functionLibrary    = null,
           functionContext    = null,

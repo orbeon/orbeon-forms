@@ -34,6 +34,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
+import org.orbeon.xforms.BasicNamespaceMapping
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node._
 
@@ -128,7 +129,7 @@ object InstanceMirror {
 
     val findInstanceExpr = "(" + axis + "::xf:instance)[1]"
 
-    Option(evalOne(outerNode, findInstanceExpr, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING)) collect {
+    Option(evalOne(outerNode, findInstanceExpr, BasicNamespaceMapping.Mapping)) collect {
       case instanceWrapper: VirtualNodeType if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
 
         val element = instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
@@ -248,7 +249,7 @@ object InstanceMirror {
       evalOne(
         item       = outerElem,
         expr       = ".//xf:instance[@id = $sourceId]",
-        namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+        namespaces = BasicNamespaceMapping.Mapping,
         variables  = Map("sourceId" -> stringToStringValue(innerInstance.getId))
       ) match {
         case instanceWrapper: VirtualNodeType if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>

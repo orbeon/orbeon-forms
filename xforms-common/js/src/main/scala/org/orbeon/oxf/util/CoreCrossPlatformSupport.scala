@@ -17,5 +17,5 @@ package org.orbeon.oxf.util
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def isPE: Boolean = true
   def randomHexId: String = ???
-  def getApplicationResourceVersion: String = ???
+  def getApplicationResourceVersion: Option[String] = ???
 }

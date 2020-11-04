@@ -25,8 +25,8 @@ import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -42,6 +42,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.BasicNamespaceMapping
 
 import java.{util => ju}
 import scala.jdk.CollectionConverters._
@@ -654,7 +655,7 @@ trait FormRunnerPersistence {
             scaxon.XPath.evalOne(
               item       = liveData,
               expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
-              namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+              namespaces = BasicNamespaceMapping.Mapping,
               variables  = Map("beforeURL" -> new StringValue(beforeURL))
             )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
           }

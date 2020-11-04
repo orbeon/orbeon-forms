@@ -107,7 +107,7 @@ trait BindingLoader extends Logging {
         debug("collecting resource baselines")
 
         def collectUniqueReferenceElements(getHeadElements : XBLAssets => Seq[HeadElement]) =
-          XBLAssetsBuilder.orderedHeadElements(
+          XBLAssets.orderedHeadElements(
             baselineBindings map (binding => XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)), // same in `allXblAssetsMaybeDuplicates`
             getHeadElements
           ).iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet).to(List)

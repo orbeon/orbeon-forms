@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
-import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{XMLReceiver, _}
@@ -34,8 +33,7 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{Namespaces, XXBLScope}
-import org.orbeon.xml.NamespaceMapping
+import org.orbeon.xforms.XXBLScope
 import org.xml.sax.Attributes
 
 import scala.jdk.CollectionConverters._
@@ -164,17 +162,6 @@ class XFormsStaticStateImpl(
 }
 
 object XFormsStaticStateImpl {
-
-  val BASIC_NAMESPACE_MAPPING =
-    NamespaceMapping(Map(
-      XFORMS_PREFIX        -> Namespaces.XF,
-      XFORMS_SHORT_PREFIX  -> Namespaces.XF,
-      XXFORMS_PREFIX       -> Namespaces.XXF,
-      XXFORMS_SHORT_PREFIX -> Namespaces.XXF,
-      XML_EVENTS_PREFIX    -> XML_EVENTS_NAMESPACE_URI,
-      XHTML_PREFIX         -> XMLConstants.XHTML_NAMESPACE_URI,
-      XHTML_SHORT_PREFIX   -> XMLConstants.XHTML_NAMESPACE_URI
-    ))
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.

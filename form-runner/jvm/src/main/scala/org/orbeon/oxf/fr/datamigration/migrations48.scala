@@ -22,12 +22,13 @@ import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.BasicNamespaceMapping
+
 import scala.collection.compat._
 
 case class Migration48(
@@ -290,7 +291,7 @@ object MigrationOps48 extends MigrationOps {
 
           // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
           val parentNodes =
-            scaxon.XPath.eval(dataRootElem, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
+            scaxon.XPath.eval(dataRootElem, pathToParentNodes, BasicNamespaceMapping.Mapping) collect {
             case node: NodeInfo => node
           }
 

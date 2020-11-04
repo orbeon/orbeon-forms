@@ -13,8 +13,24 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import scala.collection.mutable
+import scala.collection.compat._
 
 case class XBLAssets(cssName: Option[String], scripts: Seq[HeadElement], styles: Seq[HeadElement])
+
+object XBLAssets {
+
+  // All elements ordered in a consistent way: first by CSS name, then in the order in which they appear for that
+  // given CSS name, removing duplicates
+  //
+  // NOTE: We used to attempt to sort by binding `QName`, when all bindings were direct. The code was actually incorrect
+  // and "sorted" by `<xbl:binding>` instead (so no sorting). Now we sort by CSS name instead.
+  def orderedHeadElements(
+    bindings        : Iterable[XBLAssets],
+    getHeadElements : XBLAssets => Seq[HeadElement]
+  ): List[HeadElement] =
+    (bindings.toList sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
+}
 
 sealed trait HeadElement
 object HeadElement {

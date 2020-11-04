@@ -8,7 +8,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
-import org.orbeon.oxf.xforms.{XFormsStaticElementValue, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
 import org.orbeon.oxf.xforms.analysis.model.{Instance, StaticBind}
@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -269,7 +269,7 @@ object SelectionControlBuilder {
             ]
           )
         """,
-        namespaceMapping   = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+        namespaceMapping   = BasicNamespaceMapping.Mapping,
         variableToValueMap = null,
         functionLibrary    = null,
         functionContext    = null,

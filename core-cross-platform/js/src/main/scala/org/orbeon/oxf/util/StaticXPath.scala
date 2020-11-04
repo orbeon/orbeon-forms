@@ -18,6 +18,7 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.parser
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
@@ -32,6 +33,7 @@ object StaticXPath extends StaticXPathTrait {
   type VirtualNodeType         = VirtualNode
   type ValueRepresentationType = om.GroundedValue
   type AxisType                = om.AxisInfo.type
+  type PathMapType             = parser.PathMap
 
   type VariableResolver = (om.StructuredQName, XPathContext) => ValueRepresentationType
 

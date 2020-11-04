@@ -18,8 +18,7 @@ import org.orbeon.dom.{Attribute, Namespace, Node, QName}
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
 import shapeless.syntax.typeable._
-import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 
 
 object NodeInfoConversions {
@@ -43,7 +42,7 @@ object NodeInfoConversions {
         if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
           Attribute(QName(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
         else
-          StaticXPath.tinyTreeToOrbeonDom(if (nodeInfo.getParent.isInstanceOf[DocumentInfo]) nodeInfo.getParent
+          StaticXPath.tinyTreeToOrbeonDom(if (nodeInfo.getParent.isInstanceOf[DocumentNodeInfoType]) nodeInfo.getParent
         else
           nodeInfo
       )

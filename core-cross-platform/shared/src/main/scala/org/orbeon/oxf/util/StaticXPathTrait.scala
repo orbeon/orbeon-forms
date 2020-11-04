@@ -16,6 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Document
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.xml.NamespaceMapping
 

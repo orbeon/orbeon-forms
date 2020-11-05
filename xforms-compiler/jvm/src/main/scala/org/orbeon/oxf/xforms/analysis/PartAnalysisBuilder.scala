@@ -18,25 +18,24 @@ import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
-import org.orbeon.oxf.xforms.{StaticStateBits, XFormsGlobalProperties, XFormsStaticStateImpl, _}
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
-import org.orbeon.oxf.xml.{DigestContentHandler, SAXStore, TeeXMLReceiver, TransformerUtils, WhitespaceXMLReceiver, XMLReceiver}
+import org.orbeon.oxf.xforms.{StaticStateBits, XFormsGlobalProperties, XFormsStaticStateImpl, _}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
-import org.orbeon.xforms.{Constants, XXBLScope}
 import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
 import org.xml.sax.Attributes
 
 import scala.collection.mutable
@@ -62,11 +61,12 @@ object PartAnalysisBuilder {
     // which worked this way. That's also fairly reasonable. But what we could do at some point later is
     // allow a nested part to override with with an explicit `xxf:function-library`.
     val functionLibrary =
-      parent map
-      (_.functionLibrary) orElse {
+      parent map (_.functionLibrary) getOrElse {
 
         // Load by reflection as we don't have the function library available at this level during compilation
-        val xformsFunctionLibrary = loadClassByName[FunctionLibrary](XFormsFunctionLibraryClassName)
+        val xformsFunctionLibrary =
+          loadClassByName[FunctionLibrary](XFormsFunctionLibraryClassName) getOrElse
+            (throw new IllegalStateException)
 
         loadClassFromProperty[FunctionLibrary](staticStateDocument, FunctionLibraryProperty) match {
           case Some(library) =>
@@ -179,7 +179,7 @@ object PartAnalysisBuilder {
             throw new OXFException("Duplicate id found for static id: " + staticId)
           startScope += staticId -> prefixedId
 
-          if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
+          if (uri == Namespaces.XXF && localname == "attribute") {
             val forStaticId = attributes.getValue("for")
             val forPrefixedId = prefix + forStaticId
             startScope += forStaticId -> forPrefixedId
@@ -254,10 +254,15 @@ object PartAnalysisBuilder {
     (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
   }
 
-  private def loadClassFromProperty[T : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
-    staticStateDocument.nonDefaultProperties.get(propertyName) map (_._1) flatMap (_.trimAllToOpt) flatMap loadClassByName
+  private def loadClassFromProperty[T <: AnyRef : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
+    staticStateDocument
+      .nonDefaultProperties
+      .get(propertyName) map
+      (_._1)             flatMap
+      (_.trimAllToOpt)   flatMap
+      loadClassByName[T]
 
-  private def loadClassByName[T : ClassTag](className: String): Option[T] = {
+  private def loadClassByName[T <: AnyRef : ClassTag](className: String): Option[T] = {
 
       def tryFromScalaObject: Try[AnyRef] = Try {
         Class.forName(className + "$").getDeclaredField("MODULE$").get(null)
@@ -270,7 +275,7 @@ object PartAnalysisBuilder {
         case instance: T => Some(instance)
         case _ =>
           throw new ClassCastException(
-            s"property `$className` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName} with `$className`"
+            s"class `$className` does not refer to a ${implicitly[ClassTag[T]].runtimeClass.getName}"
           )
       }
     }

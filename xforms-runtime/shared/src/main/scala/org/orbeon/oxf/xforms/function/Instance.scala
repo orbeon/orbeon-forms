@@ -24,7 +24,7 @@ import org.orbeon.saxon.om._
  *
  * 7.11.1 The instance() Function
  */
-class Instance extends XFormsFunction {
+class Instance extends XFormsFunction with InstanceTrait {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     // "If the argument is omitted or is equal to the empty string, then the root element node (also called the

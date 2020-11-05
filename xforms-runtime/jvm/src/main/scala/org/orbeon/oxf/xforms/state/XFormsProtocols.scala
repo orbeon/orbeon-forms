@@ -18,13 +18,15 @@ import java.io._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.{Document, Namespace, QName}
-import org.orbeon.oxf.util.{PathMatcher, WhitelistObjectInputStream}
+import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms.model.InstanceCaching
+import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
-import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.xforms.DelayedEvent
 import sbinary.Operations._
 import sbinary._
+
 
 // TODO: Almost none of this should be needed, as case classes, etc. should be handled automatically.
 object XFormsOperations {
@@ -40,51 +42,30 @@ object XFormsOperations {
 
 object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLongUTF {
 
-  class JavaOutputStream(output: Output) extends OutputStream {
-    def write(b: Int): Unit = { output.writeByte(b.asInstanceOf[Byte]) }
-    override def write(b: Array[Byte], off: Int, len: Int): Unit = { output.writeAll(b, off, len) }
+  implicit object DynamicStateFormat extends SerializableFormat[DynamicState] {
+    def allowedClass: Class[DynamicState] = classOf[DynamicState]
   }
-
-  class JavaInputStream(input: Input) extends InputStream {
-    def read() = input.readByte
-    override def read(b: Array[Byte], off: Int, len: Int) = input.readTo(b, off, len)
-  }
-
-  // Base trait for stuff that should be serialized via Serializable/Externalizable
-  trait SerializableFormat[T <: java.io.Serializable] extends Format[T] {
-
-    def allowedClass: Class[_]
-
-    def writes(output: Output, o: T) =
-      new ObjectOutputStream(new JavaOutputStream(output)).writeObject(o)
-
-    def reads(input: Input) =
-      WhitelistObjectInputStream(new JavaInputStream(input), allowedClass, List("org.orbeon.oxf.http.HttpMethod$")).readObject.asInstanceOf[T]
-  }
-
-  implicit object DynamicStateFormat extends SerializableFormat[DynamicState] { def allowedClass = classOf[DynamicState] }
-  implicit object SAXStoreFormat     extends SerializableFormat[SAXStore]     { def allowedClass = classOf[SAXStore]     }
 
   implicit object Dom4jFormat extends Format[Document] {
-    def writes(output: Output, document: Document) = {
+    def writes(output: Output, document: Document): Unit = {
       val identity = TransformerUtils.getXMLIdentityTransformer
       identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
       identity.transform(new LocationDocumentSource(document), new StreamResult(new JavaOutputStream(output)))
     }
 
-    def reads(input: Input) =
+    def reads(input: Input): Document =
       TransformerUtils.readDom4j(new JavaInputStream(input), null, false, false)
   }
 
   implicit object ControlFormat extends Format[ControlState] {
 
-    def writes(output: Output, control: ControlState) = {
+    def writes(output: Output, control: ControlState): Unit = {
       write(output, control.effectiveId)
       write(output, control.visited)
       write(output, control.keyValues)
     }
 
-    def reads(input: Input) =
+    def reads(input: Input): ControlState =
       ControlState(read[String](input), read[Boolean](input), read[Map[String, String]](input))
   }
 
@@ -123,7 +104,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       write(output, instance.requestBodyHash)
     }
 
-    def reads(in: Input) =
+    def reads(in: Input): InstanceCaching =
       InstanceCaching(
         read[Long](in),
         read[Boolean](in),
@@ -146,7 +127,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       write(output, instance.valid)
     }
 
-    def reads(in: Input) = {
+    def reads(in: Input): InstanceState = {
 
       def readCachingOrContent = read[Byte](in) match {
         case 0 => Left(read[InstanceCaching](in))
@@ -173,7 +154,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
     }
 
-    def reads(in: Input) =
+    def reads(in: Input): QName =
       QName(
         read[String](in),
         Namespace(read[String](in), read[String](in)),
@@ -188,8 +169,8 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       write(output, value.versioned)
     }
 
-    def reads(in: Input) =
-      new PathMatcher(
+    def reads(in: Input): PathMatcher =
+      PathMatcher(
         read[String](in),
         read[Option[String]](in).orNull,
         read[Boolean](in)
@@ -222,7 +203,7 @@ trait JavaLongUTF extends CoreProtocol {
   // buffers every time.
 
   implicit object StringFormat extends Format[String] {
-    def reads(input: Input) = {
+    def reads(input: Input): String = {
       // Read 4-byte size header (ObjectInputStream uses 2 or 8)
       val utfLength = read[Int](input)
       val (cbuffer, bbuffer) = (new Array[Char](utfLength * 2), new Array[Byte](utfLength * 2))

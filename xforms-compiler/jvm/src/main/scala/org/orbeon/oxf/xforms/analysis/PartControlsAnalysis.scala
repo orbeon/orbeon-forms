@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.saxon.om

@@ -316,7 +316,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val pathMatchers = (
       routeElements
       collect { case files: FileElement if files.versioned => files }
-      map     (f => new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+      map     (f => PathMatcher(f.path, f.mimeType.orNull, f.versioned))
     )
 
     // Compile the pipeline for the given page element

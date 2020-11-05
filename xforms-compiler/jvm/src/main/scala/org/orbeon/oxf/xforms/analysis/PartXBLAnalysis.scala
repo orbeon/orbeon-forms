@@ -13,13 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
-import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, XFormsId}
 

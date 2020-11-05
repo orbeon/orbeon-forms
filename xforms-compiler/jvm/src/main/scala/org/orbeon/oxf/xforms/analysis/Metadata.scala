@@ -15,15 +15,15 @@ package org.orbeon.oxf.xforms.analysis
 
 
 import org.orbeon.dom.io.DocumentSource
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
+
 
 /**
  * Container for element metadata gathered during document annotation/extraction:

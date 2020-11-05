@@ -1,14 +1,12 @@
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.{Document, Element}
 import org.orbeon.dom.io.XMLWriter
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.util.NumberUtils
+import org.orbeon.oxf.xforms.{XFormsProperties => P}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{DigestContentHandler, EncodeDecode, TransformerUtils}
 import org.orbeon.xforms.XFormsNames.{STATIC_STATE_PROPERTIES_QNAME, XBL_XBL_QNAME}
-import org.orbeon.oxf.xforms.{XFormsProperties => P}
-
-import scala.jdk.CollectionConverters._
 
 
 // Represent the static state XML document resulting from the extractor
@@ -25,7 +23,7 @@ class StaticStateDocument(val xmlDocument: Document) {
 
   // Pointers to nested elements
   def rootControl: Element = staticStateElement.element("root")
-  def xblElements = rootControl.jElements(XBL_XBL_QNAME).asScala
+  def xblElements: Seq[Element] = rootControl.elements(XBL_XBL_QNAME)
 
   // TODO: if staticStateDocument contains XHTML document, get controls and models from there?
 
@@ -62,8 +60,8 @@ class StaticStateDocument(val xmlDocument: Document) {
     }
 
   private def isClientStateHandling: Boolean = {
-    def nonDefault = nonDefaultProperties.get(P.StateHandlingProperty) map (_._1 == StateHandlingClientValue)
-    def default    = P.SupportedDocumentProperties(P.StateHandlingProperty).defaultValue.toString == StateHandlingClientValue
+    def nonDefault = nonDefaultProperties.get(P.StateHandlingProperty) map (_._1 == P.StateHandlingClientValue)
+    def default    = P.SupportedDocumentProperties(P.StateHandlingProperty).defaultValue.toString == P.StateHandlingClientValue
 
     nonDefault getOrElse default
   }
@@ -71,9 +69,9 @@ class StaticStateDocument(val xmlDocument: Document) {
   // Get the encoded static state
   // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
   // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
-  def asBase64 =
+  def asBase64: String =
     EncodeDecode.encodeXML(xmlDocument, true, isClientStateHandling, true) // compress = true, encrypt = isClientStateHandling, location = true
 
-  def dump() =
+  def dump(): Unit =
     println(xmlDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
 }

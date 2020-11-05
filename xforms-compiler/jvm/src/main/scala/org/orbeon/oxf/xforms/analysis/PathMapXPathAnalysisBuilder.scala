@@ -21,15 +21,12 @@ import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
-import org.orbeon.oxf.xforms.function.Instance
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
+import org.orbeon.oxf.xforms.function.{InstanceTrait, XXFormsInstanceTrait}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.PathMap.PathMapArc
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Axis
-import org.orbeon.saxon.trace.ExpressionPresenter
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
@@ -292,7 +289,7 @@ object PathMapXPathAnalysisBuilder {
 
     expression match {
       case instanceExpression: FunctionCall
-          if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] =>
+          if instanceExpression.isInstanceOf[InstanceTrait] || instanceExpression.isInstanceOf[XXFormsInstanceTrait] =>
 
         val hasParameter = instanceExpression.getArguments.nonEmpty
         if (! hasParameter) {
@@ -317,7 +314,7 @@ object PathMapXPathAnalysisBuilder {
           instanceNameExpression match {
             case stringLiteral: StringLiteral =>
               val originalInstanceId = stringLiteral.getStringValue
-              val searchAncestors = expression.isInstanceOf[XXFormsInstance]
+              val searchAncestors = expression.isInstanceOf[XXFormsInstanceTrait]
 
               // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an
               // instance() StringLiteral parameter twice
@@ -563,7 +560,9 @@ object PathMapXPathAnalysisBuilder {
 //  import java.io.ByteArrayOutputStream
 //  import org.orbeon.io.CharsetNames
 //  import org.orbeon.oxf.xml.dom.IOSupport
+//  import org.orbeon.saxon.Configuration
 //  import org.orbeon.saxon.expr.PathMap.PathMapNode
+//  import org.orbeon.saxon.trace.ExpressionPresenter
 //  import scala.xml._
 //
 //  /**

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsGlobalProperties$;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.xbl.IndexableBinding;
 import org.orbeon.oxf.xml.*;
@@ -66,7 +66,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     private NamespaceContext namespaceContext = new NamespaceContext();
 
-    private final boolean hostLanguageAVTs = XFormsGlobalProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
+    private final boolean hostLanguageAVTs = XFormsGlobalProperties$.MODULE$.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
 

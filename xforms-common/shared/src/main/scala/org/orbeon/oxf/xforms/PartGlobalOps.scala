@@ -64,7 +64,6 @@ trait PartGlobalOps {
   def scriptsByPrefixedId: Map[String, StaticScript]
   def uniqueJsScripts: List[ShareableScript]
   def baselineResources: (List[String], List[String])
-  def bindingResources: (List[HeadElement], List[HeadElement])
 
   // Functions derived from getControlAnalysis
   def hasBinding(prefixedId: String): Boolean = findControlAnalysis(prefixedId) exists (_.hasBinding)

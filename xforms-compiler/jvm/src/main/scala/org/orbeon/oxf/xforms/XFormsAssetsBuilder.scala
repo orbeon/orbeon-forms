@@ -57,6 +57,7 @@ object XFormsAssetsBuilder {
     allUpdates.foldLeft(assets)(maybeAddOrRemoveOne)
   }
 
+  // Public for tests
   def fromJsonString(json: String): XFormsAssets =
     fromJson(json.parseJson)
 

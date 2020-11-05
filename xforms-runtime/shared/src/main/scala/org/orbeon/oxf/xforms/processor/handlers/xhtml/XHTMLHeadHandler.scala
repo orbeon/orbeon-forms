@@ -65,7 +65,7 @@ class XHTMLHeadHandler(
     val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
 
     // Create prefix for combined resources if needed
-    val isMinimal = XFormsProperties.isMinimalResources
+    val isMinimal = XFormsGlobalProperties.isMinimalResources
     val isVersionedResources = URLRewriterUtils.isResourcesVersioned
 
     // Include static XForms CSS and JS

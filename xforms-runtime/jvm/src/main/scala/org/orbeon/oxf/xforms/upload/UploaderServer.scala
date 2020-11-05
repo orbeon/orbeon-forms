@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
@@ -81,7 +81,7 @@ object UploaderServer {
           def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
             withDocumentAcquireLock(
               uuid    = uuid,
-              timeout = XFormsProperties.uploadXFormsAccessTimeout)(
+              timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout)(
               block   = _.getUploadConstraintsForControl(controlEffectiveId)
             ).flatten
         }

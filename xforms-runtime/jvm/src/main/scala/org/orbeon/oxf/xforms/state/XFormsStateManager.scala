@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
@@ -33,7 +33,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
   import Private._
 
-  private val ReplicationEnabled = XFormsProperties.isReplication
+  private val ReplicationEnabled = XFormsGlobalProperties.isReplication
 
   if (ReplicationEnabled)
      Version.instance.requirePEFeature("State replication")
@@ -200,7 +200,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     disableDocumentCache : Boolean  // for testing only
   ): XFormsContainingDocument =
     // Try cache first unless the initial state is requested
-    if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
+    if (XFormsGlobalProperties.isCacheDocument && ! disableDocumentCache) {
       // Try to find the document in cache using the UUID
       // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
       // we can't know that the property is set to false before trying.
@@ -234,7 +234,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
   // Return the dynamic state string to send to the client in the HTML page.
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] =
     containingDocument.staticState.isClientStateHandling option
-      DynamicState.encodeDocumentToString(containingDocument, XFormsProperties.isGZIPState, isForceEncryption = true)
+      DynamicState.encodeDocumentToString(containingDocument, XFormsGlobalProperties.isGZIPState, isForceEncryption = true)
 
   // Update the document's change sequence.
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit = {
@@ -367,7 +367,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
       disableDocumentCache : Boolean // for testing only
     ): Unit = {
 
-      if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
+      if (XFormsGlobalProperties.isCacheDocument && ! disableDocumentCache) {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)

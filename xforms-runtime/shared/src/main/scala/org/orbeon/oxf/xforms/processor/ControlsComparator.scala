@@ -17,10 +17,10 @@ import cats.syntax.option._
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.processor.handlers._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.RepeatSeparator
 import org.orbeon.xforms.XFormsNames._

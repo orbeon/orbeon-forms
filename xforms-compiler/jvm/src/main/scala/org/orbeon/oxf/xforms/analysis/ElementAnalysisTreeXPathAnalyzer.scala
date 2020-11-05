@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysisBuilder.buildInstanceString
-import org.orbeon.oxf.xforms.{MapSet, XFormsProperties}
+import org.orbeon.oxf.xforms.{MapSet, XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.{valueOrSelectAttribute, valueOrSequenceElement}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
@@ -211,7 +211,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
                 e.element.visitDescendants(
                   new VisitorListener {
-                    val hostLanguageAVTs: Boolean = XFormsProperties.isHostLanguageAVTs
+                    val hostLanguageAVTs: Boolean = XFormsGlobalProperties.isHostLanguageAVTs
                     def startElement(element: Element): Unit = {
                       if (element.getQName == XFORMS_OUTPUT_QNAME) {
                         // Add dependencies

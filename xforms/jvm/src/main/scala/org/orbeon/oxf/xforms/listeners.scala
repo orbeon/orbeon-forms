@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 class ReplicationServletContextListener extends ServletContextListener {
 
   override def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
-    if (XFormsProperties.isReplication) {
+    if (XFormsGlobalProperties.isReplication) {
       Version.instance.requirePEFeature("State replication")
       withDebug("eagerly bootstrapping caches for replication")(Caches)(cache.Caches.Logger)
     }

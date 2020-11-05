@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analytics
 
-import collection.mutable
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
+
+import scala.collection.mutable
+
 
 // Gather request statistics
 // For now, only support XPath statistics
@@ -94,7 +96,7 @@ object NOPRequestStats extends RequestStats {
 
 object RequestStatsImpl {
   def apply(): RequestStats =
-    if (XFormsProperties.isRequestStats)
+    if (XFormsGlobalProperties.isRequestStats)
       new RequestStatsImpl()
     else
       NOPRequestStats

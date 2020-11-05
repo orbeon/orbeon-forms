@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
@@ -154,7 +154,7 @@ private object SubmitResponseEvent {
         val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption
 
         // See https://github.com/orbeon/orbeon-forms/issues/3082
-        if (XFormsProperties.getErrorLogging.contains("submission-error-body") && ! cxr.isSuccessResponse)
+        if (XFormsGlobalProperties.getErrorLogging.contains("submission-error-body") && ! cxr.isSuccessResponse)
           result map asString foreach { value =>
             logger.logError("xforms-submit-done|error", "setting body document", "body", s"\n$value")
           }

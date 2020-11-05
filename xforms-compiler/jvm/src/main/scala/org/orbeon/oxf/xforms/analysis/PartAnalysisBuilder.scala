@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
-import org.orbeon.oxf.xforms.{StaticStateBits, XFormsStaticStateImpl, _}
+import org.orbeon.oxf.xforms.{StaticStateBits, XFormsGlobalProperties, XFormsStaticStateImpl, _}
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
@@ -93,7 +93,7 @@ object PartAnalysisBuilder {
     val partAnalysisCtx = StaticPartAnalysisImpl(staticState, parent, startScope, metadata, xblSupport, functionLibrary)
     analyze(partAnalysisCtx, staticStateDocument.rootControl)
 
-    if (XFormsProperties.getDebugLogXPathAnalysis)
+    if (XFormsGlobalProperties.getDebugLogXPathAnalysis)
       PartAnalysisDebugSupport.printPartAsXml(partAnalysisCtx)
 
     partAnalysisCtx

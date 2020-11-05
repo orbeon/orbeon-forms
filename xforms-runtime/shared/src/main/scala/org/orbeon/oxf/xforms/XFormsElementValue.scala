@@ -167,7 +167,7 @@ object XFormsElementValue {
         containsHTML      = containsHTML,
         sb                = sb,
         childElement      = childElement,
-        hostLanguageAVTs  = XFormsProperties.isHostLanguageAVTs
+        hostLanguageAVTs  = XFormsGlobalProperties.isHostLanguageAVTs
       )
     }
 

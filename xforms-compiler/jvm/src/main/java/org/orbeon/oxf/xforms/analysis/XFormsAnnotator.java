@@ -66,7 +66,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     private NamespaceContext namespaceContext = new NamespaceContext();
 
-    private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
+    private final boolean hostLanguageAVTs = XFormsGlobalProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
 

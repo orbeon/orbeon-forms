@@ -40,7 +40,7 @@ object EhcacheStateStore {
     withDebug("storing document state", List(
       "document UUID"             -> documentUUID,
       "store size before storing" -> getCurrentSize.toString,
-      "replication"               -> XFormsProperties.isReplication.toString
+      "replication"               -> XFormsGlobalProperties.isReplication.toString
     )) {
       val staticStateDigest = document.staticState.digest
       val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)

@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget, XF
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase.getRequestedSerialization
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
@@ -86,7 +86,7 @@ object XFormsModelSubmission {
       indentedLogger
     }
 
-  private def isLogDetails = XFormsProperties.getDebugLogging.contains("submission-details")
+  private def isLogDetails = XFormsGlobalProperties.getDebugLogging.contains("submission-details")
 
   // Only allow xxforms-submit from client
   private val ALLOWED_EXTERNAL_EVENTS = new util.HashSet[String]

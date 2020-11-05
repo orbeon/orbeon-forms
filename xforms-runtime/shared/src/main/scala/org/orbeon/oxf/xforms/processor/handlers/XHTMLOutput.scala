@@ -19,8 +19,8 @@ import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, ComponentContro
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.xhtml._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Namespaces._
 import org.orbeon.xforms.XFormsNames._

@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
 import org.scalatest.funspec.AnyFunSpecLike
 
 class XFormsStateManagerTest
@@ -179,7 +179,7 @@ class XFormsStateManagerTest
           state1.document.afterInitialResponse()
           XFormsStateManager.afterInitialResponse(state1.document, ! isCache)
 
-          DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState, isForceEncryption = false)
+          DynamicState.encodeDocumentToString(state1.document, XFormsGlobalProperties.isGZIPState, isForceEncryption = false)
         }
 
         assert(1 === state1.document.sequence)
@@ -212,7 +212,7 @@ class XFormsStateManagerTest
         assertEmptyClientState(state4)
         assert(
           stripSequenceNumber(initialDynamicStateString) ===
-            stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState, isForceEncryption = false))
+            stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsGlobalProperties.isGZIPState, isForceEncryption = false))
         )
       }
     }
@@ -296,7 +296,7 @@ class XFormsStateManagerTest
     }
 
     def stripSequenceNumber(serializedState: String) =
-      DynamicState(serializedState).copy(sequence = 1, initialClientScript = None).encodeToString(XFormsProperties.isGZIPState, isForceEncryption = false)
+      DynamicState(serializedState).copy(sequence = 1, initialClientScript = None).encodeToString(XFormsGlobalProperties.isGZIPState, isForceEncryption = false)
 
     def getSequenceNumber(serializedState: String) =
       DynamicState(serializedState).sequence

@@ -18,7 +18,7 @@ import java.net.{URI, URISyntaxException}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
@@ -532,7 +532,7 @@ trait ExtractorProperties {
         for {
           (name, prop) <- SupportedDocumentProperties
           defaultValue = prop.defaultValue
-          globalValue  = propertySet.getObject(XFormsProperties.PropertyPrefix + name, defaultValue)
+          globalValue  = propertySet.getObject(XFormsGlobalProperties.PropertyPrefix + name, defaultValue)
         } yield
           unparsedInlineProperties.get(name) match {
             case Some(localValue) => localValue  != defaultValue.toString option (name, localValue          , true)

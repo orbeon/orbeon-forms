@@ -584,7 +584,7 @@ class XFormsServer extends ProcessorImpl {
     // Logger used for heartbeat and request/response
     implicit val indentedLogger = Loggers.getIndentedLogger("server")
 
-    val logRequestResponse = XFormsProperties.getDebugLogging.contains("server-body")
+    val logRequestResponse = XFormsGlobalProperties.getDebugLogging.contains("server-body")
 
     if (logRequestResponse)
       debug("ajax request", List("body" -> requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
@@ -629,7 +629,7 @@ class XFormsServer extends ProcessorImpl {
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
     val lockResult: Try[Try[Option[Eval[SubmissionResult]]]] =
-      withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
+      withLock(parameters, if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
           val ignoreSequenceNumber   = ! isAjaxRequest
@@ -798,7 +798,7 @@ class XFormsServer extends ProcessorImpl {
             } catch {
               case NonFatal(t) =>
                 // Log body of Ajax request if needed
-                if (XFormsProperties.getErrorLogging.contains("server-body"))
+                if (XFormsGlobalProperties.getErrorLogging.contains("server-body"))
                   indentedLogger.logError("", "error processing Ajax update", "request", requestDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
 
                 // Don't keep the document around

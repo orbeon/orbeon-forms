@@ -44,7 +44,7 @@ class AssetsAggregator extends ProcessorImpl {
     addOutput(name, new ProcessorOutputImpl(self, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
         readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
-          if (! XFormsProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
+          if (! XFormsGlobalProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
 
             sealed trait HeadElement {
               val name: String

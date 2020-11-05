@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import cats.Eval
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
+import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsUtils}
 import org.orbeon.xforms.UrlType
 
 trait SubmissionProcess {
@@ -94,5 +94,5 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 object BaseSubmission {
 
   def isLogBody: Boolean =
-    XFormsProperties.getDebugLogging.contains("submission-body")
+    XFormsGlobalProperties.getDebugLogging.contains("submission-body")
 }

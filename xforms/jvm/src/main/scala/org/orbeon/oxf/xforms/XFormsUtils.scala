@@ -43,7 +43,7 @@ object XFormsUtils {
   //@XPathFunction
   def encodeXMLAsDOM(node: org.w3c.dom.Node): String =
     try
-      EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState, true, false)
+      EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsGlobalProperties.isGZIPState, true, false)
     catch {
       case e: TransformerException =>
         throw new OXFException(e)

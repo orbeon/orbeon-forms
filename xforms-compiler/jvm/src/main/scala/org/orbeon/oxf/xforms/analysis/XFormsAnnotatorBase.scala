@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
-import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
 import org.orbeon.xforms.Constants.DocumentId
@@ -30,7 +30,7 @@ abstract class XFormsAnnotatorBase(
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents {
 
-  private val keepLocationData = XFormsProperties.isKeepLocation
+  private val keepLocationData = XFormsGlobalProperties.isKeepLocation
   private var _documentLocator: Locator = null
   def documentLocator = _documentLocator
 

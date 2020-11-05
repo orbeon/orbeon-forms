@@ -530,7 +530,7 @@ trait ContainingDocumentLogging {
     loggersMap.getOrElseUpdate(loggingCategory,
       new IndentedLogger(
         Loggers.logger,
-        Loggers.logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(loggingCategory),
+        Loggers.logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(loggingCategory),
         indentation
       )
     )

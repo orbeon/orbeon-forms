@@ -32,7 +32,7 @@ object Loggers {
 
     def newLogger = {
       val logger = Loggers.logger
-      val isDebugEnabled = logger.isDebugEnabled && XFormsProperties.getDebugLogging.contains(category)
+      val isDebugEnabled = logger.isDebugEnabled && XFormsGlobalProperties.getDebugLogging.contains(category)
       new IndentedLogger(logger, isDebugEnabled)
     }
 

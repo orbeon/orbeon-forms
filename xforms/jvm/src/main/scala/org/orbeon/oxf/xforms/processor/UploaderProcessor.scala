@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{Loggers, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.scaxon.NodeConversions
@@ -80,7 +80,7 @@ class UploaderProcessor extends ProcessorImpl {
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                   <xxf:action>
                     <xxf:server-events>{
-                      EncodeDecode.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
+                      EncodeDecode.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsGlobalProperties.isGZIPState, true, false)
                     }</xxf:server-events>
                   </xxf:action>
                 </xxf:event-response>

@@ -79,7 +79,7 @@ object XFormsContextStack {
 
 class XFormsContextStack {
 
-  private val keepLocationData = XFormsProperties.isKeepLocation
+  private val keepLocationData = XFormsGlobalProperties.isKeepLocation
 
   var container: XBLContainer = null
   private var containingDocument: XFormsContainingDocument = null

@@ -81,7 +81,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         val fromCurrentStateOptTry =
           withDocumentAcquireLock(
             uuid,
-            XFormsProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
+            XFormsGlobalProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
           )(_.initialClientScript)
 
         fromCurrentStateOptTry match {

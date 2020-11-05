@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.properties.PropertySet
+
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def isPE: Boolean = true
   def randomHexId: String = ???
   def getApplicationResourceVersion: Option[String] = ???
+  def properties: PropertySet = ???
 }

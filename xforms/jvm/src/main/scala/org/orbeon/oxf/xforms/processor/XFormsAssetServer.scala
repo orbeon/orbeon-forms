@@ -30,7 +30,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
@@ -46,7 +46,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val externalContext = CrossPlatformSupport.externalContext
+    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val requestPath = externalContext.getRequest.getRequestPath
     val response    = externalContext.getResponse
@@ -66,10 +66,10 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         val updatesParameterValue = externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
         val updatesPropertyName   = updatesParameterValue.map(List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, _).mkString("."))
-        val updatesPropertyValue  = updatesPropertyName.map(CrossPlatformSupport.properties.getString)
+        val updatesPropertyValue  = updatesPropertyName.map(CoreCrossPlatformSupport.properties.getString)
         val updates               = updatesPropertyValue.getOrElse("")
         val assets                = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJSONProperty, excludesProp = "", updates)
-        val isMinimal             = XFormsProperties.isMinimalResources
+        val isMinimal             = XFormsGlobalProperties.isMinimalResources
         val resources             = assets.js.map(_.assetPath(tryMin = isMinimal)).to(ListSet)
 
         AssetsAggregator.aggregate(resources, redirect, None, isCSS = false)
@@ -314,7 +314,7 @@ object XFormsAssetServer {
   ): String = {
 
     // Get session
-    val externalContext = CrossPlatformSupport.externalContext
+    val externalContext = XFormsCrossPlatformSupport.externalContext
     val session = externalContext.getRequest.getSession(true)
 
     require(session ne null, "proxyURI requires a session")
@@ -323,7 +323,7 @@ object XFormsAssetServer {
     // an absolute URI.
     val serviceAbsoluteUrl = new URI(
       URLRewriterUtils.rewriteServiceURL(
-        CrossPlatformSupport.externalContext.getRequest,
+        XFormsCrossPlatformSupport.externalContext.getRequest,
         uri,
         URLRewriter.REWRITE_MODE_ABSOLUTE
       )
@@ -366,7 +366,7 @@ object XFormsAssetServer {
     removeFile      : Boolean
   ): Unit = {
 
-    implicit val externalContext = CrossPlatformSupport.externalContext
+    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
     findDynamicResource(requestPath) foreach { resource =>
       externalContext.getRequest.sessionOpt foreach { session =>

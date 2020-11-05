@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.w3c.dom
 import org.xml.sax.InputSource
 
@@ -122,13 +122,13 @@ object XFormsUtils {
     if (skipRewrite)
       resolvedURIStringNoPortletFragment
     else
-      CrossPlatformSupport.externalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
+      XFormsCrossPlatformSupport.externalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: Element, url: String): String = {
     val resolvedURI = resolveXMLBase(containingDocument, currentElement, url)
     val resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI)
-    CrossPlatformSupport.externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
+    XFormsCrossPlatformSupport.externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
@@ -153,7 +153,7 @@ object XFormsUtils {
    */
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = resolveXMLBase(containingDocument, element, url)
-    CrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
+    XFormsCrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
   }
 
   /**
@@ -167,7 +167,7 @@ object XFormsUtils {
    */
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = resolveXMLBase(containingDocument, element, url)
-    URLRewriterUtils.rewriteServiceURL(CrossPlatformSupport.externalContext.getRequest, resolvedURI.toString, rewriteMode)
+    URLRewriterUtils.rewriteServiceURL(XFormsCrossPlatformSupport.externalContext.getRequest, resolvedURI.toString, rewriteMode)
   }
 
   /**

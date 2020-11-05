@@ -27,7 +27,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.AssetPath
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -66,7 +66,7 @@ object XFormsResourceRewriter extends Logging {
     logger       : IndentedLogger
   ): Unit = {
 
-    val response = CrossPlatformSupport.externalContext.getResponse
+    val response = XFormsCrossPlatformSupport.externalContext.getResponse
 
     val pipelineContext = PipelineContext.get
 

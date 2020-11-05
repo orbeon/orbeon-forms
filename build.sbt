@@ -737,9 +737,12 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
   )
 
 lazy val xformsCommonJVM = xformsCommon.jvm
-  .dependsOn(commonJVM)
-  .dependsOn(domJVM)
-  .dependsOn(coreCrossPlatformJVM)
+  .dependsOn(
+    commonJVM,
+    domJVM,
+    core,
+    coreCrossPlatformJVM // implied
+  )
 
 lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(commonJS)
@@ -767,8 +770,8 @@ lazy val xformsCompiler = (crossProject(JVMPlatform, JSPlatform).crossType(Cross
 lazy val xformsCompilerJVM = xformsCompiler.jvm
   .dependsOn(
     xformsCommonJVM,
-    coreCrossPlatformJVM,
-    core
+    core,
+    coreCrossPlatformJVM // implied
   )
 
 lazy val xformsCompilerJS = xformsCompiler.js
@@ -794,8 +797,8 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
     xformsCommonJVM,
-    coreCrossPlatformJVM,
-    core
+    core,
+    coreCrossPlatformJVM // implied
   )
 
 lazy val xformsRuntimeJS = xformsRuntime.js

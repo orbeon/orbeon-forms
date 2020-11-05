@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{XFormsState, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.xforms.{CrossPlatformSupport, DeploymentType}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, DeploymentType}
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -78,7 +78,7 @@ object XFormsContainingDocumentBuilder {
     }
 
   private def createInitialRequestInformation: RequestInformation =
-    Option(CrossPlatformSupport.externalContext.getRequest) match {
+    Option(XFormsCrossPlatformSupport.externalContext.getRequest) match {
       case Some(request) =>
         // Remember if filter provided separate deployment information
 

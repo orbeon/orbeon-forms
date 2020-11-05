@@ -21,11 +21,13 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.IndentedLogger
 
 
-object CrossPlatformSupport extends CrossPlatformSupportTrait {
+//
+// This object contains functions that are required both in the JVM and the JavaScript environment, but which
+// must have separate implementations on each side.
+//
+trait XFormsCrossPlatformSupportTrait {
 
-  def properties: PropertySet = ???
-
-  def externalContext: ExternalContext = ???
+  def externalContext: ExternalContext
 
   def proxyURI(
     uri              : String,
@@ -35,8 +37,7 @@ object CrossPlatformSupport extends CrossPlatformSupportTrait {
     customHeaders    : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String =
-    ???
+  ): String
 
   def proxyBase64Binary(
     value            : String,
@@ -45,24 +46,20 @@ object CrossPlatformSupport extends CrossPlatformSupportTrait {
     evaluatedHeaders : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String =
-    ???
+  ): String
 
   def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
-  ): URI =
-    ???
+  ): URI
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
-    ???
+  ): Option[String]
 
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
-    ???
+  ): Option[String]
 }

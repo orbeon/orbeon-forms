@@ -243,7 +243,7 @@ object XFormsServer {
               outputSubmissionInfo(
                 twoPassSubmitEvent,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,
-                CrossPlatformSupport.externalContext.getResponse // would be better to pass this to `outputAjaxResponse`
+                XFormsCrossPlatformSupport.externalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
             }
 
@@ -571,7 +571,7 @@ class XFormsServer extends ProcessorImpl {
 
     // Use request input provided by client
     val requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServer.InputRequest)
-    val externalContext = CrossPlatformSupport.externalContext
+    val externalContext = XFormsCrossPlatformSupport.externalContext
     val request = externalContext.getRequest
 
     // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,

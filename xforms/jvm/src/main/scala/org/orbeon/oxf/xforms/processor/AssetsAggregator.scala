@@ -24,7 +24,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -74,8 +74,8 @@ class AssetsAggregator extends ProcessorImpl {
             val preservedJS     = Buffer[HeadElement]()
 
             // Whether we are in separate deployment as in that case we don't combine paths to user resources
-            val request  = CrossPlatformSupport.externalContext.getRequest
-            val response = CrossPlatformSupport.externalContext.getResponse
+            val request  = XFormsCrossPlatformSupport.externalContext.getRequest
+            val response = XFormsCrossPlatformSupport.externalContext.getResponse
             val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(request)
 
             // In this mode, resources are described in JSON within a <div>

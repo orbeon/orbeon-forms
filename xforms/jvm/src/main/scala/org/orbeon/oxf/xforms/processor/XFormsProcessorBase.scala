@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 
@@ -106,7 +106,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
     outputName      : String
   ): Unit = {
 
-    val externalContext = CrossPlatformSupport.externalContext
+    val externalContext = XFormsCrossPlatformSupport.externalContext
     val htmlLogger      = Loggers.getIndentedLogger("html")
     val cachingLogger   = Loggers.getIndentedLogger("cache")
 

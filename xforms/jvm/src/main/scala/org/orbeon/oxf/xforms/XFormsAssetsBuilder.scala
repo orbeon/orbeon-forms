@@ -13,9 +13,9 @@
   */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.CrossPlatformSupport
 import spray.json._
 
 import scala.collection.compat._
@@ -61,7 +61,7 @@ object XFormsAssetsBuilder {
     fromJson(json.parseJson)
 
   def fromJSONProperty: XFormsAssets =
-    CrossPlatformSupport.properties
+    CoreCrossPlatformSupport.properties
       .getPropertyOrThrow(AssetsBaselineProperty)
       .associatedValue(v => fromJsonString(v.value.toString))
 

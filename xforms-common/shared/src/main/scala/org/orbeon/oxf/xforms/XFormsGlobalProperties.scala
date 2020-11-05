@@ -1,8 +1,9 @@
 package org.orbeon.oxf.xforms
 
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
+
 
 object XFormsGlobalProperties {
 
@@ -13,7 +14,7 @@ object XFormsGlobalProperties {
   val RetryMaxDelay                  = "retry.max-delay"
 
   private def propertySet =
-    CrossPlatformSupport.properties
+    CoreCrossPlatformSupport.properties
 
   def getDebugLogging: collection.Set[String] =
     Option(propertySet.getNmtokens(PropertyPrefix + "logging.debug")) map (_.asScala) getOrElse Set.empty

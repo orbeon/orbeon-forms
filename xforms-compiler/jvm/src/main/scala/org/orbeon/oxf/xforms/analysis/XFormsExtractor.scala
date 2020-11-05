@@ -17,8 +17,9 @@ import java.net.{URI, URISyntaxException}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
@@ -27,7 +28,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{Constants, CrossPlatformSupport, Namespaces, XXBLScope}
+import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
@@ -526,7 +527,7 @@ trait ExtractorProperties {
   protected def outputNonDefaultProperties(): Unit =
     xmlReceiverOpt foreach { implicit xmlReceiver =>
 
-      val propertySet = CrossPlatformSupport.properties
+      val propertySet = CoreCrossPlatformSupport.properties
 
       val propertiesToKeep = {
         for {

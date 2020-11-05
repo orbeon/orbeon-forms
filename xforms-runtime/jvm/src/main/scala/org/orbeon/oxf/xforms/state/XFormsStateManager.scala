@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
 
@@ -267,7 +267,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
-    implicit val externalContext = CrossPlatformSupport.externalContext
+    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val xformsState = getStateFromParamsOrStore(parameters, isInitialState)
 
@@ -399,7 +399,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
       require(containingDocument.staticState.isServerStateHandling)
       EhcacheStateStore.storeDocumentState(
         containingDocument,
-        CrossPlatformSupport.externalContext.getRequest.getSession(ForceSessionCreation),
+        XFormsCrossPlatformSupport.externalContext.getRequest.getSession(ForceSessionCreation),
         isInitialState
       )
     }

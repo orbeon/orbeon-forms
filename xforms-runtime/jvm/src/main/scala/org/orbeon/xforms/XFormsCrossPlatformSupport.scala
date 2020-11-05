@@ -16,20 +16,19 @@ package org.orbeon.xforms
 import java.io.InputStream
 import java.net.URI
 
+import cats.syntax.option._
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.util.{Connection, IndentedLogger, NetUtils}
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 
 
-//
-// This object contains functions that are required both in the JVM and the JavaScript environment, but which
-// must have separate implementations on each side.
-//
-trait CrossPlatformSupportTrait {
+object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
-  def properties: PropertySet
+  def properties: PropertySet = Properties.instance.getPropertySet
 
-  def externalContext: ExternalContext
+  def externalContext: ExternalContext = NetUtils.getExternalContext
 
   def proxyURI(
     uri              : String,
@@ -39,7 +38,16 @@ trait CrossPlatformSupportTrait {
     customHeaders    : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String
+  ): String =
+    XFormsAssetServer.proxyURI(
+        uri              = uri,
+        filename         = filename,
+        contentType      = contentType,
+        lastModified     = lastModified,
+        customHeaders    = customHeaders,
+        headersToForward = Connection.headersToForwardFromProperty,
+        getHeader        = getHeader
+    )
 
   def proxyBase64Binary(
     value            : String,
@@ -48,20 +56,35 @@ trait CrossPlatformSupportTrait {
     evaluatedHeaders : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String
+  ): String =
+    proxyURI(
+      uri              = NetUtils.base64BinaryToAnyURI(value, NetUtils.SESSION_SCOPE, logger.logger.logger),
+      filename         = filename,
+      contentType      = mediatype,
+      lastModified     = -1,
+      customHeaders    = evaluatedHeaders,
+      getHeader        = getHeader
+    )
 
   def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
-  ): URI
+  ): URI =
+    NetUtils.renameAndExpireWithSession(existingFileURI, logger.logger.logger).toURI
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String]
+  ): Option[String] =
+    useAndClose(inputStream) { is =>
+      NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger.logger).some
+    }
 
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String]
+  ): Option[String] =
+    useAndClose(inputStream) { is =>
+      NetUtils.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, logger.logger.logger).some
+    }
 }

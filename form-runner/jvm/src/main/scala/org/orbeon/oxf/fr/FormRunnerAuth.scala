@@ -33,41 +33,7 @@ object FormRunnerAuth {
     Headers.OrbeonCredentialsLower
   )
 
-  sealed abstract class AuthMethod(override val entryName: String) extends EnumEntry
-
-  object AuthMethod extends Enum[AuthMethod] {
-
-     val values = findValues
-
-     case object Container extends AuthMethod("container")
-     case object Header    extends AuthMethod("header")
-  }
-
   import Private._
-
-  // Get the username, group and roles from the request, based on the Form Runner configuration.
-  // The first time this is called, the result is stored into the required session. The subsequent times,
-  // the value stored in the session is retrieved. This ensures that authentication information remains an
-  // invariant for a given session.
-  //
-  // See https://github.com/orbeon/orbeon-forms/issues/2464
-  // See also https://github.com/orbeon/orbeon-forms/issues/2632
-  def getCredentialsUseSession(
-    userRoles  : UserRolesFacade,
-    session    : SessionFacade,
-    getHeader  : String => List[String]
-  ): Option[Credentials] =
-    ServletPortletRequest.findCredentialsInSession(session) orElse {
-
-      val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
-
-      // Only store the information into the session if we get user credentials. This handles the case of the initial
-      // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
-      newCredentialsOpt foreach
-        (ServletPortletRequest.storeCredentialsInSession(session, _))
-
-      newCredentialsOpt
-    }
 
   def getCredentialsAsHeadersUseSession(
     userRoles  : UserRolesFacade,
@@ -104,6 +70,37 @@ object FormRunnerAuth {
     val HeaderCredentialsPropertyName       = PropertyPrefix + "header.credentials"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
+
+    sealed abstract class AuthMethod(override val entryName: String) extends EnumEntry
+    object AuthMethod extends Enum[AuthMethod] {
+       val values = findValues
+       case object Container extends AuthMethod("container")
+       case object Header    extends AuthMethod("header")
+    }
+
+    // Get the username, group and roles from the request, based on the Form Runner configuration.
+    // The first time this is called, the result is stored into the required session. The subsequent times,
+    // the value stored in the session is retrieved. This ensures that authentication information remains an
+    // invariant for a given session.
+    //
+    // See https://github.com/orbeon/orbeon-forms/issues/2464
+    // See also https://github.com/orbeon/orbeon-forms/issues/2632
+    def getCredentialsUseSession(
+      userRoles  : UserRolesFacade,
+      session    : SessionFacade,
+      getHeader  : String => List[String]
+    ): Option[Credentials] =
+      ServletPortletRequest.findCredentialsInSession(session) orElse {
+
+        val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
+
+        // Only store the information into the session if we get user credentials. This handles the case of the initial
+        // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
+        newCredentialsOpt foreach
+          (ServletPortletRequest.storeCredentialsInSession(session, _))
+
+        newCredentialsOpt
+      }
 
     def headersAsJSONString(headers: List[(String, Array[String])]): String = {
 

@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tinytree.TinyBuilder
@@ -54,6 +54,8 @@ object StaticXPath extends StaticXPathTrait {
 
     super.setNamePool(GlobalNamePool)
     super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
+    super.getExtensionBinder("java").asInstanceOf[JavaExtensionLibrary]
+      .declareJavaClass("http://www.w3.org/2005/xpath-functions/math", classOf[org.orbeon.saxon.exslt.Math])
 
     // See https://github.com/orbeon/orbeon-forms/issues/3468
     // We decide not to use a pool for now as creating a parser is fairly cheap

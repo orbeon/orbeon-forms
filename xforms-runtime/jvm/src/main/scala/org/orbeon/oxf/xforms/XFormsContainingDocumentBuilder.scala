@@ -31,8 +31,10 @@ import org.orbeon.xforms.{CrossPlatformSupport, DeploymentType}
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
-
 import java.{util => ju}
+
+import org.orbeon.oxf.xml.EncodeDecode
+import org.orbeon.xforms.xbl.Scope
 
 
 object XFormsContainingDocumentBuilder {
@@ -198,6 +200,29 @@ object XFormsContainingDocumentBuilder {
   private def isPortletContainerOrRemoteFromHeaders(containerType: String, headers: Map[String, List[String]]) =
     containerType == "portlet" || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
 
+
+  // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
+  // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
+  private def restoreStaticState(digest: Option[String], encodedState: String, forceEncryption: Boolean): XFormsStaticStateImpl = {
+
+    val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
+
+    // Restore template
+    val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
+
+    // Restore metadata
+    val metadata = Metadata(staticStateDocument, template)
+
+    new XFormsStaticStateImpl(
+      encodedState,
+      staticStateDocument.getOrComputeDigest(digest),
+      new Scope(None, ""),
+      metadata,
+      template,
+      staticStateDocument
+    )
+  }
+
   private def findOrRestoreStaticState(
     xformsState     : XFormsState,
     forceEncryption : Boolean)(implicit
@@ -215,7 +240,7 @@ object XFormsContainingDocumentBuilder {
             debug("did not find static state by digest in cache")
             val restoredStaticState =
               withDebug("initialization: restoring static state") {
-                XFormsStaticStateImpl.restore(
+                restoreStaticState(
                   digest          = digestOpt,
                   encodedState    = xformsState.staticState getOrElse (throw new IllegalStateException),
                   forceEncryption = forceEncryption
@@ -228,7 +253,7 @@ object XFormsContainingDocumentBuilder {
       case digestOpt @ None =>
         // Not digest provided, create static state from input
         debug("did not find static state by digest in cache")
-        XFormsStaticStateImpl.restore(
+        restoreStaticState(
           digest          = digestOpt,
           encodedState    = xformsState.staticState getOrElse (throw new IllegalStateException),
           forceEncryption = forceEncryption

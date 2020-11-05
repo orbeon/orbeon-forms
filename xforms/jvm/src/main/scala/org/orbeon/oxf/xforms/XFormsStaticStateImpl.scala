@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.StringUtils._
@@ -24,17 +24,13 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, AnnotatedTemplateBuilder}
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
-import org.orbeon.oxf.xml.{XMLReceiver, _}
+import org.orbeon.oxf.xml._
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.XXBLScope
-import org.xml.sax.Attributes
 
 import scala.jdk.CollectionConverters._
 
@@ -56,7 +52,6 @@ class XFormsStaticStateImpl(
   // Create top-level part once `val`s are all initialized
   val topLevelPart: TopLevelPartAnalysis =
     PartAnalysisBuilder(this, None, startScope, metadata, staticStateDocument)
-
 
   def functionLibrary = topLevelPart.functionLibrary
 
@@ -163,182 +158,7 @@ class XFormsStaticStateImpl(
 
 object XFormsStaticStateImpl {
 
-  // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
-  // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
-  def restore(digest: Option[String], encodedState: String, forceEncryption: Boolean): XFormsStaticStateImpl = {
 
-    val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
-
-    // Restore template
-    val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
-
-    // Restore metadata
-    val metadata = Metadata(staticStateDocument, template)
-
-    new XFormsStaticStateImpl(
-      encodedState,
-      staticStateDocument.getOrComputeDigest(digest),
-      new Scope(None, ""),
-      metadata,
-      template,
-      staticStateDocument
-    )
-  }
-
-  // Create analyzed static state for the given static state document.
-  // Used by `XFormsToXHTML`.
-  def createFromStaticStateBits(staticStateBits: StaticStateBits): XFormsStaticStateImpl = {
-
-    val startScope = new Scope(None, "")
-    val staticStateDocument = new StaticStateDocument(staticStateBits.staticStateDocument)
-
-    new XFormsStaticStateImpl(
-      staticStateDocument.asBase64,
-      staticStateBits.staticStateDigest,
-      startScope,
-      staticStateBits.metadata,
-      staticStateDocument.template map (_ => staticStateBits.template),    // only keep the template around if needed
-      staticStateDocument
-    )
-  }
-
-  // Create analyzed static state for the given XForms document.
-  // Used by tests.
-  def createFromDocument(formDocument: Document): XFormsStaticState = {
-
-    val startScope = new Scope(None, "")
-
-    def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
-      val staticStateDocument = new StaticStateDocument(staticStateXML)
-
-      new XFormsStaticStateImpl(
-        staticStateDocument.asBase64,
-        digest,
-        startScope,
-        metadata,
-        staticStateDocument.template map (_ => template),    // only keep the template around if needed
-        staticStateDocument
-      )
-    }
-
-    createFromDocument(formDocument, startScope, create)._2
-  }
-
-  // Create template and analyzed part for the given XForms document.
-  // Used by `xxf:dynamic`.
-  def createPart(
-    staticState  : XFormsStaticState,
-    parent       : PartAnalysis,
-    formDocument : Document,
-    startScope   : Scope)(implicit
-    logger       : IndentedLogger
-  ): (SAXStore, NestedPartAnalysis) =
-    createFromDocument(formDocument, startScope, (staticStateDocument: Document, _: String, metadata: Metadata, _) => {
-      PartAnalysisBuilder(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
-    })
-
-  // Extractor with prefix
-  private class Extractor(
-    extractorReceiver : XMLReceiver,
-    metadata          : Metadata,
-    startScope        : Scope,
-    template          : SAXStore,
-    prefix            : String
-  ) extends XFormsExtractor(
-    xmlReceiverOpt               = Some(extractorReceiver),
-    metadata                     = metadata,
-    templateUnderConstructionOpt = Some(AnnotatedTemplate(template)),
-    baseURI                      = ".",
-    startScope                   = XXBLScope.Inner,
-    isTopLevel                   = startScope.isTopLevelScope,
-    outputSingleTemplate         = false
-  ) {
-
-    override def getPrefixedId(staticId: String) = prefix + staticId
-
-    override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XXBLScope): Unit = {
-      val staticId = attributes.getValue("id")
-      if (staticId ne null) {
-        val prefixedId = prefix + staticId
-        if (metadata.getNamespaceMapping(prefixedId).isDefined) {
-          if (startScope.contains(staticId))
-            throw new OXFException("Duplicate id found for static id: " + staticId)
-          startScope += staticId -> prefixedId
-
-          if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
-            val forStaticId = attributes.getValue("for")
-            val forPrefixedId = prefix + forStaticId
-            startScope += forStaticId -> forPrefixedId
-          }
-        }
-      }
-    }
-  }
-
-  // Annotator with prefix
-  private class Annotator(
-    extractorReceiver : XMLReceiver,
-    metadata          : Metadata,
-    startScope        : Scope,
-    template          : XMLReceiver,
-    prefix            : String
-  ) extends XFormsAnnotator(
-    template,
-    extractorReceiver,
-    metadata,
-    startScope.isTopLevelScope
-  ) {
-    protected override def rewriteId(id: String) = prefix + id
-  }
-
-  // Used by `xxf:dynamic` and tests.
-  private def createFromDocument[T](
-    formDocument : Document,
-    startScope   : Scope,
-    create       : (Document, String, Metadata, AnnotatedTemplate) => T
-  ): (SAXStore, T) = {
-    val identity = TransformerUtils.getIdentityTransformerHandler
-
-    val documentResult = new LocationDocumentResult
-    identity.setResult(documentResult)
-
-    val metadata             = Metadata(isTopLevelPart = startScope.isTopLevelScope)
-    val digestContentHandler = new DigestContentHandler
-    val template             = new SAXStore
-    val prefix               = startScope.fullPrefix
-
-    // Read the input through the annotator and gather namespace mappings
-    TransformerUtils.writeDom4j(
-      formDocument,
-      new WhitespaceXMLReceiver(
-        new Annotator(
-          new Extractor(
-            new WhitespaceXMLReceiver(
-              new TeeXMLReceiver(identity, digestContentHandler),
-              WhitespaceMatching.defaultBasePolicy,
-              WhitespaceMatching.basePolicyMatcher
-            ),
-            metadata,
-            startScope,
-            template,
-            prefix
-          ),
-          metadata,
-          startScope,
-          template,
-          prefix
-        ),
-        WhitespaceMatching.defaultHTMLPolicy,
-        WhitespaceMatching.htmlPolicyMatcher
-      )
-    )
-
-    // Get static state document and create static state object
-    val staticStateXML = documentResult.getDocument
-    val digest = NumberUtils.toHexString(digestContentHandler.getResult)
-
-    (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
-  }
 
   // Represent the static state XML document resulting from the extractor
   //

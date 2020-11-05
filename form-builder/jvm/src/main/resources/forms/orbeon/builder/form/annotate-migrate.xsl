@@ -111,6 +111,16 @@
         name="service-nodes-all-ids"
         select="$service-nodes-all/generate-id()"/>
 
+    <xsl:template match="/*">
+        <xsl:copy>
+            <!-- https://github.com/orbeon/orbeon-forms/issues/4508 -->
+            <xsl:if test="not(in-scope-prefixes(.) = 'math')">
+                <xsl:namespace name="math" select="'http://www.w3.org/2005/xpath-functions/math'"/>
+            </xsl:if>
+            <xsl:apply-templates select="@* | node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- `nodeset` → `ref` -->
     <xsl:template match="xf:*/@nodeset" mode="#all">
         <xsl:attribute name="ref" select="."/>

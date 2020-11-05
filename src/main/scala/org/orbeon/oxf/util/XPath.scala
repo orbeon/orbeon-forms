@@ -29,7 +29,7 @@ import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
@@ -155,6 +155,8 @@ object XPath {
     super.setNamePool(GlobalNamePool)
     super.registerExternalObjectModel(GlobalDataConverter)
     super.registerExternalObjectModel(OrbeonDOMObjectModel)
+    super.getExtensionBinder("java").asInstanceOf[JavaExtensionLibrary]
+      .declareJavaClass("http://www.w3.org/2005/xpath-functions/math", classOf[org.orbeon.saxon.exslt.Math])
 
     // See https://github.com/orbeon/orbeon-forms/issues/3468
     // We decide not to use a pool for now as creating a parser is fairly cheap

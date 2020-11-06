@@ -23,12 +23,14 @@ import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom.XmlLocationData
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.{InputSource, Locator}
 
 import scala.util.control.NonFatal
+
 
 case class SchemaInfo(grammar: Grammar, dependencies: SchemaDependencies)
 case class SchemaKey(urlString: String) extends CacheKey
@@ -49,7 +51,7 @@ class MSVGrammarReaderController(
         case Some(baseURL) =>
           URLFactory.createURL(baseURL, systemId)
         case None =>
-          URLFactory.createURL(XFormsUtils.resolveServiceURL(containingDocument, null, systemId, URLRewriter.REWRITE_MODE_ABSOLUTE))
+          URLFactory.createURL(XFormsCrossPlatformSupport.resolveServiceURL(containingDocument, null, systemId, URLRewriter.REWRITE_MODE_ABSOLUTE))
       }
 
     dependencies.addInclude(url)

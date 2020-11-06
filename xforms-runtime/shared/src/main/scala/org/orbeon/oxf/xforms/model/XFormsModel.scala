@@ -37,12 +37,12 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{CrossPlatformSupport, XFormsId, XFormsNames}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
 
@@ -270,7 +270,7 @@ trait XFormsModelVariables {
   private val contextStack: XFormsContextStack = new XFormsContextStack(container)
   def getContextStack: XFormsContextStack = contextStack
 
-  def getVariable(variableName: String): SequenceIterator =
+  def getVariable(variableName: String): om.SequenceIterator =
     Value.asIterator(topLevelVariables.get(variableName).orNull)
 
   def unsafeGetVariableAsNodeInfo(variableName: String): om.NodeInfo =
@@ -294,8 +294,8 @@ trait XFormsModelVariables {
     defaultEvaluationContext = contextStack.getCurrentBindingContext
   }
 
-  val variableResolver: (StructuredQName, XPathContext) => ValueRepresentationType =
-    (variableQName: StructuredQName, xpathContext: XPathContext) =>
+  val variableResolver: (om.StructuredQName, XPathContext) => ValueRepresentationType =
+    (variableQName: om.StructuredQName, xpathContext: XPathContext) =>
       staticModel.bindsByName.get(variableQName.getLocalName) match {
         case Some(targetStaticBind) =>
           // Variable value is a bind nodeset to resolve
@@ -405,7 +405,7 @@ trait XFormsModelInstances {
       model               = selfModel,
       resolvedAbsoluteUrl = new URI(
         URLRewriterUtils.rewriteServiceURL(
-          CrossPlatformSupport.externalContext.getRequest,
+          XFormsCrossPlatformSupport.externalContext.getRequest,
           pathOrAbsoluteURI,
           URLRewriter.REWRITE_MODE_ABSOLUTE
         )
@@ -479,7 +479,7 @@ trait XFormsModelInstances {
     }
 
   private def resolveInstanceURL(instance: Instance): String =
-    XFormsUtils.resolveServiceURL(
+    XFormsCrossPlatformSupport.resolveServiceURL(
       containingDocument,
       instance.element,
       instance.instanceSource.get,
@@ -544,7 +544,7 @@ trait XFormsModelInstances {
 
           val absoluteResolvedUrl = new URI(absoluteURLString)
 
-          implicit val ec                      : ExternalContext               = CrossPlatformSupport.externalContext
+          implicit val ec                      : ExternalContext               = XFormsCrossPlatformSupport.externalContext
           implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(

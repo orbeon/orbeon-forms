@@ -18,6 +18,7 @@ import java.{lang => jl, util => ju}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -195,7 +196,7 @@ object InstanceData {
     if (nodeInfo.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE) {
       // Check for xsi:type attribute
       // NOTE: Saxon 9 has new code to resolve such QNames
-      val typeQName = nodeInfo.getAttributeValue(StandardNames.XSI_TYPE)
+      val typeQName = nodeInfo.getAttributeValue(om.StandardNames.XSI_TYPE)
       if (typeQName ne null)
         try {
           val checker = nodeInfo.getConfiguration.getNameChecker
@@ -206,7 +207,7 @@ object InstanceData {
             return QName.apply(parts(1))
 
           // There is a prefix, resolve it
-          val namespaceNodes = nodeInfo.iterateAxis(AxisType.NAMESPACE)
+          val namespaceNodes = nodeInfo.iterateAxis(StaticXPath.NamespaceAxisType)
           breakable {
             while (true) {
               val currentNamespaceNode = namespaceNodes.next.asInstanceOf[om.NodeInfo]

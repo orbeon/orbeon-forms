@@ -57,6 +57,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
+import org.orbeon.xforms.XFormsCrossPlatformSupport;
 import org.orbeon.xforms.XFormsNames;
 import org.orbeon.xforms.runtime.ErrorInfo;
 import org.xml.sax.InputSource;
@@ -552,7 +553,7 @@ public class XFormsModelSchemaValidator {
         if (schemaURIs != null && schemaURIs.length > 0) {
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-            final String resolvedURLString = org.orbeon.oxf.xforms.XFormsUtils.resolveServiceURL(containingDocument, modelElement, schemaURIs[0],
+            final String resolvedURLString = XFormsCrossPlatformSupport.resolveServiceURL(containingDocument, modelElement, schemaURIs[0],
                     URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE());
 
             // Load associated grammar

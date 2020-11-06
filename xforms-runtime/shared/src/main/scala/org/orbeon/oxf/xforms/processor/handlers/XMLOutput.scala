@@ -21,9 +21,10 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import shapeless.syntax.typeable._
 
 //
@@ -55,7 +56,7 @@ object XMLOutput extends XMLReceiverSupport {
   def writeTextOrHTML(name: String, value: String, html: Boolean)(implicit xmlReceiver: XMLReceiver): Unit =
     if (html)
       withElement(name, atts = List("html" -> true.toString)) {
-        XFormsUtils.streamHTMLFragment(xmlReceiver, value, null, "")
+        XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, value, null, "")
       }
     else
       element(name, text = value)

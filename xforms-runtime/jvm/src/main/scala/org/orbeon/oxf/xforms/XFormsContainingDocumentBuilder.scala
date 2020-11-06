@@ -23,11 +23,12 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatcher, StringConversions}
 import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
 import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
-import org.orbeon.oxf.xforms.state.{XFormsState, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplateBuilder, XFormsState, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, DeploymentType}
+import org.orbeon.xforms.{DeploymentType, XFormsCrossPlatformSupport}
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -66,7 +67,7 @@ object XFormsContainingDocumentBuilder {
       implicit val logger = doc.indentedLogger
       withDebug("initialization: creating new ContainingDocument (static state object provided).", List("uuid" -> uuid)) {
 
-        doc.initializeRequestInformation(createInitialRequestInformation)
+        doc.setRequestInformation(createInitialRequestInformation)
 
         if (mustInitialize)
           doc.initialize(uriResolver, response)
@@ -168,7 +169,7 @@ object XFormsContainingDocumentBuilder {
           dynamicState.decodeDelayedEvents,
           dynamicState.decodePendingUploads,
           dynamicState.decodeLastAjaxResponse,
-          dynamicState.decodeControls,
+          dynamicState.decodeInstancesControls,
           dynamicState.focusedControl,
           deploymentTypeOpt map (deploymentType =>
             RequestInformation(

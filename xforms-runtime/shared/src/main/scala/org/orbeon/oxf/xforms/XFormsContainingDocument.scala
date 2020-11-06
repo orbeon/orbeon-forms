@@ -24,13 +24,15 @@ import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, Path
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
-import org.orbeon.oxf.xforms.state.ControlState
+import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.{DelayedEvent, DeploymentType}
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.XFormsCrossPlatformSupport
+
 
 import scala.collection.{Seq, immutable}
 
@@ -147,7 +149,7 @@ class XFormsContainingDocument(
     delayedEvents      : immutable.Seq[DelayedEvent],
     pendingUploads     : Set[String],
     lastAjaxResponse   : Option[SAXStore],
-    decodeControls     : List[ControlState],
+    decodeControls     : InstancesControls,
     focusedControl     : Option[String],
     requestInformation : RequestInformation
   ): Unit = {
@@ -157,7 +159,7 @@ class XFormsContainingDocument(
     indentedLogger.logDebug("initialization", "restoring dynamic state for UUID", "UUID", this.uuid, "sequence", this._sequence.toString)
 
     // Restore request information
-    restoreRequestInformation(requestInformation)
+    setRequestInformation(requestInformation)
 
     // Restore other encoded objects
     restoreDelayedEvents(delayedEvents)

@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.{XFormsInsertEvent, XXFormsReplaceEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, InstanceDataOps, XFormsInstance}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.NodeInfoConversions
@@ -355,7 +355,7 @@ object XFormsInsertAction {
     if (node.getParent == null)
       return 0
 
-    val it = node.iterateAxis(StaticXPath.AxisType.PRECEDING_SIBLING)
+    val it = node.iterateAxis(StaticXPath.PrecedingSiblingAxisType)
     var result = 0
     var i = it.next()
     while (i ne null) {
@@ -471,7 +471,7 @@ class XFormsInsertAction extends XFormsAction {
 
     val collectionToUpdate =
       if (currentBindingContext.newBind)
-        currentBindingContext.nodeset.asScala.toList.narrowTo[List[NodeInfo]] getOrElse
+        currentBindingContext.nodeset.asScala.toList.narrowTo[List[om.NodeInfo]] getOrElse
           (throw new IllegalArgumentException("xf:insert: collection to update must only contain nodes"))
       else
         Nil

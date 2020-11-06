@@ -22,7 +22,7 @@ import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.hmacURL
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 // Handle replace="xxf:binary"
 class BinaryReplacer(
@@ -37,7 +37,7 @@ class BinaryReplacer(
     p                : SubmissionParameters,
     p2               : SecondPassParameters
   ): Unit =
-    contentUrlOpt = CrossPlatformSupport.inputStreamToSessionUri(
+    contentUrlOpt = XFormsCrossPlatformSupport.inputStreamToSessionUri(
       connectionResult.content.inputStream)(
       submission.getDetailsLogger(p, p2)
     )

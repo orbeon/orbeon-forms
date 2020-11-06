@@ -16,11 +16,12 @@ package org.orbeon.oxf.xforms.model
 import java.net.URI
 
 import javax.xml.transform.stream.StreamResult
-import org.orbeon.datatypes.BasicLocationData
+import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.processor.DebugProcessor
 import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
@@ -34,7 +35,7 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
-import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 
 import scala.jdk.CollectionConverters._
 
@@ -82,7 +83,7 @@ object InstanceCaching {
       pathOrAbsoluteURI = Connection.findInternalUrl(
         normalizedUrl = new URI(sourceURI).normalize,
         filter        = isInternalPath)(
-        ec            = CrossPlatformSupport.externalContext
+        ec            = XFormsCrossPlatformSupport.externalContext
       ) getOrElse sourceURI, // adjust for internal path so replication works
       requestBodyHash   = requestBodyHash
     )
@@ -166,9 +167,24 @@ class XFormsInstance(
 
   def getLocationData =
     underlyingDocumentOpt match {
-      case Some(doc) => XFormsUtils.getNodeLocationData(doc.getRootElement)
+      case Some(doc) => getNodeLocationData(doc.getRootElement)
       case None      => BasicLocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
     }
+
+  private def getNodeLocationData(node: Node): LocationData = {
+    val data =
+      node match {
+        case elem: Element  => elem.getData
+        case att: Attribute => att.getData
+        case _              => null
+      }
+    // TODO: other node types
+    data match {
+      case ld: LocationData => ld
+      case id: InstanceData => id.getLocationData
+      case _                => null
+    }
+  }
 
   def parentEventObserver: XFormsEventTarget = model
 
@@ -261,13 +277,13 @@ class XFormsInstance(
     write(identityTransformerHandler)
   }
 
-  // Log the current MIP values applied to this instance
-  def debugLogMIPs(): Unit = {
-    XFormsUtils.logDebugDocument(
-      "MIPs: ",
-      XFormsInstance.createDebugMipsDocument(underlyingDocumentOpt.get)
-    )
-  }
+//  // Log the current MIP values applied to this instance
+//  def debugLogMIPs(): Unit = {
+//    XFormsUtils.logDebugDocument(
+//      "MIPs: ",
+//      XFormsInstance.createDebugMipsDocument(underlyingDocumentOpt.get)
+//    )
+//  }
 
   // Replace the instance with the given document
   // This includes marking the structural change as well as dispatching events
@@ -458,7 +474,7 @@ object XFormsInstance extends Logging {
   import Instance._
 
   // Create an initial instance without caching information
-  def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentInfo): XFormsInstance =
+  def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentNodeInfoType): XFormsInstance =
     new XFormsInstance(
       model,
       instance,

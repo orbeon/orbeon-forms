@@ -21,8 +21,8 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.xforms.{UrlType, XFormsNames}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.xforms.{Load, UrlType, XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLConstants
 
 
@@ -51,7 +51,7 @@ class XFormsLoadAction extends XFormsAction {
       UrlType.withNameLowercaseOnly getOrElse
       UrlType.Render
 
-    val urlNorewrite   = XFormsUtils.resolveUrlNorewrite(actionElem)
+    val urlNorewrite   = resolveUrlNorewrite(actionElem)
     val isShowProgress = interpreter.resolveAVT(actionElem, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
 
     // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
@@ -146,7 +146,7 @@ object XFormsLoadAction {
         // URL must be resolved
         if (urlType == UrlType.Resource) {
           // Load as resource URL
-          XFormsUtils.resolveResourceURL(
+          XFormsCrossPlatformSupport.resolveResourceURL(
             containingDocument,
             currentElem.orNull,
             value,
@@ -211,7 +211,7 @@ object XFormsLoadAction {
               // NOTE: As of 2016-03-17, the initialization case will fail and the portlet will throw an exception.
               true
             }
-          XFormsUtils.resolveRenderURL(
+          XFormsCrossPlatformSupport.resolveRenderURL(
             containingDocument,
             currentElem.orNull,
             value,
@@ -228,5 +228,25 @@ object XFormsLoadAction {
         isShowProgress
 
     containingDocument.addLoadToRun(Load(externalURL, target, urlType, doReplace, effectiveIsShowProgress))
+  }
+
+  /**
+   * Resolve f:url-norewrite attributes on this element, taking into account ancestor f:url-norewrite attributes for
+   * the resolution.
+   *
+   * @param element element used to start resolution
+   * @return true if rewriting is turned off, false otherwise
+   */
+  def resolveUrlNorewrite(element: Element): Boolean = {
+    var currentElement = element
+    do {
+      val urlNorewriteAttribute = currentElement.attributeValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME)
+      // Return the first ancestor value found
+      if (urlNorewriteAttribute != null)
+        return "true" == urlNorewriteAttribute
+      currentElement = currentElement.getParent
+    } while (currentElement ne null)
+    // Default is to rewrite
+    false
   }
 }

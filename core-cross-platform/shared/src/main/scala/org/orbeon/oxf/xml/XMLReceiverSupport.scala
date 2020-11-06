@@ -34,7 +34,7 @@ trait XMLReceiverSupport {
     localName : String,
     prefix    : String = "",
     uri       : String = "",
-    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES)(
+    atts      : Attributes = XMLReceiverSupport.EmptyAttributes)(
     body      : => T)(implicit
     receiver  : XMLReceiver
   ): T = {
@@ -49,7 +49,7 @@ trait XMLReceiverSupport {
     localName : String,
     prefix    : String = "",
     uri       : String = "",
-    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES,
+    atts      : Attributes = XMLReceiverSupport.EmptyAttributes,
     text      : String = "")(implicit
     receiver  : XMLReceiver
   ): Unit =
@@ -62,7 +62,7 @@ trait XMLReceiverSupport {
     localName : String,
     prefix    : String = "",
     uri       : String = "",
-    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES)(implicit
+    atts      : Attributes = XMLReceiverSupport.EmptyAttributes)(implicit
     receiver  : XMLReceiver
   ): Unit =
     receiver.startElement(uri, localName, XMLUtils.buildQName(prefix, localName), atts)
@@ -103,4 +103,20 @@ trait XMLReceiverSupport {
   }
 }
 
-object XMLReceiverSupport extends XMLReceiverSupport
+object XMLReceiverSupport extends XMLReceiverSupport {
+
+  val EmptyAttributes: Attributes = new Attributes {
+    def getLength = 0
+    def getURI(i: Int): String = null
+    def getLocalName(i: Int): String = null
+    def getQName(i: Int): String = null
+    def getType(i: Int): String = null
+    def getValue(i: Int): String = null
+    def getIndex(s: String, s1: String): Int = -1
+    def getIndex(s: String): Int = -1
+    def getType(s: String, s1: String): String = null
+    def getType(s: String): String = null
+    def getValue(s: String, s1: String): String = null
+    def getValue(s: String): String = null
+  }
+}

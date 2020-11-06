@@ -17,8 +17,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -27,9 +26,7 @@ import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.xforms.XFormsId
 
-/**
- * xxf:attribute control
- */
+
 class XXFormsAttributeControl(
   container   : XBLContainer,
   parent      : XFormsControl,
@@ -76,13 +73,13 @@ class XXFormsAttributeControl(
     val externalValue = getExternalValue()
     attributeName match {
       case "src" =>
-        resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
       case "href" if ! externalValue.startsWith("#") =>
         // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
         attributeControl.urlType match {
-          case "action"   => resolveActionURL  (containingDocument, element, externalValue)
-          case "resource" => resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
-          case _          => resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
+          case "action"   => XFormsCrossPlatformSupport.resolveActionURL  (containingDocument, element, externalValue)
+          case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
         }
       case _ => externalValue
     }
@@ -101,7 +98,7 @@ class XXFormsAttributeControl(
     attributeName match {
       case "src" if forName == "img" =>
         // Return rewritten URL of dummy image URL
-        resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, REWRITE_MODE_ABSOLUTE_PATH)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, REWRITE_MODE_ABSOLUTE_PATH)
       case "src" if forName == "script" =>
         DUMMY_SCRIPT_URI
       case _ =>

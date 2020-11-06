@@ -26,9 +26,9 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{ContentTypes, XPath}
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 
@@ -168,7 +168,7 @@ object SerializationParameters {
             // NOTE: We support a relative path, in which case the path is resolved as a service URL
             val resolvedAbsoluteUrl =
               new URI(
-                XFormsUtils.resolveServiceURL(
+                XFormsCrossPlatformSupport.resolveServiceURL(
                   submission.containingDocument,
                   submission.staticSubmission.element,
                   documentToSubmit.getRootElement.getStringValue,

@@ -16,9 +16,13 @@ package org.orbeon.xforms
 import java.io.InputStream
 import java.net.URI
 
+import org.orbeon.datatypes.LocationData
+import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xml.XMLReceiver
 
 
 //
@@ -28,6 +32,25 @@ import org.orbeon.oxf.util.IndentedLogger
 trait XFormsCrossPlatformSupportTrait {
 
   def externalContext: ExternalContext
+
+  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress]
+
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
+
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
+
+  def resolveRenderURL(
+    containingDocument : XFormsContainingDocument,
+    currentElement     : dom.Element,
+    url                : String,
+    skipRewrite        : Boolean
+  ): String
+
+  def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit
+
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String
+
+  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document
 
   def proxyURI(
     uri              : String,

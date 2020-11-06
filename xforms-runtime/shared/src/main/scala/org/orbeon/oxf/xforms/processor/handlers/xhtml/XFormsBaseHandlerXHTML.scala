@@ -17,7 +17,6 @@ import java.{lang => jl}
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -26,6 +25,7 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandl
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -479,7 +479,7 @@ object XFormsBaseHandlerXHTML {
   ): Unit =
     if ((value ne null) && value.nonEmpty) {
       if (mustOutputHTMLFragment)
-        XFormsUtils.streamHTMLFragment(
+        XFormsCrossPlatformSupport.streamHTMLFragment(
           xmlReceiver,
           value,
           locationDataOpt.orNull,

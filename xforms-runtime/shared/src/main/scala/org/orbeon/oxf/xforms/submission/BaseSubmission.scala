@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.submission
 import cats.Eval
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
-import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsUtils}
-import org.orbeon.xforms.UrlType
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
+import org.orbeon.xforms.{UrlType, XFormsCrossPlatformSupport}
 
 trait SubmissionProcess {
   def process(request: ExternalContext.Request, response: ExternalContext.Response)
@@ -45,9 +45,9 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
     val resolve =
       if (urlType == UrlType.Resource)
-        XFormsUtils.resolveResourceURL _
+        XFormsCrossPlatformSupport.resolveResourceURL _
       else
-        XFormsUtils.resolveServiceURL _
+        XFormsCrossPlatformSupport.resolveServiceURL _
 
     resolve(
       containingDocument,
@@ -92,7 +92,6 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 }
 
 object BaseSubmission {
-
   def isLogBody: Boolean =
     XFormsGlobalProperties.getDebugLogging.contains("submission-body")
 }

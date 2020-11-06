@@ -17,7 +17,7 @@ import org.junit.After
 import org.orbeon.dom
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {

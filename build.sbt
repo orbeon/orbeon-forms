@@ -569,10 +569,10 @@ lazy val formRunnerJS = formRunner.js
   .settings(
 
     libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion,
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
+      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
+      "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
+      "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0"
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
@@ -693,8 +693,10 @@ lazy val xformsJVM = xforms.jvm
   )
 
 lazy val xformsJS = xforms.js
-  .dependsOn(commonJS % "test->test;compile->compile")
-  .dependsOn(xformsCommonJS)
+  .dependsOn(
+    commonJS % "test->test;compile->compile",
+    xformsCommonJS
+  )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
   .settings(
@@ -787,6 +789,9 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
   .settings(
     name := "orbeon-xforms-runtime",
 
+    libraryDependencies += "com.lihaoyi"            %%% "autowire"  % AutowireVersion,
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % ScalaXmlVersion,
+
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
@@ -796,6 +801,7 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
+    xformsCompilerJVM, // only on JVM side
     xformsCommonJVM,
     core,
     coreCrossPlatformJVM // implied

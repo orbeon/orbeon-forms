@@ -22,7 +22,7 @@ object XFormsCommonBinaryFormats {
   // Base trait for stuff that should be serialized via Serializable/Externalizable
   trait SerializableFormat[T <: java.io.Serializable] extends Format[T] {
 
-    def allowedClass: Class[_]
+    def allowedClass: Class[T]
 
     def writes(output: Output, o: T): Unit =
       new ObjectOutputStream(new JavaOutputStream(output)).writeObject(o)
@@ -32,6 +32,6 @@ object XFormsCommonBinaryFormats {
   }
 
   implicit object SAXStoreFormat extends SerializableFormat[SAXStore] {
-    def allowedClass: Class[_] = classOf[SAXStore]
+    def allowedClass: Class[SAXStore] = classOf[SAXStore]
   }
 }

@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms
 
+import java.net.{URI, URISyntaxException}
 import java.util.concurrent.locks.Lock
 
 import cats.Eval
 import cats.syntax.option._
-import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.{LocationData, MaximumSize}
+import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -42,15 +44,17 @@ import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms._
 import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
-import scala.collection.{immutable, immutable => i, mutable => m}
+import scala.collection.{immutable, mutable}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
+
 
 object XFormsContainingDocumentSupport {
 
@@ -183,7 +187,7 @@ trait ContainingDocumentTransientState {
   def addScriptToRun(scriptInvocation: ScriptInvocation): Unit =
     transientState.scriptsToRun :+= Right(scriptInvocation)
 
-  def getScriptsToRun: i.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
+  def getScriptsToRun: immutable.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
     findTwoPassSubmitEvent match {
@@ -196,7 +200,7 @@ trait ContainingDocumentTransientState {
           transientState.nonJavaScriptLoadsToRun :+= load
     }
 
-  def getNonJavaScriptLoadsToRun: i.Seq[Load] = transientState.nonJavaScriptLoadsToRun
+  def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
   def getReplaceAllEval: Option[Eval[SubmissionResult]] = transientState.replaceAllEval
 
@@ -223,7 +227,7 @@ trait ContainingDocumentTransientState {
   def addMessageToRun(message: String, level: String): Unit =
     transientState.messagesToRun :+= Message(message, level)
 
-  def getMessagesToRun: i.Seq[Message] = transientState.messagesToRun
+  def getMessagesToRun: immutable.Seq[Message] = transientState.messagesToRun
 
   def addServerError(serverError: ServerError): Unit = {
     val maxErrors = getShowMaxRecoverableErrors
@@ -231,7 +235,7 @@ trait ContainingDocumentTransientState {
       transientState.serverErrors :+= serverError
   }
 
-  def getServerErrors: i.Seq[ServerError] = transientState.serverErrors
+  def getServerErrors: immutable.Seq[ServerError] = transientState.serverErrors
 
   // Tell the client that help must be shown for the given effective control id.
   // This can be called several times, but only the last control id is remembered.
@@ -394,7 +398,7 @@ trait ContainingDocumentProperties {
   }
 
   private object Memo {
-    private val cache = m.Map.empty[String, Any]
+    private val cache = mutable.Map.empty[String, Any]
 
     private def memo[T](name: String, get: => T) =
       cache.getOrElseUpdate(name, get).asInstanceOf[T]
@@ -524,7 +528,7 @@ private object ContainingDocumentProperties {
 trait ContainingDocumentLogging {
 
   private final val indentation = new IndentedLogger.Indentation
-  private final val loggersMap = m.HashMap[String, IndentedLogger]()
+  private final val loggersMap = mutable.HashMap[String, IndentedLogger]()
 
   def getIndentedLogger(loggingCategory: String): IndentedLogger =
     loggersMap.getOrElseUpdate(loggingCategory,
@@ -569,18 +573,8 @@ trait ContainingDocumentRequest {
   def isEmbedded                 = _requestInformation.isEmbedded
   def isServeInlineResources     = staticState.isInlineResources || _requestInformation.isPortletContainerOrRemote
 
-  protected[xforms] def initializeRequestInformation(requestInformation: RequestInformation): Unit =
+  protected[xforms] def setRequestInformation(requestInformation: RequestInformation): Unit =
     this._requestInformation = requestInformation
-
-  protected def restoreRequestInformation(requestInformationOpt: Option[RequestInformation]): Unit =
-    requestInformationOpt match {
-      case Some(requestInformation) =>
-        this._requestInformation = requestInformation
-      case None =>
-        // Use information from the request
-        // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
-        initializeRequestInformation()
-    }
 
   def namespaceId(id: CharSequence): String =
     if (id == null)
@@ -600,13 +594,36 @@ trait ContainingDocumentRequest {
 
   def getNamespacedFormId: String =
     namespaceId("xforms-form")
+
+  /**
+   * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
+   * the resolution, and using the document's request URL as a base.
+   *
+   * @param element            element used to start resolution (if null, no resolution takes place)
+   * @param uri                URI to resolve
+   * @return resolved URI
+   */
+  def resolveXMLBase(element: Element, uri: String): URI =
+    try {
+      element.resolveXMLBase(Option(getRequestPath), uri)
+    } catch {
+      case e: URISyntaxException =>
+        throw new ValidationException(
+          s"Error while resolving URI: `$uri`",
+          e,
+          if (element ne null)
+            element.getData.asInstanceOf[LocationData]
+          else
+            null
+        )
+    }
 }
 
 trait ContainingDocumentDelayedEvents {
 
   self: XBLContainer with ContainingDocumentEvent =>
 
-  private val _delayedEvents = m.ListBuffer[DelayedEvent]()
+  private val _delayedEvents = mutable.ListBuffer[DelayedEvent]()
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
@@ -730,7 +747,7 @@ trait ContainingDocumentClientState {
 
   def setInitialClientScript(): Unit = {
 
-    implicit val externalContext = CrossPlatformSupport.externalContext
+    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
@@ -739,7 +756,7 @@ trait ContainingDocumentClientState {
       ScriptBuilder.findConfigurationProperties(
         this,
         URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, CrossPlatformSupport.externalContext)
+        XFormsStateManager.getHeartbeatDelay(this, XFormsCrossPlatformSupport.externalContext)
       ).toList :::
       List(
         ScriptBuilder.buildJavaScriptInitialData(

@@ -31,6 +31,9 @@ trait StaticXPathTrait {
   type AxisType
   type PathMapType
 
+  def PrecedingSiblingAxisType: AxisType
+  def NamespaceAxisType: AxisType
+
   // Used by `ShareableXPathStaticContext`
   type VariableResolver
 

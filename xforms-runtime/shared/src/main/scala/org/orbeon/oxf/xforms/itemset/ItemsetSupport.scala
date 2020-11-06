@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms.XFormsUtils.streamHTMLFragment
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
@@ -38,6 +37,7 @@ import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.SAXException
 
 import scala.jdk.CollectionConverters._
@@ -384,7 +384,7 @@ object ItemsetSupport {
   def streamAsHTML(lhhaValue: LHHAValue, locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
     if (lhhaValue.label.nonAllBlank) {
       if (lhhaValue.isHTML)
-        streamHTMLFragment(xmlReceiver, lhhaValue.label, locationData, "")
+        XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, lhhaValue.label, locationData, "")
       else
         text(lhhaValue.label)
     }

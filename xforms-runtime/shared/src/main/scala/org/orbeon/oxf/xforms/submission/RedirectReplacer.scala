@@ -17,7 +17,7 @@ import cats.Eval
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 object RedirectReplacer {
 
@@ -35,7 +35,7 @@ class RedirectReplacer(containingDocument: XFormsContainingDocument)
 
   def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
     containingDocument.setGotSubmissionRedirect()
-    RedirectReplacer.updateResponse(connectionResult, CrossPlatformSupport.externalContext.getResponse)
+    RedirectReplacer.updateResponse(connectionResult, XFormsCrossPlatformSupport.externalContext.getResponse)
     None
   }
 }

@@ -128,7 +128,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       throw new OXFException("operation not allowed")
 
   // Subclasses can override this to translate the incoming external value
-  def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = Option(externalValue)
+  def translateExternalValue(boundItem: om.Item, externalValue: String): Option[String] = Option(externalValue)
 
   // Set the external value into the instance
   final def doStoreExternalValue(externalValue: String): Unit = {

@@ -18,13 +18,14 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.oxf.xforms.XFormsError
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
@@ -55,7 +56,7 @@ class XFormsOutputControl(
   // Value attribute
   private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)
   // TODO: resolve statically
-  private val urlNorewrite = XFormsUtils.resolveUrlNorewrite(element)
+  private val urlNorewrite = XFormsLoadAction.resolveUrlNorewrite(element)
 
   override def markDirtyImpl(): Unit ={
     super.markDirtyImpl()
@@ -152,14 +153,14 @@ class XFormsOutputControl(
                   // driver for data: URL support here), and in general make more sense for relatively short
                   // values. So for now we keep the proxying for data: URLs.
 
-                  val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, trimmedInternalValue)
-                  val servletRewriter = new ServletURLRewriter(CrossPlatformSupport.externalContext.getRequest)
+                  val rebasedURI      = containingDocument.resolveXMLBase(element, trimmedInternalValue)
+                  val servletRewriter = new ServletURLRewriter(XFormsCrossPlatformSupport.externalContext.getRequest)
                   val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
                   val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
 
                   (
                     resolvedURI,
-                    CrossPlatformSupport.proxyURI(
+                    XFormsCrossPlatformSupport.proxyURI(
                       uri              = resolvedURI,
                       filename         = filename,
                       contentType      = mediatype,
@@ -183,7 +184,7 @@ class XFormsOutputControl(
               )
             case "base64Binary" =>
               // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
-              CrossPlatformSupport.proxyBase64Binary(
+              XFormsCrossPlatformSupport.proxyBase64Binary(
                 trimmedInternalValue,
                 filename,
                 mediatype,
@@ -218,7 +219,7 @@ class XFormsOutputControl(
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
-        XFormsUtils.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
       } else
         // Empty value, return as is
         externalValue
@@ -232,7 +233,7 @@ class XFormsOutputControl(
   override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
       // Return rewritten URL of dummy image URL
-      XFormsUtils.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
     else
       super.getNonRelevantEscapedExternalValue
 

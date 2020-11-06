@@ -37,7 +37,7 @@ object XFormsOperations {
     toByteArray(t).toSeq // actually a `WrappedArray`
 
   def fromByteSeq[T: Reads](bytes: Seq[Byte]): T =
-    fromByteArray(bytes.toArray) // TODO: inefficient copy to array -> implement Input instead
+    fromByteArray(bytes.toArray)(implicitly[Reads[T]]) // TODO: inefficient copy to array -> implement Input instead
 }
 
 object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLongUTF {

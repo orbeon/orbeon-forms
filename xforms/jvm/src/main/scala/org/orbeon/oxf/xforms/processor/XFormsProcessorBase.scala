@@ -26,11 +26,13 @@ import org.orbeon.oxf.processor.impl.DependenciesProcessorInput
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
+
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -154,7 +156,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
               // Create containing document and initialize XForms engine
               // NOTE: Create document here so we can do appropriate analysis of caching dependencies
               val containingDocument =
-                XFormsContainingDocument(
+                XFormsContainingDocumentBuilder(
                   staticState    = staticState,
                   uriResolver    = uriResolver.some,
                   response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
@@ -204,7 +206,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   }
 
                   val staticState =
-                    XFormsStaticStateImpl.createFromStaticStateBits(
+                    PartAnalysisBuilder.createFromStaticStateBits(
                       StaticStateBits.fromXmlReceiver(
                         stage2CacheableState.staticStateDigest.some,
                         readInputAsSAX(pipelineContext, InputAnnotatedDocument, _))(
@@ -216,7 +218,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   staticState
               }
 
-              XFormsContainingDocument(
+              XFormsContainingDocumentBuilder(
                 staticState    = staticState,
                 uriResolver    = uriResolver.some,
                 response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
@@ -278,7 +280,7 @@ private object XFormsProcessorBase {
         (_, instance)         <- model.instances
         if instance.dependencyURL.isDefined && ! instance.cache
         resolvedDependencyURL =
-          XFormsUtils.resolveServiceURL(
+        XFormsCrossPlatformSupport.resolveServiceURL(
             containingDocument,
             instance.element,
             instance.dependencyURL.get,
@@ -334,7 +336,7 @@ private object XFormsProcessorBase {
             cachingLogger.logDebug("", s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
           }
 
-          val newStaticState = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits)
+          val newStaticState = PartAnalysisBuilder.createFromStaticStateBits(staticStateBits)
           cacheTracer.staticStateStatus(found = false, newStaticState.digest)
           XFormsStaticStateCache.storeDocument(newStaticState)
           newStaticState

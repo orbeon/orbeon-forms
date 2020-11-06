@@ -23,7 +23,7 @@ import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
@@ -47,7 +47,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val timingLogger  = getTimingLogger(p, p2)
     val detailsLogger = getDetailsLogger(p, p2)
 
-    val externalContext = CrossPlatformSupport.externalContext
+    val externalContext = XFormsCrossPlatformSupport.externalContext
 
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(

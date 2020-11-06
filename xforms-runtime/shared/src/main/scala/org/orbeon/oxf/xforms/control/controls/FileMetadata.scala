@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.upload.UploaderServer
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal
@@ -181,7 +181,7 @@ object FileMetadata {
   // Find the progress information in the session
   def progress(metadata: FileMetadata): Option[UploadProgress] =
     UploaderServer.getUploadProgress(
-      CrossPlatformSupport.externalContext.getRequest,
+      XFormsCrossPlatformSupport.externalContext.getRequest,
       metadata.containingDocument.uuid,
       metadata.getEffectiveId
     ) filter

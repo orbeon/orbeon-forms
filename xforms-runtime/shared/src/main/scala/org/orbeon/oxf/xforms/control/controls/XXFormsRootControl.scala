@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainer
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
@@ -41,7 +41,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     case load: XXFormsLoadEvent =>
       // Internal load event for "two-pass load" handling Ajax load in portlet environments (see `XFormsLoadAction`)
       try {
-        CrossPlatformSupport.externalContext.getResponse.sendRedirect(load.resource, false, false)
+        XFormsCrossPlatformSupport.externalContext.getResponse.sendRedirect(load.resource, false, false)
       } catch {
         case e: IOException => throw new ValidationException(e, getLocationData)
       }

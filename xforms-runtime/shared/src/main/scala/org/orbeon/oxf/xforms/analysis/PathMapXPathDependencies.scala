@@ -752,10 +752,10 @@ private object PathMapXPathDependencies {
   }
 
   // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
-  def createFingerprintedPath(node: NodeInfo): String = {
+  def createFingerprintedPath(node: om.NodeInfo): String = {
 
     // Create an immutable list with ancestor-or-self nodes up to but not including the document node
-    var ancestorOrSelf: List[NodeInfo] = Nil
+    var ancestorOrSelf: List[om.NodeInfo] = Nil
     var currentNode = node
     while (currentNode != null && currentNode.getNodeKind != DOCUMENT_NODE) {
       ancestorOrSelf = currentNode :: ancestorOrSelf

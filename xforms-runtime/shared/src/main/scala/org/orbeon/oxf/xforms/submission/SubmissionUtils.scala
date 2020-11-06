@@ -32,10 +32,10 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.mutable
 
@@ -73,13 +73,32 @@ object SubmissionUtils {
     containingDocument : XFormsContainingDocument
   ): Option[String] =
     Option(
-      XFormsUtils.resolveAttributeValueTemplates(
+      resolveAttributeValueTemplates(
         containingDocument,
         refContext.xpathContext,
         refContext.refNodeInfo,
         value
       )
     ) flatMap (_.trimAllToOpt)
+
+  /**
+   * Resolve attribute value templates (AVTs).
+   *
+   * @param xpathContext   current XPath context
+   * @param contextNode    context node for evaluation
+   * @param attributeValue attribute value
+   * @return resolved attribute value
+   */
+  private def resolveAttributeValueTemplates(
+    containingDocument : XFormsContainingDocument,
+    xpathContext       : XPathCache.XPathContext,
+    contextNode        : om.NodeInfo,
+    attributeValue     : String
+  ): String = {
+    if (attributeValue == null)
+      return null
+    XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue, containingDocument.getRequestStats.getReporter)
+  }
 
   def booleanAvtOpt(
     value              : String)(implicit
@@ -113,7 +132,7 @@ object SubmissionUtils {
   private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {
 
     implicit val _logger                   = model.indentedLogger
-    implicit val _externalContext          = CrossPlatformSupport.externalContext
+    implicit val _externalContext          = XFormsCrossPlatformSupport.externalContext
     implicit val _coreCrossPlatformSupport = CoreCrossPlatformSupport
 
     Connection.connectNow(

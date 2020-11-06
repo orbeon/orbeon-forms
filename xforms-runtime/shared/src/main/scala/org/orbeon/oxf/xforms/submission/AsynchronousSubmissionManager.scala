@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.xforms.{CrossPlatformSupport, EventNames}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, EventNames}
 
 /**
   * Handle asynchronous submissions.
@@ -75,7 +75,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
       // Should we use `AsyncExternalContext` here?
       val newExternalContext = {
 
-        val currentExternalContext = CrossPlatformSupport.externalContext
+        val currentExternalContext = XFormsCrossPlatformSupport.externalContext
 
         new LocalExternalContext(
           currentExternalContext.getWebAppContext,
@@ -212,7 +212,7 @@ private object AsynchronousSubmissionManager {
 
   def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
 
-    val session = CrossPlatformSupport.externalContext.getRequest.getSession(true)
+    val session = XFormsCrossPlatformSupport.externalContext.getRequest.getSession(true)
 
     session.getAttribute(sessionKey) map (_.asInstanceOf[AsynchronousSubmissions]) orElse {
       if (create) {

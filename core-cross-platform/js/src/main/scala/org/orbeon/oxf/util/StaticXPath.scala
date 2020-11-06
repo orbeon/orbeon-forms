@@ -32,8 +32,11 @@ object StaticXPath extends StaticXPathTrait {
   type DocumentNodeInfoType    = om.TreeInfo
   type VirtualNodeType         = VirtualNode
   type ValueRepresentationType = om.GroundedValue
-  type AxisType                = om.AxisInfo.type
+  type AxisType                = Int
   type PathMapType             = parser.PathMap
+
+  def PrecedingSiblingAxisType: AxisType = om.AxisInfo.PRECEDING_SIBLING
+  def NamespaceAxisType: AxisType = om.AxisInfo.NAMESPACE
 
   type VariableResolver = (om.StructuredQName, XPathContext) => ValueRepresentationType
 

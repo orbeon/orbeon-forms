@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
 import shapeless.syntax.typeable._
 
@@ -83,7 +83,7 @@ class XFormsLHHAHandler(
               if externalValue.nonEmpty
             } locally {
               if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
-                XFormsUtils.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
+                XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
               } else {
                 xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
               }

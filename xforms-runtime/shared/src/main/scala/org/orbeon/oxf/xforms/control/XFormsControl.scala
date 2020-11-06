@@ -34,7 +34,7 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.Constants.RepeatSeparatorString
 import org.orbeon.xforms.runtime.XFormsObject
-import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes
 
@@ -283,8 +283,8 @@ object XFormsControl {
 
     val sb = new StringBuilder(rawValue.length * 2) // just an approx of the size it may take
     // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-    val rewriter = CrossPlatformSupport.externalContext.getResponse
-    XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver {
+    val rewriter = XFormsCrossPlatformSupport.externalContext.getResponse
+    XFormsCrossPlatformSupport.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver {
 
       private var isStartElement = false
 

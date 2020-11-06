@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent,
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
@@ -350,7 +351,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
     val newScope = new Scope(Some(getResolutionScope ensuring (_ ne null)), getPrefixedId)
-    val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.staticState, parent, doc, newScope)
+    val (template, newPart) = PartAnalysisBuilder.createPart(containingDocument.staticState, parent, doc, newScope)
     containingDocument.staticOps.addPart(newPart)
 
     (template, newPart)

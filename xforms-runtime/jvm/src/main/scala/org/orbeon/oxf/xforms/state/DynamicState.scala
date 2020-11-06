@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
@@ -69,7 +70,7 @@ case class DynamicState(
     )
 
   // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
-  def toXML = {
+  def toXML: Document = {
 
     val document = dom.Document()
     val rootElement = document.addElement("dynamic-state")

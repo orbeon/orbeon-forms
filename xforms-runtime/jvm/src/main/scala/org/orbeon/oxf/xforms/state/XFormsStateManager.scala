@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties, XFormsProperties}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
@@ -273,7 +273,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     // Create document
     val documentFromStore =
-      XFormsContainingDocument(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
+      XFormsContainingDocumentBuilder(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
         (isServerState && document.staticState.isServerStateHandling) ||
           document.staticState.isClientStateHandling
       }

@@ -235,7 +235,7 @@ class XFormsRepeatControl(
     *
     * NOTE: The new binding context must have been set on this control before calling.
     */
-  def updateIterations(oldRepeatItems : Seq[Item]): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
+  def updateIterations(oldRepeatItems : Seq[om.Item]): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
     // NOTE: The following assumes the nodesets have changed
 
@@ -491,9 +491,9 @@ class XFormsRepeatControl(
         Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, localRefreshInfo.oldRepeatIndex, getIndex))
     }
 
-  private def findItemIndexes(items1: Seq[Item], items2: Seq[Item]) = {
+  private def findItemIndexes(items1: Seq[om.Item], items2: Seq[om.Item]) = {
 
-    def indexOfItem(otherItem: Item) =
+    def indexOfItem(otherItem: om.Item) =
       items2 indexWhere (SaxonUtils.compareItems(_, otherItem))
 
     items1 map indexOfItem toArray

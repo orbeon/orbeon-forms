@@ -81,7 +81,7 @@ class AssetsAggregator extends ProcessorImpl {
             // In this mode, resources are described in JSON within a <div>
             val isPortlet = request.getContainerType == "portlet"
             val namespaceOpt = isPortlet option response.getNamespacePrefix
-            val isMinimal = XFormsProperties.isMinimalResources
+            val isMinimal = XFormsGlobalProperties.isMinimalResources
 
             // Whether a path is a user resource in separate deployment
             def isSeparatePath(path: String) = isSeparateDeployment && ! URLRewriterUtils.isPlatformPath(path)

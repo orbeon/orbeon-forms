@@ -13,7 +13,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{CrossPlatformSupport, RelevanceHandling, UrlType}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, RelevanceHandling, UrlType}
 
 
 // Subset of `SubmissionParameters`
@@ -232,7 +232,7 @@ object SubmissionParameters {
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
     // NOTE: Method can be `null` e.g. in a portlet render request.
-    val incomingMethod = CrossPlatformSupport.externalContext.getRequest.getMethod
+    val incomingMethod = XFormsCrossPlatformSupport.externalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing

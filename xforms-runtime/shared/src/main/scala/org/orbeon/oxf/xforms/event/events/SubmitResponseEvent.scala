@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
-import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.immutable
 import scala.util.Try
@@ -123,7 +123,7 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try {
-          CrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
+          XFormsCrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
         } catch {
           warn("error while reading response body")
         }
@@ -132,7 +132,7 @@ private object SubmitResponseEvent {
 
         // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
         // Should modify readTinyTree() and readDom4j()
-        def tryXML: Try[String Either DocumentInfo] =
+        def tryXML: Try[String Either DocumentNodeInfoType] =
           Try {
             Right(
               useAndClose(URLFactory.createURL(tempURI).openStream()) { is =>
@@ -141,12 +141,12 @@ private object SubmitResponseEvent {
             )
           }
 
-        def tryText: Try[String Either DocumentInfo]  =
+        def tryText: Try[String Either DocumentNodeInfoType]  =
           Try {
             Left(IOUtils.readStreamAsStringAndClose(URLFactory.createURL(tempURI).openStream(), cxr.charset))
           }
 
-        def asString(value: String Either DocumentInfo) = value match {
+        def asString(value: String Either DocumentNodeInfoType) = value match {
           case Left(text) => text
           case Right(xml) => TransformerUtils.tinyTreeToString(xml)
         }

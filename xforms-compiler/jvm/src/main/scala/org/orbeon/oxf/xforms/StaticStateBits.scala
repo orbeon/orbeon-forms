@@ -45,7 +45,7 @@ object StaticStateBits {
   ): StaticStateBits =
     withDebug("reading input", List("existing digest" -> existingStaticStateDigest.orNull)) {
 
-      val isLogStaticStateInput = XFormsProperties.getDebugLogging.contains("html-static-state")
+      val isLogStaticStateInput = XFormsGlobalProperties.getDebugLogging.contains("html-static-state")
 
       val existingStaticStateDigestOrReceiver =
         (if (isLogStaticStateInput) None else existingStaticStateDigest).toLeft(new DigestContentHandler)

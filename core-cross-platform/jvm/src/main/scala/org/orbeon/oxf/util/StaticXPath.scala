@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.Document
+import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
@@ -77,7 +77,7 @@ object StaticXPath extends StaticXPathTrait {
     private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
   }
 
-  def orbeonDomToTinyTree(doc: Document): DocumentNodeInfoType = {
+  def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType = {
 
     val treeBuilder = new TinyBuilder
 
@@ -96,7 +96,7 @@ object StaticXPath extends StaticXPathTrait {
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
   }
 
-  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): Document = ???
+  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = ???
 
   val EmptyDocument: DocumentNodeInfoType = {
 

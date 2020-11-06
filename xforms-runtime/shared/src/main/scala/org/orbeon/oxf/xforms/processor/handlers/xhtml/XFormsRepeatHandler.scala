@@ -17,7 +17,6 @@ import java.{lang => jl}
 
 import cats.syntax.option._
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
@@ -62,7 +61,7 @@ class XFormsRepeatHandler(
   override protected def handleControlStart(): Unit = {
 
     val isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
-    val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
+    val namespacedId = containingDocument.namespaceId(getEffectiveId)
 
     val repeatControl = containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
 

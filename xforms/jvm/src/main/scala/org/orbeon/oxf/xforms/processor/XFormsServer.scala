@@ -490,8 +490,8 @@ object XFormsServer {
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
           "name"        -> scriptInvocation.script.shared.clientName,
-          "target-id"   -> XFormsUtils.namespaceId(doc, scriptInvocation.targetEffectiveId),
-          "observer-id" -> XFormsUtils.namespaceId(doc, scriptInvocation.observerEffectiveId)
+          "target-id"   -> doc.namespaceId(scriptInvocation.targetEffectiveId),
+          "observer-id" -> doc.namespaceId(scriptInvocation.observerEffectiveId)
         )
       ) {
 
@@ -516,7 +516,7 @@ object XFormsServer {
         localName = if (focus) "focus" else "blur",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = List("control-id" -> XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId))
+        atts      = List("control-id" -> containingDocument.namespaceId(focusControlEffectiveId))
       )
 
     def outputHelpInfo(
@@ -528,7 +528,7 @@ object XFormsServer {
         localName = "help",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = List("control-id" -> XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId))
+        atts      = List("control-id" -> containingDocument.namespaceId(helpControlEffectiveId))
       )
   }
 }

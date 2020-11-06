@@ -24,7 +24,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
+import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -242,36 +242,6 @@ object XFormsUtils {
     DebugProcessor.logger.info(debugMessage + ":\n" + IOSupport.domToPrettyStringJava(document))
 
   /**
-   * Prefix an id with the container namespace if needed. If the id is null, return null.
-   *
-   * @param containingDocument current ContainingDocument
-   * @param id                 id to prefix
-   * @return prefixed id or null
-   */
-  def namespaceId(containingDocument: XFormsContainingDocument, id: CharSequence): String =
-    if (id == null)
-      null
-    else
-      containingDocument.getContainerNamespace + id
-
-  /**
-   * Remove the container namespace prefix if possible. If the id is null, return null.
-   *
-   * @param containingDocument current ContainingDocument
-   * @param id                 id to de-prefix
-   * @return de-prefixed id if possible or null
-   */
-  def deNamespaceId(containingDocument: XFormsContainingDocument, id: String): String = {
-    if (id == null)
-      return null
-    val containerNamespace = containingDocument.getContainerNamespace
-    if (containerNamespace.length > 0 && id.startsWith(containerNamespace))
-      id.substring(containerNamespace.length)
-    else
-      id
-  }
-
-  /**
    * Return LocationData for a given node, null if not found.
    *
    * @param node node containing the LocationData
@@ -325,7 +295,4 @@ object XFormsUtils {
       throw new OXFException(errorMessage)
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Node]
   }
-
-  def getNamespacedFormId(containingDocument: XFormsContainingDocument): String =
-    namespaceId(containingDocument, "xforms-form")
 }

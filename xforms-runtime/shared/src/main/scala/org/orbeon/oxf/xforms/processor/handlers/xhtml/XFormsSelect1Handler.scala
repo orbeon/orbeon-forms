@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -164,7 +164,7 @@ object XFormsSelect1Handler {
 
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = spanAttributes) {
 
-      val itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.containingDocument, itemEffectiveId)
+      val itemNamespacedId = xformsHandlerContextForItem.getContainingDocument.namespaceId(itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
 
       if (! isBooleanInput) {

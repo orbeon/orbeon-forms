@@ -15,9 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
+import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 
@@ -96,7 +95,7 @@ class XFormsGroupSeparatorHandler(
 
           // Delimiter: begin group
           if (isMustGenerateBeginEndDelimiters)
-            outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses, "group-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+            outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses, "group-begin-" + containingDocument.namespaceId(getEffectiveId))
         },
         isAroundTableOrListElement = true
     )
@@ -119,7 +118,7 @@ class XFormsGroupSeparatorHandler(
     outputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
     val isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     if (isMustGenerateBeginEndDelimiters)
-      outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end", "group-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+      outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end", "group-end-" + containingDocument.namespaceId(getEffectiveId))
   }
 
   // Don't output any LHHA

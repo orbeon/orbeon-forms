@@ -52,7 +52,7 @@ trait ControlAjaxSupport {
     var added = false
 
     // Control id
-    attributesImpl.addAttribute("", "id", "id", CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+    attributesImpl.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(getEffectiveId))
 
     // This is handled specially because it's a list of tokens, some of which can be added and removed
     added |= addAjaxClasses(attributesImpl, previousControlOpt, this)
@@ -220,7 +220,7 @@ object ControlAjaxSupport {
       val attributeValue = value2 getOrElse ""
       val attributesImpl = new AttributesImpl
 
-      addAttribute(attributesImpl, "for",  XFormsUtils.namespaceId(containingDocument, effectiveId))
+      addAttribute(attributesImpl, "for",  containingDocument.namespaceId(effectiveId))
       addAttribute(attributesImpl, "name", name)
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
       ch.text(attributeValue)

@@ -222,10 +222,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
   override def findAriaByControlEffectiveId: Option[String] =
     Some(
-      XFormsUtils.namespaceId(
-        containingDocument,
-        XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")
-      )
+      containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input"))
     )
 
   override def getBackCopy: AnyRef = {

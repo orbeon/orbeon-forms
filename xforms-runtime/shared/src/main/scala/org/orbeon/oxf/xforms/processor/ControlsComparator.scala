@@ -18,7 +18,6 @@ import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.processor.handlers._
@@ -153,7 +152,7 @@ class ControlsComparator(
           val atts =
             relevant.map("relevant" -> _.toString) ++:
             readonly.map("readonly" -> _.toString) ++:
-            List("id" -> namespaceId(document, effectiveId))
+            List("id" -> document.namespaceId(effectiveId))
 
           withElement(
             "init",
@@ -415,7 +414,7 @@ class ControlsComparator(
       "inner-html",
       prefix = "xxf",
       uri    = XXFORMS_NAMESPACE_URI,
-      atts   = List("id" -> namespaceId(document, control.effectiveId))
+      atts   = List("id" -> document.namespaceId(control.effectiveId))
     ) {
 
       def outputInitOrDestroy(control: XFormsControl, isInit: Boolean): Unit = {
@@ -426,7 +425,7 @@ class ControlsComparator(
           import io.circe.syntax._
 
           val controls =
-            controlsToInitialize map { case (id, value) => rpc.Control(namespaceId(document, id), value) }
+            controlsToInitialize map { case (id, value) => rpc.Control(document.namespaceId(id), value) }
 
           element(
             if (isInit) "init" else "destroy",
@@ -483,7 +482,7 @@ class ControlsComparator(
         prefix = "xxf",
         uri    = XXFORMS_NAMESPACE_URI,
         atts   = List(
-          "id"             -> namespaceId(document, templateId),
+          "id"             -> document.namespaceId(templateId),
           "parent-indexes" -> parentIndexes,
           "count"          -> count.toString
         )

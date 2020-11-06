@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.UploadControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -138,8 +138,5 @@ class XFormsUploadHandler(
   }
 
   override def getForEffectiveId(effectiveId: String): String =
-    XFormsUtils.namespaceId(
-      containingDocument,
-      XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")
-    )
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input"))
 }

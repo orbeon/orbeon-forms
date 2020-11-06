@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
@@ -24,7 +23,7 @@ import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparator
@@ -231,7 +230,6 @@ class XFormsInputHandler(
     }
   }
 
-  import XFormsUtils.namespaceId
 
   // Do as if this was in a component, noscript has to handle that
   private def getFirstInputEffectiveId(effectiveId: String): String =
@@ -239,7 +237,7 @@ class XFormsInputHandler(
 
   // Do as if this was in a component, noscript has to handle that
   private def getSecondInputEffectiveId(effectiveId: String): String =
-    isDateTime option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2")) orNull
+    isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2")) orNull
 
   override def getForEffectiveId(effectiveId: String): String =
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveId(getEffectiveId)
@@ -254,8 +252,6 @@ class XFormsInputHandler(
 }
 
 object XFormsInputHandler {
-
   def firstInputEffectiveId(effectiveId: String)(containingDocument: XFormsContainingDocument): String =
-    namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-1"))
-
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-1"))
 }

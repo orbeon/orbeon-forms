@@ -14,18 +14,15 @@
 package org.orbeon.oxf.xforms
 
 import java.util.concurrent.locks.Lock
-import java.{util => ju}
+
 import cats.Eval
 import cats.syntax.option._
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
@@ -584,6 +581,25 @@ trait ContainingDocumentRequest {
         // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
         initializeRequestInformation()
     }
+
+  def namespaceId(id: CharSequence): String =
+    if (id == null)
+      null
+    else
+      getContainerNamespace + id
+
+  def deNamespaceId(id: String): String = {
+    if (id == null)
+      return null
+    val containerNamespace = getContainerNamespace
+    if (containerNamespace.length > 0 && id.startsWith(containerNamespace))
+      id.substring(containerNamespace.length)
+    else
+      id
+  }
+
+  def getNamespacedFormId: String =
+    namespaceId("xforms-form")
 }
 
 trait ContainingDocumentDelayedEvents {

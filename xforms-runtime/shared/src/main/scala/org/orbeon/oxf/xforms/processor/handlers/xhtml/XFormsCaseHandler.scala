@@ -18,9 +18,8 @@ import java.{lang => jl}
 import org.orbeon.oxf.xforms.analysis.controls.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsNames
@@ -148,7 +147,7 @@ class XFormsCaseHandler(
                 outputInterceptor.outputDelimiter(
                   currentSavedOutput,
                   firstDelimiterClasses,
-                  "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
+                  "xforms-case-begin-" + containingDocument.namespaceId(getEffectiveId)
                 )
             },
             XFormsControl.appearances(elementAnalysis.parent.get)(XFormsNames.XXFORMS_SEPARATOR_APPEARANCE_QNAME)
@@ -184,7 +183,7 @@ class XFormsCaseHandler(
           currentOutputInterceptor.generateFirstDelimitersIfNeeded()
 
           // Output end delimiter
-          currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+          currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + containingDocument.namespaceId(getEffectiveId))
         }
     }
 

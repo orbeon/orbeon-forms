@@ -739,7 +739,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Build an namespaced id for a given static id or return null (the empty sequence)
   def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String = {
     val effectiveId  = buildFormBuilderControlEffectiveId(staticId)
-    val namespacedId = effectiveId.map(XFormsUtils.namespaceId(XFormsAPI.inScopeContainingDocument, _))
+    val namespacedId = effectiveId.map(XFormsAPI.inScopeContainingDocument.namespaceId)
     namespacedId.orNull
   }
 

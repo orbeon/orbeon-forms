@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEven
 import org.orbeon.oxf.xforms.model.{DataModel, StaticDataModel}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils}
+import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsId
@@ -303,7 +303,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       val selectedCaseEffectiveId = getSelectedCaseEffectiveId ensuring (_ ne null)
 
       ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
-        "id", XFormsUtils.namespaceId(containingDocument, selectedCaseEffectiveId),
+        "id", containingDocument.namespaceId(selectedCaseEffectiveId),
         "visibility", "visible")
       )
 
@@ -313,7 +313,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
           val previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl) ensuring (_ ne null)
 
           ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
-            "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
+            "id", containingDocument.namespaceId(previousSelectedCaseId),
             "visibility", "hidden")
           )
         case _ =>
@@ -322,7 +322,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
           // TODO: 2020-02-27: There are no more repeat templates. Check this.
           getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl =>
             ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
-              "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
+              "id", containingDocument.namespaceId(caseControl.getEffectiveId ensuring (_ ne null)),
               "visibility", "hidden")
             )
           }

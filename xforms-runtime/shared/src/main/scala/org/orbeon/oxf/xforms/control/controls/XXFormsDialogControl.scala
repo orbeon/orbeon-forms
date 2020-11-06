@@ -17,7 +17,6 @@ import java.{util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.events.{XFormsFocusEvent, XXFormsDialogCloseEvent, XXFormsDialogOpenEvent}
@@ -180,7 +179,7 @@ class XXFormsDialogControl(
       var doOutputElement = false
 
       val atts = new AttributesImpl
-      atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
+      atts.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(getEffectiveId))
 
       val visible = isDialogVisible
       if (previousControl.isEmpty || previousDialog.exists(_.wasDialogVisible != visible)) {
@@ -190,7 +189,7 @@ class XXFormsDialogControl(
       if (visible) {
         neighborControlId foreach { neighbor =>
           if (previousControl.isEmpty || previousDialog.exists(_.neighborControlId != neighborControlId)) {
-              atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
+              atts.addAttribute("", "neighbor", "neighbor", CDATA, containingDocument.namespaceId(neighbor))
               doOutputElement = true
           }
         }

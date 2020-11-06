@@ -386,7 +386,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Get event target
       val eventTarget =
-        doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetId))) match {
+        doc.getObjectByEffectiveId(doc.deNamespaceId(adjustIdForRepeatIteration(doc, event.targetId))) match {
           case eventTarget: XFormsEventTarget => eventTarget
           case _ =>
             debug(

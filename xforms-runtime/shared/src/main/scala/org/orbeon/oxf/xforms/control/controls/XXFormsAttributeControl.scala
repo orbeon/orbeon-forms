@@ -133,7 +133,7 @@ class XXFormsAttributeControl(
       addOrAppendToAttributeIfNeeded(
         attributesImpl       = atts,
         name                 = "for",
-        value                = namespaceId(containingDocument, attributeControl2.getEffectiveForAttribute),
+        value                = containingDocument.namespaceId(attributeControl2.getEffectiveForAttribute),
         isNewRepeatIteration = false, // doesn't matter because `isDefaultValue == false`
         isDefaultValue       = false
       )
@@ -173,7 +173,7 @@ class XXFormsAttributeControl(
         if (doOutputElement) {
           // Pass the HTML element id, not the control id, because that's what the client will expect
           val effectiveFor2 = attributeControl2.getEffectiveForAttribute
-          atts.addAttribute("", "id", "id", CDATA, XFormsUtils.namespaceId(containingDocument, effectiveFor2))
+          atts.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(effectiveFor2))
 
           ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", atts)
         }

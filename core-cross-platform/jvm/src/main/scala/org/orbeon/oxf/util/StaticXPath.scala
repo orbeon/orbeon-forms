@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.util
 
+import javax.xml.transform.{Result, Source}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tinytree.TinyBuilder
-import org.orbeon.saxon.{Configuration, TransformerFactoryImpl, om}
+import org.orbeon.saxon.trans.XPathException
+import org.orbeon.saxon.{Configuration, Controller, TransformerFactoryImpl, om}
 import org.orbeon.xml.NamespaceMapping
-import org.xml.sax.XMLReader
+import org.xml.sax.{SAXParseException, XMLReader}
 
 
 object StaticXPath extends StaticXPathTrait {
@@ -96,7 +100,44 @@ object StaticXPath extends StaticXPathTrait {
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
   }
 
-  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = ???
+  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = {
+    val identity = new IdentityTransformerWithFixup(GlobalConfiguration)
+    val documentResult = new LocationDocumentResult
+    identity.transform(nodeInfo, documentResult)
+    documentResult.getDocument
+  }
+
+  // Custom version of Saxon's IdentityTransformer which hooks up a `ComplexContentOutputter`
+  private class IdentityTransformerWithFixup(config: Configuration) extends Controller(config) {
+
+    override def transform(source: Source, result: Result): Unit =
+      try {
+        val pipelineConfig = makePipelineConfiguration
+
+        val receiver =
+          config.getSerializerFactory.getReceiver(result, pipelineConfig, getOutputProperties)
+
+        // To remove duplicate namespace declarations
+        val reducer = new NamespaceReducer
+        reducer.setUnderlyingReceiver(receiver)
+        reducer.setPipelineConfiguration(pipelineConfig)
+
+        // To fixup namespaces
+        val cco = new ComplexContentOutputter
+        cco.setHostLanguage(pipelineConfig.getHostLanguage)
+        cco.setPipelineConfiguration(pipelineConfig)
+        cco.setReceiver(reducer)
+
+        new Sender(pipelineConfig).send(source, cco, true)
+      } catch {
+        case xpe: XPathException =>
+          xpe.getException match {
+            case spe: SAXParseException if ! spe.getException.isInstanceOf[RuntimeException] => // NOP
+            case _ => reportFatalError(xpe)
+          }
+          throw xpe
+      }
+  }
 
   val EmptyDocument: DocumentNodeInfoType = {
 

@@ -17,6 +17,9 @@ import org.orbeon.oxf.properties.PropertySet
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
+
+  type FileItemType = Unit // TODO
+
   def isPE: Boolean = true
   def randomHexId: String = ???
   def getApplicationResourceVersion: Option[String] = ???

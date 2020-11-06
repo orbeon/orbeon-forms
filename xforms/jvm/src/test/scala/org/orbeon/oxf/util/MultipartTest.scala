@@ -114,10 +114,10 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         }
 
         implicit val uploadProgressEq =
-          new Equality[UploadProgress] {
-            def areEqual(a: UploadProgress, b: Any) =
+          new Equality[UploadProgress[DiskFileItem]] {
+            def areEqual(a: UploadProgress[DiskFileItem], b: Any) =
               b match {
-                case b: UploadProgress =>
+                case b: UploadProgress[_] =>
                   a.fieldName    == b.fieldName    &&
                   a.expectedSize == b.expectedSize &&
                   a.receivedSize == b.receivedSize &&

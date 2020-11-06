@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.control.controls
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{NetUtils, UploadProgress}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{UploadProgress}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
@@ -25,7 +26,6 @@ import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsV
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.helpers.AttributesImpl
 
@@ -179,8 +179,8 @@ object FileMetadata {
   val AllMetadataNames: Seq[String] = Evaluators.keys.toList
 
   // Find the progress information in the session
-  def progress(metadata: FileMetadata): Option[UploadProgress] =
-    UploaderServer.getUploadProgress(
+  def progress(metadata: FileMetadata): Option[UploadProgress[CoreCrossPlatformSupport.FileItemType]] =
+    XFormsCrossPlatformSupport.getUploadProgress(
       XFormsCrossPlatformSupport.externalContext.getRequest,
       metadata.containingDocument.uuid,
       metadata.getEffectiveId

@@ -21,8 +21,8 @@ import org.apache.commons.fileupload._
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
-import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
+import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
@@ -32,40 +32,19 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import shapeless.syntax.typeable._
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends FileUploadException
 case class FileScanException           (message: String)                                           extends FileUploadException
-
-sealed trait Reason
-object Reason {
-  case class SizeReason     (permitted: Long,                actual: Long)              extends Reason
-  case class MediatypeReason(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends Reason
-  case class FileScanReason (message: String)                                           extends Reason
-}
-
-sealed trait UploadState { def name: String }
-object UploadState {
-  case object Started                             extends UploadState { val name = "started" }
-  case class  Completed(fileItem: DiskFileItem)   extends UploadState { val name = "completed" }
-  case class  Interrupted(reason: Option[Reason]) extends UploadState { val name = "interrupted" }
-}
-
-// NOTE: Fields don't need to be @volatile as they are accessed via the session, which provides synchronized access.
-case class UploadProgress(
-  fieldName        : String,
-  expectedSize     : Option[Long],
-  var receivedSize : Long        = 0L,
-  var state        : UploadState = UploadState.Started
-)
 
 trait MultipartLifecycle {
   def fieldReceived(fieldName: String, value: String)         : Unit
   def fileItemStarting(fieldName: String, fileItem: FileItem) : Option[MaximumSize]
   def updateProgress(b: Array[Byte], off: Int, len: Int)      : Unit
-  def fileItemState(state: UploadState)                       : Unit
+  def fileItemState(state: UploadState[DiskFileItem])         : Unit
   def interrupted()                                           : Unit
 }
 

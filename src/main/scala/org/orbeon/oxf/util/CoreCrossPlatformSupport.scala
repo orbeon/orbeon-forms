@@ -13,11 +13,15 @@
  */
 package org.orbeon.oxf.util
 
+import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
+
+  type FileItemType = DiskFileItem
+
   def isPE: Boolean = Version.isPE
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = Option(URLRewriterUtils.getApplicationResourceVersion)

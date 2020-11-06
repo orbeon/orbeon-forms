@@ -27,7 +27,7 @@ import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Connection, IndentedLogger, NetUtils, URLRewriterUtils, UploadProgress}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, URLRewriterUtils, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
@@ -41,7 +41,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def externalContext: ExternalContext = NetUtils.getExternalContext
 
-  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress] =
+  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[CoreCrossPlatformSupport.FileItemType]] =
     UploaderServer.getUploadProgress(request, uuid, fieldName)
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = {

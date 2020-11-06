@@ -20,6 +20,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLReceiver
@@ -33,7 +34,7 @@ trait XFormsCrossPlatformSupportTrait {
 
   def externalContext: ExternalContext
 
-  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress]
+  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[FileItemType]]
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
 

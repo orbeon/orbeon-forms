@@ -92,12 +92,12 @@ object UploaderServer {
     )
   }
 
-  def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress] =
+  def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress[DiskFileItem]] =
     session flatMap (_.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
-      case progress: UploadProgress => progress
+      case progress: UploadProgress[_] => progress.asInstanceOf[UploadProgress[DiskFileItem]]
     }
 
-  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress] =
+  def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[DiskFileItem]] =
     getUploadProgressFromSession(request.sessionOpt, uuid, fieldName)
 
   def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
@@ -113,9 +113,9 @@ object UploaderServer {
   ) extends MultipartLifecycle {
 
     // Mutable state
-    private var uuidOpt     : Option[String]         = None
-    private var progressOpt : Option[UploadProgress] = None
-    private var fileScanOpt : Option[FileScan]       = None
+    private var uuidOpt     : Option[String]                       = None
+    private var progressOpt : Option[UploadProgress[DiskFileItem]] = None
+    private var fileScanOpt : Option[FileScan]                     = None
 
     def fieldReceived(fieldName: String, value: String): Unit =
       if (fieldName == Constants.UuidFieldName) {
@@ -166,7 +166,7 @@ object UploaderServer {
         // So that the XFCD is aware of progress information
         // Do this before checking size so that we can report the interrupted upload
         locally {
-          val progress = UploadProgress(fieldName, untrustedExpectedSizeOpt)
+          val progress = UploadProgress[DiskFileItem](fieldName, untrustedExpectedSizeOpt)
 
           val newSessionKey = getProgressSessionKey(uuid, fieldName)
           sessionKeys += newSessionKey
@@ -238,7 +238,7 @@ object UploaderServer {
     }
 
     // Can throw
-    def fileItemState(state: UploadState): Unit = {
+    def fileItemState(state: UploadState[DiskFileItem]): Unit = {
 
       state match {
         case UploadState.Completed(fileItem) => fileScanOpt foreach (fileScan => withFileScanCall(fileScan.complete(fileFromFileItemCreateIfNeeded(fileItem))))
@@ -260,9 +260,9 @@ object UploaderServer {
         )
     }
 
-    private def getUploadProgress(sessionKey: String): Option[UploadProgress] =
+    private def getUploadProgress(sessionKey: String): Option[UploadProgress[DiskFileItem]] =
       session.getAttribute(sessionKey) collect {
-        case progress: UploadProgress => progress
+        case progress: UploadProgress[_] => progress.asInstanceOf[UploadProgress[DiskFileItem]]
       }
   }
 

@@ -736,6 +736,7 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
   .settings(
     name := "orbeon-xforms-common",
     libraryDependencies += "com.chuusai" %% "shapeless" % ShapelessVersion,
+    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion
   )
 
 lazy val xformsCommonJVM = xformsCommon.jvm

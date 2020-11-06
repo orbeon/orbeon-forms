@@ -568,7 +568,7 @@ public class TransformerUtils {
      * Transform a dom4j Node to SAX events.
      */
     public static void writeDom4j(org.orbeon.dom.Node node, ContentHandler contentHandler) {
-        sourceToSAX(new LocationDocumentSource(node), contentHandler);
+        sourceToSAX(new LocationDocumentSource(node.getDocument()), contentHandler);
     }
 
     /**

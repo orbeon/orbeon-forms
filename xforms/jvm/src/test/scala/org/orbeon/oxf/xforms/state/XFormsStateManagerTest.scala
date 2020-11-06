@@ -19,8 +19,9 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class XFormsStateManagerTest
   extends DocumentTestBase
@@ -51,7 +52,7 @@ class XFormsStateManagerTest
         def createDoc() = {
 
           val doc =
-            XFormsContainingDocument(
+            XFormsContainingDocumentBuilder(
               XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml"),
               None,
               None,
@@ -108,7 +109,7 @@ class XFormsStateManagerTest
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
         // Initialize document and get initial document state
-        val state1 = TestState(XFormsContainingDocument(staticState, None, None, mustInitialize = true))
+        val state1 = TestState(XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true))
 
         locally {
 
@@ -170,7 +171,7 @@ class XFormsStateManagerTest
 
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
-        val state1 = TestState(XFormsContainingDocument(staticState, None, None, mustInitialize = true))
+        val state1 = TestState(XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true))
 
         val initialDynamicStateString = {
           assert(state1.uuid.length === SecureUtils.HexIdLength)

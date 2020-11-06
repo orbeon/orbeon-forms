@@ -25,10 +25,11 @@ import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorS
 import org.orbeon.xforms.XFormsId
 import org.scalatestplus.junit.AssertionsForJUnit
 
+
 object XFormsStaticStateTest {
 
   def getStaticState(documentURL: String): XFormsStaticState =
-    XFormsStaticStateImpl.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
+    PartAnalysisBuilder.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
   def withRefresh[T](thunk: => T)(implicit dependencies: XPathDependencies): T = {
     dependencies.refreshStart()

@@ -17,8 +17,10 @@ import org.junit.After
 import org.orbeon.dom
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.processor.ProcessorUtils
+import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder}
+
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
 
@@ -34,8 +36,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     // Initialize once
     ResourceManagerSupport
 
-    val staticState = XFormsStaticStateImpl.createFromDocument(xhtml)
-    val doc = XFormsContainingDocument(staticState, None, None, mustInitialize = true)
+    val staticState = PartAnalysisBuilder.createFromDocument(xhtml)
+    val doc = XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true)
 
     doc.afterInitialResponse()
     doc.beforeExternalEvents(null, true)

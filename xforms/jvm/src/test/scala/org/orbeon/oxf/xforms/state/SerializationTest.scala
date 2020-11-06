@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.state
 import org.junit.{Assume, Test}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xforms.{XFormsContainingDocumentBuilder, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml._
@@ -25,6 +26,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 import org.xml.sax.Attributes
 
 import scala.jdk.CollectionConverters._
+
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -169,7 +171,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Serialize/deserialize
     val serialized = doc.staticState.encodedState
-    val restored = XFormsStaticStateImpl.restore(None, serialized, forceEncryption = false)
+    val restored = XFormsContainingDocumentBuilder.restoreStaticState(None, serialized, forceEncryption = false)
     val restoredXML = restored.staticStateDocument.xmlDocument
 
     // Compare expected/actual XML representation of the static state

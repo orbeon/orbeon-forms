@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xml.XMLReceiver
 
 
@@ -27,7 +26,7 @@ import org.orbeon.oxf.xml.XMLReceiver
 class XPathAnalysisProcessor extends SimpleProcessor {
   def generateAnalysis(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
     val formDocument = readInputAsOrbeonDom(pipelineContext, "form")
-    val staticState = XFormsStaticStateImpl.createFromDocument(formDocument)
+    val staticState = PartAnalysisBuilder.createFromDocument(formDocument)
 
     PartAnalysisDebugSupport.writePart(staticState.topLevelPart)(xmlReceiver)
   }

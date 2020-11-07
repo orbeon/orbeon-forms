@@ -826,7 +826,7 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
-    xformsCompilerJVM, // only on JVM side
+    xformsCompilerJVM, // "real" compiler is only on JVM side
     xformsAnalysisJVM,
     core,
     coreCrossPlatformJVM // implied
@@ -834,6 +834,7 @@ lazy val xformsRuntimeJVM = xformsRuntime.jvm
 
 lazy val xformsRuntimeJS = xformsRuntime.js
   .dependsOn(
+    xformsCompilerJS, // stubs
     xformsAnalysisJS,
     coreCrossPlatformJS
   )

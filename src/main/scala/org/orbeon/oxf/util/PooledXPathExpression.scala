@@ -29,7 +29,11 @@ import scala.collection.mutable
 import scala.util.control.NonFatal
 import scala.collection.compat._
 
-class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: List[(String, XPathVariable)]) {
+class PooledXPathExpression(
+  expression : XPathExpression,
+  pool       : ObjectPool[PooledXPathExpression],
+  variables  : List[(String, XPathVariable)]
+) {
 
   // FIXME: This shouldn't be mutable state
   private var variableToValueMap: ju.Map[String, ValueRepresentation] = null
@@ -176,13 +180,6 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
     val (dynamicContext, xpathContext) = newDynamicAndMajorContexts
     prepareDynamicContext(xpathContext)
     expression.iterate(dynamicContext)
-  }
-
-  // Called from `xxf:evaluate-avt()
-  def prepareExpression(xpathContext: XPathContextMajor): Expression = {
-    expression.createDynamicContext(xpathContext, contextItem, contextPosition)
-    prepareDynamicContext(xpathContext)
-    expression.getInternalExpression
   }
 
   // Called from exf:sort(), indirectly from xxf:evaluate-avt(), and evaluate()

@@ -18,7 +18,8 @@ import java.util.{Locale, Iterator => JIterator}
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.XPath.compileExpressionWithStaticContext
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -29,7 +30,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.{Expression, XPathContextMajor, _}
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
@@ -176,38 +177,6 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     }
   }
 
-  // The following is inspired by saxon:evaluate()
-  protected def prepareExpression(initialXPathContext: XPathContext, parameterExpression: Expression, isAVT: Boolean): PooledXPathExpression = {
-
-    // Evaluate parameter into an XPath string
-    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
-
-    // Copy static context information
-    val staticContext = this.staticContext.copy
-    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
-
-    // Propagate in-scope variable definitions since they are not copied automatically
-    val inScopeVariables = bindingContext.getInScopeVariables
-    val variableDeclarations =
-      for {
-        (name, _) <- inScopeVariables.asScala.toList
-        variable = staticContext.declareVariable("", name)
-      } yield
-        name -> variable
-
-    // Create expression
-    val pooledXPathExpression =
-      XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations)
-
-    // Set context items and position for use at runtime
-    pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
-
-    // Set variables for use at runtime
-    pooledXPathExpression.setVariables(inScopeVariables)
-
-    pooledXPathExpression
-  }
-
   // See comments in Saxon Evaluate.java
   private var staticContext: IndependentContext = null
 
@@ -271,6 +240,46 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     } else {
       null
     }
+
+  // The following is inspired by saxon:evaluate()
+  protected def prepareExpression(
+    initialXPathContext : XPathContext,
+    parameterExpression : Expression,
+    isAVT               : Boolean
+  ): (Expression, XPathContext) = {
+
+    // Evaluate parameter into an XPath string
+    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
+
+    // Copy static context information
+    val staticContext = this.staticContext.copy
+    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
+
+    // Propagate in-scope variable definitions since they are not copied automatically
+    val inScopeVariables = bindingContext.getInScopeVariables
+    val variableDeclarations =
+      for {
+        (name, _) <- inScopeVariables.asScala.toList
+        variable = staticContext.declareVariable("", name)
+      } yield
+        name -> variable
+
+    // Create expression
+    val xpe = compileExpressionWithStaticContext(staticContext, xpathString, isAVT)
+
+    val newXPathContext = initialXPathContext.newCleanContext
+
+    xpe.createDynamicContext(newXPathContext, initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
+
+    if (inScopeVariables ne null)
+      for ((name, variable) <- variableDeclarations) {
+        val value = inScopeVariables.get(name)
+        if (value ne null) // FIXME: this should never happen, right?
+          newXPathContext.setLocalVariable(variable.getLocalSlotNumber, value)
+      }
+
+    (xpe.getInternalExpression, newXPathContext)
+  }
 }
 
 object XFormsFunction {

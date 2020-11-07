@@ -3,7 +3,6 @@ package org.orbeon.oxf.xforms.state
 import java.util.concurrent.locks.Lock
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateLifecycle}
 
 
 object XFormsStateManager extends XFormsStateLifecycle {

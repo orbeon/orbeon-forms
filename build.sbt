@@ -748,9 +748,33 @@ lazy val xformsCommonJVM = xformsCommon.jvm
   )
 
 lazy val xformsCommonJS = xformsCommon.js
-  .dependsOn(commonJS)
-  .dependsOn(domJS)
-  .dependsOn(coreCrossPlatformJS)
+  .dependsOn(
+    commonJS,
+    domJS,
+    coreCrossPlatformJS
+  )
+  .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
+lazy val xformsAnalysis = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-analysis"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-analysis"
+  )
+
+lazy val xformsAnalysisJVM = xformsAnalysis.jvm
+  .dependsOn(
+    xformsCommonJVM
+  )
+
+lazy val xformsAnalysisJS = xformsAnalysis.js
+  .dependsOn(
+    xformsCommonJS
+  )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
   .settings(
@@ -772,14 +796,14 @@ lazy val xformsCompiler = (crossProject(JVMPlatform, JSPlatform).crossType(Cross
 
 lazy val xformsCompilerJVM = xformsCompiler.jvm
   .dependsOn(
-    xformsCommonJVM,
+    xformsAnalysisJVM,
     core,
     coreCrossPlatformJVM // implied
   )
 
 lazy val xformsCompilerJS = xformsCompiler.js
   .dependsOn(
-    xformsCommonJS,
+    xformsAnalysisJS,
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
@@ -803,14 +827,14 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 lazy val xformsRuntimeJVM = xformsRuntime.jvm
   .dependsOn(
     xformsCompilerJVM, // only on JVM side
-    xformsCommonJVM,
+    xformsAnalysisJVM,
     core,
     coreCrossPlatformJVM // implied
   )
 
 lazy val xformsRuntimeJS = xformsRuntime.js
   .dependsOn(
-    xformsCommonJS,
+    xformsAnalysisJS,
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)

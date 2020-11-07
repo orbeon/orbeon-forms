@@ -136,7 +136,10 @@ object ElementAnalysisTreeBuilder {
 
   // Can be used only in a sub-part, as this mutates the tree.
   // Used by `XFormsComponentControl`.
-  def clearShadowTree(partAnalysisCtx: NestedPartAnalysis, existingComponent: ComponentControl): Unit = {
+  def clearShadowTree(
+    partAnalysisCtx   : NestedPartAnalysis,
+    existingComponent : ComponentControl
+  ): Unit = {
     assert(! existingComponent.isTopLevelPart)
     removeConcreteBinding(partAnalysisCtx, existingComponent)
   }

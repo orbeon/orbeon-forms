@@ -1,4 +1,4 @@
-package org.orbeon.xforms.state
+package org.orbeon.oxf.xforms.state
 
 import java.util.concurrent.locks.Lock
 

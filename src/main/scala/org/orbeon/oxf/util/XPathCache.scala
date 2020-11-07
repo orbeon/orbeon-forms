@@ -266,7 +266,7 @@ object XPathCache {
   }
 
   // Evaluate the expression as a variable value usable by Saxon in further XPath expressions
-  // 1 external usage
+  // 1 external usage by `Variable`
   def evaluateAsExtent(
     contextItems       : JList[Item],
     contextPosition    : Int,

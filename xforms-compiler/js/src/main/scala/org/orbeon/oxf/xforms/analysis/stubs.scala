@@ -10,7 +10,7 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 
 
-trait NestedPartAnalysis
+trait NestedPartAnalysis extends PartAnalysis
 
 object ElementAnalysisTreeBuilder {
 

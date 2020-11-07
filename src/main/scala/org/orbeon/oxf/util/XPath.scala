@@ -42,16 +42,10 @@ import org.xml.sax.{InputSource, XMLReader}
 import scala.util.Try
 import scala.util.control.NonFatal
 
-object XPath { // extends XPathTrait
+object XPath extends XPathTrait {
 
   type SaxonConfiguration = Configuration
   type VariableResolver = (StructuredQName, XPathContext) => ValueRepresentation
-
-  // Marker for XPath function context
-  trait FunctionContext
-
-  // To report timing information
-  type Reporter = (String, Long) => Unit
 
   // Context accessible during XPath evaluation
   // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
@@ -331,7 +325,7 @@ object XPath { // extends XPathTrait
   // TODO: Should always return a string!
   // TODO: Check what we do upon NodeInfo
   // NOTE: callers tend to use string(foo), so issue of null/NodeInfo should not occur
-  // 2 usages
+  // 2 XForms usages
   def evaluateAsString(
     contextItems        : JList[Item],
     contextPosition     : Int,

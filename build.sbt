@@ -561,7 +561,7 @@ lazy val formRunnerJVM = formRunner.jvm
 lazy val formRunnerJS = formRunner.js
   .dependsOn(
     commonJS,
-    xformsJS % "test->test;compile->compile",
+    xformsWeb % "test->test;compile->compile",
     webFacades
   )
   .settings(commonScalaJsSettings)
@@ -579,8 +579,8 @@ lazy val formRunnerJS = formRunner.js
 
     Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
-    // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
-    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsJS/ baseDirectory).value),
+    // HACK: Not sure why `xformsWeb % "test->test;compile->compile"` doesn't expose this.
+    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsWeb / baseDirectory).value),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -622,7 +622,7 @@ lazy val formBuilderJVM = formBuilder.jvm
 lazy val formBuilderJS = formBuilder.js
   .dependsOn(
     commonJS,
-    xformsJS % "test->test;compile->compile",
+    xformsWeb % "test->test;compile->compile",
     formRunnerJS
   )
   .settings(commonScalaJsSettings)
@@ -689,7 +689,7 @@ lazy val xformsJVM = xforms.jvm
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsJS/ Compile / fullOptJS).value.data, XFormsResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb / Compile / fullOptJS).value.data, XFormsResourcesPathInWar)
   )
 
 lazy val xformsJS = xforms.js
@@ -841,6 +841,56 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
 
+lazy val xformsWeb = (project in file("xforms-web"))
+  .settings(commonSettings: _*)
+  .settings(commonScalaJsSettings)
+  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(JSDependenciesPlugin)
+  .dependsOn(
+    commonJS % "test->test;compile->compile",
+    xformsCommonJS
+  )
+  .settings(
+    name := "orbeon-xforms-web",
+
+    libraryDependencies            ++= Seq(
+      "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
+      "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
+      "com.outr"               %%% "scribe"           % ScribeVersion,
+      "com.outr"               %%% "perfolation"      % PerfolationVersion, // to avoid dependency on `scala-java-locales`
+      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz"      %%% "scala-java-time"  % "2.0.0"
+    ),
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion),
+
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+
+    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
+    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
+
+    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+
+    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (Compile / fastOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
+      XFormsResourcesPathInWar
+    ),
+
+    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (Compile / fullOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
+      XFormsResourcesPathInWar
+    )
+  )
+
 lazy val fileScanExample = (project in file("file-scan-example"))
   .dependsOn(xformsJVM)
   .settings(commonSettings: _*)
@@ -970,7 +1020,7 @@ lazy val orbeonWarJS = orbeonWar.js
   .settings(commonSettings: _*)
   .dependsOn(
     commonJS,
-    xformsJS,
+    xformsWeb,
     nodeFacades
   )
   .settings(
@@ -1008,7 +1058,7 @@ lazy val root = (project in file("."))
     domJVM,
     core,
     xformsJVM,
-    xformsJS,
+    xformsWeb,
     formRunnerJVM,
     formRunnerJS,
     formBuilderJVM,

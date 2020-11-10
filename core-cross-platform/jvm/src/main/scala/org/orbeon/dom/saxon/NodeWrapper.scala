@@ -512,32 +512,35 @@ class NodeWrapper protected (
    *
    *         For a node other than an element, the method returns null.
    */
-  def getDeclaredNamespaces(buffer: Array[Int]): Array[Int] = node match {
-    case elem: Element =>
-      val namespaces = elem.allInScopeNamespacesAsNodes
-      if (namespaces.isEmpty)
-        NodeInfo.EMPTY_NAMESPACE_LIST
-      else {
-        val count = namespaces.size
-        val result =
-          if ((buffer eq null) || count > buffer.length)
-            new Array[Int](count)
-          else
-            buffer
-        val pool = getNamePool
-        var n = 0
-        val i = namespaces.iterator
-        while (i.hasNext) {
-          val namespace = i.next()
-          result(n) = pool.allocateNamespaceCode(namespace._1, namespace._2.uri)
-          n += 1
+  // 2020-11-09: Mmh, this returns all in-scope namespaces. Not sure our implementation is correct. It's different with
+  // Saxon 10.
+  def getDeclaredNamespaces(buffer: Array[Int]): Array[Int] =
+    node match {
+      case elem: Element =>
+        val namespaces = elem.allInScopeNamespacesAsNodes
+        if (namespaces.isEmpty)
+          NodeInfo.EMPTY_NAMESPACE_LIST
+        else {
+          val count = namespaces.size
+          val result =
+            if ((buffer eq null) || count > buffer.length)
+              new Array[Int](count)
+            else
+              buffer
+          val pool = getNamePool
+          var n = 0
+          val i = namespaces.iterator
+          while (i.hasNext) {
+            val namespace = i.next()
+            result(n) = pool.allocateNamespaceCode(namespace._1, namespace._2.uri)
+            n += 1
+          }
+          if (count < result.length)
+            result(count) = -1
+          result
         }
-        if (count < result.length)
-          result(count) = -1
-        result
-      }
-    case _ => null
-  }
+      case _ => null
+    }
 
   override def equals(other: Any): Boolean =
     other match {

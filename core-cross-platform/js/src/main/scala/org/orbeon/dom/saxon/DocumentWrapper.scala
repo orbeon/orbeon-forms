@@ -1,59 +1,56 @@
 package org.orbeon.dom.saxon
 
-import java.util
-import java.util.Collections
-
-import org.orbeon.dom.{Document, Element, Node}
-import org.orbeon.saxon.om.{GenericTreeInfo, NamePool, NodeInfo}
+import org.orbeon.dom
+import org.orbeon.dom.Node
+import org.orbeon.saxon.om
 import org.orbeon.saxon.utils.Configuration
 
-/**
- * The root node of an XPath tree. (Or equivalently, the tree itself).
- * This class should have been named Root; it is used not only for the root of a document,
- * but also for the root of a result tree fragment, which is not constrained to contain a
- * single top-level element.
- *
- * @author Michael H. Kay
- */
-object DocumentWrapper {
-
-  /**
-   * Wrap a node without a document. The node must not have a document.
-   */
-//  def makeWrapper(node: Node): NodeWrapper = {
-//    require(node.getDocument eq null)
-//    NodeWrapper.makeWrapperImpl(node, null, null)
-//  }
-}
 
 class DocumentWrapper(
-  val doc     : Document,
+  val doc     : dom.Document,
   var baseURI : String,
   var config  : Configuration
-) extends GenericTreeInfo(config) {
+) extends om.GenericTreeInfo(config)
+     with NodeWrapper {
 
-//  private var idGetter: String => Element = null
-//
-//  def wrap(node: Node): NodeInfo =
-//    if (node eq this.node)
-//      this
-//    else
-//      makeWrapper(node, this)
-//
-//  def setIdGetter(idGetter: String => Element): Unit =
-//    this.idGetter = idGetter
-//
-//  // ORBEON: Was `def selectID(id: String): NodeInfo`
-//  override def selectID(id: String, getParent: Boolean): NodeInfo =
-//    if (idGetter eq null)
-//      null
-//    else {
-//      val element = idGetter.apply(id)
-//      if (element != null)
-//        wrap(element)
-//      else
-//        null
-//    }
+  // Define abstract members
+  val node       : dom.Node        = doc
+  val docWrapper : DocumentWrapper = this
+  var parent     : NodeWrapper     = null
+
+  this.setRootNode(docWrapper)
+
+  // These overrides are necessary as these are in two of the super traits and the ocmpiler complains otherwise
+  override def getSystemId              : String        = super.getSystemId
+  override def setSystemId(uri: String) : Unit          = super.setSystemId(uri)
+  override def getConfiguration         : Configuration = super.getConfiguration
+  override def getPublicId              : String        = super.getPublicId
+  override def isStreamed               : Boolean       = super.isStreamed
+
+  // NOTE: Also used externally
+  def wrap(node: Node): om.NodeInfo =
+    if (node eq this.node)
+      this
+    else
+      ConcreteNodeWrapper.makeWrapper(node, this, null)
+
+  private var idGetter: String => dom.Element = null
+
+  def setIdGetter(idGetter: String => dom.Element): Unit =
+    this.idGetter = idGetter
+
+  // 2020-11-09: NOTE: Saxon's DOM wrapper supports `xml:id` directly.
+  // See our `XFormsInstanceIndex` for comments.
+  override def selectID(id: String, getParent: Boolean): om.NodeInfo =
+    if (idGetter eq null)
+      null
+    else {
+      val element = idGetter(id)
+      if (element != null)
+        wrap(element)
+      else
+        null
+    }
 }
 
 // The contents of this file are subject to the Mozilla Public License Version 1.0 (the "License");

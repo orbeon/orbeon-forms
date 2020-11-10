@@ -87,6 +87,7 @@
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.split"                   value="(\s*[,\|]\s*)+"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.property-name"           value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.header.credentials"                   value="My-Credentials-Header"/>
+    <property as="xs:boolean" name="oxf.fr.authentication.header.sticky"                        value="false"/>
     <!-- E.g. "orbeon admin user" -->
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles.split"                value=",|\s+"/>

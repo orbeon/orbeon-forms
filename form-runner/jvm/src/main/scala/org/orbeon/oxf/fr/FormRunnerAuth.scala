@@ -15,11 +15,12 @@ package org.orbeon.oxf.fr
 
 import enumeratum._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, ServletPortletRequest, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, ExternalContext, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.webapp.{SessionFacade, UserRolesFacade}
+import org.orbeon.oxf.webapp.UserRolesFacade
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
@@ -37,7 +38,7 @@ object FormRunnerAuth {
 
   def getCredentialsAsHeadersUseSession(
     userRoles  : UserRolesFacade,
-    session    : SessionFacade,
+    session    : ExternalContext.Session,
     getHeader  : String => List[String]
   ): List[(String, Array[String])] = {
 
@@ -68,6 +69,7 @@ object FormRunnerAuth {
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
     val HeaderCredentialsPropertyName       = PropertyPrefix + "header.credentials"
+    val HeaderStickyPropertyName            = PropertyPrefix + "header.sticky"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
@@ -87,20 +89,29 @@ object FormRunnerAuth {
     // See also https://github.com/orbeon/orbeon-forms/issues/2632
     def getCredentialsUseSession(
       userRoles  : UserRolesFacade,
-      session    : SessionFacade,
+      session    : ExternalContext.Session,
       getHeader  : String => List[String]
-    ): Option[Credentials] =
-      ServletPortletRequest.findCredentialsInSession(session) orElse {
+    ): Option[Credentials] = {
 
-        val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
+      val sessionCredentialsOpt = ServletPortletRequest.findCredentialsInSession(session)
+      val newCredentialsOpt     = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
+      val propertySet           = Properties.instance.getPropertySet
+      val sticky                = propertySet.getBoolean(HeaderStickyPropertyName, default = false)
+      val updateSessionIfNew    = authMethod == AuthMethod.Header && ! sticky
 
-        // Only store the information into the session if we get user credentials. This handles the case of the initial
-        // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
-        newCredentialsOpt foreach
-          (ServletPortletRequest.storeCredentialsInSession(session, _))
-
+      if (updateSessionIfNew || sessionCredentialsOpt.isEmpty) {
+        if (newCredentialsOpt != sessionCredentialsOpt) {
+          // Reset content of the session before we store the new credentials
+          XFormsStateManager.sessionDestroyed(session)
+          session.getAttributeNames().foreach(session.removeAttribute(_))
+          XFormsStateManager.sessionCreated(session)
+          ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)
+        }
         newCredentialsOpt
+      } else {
+        sessionCredentialsOpt
       }
+    }
 
     def headersAsJSONString(headers: List[(String, Array[String])]): String = {
 
@@ -112,6 +123,16 @@ object FormRunnerAuth {
         }
 
       headerAsJSONStrings.mkString("{", ", ", "}")
+    }
+
+    def authMethod: AuthMethod = {
+
+      val propertySet               = Properties.instance.getPropertySet
+      val requestedAuthMethodString = propertySet.getString(MethodPropertyName, "container")
+      val requestedAuthMethodOpt    = AuthMethod.withNameOption(requestedAuthMethodString)
+      def unsupportedAuthMethod     = s"`$MethodPropertyName` property: unsupported authentication method `$requestedAuthMethodString`"
+
+      requestedAuthMethodOpt.getOrElse(throw new OXFException(unsupportedAuthMethod))
     }
 
     def findCredentialsFromContainerOrHeaders(

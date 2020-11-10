@@ -15,9 +15,8 @@ package org.orbeon.oxf.portlet.liferay
 
 import javax.portlet._
 import javax.portlet.filter._
-
 import org.orbeon.oxf.fr.FormRunnerAuth
-import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
+import org.orbeon.oxf.portlet.{PortletSessionImpl, RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.CollectionUtils
 
 import scala.collection.JavaConverters._
@@ -79,7 +78,7 @@ object FormRunnerAuthFilter {
 
     val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
       userRoles  = req,
-      session    = req.getPortletSession,
+      session    = new PortletSessionImpl(req.getPortletSession),
       getHeader  = req.getProperties(_).asScala.to(List)
     ).toMap
 

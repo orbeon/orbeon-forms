@@ -14,11 +14,11 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet.PortletSession
+import scala.collection.JavaConverters._
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.webapp.SessionListeners
-
 
 class PortletSessionImpl(portletSession: PortletSession)
   extends ExternalContext.Session {
@@ -44,6 +44,9 @@ class PortletSessionImpl(portletSession: PortletSession)
 
   def removeAttribute(name: String, scope: SessionScope): Unit =
     portletSession.removeAttribute(name, scope.value)
+
+  def getAttributeNames(scope: SessionScope): List[String]            =
+    portletSession.getAttributeNames(scope.value).asScala.toList
 
   def addListener(sessionListener: ExternalContext.SessionListener): Unit =
     portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {

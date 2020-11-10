@@ -205,12 +205,13 @@ object ExternalContext {
     def addListener(sessionListener: SessionListener)
     def removeListener(sessionListener: SessionListener)
 
-    def getAttribute    (name: String               , scope: SessionScope = SessionScope.Local): Option[AnyRef]
-    def setAttribute    (name: String, value: AnyRef, scope: SessionScope = SessionScope.Local): Unit
-    def removeAttribute (name: String               , scope: SessionScope = SessionScope.Local): Unit
-    def javaGetAttribute(name: String                                                         ): AnyRef = getAttribute(name).orNull
-    def javaGetAttribute(name: String               , scope: SessionScope                     ): AnyRef = getAttribute(name, scope).orNull
-    def javaSetAttribute(name: String, value: AnyRef                                          ): Unit   = setAttribute(name, value)
+    def getAttribute     (name: String               , scope: SessionScope = SessionScope.Local): Option[AnyRef]
+    def setAttribute     (name: String, value: AnyRef, scope: SessionScope = SessionScope.Local): Unit
+    def removeAttribute  (name: String               , scope: SessionScope = SessionScope.Local): Unit
+    def getAttributeNames(                             scope: SessionScope = SessionScope.Local): List[String]
+    def javaGetAttribute (name: String                                                         ): AnyRef = getAttribute(name).orNull
+    def javaGetAttribute (name: String               , scope: SessionScope                     ): AnyRef = getAttribute(name, scope).orNull
+    def javaSetAttribute (name: String, value: AnyRef                                          ): Unit   = setAttribute(name, value)
   }
 }
 

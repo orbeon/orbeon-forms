@@ -13,17 +13,13 @@
   */
 package org.orbeon.oxf
 
+import java.{util => ju}
 
 package object webapp {
 
   type UserRolesFacade = {
     def getRemoteUser(): String
     def isUserInRole(role: String): Boolean
-  }
-
-  type SessionFacade = {
-    def getAttribute(name: String): AnyRef
-    def setAttribute(name: String, value: AnyRef): Unit
   }
 
 }

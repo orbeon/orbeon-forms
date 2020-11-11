@@ -60,7 +60,7 @@ class DocumentWrapper(
         null
     }
 
-  def getUnparsedEntityNames: util.Iterator[_] = Collections.emptyIterator
+  def getUnparsedEntityNames: util.Iterator[_] = Collections.emptyIterator[String]
   def getUnparsedEntity(name: String): Array[String] = null
 
   override def getConfiguration: Configuration = config

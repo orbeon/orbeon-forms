@@ -59,7 +59,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
               serviceStaticError(externalContext, t)
           }
       }
-    }
+    }(externalContext)
   }
 
   private def serviceError(externalContext: ExternalContext, throwable: Throwable): Unit = errorProcessor match {

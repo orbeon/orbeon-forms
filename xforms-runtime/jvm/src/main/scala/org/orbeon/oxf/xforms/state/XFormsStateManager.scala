@@ -20,7 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -381,6 +381,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
         Logger.logDebug(LogType, "Document cache disabled. Storing initial document state.")
         storeDocumentState(containingDocument, isInitialState)
       }
+
+      implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
 
       LifecycleLogger.eventAssumingRequest(
         "xforms",

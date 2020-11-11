@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 
 
@@ -26,4 +27,5 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = Option(URLRewriterUtils.getApplicationResourceVersion)
   def properties: PropertySet = Properties.instance.getPropertySet
+  def externalContext: ExternalContext = NetUtils.getExternalContext
 }

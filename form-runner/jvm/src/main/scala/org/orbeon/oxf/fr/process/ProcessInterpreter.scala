@@ -15,13 +15,14 @@ package org.orbeon.oxf.fr.process
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Logging, SecureUtils}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XSD_PREFIX}
@@ -215,10 +216,12 @@ trait ProcessInterpreter extends Logging {
 
   // Main entry point for starting a process associated with a named button
   //@XPathFunction
-  def runProcessByName(scope: String, name: String): Try[Any] =
+  def runProcessByName(scope: String, name: String): Try[Any] = {
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
     LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
       runProcess(scope, rawProcessByName(scope, name))
     }
+  }
 
   // Main entry point for starting a literal process
   //@XPathFunction

@@ -57,6 +57,9 @@ object XFormsContainingDocumentBuilder {
     mustInitialize : Boolean
   ): XFormsContainingDocument =
     try {
+
+      implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+
       val uuid = CoreCrossPlatformSupport.randomHexId
 
       // attempt to ignore `oxf:xforms-submission`

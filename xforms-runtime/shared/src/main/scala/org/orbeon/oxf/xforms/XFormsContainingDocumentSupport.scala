@@ -70,6 +70,8 @@ object XFormsContainingDocumentSupport {
 
   def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): Try[T] = {
 
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+
     LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
     XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.state
 import net.sf.ehcache.{Element => EhElement}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.util.Logging._
 
@@ -31,6 +31,8 @@ object EhcacheStateStore {
   ): Unit = {
 
     assert(document.staticState.isServerStateHandling)
+
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
 
     if (! isInitialState)
       LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" -> document.uuid))
@@ -65,7 +67,10 @@ object EhcacheStateStore {
     session        : ExternalContext.Session,
     documentUUID   : String,
     isInitialState : Boolean
-  ): Option[XFormsState] =
+  ): Option[XFormsState] = {
+
+    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+
     LifecycleLogger.withEventAssumingRequest(
       "xforms",
       "restore state",
@@ -103,6 +108,7 @@ object EhcacheStateStore {
           None
       }
     }
+  }
 
   // NOTE: Don't remove the static state as it might be in use by other form sessions.
   def removeDynamicState(documentUUID: String): Unit = {

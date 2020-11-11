@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -62,7 +62,7 @@ class XFormsDispatchAction extends XFormsAction {
 
     val resolvedDelayOpt =
       Option(interpreter.resolveAVT(actionElement, "delay")) filter
-      isNotBlank                  flatMap // "The default is the empty string, which indicates no delay"
+      (_.nonAllBlank)              flatMap // "The default is the empty string, which indicates no delay"
       (s => Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
       (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
 

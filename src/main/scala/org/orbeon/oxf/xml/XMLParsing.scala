@@ -227,7 +227,7 @@ object XMLParsing {
       logger.info("Error: " + exception)
 
     def fatalError(exception: SAXParseException): Unit =
-      throw new ValidationException("Fatal error: " + exception.getMessage, XmlLocationData.apply(exception))
+      throw new ValidationException("Fatal error: " + exception.getMessage, XmlLocationData(exception))
 
     def warning(exception: SAXParseException): Unit =
       logger.info("Warning: " + exception)
@@ -277,7 +277,7 @@ object XMLParsing {
         xmlReader.parse(inputSource)
       } catch {
         case e: SAXParseException =>
-          throw new ValidationException(e.getMessage, XmlLocationData.apply(e))
+          throw new ValidationException(e.getMessage, XmlLocationData(e))
         case e: Exception =>
           throw new OXFException(e)
       }

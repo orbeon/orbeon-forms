@@ -13,13 +13,9 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.action.actions._
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
-import org.orbeon.oxf.xforms.analysis.EventHandler._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, WithChildrenTrait}
-import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.xforms.XFormsNames._
 
 object XFormsActions {
@@ -62,5 +58,5 @@ object XFormsActions {
   )
 
   // Return the action with the QName, null if there is no such action
-  def getAction(qName: QName): XFormsAction = Actions.get(qName) orNull
+  def getAction(qName: QName): XFormsAction = Actions.get(qName).orNull
 }

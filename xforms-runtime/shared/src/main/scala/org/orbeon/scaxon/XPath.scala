@@ -13,28 +13,30 @@
   */
 package org.orbeon.scaxon
 
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPath.{FunctionContext, Reporter}
 import org.orbeon.oxf.util.XPathCache.{evaluate, evaluateAsAvt, evaluateSingleKeepItems}
-import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.om
+import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{Map, Seq}
+import scala.jdk.CollectionConverters._
+
 
 // Convenience methods for `the `XPathCache` API
 // Q: Do we need those? Why not just use `XPathCache` directly?
 object XPath {
 
   def evalOne(
-      item            : Item,
+      item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
-  ): Item =
+      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
+      variables       : Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                             = null,
+      functionContext : FunctionContext                      = null)(
+      implicit library: FunctionLibrary                      = null
+  ): om.Item =
     evaluateSingleKeepItems(
       Seq(item).asJava,
       1,
@@ -51,13 +53,13 @@ object XPath {
   // Evaluate an XPath expression and return a Seq of native Java objects (String, Boolean, etc.), but NodeInfo
   // wrappers are preserved.
   def eval(
-      item            : Item,
+      item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
+      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
+      variables       : Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                             = null,
+      functionContext : FunctionContext                      = null)(
+      implicit library: FunctionLibrary                      = null
   ): Seq[AnyRef] =
     evaluate(item,
       expr,
@@ -71,13 +73,13 @@ object XPath {
 
     // Evaluate an XPath expression as a value template
   def evalValueTemplate(
-      item            : Item,
+      item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
+      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
+      variables       : Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                             = null,
+      functionContext : FunctionContext                      = null)(
+      implicit library: FunctionLibrary                      = null
   ): String =
     evaluateAsAvt(
       item,

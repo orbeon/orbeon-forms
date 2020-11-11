@@ -105,9 +105,9 @@ trait Reindex extends FormDefinition {
 
       // Check if there is anything to delete from the value index
       val countFromValueIndex =
-        useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps ⇒
+        useAndClose(connection.prepareStatement(countFromValueIndexSql)) { ps =>
           paramSetter(ps)
-          useAndClose(ps.executeQuery()) { rs ⇒
+          useAndClose(ps.executeQuery()) { rs =>
             rs.next()
             rs.getInt(1)
           }
@@ -124,7 +124,7 @@ trait Reindex extends FormDefinition {
       ).flatten
 
       deleteSql.foreach { deleteSql =>
-        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps ⇒
+        useAndClose(connection.prepareStatement(deleteSql + orderByClause)) { ps =>
           paramSetter(ps)
           ps.executeUpdate()
         }

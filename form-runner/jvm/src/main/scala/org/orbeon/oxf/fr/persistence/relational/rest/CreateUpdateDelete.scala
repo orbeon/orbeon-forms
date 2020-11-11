@@ -241,7 +241,7 @@ trait CreateUpdateDelete
         val count =
           useAndClose(connection.prepareStatement(fromControlIndexCount)) { ps =>
             ps.setString(1, dataPart.documentId)
-            useAndClose(ps.executeQuery()) { rs ⇒
+            useAndClose(ps.executeQuery()) { rs =>
               rs.next()
               rs.getInt(1)
             }

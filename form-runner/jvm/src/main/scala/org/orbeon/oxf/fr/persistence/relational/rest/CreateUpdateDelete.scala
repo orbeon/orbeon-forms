@@ -222,6 +222,11 @@ trait CreateUpdateDelete
               |    )
               |""".stripMargin
 
+        val orderByClause = req.provider match {
+          case Provider.MySQL => " ORDER BY data_id"
+          case _              => ""
+        }
+
         val fromControlIndexCount = "SELECT count(*) FROM orbeon_i_control_text " + fromControlIndexWhere
 
         val count =
@@ -263,7 +268,7 @@ trait CreateUpdateDelete
                 |            draft       = 'Y'
                 |""".stripMargin
           val select = "     SELECT count(*) count" + fromWhere
-          val delete = "     DELETE" + fromWhere
+          val delete = "     DELETE" + fromWhere + orderByClause
           val count =
             useAndClose(connection.prepareStatement(select)) { ps =>
               ps.setString(1, dataPart.documentId)

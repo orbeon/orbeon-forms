@@ -75,7 +75,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
     // actually know what a "resource" is.
     if (pageFlow.pathMatchers.nonEmpty) {
-      Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[PathMatcher]]) match {
+      Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[URLRewriterUtils.PathMatcher]]) match {
         case Some(existingPathMatchers) =>
           // Add if we come after others (in case of nested page flows)
           val allMatchers = existingPathMatchers.asScala ++ pageFlow.pathMatchers
@@ -316,7 +316,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val pathMatchers = (
       routeElements
       collect { case files: FileElement if files.versioned => files }
-      map     (f => new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+      map     (f => new URLRewriterUtils.PathMatcher(f.path, f.mimeType.orNull, f.versioned))
     )
 
     // Compile the pipeline for the given page element
@@ -620,7 +620,7 @@ object PageFlowControllerProcessor {
     notFoundRoute     : Option[PageOrServiceRoute],
     unauthorizedRoute : Option[PageOrServiceRoute],
     errorRoute        : Option[PageOrServiceRoute],
-    pathMatchers      : Seq[PathMatcher],
+    pathMatchers      : Seq[URLRewriterUtils.PathMatcher],
     file              : Option[String]
   )
 

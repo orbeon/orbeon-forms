@@ -136,11 +136,11 @@ class XHTMLBodyHandler(
       prefix    = htmlPrefix,
       uri       = XH,
       atts      =
-        ("id"       -> XFormsUtils.getNamespacedFormId(containingDocument)) ::
-        ("class"    -> formElemClasses)                                     ::
-        ("action"   -> xformsSubmissionPath)                                ::
-        ("method"   -> "POST")                                              ::
-        ("onsubmit" -> "return false")                                      ::
+        ("id"       -> containingDocument.getNamespacedFormId) ::
+        ("class"    -> formElemClasses)                        ::
+        ("action"   -> xformsSubmissionPath)                   ::
+        ("method"   -> "POST")                                 ::
+        ("onsubmit" -> "return false")                         ::
         (doMultipartPOST list ("enctype" -> "multipart/form-data"))
     )
 
@@ -184,7 +184,7 @@ class XHTMLBodyHandler(
   override def end(): Unit = {
 
     // Add global top-level XBL markup
-    containingDocument.staticOps.getGlobals.iterator foreach
+    containingDocument.staticOps.iterateGlobals foreach
       (global => XXFormsComponentHandler.processShadowTree(handlerContext.controller, global.templateTree))
 
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xml
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.dom.Converter._
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl
@@ -163,7 +163,7 @@ trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
       uri,
       localname,
       qName,
-      if (attributes.getLength == 0) SAXUtils.EMPTY_ATTRIBUTES else new AttributesImpl(attributes), // Q: Why copy `Attributes`?
+      if (attributes.getLength == 0) XMLReceiverSupport.EmptyAttributes else new AttributesImpl(attributes), // Q: Why copy `Attributes`?
       handlerContext
     ) map
       (HandlerInfo(level, _, locator))

@@ -19,7 +19,8 @@ import java.{util => ju}
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper}
+import org.xml.sax.helpers.AttributesImpl
 
 import scala.jdk.CollectionConverters._
 
@@ -160,6 +161,13 @@ object Extensions {
           else
             r.resolve(currentXMLBaseURI)
       }
+    }
+
+    def attributesAsSax: AttributesImpl = {
+      val result = new AttributesImpl
+      for (att <- e.attributeIterator)
+        result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
+      result
     }
   }
 

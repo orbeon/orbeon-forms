@@ -13,23 +13,13 @@
  */
 package org.orbeon.oxf.xml.dom
 
-import org.orbeon.dom.Element
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.dom
 
 
+// TODO: Rename this.
 object Converter {
 
   implicit class ScalaElemConverterOps(private val e: scala.xml.Elem) extends AnyVal {
-    def toDocument: org.orbeon.dom.Document = IOSupport.readDom4j(e.toString)
-  }
-
-  implicit class DomElemConverterOps(private val e: Element) extends AnyVal {
-    def attributesAsSax: AttributesImpl = {
-      val result = new AttributesImpl
-      for (att <- e.attributeIterator)
-        result.addAttribute(att.getNamespaceURI, att.getName, att.getQualifiedName, XMLReceiverHelper.CDATA, att.getValue)
-      result
-    }
+    def toDocument: dom.Document = IOSupport.readDom4j(e.toString)
   }
 }

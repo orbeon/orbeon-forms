@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.{Constants, XFormsId}
 import org.xml.sax.Attributes
@@ -96,7 +96,7 @@ object XFormsBaseHandler {
 
     // Copy "id"
     if (effectiveId ne null)
-      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument, effectiveId))
+      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(effectiveId))
 
     // Create "class" attribute if necessary
     if (classes != null && classes.length > 0)
@@ -122,7 +122,7 @@ object XFormsBaseHandler {
     controlEffectiveId : String,
     suffix             : String
   ): String =
-    XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, Constants.LhhacSeparator + suffix))
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(controlEffectiveId, Constants.LhhacSeparator + suffix))
 
   def handleAVTsAndIDs(
     _attributes          : Attributes,
@@ -145,7 +145,7 @@ object XFormsBaseHandler {
         val attributesCount = attributes.getLength
         for (i <- 0 until attributesCount) {
           val attributeValue = attributes.getValue(i)
-          if (XFormsUtils.maybeAVT(attributeValue)) {
+          if (XMLUtils.maybeAVT(attributeValue)) {
             // This is an AVT most likely
             found = true
             val attributeLocalName = attributes.getLocalName(i)
@@ -169,10 +169,10 @@ object XFormsBaseHandler {
           }
         }
         if (found) // update the value of the id attribute
-          attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId))
+          attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
       }
       if (! found) // id was not replaced as part of AVT processing
-        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId))
+        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
     }
     // Check `@for` or other attribute
     for (refIdAttributeName <- refIdAttributeNames) {

@@ -164,7 +164,7 @@ object XFormsSelect1Handler {
 
     withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = spanAttributes) {
 
-      val itemNamespacedId = xformsHandlerContextForItem.getContainingDocument.namespaceId(itemEffectiveId)
+      val itemNamespacedId = xformsHandlerContextForItem.containingDocument.namespaceId(itemEffectiveId)
       val labelName = if (! isStaticReadonly) "label" else "span"
 
       if (! isBooleanInput) {

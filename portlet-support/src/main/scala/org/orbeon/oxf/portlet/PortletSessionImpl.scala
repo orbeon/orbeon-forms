@@ -45,8 +45,12 @@ class PortletSessionImpl(portletSession: PortletSession)
   def removeAttribute(name: String, scope: SessionScope): Unit =
     portletSession.removeAttribute(name, scope.value)
 
-  def getAttributeNames(scope: SessionScope): List[String]            =
-    portletSession.getAttributeNames(scope.value).asScala.toList
+  def getAttributeNames(scope: SessionScope): List[String]            = {
+    Option(portletSession.getAttributeNames(scope.value)) match {
+      case None        => List.empty // `getAttributeNames()` can return `null`
+      case Some(names) => names.asScala.toList
+    }
+  }
 
   def addListener(sessionListener: ExternalContext.SessionListener): Unit =
     portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {

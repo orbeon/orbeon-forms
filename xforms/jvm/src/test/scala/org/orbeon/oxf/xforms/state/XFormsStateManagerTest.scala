@@ -66,7 +66,7 @@ class XFormsStateManagerTest
         val docs = List(createDoc(), createDoc())
 
         docs foreach { doc =>
-          assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
+          assert(XFormsStateManager.getUuidListInSession(session).contains(doc.getUUID))
           assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
         }
 

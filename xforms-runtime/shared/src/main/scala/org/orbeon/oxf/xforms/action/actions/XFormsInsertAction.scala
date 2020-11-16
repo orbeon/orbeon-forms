@@ -67,8 +67,8 @@ object XFormsInsertAction {
     val modifiedInstanceOpt =
       searchForInstance flatOption {
         for {
-          containingDocument     <- containingDocumentOpt
-          modifiedInstance       <- containingDocument.instanceForNodeOpt(insertLocationNodeInfo)
+          containingDocument <- containingDocumentOpt
+          modifiedInstance   <- containingDocument.instanceForNodeOpt(insertLocationNodeInfo)
         } yield
           modifiedInstance
       }

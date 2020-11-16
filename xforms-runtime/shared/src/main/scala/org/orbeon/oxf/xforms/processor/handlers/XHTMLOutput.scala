@@ -135,20 +135,22 @@ object XHTMLOutput {
 
   val bodyPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
 
-    val withElementAnalysis: BasicHandlerInput => Option[ElementHandlerInput] = {
-      case (uri, localname, qName, atts, hc) =>
-        hc.containingDocument.staticOps.findControlAnalysis(hc.getPrefixedId(atts)) map ((uri, localname, qName, atts, _, hc))
-    }
+    val findElementAnalysisPf: PartialFunction[BasicHandlerInput, ElementHandlerInput] = {
 
-    val findElementAnalysisPf: PartialFunction[BasicHandlerInput, ElementHandlerInput] =
+      val withElementAnalysis: BasicHandlerInput => Option[ElementHandlerInput] = {
+        case (uri, localname, qName, atts, hc) =>
+          hc.containingDocument.staticOps.findControlAnalysis(hc.getPrefixedId(atts)) map ((uri, localname, qName, atts, _, hc))
+      }
+
       new PartialFunction[BasicHandlerInput, ElementHandlerInput] {
 
-        def isDefinedAt(x: BasicHandlerInput): Boolean       = withElementAnalysis(x).isDefined
-        def apply(x: BasicHandlerInput): ElementHandlerInput = withElementAnalysis(x).get
+        def isDefinedAt(x: BasicHandlerInput): Boolean       = withElementAnalysis(x).isDefined // only `applyOrElse` should be called in our context
+        def apply(x: BasicHandlerInput): ElementHandlerInput = withElementAnalysis(x).get       // only `applyOrElse` should be called in our context
 
         override def applyOrElse[A1 <: BasicHandlerInput, B1 >: ElementHandlerInput](x: A1, default: A1 => B1): B1 =
           withElementAnalysis(x).getOrElse(default(x))
       }
+    }
 
     findElementAnalysisPf.andThenPF(findHandlerTakeElementAnalysisPf)
   }

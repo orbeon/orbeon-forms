@@ -54,23 +54,35 @@ object XHTMLOutput {
     template.saxStore.replay(new ExceptionWrapperXMLReceiver(ehc, "converting XHTML+XForms document to XHTML"))
   }
 
+  private object ComposeFcnOps {
+    // Scala 2.13 has this built-oin
+    // See https://blog.genuine.com/2019/12/composing-partial-functions-in-scala/
+    implicit class PartialCompose[A, B](pf: PartialFunction[A, B]) {
+      def andThenPF[C](that: PartialFunction[B, C]): PartialFunction[A, C] =
+        Function.unlift(x => pf.lift(x).flatMap(that.lift))
+    }
+  }
+
+  import ComposeFcnOps._
+
   val defaultPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
     case (ns @ XF,  ln              , qn, atts, hc)                       => new NullHandler        (ns, ln, qn, atts, hc)
     case (ns @ XXF, ln              , qn, atts, hc)                       => new NullHandler        (ns, ln, qn, atts, hc)
     case (ns @ XBL, ln              , qn, atts, hc)                       => new NullHandler        (ns, ln, qn, atts, hc)
   }
 
-  val rootPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
-    case (ns @ XH,  ln @ "head"     , qn, atts, hc)                       => new XHTMLHeadHandler   (ns, ln, qn, atts, hc)
-    case (ns @ XH,  ln @ "body"     , qn, atts, hc)                       => new XHTMLBodyHandler   (ns, ln, qn, atts, hc)
+  private val attributesPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
     case (ns @ XXF, ln @ "attribute", qn, atts, hc) if isHostLanguageAVTs => new NullHandler        (ns, ln, qn, atts, hc)
     case (ns @ XH,  ln              , qn, atts, hc) if isHostLanguageAVTs => new XHTMLElementHandler(ns, ln, qn, atts, hc)
   }
 
-  val fullUpdatePf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
-    case (ns @ XXF, ln @ "attribute", qn, atts, hc) if isHostLanguageAVTs => new NullHandler        (ns, ln, qn, atts, hc)
-    case (ns @ XH,  ln              , qn, atts, hc) if isHostLanguageAVTs => new XHTMLElementHandler(ns, ln, qn, atts, hc)
+  private val headBodyPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
+    case (ns @ XH,  ln @ "head"     , qn, atts, hc)                       => new XHTMLHeadHandler   (ns, ln, qn, atts, hc)
+    case (ns @ XH,  ln @ "body"     , qn, atts, hc)                       => new XHTMLBodyHandler   (ns, ln, qn, atts, hc)
   }
+
+  val rootPf      : PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = headBodyPf.orElse(attributesPf)
+  val fullUpdatePf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = attributesPf
 
   // This just adds `xxf:text` for `xh:title`
   val headPf: PartialFunction[BasicHandlerInput, ElementHandler[HandlerContext]] = {
@@ -137,16 +149,6 @@ object XHTMLOutput {
         override def applyOrElse[A1 <: BasicHandlerInput, B1 >: ElementHandlerInput](x: A1, default: A1 => B1): B1 =
           withElementAnalysis(x).getOrElse(default(x))
       }
-
-    object ComposeFcnOps {
-      // See https://blog.genuine.com/2019/12/composing-partial-functions-in-scala/
-      implicit class PartialCompose[A, B](pf: PartialFunction[A, B]) {
-        def andThenPF[C](that: PartialFunction[B, C]): PartialFunction[A, C] =
-          Function.unlift(x => pf.lift(x).flatMap(that.lift))
-      }
-    }
-
-    import ComposeFcnOps._
 
     findElementAnalysisPf.andThenPF(findHandlerTakeElementAnalysisPf)
   }

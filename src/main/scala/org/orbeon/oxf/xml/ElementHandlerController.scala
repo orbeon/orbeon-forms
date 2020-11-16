@@ -118,7 +118,7 @@ trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
       currentHandlerInfoOpt flatMap (_.saxStore) foreach (_.replay(new XMLReceiverAdapter {
 
         override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-          findHandler(uri, localname, qName, attributes)  map (_.elementHandler) match {
+          findHandler(uri, localname, qName, attributes) map (_.elementHandler) match {
             case Some(_: NullHandler[_] | _: TransparentHandler[_]) =>
             case Some(elementHandler) =>
               result = Some(Left(elementHandler))

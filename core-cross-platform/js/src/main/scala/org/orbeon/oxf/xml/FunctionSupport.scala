@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr.{ExpressionVisitor, _}
+import org.orbeon.saxon.expr._
+import org.orbeon.saxon.expr.parser.ExpressionTool
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
+import org.orbeon.saxon.tree.iter.SingletonIterator
 import org.orbeon.saxon.value._
 
 
@@ -26,29 +27,33 @@ trait DefaultFunctionSupport
     with NoPreEvaluate
 
 trait RuntimeDependentFunction extends DefaultFunctionSupport {
-  override def getIntrinsicDependencies: Int =
-    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
+  // TODO: Saxon 10
+//  override def getIntrinsicDependencies: Int =
+//    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
 }
 
 trait DependsOnContextItem extends FunctionSupport {
-  override def getIntrinsicDependencies: Int =
-    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_CONTEXT_ITEM
+  // TODO: Saxon 10
+//  override def getIntrinsicDependencies: Int =
+//    super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_CONTEXT_ITEM
 }
 
 // Mix-in for functions which use the context if single optional argument is missing
 trait DependsOnContextItemIfSingleArgumentMissing extends FunctionSupport {
-  override def getIntrinsicDependencies: Int =
-    super.getIntrinsicDependencies | (if (arguments.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0)
+  // TODO: Saxon 10
+//  override def getIntrinsicDependencies: Int =
+//    super.getIntrinsicDependencies | (if (arguments.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0)
 }
 
 trait NoPathMapDependencies extends SystemFunction {
-  override def addToPathMap(
-    pathMap        : PathMap,
-    pathMapNodeSet : PathMapNodeSet
-  ): PathMapNodeSet = {
-    pathMap.setInvalidated(true)
-    null
-  }
+  // TODO: Saxon 10
+//  override def addToPathMap(
+//    pathMap        : PathMap,
+//    pathMapNodeSet : PathMapNodeSet
+//  ): PathMapNodeSet = {
+//    pathMap.setInvalidated(true)
+//    null
+//  }
 }
 
 /**
@@ -58,14 +63,16 @@ trait NoPathMapDependencies extends SystemFunction {
  * NOTE: A few functions would benefit from not having this, but it is always safe.
  */
 trait NoPreEvaluate extends SystemFunction {
-  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
+  // TODO: Saxon 10
+//  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
 }
-
-abstract class FunctionSupportJava extends FunctionSupport
 
 trait FunctionSupport extends SystemFunction {
 
-  def arguments: Seq[Expression] = getArguments
+
+//  override def call(context: XPathContext, args: Array[Sequence]): Sequence = ???
+
+  def arguments: Seq[Expression] = ??? // TODO: Saxon 10
 
   def stringArgument(i: Int)(implicit xpathContext: XPathContext): String =
     arguments(i).evaluateAsString(xpathContext).toString

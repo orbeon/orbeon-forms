@@ -131,8 +131,8 @@ object XHTMLOutput {
     val findElementAnalysisPf: PartialFunction[BasicHandlerInput, ElementHandlerInput] =
       new PartialFunction[BasicHandlerInput, ElementHandlerInput] {
 
-        def isDefinedAt(x: BasicHandlerInput): Boolean = {  println("xxx isDefinedAt");withElementAnalysis(x).isDefined }
-        def apply(x: BasicHandlerInput): ElementHandlerInput = { println("xxx apply"); withElementAnalysis(x).get }
+        def isDefinedAt(x: BasicHandlerInput): Boolean       = withElementAnalysis(x).isDefined
+        def apply(x: BasicHandlerInput): ElementHandlerInput = withElementAnalysis(x).get
 
         override def applyOrElse[A1 <: BasicHandlerInput, B1 >: ElementHandlerInput](x: A1, default: A1 => B1): B1 =
           withElementAnalysis(x).getOrElse(default(x))

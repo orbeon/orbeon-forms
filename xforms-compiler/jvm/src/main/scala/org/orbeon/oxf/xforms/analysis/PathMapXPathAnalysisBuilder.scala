@@ -523,38 +523,7 @@ object PathMapXPathAnalysisBuilder {
     } mkString "/"
   }
 
-  /**
-   * Given a display path, get an internal path (for unit tests).
-   */
-  def getInternalPath(namespaces: Map[String, String], path: String): String = {
-
-    // Special case of empty path
-    if (path.isEmpty) return path
-
-    val pool = XPath.GlobalConfiguration.getNamePool
-
-    {
-      for (token <- path split '/') yield {
-        if (token.startsWith("instance(")) {
-          // instance(...)
-          token
-        } else {
-          val (optionalAt, qName) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
-
-          optionalAt + {
-
-            val prefix = XMLUtils.prefixFromQName(qName)
-            val localname = XMLUtils.localNameFromQName(qName)
-
-            // Get number from pool based on QName
-            pool.allocate(prefix, namespaces(prefix), localname)
-          }
-        }
-      }
-    } mkString "/"
-  }
-
-  def buildInstanceString(instanceId: String) = "instance('" + instanceId.replaceAll("'", "''") + "')"
+  def buildInstanceString(instanceId: String): String = "instance('" + instanceId.replaceAll("'", "''") + "')"
 
 
 //  import java.io.ByteArrayOutputStream

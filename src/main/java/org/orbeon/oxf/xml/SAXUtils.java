@@ -82,26 +82,6 @@ public class SAXUtils {
     }
 
     /**
-     * @param attributes    source attributes
-     * @return              new AttributesImpl containing  all attributes that were in src attributes and that were
-     *                      in the default name space.
-     */
-    public static AttributesImpl getAttributesFromDefaultNamespace(final Attributes attributes) {
-        final AttributesImpl ret = new AttributesImpl();
-        final int size = attributes.getLength();
-        for (int i = 0; i < size; i++) {
-            final String ns = attributes.getURI(i);
-            if (!"".equals(ns)) continue;
-            final String lnam = attributes.getLocalName(i);
-            final String qnam = attributes.getQName(i);
-            final String typ = attributes.getType(i);
-            final String val = attributes.getValue(i);
-            ret.addAttribute(ns, lnam, qnam, typ, val);
-        }
-        return ret;
-    }
-
-    /**
      * Append classes to existing attributes. This creates a new AttributesImpl object.
      *
      * @param attributes    existing attributes

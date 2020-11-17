@@ -24,12 +24,13 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
 
-object XFormsStateManager extends XFormsStateLifecycle {
+
+object XFormsStateManager extends XFormsStateManagerTrait {
 
   import Private._
 
@@ -56,9 +57,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
   val LogType = "state manager"
   val Logger  = Loggers.getIndentedLogger("state")
 
-  // For Java callers
-  def instance: XFormsStateManager.type = XFormsStateManager
-
   // Information about a document tied to the session.
   case class SessionDocument(uuid: String) {
     val lock = new ReentrantLock
@@ -77,19 +75,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
   def getDocumentLockOrNull(uuid: String): ReentrantLock =
     getDocumentLock(uuid).orNull
-
-  /**
-    * Return the delay for the session heartbeat event.
-    *
-    * @return delay in ms, or -1 is not applicable
-    */
-  def getHeartbeatDelay(containingDocument: XFormsContainingDocument, externalContext: ExternalContext): Long =
-    if (containingDocument.staticState.isClientStateHandling || ! containingDocument.isSessionHeartbeat) {
-      -1L
-    } else {
-      // 80% of session expiration time, in ms
-      externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 800
-    }
 
   /**
     * Called after the initial response is sent without error.
@@ -331,10 +316,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
   }
 
   private object Private {
-
-    // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
-    // strategy without session.
-    val ForceSessionCreation = true
 
     val XFormsStateManagerUuidKeyPrefix = "oxf.xforms.state.manager.uuid-key."
     val XFormsStateManagerUUIDListKey   = "oxf.xforms.state.manager.uuid-list-key"

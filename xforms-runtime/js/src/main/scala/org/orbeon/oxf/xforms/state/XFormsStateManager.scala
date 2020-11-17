@@ -1,11 +1,13 @@
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.{Lock, ReentrantLock}
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 
-object XFormsStateManager extends XFormsStateLifecycle {
+object XFormsStateManager extends XFormsStateManagerTrait {
+
+  def getDocumentLockOrNull(uuid: String): ReentrantLock = null
 
   def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String] = None
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] = None

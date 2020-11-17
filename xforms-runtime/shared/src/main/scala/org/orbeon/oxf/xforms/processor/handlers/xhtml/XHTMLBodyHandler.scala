@@ -153,10 +153,10 @@ class XHTMLBodyHandler(
     // - background upload: we don't want a sequence number as this run in parallel
     //
     // Output encoded static and dynamic state, only for client state handling (no longer supported in JavaScript)
-    XFormsStateManager.instance.getClientEncodedStaticState(containingDocument) foreach
+    XFormsStateManager.getClientEncodedStaticState(containingDocument) foreach
       (outputHiddenField(htmlPrefix, "$static-state", _))
 
-    XFormsStateManager.instance.getClientEncodedDynamicState(containingDocument) foreach
+    XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach
       (outputHiddenField(htmlPrefix, "$dynamic-state", _))
 
     XFormsError.outputAjaxErrorPanel(containingDocument)

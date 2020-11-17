@@ -27,6 +27,8 @@ import java.util.Set;
 
 public class SAXUtils {
 
+    // 2020-11-16: Duplicated as `XMLReceiverSupport.EmptyAttributes`
+    // This is now only used by processors.
     public static final Attributes EMPTY_ATTRIBUTES = new Attributes() {
         public int getLength() {
             return 0;
@@ -96,30 +98,6 @@ public class SAXUtils {
         return addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute);
     }
 
-    /**
-     * Append an attribute value to existing mutable attributes.
-     *
-     * @param attributes        existing attributes
-     * @param attributeName     attribute name
-     * @param attributeValue    value to set or append
-     */
-    // Used by handlers
-    public static void addOrAppendToAttribute(AttributesImpl attributes, String attributeName, String attributeValue) {
-
-        final int oldAttributeIndex = attributes.getIndex(attributeName);
-
-        if (oldAttributeIndex == -1) {
-            // No existing attribute
-            attributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attributeValue);
-        } else {
-            // Existing attribute
-            final String oldAttributeValue = attributes.getValue(oldAttributeIndex);
-            final String newAttributeValue = oldAttributeValue + ' ' + attributeValue;
-
-            attributes.setValue(oldAttributeIndex, newAttributeValue);
-        }
-    }
-
     // Used by handlers/annotator
     public static AttributesImpl addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
@@ -134,7 +112,7 @@ public class SAXUtils {
             if (uri.equals(attributeURI) && localname.equals(attributeLocalname)) {
                 // Found existing attribute
                 replaced = true;
-                newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value);
+                newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA(), value);
             } else {
                 // Not a matched attribute
                 newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
@@ -142,7 +120,7 @@ public class SAXUtils {
         }
         if (!replaced) {
             // Attribute did not exist already so add it
-            newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value);
+            newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA(), value);
         }
         return newAttributes;
     }

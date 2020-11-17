@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadon
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
-import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLReceiverSupport, XMLUtils}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
@@ -263,7 +263,7 @@ class XFormsOutputDownloadHandler(
         if (StringUtils.isBlank(hrefValue)) {
           // No URL so make sure a click doesn't cause navigation, and add class
           containerAttributes.addAttribute("", "href", "href", CDATA, "#")
-          SAXUtils.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
+          XMLReceiverSupport.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
         } else {
           // URL value
           containerAttributes.addAttribute("", "href", "href", CDATA, hrefValue)

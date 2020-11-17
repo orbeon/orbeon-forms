@@ -122,7 +122,7 @@ class OutputInterceptor(
     generateFirstDelimitersIfNeeded()
 
     // Wrap any other text within an xhtml:span
-    super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(SAXUtils.EMPTY_ATTRIBUTES))
+    super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLReceiverSupport.EmptyAttributes))
 
     if (characters.nonEmpty) {
       val chars = characters.toCharArray

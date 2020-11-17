@@ -106,17 +106,38 @@ trait XMLReceiverSupport {
 object XMLReceiverSupport extends XMLReceiverSupport {
 
   val EmptyAttributes: Attributes = new Attributes {
-    def getLength = 0
-    def getURI(i: Int): String = null
-    def getLocalName(i: Int): String = null
-    def getQName(i: Int): String = null
-    def getType(i: Int): String = null
-    def getValue(i: Int): String = null
-    def getIndex(s: String, s1: String): Int = -1
-    def getIndex(s: String): Int = -1
-    def getType(s: String, s1: String): String = null
-    def getType(s: String): String = null
-    def getValue(s: String, s1: String): String = null
-    def getValue(s: String): String = null
+    def getLength                              : Int    = 0
+    def getURI      (i: Int)                   : String = null
+    def getLocalName(i: Int)                   : String = null
+    def getQName    (i: Int)                   : String = null
+    def getType     (i: Int)                   : String = null
+    def getValue    (i: Int)                   : String = null
+    def getIndex    (s: String, s1: String)    : Int    = -1
+    def getIndex    (s: String)                : Int    = -1
+    def getType     (s: String, s1: String)    : String = null
+    def getType     (s: String)                : String = null
+    def getValue    (s: String, s1: String)    : String = null
+    def getValue    (s: String)                : String = null
+  }
+
+  /**
+   * Append an attribute value to existing mutable attributes.
+   *
+   * @param attributes     existing attributes
+   * @param attributeName  attribute name
+   * @param attributeValue value to set or append
+   */
+  // Used by handlers
+  def addOrAppendToAttribute(attributes: AttributesImpl, attributeName: String, attributeValue: String): Unit = {
+    val oldAttributeIndex = attributes.getIndex(attributeName)
+    if (oldAttributeIndex == -1) {
+      // No existing attribute
+      attributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attributeValue)
+    } else {
+      // Existing attribute
+      val oldAttributeValue = attributes.getValue(oldAttributeIndex)
+      val newAttributeValue = oldAttributeValue + ' ' + attributeValue
+      attributes.setValue(oldAttributeIndex, newAttributeValue)
+    }
   }
 }

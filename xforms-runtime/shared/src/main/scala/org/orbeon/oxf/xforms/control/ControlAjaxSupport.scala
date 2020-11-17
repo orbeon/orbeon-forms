@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiverSupport}
 import org.orbeon.xforms.XFormsId
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
@@ -60,7 +60,7 @@ trait ControlAjaxSupport {
 
     // Visited
     if ((previousControlOpt exists (_.visited)) != visited) {
-      SAXUtils.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
+      XMLReceiverSupport.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
       added |= true
     }
 
@@ -177,7 +177,7 @@ object ControlAjaxSupport {
     if (isNewRepeatIteration && isDefaultValue) {
       false
     } else {
-      SAXUtils.addOrAppendToAttribute(attributesImpl, name, value)
+      XMLReceiverSupport.addOrAppendToAttribute(attributesImpl, name, value)
       true
     }
 

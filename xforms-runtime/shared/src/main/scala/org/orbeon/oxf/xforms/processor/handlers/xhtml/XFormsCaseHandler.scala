@@ -111,7 +111,7 @@ class XFormsCaseHandler(
 
           // `ControlsComparator` skips the root element, so we create a dummy one to be skipped
           if (handlerContext.hasFullUpdateTopLevelControl)
-            currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, SAXUtils.EMPTY_ATTRIBUTES)
+            currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, XMLReceiverSupport.EmptyAttributes)
 
           currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes)
 

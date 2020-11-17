@@ -154,7 +154,7 @@ object XFormsSelect1Handler {
       XFormsBaseHandler.getIdClassXHTMLAttributes(
         containingDocument,
         reusableAttributes,
-        SAXUtils.EMPTY_ATTRIBUTES,
+        XMLReceiverSupport.EmptyAttributes,
         itemClasses,
         null
       )
@@ -423,7 +423,7 @@ class XFormsSelect1Handler(
                     assert(item.hasChildren)
 
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
-                    val optGroupAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
+                    val optGroupAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)
 
                     optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
 
@@ -559,7 +559,7 @@ class XFormsSelect1Handler(
   ): Boolean = {
 
     val itemClasses      = XFormsSelect1Handler.getItemClasses(item, null)
-    val optionAttributes = getIdClassXHTMLAttributes(SAXUtils.EMPTY_ATTRIBUTES, itemClasses, null)
+    val optionAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)
 
     // Add item attributes to option
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)

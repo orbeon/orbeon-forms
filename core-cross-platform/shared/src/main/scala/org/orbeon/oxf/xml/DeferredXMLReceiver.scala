@@ -13,9 +13,14 @@
  */
 package org.orbeon.oxf.xml
 
+
 /**
   * Receiver with an additional method allowing for adding attributes.
   */
 trait DeferredXMLReceiver extends XMLReceiver {
   def addAttribute(uri: String, localname: String, qName: String, value: String)
+}
+
+class DeferredXMLReceiverAdapter extends XMLReceiverAdapter with DeferredXMLReceiver {
+  def addAttribute(uri: String, localname: String, qName: String, value: String): Unit = ()
 }

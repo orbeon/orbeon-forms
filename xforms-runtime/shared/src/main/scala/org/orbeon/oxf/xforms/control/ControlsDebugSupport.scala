@@ -14,14 +14,14 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
-import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
 
 import scala.jdk.CollectionConverters._
+
 
 object ControlsDebugSupport {
 
@@ -29,15 +29,14 @@ object ControlsDebugSupport {
 
   def controlTreeAsXmlString(control: XFormsControl): String = {
 
-    implicit val identity: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
-    val result = new LocationDocumentResult
-    identity.setResult(result)
+    val (receiver, result) = StaticXPath.newTinyTreeReceiver
+    implicit val identity: XMLReceiver = receiver
 
     withDocument {
       recurse(control)
     }
 
-    result.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+    StaticXPath.tinyTreeToOrbeonDom(result()).serializeToString(XMLWriter.PrettyFormat)
   }
 
   def printControlTreeAsXml(control: XFormsControl): Unit =

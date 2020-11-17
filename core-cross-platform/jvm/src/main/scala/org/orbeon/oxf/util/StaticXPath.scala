@@ -18,7 +18,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.ShareableXPathStaticContext
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
@@ -83,21 +83,16 @@ object StaticXPath extends StaticXPathTrait {
 
   def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType = {
 
-    val treeBuilder = new TinyBuilder
-
-    val handler =
-      new TransformerFactoryImpl(GlobalConfiguration).newTransformerHandler |!>
-        (_.setResult(treeBuilder))
+    val (receiver, result) = newTinyTreeReceiver
 
     val writer =
-      new SAXWriter                  |!>
-      (_.setContentHandler(handler)) |!>
-      (_.setLexicalHandler(handler)) |!>
-      (_.setDTDHandler(handler))
+      new SAXWriter                     |!>
+        (_.setContentHandler(receiver)) |!>
+        (_.setLexicalHandler(receiver))
 
     writer.write(doc)
 
-    treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+    result()
   }
 
   def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = {
@@ -106,6 +101,21 @@ object StaticXPath extends StaticXPathTrait {
     identity.transform(nodeInfo, documentResult)
     documentResult.getDocument
   }
+
+  def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) = {
+
+    val treeBuilder = new TinyBuilder
+
+    val handler =
+      new TransformerFactoryImpl(GlobalConfiguration).newTransformerHandler |!>
+        (_.setResult(treeBuilder))
+
+    (
+      new ForwardingXMLReceiver(handler, handler),
+      () => treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
+    )
+  }
+
 
   // Custom version of Saxon's IdentityTransformer which hooks up a `ComplexContentOutputter`
   private class IdentityTransformerWithFixup(config: Configuration) extends Controller(config) {

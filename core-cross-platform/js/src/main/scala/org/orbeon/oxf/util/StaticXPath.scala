@@ -17,20 +17,23 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.SAXWriter
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.expr.parser
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.om
+import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
 
 object StaticXPath extends StaticXPathTrait {
 
   type SaxonConfiguration      = Configuration
-  type DocumentNodeInfoType    = om.TreeInfo
+  type DocumentNodeInfoType    = DocumentWrapper
   type VirtualNodeType         = VirtualNode
   type ValueRepresentationType = om.GroundedValue
   type AxisType                = Int
@@ -74,6 +77,8 @@ object StaticXPath extends StaticXPathTrait {
 
   def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = ???
 
+  def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) = ???
+
   val EmptyDocument: DocumentNodeInfoType = {
 
     val treeBuilder = om.TreeModel.TINY_TREE.makeBuilder(GlobalConfiguration.makePipelineConfiguration)
@@ -88,4 +93,10 @@ object StaticXPath extends StaticXPathTrait {
     // Q: What if it's not a document but an element?
     treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
   }
+
+  def compileExpressionWithStaticContext(
+    staticContext : XPathStaticContext,
+    xpathString   : String,
+    avt           : Boolean
+  ): XPathExpression = ???
 }

@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.XPathExpression
@@ -57,5 +58,6 @@ trait StaticXPathTrait {
 
   def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType
   def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document
+  def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType)
   val EmptyDocument: DocumentNodeInfoType
 }

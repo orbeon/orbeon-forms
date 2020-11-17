@@ -14,10 +14,9 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.apache.commons.io.FileUtils
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.{UploadProgress}
+import org.orbeon.oxf.util.UploadProgress
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
@@ -30,6 +29,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal
+
 
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
@@ -81,7 +81,7 @@ trait FileMetadata extends XFormsValueControl {
     case (k, v) => k -> Option(v.value)
   }
 
-  def humanReadableFileSize = fileSize filter StringUtils.isNotBlank map humanReadableBytes
+  def humanReadableFileSize = fileSize filter (_.nonAllBlank) map humanReadableBytes
 
   // "Instant" evaluators which go straight to the bound nodes if possible
   def boundFileMediatype  = Evaluators("mediatype").evaluate(self)
@@ -95,7 +95,7 @@ trait FileMetadata extends XFormsValueControl {
 
     // Depending on web browsers, the filename may contain a path or not (sending the path is fairly insecure and a
     // bad idea but some browsers do it. For consistency and security we just keep the filename.
-    val justFileName = StringUtils.split(filename, """\/""").lastOption getOrElse ""
+    val justFileName = filename.splitTo[List]("""\/""").lastOption getOrElse ""
     setInfoValue(filenameElement, justFileName)
   }
 
@@ -113,7 +113,7 @@ trait FileMetadata extends XFormsValueControl {
       val value2 = getValue(uploadControl2)
 
       if (value1 != value2) {
-        val attributeValue = StringUtils.defaultString(value2)
+        val attributeValue = if (value2 eq null) "" else value2
         added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, name, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
       }
     }
@@ -166,7 +166,7 @@ object FileMetadata {
 
   // How to evaluate each property and default values used when control is non-relevant
   private val Evaluators = Map[String, Evaluator](
-    "state"             -> Evaluator(m => if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
+    "state"             -> Evaluator(m => if (m.getValue.isAllBlank) "empty" else "file", "empty"),
     "mediatype"         -> Evaluator(m => m.mediatypeElement map     (childMetadataValue(m, _))        orNull, null),
     "filename"          -> Evaluator(m => m.filenameElement  map     (childMetadataValue(m, _))        orNull, null),
     "size"              -> Evaluator(m => m.sizeElement      map     (childMetadataValue(m, _))        orNull, null),

@@ -23,7 +23,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.io.{FileUtils, UriScheme}
+import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -397,7 +397,7 @@ object Connection extends ConnectionTrait {
 
       try {
         UriScheme.withName(normalizedUrl.getScheme) match {
-          case scheme @ UriScheme.File if ! FileUtils.isTemporaryFileUri(normalizedUrl) =>
+          case scheme @ UriScheme.File if ! org.orbeon.io.FileUtils.isTemporaryFileUri(normalizedUrl) =>
             throw new OXFException(s"URL scheme `${scheme.entryName}` not allowed")
           case scheme if method == GET && SupportedNonHttpReadonlySchemes(scheme) =>
 

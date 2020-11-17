@@ -70,13 +70,8 @@ object InstanceData {
     instanceData.setTransientAnnotation(name, value)
   }
 
-  def getTransientAnnotation(node: Node, name: String): String = {
-    val existingInstanceData = getLocalInstanceData(node)
-    if (existingInstanceData eq null)
-      null
-    else
-      existingInstanceData.getTransientAnnotation(name)
-  }
+  def findTransientAnnotation(node: Node, name: String): Option[String] =
+    Option(getLocalInstanceData(node)) flatMap (_.findTransientAnnotation(name))
 
   def collectAllClientCustomMIPs(nodeInfo: om.NodeInfo): Option[Predef.Map[String, String]] = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
@@ -475,11 +470,11 @@ class InstanceData private () {
     transientAnnotations.put(name, value)
   }
 
-  private def getTransientAnnotation(name: String): String =
+  private def findTransientAnnotation(name: String): Option[String] =
     if (transientAnnotations eq null)
-      null
+      None
     else
-      transientAnnotations.get(name)
+      Option(transientAnnotations.get(name))
 
   def this(locationData: LocationData) {
     this()

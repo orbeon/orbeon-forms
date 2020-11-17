@@ -17,6 +17,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URI
 import java.nio.charset.Charset
 
+import cats.syntax.option._
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.orbeon.dom.{Document, Element, VisitorSupport}
@@ -244,7 +245,7 @@ object SubmissionUtils {
     // Visit document
     val multipartEntity = new MultipartEntity
     document.accept(
-      new VisitorSupport() {
+      new VisitorSupport {
         override final def visit(element: Element): Unit = {
           // Only care about elements
           // Only consider leaves i.e. elements without children elements
@@ -258,7 +259,7 @@ object SubmissionUtils {
                 // Value is valid as per xs:anyURI
                 // Don't close the stream here, as it will get read later when the MultipartEntity
                 // we create here is written to an output stream
-                addPart(multipartEntity, URLFactory.createURL(value).openStream, element, value)
+                addPart(multipartEntity, URLFactory.createURL(value).openStream, element, value.some)
               } else {
                 // Value is invalid as per xs:anyURI
                 // Just use the value as is (could also ignore it)
@@ -268,7 +269,7 @@ object SubmissionUtils {
               // Interpret value as xs:base64Binary
               if (InstanceData.getValid(element) && value.trimAllToOpt.isDefined) {
                 // Value is valid as per xs:base64Binary
-                addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, null)
+                addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, None)
               } else {
                 // Value is invalid as per xs:base64Binary
                 multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
@@ -284,7 +285,13 @@ object SubmissionUtils {
     multipartEntity
   }
 
-  private def addPart(multipartEntity: MultipartEntity, inputStream: InputStream, element: Element, url: String): Unit = {
+  private def addPart(
+    multipartEntity : MultipartEntity,
+    inputStream     : InputStream,
+    element         : Element,
+    url             : Option[String]
+  ): Unit = {
+    
     // Gather mediatype and filename if known
     // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
     // removed during the next recalculate.
@@ -313,15 +320,22 @@ object SubmissionUtils {
     // doesn't have to be relevant and bound upon submission.
     // Benefits of using xf:upload metadata: it is possible to modify the filename and mediatype subsequently.
     // URL metadata was added 2012-05-29.
-    // Get mediatype, first via xf:upload control, or, if not found, try URL metadata
-    var mediatype = InstanceData.getTransientAnnotation(element, "xxforms-mediatype")
-    if (mediatype == null && url != null)
-      mediatype = XFormsUploadControl.getParameterOrNull(url, "mediatype")
+
+    // Get mediatype, first via `xf:upload` control, or, if not found, try URL metadata
+    val mediatype =
+      (InstanceData.findTransientAnnotation(element, "xxforms-mediatype"), url) match {
+        case (None, Some(url)) => PathUtils.getFirstQueryParameter(url, "mediatype")
+        case (mediatypeOpt, _) => mediatypeOpt
+      }
+
     // Get filename, first via xf:upload control, or, if not found, try URL metadata
-    var filename = InstanceData.getTransientAnnotation(element, "xxforms-filename")
-    if (filename == null && url != null)
-      filename = XFormsUploadControl.getParameterOrNull(url, "filename")
-    val contentBody = new InputStreamBody(inputStream, mediatype, filename)
+    val filename =
+      (InstanceData.findTransientAnnotation(element, "xxforms-filename"), url) match {
+        case (None, Some(url)) => PathUtils.getFirstQueryParameter(url, "filename")
+        case (filenameOpt, _)  => filenameOpt
+      }
+
+    val contentBody = new InputStreamBody(inputStream, mediatype.orNull, filename.orNull)
     multipartEntity.addPart(element.getName, contentBody)
   }
 

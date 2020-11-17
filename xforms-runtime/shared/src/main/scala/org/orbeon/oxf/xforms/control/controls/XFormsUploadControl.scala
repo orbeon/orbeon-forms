@@ -326,7 +326,4 @@ object XFormsUploadControl {
       case Some(mac) => hmac(removeMAC(url)) == mac
       case None      => false
     }
-
-  // For Java callers
-  def getParameterOrNull(url: String, name: String): String = PathUtils.getFirstQueryParameter(url, name).orNull
 }

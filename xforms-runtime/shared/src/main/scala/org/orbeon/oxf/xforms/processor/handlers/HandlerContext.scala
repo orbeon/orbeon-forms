@@ -5,7 +5,8 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.control.controls.{XFormsCaseControl, XFormsRepeatIterationControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.PartAnalysis
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.oxf.xml.{ElementHandlerController, XMLConstants}
 import org.orbeon.xforms.Constants

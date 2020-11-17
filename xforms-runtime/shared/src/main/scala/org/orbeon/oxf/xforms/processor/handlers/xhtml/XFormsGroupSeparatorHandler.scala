@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 

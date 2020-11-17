@@ -463,7 +463,7 @@ public class URLGenerator extends ProcessorImpl {
                             // NOTE: We check whether there is a protocol, because we have
                             // some Java location data which are NOT to be interpreted as
                             // base URIs
-                            final URL fullURL = (locationData != null && locationData.file() != null && NetUtils.urlHasProtocol(locationData.file()))
+                            final URL fullURL = (locationData != null && locationData.file() != null && PathUtils.urlHasProtocol(locationData.file()))
                                     ? URLFactory.createURL(locationData.file(), url)
                                     : URLFactory.createURL(url);
 

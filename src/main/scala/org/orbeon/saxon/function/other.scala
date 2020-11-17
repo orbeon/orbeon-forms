@@ -19,12 +19,13 @@ import org.apache.commons.codec.binary.Base64
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtilsDependsOnXPath}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
+
 
 class ImageMetadata extends DefaultFunctionSupport {
 
@@ -36,7 +37,7 @@ class ImageMetadata extends DefaultFunctionSupport {
       itemsArgumentOpt(0).get.next().getStringValue.trimAllToOpt
 
     def createStream(content: String) =
-      if (NetUtils.urlHasProtocol(content))
+      if (PathUtils.urlHasProtocol(content))
         URLFactory.createURL(content).openStream()
       else
         new ByteArrayInputStream(Base64.decodeBase64(content))

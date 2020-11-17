@@ -93,7 +93,7 @@ public class URLRewriterUtils {
         // wants a path.
 
         // Case where a protocol is specified: the URL is left untouched
-        if (NetUtils.urlHasProtocol(urlString))
+        if (PathUtils.urlHasProtocol(urlString))
             return urlString;
 
         final String baseURIProperty = getServiceBaseURI();
@@ -178,7 +178,7 @@ public class URLRewriterUtils {
         urlString = MarkupUtils.encodeHRRI(urlString, true);
 
         // Case where a protocol is specified: the URL is left untouched (except for human-readable processing)
-        if (NetUtils.urlHasProtocol(urlString))
+        if (PathUtils.urlHasProtocol(urlString))
             return urlString;
 
         try {
@@ -243,7 +243,7 @@ public class URLRewriterUtils {
 
             // 1. Rewrite to absolute path URI without context
             final String absoluteURINoContext = rewriteURL(request, urlString, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT());
-            if (NetUtils.urlHasProtocol(absoluteURINoContext))
+            if (PathUtils.urlHasProtocol(absoluteURINoContext))
                 return absoluteURINoContext; // will be an absolute path
 
             // Obtain just the path

@@ -27,7 +27,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{ContentTypes, NetUtils, XPath}
+import org.orbeon.oxf.util.{ContentTypes, NetUtils, PathUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -518,7 +518,7 @@ trait FormRunnerActions {
   // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
   // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
   private def prependCommonFormRunnerParameters(pathQueryOrUrl: String, forNavigate: Boolean) =
-    if (! NetUtils.urlHasProtocol(pathQueryOrUrl)) { // heuristic, which might not always be a right guess?
+    if (! PathUtils.urlHasProtocol(pathQueryOrUrl)) { // heuristic, which might not always be a right guess?
 
       val (path, params) = splitQueryDecodeParams(pathQueryOrUrl)
 
@@ -588,7 +588,7 @@ trait FormRunnerActions {
       // Heuristic: If the parameter is anonymous, we take it as a URL or path if it looks like one. Otherwise, we
       // consider it is a property. We could also look at whether the value looks like a property. It's better to
       // be explicit and use `uri =` or `property =`.
-      def isAbsolute(s: String) = s.startsWith("/") || NetUtils.urlHasProtocol(s)
+      def isAbsolute(s: String) = s.startsWith("/") || PathUtils.urlHasProtocol(s)
 
       def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
 

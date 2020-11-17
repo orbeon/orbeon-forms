@@ -102,5 +102,27 @@ object PathUtils {
       pathQuery.substring(0, questionIndex)
   }
 
-  // TODO: See "Move to PathUtils" in NetUtils.
+  /**
+   * Check whether a URL starts with a protocol.
+   *
+   * We consider that a protocol consists only of ASCII letters and must be at least two
+   * characters long, to avoid confusion with Windows drive letters.
+   */
+  def urlHasProtocol(urlString: String): Boolean = getProtocol(urlString) ne null
+
+  def getProtocol(urlString: String): String = {
+    val colonIndex = urlString.indexOf(":")
+
+    // Require at least two characters in a protocol
+    if (colonIndex < 2)
+      return null
+
+    // Check that there is a protocol made only of letters
+    for (i <- 0 until colonIndex) {
+      val c = urlString.charAt(i)
+      if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z'))
+        return null
+    }
+    urlString.substring(0, colonIndex)
+  }
 }

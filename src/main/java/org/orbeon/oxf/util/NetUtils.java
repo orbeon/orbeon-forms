@@ -388,35 +388,6 @@ public class NetUtils {
     }
 
     /**
-     * Check whether a URL starts with a protocol.
-     *
-     * We consider that a protocol consists only of ASCII letters and must be at least two
-     * characters long, to avoid confusion with Windows drive letters.
-     */
-    // TODO: Move to PathUtils.
-    public static boolean urlHasProtocol(String urlString) {
-        return getProtocol(urlString) != null;
-    }
-
-    // TODO: Move to PathUtils.
-    public static String getProtocol(String urlString) {
-        int colonIndex = urlString.indexOf(":");
-
-        // Require at least two characters in a protocol
-        if (colonIndex < 2)
-            return null;
-
-        // Check that there is a protocol made only of letters
-        for (int i = 0; i < colonIndex; i++) {
-            final char c = urlString.charAt(i);
-            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z')) {
-                return null;
-            }
-        }
-        return urlString.substring(0, colonIndex);
-    }
-
-    /**
      * Resolve a URI against a base URI. (Be sure to pay attention to the order or parameters.)
      *
      * @param href  URI to resolve (accept human-readable URI)

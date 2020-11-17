@@ -17,6 +17,7 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
@@ -164,7 +165,7 @@ class XFormsOutputControl(
                       uri              = resolvedURI,
                       filename         = filename,
                       contentType      = mediatype,
-                      lastModified     = lastModified,
+                      lastModified     = NetUtils.getLastModifiedIfFast(resolvedURI),
                       customHeaders    = evaluatedHeaders,
                       getHeader        = containingDocument.headersGetter
                     )

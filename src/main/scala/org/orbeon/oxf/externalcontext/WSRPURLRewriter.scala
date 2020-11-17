@@ -72,7 +72,7 @@ class WSRPURLRewriter(
 
   private def rewritePortletURL(urlString: String, urlType: Int, portletMode: String, windowState: String): String = {
     // Case where a protocol is specified OR it's just a fragment: the URL is left untouched
-    if (NetUtils.urlHasProtocol(urlString) || urlString.startsWith("#"))
+    if (PathUtils.urlHasProtocol(urlString) || urlString.startsWith("#"))
       return urlString
 
     // TEMP HACK to avoid multiple rewrites

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
-import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, UploadMediatypesValidation}
+import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, ValidationFunctionNames}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -515,10 +515,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
-        case "formula"                                    => normalizedAttOpt("expression")
-        case vn @ UploadMediatypesValidation.PropertyName => Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')") // quote
-        case vn @ ExcludedDatesValidation.PropertyName    => Some(s"xxf:$vn((${normalizedAttOpt("argument") getOrElse ""}))") // parens
-        case vn                                           => Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")   // as is
+        case "formula"                                     => normalizedAttOpt("expression")
+        case vn @ ValidationFunctionNames.UploadMediatypes => Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')") // quote
+        case vn @ ExcludedDatesValidation.PropertyName     => Some(s"xxf:$vn((${normalizedAttOpt("argument") getOrElse ""}))") // parens
+        case vn                                            => Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")   // as is
       }
 
       constraintExpressionOpt map { expr =>

@@ -284,15 +284,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
 object XFormsAssetServer {
 
-  val XFormServerPrefix          = "/xforms-server/"
-
-  val DynamicResourceRegex       = (XFormServerPrefix + "dynamic/(.+)").r
-
-  val FormDynamicResourcesPath   = XFormServerPrefix + "form/dynamic/"
-  val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
-
-  val FormStaticResourcesPath    = XFormServerPrefix + "form/static/"
-  val FormStaticResourcesRegex   = s"$FormStaticResourcesPath(.+).js".r
+  import XFormsAssetPaths._
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
   val DynamicResourcesPath       = XFormServerPrefix + "dynamic/"

@@ -37,7 +37,7 @@ import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
+import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsStateManager}
@@ -274,7 +274,7 @@ trait ContainingDocumentUpload {
   private object UploadChecker extends UploadCheckerLogic {
 
     def findAttachmentMaxSizeValidationMipFor(controlEffectiveId: String) =
-      customMipForControl(controlEffectiveId, UploadMaxSizeValidation.PropertyName)
+      customMipForControl(controlEffectiveId, ValidationFunctionNames.UploadMaxSize)
 
     def currentUploadSizeAggregate = {
 
@@ -305,7 +305,7 @@ trait ContainingDocumentUpload {
     val allowedMediatypesMaybeRange = {
 
       def fromCommonConstraint =
-        customMipForControl(controlEffectiveId, UploadMediatypesValidation.PropertyName) flatMap
+        customMipForControl(controlEffectiveId, ValidationFunctionNames.UploadMediatypes) flatMap
           AllowedMediatypes.unapply
 
       def fromFormSetting =

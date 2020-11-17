@@ -35,3 +35,16 @@ object AssetPath {
       case None      => throw new IllegalArgumentException
     }
 }
+
+object XFormsAssetPaths {
+
+  val XFormServerPrefix         = "/xforms-server/"
+
+  val DynamicResourceRegex      = (XFormServerPrefix + "dynamic/(.+)").r
+
+  val FormDynamicResourcesPath  = XFormServerPrefix + "form/dynamic/"
+  val FormDynamicResourcesRegex = s"$FormDynamicResourcesPath(.+).js".r
+
+  val FormStaticResourcesPath   = XFormServerPrefix + "form/static/"
+  val FormStaticResourcesRegex  =  s"$FormStaticResourcesPath(.+).js".r
+}

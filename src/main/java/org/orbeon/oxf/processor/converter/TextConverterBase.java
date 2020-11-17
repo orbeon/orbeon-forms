@@ -85,7 +85,7 @@ public abstract class TextConverterBase extends ConverterBase {
 
                     // Create OutputStream that converts to Base64
                     final TransformerXMLReceiver transformer = createTransformer(config);
-                    transformer.setResult(new StreamResult(new ContentHandlerWriter(xmlReceiver)));
+                    transformer.setResult(new StreamResult(new ContentHandlerWriter(xmlReceiver, false)));
 
                     // Write content
                     final boolean didEndDocument = readInput(pipelineContext, xmlReceiver, getInputByName(INPUT_DATA), transformer);

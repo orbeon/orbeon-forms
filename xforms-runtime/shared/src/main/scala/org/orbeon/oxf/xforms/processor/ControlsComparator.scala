@@ -387,7 +387,7 @@ class ControlsComparator(
         new DeferredXMLReceiverImpl(
           Rewrite.getRewriteXMLReceiver(
             externalContext.getResponse,
-            HTMLFragmentSerializer.create(new ContentHandlerWriter(receiver), skipRootElement = true),
+            HTMLFragmentSerializer.create(new ContentHandlerWriter(receiver, supportFlush = false), skipRootElement = true),
             fragment = true,
             XMLConstants.XHTML_NAMESPACE_URI
           )

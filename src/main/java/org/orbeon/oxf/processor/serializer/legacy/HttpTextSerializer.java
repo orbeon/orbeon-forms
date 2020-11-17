@@ -74,7 +74,7 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
         final ProcessorOutput output = new CacheableTransformerOutputImpl(HttpTextSerializer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 // Create OutputStream that converts to Base64
-                final Writer writer = new ContentHandlerWriter(xmlReceiver);
+                final Writer writer = new ContentHandlerWriter(xmlReceiver, false);
 
                 // Read configuration input
                 final Config config = readConfig(pipelineContext);

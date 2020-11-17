@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.apache.commons.io.FileUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.UploadProgress
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.FileUtils
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
@@ -195,7 +195,7 @@ object FileMetadata {
   }
 
   // Format a string containing a number of bytes to a human-readable string
-  // If the input string doesn't represent a Long, return the string unchanged
+  // If the input string doesn't represent a `Long`, return the string unchanged
   def humanReadableBytes(size: String): String =
     try FileUtils.byteCountToDisplaySize(size.toLong)
     catch { case NonFatal(_) => size }

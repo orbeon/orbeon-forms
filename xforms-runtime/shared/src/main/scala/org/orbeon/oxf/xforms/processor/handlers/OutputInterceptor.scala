@@ -143,7 +143,7 @@ class OutputInterceptor(
     }
 
     if (newClassAttribute != null)
-      SAXUtils.addOrReplaceAttribute(originalAttributes, "", "", "class", newClassAttribute)
+      XMLReceiverSupport.addOrReplaceAttribute(originalAttributes, "", "", "class", newClassAttribute)
     else
       originalAttributes
   }

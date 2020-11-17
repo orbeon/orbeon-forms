@@ -120,15 +120,13 @@ object XMLReceiverSupport extends XMLReceiverSupport {
     def getValue    (s: String)                : String = null
   }
 
-  /**
-   * Append an attribute value to existing mutable attributes.
-   *
-   * @param attributes     existing attributes
-   * @param attributeName  attribute name
-   * @param attributeValue value to set or append
-   */
+  // Must be used only with non-prefixed attributes!
   // Used by handlers
-  def addOrAppendToAttribute(attributes: AttributesImpl, attributeName: String, attributeValue: String): Unit = {
+  def addOrAppendToAttribute(
+    attributes     : AttributesImpl,
+    attributeName  : String,
+    attributeValue : String
+  ): Unit = {
     val oldAttributeIndex = attributes.getIndex(attributeName)
     if (oldAttributeIndex == -1) {
       // No existing attribute
@@ -139,5 +137,65 @@ object XMLReceiverSupport extends XMLReceiverSupport {
       val newAttributeValue = oldAttributeValue + ' ' + attributeValue
       attributes.setValue(oldAttributeIndex, newAttributeValue)
     }
+  }
+
+  // Match on URI and localname
+  // Used by handlers/extractor/annotator
+  def addOrReplaceAttribute(
+    attributes : Attributes,
+    uri        : String,
+    prefix     : String,
+    localname  : String,
+    value      : String
+  ): AttributesImpl = {
+    val newAttributes = new AttributesImpl
+    var replaced = false
+    for (i <- 0 until attributes.getLength) {
+      val attributeURI       = attributes.getURI(i)
+      val attributeValue     = attributes.getValue(i)
+      val attributeType      = attributes.getType(i)
+      val attributeQName     = attributes.getQName(i)
+      val attributeLocalname = attributes.getLocalName(i)
+      if (uri == attributeURI && localname == attributeLocalname) {
+        // Found existing attribute
+        replaced = true
+        newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
+      } else {
+        // Not a matched attribute
+        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue)
+      }
+    }
+
+    if (! replaced) // attribute did not exist already so add it
+      newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value)
+
+    newAttributes
+  }
+
+  // Append classes to existing attributes. This creates a new `AttributesImpl` object.
+  // Used by handlers/annotator
+  def appendToClassAttribute(attributes: Attributes, newClasses: String): AttributesImpl = {
+    val oldClassAttribute = attributes.getValue("class")
+    val newClassAttribute =
+      if (oldClassAttribute == null)
+        newClasses
+      else
+        oldClassAttribute + ' ' + newClasses
+    addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute)
+  }
+
+  // Used by handlers
+  def removeAttribute(attributes: Attributes, uri: String, localname: String): AttributesImpl = {
+    val newAttributes = new AttributesImpl
+    for (i <- 0 until attributes.getLength) {
+      val attributeURI       = attributes.getURI(i)
+      val attributeValue     = attributes.getValue(i)
+      val attributeType      = attributes.getType(i)
+      val attributeQName     = attributes.getQName(i)
+      val attributeLocalname = attributes.getLocalName(i)
+      if (uri != attributeURI || localname != attributeLocalname) // not a matched attribute
+        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue)
+    }
+    newAttributes
   }
 }

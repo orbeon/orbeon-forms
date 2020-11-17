@@ -165,20 +165,20 @@ object XFormsBaseHandler {
             // NOTE: This also handles dummy images for the xhtml:img/@src case
             val effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis)
             // Set the value of the attribute
-            attributes = SAXUtils.addOrReplaceAttribute(attributes, attributes.getURI(i), XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue)
+            attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, attributes.getURI(i), XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue)
           }
         }
         if (found) // update the value of the id attribute
-          attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
+          attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
       }
       if (! found) // id was not replaced as part of AVT processing
-        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
+        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", "id", containingDocument.namespaceId(effectiveId))
     }
     // Check `@for` or other attribute
     for (refIdAttributeName <- refIdAttributeNames) {
       val forAttribute = attributes.getValue(refIdAttributeName)
       if (forAttribute != null)
-        attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, xformsHandlerContext.getIdPrefix + forAttribute + xformsHandlerContext.getIdPostfix)
+        attributes = XMLReceiverSupport.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, xformsHandlerContext.getIdPrefix + forAttribute + xformsHandlerContext.getIdPostfix)
     }
     attributes
   }

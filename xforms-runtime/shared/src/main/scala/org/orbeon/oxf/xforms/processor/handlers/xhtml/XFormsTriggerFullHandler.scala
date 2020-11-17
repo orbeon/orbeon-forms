@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -86,7 +86,7 @@ private object XFormsTriggerFullHandler {
     val existingClasses = Option(atts.getValue("class")).toList
     val newClasses = existingClasses ::: classes ::: Nil mkString " "
 
-    SAXUtils.addOrReplaceAttribute(atts, "", "", "class", newClasses)
+    XMLReceiverSupport.addOrReplaceAttribute(atts, "", "", "class", newClasses)
   }
 
   def addAttribute(atts: AttributesImpl, name: String, value: String): Unit =

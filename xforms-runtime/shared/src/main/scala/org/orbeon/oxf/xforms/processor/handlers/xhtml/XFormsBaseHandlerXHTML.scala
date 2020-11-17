@@ -438,7 +438,7 @@ object XFormsBaseHandlerXHTML {
       if (addIds && (targetControlEffectiveId ne null)) {
         // Add or replace existing id attribute
         // NOTE: addIds == true for external LHHA
-        SAXUtils.addOrReplaceAttribute(
+        XMLReceiverSupport.addOrReplaceAttribute(
           attributes,
           "",
           "",
@@ -447,7 +447,7 @@ object XFormsBaseHandlerXHTML {
         )
       } else {
         // Remove existing id attribute if any
-        SAXUtils.removeAttribute(attributes, "", "id")
+        XMLReceiverSupport.removeAttribute(attributes, "", "id")
       }
 
     // Add @for attribute if specified and element is a label

@@ -36,7 +36,7 @@ import org.xml.sax.helpers.AttributesImpl
 object XHTMLBodyHandler {
 
   private def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
-    val newAtts = SAXUtils.appendToClassAttribute(atts, Constants.YuiSkinSamClass)
+    val newAtts = XMLReceiverSupport.appendToClassAttribute(atts, Constants.YuiSkinSamClass)
     XFormsBaseHandler.handleAVTsAndIDs(newAtts, XHTMLElementHandler.RefIdAttributeNames, xformsHandlerContext)
   }
 

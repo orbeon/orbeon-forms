@@ -164,7 +164,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                                 is.close();
                             }
                         } else {
-                            SAXUtils.objectToCharacters(o, interpreterContext.getOutput());
+                            objectToCharacters(o, interpreterContext.getOutput());
                         }
                     }
                 }
@@ -252,7 +252,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                             is.close();
                         }
                     } else {
-                        SAXUtils.objectToCharacters(o, interpreterContext.getOutput());
+                        objectToCharacters(o, interpreterContext.getOutput());
                     }
                 }
             }
@@ -541,5 +541,18 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         }
 
         return "{" + typeURI + "}" + typeLocalname;
+    }
+
+    /**
+     * Convert an Object to a String and generate SAX characters events.
+     */
+    private static void objectToCharacters(Object o, ContentHandler contentHandler) {
+        try {
+            char[] charValue = (o == null) ? null : o.toString().toCharArray();
+            if (charValue != null)
+                contentHandler.characters(charValue, 0, charValue.length);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
     }
 }

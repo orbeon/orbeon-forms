@@ -125,7 +125,7 @@ class XIncludeReceiver(
 
     val newAttributes =
       if (! topLevel && level == 0 && generateXMLBase)
-        SAXUtils.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
+        XMLReceiverSupport.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
       else
         attributes
 

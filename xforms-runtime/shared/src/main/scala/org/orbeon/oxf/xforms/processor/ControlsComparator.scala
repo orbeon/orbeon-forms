@@ -450,7 +450,7 @@ class ControlsComparator(
 
         ehc.startDocument()
         repeatIterationControlOpt foreach { _ =>
-          ehc.startElement("", "root", "root", SAXUtils.EMPTY_ATTRIBUTES)
+          ehc.startElement("", "root", "root", XMLReceiverSupport.EmptyAttributes)
         }
         replay(ehc)
         repeatIterationControlOpt foreach { _ =>

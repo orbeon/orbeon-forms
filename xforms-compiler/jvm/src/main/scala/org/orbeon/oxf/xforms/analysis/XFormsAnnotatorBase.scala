@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
-import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{SAXStore, SAXUtils, XMLReceiver, XMLReceiverUnneededEvents}
+import org.orbeon.oxf.xml.{SAXStore, XMLReceiver, XMLReceiverSupport, XMLReceiverUnneededEvents}
 import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.{Attributes, Locator}
+
 
 abstract class XFormsAnnotatorBase(
   templateReceiver  : XMLReceiver,
@@ -135,7 +136,7 @@ abstract class XFormsAnnotatorBase(
         metadata.putMark(templateSAXStore.getMark(rewriteId(xformsElementId)))
 
       def attsWithNewClass =
-        SAXUtils.appendToClassAttribute(atts, "xforms-update-full")
+        XMLReceiverSupport.appendToClassAttribute(atts, "xforms-update-full")
 
       if (isSwitch && stackElement.isFullUpdate) {
         // Don't remember mark but produce class

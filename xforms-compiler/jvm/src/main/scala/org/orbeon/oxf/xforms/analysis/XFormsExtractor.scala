@@ -340,7 +340,7 @@ class XFormsExtractor(
       outputFirstElementIfNeeded()
 
       // Add xml:base on element
-      outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
+      outputAttributes = XMLReceiverSupport.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
 
       // Add xml:lang on element if found
       elementStack.head.xmlLangOpt foreach { xmlLang =>
@@ -355,7 +355,7 @@ class XFormsExtractor(
               xmlLang
           }
 
-        outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "lang", newXMLLang)
+        outputAttributes = XMLReceiverSupport.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "lang", newXMLLang)
       }
     }
 

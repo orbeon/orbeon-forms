@@ -80,4 +80,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): Option[String] =
     ???
+
+  def getLastModifiedIfFast(absoluteURL: String): Long = ???
 }

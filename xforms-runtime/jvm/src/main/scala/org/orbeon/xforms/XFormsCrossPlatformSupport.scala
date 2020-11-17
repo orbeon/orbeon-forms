@@ -198,4 +198,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     useAndClose(inputStream) { is =>
       NetUtils.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, logger.logger.logger).some
     }
+
+  def getLastModifiedIfFast(absoluteURL: String): Long =
+    NetUtils.getLastModifiedIfFast(absoluteURL)
 }

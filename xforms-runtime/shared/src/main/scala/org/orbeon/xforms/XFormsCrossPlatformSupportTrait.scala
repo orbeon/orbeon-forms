@@ -86,4 +86,6 @@ trait XFormsCrossPlatformSupportTrait {
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String]
+
+  def getLastModifiedIfFast(absoluteURL: String): Long
 }

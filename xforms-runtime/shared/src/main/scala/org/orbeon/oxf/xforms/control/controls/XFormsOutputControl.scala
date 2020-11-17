@@ -15,8 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
@@ -135,7 +134,7 @@ class XFormsOutputControl(
       // If the value is a file: we make sure it is signed otherwise we return the default value
 
       def verifiedValueOrDefault(initial: String, value: => String, default: => String) =
-        if ("file".equals(NetUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
+        if ("file".equals(PathUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
           default
         else
           value
@@ -154,10 +153,13 @@ class XFormsOutputControl(
                   // driver for data: URL support here), and in general make more sense for relatively short
                   // values. So for now we keep the proxying for data: URLs.
 
-                  val rebasedURI      = containingDocument.resolveXMLBase(element, trimmedInternalValue)
-                  val servletRewriter = new ServletURLRewriter(XFormsCrossPlatformSupport.externalContext.getRequest)
-                  val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
-                  val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
+                  val resolvedURI =
+                    URLRewriterUtils.rewriteResourceURL(
+                      XFormsCrossPlatformSupport.externalContext.getRequest,
+                      containingDocument.resolveXMLBase(element, trimmedInternalValue).toString,
+                      URLRewriterUtils.getPathMatchers,
+                      URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+                    )
 
                   (
                     resolvedURI,
@@ -165,7 +167,7 @@ class XFormsOutputControl(
                       uri              = resolvedURI,
                       filename         = filename,
                       contentType      = mediatype,
-                      lastModified     = NetUtils.getLastModifiedIfFast(resolvedURI),
+                      lastModified     = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
                       customHeaders    = evaluatedHeaders,
                       getHeader        = containingDocument.headersGetter
                     )

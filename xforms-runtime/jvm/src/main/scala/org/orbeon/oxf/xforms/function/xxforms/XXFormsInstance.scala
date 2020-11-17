@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.{XFormsFunction, XXFormsInstanceTrait}
-import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 import org.orbeon.xforms.XFormsId
+
 
 /**
  * xxf:instance() function. This function operates like the standard instance() function, except that it looks for
@@ -35,7 +33,7 @@ class XXFormsInstance extends XFormsFunction with XXFormsInstanceTrait {
     val instanceId = stringArgument(0)
 
     val rootElementOpt =
-      XXFormsInstance.findInAncestorScopes(XFormsFunction.context.container, instanceId)
+      XFormsInstance.findInAncestorScopes(XFormsFunction.context.container, instanceId)
 
     // Return or warn
     rootElementOpt match {
@@ -49,53 +47,5 @@ class XXFormsInstance extends XFormsFunction with XXFormsInstanceTrait {
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) = {
     argument(0).addToPathMap(pathMap, pathMapNodeSet)
     new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this))
-  }
-}
-
-object XXFormsInstance {
-
-  // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
-  // Also allow an absolute instance id
-  def findInAncestorScopes(startContainer: XBLContainer, instanceId: String): Option[NodeInfo] = {
-
-    // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
-    // exists statically. If it does exist statically only, we return an empty sequence, but we don't warn
-    // as the instance actually exists. The case where the instance might exist statically but not
-    // dynamically is when this function is used during xforms-model-construct. At that time, instances in
-    // this or other models might not yet have been constructed, however they might be referred to, for
-    // example with model variables.
-
-    def findObjectByAbsoluteId(id: String) =
-      startContainer.containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(id))
-
-    def findAbsolute =
-      if (XFormsId.isAbsoluteId(instanceId))
-        collectByErasedType[XFormsInstance](findObjectByAbsoluteId(instanceId)) map (_.rootElement)
-      else
-        None
-
-    def findDynamic = {
-      val containers = Iterator.iterateOpt(startContainer)(_.parentXBLContainer)
-      val instances  = containers flatMap (_.findInstance(instanceId))
-
-      instances.nextOption() map (_.rootElement)
-    }
-
-    def findStatic = {
-
-      val containingDocument = startContainer.containingDocument
-      val ops = containingDocument.staticOps
-      val startScope = startContainer.innerScope
-
-      val scopes    = Iterator.iterateOpt(startScope)(_.parent)
-      val instances = scopes flatMap ops.getModelsForScope flatMap (_.instances.get(instanceId))
-
-      if (! instances.hasNext)
-        containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logWarning("xxf:instance()", "instance not found", "instance id", instanceId)
-
-      None
-    }
-
-    findAbsolute orElse findDynamic orElse findStatic
   }
 }

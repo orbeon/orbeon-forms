@@ -29,8 +29,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
+import org.orbeon.oxf.xforms.model.{DataModel, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
@@ -240,7 +239,7 @@ object XFormsAPI {
 
   // Return an instance's root element in the current action context as per xxf:instance()
   def instanceRoot(staticId: String): Option[om.NodeInfo] =
-    XXFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
+    XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
   def topLevelInstance(modelId: String, instanceId: String) =

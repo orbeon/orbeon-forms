@@ -22,6 +22,7 @@ import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.processor.DebugProcessor
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.util._
@@ -31,6 +32,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om
@@ -595,5 +597,50 @@ object XFormsInstance extends Logging {
     })
 
     result
+  }
+
+  // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
+  // Also allow an absolute instance id
+  def findInAncestorScopes(startContainer: XBLContainer, instanceId: String): Option[om.NodeInfo] = {
+
+    // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
+    // exists statically. If it does exist statically only, we return an empty sequence, but we don't warn
+    // as the instance actually exists. The case where the instance might exist statically but not
+    // dynamically is when this function is used during xforms-model-construct. At that time, instances in
+    // this or other models might not yet have been constructed, however they might be referred to, for
+    // example with model variables.
+
+    def findObjectByAbsoluteId(id: String) =
+      startContainer.containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(id))
+
+    def findAbsolute =
+      if (XFormsId.isAbsoluteId(instanceId))
+        collectByErasedType[XFormsInstance](findObjectByAbsoluteId(instanceId)) map (_.rootElement)
+      else
+        None
+
+    def findDynamic = {
+      val containers = Iterator.iterateOpt(startContainer)(_.parentXBLContainer)
+      val instances  = containers flatMap (_.findInstance(instanceId))
+
+      instances.nextOption() map (_.rootElement)
+    }
+
+    def findStatic = {
+
+      val containingDocument = startContainer.containingDocument
+      val ops = containingDocument.staticOps
+      val startScope = startContainer.innerScope
+
+      val scopes    = Iterator.iterateOpt(startScope)(_.parent)
+      val instances = scopes flatMap ops.getModelsForScope flatMap (_.instances.get(instanceId))
+
+      if (! instances.hasNext)
+        containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logWarning("xxf:instance()", "instance not found", "instance id", instanceId)
+
+      None
+    }
+
+    findAbsolute orElse findDynamic orElse findStatic
   }
 }

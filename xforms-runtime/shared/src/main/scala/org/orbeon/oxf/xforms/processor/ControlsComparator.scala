@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor
 
 import cats.syntax.option._
-import org.orbeon.oxf.processor.converter.XHTMLRewrite
+import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.ContentHandlerWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.control._
@@ -385,10 +385,11 @@ class ControlsComparator(
 
       ehc.output =
         new DeferredXMLReceiverImpl(
-          new XHTMLRewrite().getRewriteXMLReceiver(
+          Rewrite.getRewriteXMLReceiver(
             externalContext.getResponse,
             HTMLFragmentSerializer.create(new ContentHandlerWriter(receiver), skipRootElement = true),
-            true
+            fragment = true,
+            XMLConstants.XHTML_NAMESPACE_URI
           )
         )
 

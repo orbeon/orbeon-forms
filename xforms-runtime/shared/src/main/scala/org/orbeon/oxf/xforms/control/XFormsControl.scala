@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.processor.converter.XHTMLRewrite
+import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
-import org.orbeon.oxf.xml.ForwardingXMLReceiver
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
@@ -284,46 +284,55 @@ object XFormsControl {
     val sb = new StringBuilder(rawValue.length * 2) // just an approx of the size it may take
     // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
     val rewriter = XFormsCrossPlatformSupport.externalContext.getResponse
-    XFormsCrossPlatformSupport.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver {
+    XFormsCrossPlatformSupport.streamHTMLFragment(
+      Rewrite.getRewriteXMLReceiver(
+        rewriter,
+        new ForwardingXMLReceiver {
 
-      private var isStartElement = false
+          private var isStartElement = false
 
-      override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
-        sb.append(new String(chars, start, length).escapeXmlMinimal) // NOTE: not efficient to create a new String here
-        isStartElement = false
-      }
+          override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
+            sb.append(new String(chars, start, length).escapeXmlMinimal) // NOTE: not efficient to create a new String here
+            isStartElement = false
+          }
 
-      override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-        sb.append('<')
-        sb.append(localname)
-        val attributeCount = attributes.getLength
+          override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+            sb.append('<')
+            sb.append(localname)
+            val attributeCount = attributes.getLength
 
-        for (i <- 0 until attributeCount) {
-          val currentName = attributes.getLocalName(i)
-          val currentValue = attributes.getValue(i)
-          sb.append(' ')
-          sb.append(currentName)
-          sb.append("=\"")
-          sb.append(currentValue)
-          sb.append('"')
-        }
+            for (i <- 0 until attributeCount) {
+              val currentName = attributes.getLocalName(i)
+              val currentValue = attributes.getValue(i)
+              sb.append(' ')
+              sb.append(currentName)
+              sb.append("=\"")
+              sb.append(currentValue)
+              sb.append('"')
+            }
 
-        sb.append('>')
-        isStartElement = true
-      }
+            sb.append('>')
+            isStartElement = true
+          }
 
-      override def endElement(uri: String, localname: String, qName: String): Unit = {
-        if (! isStartElement || ! VoidElements(localname)) {
-          // We serialize to HTML: don't close elements that just opened (will cover `<br>`, `<hr>`, etc.). Be sure not
-          // to drop closing elements of other tags though!
-          sb.append("</")
-          sb.append(localname)
-          sb.append('>')
-        }
-        isStartElement = false
-      }
+          override def endElement(uri: String, localname: String, qName: String): Unit = {
+            if (! isStartElement || ! VoidElements(localname)) {
+              // We serialize to HTML: don't close elements that just opened (will cover `<br>`, `<hr>`, etc.). Be sure not
+              // to drop closing elements of other tags though!
+              sb.append("</")
+              sb.append(localname)
+              sb.append('>')
+            }
+            isStartElement = false
+          }
 
-    }, true), rawValue, locationData, "xhtml")
+        },
+        fragment = true,
+        XMLConstants.XHTML_NAMESPACE_URI
+      ),
+      rawValue,
+      locationData, "xhtml"
+    )
 
     sb.toString
   }

@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
@@ -184,7 +184,7 @@ class XXFormsAttributeControl(
 object XXFormsAttributeControl {
 
   private def getExternalValueHandleSrc(controlValue: String, attributeName: String, forName: String): String =
-    if (StringUtils.isBlank(controlValue)) {
+    if (controlValue.isAllBlank) {
       attributeName match {
         case "src" if forName == "img"    => DUMMY_IMAGE_URI
         case "src" if forName == "script" => DUMMY_SCRIPT_URI // IE8 ignores it; IE9+ loads JS properly

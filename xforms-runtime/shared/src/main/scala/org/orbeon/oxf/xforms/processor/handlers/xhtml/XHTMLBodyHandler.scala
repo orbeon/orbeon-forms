@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.QName
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
@@ -42,9 +42,9 @@ object XHTMLBodyHandler {
 
   def getIncludedResourcePath(requestPath: String, fileName: String): String = {
     // Path will look like "/app-name/whatever"
-    val pathElements = StringUtils.split(requestPath, '/')
+    val pathElements = requestPath.splitTo[List]("/")
     if (pathElements.length >= 2) {
-      val appName = pathElements(0) // it seems that split() does not return first blank match
+      val appName = pathElements.head // `splitTo()` does not return the first blank match
       val path = "/apps/" + appName + "/" + fileName
       if (ResourceManagerWrapper.instance.exists(path))
         return path

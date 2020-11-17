@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
@@ -260,7 +260,7 @@ class XFormsOutputDownloadHandler(
 
         val hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null)
 
-        if (StringUtils.isBlank(hrefValue)) {
+        if (hrefValue.isAllBlank) {
           // No URL so make sure a click doesn't cause navigation, and add class
           containerAttributes.addAttribute("", "href", "href", CDATA, "#")
           XMLReceiverSupport.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")

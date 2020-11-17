@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.analysis.EventHandler.parseKeyModifiers
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.xforms.EventNames._
+
 
 abstract class KeyboardEvent(name: String, target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(name, target, KeyboardEvent.filter(properties), bubbles = true, cancelable = false) {
@@ -56,8 +56,8 @@ object KeyboardEvent {
   private def filter(properties: PropertyGetter): PropertyGetter = new PropertyGetter {
     def isDefinedAt(name: String) = properties.isDefinedAt(name)
     def apply(name: String) = name match {
-      case KeyModifiersPropertyName => properties(name) collect { case value: String if isNotBlank(value) => value.trimAllToEmpty }
-      case KeyTextPropertyName      => properties(name) collect { case value: String if isNotEmpty(value) => value } // allow for e.g. " "
+      case KeyModifiersPropertyName => properties(name) collect { case value: String if value.nonAllBlank => value.trimAllToEmpty }
+      case KeyTextPropertyName      => properties(name) collect { case value: String if value.nonAllBlank => value } // allow for e.g. " "
       case _                        => properties(name)
     }
   }

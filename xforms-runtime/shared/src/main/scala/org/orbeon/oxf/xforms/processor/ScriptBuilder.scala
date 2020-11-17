@@ -28,6 +28,7 @@ import org.orbeon.xforms.{EventNames, rpc}
 
 import scala.collection.mutable
 
+
 object ScriptBuilder {
 
   // TODO: Constants duplicated from URLRewriterUtils
@@ -38,9 +39,10 @@ object ScriptBuilder {
   private def quoteString(s: String) =
     s""""${s.escapeJavaScript}""""
 
-  def escapeJavaScriptInsideScript (js: String): String =
+  def escapeJavaScriptInsideScript (js: String): String = {
     // Method from https://stackoverflow.com/a/23983448/5295
-    org.apache.commons.lang3.StringUtils.replace(js, "</script", "</scr\\ipt")
+    js.replaceAllLiterally("</script", "</scr\\ipt")
+  }
 
   def writeScripts(shareableScripts: Iterable[ShareableScript], write: String => Unit): Unit =
     for (shareableScript <- shareableScripts) {

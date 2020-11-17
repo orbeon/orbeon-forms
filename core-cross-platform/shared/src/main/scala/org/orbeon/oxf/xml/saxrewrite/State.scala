@@ -10,8 +10,8 @@ import org.xml.sax.{Attributes, Locator}
  * we are really only considering state changes on start and end element events.
  */
 abstract class State(
-  val previousState: State,
-  val xmlReceiver: XMLReceiver
+  val previousState : State,
+  val xmlReceiver   : XMLReceiver
 ) {
 
   /**

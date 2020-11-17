@@ -326,7 +326,7 @@ class RewriteState private[rewrite] (
   //     *     <xsl:apply-templates/>
   //     * If there no character data has been accumulated do nothing.  Also clears buffer.
   private def flushCharacters(): Unit = {
-    val bfLen = if (charactersBuf == null) 0 else charactersBuf.position
+    val bfLen = if (charactersBuf == null) 0 else (charactersBuf.position: Int)
     if (bfLen > 0) {
       charactersBuf.asInstanceOf[Buffer].flip // cast: see #4682
       val chs = charactersBuf.array
@@ -446,8 +446,11 @@ class RewriteState private[rewrite] (
   override def characters(ch: Array[Char], strt: Int, len: Int): State = {
     if (scriptDepth > 0) xmlReceiver.characters(ch, strt, len)
     else {
-      val bufLen = if (charactersBuf == null) 0
-      else charactersBuf.position
+      val bufLen =
+        if (charactersBuf == null)
+          0
+        else
+          (charactersBuf.position: Int)
       val cpcty = bufLen + (len * 2)
       if (charactersBuf == null || charactersBuf.remaining < cpcty) {
         val newBuf = java.nio.CharBuffer.allocate(cpcty)

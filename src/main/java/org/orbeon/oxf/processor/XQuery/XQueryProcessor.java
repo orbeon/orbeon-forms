@@ -248,10 +248,10 @@ public class XQueryProcessor extends ProcessorImpl {
                                     helper.text(rs.getItem().getAtomicValue());
                                 } else {
                                     rs.writeItemToSAX(new SimpleForwardingXMLReceiver(xmlReceiver) {
-                                        public void startDocument() throws SAXException {
+                                        public void startDocument() {
                                         }
 
-                                        public void endDocument() throws SAXException {
+                                        public void endDocument() {
                                         }
                                     });
                                 }

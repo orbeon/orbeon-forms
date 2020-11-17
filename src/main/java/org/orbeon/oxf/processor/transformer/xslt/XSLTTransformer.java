@@ -343,7 +343,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         @Override
-                        public void startDocument() throws SAXException {
+                        public void startDocument() {
                             // Try to set fallback Locator
                             if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
                                     && processorLocationData != null && dumbOutputLocation) {
@@ -354,7 +354,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         @Override
-                        public void endDocument() throws SAXException {
+                        public void endDocument() {
                             if (endDocumentCalled()) {
                                 // Hack to test if Saxon outputs more than one endDocument() event
                                 logger.warn("XSLT transformer attempted to call endDocument() more than once.");
@@ -364,7 +364,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         @Override
-                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                        public void startElement(String uri, String localname, String qName, Attributes attributes){
                             if (outputLocator != null) {
                                 final LocationData locationData = findSourceElementLocationData(uri, localname);
                                 outputLocator.setLocationData(locationData);
@@ -377,7 +377,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         @Override
-                        public void endElement(String uri, String localname, String qName) throws SAXException {
+                        public void endElement(String uri, String localname, String qName) {
                             if (outputLocator != null) {
                                 // Here we do a funny thing: since Saxon does not provide location data on endElement(), we use that of startElement()
                                 final LocationData locationData = startElementLocationStack.peek();
@@ -391,7 +391,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         @Override
-                        public void characters(char[] chars, int start, int length) throws SAXException {
+                        public void characters(char[] chars, int start, int length) {
                             if (outputLocator != null) {
                                 final LocationData locationData = findSourceCharacterLocationData();
                                 outputLocator.setLocationData(locationData);

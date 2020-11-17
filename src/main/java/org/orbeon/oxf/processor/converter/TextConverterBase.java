@@ -18,7 +18,6 @@ import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.BinaryTextSupport;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
@@ -26,6 +25,7 @@ import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -132,7 +132,7 @@ public abstract class TextConverterBase extends ConverterBase {
         private boolean seenRootElement = false;
 
         @Override
-        public void processingInstruction(String target, String data) throws SAXException {
+        public void processingInstruction(String target, String data) {
 
             // Forward directly to the output any serializer processing instructions that took place before the root
             // element. Note that this is a rather arbitrary choice! we could do any of the following:
@@ -144,17 +144,22 @@ public abstract class TextConverterBase extends ConverterBase {
             // This could even be configurable. For now, we choose option #3 for ease of implementation.
             if (seenRootElement || ! BinaryTextXMLReceiver.isSerializerPI(target, data))
                 super.processingInstruction(target, data);
-            else
-                downstreamReceiver.processingInstruction(target, data);
+            else {
+                try {
+                    downstreamReceiver.processingInstruction(target, data);
+                } catch (SAXException e) {
+                    throw new OXFException(e);
+                }
+            }
         }
 
         @Override
-        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localname, String qName, Attributes attributes) {
             seenRootElement = true;
             super.startElement(uri, localname, qName, attributes);
         }
 
-        public void endDocument() throws SAXException {
+        public void endDocument() {
             super.endDocument();
             sendEndDocument(downstreamReceiver);
             didEndDocument[0] = true;

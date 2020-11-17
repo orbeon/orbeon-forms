@@ -23,7 +23,6 @@ import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import java.util.Map;
 
@@ -45,7 +44,7 @@ public class ScopeSerializer extends ScopeProcessorBase {
                 final XMLReceiver filter = new SimpleForwardingXMLReceiver(saxStore) {
                     private boolean root = true;
 
-                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                    public void startElement(String uri, String localname, String qName, Attributes attributes) {
                         super.startElement(uri, localname, qName, attributes);
                         if (root) {
                             isNull = uri.equals("") && localname.equals("null") && "true".equals(attributes.getValue(XMLConstants.XSI_URI(), "nil"));

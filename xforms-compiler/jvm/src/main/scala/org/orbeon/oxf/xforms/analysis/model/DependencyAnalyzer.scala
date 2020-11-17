@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableReference}
-import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
 import scala.collection.compat._
@@ -30,7 +30,7 @@ import scala.collection.compat._
 //
 object DependencyAnalyzer {
 
-  val Logger = LoggerFactory.getLogger("org.orbeon.xforms.analysis.calculate")
+  val Logger = LoggerFactory.createLogger("org.orbeon.xforms.analysis.calculate")
 
   private case class BindDetails(
     staticBind : StaticBind,

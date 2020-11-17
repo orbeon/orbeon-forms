@@ -52,22 +52,6 @@ object XPath extends XPathTrait {
   // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
   // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
   // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  private val xpathContextDyn = new DynamicVariable[FunctionContext]
-
-  def withFunctionContext[T](functionContext: FunctionContext)(thunk: => T): T = {
-    xpathContextDyn.withValue(functionContext) {
-      thunk
-    }
-  }
-
-  // Return the currently scoped function context if any
-  def functionContext: Option[FunctionContext] = xpathContextDyn.value
-
-  // Context accessible during XPath evaluation
-  // 2015-05-27: We use a ThreadLocal for this. Ideally we should pass this with the XPath dynamic context, via the Controller
-  // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
-  // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
-  // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
   private val GlobalNamePool = StaticXPath.GlobalNamePool
 
   // HACK: We can't register new converters directly, so we register an external object model, even though this is

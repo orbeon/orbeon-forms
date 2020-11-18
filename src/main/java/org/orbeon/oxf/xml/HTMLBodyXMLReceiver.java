@@ -65,7 +65,7 @@ public class HTMLBodyXMLReceiver extends ForwardingXMLReceiver {
                     final String currentAttributeValue = attributes.getValue(i);
 
                     if ("".equals(attributes.getURI(i)))
-                        newAttributesImpl.addAttribute("", currentAttributeName, currentAttributeName, XMLReceiverHelper.CDATA, currentAttributeValue);
+                        newAttributesImpl.addAttribute("", currentAttributeName, currentAttributeName, XMLReceiverHelper.CDATA(), currentAttributeValue);
                 }
                 newAttributes = newAttributesImpl;
             } else

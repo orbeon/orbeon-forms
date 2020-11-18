@@ -18,10 +18,13 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.XPathCache.evaluateSingleKeepItems
 import org.orbeon.oxf.xml.{SAXStore, XMLReceiver, XMLReceiverHelper}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon
+import org.orbeon.xml.NamespaceMapping
 
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**
@@ -35,7 +38,7 @@ class ExceptionCatcher extends ProcessorImpl {
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))
 
-  override def createOutput(name: String) =
+  override def createOutput(name: String): ProcessorOutput =
     addOutput(name, new ProcessorOutputImpl(ExceptionCatcher.this, name) {
       def readImpl(context: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
@@ -44,8 +47,22 @@ class ExceptionCatcher extends ProcessorImpl {
           if (getConnectedInputs.get(INPUT_CONFIG) ne null) {
             readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader[Boolean] {
               def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
+
                 val doc = readInputAsTinyTree(context, input, XPath.GlobalConfiguration)
-                scaxon.XPath.evalOne(doc, "not(/*/stack-trace = 'false')").asInstanceOf[BooleanValue].getBooleanValue
+
+                evaluateSingleKeepItems(
+                  List(doc: om.Item).asJava,
+                  1,
+                  "not(/*/stack-trace = 'false')",
+                  NamespaceMapping.EmptyMapping,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ).asInstanceOf[BooleanValue].getBooleanValue
+
               }
             })
           } else

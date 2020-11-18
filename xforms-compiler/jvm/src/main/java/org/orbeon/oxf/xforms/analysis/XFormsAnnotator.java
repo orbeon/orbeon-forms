@@ -229,7 +229,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Start xf:repeat-iteration
                     // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");	    
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), xformsElementId + "~iteration");	    
                     final Attributes repeatIterationAttributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, reusableAttributes, reusableStringArray, 0);
                     stackElement.startElement(uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
                 } else {
@@ -271,7 +271,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
                     // given QName must be in scope as that QName is the original element name.
                     final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex));
-                    newAttributes.addAttribute(XFormsNames.XXFORMS_NAMESPACE_URI(), "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
+                    newAttributes.addAttribute(XFormsNames.XXFORMS_NAMESPACE_URI(), "element", "xxf:element", XMLReceiverHelper.CDATA(), qName);
 
                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
                     stackElement.startElement(XFormsNames.XFORMS_NAMESPACE_URI(), "group", "xf:group", newAttributes);
@@ -309,11 +309,11 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                                     final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, reusableAttributes, reusableStringArray, -1);
 
-                                    newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, htmlElementId);
-                                    newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, attributeName);
-                                    newAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, attributeValue);
+                                    newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA(), htmlElementId);
+                                    newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA(), attributeName);
+                                    newAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA(), attributeValue);
 
-                                    newAttributes.addAttribute("", "for-name", "for-name", XMLReceiverHelper.CDATA, localname);
+                                    newAttributes.addAttribute("", "for-name", "for-name", XMLReceiverHelper.CDATA(), localname);
 
                                     // These extra attributes can be used alongside src/href attributes
                                     if ("src".equals(attributeName) || "href".equals(attributeName)) {
@@ -322,11 +322,11 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                                         final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI(), "window-state");
 
                                         if (urlType != null)
-                                            newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA, urlType);
+                                            newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA(), urlType);
                                         if (portletMode != null)
-                                            newAttributes.addAttribute("", "portlet-mode", "portlet-mode", XMLReceiverHelper.CDATA, "portlet-mode");
+                                            newAttributes.addAttribute("", "portlet-mode", "portlet-mode", XMLReceiverHelper.CDATA(), "portlet-mode");
                                         if (windowState != null)
-                                            newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA, "window-state");
+                                            newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA(), "window-state");
                                     }
 
                                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
@@ -439,7 +439,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                             final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
 
                             reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
+             	            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), "orbeon-inspector");
                             final Attributes newAttributes = getAttributesGatherNamespacesMaybeGenerateIds(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
                             final String xformsElementId = reusableStringArray[0];
 
@@ -504,7 +504,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
                 rawId = metadata.idGenerator().nextId();
-                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, rawId);
+                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), rawId);
                 attributes = newAttributes;
             } else {
                 // Keep existing id

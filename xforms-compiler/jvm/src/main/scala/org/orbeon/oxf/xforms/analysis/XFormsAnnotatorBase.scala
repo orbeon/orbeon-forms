@@ -14,9 +14,16 @@
 package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option._
+import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver
+import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter.RendererBaseUriAttributeName
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{SAXStore, XMLReceiver, XMLReceiverSupport, XMLReceiverUnneededEvents}
+import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.{NamespaceContext, _}
 import org.orbeon.xforms.Constants.DocumentId
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
@@ -24,12 +31,14 @@ import org.xml.sax.{Attributes, Locator}
 
 
 abstract class XFormsAnnotatorBase(
-  templateReceiver  : XMLReceiver,
-  extractorReceiver : XMLReceiver,
-  metadata          : Metadata,
-  isTopLevel        : Boolean
+  protected val templateReceiver : XMLReceiver,
+  extractorReceiver              : XMLReceiver,
+  metadata                       : Metadata,
+  isTopLevel                     : Boolean
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents {
+
+  import XFormsAnnotatorBase._
 
   private val keepLocationData = XFormsGlobalProperties.isKeepLocation
   private var _documentLocator: Locator = null
@@ -44,19 +53,6 @@ abstract class XFormsAnnotatorBase(
 
   def isInXBLBinding: Boolean
   def isInPreserve: Boolean
-
-  // Name of container elements that require the use of separators for handling visibility
-  private val SeparatorAppearanceElements = Set(
-    "table",
-    "tbody",
-    "colgroup",
-    "thead",
-    "tfoot",
-    "tr",
-    "ol",
-    "ul",
-    "dl"
-  )
 
   case class StackElement(
     parent                     : Option[StackElement],
@@ -275,5 +271,64 @@ abstract class XFormsAnnotatorBase(
 
     if (extractorReceiver ne null)
       extractorReceiver.endPrefixMapping(prefix)
+  }
+}
+
+object XFormsAnnotatorBase {
+
+  // Name of container elements that require the use of separators for handling visibility
+  private val SeparatorAppearanceElements = Set(
+    "table",
+    "tbody",
+    "colgroup",
+    "thead",
+    "tfoot",
+    "tr",
+    "ol",
+    "ul",
+    "dl"
+  )
+
+  private def getIncludedResourcePath(requestPath: String, fileName: String): String = {
+    // Path will look like "/app-name/whatever"
+    val pathElements = requestPath.splitTo[List]("/")
+    if (pathElements.length >= 2) {
+      val appName = pathElements.head // `splitTo()` does not return the first blank match
+      val path = "/apps/" + appName + "/" + fileName
+      if (ResourceManagerWrapper.instance.exists(path))
+        return path
+    }
+    // Default
+    "/config/" + fileName
+  }
+
+  private def include(
+    requestPath      : String,
+    fileName         : String,
+    namespaceContext : NamespaceContext)(implicit
+    xmlReceiver      : XMLReceiver
+  ): Unit =
+    useAndClose(new TransformerURIResolver(ParserConfiguration.XIncludeOnly)) { resolver =>
+
+      val href = "oxf:" + getIncludedResourcePath(requestPath, fileName)
+      val rcv  = new EmbeddedDocumentXMLReceiver(new XIncludeReceiver(xmlReceiver, resolver, namespaceContext.current))
+
+      TransformerUtils.sourceToSAX(resolver.resolve(href, null), rcv)
+    }
+
+  def outputPanels(namespaceContext: NamespaceContext)(implicit xmlReceiver: XMLReceiver): Unit = {
+
+    // FIXME: Logic duplicated from `createInitialRequestInformation`.
+    val requestPath: String =
+      Option(NetUtils.getExternalContext) map (_.getRequest) match {
+        case Some(req) =>
+          Option(req.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse req.getRequestPath
+        case None =>
+          "/"
+      }
+
+    include(requestPath, "noscript-panel.xml", namespaceContext)
+    include(requestPath, "error-dialog.xml",   namespaceContext)
+    include(requestPath, "help-panel.xml",     namespaceContext)
   }
 }

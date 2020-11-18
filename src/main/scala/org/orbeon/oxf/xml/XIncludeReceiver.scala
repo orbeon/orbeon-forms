@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
+import cats.syntax.option._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.URIReferences
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
@@ -33,17 +34,35 @@ import scala.util.control.NonFatal
 // Streaming XInclude processing
 // NOTE: Does not support: `<xi:fallback>`, `encoding`, `accept`, or `accept-language` attributes.
 class XIncludeReceiver(
-    pipelineContext: PipelineContext,
-    val parent     : Option[XIncludeReceiver],
-    xmlReceiver    : XMLReceiver,
-    uriReferences  : URIReferences,
-    uriResolver    : TransformerURIResolver,
-    xmlBase        : String,
-    generateXMLBase: Boolean,
-    outputLocator  : OutputLocator
+    pipelineContext  : Option[PipelineContext],
+    val parent       : Option[XIncludeReceiver],
+    contextOpt       : Option[NamespaceContext#Context],
+    xmlReceiver      : XMLReceiver,
+    uriReferences    : Option[URIReferences],
+    uriResolver      : TransformerURIResolver,
+    xmlBase          : Option[String],
+    generateXMLBase  : Boolean,
+    outputLocator    : OutputLocator
 ) extends ForwardingXMLReceiver(xmlReceiver) {
 
   self =>
+
+  def this(
+    xmlReceiver     : XMLReceiver,
+    uriResolver     : TransformerURIResolver,
+    namespaceContext: NamespaceContext#Context
+  ) =
+    this(
+      None,
+      None,
+      namespaceContext.some,
+      xmlReceiver,
+      None,
+      uriResolver,
+      None,
+      false,
+      new OutputLocator
+    )
 
   def this(
     pipelineContext: PipelineContext,
@@ -52,12 +71,13 @@ class XIncludeReceiver(
     uriResolver    : TransformerURIResolver
   ) =
     this(
-      pipelineContext,
+      Option(pipelineContext),
+      None,
       None,
       xmlReceiver,
-      uriReferences,
+      Option(uriReferences),
       uriResolver,
-      null,
+      None,
       true,
       new OutputLocator
     )
@@ -90,12 +110,16 @@ class XIncludeReceiver(
   def findPending(pending: Map[String, String]): Map[String, String] =
     if (! topLevel && level == 0) {
 
-      def ancestors = Iterator.iterateOpt(self)(_.parent)
-      def relevantContexts = ancestors flatMap (_.contexts) filter (_.relevant)
+      def fromAncestors = {
+        def ancestors = Iterator.iterateOpt(self)(_.parent)
+        def relevantContexts = ancestors flatMap (_.contexts) filter (_.relevant)
+
+        relevantContexts.next().context
+      }
 
       val closestAncestorMappings =
-        relevantContexts.next().context.mappingsWithDefault filterNot
-        { case (prefix, _) => prefix == "xml" }
+        contextOpt.getOrElse(fromAncestors).mappingsWithDefault filterNot
+          { case (prefix, _) => prefix == "xml" }
 
       val toUndeclare = closestAncestorMappings.toSet -- pending
       val toDeclare   = pending.toSet -- closestAncestorMappings
@@ -124,8 +148,8 @@ class XIncludeReceiver(
     _contexts ::= ElementContext(pending, namespaceContext.current, ! isInclude)
 
     val newAttributes =
-      if (! topLevel && level == 0 && generateXMLBase)
-        XMLReceiverSupport.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
+      if (! topLevel && level == 0 && generateXMLBase && xmlBase.isDefined)
+        XMLReceiverSupport.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase.orNull)
       else
         attributes
 
@@ -143,6 +167,7 @@ class XIncludeReceiver(
       val generateXMLBase = {
         val disableXMLBase = attributes.getValue(XXIncludeOmitXmlBaseQName.namespace.uri, XXIncludeOmitXmlBaseQName.localName)
         val fixupXMLBase   = attributes.getValue(XIncludeFixupXMLBaseQName.namespace.uri, XIncludeFixupXMLBaseQName.localName)
+
         ! (disableXMLBase == "true" || fixupXMLBase == "false")
       }
 
@@ -155,11 +180,21 @@ class XIncludeReceiver(
       val systemId = source.getSystemId
 
       // Keep URI reference for caching
-      if (uriReferences ne null)
-        uriReferences.addReference(base, href, null)
+      uriReferences foreach
+        (_.addReference(base, href, null))
 
       def createChildReceiver =
-        new XIncludeReceiver(pipelineContext, Some(self), getXMLReceiver, uriReferences, uriResolver, systemId, generateXMLBase, outputLocator)
+        new XIncludeReceiver(
+          pipelineContext,
+          self.some,
+          None,
+          getXMLReceiver,
+          uriReferences,
+          uriResolver,
+          Option(systemId),
+          generateXMLBase,
+          outputLocator
+        )
 
       try {
         xpointer match {
@@ -185,7 +220,7 @@ class XIncludeReceiver(
             // TODO: Use Saxon to stream the result?
             // TODO: Should not require a `PipelineContext`!
             for (item <- result.asScala) // contains `String`, `Boolean`, but `NodeInfo` wrappers
-              XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, XmlLocationData(outputLocator))
+              XPathProcessor.streamResult(pipelineContext.orNull, createChildReceiver, item, XmlLocationData(outputLocator))
 
           case Some(xpointer) =>
             // Other XPointer schemes are not supported

@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang => jl}
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler, XHTMLOutput}
@@ -33,28 +30,12 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 
-object XHTMLBodyHandler {
+private object XHTMLBodyHandler {
 
-  private def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
+  def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
     val newAtts = XMLReceiverSupport.appendToClassAttribute(atts, Constants.YuiSkinSamClass)
     XFormsBaseHandler.handleAVTsAndIDs(newAtts, XHTMLElementHandler.RefIdAttributeNames, xformsHandlerContext)
   }
-
-  def getIncludedResourcePath(requestPath: String, fileName: String): String = {
-    // Path will look like "/app-name/whatever"
-    val pathElements = requestPath.splitTo[List]("/")
-    if (pathElements.length >= 2) {
-      val appName = pathElements.head // `splitTo()` does not return the first blank match
-      val path = "/apps/" + appName + "/" + fileName
-      if (ResourceManagerWrapper.instance.exists(path))
-        return path
-    }
-    // Default
-    "/config/" + fileName
-  }
-
-  def getIncludedResourceURL(requestPath: String, fileName: String): String =
-    "oxf:" + getIncludedResourcePath(requestPath, fileName)
 }
 
 class XHTMLBodyHandler(
@@ -97,8 +78,6 @@ class XHTMLBodyHandler(
         XFORMS_SERVER_SUBMIT
       else
         requestPath // submission posts to URL of the current page and `xforms-xml-submission.xpl` intercepts that
-
-    outputXInclude(XHTMLBodyHandler.getIncludedResourceURL(requestPath, "noscript-panel.xml"))
 
     val formElemClasses = {
       val sb = new jl.StringBuilder("xforms-form xforms-initially-hidden")
@@ -158,10 +137,6 @@ class XHTMLBodyHandler(
 
     XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach
       (outputHiddenField(htmlPrefix, "$dynamic-state", _))
-
-    XFormsError.outputAjaxErrorPanel(containingDocument)
-
-    outputXInclude(XHTMLBodyHandler.getIncludedResourceURL(requestPath, "help-panel.xml"))
 
     // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
     // `xf:select[@appearance = 'full']`, `xf:input[@type = 'xs:boolean']`

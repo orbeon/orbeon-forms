@@ -21,8 +21,6 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
@@ -159,10 +157,6 @@ object XFormsError {
       containingDocument.addServerError(ServerError(t))
     }
   }
-
-  // Output the Ajax error panel with a placeholder for errors
-  def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument)(implicit xmlReceiver: XMLReceiver): Unit =
-    outputXInclude(XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"))
 
   import XMLReceiverSupport._
 

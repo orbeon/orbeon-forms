@@ -23,13 +23,6 @@ object XHTMLElementHandler {
 
   val RefIdAttributeNames: Array[String] = Array("for")
 
-  def outputXInclude(href: String)(implicit xmlReceiver: XMLReceiver): Unit =
-    element(
-      localName = "include",
-      uri       = XMLNames.XIncludeURI,
-      atts      = List("href" -> href, "fixup-xml-base" -> "false")
-    )
-
   def outputHiddenField(htmlPrefix: String, name: String, value: String)(implicit xmlReceiver: XMLReceiver): Unit =
     element(
       localName = "input",

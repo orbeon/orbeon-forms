@@ -696,20 +696,40 @@
         <output name="response">
             <xh:html>
                 <xh:body class="yui-skin-sam">
-                    <noscript xmlns="http://www.w3.org/1999/xhtml">
-                        <div class="xforms-noscript-panel">
-                            <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
-                            <ul>
-                                <li>Turn on JavaScript in your browser if it supports it.</li>
-                                <li>Use a browser that supports JavaScript.</li>
-                                <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
-                            </ul>
-                        </div>
-                    </noscript>
                     <xh:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-label-appearance-full xforms-hint-appearance-full xforms-disable-hint-as-tooltip xforms-help-appearance-dialog" action="/doc/home-welcome" method="POST" onsubmit="return false">
                         <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
+                        <xh:span id="xforms-select-full-template" class="xforms-template">
+                            <xh:span class="xforms-deselected">
+                                <xh:label class="checkbox">
+                                    <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
+                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
+                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
+                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
+                                </xh:label>
+                            </xh:span>
+                        </xh:span>
+                        <xh:span id="xforms-select1-full-template" class="xforms-template">
+                            <xh:span class="xforms-deselected">
+                                <xh:label class="radio">
+                                    <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>
+                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
+                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
+                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
+                                </xh:label>
+                            </xh:span>
+                        </xh:span>
+                        <noscript xmlns="http://www.w3.org/1999/xhtml">
+                            <div class="xforms-noscript-panel">
+                                <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
+                                <ul>
+                                    <li>Turn on JavaScript in your browser if it supports it.</li>
+                                    <li>Use a browser that supports JavaScript.</li>
+                                    <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
+                                </ul>
+                            </div>
+                        </noscript>
                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-dialogs">
                             <div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
                                 <div class="hd" id="error-dialog-title">An error has occurred</div>
@@ -778,26 +798,6 @@
                                 </div>
                             </div>
                         </div>
-                        <xh:span id="xforms-select-full-template" class="xforms-template">
-                            <xh:span class="xforms-deselected">
-                                <xh:label class="checkbox">
-                                    <xh:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>
-                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
-                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
-                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
-                                </xh:label>
-                            </xh:span>
-                        </xh:span>
-                        <xh:span id="xforms-select1-full-template" class="xforms-template">
-                            <xh:span class="xforms-deselected">
-                                <xh:label class="radio">
-                                    <xh:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>
-                                    <xh:span class="xforms-hint-region">$xforms-template-label$</xh:span>
-                                    <xh:span class="xforms-help">$xforms-template-help$</xh:span>
-                                    <xh:span class="xforms-hint">$xforms-template-hint$</xh:span>
-                                </xh:label>
-                            </xh:span>
-                        </xh:span>
                         <xh:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end xforms-update-full"/>
                         <xh:span class="xforms-repeat-delimiter"/>
                         <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>

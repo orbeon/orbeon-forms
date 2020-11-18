@@ -66,6 +66,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
     private NamespaceContext namespaceContext = new NamespaceContext();
 
+
     private final boolean hostLanguageAVTs = XFormsGlobalProperties$.MODULE$.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
@@ -241,6 +242,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                 String htmlElementId = null;
 
+                boolean mustOutputPanels = false;
+
                 if (! isRestore) {
                     if (level == 1) {
                         if ("head".equals(localname)) {
@@ -250,6 +253,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                             // Entering body
                             inBody = true;
                             metadata.initializeBindingLibraryIfNeeded();
+
+                            if (this.isTopLevel)
+                                mustOutputPanels = true;
                         }
                     } else if (level == 2) {
                         if (inHead && "title".equals(localname)) {
@@ -342,11 +348,13 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     } else {
                         stackElement.startElement(uri, localname, qName, attributes);
                     }
-
                 } else {
                     // No AVT handling, just output the element
                     stackElement.startElement(uri, localname, qName, attributes);
                 }
+
+                if (mustOutputPanels)
+                    XFormsAnnotatorBase.outputPanels(namespaceContext, templateReceiver());
             }
         }
 

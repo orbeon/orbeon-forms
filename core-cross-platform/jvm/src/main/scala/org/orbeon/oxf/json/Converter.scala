@@ -22,16 +22,16 @@
  */
 package org.orbeon.oxf.json
 
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml._
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.xml.sax.helpers.AttributesImpl
 import spray.json._
 
 import scala.language.postfixOps
-
 import org.orbeon.oxf.xml.SaxonUtils
+
 
 //
 // Concrete functions to convert JSON to XML and back following the XForms 2.0 specification.
@@ -47,7 +47,7 @@ import org.orbeon.oxf.xml.SaxonUtils
 //
 object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
 
-  type XmlElem = NodeInfo
+  type XmlElem = om.NodeInfo
 
   def localname(elem: XmlElem)                    = elem.localname
   def stringValue(elem: XmlElem)                  = elem.stringValue
@@ -64,17 +64,17 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   def makeNCName(name: String): String                          = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): DocumentInfo = {
-    val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
+  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): StaticXPath.DocumentNodeInfoType = {
+    val (receiver, result) = StaticXPath.newTinyTreeReceiver
     jsonStringToXmlStream(source, receiver, rootElementName)
-    builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+    result()
   }
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonToXmlDoc(ast: JsValue): DocumentInfo = {
-    val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
+  def jsonToXmlDoc(ast: JsValue): StaticXPath.DocumentNodeInfoType = {
+    val (receiver, result) = StaticXPath.newTinyTreeReceiver
     jsonToXmlStream(ast, receiver)
-    builder.getCurrentRoot.asInstanceOf[DocumentInfo]
+    result()
   }
 
   // Convert a JSON String to a stream of XML events

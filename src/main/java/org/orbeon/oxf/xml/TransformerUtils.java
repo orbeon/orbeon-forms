@@ -406,12 +406,6 @@ public class TransformerUtils {
         return dom4jResult.getDocument();
 
     }
-    public static Tuple2<TinyBuilder, XMLReceiver> createTinyBuilder(Configuration configuration) {
-        final TinyBuilder treeBuilder = new TinyBuilder();
-        final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
-        identityHandler.setResult(treeBuilder);
-        return new Tuple2<TinyBuilder, XMLReceiver>(treeBuilder, identityHandler);
-    }
 
     /**
      * Transform an InputStream to a TinyTree.

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import cats.syntax.option._
-import org.apache.commons.validator.routines.{EmailValidator, RegexValidator}
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.errorified.Exceptions
@@ -27,7 +26,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -39,6 +38,7 @@ import scala.collection.compat._
 import scala.collection.{mutable => m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
+
 
 class XFormsModelBinds(protected val model: XFormsModel)
   extends RebuildBindOps
@@ -125,8 +125,8 @@ object XFormsModelBinds {
 
     private val DomainRegex = new RegexValidator(DomainNameRegex)
 
-    override def isValidDomain(domain: String) =
-      Option(DomainRegex.`match`(domain)) exists (_.nonEmpty)
+    override def isValidDomain(domain: String): Boolean =
+      Option(DomainRegex.matches(domain)) exists (_.nonEmpty)
   }
 
   def isEmptyValue(value: String): Boolean = "" == value

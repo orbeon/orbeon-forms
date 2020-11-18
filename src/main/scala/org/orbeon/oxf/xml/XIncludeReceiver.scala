@@ -72,14 +72,14 @@ class XIncludeReceiver(
   // for the same prefixes. So we nicely merge namespace events so that the output is as clean as possible from
   // the point of view of namespace events.
   //
-  // We keep a stack of context information (ElementContext), with, for each element:
+  // We keep a stack of context information (`ElementContext`), with, for each element:
   //
   // 1. the pending mappings between the closest relevant ancestor element
   // 2. its in-scope namespace mappings
   // 3. whether the context is "relevant", that is useful for finding pending mappings
   //
   // For the root element of an included document only, we use this information to search the closest relevant
-  // ancestor ElementContext, and use it to compute an exact list of undeclarations/declarations to send when
+  // ancestor `ElementContext`, and use it to compute an exact list of undeclarations/declarations to send when
   // needed.
   //
   // For non-root elements, the pending mappings are just the mappings between the element and its parent,
@@ -109,8 +109,8 @@ class XIncludeReceiver(
 
   case class ElementContext(pending: Map[String, String], context: NamespaceContext#Context, relevant: Boolean)
 
-  private var _contexts: List[ElementContext] = ElementContext(Map(), namespaceContext.current, relevant = topLevel) :: Nil
-  def contexts = _contexts
+  private var _contexts: List[ElementContext] = ElementContext(Map.empty, namespaceContext.current, relevant = topLevel) :: Nil
+  def contexts: List[ElementContext] = _contexts
 
   override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
@@ -142,7 +142,7 @@ class XIncludeReceiver(
       // Whether to create/update xml:base attribute or not
       val generateXMLBase = {
         val disableXMLBase = attributes.getValue(XXIncludeOmitXmlBaseQName.namespace.uri, XXIncludeOmitXmlBaseQName.localName)
-        val fixupXMLBase = attributes.getValue(XIncludeFixupXMLBaseQName.namespace.uri, XIncludeFixupXMLBaseQName.localName)
+        val fixupXMLBase   = attributes.getValue(XIncludeFixupXMLBaseQName.namespace.uri, XIncludeFixupXMLBaseQName.localName)
         ! (disableXMLBase == "true" || fixupXMLBase == "false")
       }
 
@@ -183,6 +183,7 @@ class XIncludeReceiver(
 
             // Each resulting object is output through the next level of processing
             // TODO: Use Saxon to stream the result?
+            // TODO: Should not require a `PipelineContext`!
             for (item <- result.asScala) // contains `String`, `Boolean`, but `NodeInfo` wrappers
               XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, XmlLocationData(outputLocator))
 
@@ -202,8 +203,8 @@ class XIncludeReceiver(
       } catch {
         case NonFatal(t) =>
           // Resource error, must go to fallback if possible
-          if (systemId != null)
-            throw new OXFException("Error while handling: " + systemId, t)
+          if (systemId ne null)
+            throw new OXFException(s"Error while handling `$systemId` ", t)
           else
             throw new OXFException(t)
       }
@@ -238,7 +239,7 @@ class XIncludeReceiver(
     namespaceContext.startPrefixMapping(prefix, uri)
 
   // Don't do anything, we take care of regenerating these (unneeded!) events
-  override def endPrefixMapping(s: String) = ()
+  override def endPrefixMapping(s: String): Unit = ()
 
   override def setDocumentLocator(locator: Locator): Unit = {
     // Keep track of current locator

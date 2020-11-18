@@ -188,7 +188,7 @@ trait ValidationBindOps extends Logging {
         // Just a marker type
         true
       } else if (isBuiltInXFormsType && ModelDefs.XFormsSchemaTypeNames(typeLocalname)) {
-        // `xf:dayTimeDuration`, `xf:yearMonthDuration`, `xf:email`, `xf:card-number`
+        // `xf:dayTimeDuration`, `xf:yearMonthDuration`, `xf:card-number`
         val validationError = xformsValidator.validateDatatype(
           nodeValue,
           typeNamespaceURI,

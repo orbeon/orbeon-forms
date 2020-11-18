@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.util
 
-import javax.xml.transform.{Result, Source}
+import java.{lang => jl}
+
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{OutputKeys, Result, Source}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
 import org.orbeon.saxon.expr._
@@ -102,6 +106,14 @@ object StaticXPath extends StaticXPathTrait {
     documentResult.getDocument
   }
 
+  def tinyTreeToString(nodeInfo: om.NodeInfo): String = {
+    val identity = new IdentityTransformerWithFixup(GlobalConfiguration)
+    identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+    val writer = new StringBuilderWriter(new jl.StringBuilder)
+    identity.transform(nodeInfo, new StreamResult(writer))
+    writer.result
+  }
+
   def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) = {
 
     val treeBuilder = new TinyBuilder
@@ -115,7 +127,6 @@ object StaticXPath extends StaticXPathTrait {
       () => treeBuilder.getCurrentRoot.asInstanceOf[DocumentNodeInfoType]
     )
   }
-
 
   // Custom version of Saxon's IdentityTransformer which hooks up a `ComplexContentOutputter`
   private class IdentityTransformerWithFixup(config: Configuration) extends Controller(config) {
@@ -171,17 +182,15 @@ object StaticXPath extends StaticXPathTrait {
     functionLibrary  : FunctionLibrary,
     avt              : Boolean)(implicit
     logger           : IndentedLogger
-  ): CompiledExpression = {
-    CompiledExpression(
-      compileExpressionWithStaticContext(
-        new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
-        xpathString,
-        avt
-      ),
+  ): CompiledExpression = CompiledExpression(
+    compileExpressionWithStaticContext(
+      new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
       xpathString,
-      locationData
-    )
-  }
+      avt
+    ),
+    xpathString,
+    locationData
+  )
 
   // Create and compile an expression
   def compileExpressionWithStaticContext(
@@ -214,7 +223,7 @@ object StaticXPath extends StaticXPathTrait {
     }
 
   // Ideally: add this to Saxon XPathEvaluator
-  private def prepareExpressionForAVT(staticContext: XPathStaticContext, expression: Expression): XPathExpression = {
+  private def prepareExpressionForAVT(staticContext: XPathStaticContext, expression: Expression) = {
     // Based on XPathEvaluator.createExpression()
     expression.setContainer(staticContext)
     val visitor = ExpressionVisitor.make(staticContext)

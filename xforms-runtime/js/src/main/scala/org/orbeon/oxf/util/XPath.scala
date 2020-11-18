@@ -3,8 +3,11 @@ package org.orbeon.oxf.util
 import java.{util => ju}
 
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.Item
+import org.orbeon.xml.NamespaceMapping
+
 
 object XPath extends XPathTrait {
 
@@ -28,4 +31,11 @@ object XPath extends XPathTrait {
     reporter            : Reporter
   ): AnyRef = ???
 
+  def isXPath2ExpressionOrValueTemplate(
+    xpathString      : String,
+    namespaceMapping : NamespaceMapping,
+    functionLibrary  : FunctionLibrary,
+    avt              : Boolean)(implicit
+    logger           : IndentedLogger
+  ): Boolean = ???
 }

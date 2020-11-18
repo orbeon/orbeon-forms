@@ -15,13 +15,10 @@ package org.orbeon.oxf.xforms.model
 
 import java.net.URI
 
-import javax.xml.transform.stream.StreamResult
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
-import org.orbeon.oxf.processor.DebugProcessor
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
@@ -34,12 +31,13 @@ import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 
 import scala.jdk.CollectionConverters._
+
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
@@ -253,32 +251,32 @@ class XFormsInstance(
   def contentAsString: String =
     underlyingDocumentOpt map
       (_.serializeToString(dom.io.XMLWriter.DefaultFormat)) getOrElse
-        TransformerUtils.tinyTreeToString(_documentInfo)
+        StaticXPath.tinyTreeToString(_documentInfo)
 
   // Don't allow any external events
   def allowExternalEvent(eventName: String) = false
 
-  // Write the instance document to the specified ContentHandler
-  def write(xmlReceiver: XMLReceiver): Unit =
-    TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
-
-  // Log the instance
-  def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
-    implicit val logger = indentedLogger
-    debug(message, Seq(
-      "model effective id"    -> parent.getEffectiveId,
-      "instance effective id" -> getEffectiveId,
-      "instance"              -> TransformerUtils.tinyTreeToString(rootElement)
-    ))
-  }
-
-  // Print the instance with extra annotation attributes to Console.out. For debug only.
-  def debugPrintOut(): Unit = {
-    val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
-    identityTransformerHandler.setResult(new StreamResult(Console.out))
-    write(identityTransformerHandler)
-  }
-
+//  // Write the instance document to the specified ContentHandler
+//  def write(xmlReceiver: XMLReceiver): Unit =
+//    TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
+//
+//  // Log the instance
+//  def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
+//    implicit val logger = indentedLogger
+//    debug(message, Seq(
+//      "model effective id"    -> parent.getEffectiveId,
+//      "instance effective id" -> getEffectiveId,
+//      "instance"              -> XFormsCrossPlatformSupport.tinyTreeToString(rootElement)
+//    ))
+//  }
+//
+//  // Print the instance with extra annotation attributes to Console.out. For debug only.
+//  def debugPrintOut(): Unit = {
+//    val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
+//    identityTransformerHandler.setResult(new StreamResult(Console.out))
+//    write(identityTransformerHandler)
+//  }
+//
 //  // Log the current MIP values applied to this instance
 //  def debugLogMIPs(): Unit = {
 //    XFormsUtils.logDebugDocument(
@@ -510,7 +508,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       documentInfo // the optimal case: no copy of the cached document is needed
     else
-      XFormsInstanceSupport.wrapDocument(TransformerUtils.tinyTreeToDom4j(documentInfo), exposeXPathTypes)
+      XFormsInstanceSupport.wrapDocument(StaticXPath.tinyTreeToOrbeonDom(documentInfo), exposeXPathTypes)
   }
 
   // Restore an instance on the model, given InstanceState

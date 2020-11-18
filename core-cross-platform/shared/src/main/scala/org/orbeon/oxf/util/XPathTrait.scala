@@ -1,5 +1,11 @@
 package org.orbeon.oxf.util
 
+import java.{util => ju}
+
+import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om
+import org.orbeon.xml.NamespaceMapping
+
 
 trait XPathTrait {
 
@@ -24,4 +30,32 @@ trait XPathTrait {
 
   // Return the currently scoped function context if any
   def functionContext: Option[FunctionContext] = xpathContextDyn.value
+
+  val GlobalConfiguration: StaticXPath.SaxonConfiguration
+
+  def evaluateAsString(
+    contextItems        : ju.List[om.Item],
+    contextPosition     : Int,
+    compiledExpression  : StaticXPath.CompiledExpression,
+    functionContext     : FunctionContext,
+    variableResolver    : StaticXPath.VariableResolver)(implicit
+    reporter            : Reporter
+  ): String
+
+  def evaluateSingle(
+    contextItems        : ju.List[om.Item],
+    contextPosition     : Int,
+    compiledExpression  : StaticXPath.CompiledExpression,
+    functionContext     : FunctionContext,
+    variableResolver    : StaticXPath.VariableResolver)(implicit
+    reporter            : Reporter
+  ): AnyRef
+
+  def isXPath2ExpressionOrValueTemplate(
+    xpathString      : String,
+    namespaceMapping : NamespaceMapping,
+    functionLibrary  : FunctionLibrary,
+    avt              : Boolean)(implicit
+    logger           : IndentedLogger
+  ): Boolean
 }

@@ -7,26 +7,30 @@ import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.XPath.{FunctionContext, Reporter}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 
-object XPathCache {
+object XPathCache extends XPathCacheTrait {
 
-  case class XPathContext(
+  // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
+  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
+  def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
+
+  def evaluateSingleKeepItems(
+    contextItems       : ju.List[Item],
+    contextPosition    : Int,
+    xpathString        : String,
     namespaceMapping   : NamespaceMapping,
     variableToValueMap : ju.Map[String, ValueRepresentationType],
     functionLibrary    : FunctionLibrary,
     functionContext    : FunctionContext,
     baseURI            : String,
-    locationData       : LocationData
-  )
-
-  // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
-  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
-  def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
+    locationData       : LocationData,
+    reporter           : Reporter
+  ): Item = ???
 
   def evaluateAsExtent(
     contextItems       : ju.List[om.Item],
@@ -167,4 +171,11 @@ object XPathCache {
     locationData       : LocationData,
     reporter           : Reporter
   ) : String = ???
+
+  def evaluateSingleWithContext(
+    xpathContext : XPathContext,
+    contextItem  : Item,
+    xpathString  : String,
+    reporter     : Reporter
+  ): AnyRef = ???
 }

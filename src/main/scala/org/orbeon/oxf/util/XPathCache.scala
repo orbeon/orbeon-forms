@@ -35,7 +35,7 @@ import scala.util.control.NonFatal
 /**
  * XPath expressions cache.
  */
-object XPathCache {
+object XPathCache extends XPathCacheTrait {
 
   import XPath._
 
@@ -44,40 +44,11 @@ object XPathCache {
 
   private val Logger = LoggerFactory.createLogger(getClass)
 
-  case class XPathContext(
-    namespaceMapping   : NamespaceMapping,
-    variableToValueMap : JMap[String, ValueRepresentation],
-    functionLibrary    : FunctionLibrary,
-    functionContext    : FunctionContext,
-    baseURI            : String,
-    locationData       : LocationData
-  )
-
-  object XPathContext {
-
-    def apply(
-      ns              : NamespaceMapping                 = NamespaceMapping.EmptyMapping,
-      vars            : Map[String, ValueRepresentation] = Map.empty,
-      functionLibrary : FunctionLibrary                  = null,
-      functionContext : FunctionContext                  = null,
-      baseURI         : String                           = null,
-      locationData    : LocationData                     = null,
-      reporter        : Reporter                         = null
-    ): XPathContext =
-      XPathContext(
-        namespaceMapping   = ns,
-        variableToValueMap = vars.asJava,
-        functionLibrary    = null,
-        functionContext    = null,
-        baseURI            = null,
-        locationData       = null
-      )
-  }
-
   def isDynamicXPathError(t: Throwable): Boolean = t match {
     case e: XPathException if ! e.isStaticError => true
     case _ => false
   }
+
   // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
   // etc.), but NodeInfo wrappers are preserved.
   // 7 external usages

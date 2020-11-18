@@ -149,7 +149,7 @@ private object SubmitResponseEvent {
 
         def asString(value: String Either DocumentNodeInfoType) = value match {
           case Left(text) => text
-          case Right(xml) => TransformerUtils.tinyTreeToString(xml)
+          case Right(xml) => StaticXPath.tinyTreeToString(xml)
         }
 
         val result = tryXML orElse tryText onFailure warn("error while reading response body") toOption

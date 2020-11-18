@@ -20,14 +20,13 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
@@ -117,7 +116,7 @@ abstract class XFormsModelSubmissionBase
     if (! instanceSatisfiesValidRequired) {
       debug(
         "instance document or subset thereof cannot be submitted",
-        List("document" -> TransformerUtils.tinyTreeToString(currentNodeInfo))
+        List("document" -> StaticXPath.tinyTreeToString(currentNodeInfo))
       )
       throw new XFormsSubmissionException(
         submission       = thisSubmission,
@@ -204,9 +203,9 @@ object XFormsModelSubmissionBase {
       // Submitting read-only instance backed by TinyTree (no MIPs to check)
       // TODO: What about re-rooting and annotations?
       case ref if ref.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE  =>
-        TransformerUtils.tinyTreeToDom4j(ref)
+        StaticXPath.tinyTreeToOrbeonDom(ref)
       case ref =>
-        TransformerUtils.tinyTreeToDom4j(ref.getRoot)
+        StaticXPath.tinyTreeToOrbeonDom(ref.getRoot)
     }
 
   def processRelevant(

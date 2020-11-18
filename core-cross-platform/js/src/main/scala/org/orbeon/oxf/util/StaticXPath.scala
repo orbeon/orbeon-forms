@@ -77,6 +77,8 @@ object StaticXPath extends StaticXPathTrait {
 
   def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document = ???
 
+  def tinyTreeToString(nodeInfo: om.NodeInfo): String = ???
+
   def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) = ???
 
   val EmptyDocument: DocumentNodeInfoType = {

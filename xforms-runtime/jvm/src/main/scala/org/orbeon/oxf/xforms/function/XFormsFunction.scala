@@ -30,7 +30,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.expr.{Expression, XPathContextMajor, _}
+import org.orbeon.saxon.expr.{Expression, _}
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
@@ -39,6 +39,7 @@ import org.orbeon.xforms.xbl.Scope
 
 import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
+
 
 /**
  * Base class for all XForms functions.

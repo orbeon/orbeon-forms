@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
@@ -34,7 +34,8 @@ import scala.collection.immutable
 import scala.util.Try
 import scala.util.control.NonFatal
 
-// Helper trait for xforms-submit-done/xforms-submit-error
+
+// Helper trait for `xforms-submit-done`/`xforms-submit-error`
 trait SubmitResponseEvent extends XFormsEvent {
 
   def connectionResult: Option[ConnectionResult]

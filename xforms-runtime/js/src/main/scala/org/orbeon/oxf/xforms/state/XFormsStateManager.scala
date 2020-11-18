@@ -9,7 +9,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
   def getDocumentLockOrNull(uuid: String): ReentrantLock = null
 
-  def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String] = None
+  def getClientEncodedStaticState (containingDocument: XFormsContainingDocument): Option[String] = None
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] = None
 
   def afterInitialResponse(containingDocument: XFormsContainingDocument, disableDocumentCache: Boolean): Unit = ()

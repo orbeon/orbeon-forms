@@ -94,13 +94,11 @@ object StaticStateBits {
           new XFormsAnnotator(
             template.saxStore,
             new XFormsExtractor(
-              Some(
-                new WhitespaceXMLReceiver(
-                  extractorOutput,
-                  WhitespaceMatching.defaultBasePolicy,
-                  WhitespaceMatching.basePolicyMatcher
-                )
-              ),
+              new WhitespaceXMLReceiver(
+                extractorOutput,
+                WhitespaceMatching.defaultBasePolicy,
+                WhitespaceMatching.basePolicyMatcher
+              ).some,
               metadata,
               template.some,
               ".",

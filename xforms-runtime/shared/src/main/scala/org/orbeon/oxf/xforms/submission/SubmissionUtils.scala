@@ -291,7 +291,7 @@ object SubmissionUtils {
     element         : Element,
     url             : Option[String]
   ): Unit = {
-    
+
     // Gather mediatype and filename if known
     // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
     // removed during the next recalculate.

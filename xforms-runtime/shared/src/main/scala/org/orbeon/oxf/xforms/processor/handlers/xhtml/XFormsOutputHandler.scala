@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl

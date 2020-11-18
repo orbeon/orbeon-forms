@@ -298,7 +298,7 @@ object XFormsUploadControl {
 
   // Get the MAC for a given string
   def hmac(value: String): String =
-    SecureUtils.hmacString(value, "hex")
+    XFormsCrossPlatformSupport.hmacString(value, "hex")
 
   // Remove the MAC from the URL
   def removeMAC(url: String): String = {

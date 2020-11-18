@@ -21,6 +21,7 @@ import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
+import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLReceiver
@@ -88,4 +89,28 @@ trait XFormsCrossPlatformSupportTrait {
   ): Option[String]
 
   def getLastModifiedIfFast(absoluteURL: String): Long
+
+  def readTinyTree(
+    configuration  : SaxonConfiguration,
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType
+
+  def stringToTinyTree(
+    configuration  : SaxonConfiguration,
+    string         : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType
+
+  def readDom4j(
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): dom.Document
+
+  def hmacString(text: String, encoding: String): String
 }

@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.saxon.om
 
@@ -107,7 +106,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
               Converter.jsonStringToXmlStream(SubmissionUtils.readTextContent(connectionResult.content).get, receiver)
               receiver.getDocument
             } else {
-              TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
+              XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, isHandleXInclude, true)
             }
           )
         } else {
@@ -120,7 +119,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             if (isJSON)
               Converter.jsonStringToXmlDoc(SubmissionUtils.readTextContent(connectionResult.content).get)
             else
-              TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
+              XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
           )
         }
       }

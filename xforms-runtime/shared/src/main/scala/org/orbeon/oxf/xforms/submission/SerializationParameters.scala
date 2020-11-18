@@ -32,6 +32,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 
+
 case class SerializationParameters(
   messageBody            : Option[Array[Byte]],
   queryString            : String,

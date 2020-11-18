@@ -31,10 +31,9 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants, XMLParsing}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -109,7 +108,7 @@ object SubmissionUtils {
     stringAvtTrimmedOpt(value) map (_.toBoolean)
 
   def dataNodeHash(node: om.NodeInfo): String =
-    SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
+    XFormsCrossPlatformSupport.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
   def readByteArray(model: XFormsModel, resolvedAbsoluteUrl: URI): Array[Byte] =
     processGETConnection(model, resolvedAbsoluteUrl) { is =>
@@ -118,7 +117,7 @@ object SubmissionUtils {
 
   def readTinyTree(model: XFormsModel, resolvedAbsoluteUrl: URI, handleXInclude: Boolean): DocumentNodeInfoType =
     processGETConnection(model, resolvedAbsoluteUrl) { is =>
-      TransformerUtils.readTinyTree(
+      XFormsCrossPlatformSupport.readTinyTree(
         XPath.GlobalConfiguration,
         is,
         resolvedAbsoluteUrl.toString,

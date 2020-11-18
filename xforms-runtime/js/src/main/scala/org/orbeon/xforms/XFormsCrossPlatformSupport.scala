@@ -20,7 +20,10 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.saxon.Configuration
+import org.orbeon.saxon.om.DocumentInfo
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
@@ -82,4 +85,28 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     ???
 
   def getLastModifiedIfFast(absoluteURL: String): Long = ???
+
+  def readTinyTree(
+    configuration  : SaxonConfiguration,
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType = ???
+
+  def stringToTinyTree(
+    configuration  : SaxonConfiguration,
+    string         : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType = ???
+
+  def readDom4j(
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): dom.Document = ???
+
+  def hmacString(text: String, encoding: String): String = ???
 }

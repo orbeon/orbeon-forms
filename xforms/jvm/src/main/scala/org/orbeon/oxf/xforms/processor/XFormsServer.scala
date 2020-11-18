@@ -28,7 +28,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -569,6 +569,10 @@ class XFormsServer extends ProcessorImpl {
 
   private def doIt(pipelineContext: PipelineContext, xmlReceiverOpt: Option[XMLReceiver]): Unit = {
 
+    def assertSessionExists(): Unit =
+      Option(NetUtils.getSession(false)) getOrElse
+        (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
+
     // Use request input provided by client
     val requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServer.InputRequest)
     val externalContext = XFormsCrossPlatformSupport.externalContext
@@ -579,7 +583,7 @@ class XFormsServer extends ProcessorImpl {
     //
     // NOTE: We should test this at the beginning of this method, but calling readInputAsOrbeonDom() in unit tests
     // can cause the side effect to create the session, so doing so without changing some tests doesn't work.
-    ClientEvents.assertSessionExists()
+    assertSessionExists()
 
     // Logger used for heartbeat and request/response
     implicit val indentedLogger = Loggers.getIndentedLogger("server")

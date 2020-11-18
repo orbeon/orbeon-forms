@@ -26,8 +26,9 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, URLRewriterUtils, UploadProgress}
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, SecureUtils, URLRewriterUtils, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
@@ -201,4 +202,32 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def getLastModifiedIfFast(absoluteURL: String): Long =
     NetUtils.getLastModifiedIfFast(absoluteURL)
+
+  def readTinyTree(
+    configuration  : SaxonConfiguration,
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType =
+    TransformerUtils.readTinyTree(configuration, inputStream, systemId, handleXInclude, handleLexical)
+
+  def stringToTinyTree(
+    configuration  : SaxonConfiguration,
+    string         : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): DocumentNodeInfoType =
+    TransformerUtils.stringToTinyTree(configuration, string, handleXInclude, handleLexical)
+
+  def readDom4j(
+    inputStream    : InputStream,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean
+  ): dom.Document =
+    TransformerUtils.readDom4j(inputStream, systemId, handleXInclude, handleLexical)
+
+  def hmacString(text: String, encoding: String): String =
+    SecureUtils.hmacString(text, encoding)
 }

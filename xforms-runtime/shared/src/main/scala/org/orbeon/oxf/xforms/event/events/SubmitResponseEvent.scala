@@ -75,7 +75,7 @@ private object SubmitResponseEvent {
         sb.append("</header>")
       }
       sb.append("</headers>")
-      TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
+      XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
     }
 
   def headerElements(e: SubmitResponseEvent): Option[Seq[om.Item]] = {
@@ -137,7 +137,7 @@ private object SubmitResponseEvent {
           Try {
             Right(
               useAndClose(URLFactory.createURL(tempURI).openStream()) { is =>
-                TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
+                XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
               }
             )
           }

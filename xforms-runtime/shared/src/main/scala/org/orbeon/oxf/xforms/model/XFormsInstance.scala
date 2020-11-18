@@ -492,7 +492,7 @@ object XFormsInstance extends Logging {
 
   def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType =
     if (readonly)
-      TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
+      XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
       XFormsInstanceSupport.wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
 

@@ -26,12 +26,13 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
 import org.orbeon.xforms.{EventNames, XFormsId}
+import org.orbeon.xforms.XFormsCrossPlatformSupport
+
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -132,10 +133,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       processingInstruction("orbeon-serializer", List("status-code" -> code.toString))
     }
 
-  def assertSessionExists(): Unit =
-    Option(NetUtils.getSession(false)) getOrElse
-      (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
-
   // Check for and handle events that don't need access to the document but can return an Ajax response rapidly
   def handleQuickReturnEvents(
     xmlReceiver         : XMLReceiver,
@@ -204,7 +201,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             logEvent("ajax upload progress")
 
             val ids         = uploadProgressEventsNel map (_.targetId)
-            val allProgress = ids flatMap (id => UploaderServer.getUploadProgress(request, requestUuid, id).toList)
+            val allProgress = ids flatMap (id => XFormsCrossPlatformSupport.getUploadProgress(request, requestUuid, id).toList)
 
             if (allProgress.nonEmpty) {
 

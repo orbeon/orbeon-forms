@@ -135,4 +135,8 @@ trait XFormsCrossPlatformSupportTrait {
   def openUrlStream(urlString: String): InputStream
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String
+
+  def getRootThrowable(t : Throwable) : Throwable
+
+  def causesIterator(t : Throwable) : Iterator[Throwable]
 }

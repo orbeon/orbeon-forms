@@ -28,6 +28,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
 import org.orbeon.dom.io.DocumentSource
+import org.orbeon.errorified.Exceptions
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
@@ -425,4 +426,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     val contentBody = new InputStreamBody(inputStream, mediatype.orNull, filename.orNull)
     multipartEntity.addPart(element.getName, contentBody)
   }
+
+  def getRootThrowable(t : Throwable) : Throwable =
+    Exceptions.getRootThrowable(t)
+
+  def causesIterator(t : Throwable) : Iterator[Throwable] =
+    Exceptions.causesIterator(t)
 }

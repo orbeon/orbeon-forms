@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.LocationData
-import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
 import org.orbeon.oxf.util.MarkupUtils._
@@ -24,6 +23,7 @@ import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat._
@@ -42,7 +42,7 @@ case class ServerError(
 object ServerError {
 
   def apply(t: Throwable): ServerError = {
-    val root = Exceptions.getRootThrowable(t)
+    val root = XFormsCrossPlatformSupport.getRootThrowable(t)
     ServerError(
       root.getMessage,
       OrbeonLocationException.getRootLocationData(t),
@@ -141,7 +141,7 @@ object XFormsError {
     // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
     // errors are fatal. See https://github.com/orbeon/orbeon-forms/issues/2194
     def causesContainFatalError =
-      Exceptions.causesIterator(t) exists {
+      XFormsCrossPlatformSupport.causesIterator(t) exists {
         case e: XPathException if e.isStaticError => true
         case _: HttpStatusCode                    => true
         case _                                    => false

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.model
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper
-import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
@@ -33,6 +32,7 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.compat._
 import scala.collection.{mutable => m}
@@ -182,7 +182,7 @@ object XFormsModelBinds {
     collector : XFormsEvent => Unit)(implicit
     logger    : IndentedLogger
   ): Unit = {
-    Exceptions.getRootThrowable(throwable) match {
+    XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
       case e: TypedNodeWrapper.TypedValueException =>
         // Consider validation errors as ignorable. The rationale is that if the function (the XPath
         // expression) works on inputs that are not valid (hence the validation error), then the function cannot

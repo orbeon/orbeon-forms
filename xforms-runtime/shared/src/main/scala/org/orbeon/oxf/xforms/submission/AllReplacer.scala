@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 
+
 /**
   * Handle replace="all".
   */

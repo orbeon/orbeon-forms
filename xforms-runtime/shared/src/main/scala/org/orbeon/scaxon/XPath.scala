@@ -39,7 +39,7 @@ object XPath {
       implicit library: FunctionLibrary                      = null
   ): om.Item =
     evaluateSingleKeepItems(
-      Seq(item).asJava,
+      List(item).asJava,
       1,
       expr,
       namespaces,

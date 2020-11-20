@@ -17,6 +17,7 @@ import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => HtmlURI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+
 class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
     extends ForwardingXMLReceiver(xmlReceiver) {
 
@@ -24,9 +25,9 @@ class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
   var inXHTMLNamespace = false
 
   // Consider elements in no namespace to be HTML, see #1981
-  def isHTMLElement(uri: String) = uri == HtmlURI || uri == ""
+  def isHTMLElement(uri: String): Boolean = uri == HtmlURI || uri == ""
 
-  override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
+  override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
     // http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer SHOULD output
     // namespace declarations in a way that is consistent with the requirements of the XHTML DTD if
@@ -46,7 +47,7 @@ class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
     level += 1
   }
 
-  override def endElement(uri: String, localname: String, qName: String) = {
+  override def endElement(uri: String, localname: String, qName: String): Unit = {
 
     level -= 1
 
@@ -58,11 +59,11 @@ class PlainHTMLOrXHTMLReceiver(targetURI: String, xmlReceiver: XMLReceiver)
   }
 
   // Swallow all namespace mappings
-  override def startPrefixMapping(prefix: String, uri: String) = ()
-  override def endPrefixMapping(prefix: String) = ()
+  override def startPrefixMapping(prefix: String, uri: String): Unit = ()
+  override def endPrefixMapping(prefix: String): Unit = ()
 
   // Only keep attributes in no namespace
-  def filterAttributes(attributes: Attributes) = {
+  def filterAttributes(attributes: Attributes): Attributes = {
 
     val length = attributes.getLength
 

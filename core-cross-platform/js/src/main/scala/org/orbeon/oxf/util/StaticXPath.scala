@@ -15,7 +15,6 @@ package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.Document
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CoreUtils._

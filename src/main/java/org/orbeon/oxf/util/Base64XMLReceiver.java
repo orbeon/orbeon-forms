@@ -72,7 +72,7 @@ public class Base64XMLReceiver extends XMLReceiverAdapter {
     private int fillBufferNoWhiteSpace(char ch[], int start, int length) {
         int i;
         for (i = start; i < start + length; i++) {
-            if (!Base64.isWhiteSpace(ch[i])) {
+            if (! Base64.isWhiteSpace(ch[i])) {
                 buffer[bufferSize++] = ch[i];
                 if (bufferSize == buffer.length)
                     break;

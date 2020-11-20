@@ -729,8 +729,11 @@ object XPathCache extends XPathCacheTrait {
   private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: => T): T =
     try {
       if (reporter ne null) {
+
         val startTime = System.nanoTime
+
         val result = body
+
         val totalTimeMicroSeconds = (System.nanoTime - startTime) / 1000 // never smaller than 1000 ns on OS X
         if (totalTimeMicroSeconds > 0)
           reporter(xpathString, totalTimeMicroSeconds)

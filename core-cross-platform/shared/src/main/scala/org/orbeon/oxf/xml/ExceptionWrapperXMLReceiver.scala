@@ -1,7 +1,6 @@
 package org.orbeon.oxf.xml
 
-import java.util.Set
-import java.{util, lang => jl, util => ju}
+import java.{lang => jl, util => ju}
 
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xml.dom.{XmlExtendedLocationData, XmlLocationData}

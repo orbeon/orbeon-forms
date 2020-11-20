@@ -840,6 +840,10 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
 
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)

@@ -21,7 +21,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.{StaticXPath, XPathCache}
+import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}

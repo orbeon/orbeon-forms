@@ -4,14 +4,15 @@ import java.{util => ju}
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPath.{FunctionContext, Reporter}
+import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
+
 
 object XPathCache extends XPathCacheTrait {
 

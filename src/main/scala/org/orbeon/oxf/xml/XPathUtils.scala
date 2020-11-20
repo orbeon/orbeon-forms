@@ -17,8 +17,7 @@ import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPath, XPathCache}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value._

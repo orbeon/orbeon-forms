@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
-import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, NestedPartAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls._

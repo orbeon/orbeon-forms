@@ -18,8 +18,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -52,7 +51,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   // All XPath runs in the context of the main form instance's root element
   def xpathContext: Item = formInstance.rootElement
   def xpathFunctionLibrary: FunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
-  def xpathFunctionContext: XPath.FunctionContext = XPath.functionContext.orNull
+  def xpathFunctionContext: FunctionContext = XPath.functionContext.orNull
 
   // NOTE: Clear the PDF/TIFF URLs *before* the process, because if we clear it after, it will be already cleared
   // during the second pass of a two-pass submission.

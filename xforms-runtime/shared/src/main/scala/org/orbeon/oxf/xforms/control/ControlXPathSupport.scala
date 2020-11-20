@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.control
 import java.{util => ju}
 
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.XMLUtils

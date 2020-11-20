@@ -54,7 +54,7 @@ trait ProcessInterpreter extends Logging {
   def processError(t: Throwable): Unit
   def xpathContext: Item
   implicit def xpathFunctionLibrary: FunctionLibrary
-  def xpathFunctionContext: u.XPath.FunctionContext
+  def xpathFunctionContext: u.FunctionContext
   def writeSuspendedProcess(process: String): Unit
   def readSuspendedProcess: String
   def createUniqueProcessId: String = SecureUtils.randomHexId

@@ -7,10 +7,10 @@ import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
 
-trait XPathTrait {
+// Marker for XPath function context
+trait FunctionContext
 
-  // Marker for XPath function context
-  trait FunctionContext
+trait XPathTrait {
 
   // To report timing information
   type Reporter = (String, Long) => Unit

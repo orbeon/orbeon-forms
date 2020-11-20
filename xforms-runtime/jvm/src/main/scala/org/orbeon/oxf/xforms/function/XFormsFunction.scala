@@ -18,7 +18,7 @@ import java.util.{Locale, Iterator => JIterator}
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{FunctionContext, PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.util.XPath.compileExpressionWithStaticContext
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
@@ -291,7 +291,7 @@ object XFormsFunction {
     sourceEffectiveId : String,
     modelOpt          : Option[XFormsModel],
     data              : Any
-  ) extends XPath.FunctionContext {
+  ) extends FunctionContext {
 
     def containingDocument = container.containingDocument
 

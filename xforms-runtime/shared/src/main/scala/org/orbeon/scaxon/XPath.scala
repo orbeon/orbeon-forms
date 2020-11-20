@@ -13,8 +13,9 @@
   */
 package org.orbeon.scaxon
 
+import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPath.{FunctionContext, Reporter}
+import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.XPathCache.{evaluate, evaluateAsAvt, evaluateSingleKeepItems}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om

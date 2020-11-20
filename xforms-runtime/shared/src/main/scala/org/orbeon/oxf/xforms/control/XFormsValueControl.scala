@@ -17,8 +17,8 @@ import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.FunctionContext
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.xforms.analysis.controls.{FormatTrait, StaticLHHASupport, ValueTrait, ViewTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent

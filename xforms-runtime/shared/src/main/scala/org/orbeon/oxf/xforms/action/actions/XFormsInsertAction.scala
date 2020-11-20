@@ -328,9 +328,9 @@ object XFormsInsertAction {
               Option(insertedNodeInfos.head.getParent)
 
           parentOpt match {
-            case Some(parent) if parent == parent.getDocumentRoot =>
+            case Some(parent) if parent == parent.getRoot =>
               // Node was inserted under document node
-              (parent.getDocumentRoot, "into")
+              (parent.getRoot, "into")
             case _ =>
               (insertLocationNodeInfo, beforeAfterInto)
           }
@@ -352,6 +352,7 @@ object XFormsInsertAction {
   }
 
   private def findNodeIndex(node: om.NodeInfo): Int = {
+
     if (node.getParent == null)
       return 0
 

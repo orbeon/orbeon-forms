@@ -273,7 +273,7 @@ class XFormsComponentControl(
   private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNodeType): Option[VirtualNodeType] =
     _nestedContainerOpt map { nestedContainer =>
 
-      val outerDocument = referenceNode.getDocumentRoot
+      val outerDocument = referenceNode.getRoot
       val outerInstance = containingDocument.instanceForNodeOpt(outerDocument).orNull // TODO: `Option`
 
       val newListenerWithCycleDetector = new ListenerCycleDetector

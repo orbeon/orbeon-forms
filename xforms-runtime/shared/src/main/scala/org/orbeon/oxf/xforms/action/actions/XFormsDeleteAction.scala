@@ -168,7 +168,7 @@ object XFormsDeleteAction extends Logging {
     // `groupByKeepOrder` uses universal equality but it works because `==` is `equals()` is `isSameNodeInfo()`.
     // NOTE: `getDocumentRoot` can be `null`.
     val instancesWithDescriptors =
-      nodesToDelete.groupByKeepOrder(n => n.getDocumentRoot) map { case (docNodeOrNull, nodesToDelete) =>
+      nodesToDelete.groupByKeepOrder(n => n.getRoot) map { case (docNodeOrNull, nodesToDelete) =>
 
         val nodeArray = nodesToDelete.toArray
         ju.Arrays.sort(nodeArray, ReverseLocalOrderComparator)

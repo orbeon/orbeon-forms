@@ -326,7 +326,7 @@ class XFormsInstance(
           this,
           Seq[om.NodeInfo](currentRoot).asJava,
           null,   // CHECK
-          currentRoot.getDocumentRoot,
+          currentRoot.getRoot,
           "into", // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
           0
         )

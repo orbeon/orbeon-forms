@@ -348,7 +348,7 @@ trait XFormsModelInstances {
   // Return the XFormsInstance object containing the given node
   def findInstanceForNode(nodeInfo: om.NodeInfo): Option[XFormsInstance] =
     container.isRelevant flatOption { // NOTE: We shouldn't even be called if the parent control is not relevant.
-      val documentInfo = nodeInfo.getDocumentRoot
+      val documentInfo = nodeInfo.getRoot
       instancesIterator find (_.documentInfo.isSameNodeInfo(documentInfo))
     }
 

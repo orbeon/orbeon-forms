@@ -363,7 +363,7 @@ object InstanceMirror {
                 findMatchingNode(delete.targetInstance, removedParentNodeInfo, None) match {
                   case Match(_, matchingParentNode) =>
 
-                    val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
+                    val docWrapper    = matchingParentNode.getRoot.asInstanceOf[DocumentWrapper]
                     val newParentNode = NodeInfoConversions.unwrapNode(matchingParentNode) getOrElse (throw new IllegalArgumentException)
 
                     body(newParentNode) match {

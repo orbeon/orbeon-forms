@@ -28,23 +28,25 @@ class Scope(val parent: Option[Scope], val scopeId: String) {
 
   require(parent.isDefined && scopeId.nonEmpty || parent.isEmpty && scopeId.isEmpty)
 
-  private val idMap = mutable.HashMap[String, String]()
+  private val _idMap = mutable.HashMap[String, String]()
+  def idMap: collection.Map[String, String] = _idMap
+
   val fullPrefix: String = if (isTopLevelScope) "" else scopeId + ComponentSeparator
 
   def isTopLevelScope                           : Boolean        = scopeId.isEmpty
-  def prefixedIdForStaticId(staticId: String)   : String         = idMap.get(staticId).orNull
-  def prefixedIdForStaticIdOpt(staticId: String): Option[String] = idMap.get(staticId)
-  def contains(staticId: String)                : Boolean        = idMap.contains(staticId)
+  def prefixedIdForStaticId(staticId: String)   : String         = _idMap.get(staticId).orNull
+  def prefixedIdForStaticIdOpt(staticId: String): Option[String] = _idMap.get(staticId)
+  def contains(staticId: String)                : Boolean        = _idMap.contains(staticId)
 
   // Add a static id -> prefixed id mapping
   def += (kv: (String, String)): Unit = kv match {
     case (staticId, prefixedId) =>
-      idMap += staticId -> prefixedId
+      _idMap += staticId -> prefixedId
   }
 
   // Remove a mapping by static id
   def -= (staticId: String): Unit =
-    idMap -= staticId
+    _idMap -= staticId
 
   // Equality is defined purely based on the scope id
   override def hashCode: Int = scopeId.hashCode

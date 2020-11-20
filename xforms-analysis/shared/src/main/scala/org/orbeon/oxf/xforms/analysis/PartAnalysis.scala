@@ -10,6 +10,8 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+import scala.collection.mutable
+
 
 case class Global(templateTree: SAXStore, compactShadowTree: dom.Document)
 
@@ -48,6 +50,10 @@ trait PartAnalysis
 
   def ancestorIterator      : Iterator[PartAnalysis] = partAnalysisIterator(parent)
   def ancestorOrSelfIterator: Iterator[PartAnalysis] = partAnalysisIterator(this.some)
+
+  // TODO for serialization
+  val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis]
+
 }
 
 trait PartAnalysisRuntimeOps extends PartGlobalOps {

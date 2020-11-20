@@ -797,9 +797,10 @@ lazy val xformsCompiler = (crossProject(JVMPlatform, JSPlatform).crossType(Cross
 lazy val xformsCompilerJVM = xformsCompiler.jvm
   .dependsOn(
     xformsAnalysisJVM,
-    core,
+    core % "test->test;compile->compile",
     coreCrossPlatformJVM // implied
   )
+  .settings(jUnitTestOptions: _*)
 
 lazy val xformsCompilerJS = xformsCompiler.js
   .dependsOn(

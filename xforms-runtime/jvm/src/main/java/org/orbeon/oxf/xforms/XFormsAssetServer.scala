@@ -32,9 +32,12 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import XFormsAssetPaths._
+
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.{Failure, Success, Try}
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 /**

@@ -549,6 +549,7 @@ class XFormsServer extends ProcessorImpl {
           doIt(pipelineContext, xmlReceiverOpt = Some(xmlReceiver))
         } catch {
           case e: SessionExpiredException =>
+            implicit val externalContext = XFormsCrossPlatformSupport.externalContext
             LifecycleLogger.eventAssumingRequest("xforms", e.message, Nil)
             // Don't log whole exception
             Loggers.logger.info(e.message)
@@ -575,7 +576,7 @@ class XFormsServer extends ProcessorImpl {
 
     // Use request input provided by client
     val requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServer.InputRequest)
-    val externalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
     val request = externalContext.getRequest
 
     // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,
@@ -607,7 +608,6 @@ class XFormsServer extends ProcessorImpl {
             ClientEvents.handleQuickReturnEvents(
               xmlReceiver,
               parameters.uuid,
-              request,
               logRequestResponse,
               extractedEvents
             )

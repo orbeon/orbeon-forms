@@ -17,7 +17,6 @@ import java.{util => ju}
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -137,10 +136,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   def handleQuickReturnEvents(
     xmlReceiver         : XMLReceiver,
     requestUuid         : String,
-    request             : ExternalContext.Request,
     logRequestResponse  : Boolean,
     clientEvents        : List[WireAjaxEvent])(implicit
-    indentedLogger      : IndentedLogger
+    indentedLogger      : IndentedLogger,
+    externalContext     : ExternalContext
   ): List[WireAjaxEvent] = {
 
     val eventsWithSequence = clientEvents collect {
@@ -201,7 +200,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
             logEvent("ajax upload progress")
 
             val ids         = uploadProgressEventsNel map (_.targetId)
-            val allProgress = ids flatMap (id => XFormsCrossPlatformSupport.getUploadProgress(request, requestUuid, id).toList)
+            val allProgress = ids flatMap (id => XFormsCrossPlatformSupport.getUploadProgress(externalContext.getRequest, requestUuid, id).toList)
 
             if (allProgress.nonEmpty) {
 
@@ -212,7 +211,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
                 progress =>
                   helper.element(
                     "xxf", XXFORMS_NAMESPACE_URI, "control",
-                    Array[String]("id", request.getContainerNamespace + progress.fieldName,
+                    Array[String]("id", externalContext.getRequest.getContainerNamespace + progress.fieldName,
                       "progress-state",    progress.state.name,
                       "progress-received", progress.receivedSize.toString,
                       "progress-expected", progress.expectedSize map (_.toString) orNull

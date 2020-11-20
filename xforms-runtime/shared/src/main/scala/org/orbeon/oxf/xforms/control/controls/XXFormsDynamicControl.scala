@@ -18,6 +18,7 @@ import org.orbeon.dom._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, NestedPartAnalysis, PartAnalysis, PartAnalysisBuilder}
@@ -33,7 +34,6 @@ import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.`type`.{Type => SaxonType}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -119,7 +119,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
   }
 
-  private def updateSubTree(create: Boolean, boundElem: om.VirtualNode): Unit =
+  private def updateSubTree(create: Boolean, boundElem: VirtualNodeType): Unit =
     if (create || fullUpdateChange) {
       // Document has changed and needs to be fully recreated
       processFullUpdate(create, boundElem)
@@ -133,7 +133,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         processXBLUpdates()
     }
 
-  private def processFullUpdate(create: Boolean, boundElem: om.VirtualNode): Unit = {
+  private def processFullUpdate(create: Boolean, boundElem: VirtualNodeType): Unit = {
     fullUpdateChange = false
     xblChanges.clear()
     bindChanges.clear()
@@ -342,10 +342,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     bindChanges.clear()
    }
 
-  private def getBoundElement: Option[om.VirtualNode] =
+  private def getBoundElement: Option[VirtualNodeType] =
     bindingContext.singleNodeOpt match {
-      case Some(node: om.VirtualNode) if node.getNodeKind == ELEMENT_NODE => Some(node)
-      case _                                                           => None
+      case Some(node: VirtualNodeType) if node.getNodeKind == ELEMENT_NODE => Some(node)
+      case _                                                               => None
     }
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
@@ -404,7 +404,7 @@ object XXFormsDynamicControl {
   // Find whether a change occurred in a descendant of a top-level XBL binding
   def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
 
-    if (node.getNodeKind == SaxonType.NAMESPACE)
+    if (node.getNodeKind == SaxonUtils.NamespaceType)
       None // can't find ancestors of namespace nodes with dom4j
     else {
 

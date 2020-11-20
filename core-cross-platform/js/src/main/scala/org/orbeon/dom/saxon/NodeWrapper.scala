@@ -22,6 +22,13 @@ trait NodeWrapper
   val docWrapper : DocumentWrapper
   var parent     : NodeWrapper // null means unknown
 
+  protected def makeWrapper(
+    node       : dom.Node,
+    docWrapper : DocumentWrapper,
+    parent     : NodeWrapper
+  ): NodeWrapper =
+    ConcreteNodeWrapper.makeWrapper(node, docWrapper, parent)
+
   // From `AbstractNodeWrapper`
   def getNextSibling: NodeWrapper =
     iterateSiblings(AnyNodeTest.getInstance, forwards = true).next().asInstanceOf[NodeWrapper]
@@ -60,7 +67,7 @@ trait NodeWrapper
     if (next eq null)
       null
     else
-      ConcreteNodeWrapper.makeWrapper(next, docWrapper, null)
+      makeWrapper(next, docWrapper, null)
   }
 
   private def getSuccessorNode(start: dom.Node, anchor: dom.Node): dom.Node = {
@@ -267,7 +274,7 @@ trait NodeWrapper
 
     def next(): om.NodeInfo =
       if (attsIt.hasNext)
-        ConcreteNodeWrapper.makeWrapper(attsIt.next(), docWrapper, start)
+        makeWrapper(attsIt.next(), docWrapper, start)
       else
         null
 
@@ -329,7 +336,7 @@ trait NodeWrapper
               return
             case _ =>
           }
-          current = ConcreteNodeWrapper.makeWrapper(nextChild, docWrapper, commonParent)
+          current = makeWrapper(nextChild, docWrapper, commonParent)
         } else
           current = null
       } else { // backwards
@@ -341,7 +348,7 @@ trait NodeWrapper
               return
             case _ =>
           }
-          current = ConcreteNodeWrapper.makeWrapper(nextChild, docWrapper, commonParent)
+          current = makeWrapper(nextChild, docWrapper, commonParent)
         } else
           current = null
       }
@@ -361,17 +368,17 @@ trait NodeWrapper
         node match {
           case elem: dom.Element =>
             if (elem.isRootElement)
-              parent = ConcreteNodeWrapper.makeWrapper(node.getDocument, docWrapper, null)
+              parent = makeWrapper(node.getDocument, docWrapper, null)
             else {
               val parentNode = node.getParent
               // This checks the case of an element detached from a Document
               if (parentNode ne null)
-                parent = ConcreteNodeWrapper.makeWrapper(parentNode, docWrapper, null)
+                parent = makeWrapper(parentNode, docWrapper, null)
             }
-          case _: dom.Text                  => parent = ConcreteNodeWrapper.makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.Comment               => parent = ConcreteNodeWrapper.makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.ProcessingInstruction => parent = ConcreteNodeWrapper.makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.Attribute             => parent = ConcreteNodeWrapper.makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Text                  => parent = makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Comment               => parent = makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.ProcessingInstruction => parent = makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Attribute             => parent = makeWrapper(node.getParent, docWrapper, null)
           case _: dom.Document              => parent = null
           case _: dom.Namespace             => throw new UnsupportedOperationException("Cannot find parent of a Namespace node")
           case _ => throw new IllegalStateException

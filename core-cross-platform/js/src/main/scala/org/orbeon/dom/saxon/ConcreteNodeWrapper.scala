@@ -16,7 +16,7 @@ object ConcreteNodeWrapper {
   }
 }
 
-class ConcreteNodeWrapper private (
+class ConcreteNodeWrapper protected (
   val node       : dom.Node,
   val docWrapper : DocumentWrapper,
   var parent     : NodeWrapper // null means unknown

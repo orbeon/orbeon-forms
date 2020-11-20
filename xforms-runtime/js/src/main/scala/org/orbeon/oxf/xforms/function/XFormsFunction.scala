@@ -18,16 +18,15 @@ import java.util.{Locale, Iterator => JIterator}
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{StaticXPath, XPath}
+import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPath}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
+//import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
-import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.`type`.AtomicType
+//import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.{Expression, _}
 import org.orbeon.saxon.sxpath.IndependentContext
@@ -131,34 +130,36 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   def setProperty(name: String, value: Option[String]): Unit =
     context.setProperty(name, value)
 
-  def currentLangOpt(implicit xpathContext: XPathContext): Option[String] =
-    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
+  // TODO: Saxon 10
+//  def currentLangOpt(implicit xpathContext: XPathContext): Option[String] =
+//    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
 
-  def currentLocale(implicit xpathContext: XPathContext): Locale =
-    currentLangOpt match {
-      case Some(lang) =>
-        // Not sure how xml:lang should be parsed, see:
-        //
-        // XML spec points to:
-        //
-        // - http://tools.ietf.org/html/rfc4646
-        // - http://tools.ietf.org/html/rfc4647
-        //
-        // NOTES:
-        //
-        // - IETF BCP 47 replaces RFC 4646 (and includes RFC 5646 and RFC 4647)
-        // - Java 7 has an improved Locale class which supports parsing BCP 47
-        //
-        // http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html#forLanguageTag(java.lang.String)
-        // http://www.w3.org/International/articles/language-tags/
-        // http://sites.google.com/site/openjdklocale/design-specification
-        // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
-
-        // Use Saxon utility for now
-        Configuration.getLocale(lang)
-      case None =>
-        Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
-  }
+  // TODO: Saxon 10
+//  def currentLocale(implicit xpathContext: XPathContext): Locale =
+//    currentLangOpt match {
+//      case Some(lang) =>
+//        // Not sure how xml:lang should be parsed, see:
+//        //
+//        // XML spec points to:
+//        //
+//        // - http://tools.ietf.org/html/rfc4646
+//        // - http://tools.ietf.org/html/rfc4647
+//        //
+//        // NOTES:
+//        //
+//        // - IETF BCP 47 replaces RFC 4646 (and includes RFC 5646 and RFC 4647)
+//        // - Java 7 has an improved Locale class which supports parsing BCP 47
+//        //
+//        // http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html#forLanguageTag(java.lang.String)
+//        // http://www.w3.org/International/articles/language-tags/
+//        // http://sites.google.com/site/openjdklocale/design-specification
+//        // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+//
+//        // Use Saxon utility for now
+//        Configuration.getLocale(lang)
+//      case None =>
+//        Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
+//  }
 
   protected def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName = {
 
@@ -180,106 +181,107 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   // See comments in Saxon Evaluate.java
   private var staticContext: IndependentContext = null
 
+  // TODO: Saxon 10
   // The following copies all the StaticContext information into a new StaticContext
-  def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
-    // See same method in Saxon Evaluate.java
-    if (staticContext eq null) { // only do this once
-      val env = visitor.getStaticContext
-      super.checkArguments(visitor)
-
-      val namespaceResolver = env.getNamespaceResolver
-
-      staticContext = new IndependentContext(env.getConfiguration)
-
-      staticContext.setBaseURI(env.getBaseURI)
-      staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces)
-      staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace)
-      staticContext.setDefaultElementNamespace(env.getDefaultElementNamespace)
-      staticContext.setFunctionLibrary(env.getFunctionLibrary)
-
-      for {
-        prefix <- namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
-        if prefix.nonEmpty
-        uri = namespaceResolver.getURIForPrefix(prefix, true)
-      } locally {
-        staticContext.declareNamespace(prefix, uri)
-      }
-    }
-  }
+//  def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
+//    // See same method in Saxon Evaluate.java
+//    if (staticContext eq null) { // only do this once
+//      val env = visitor.getStaticContext
+//      super.checkArguments(visitor)
+//
+//      val namespaceResolver = env.getNamespaceResolver
+//
+//      staticContext = new IndependentContext(env.getConfiguration)
+//
+//      staticContext.setBaseURI(env.getBaseURI)
+//      staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces)
+//      staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace)
+//      staticContext.setDefaultElementNamespace(env.getDefaultElementNamespace)
+//      staticContext.setFunctionLibrary(env.getFunctionLibrary)
+//
+//      for {
+//        prefix <- namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
+//        if prefix.nonEmpty
+//        uri = namespaceResolver.getURIForPrefix(prefix, true)
+//      } locally {
+//        staticContext.declareNamespace(prefix, uri)
+//      }
+//    }
+//  }
 
   // Default implementation which adds child expressions (here function arguments) to the pathmap
-  protected def addSubExpressionsToPathMap(
-    pathMap        : PathMap,
-    pathMapNodeSet : PathMapNodeSet
-  ): PathMapNodeSet  = {
+//  protected def addSubExpressionsToPathMap(
+//    pathMap        : PathMap,
+//    pathMapNodeSet : PathMapNodeSet
+//  ): PathMapNodeSet  = {
+//
+//    val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
+//
+//    val result = new PathMapNodeSet
+//    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child =>
+//      result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
+//    }
+//
+//    val th = getExecutable.getConfiguration.getTypeHierarchy
+//    if (getItemType(th).isInstanceOf[AtomicType])
+//      null
+//    else
+//      result
+//  }
 
-    val attachmentPoint = pathMapAttachmentPoint(pathMap, pathMapNodeSet)
-
-    val result = new PathMapNodeSet
-    iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] foreach { child =>
-      result.addNodeSet(child.addToPathMap(pathMap, attachmentPoint))
-    }
-
-    val th = getExecutable.getConfiguration.getTypeHierarchy
-    if (getItemType(th).isInstanceOf[AtomicType])
-      null
-    else
-      result
-  }
-
-  protected def pathMapAttachmentPoint(
-    pathMap        : PathMap,
-    pathMapNodeSet : PathMapNodeSet
-  ): PathMapNodeSet  =
-    if ((getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0) {
-      Option(pathMapNodeSet) getOrElse {
-        val cie = new ContextItemExpression
-        cie.setContainer(getContainer)
-        new PathMapNodeSet(pathMap.makeNewRoot(cie))
-      }
-    } else {
-      null
-    }
+//  protected def pathMapAttachmentPoint(
+//    pathMap        : PathMap,
+//    pathMapNodeSet : PathMapNodeSet
+//  ): PathMapNodeSet  =
+//    if ((getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0) {
+//      Option(pathMapNodeSet) getOrElse {
+//        val cie = new ContextItemExpression
+//        cie.setContainer(getContainer)
+//        new PathMapNodeSet(pathMap.makeNewRoot(cie))
+//      }
+//    } else {
+//      null
+//    }
 
   // The following is inspired by saxon:evaluate()
-  protected def prepareExpression(
-    initialXPathContext : XPathContext,
-    parameterExpression : Expression,
-    isAVT               : Boolean
-  ): (Expression, XPathContext) = {
-
-    // Evaluate parameter into an XPath string
-    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
-
-    // Copy static context information
-    val staticContext = this.staticContext.copy
-    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
-
-    // Propagate in-scope variable definitions since they are not copied automatically
-    val inScopeVariables = bindingContext.getInScopeVariables
-    val variableDeclarations =
-      for {
-        (name, _) <- inScopeVariables.asScala.toList
-        variable = staticContext.declareVariable("", name)
-      } yield
-        name -> variable
-
-    // Create expression
-    val xpe = StaticXPath.compileExpressionWithStaticContext(staticContext, xpathString, isAVT)
-
-    val newXPathContext = initialXPathContext.newCleanContext
-
-    xpe.createDynamicContext(newXPathContext, initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
-
-    if (inScopeVariables ne null)
-      for ((name, variable) <- variableDeclarations) {
-        val value = inScopeVariables.get(name)
-        if (value ne null) // FIXME: this should never happen, right?
-          newXPathContext.setLocalVariable(variable.getLocalSlotNumber, value)
-      }
-
-    (xpe.getInternalExpression, newXPathContext)
-  }
+//  protected def prepareExpression(
+//    initialXPathContext : XPathContext,
+//    parameterExpression : Expression,
+//    isAVT               : Boolean
+//  ): (Expression, XPathContext) = {
+//
+//    // Evaluate parameter into an XPath string
+//    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
+//
+//    // Copy static context information
+//    val staticContext = this.staticContext.copy
+//    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
+//
+//    // Propagate in-scope variable definitions since they are not copied automatically
+//    val inScopeVariables = bindingContext.getInScopeVariables
+//    val variableDeclarations =
+//      for {
+//        (name, _) <- inScopeVariables.asScala.toList
+//        variable = staticContext.declareVariable("", name)
+//      } yield
+//        name -> variable
+//
+//    // Create expression
+//    val xpe = StaticXPath.compileExpressionWithStaticContext(staticContext, xpathString, isAVT)
+//
+//    val newXPathContext = initialXPathContext.newCleanContext
+//
+//    xpe.createDynamicContext(newXPathContext, initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
+//
+//    if (inScopeVariables ne null)
+//      for ((name, variable) <- variableDeclarations) {
+//        val value = inScopeVariables.get(name)
+//        if (value ne null) // FIXME: this should never happen, right?
+//          newXPathContext.setLocalVariable(variable.getLocalSlotNumber, value)
+//      }
+//
+//    (xpe.getInternalExpression, newXPathContext)
+//  }
 }
 
 object XFormsFunction {
@@ -290,7 +292,7 @@ object XFormsFunction {
     sourceEffectiveId : String,
     modelOpt          : Option[XFormsModel],
     data              : Any
-  ) extends XPath.FunctionContext {
+  ) extends FunctionContext {
 
     def containingDocument = container.containingDocument
 
@@ -304,11 +306,11 @@ object XFormsFunction {
     }
   }
 
-  def sourceElementAnalysis(pathMap: PathMap): ElementAnalysis =
-    pathMap.getPathMapContext match {
-      case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext => context.element
-      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-    }
+//  def sourceElementAnalysis(pathMap: PathMap): ElementAnalysis =
+//    pathMap.getPathMapContext match {
+//      case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext => context.element
+//      case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+//    }
 
   def context: Context =
     XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull

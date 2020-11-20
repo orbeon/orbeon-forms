@@ -9,7 +9,7 @@ import org.orbeon.saxon.trans.XPathException
 class XXFormsEvaluateAVT extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext) = {
-    val (avtExpression, newXPathContext) = prepareExpression(xpathContext, argument(0), isAVT = true)
+    val (avtExpression, newXPathContext) = prepareExpressionSaxonNoPool(xpathContext, argument(0), isAVT = true)
     avtExpression.iterate(newXPathContext)
   }
 

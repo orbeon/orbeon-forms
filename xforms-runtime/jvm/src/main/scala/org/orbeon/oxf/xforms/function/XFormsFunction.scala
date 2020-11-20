@@ -242,8 +242,42 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
       null
     }
 
+  // TODO: Only called by `EXFormsSort`. Move to using `prepareExpressionSaxonNoPool`.
   // The following is inspired by saxon:evaluate()
-  protected def prepareExpression(
+  protected def prepareExpression(initialXPathContext: XPathContext, parameterExpression: Expression, isAVT: Boolean): PooledXPathExpression = {
+
+    // Evaluate parameter into an XPath string
+    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
+
+    // Copy static context information
+    val staticContext = this.staticContext.copy
+    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
+
+    // Propagate in-scope variable definitions since they are not copied automatically
+    val inScopeVariables = bindingContext.getInScopeVariables
+    val variableDeclarations =
+      for {
+        (name, _) <- inScopeVariables.asScala.toList
+        variable = staticContext.declareVariable("", name)
+      } yield
+        name -> variable
+
+    // Create expression
+    val pooledXPathExpression =
+      XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations)
+
+    // Set context items and position for use at runtime
+    pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
+
+    // Set variables for use at runtime
+    pooledXPathExpression.setVariables(inScopeVariables)
+
+    pooledXPathExpression
+  }
+
+  // Only called by `XXFormsEvaluateAVT`
+  // The following is inspired by saxon:evaluate()
+  protected def prepareExpressionSaxonNoPool(
     initialXPathContext : XPathContext,
     parameterExpression : Expression,
     isAVT               : Boolean

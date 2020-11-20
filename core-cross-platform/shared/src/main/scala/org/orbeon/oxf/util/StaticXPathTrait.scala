@@ -18,7 +18,7 @@ import org.orbeon.dom
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.sxpath.XPathExpression
+import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
 import org.orbeon.xml.NamespaceMapping
 
 // TODO: Check what really belongs to the form compilation and split out the rest.
@@ -56,8 +56,15 @@ trait StaticXPathTrait {
     logger           : IndentedLogger
   ): CompiledExpression
 
-  def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType
-  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document
-  def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType)
-  val EmptyDocument: DocumentNodeInfoType
+  def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType   // `xforms-compiler`
+  def tinyTreeToOrbeonDom(nodeInfo: om.NodeInfo): dom.Document       // `xforms-runtime`
+  def tinyTreeToString(nodeInfo: om.NodeInfo): String                // `xforms-runtime`
+  def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) // `xforms-runtime` and `xforms-compiler` (used by orbeonDomToTinyTree)
+  val EmptyDocument: DocumentNodeInfoType                            // `xforms-runtime`
+
+  def compileExpressionWithStaticContext(
+    staticContext : XPathStaticContext,
+    xpathString   : String,
+    avt           : Boolean
+  ): XPathExpression
 }

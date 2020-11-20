@@ -206,9 +206,9 @@ class XFormsRepeatHandler(
         case Some(Right(structuredQName)) => // no handler for the element (shouldn't happen as we have `XHTMLElementHandler`)
 
           outputBeginEndDelimiters(
-            localName = structuredQName.getLocalName,
+            localName = SaxonUtils.getStructuredQNameLocalPart(structuredQName),
             prefix    = structuredQName.getPrefix,
-            uri       = structuredQName.getNamespaceURI
+            uri       = SaxonUtils.getStructuredQNameURI(structuredQName)
           )
 
         case Some(Left(_)) | None  => // handler is not one we support or no element was output

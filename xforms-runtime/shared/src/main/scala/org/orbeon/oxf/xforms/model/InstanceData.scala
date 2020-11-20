@@ -18,16 +18,14 @@ import java.{lang => jl, util => ju}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 
 import scala.jdk.CollectionConverters._
-import scala.util.control.Breaks.{break, breakable}
 
 
 /**
@@ -187,38 +185,11 @@ object InstanceData {
         return schemaOrBindType
     }
 
-    // No type was assigned by schema or MIP, try xsi:type
-    if (nodeInfo.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE) {
-      // Check for xsi:type attribute
-      // NOTE: Saxon 9 has new code to resolve such QNames
-      val typeQName = nodeInfo.getAttributeValue(om.StandardNames.XSI_TYPE)
-      if (typeQName ne null)
-        try {
-          val checker = nodeInfo.getConfiguration.getNameChecker
-          val parts = checker.getQNameParts(typeQName)
-
-          // No prefix
-          if (parts(0) == "")
-            return QName.apply(parts(1))
-
-          // There is a prefix, resolve it
-          val namespaceNodes = nodeInfo.iterateAxis(StaticXPath.NamespaceAxisType)
-          breakable {
-            while (true) {
-              val currentNamespaceNode = namespaceNodes.next.asInstanceOf[om.NodeInfo]
-              if (currentNamespaceNode eq null)
-                break()
-              val prefix = currentNamespaceNode.getLocalPart
-              if (prefix == parts(0))
-                return QName.apply(parts(1), "", currentNamespaceNode.getStringValue)
-            }
-          }
-        } catch {
-          case e: Exception =>
-            throw new OXFException(e)
-        }
-    }
-    null
+    // No type was assigned by schema or MIP, try `xsi:type`
+    if (nodeInfo.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE)
+      SaxonUtils.xsiType(nodeInfo).orNull
+    else
+      null
   }
 
   def getType(node: Node): QName = {

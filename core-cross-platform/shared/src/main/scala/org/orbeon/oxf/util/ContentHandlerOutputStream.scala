@@ -1,15 +1,27 @@
 package org.orbeon.oxf.util
 
-import java.io.{IOException, OutputStream}
+import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
 
+import org.orbeon.io.IOUtils
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.xml.XMLConstants
 import org.xml.sax.ContentHandler
 import org.xml.sax.helpers.AttributesImpl
 
 
-private object ContentHandlerOutputStream {
-  val DefaultBinaryDocumentElement = "document"
+object ContentHandlerOutputStream {
+
+  private val DefaultBinaryDocumentElement = "document"
+
+  /**
+   * Read bytes from an InputStream and generate SAX characters events in Base64 encoding. The
+   * InputStream is closed when done.
+   *
+   * The caller has to close the stream if needed.
+   */
+  def copyStreamAndClose(is: InputStream, contentHandler: ContentHandler): Unit =
+    IOUtils.copyStreamAndClose(is, new ContentHandlerOutputStream(contentHandler, false))
 }
 
 /**

@@ -13,18 +13,15 @@
   */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, Required, Type}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.{XMLConstants, XMLParsing}
-import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, ValidationFailure}
-import org.orbeon.saxon.expr.XPathContextMajor
-import org.orbeon.saxon.om.{NodeInfo, StandardNames}
-import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
+import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLParsing}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.xforms.XFormsNames
@@ -154,7 +151,7 @@ trait ValidationBindOps extends Logging {
       }
     }
 
-    def validateType(bind: RuntimeBind, currentNodeInfo: NodeInfo, required: Boolean): Boolean = {
+    def validateType(bind: RuntimeBind, currentNodeInfo: om.NodeInfo, required: Boolean): Boolean = {
 
       val staticBind = bind.staticBind
 
@@ -203,40 +200,13 @@ trait ValidationBindOps extends Logging {
         // Use XML Schema namespace URI as Saxon doesn't know anything about XForms types
         val newTypeNamespaceURI = XMLConstants.XSD_URI
 
-        // Get type information
-        val requiredTypeFingerprint = StandardNames.getFingerprint(newTypeNamespaceURI, typeLocalname)
-        if (requiredTypeFingerprint == -1)
-          throwError()
-
-        // Need an evaluator to check and convert type below
-        val xpathEvaluator =
-          try {
-            val evaluator = new XPathEvaluator(XPath.GlobalConfiguration)
-
-            // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
-            val context = evaluator.getStaticContext.asInstanceOf[IndependentContext]
-            for ((prefix, uri) <- staticBind.namespaceMapping.mapping)
-              context.declareNamespace(prefix, uri)
-
-            evaluator
-          } catch {
-            case NonFatal(t) =>
-              throw OrbeonLocationException.wrapException(t, staticBind.locationData)
-              // TODO: Check what XForms event must be dispatched.
-          }
-
         // Try to perform casting
         // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens.
         // Is that expected?
-        val stringValue = new StringValue(nodeValue)
-        stringValue.convertPrimitive(
-          BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType],
-          true,
-          new XPathContextMajor(stringValue, xpathEvaluator.getExecutable)
-        ) match {
-          case _: ValidationFailure => false
-          case _                    => true
-        }
+        val stringValue = StringValue.makeStringValue(nodeValue)
+        SaxonUtils.convertType(stringValue, newTypeNamespaceURI, typeLocalname, XPath.GlobalConfiguration)
+          .getOrElse(throwError())
+          .isDefined
       } else if (isBuiltInXXFormsType) {
         // Built-in extension types
 

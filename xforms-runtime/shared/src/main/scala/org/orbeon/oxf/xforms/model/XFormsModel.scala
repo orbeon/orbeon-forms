@@ -21,24 +21,23 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs, Submission}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value.{SequenceExtent, Value}
+import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
@@ -271,7 +270,7 @@ trait XFormsModelVariables {
   def getContextStack: XFormsContextStack = contextStack
 
   def getVariable(variableName: String): om.SequenceIterator =
-    Value.asIterator(topLevelVariables.get(variableName).orNull)
+    SaxonUtils.valueAsIterator(topLevelVariables.get(variableName).orNull)
 
   def unsafeGetVariableAsNodeInfo(variableName: String): om.NodeInfo =
     getVariable(variableName).next().asInstanceOf[om.NodeInfo]
@@ -296,7 +295,7 @@ trait XFormsModelVariables {
 
   val variableResolver: (om.StructuredQName, XPathContext) => ValueRepresentationType =
     (variableQName: om.StructuredQName, xpathContext: XPathContext) =>
-      staticModel.bindsByName.get(variableQName.getLocalName) match {
+      staticModel.bindsByName.get(SaxonUtils.getStructuredQNameLocalPart(variableQName)) match {
         case Some(targetStaticBind) =>
           // Variable value is a bind nodeset to resolve
           BindVariableResolver.resolveClosestBind(
@@ -309,7 +308,7 @@ trait XFormsModelVariables {
           // Try top-level model variables
           val modelVariables = getDefaultEvaluationContext.getInScopeVariables
           // NOTE: With XPath analysis on, variable scope has been checked statically
-          Option(modelVariables.get(variableQName.getLocalName)) getOrElse
+          Option(modelVariables.get(SaxonUtils.getStructuredQNameLocalPart(variableQName))) getOrElse
             (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
       }
 }
@@ -489,7 +488,7 @@ trait XFormsModelInstances {
   private def loadInitialExternalInstanceFromCacheIfNeeded(instance: Instance): Unit = {
     val instanceResource = instance.instanceSource.get
     try {
-      if (instance.cache && ! ProcessorImpl.isProcessorInputScheme(instanceResource)) {
+      if (instance.cache && ! isProcessorInputScheme(instanceResource)) {
         // Instance 1) has cache hint and 2) is not input:*, so it can be cached
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
         val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
@@ -537,7 +536,7 @@ trait XFormsModelInstances {
         case None =>
           // Connect directly if there is no resolver or if the instance is globally cached
           // NOTE: If there is no resolver, URLs of the form input:* are not allowed
-          assert(! ProcessorImpl.isProcessorInputScheme(absoluteURLString))
+          assert(! isProcessorInputScheme(absoluteURLString))
 
           if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
@@ -573,9 +572,9 @@ trait XFormsModelInstances {
             // Read result as XML
             // TODO: use submission code?
             if (! instance.readonly)
-              Left(TransformerUtils.readDom4j(is, connectionResult.url, false, true))
+              Left(XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, false, true))
             else
-              Right(TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
+              Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
           }
         case Some(uriResolver) =>
           // Optimized case that uses the provided resolver
@@ -597,4 +596,10 @@ trait XFormsModelInstances {
       )
     )
   }
+
+  // Duplicated from `ProcessorImpl` but we don't want that dependency.
+  private val ProcessorInputScheme = "input:"
+
+  private def isProcessorInputScheme(uri: String): Boolean =
+    uri.startsWith(ProcessorInputScheme) && ! uri.startsWith(ProcessorInputScheme + "/")
 }

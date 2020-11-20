@@ -318,7 +318,7 @@ class ControlsComparator(
 
               if (control1Opt.isDefined)
                 for (newIteration <- children2.view(size1, size2))
-                  processFullUpdateForContent(newIteration, None, receiver => mark.replay(new HTMLFragmentSerializer.SkipRootElement(receiver)))
+                  processFullUpdateForContent(newIteration, None, receiver => mark.replay(new SkipRootElement(receiver)))
               else
                 diffChildren(Nil, children2.view(size1, size2), fullUpdateBuffer) // test mode
 
@@ -387,7 +387,7 @@ class ControlsComparator(
         new DeferredXMLReceiverImpl(
           Rewrite.getRewriteXMLReceiver(
             externalContext.getResponse,
-            HTMLFragmentSerializer.create(new ContentHandlerWriter(receiver, supportFlush = false), skipRootElement = true),
+            XFormsCrossPlatformSupport.createHTMLFragmentXmlReceiver(new ContentHandlerWriter(receiver, supportFlush = false), skipRootElement = true),
             fragment = true,
             XMLConstants.XHTML_NAMESPACE_URI
           )

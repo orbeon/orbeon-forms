@@ -26,8 +26,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.xml.SAXUtils;
-import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom.IOSupport;
 import org.slf4j.Logger;
 
@@ -580,37 +578,6 @@ public class NetUtils {
                 deleteFileItem(fileItem, APPLICATION_SCOPE, logger);
             }
         });
-    }
-
-    /**
-     * Convert a String in xs:anyURI to an xs:base64Binary.
-     *
-     * The URI has to be a URL. It is read entirely
-     */
-    public static String anyURIToBase64Binary(String value) {
-        InputStream is = null;
-        try {
-            // Read from URL and convert to Base64
-            is = URLFactory.createURL(value).openStream();
-            final StringBuilder sb = new StringBuilder();
-            SAXUtils.inputStreamToBase64Characters(is, new XMLReceiverAdapter() {
-                public void characters(char ch[], int start, int length) {
-                    sb.append(ch, start, length);
-                }
-            });
-            // Return Base64 String
-            return sb.toString();
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
     }
 
     public static void anyURIToOutputStream(String value, OutputStream outputStream) {

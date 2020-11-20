@@ -17,7 +17,6 @@ import org.log4s
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
@@ -136,7 +135,7 @@ private object SubmitResponseEvent {
         def tryXML: Try[String Either DocumentNodeInfoType] =
           Try {
             Right(
-              useAndClose(URLFactory.createURL(tempURI).openStream()) { is =>
+              useAndClose(XFormsCrossPlatformSupport.openUrlStream(tempURI)) { is =>
                 XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, cxr.url, false, true)
               }
             )
@@ -144,7 +143,7 @@ private object SubmitResponseEvent {
 
         def tryText: Try[String Either DocumentNodeInfoType]  =
           Try {
-            Left(IOUtils.readStreamAsStringAndClose(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+            Left(IOUtils.readStreamAsStringAndClose(XFormsCrossPlatformSupport.openUrlStream(tempURI), cxr.charset))
           }
 
         def asString(value: String Either DocumentNodeInfoType) = value match {

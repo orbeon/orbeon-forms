@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{SaxonUtils, XMLUtils}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -429,37 +429,7 @@ class PathMapXPathDependencies(
   // For unit tests only
   def markValueChangedTest(instance: XFormsInstance, namespaces: Map[String, String], path: String): Unit =
     getOrCreateModelState(instance.model)
-      .markValueChangedForTests(instance, getInternalPath(namespaces, path))
-
-  // Given a display path, get an internal path (for unit tests).
-  private def getInternalPath(namespaces: Map[String, String], path: String): String = {
-
-    // Special case of empty path
-    if (path.isEmpty)
-      return path
-
-    val pool = XPath.GlobalConfiguration.getNamePool
-
-    {
-      for (token <- path split '/') yield {
-        if (token.startsWith("instance(")) {
-          // instance(...)
-          token
-        } else {
-          val (optionalAt, qName) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
-
-          optionalAt + {
-
-            val prefix = XMLUtils.prefixFromQName(qName)
-            val localname = XMLUtils.localNameFromQName(qName)
-
-            // Get number from pool based on QName
-            pool.allocate(prefix, namespaces(prefix), localname)
-          }
-        }
-      }
-    } mkString "/"
-  }
+      .markValueChangedForTests(instance, SaxonUtils.getInternalPathForDisplayPath(namespaces, path))
 
   private case class UpdateResult(requireUpdate: Boolean, savedEvaluations: Int)
   private val MustUpdateResultOne     = UpdateResult(requireUpdate = true,  savedEvaluations = 1)

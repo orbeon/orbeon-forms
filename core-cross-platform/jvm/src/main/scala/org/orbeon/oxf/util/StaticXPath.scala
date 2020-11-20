@@ -56,7 +56,7 @@ object StaticXPath extends StaticXPathTrait {
   // for example. One issue is that we have native Java/Scala functions called via XPath which need access to FunctionContext
   // but don't have access to the XPath dynamic context anymore. This could be fixed if we implement these native functions as
   // Saxon functions, possibly generally via https://github.com/orbeon/orbeon-forms/issues/2214.
-  protected[util] val GlobalNamePool = new om.NamePool
+  val GlobalNamePool = new om.NamePool
   protected[util] val GlobalDocumentNumberAllocator = new om.DocumentNumberAllocator
 
   // Global Saxon configuration with a global name pool

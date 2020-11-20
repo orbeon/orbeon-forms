@@ -20,10 +20,10 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node._
 import StaticDataModel._
+import org.orbeon.oxf.xml.SaxonUtils
 
 
 /**
@@ -211,7 +211,7 @@ object DataModel {
 
   // Return the given node's first child element
   def firstChildElement(node: NodeInfo): NodeInfo = {
-    val iterator = node.iterateAxis(Axis.CHILD)
+    val iterator = node.iterateAxis(SaxonUtils.ChildAxisInfo)
     var next = iterator.next()
     while (next ne null) {
       next match {
@@ -230,17 +230,17 @@ object DataModel {
     visit(e)
 
     locally {
-      val iterator = e.iterateAxis(Axis.ATTRIBUTE)
+      val iterator = e.iterateAxis(SaxonUtils.AttributeAxisInfo)
       var next = iterator.next()
       while (next ne null) {
-        // We know that iterateAxis(Axis.ATTRIBUTE) returns only NodeInfo
+        // NOTE: Cast not needed with Saxon 10.
         visit(next.asInstanceOf[NodeInfo])
         next = iterator.next()
       }
     }
 
     locally {
-      val iterator = e.iterateAxis(Axis.CHILD)
+      val iterator = e.iterateAxis(SaxonUtils.ChildAxisInfo)
       var next = iterator.next()
       while (next ne null) {
         next match {

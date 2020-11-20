@@ -1,5 +1,7 @@
 package org.orbeon.oxf.json
 
+import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.om.NodeInfo
 
 
@@ -10,4 +12,6 @@ object Converter {
   type XmlElem = NodeInfo
 
   def xmlToJsonString(root: XmlElem, strict: Boolean): String = ???
+  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): StaticXPath.DocumentNodeInfoType = ???
+  def jsonStringToXmlStream(source: String, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = ???
 }

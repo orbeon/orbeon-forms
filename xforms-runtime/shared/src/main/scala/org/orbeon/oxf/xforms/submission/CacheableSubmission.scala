@@ -22,10 +22,11 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.InstanceCaching
-import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
+
 
 /**
  * Cacheable remote submission going through a protocol handler.
@@ -54,7 +55,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
 
     // Compute a hash of the body if needed
     val requestBodyHash =
-      sp.messageBody map (SecureUtils.digestBytes(_, "hex"))
+      sp.messageBody map (XFormsCrossPlatformSupport.digestBytes(_, "hex"))
 
     val detailsLogger = getDetailsLogger(p, p2)
 

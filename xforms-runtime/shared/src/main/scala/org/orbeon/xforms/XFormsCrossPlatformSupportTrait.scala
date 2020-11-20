@@ -13,17 +13,19 @@
  */
 package org.orbeon.xforms
 
-import java.io.InputStream
+import java.io.{InputStream, OutputStream, Writer}
 import java.net.URI
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
+import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 
 
@@ -36,6 +38,7 @@ trait XFormsCrossPlatformSupportTrait {
   def externalContext: ExternalContext
 
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[FileItemType]]
+  def removeUploadProgress(request: Request, control: XFormsValueControl): Unit
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
 
@@ -50,9 +53,21 @@ trait XFormsCrossPlatformSupportTrait {
 
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit
 
+  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver
+
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String
 
   def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document
+
+  def serializeToByteArray(
+    document           : dom.Document,
+    method             : String,
+    encoding           : String,
+    versionOpt         : Option[String],
+    indent             : Boolean,
+    omitXmlDeclaration : Boolean,
+    standaloneOpt      : Option[Boolean],
+  ): Array[Byte]
 
   def proxyURI(
     uri              : String,
@@ -105,6 +120,8 @@ trait XFormsCrossPlatformSupportTrait {
     handleLexical  : Boolean
   ): DocumentNodeInfoType
 
+  def readDom4j(xmlString: String): dom.Document
+
   def readDom4j(
     inputStream    : InputStream,
     systemId       : String,
@@ -113,4 +130,9 @@ trait XFormsCrossPlatformSupportTrait {
   ): dom.Document
 
   def hmacString(text: String, encoding: String): String
+  def digestBytes(bytes: Array[Byte], encoding: String): String
+
+  def openUrlStream(urlString: String): InputStream
+
+  def writeMultipartFormData(document: dom.Document, os: OutputStream): String
 }

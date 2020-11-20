@@ -13,26 +13,40 @@
  */
 package org.orbeon.xforms
 
-import java.io.{InputStream, StringReader}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream, StringReader, Writer}
 import java.net.{URI, URISyntaxException}
+import java.nio.charset.Charset
 
 import cats.syntax.option._
 import javax.xml.transform.Result
 import javax.xml.transform.dom.{DOMResult, DOMSource}
+import javax.xml.transform.stream.StreamResult
+import org.apache.http.entity.mime.MultipartEntity
+import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
+import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
+import org.orbeon.dom.io.DocumentSource
+import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.processor.XPLConstants
+import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, SecureUtils, URLRewriterUtils, UploadProgress}
+import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, PathUtils, SecureUtils, URLRewriterUtils, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
-import org.orbeon.oxf.xml.{HTMLBodyXMLReceiver, TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.xml.{HTMLBodyXMLReceiver, ParserConfiguration, PlainHTMLOrXHTMLReceiver, SkipRootElement, TransformerUtils, XMLConstants, XMLParsing, XMLReceiver}
 import org.xml.sax.InputSource
 
 import scala.util.control.NonFatal
@@ -44,6 +58,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[CoreCrossPlatformSupport.FileItemType]] =
     UploaderServer.getUploadProgress(request, uuid, fieldName)
+
+  def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
+    UploaderServer.removeUploadProgress(request, control)
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
@@ -142,6 +159,70 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     }
   }
 
+  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
+    val identity = TransformerUtils.getIdentityTransformerHandler
+
+    TransformerUtils.applyOutputProperties(
+      identity.getTransformer,
+      Properties.instance.getPropertySet(
+        QName(
+          "html-converter",
+          XPLConstants.OXF_PROCESSORS_NAMESPACE
+        )
+      ).getQName(
+        TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
+        XMLConverter.DEFAULT_METHOD
+      ).clarkName,
+      null,
+      null,
+      null,
+      CharsetNames.Utf8,
+      true,
+      null,
+      false,
+      0
+    )
+
+    identity.setResult(new StreamResult(writer))
+
+    val htmlReceiver = new PlainHTMLOrXHTMLReceiver("", identity)
+
+    if (skipRootElement)
+      new SkipRootElement(htmlReceiver)
+    else
+      htmlReceiver
+  }
+
+  def serializeToByteArray(
+    document           : dom.Document,
+    method             : String,
+    encoding           : String,
+    versionOpt         : Option[String],
+    indent             : Boolean,
+    omitXmlDeclaration : Boolean,
+    standaloneOpt      : Option[Boolean],
+  ): Array[Byte] = {
+    val identity = TransformerUtils.getIdentityTransformer
+    TransformerUtils.applyOutputProperties(
+      identity,
+      method,
+      versionOpt.orNull,
+      null,
+      null,
+      encoding,
+      omitXmlDeclaration,
+      standaloneOpt map java.lang.Boolean.valueOf orNull,
+      indent,
+      4
+    )
+
+    // TODO: use cdata-section-elements
+
+    val os = new ByteArrayOutputStream
+    identity.transform(new DocumentSource(document), new StreamResult(os))
+    os.toByteArray
+  }
+
   def proxyURI(
     uri              : String,
     filename         : Option[String],
@@ -220,6 +301,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): DocumentNodeInfoType =
     TransformerUtils.stringToTinyTree(configuration, string, handleXInclude, handleLexical)
 
+  def readDom4j(xmlString: String): dom.Document =
+    IOSupport.readDom4j(xmlString)
+
   def readDom4j(
     inputStream    : InputStream,
     systemId       : String,
@@ -230,4 +314,115 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def hmacString(text: String, encoding: String): String =
     SecureUtils.hmacString(text, encoding)
+
+  def digestBytes(bytes: Array[Byte], encoding: String): String =
+    SecureUtils.digestBytes(bytes, encoding)
+
+  def openUrlStream(urlString: String): InputStream =
+    URLFactory.createURL(urlString).openStream
+
+  /**
+   * Implement support for XForms 1.1 section "11.9.7 Serialization as multipart/form-data".
+   *
+   * @param document XML document to submit
+   * @return MultipartRequestEntity
+   */
+  def writeMultipartFormData(document: Document, os: OutputStream): String = {
+    // Visit document
+    val multipartEntity = new MultipartEntity
+    document.accept(
+      new VisitorSupport {
+        override final def visit(element: Element): Unit = {
+          // Only care about elements
+          // Only consider leaves i.e. elements without children elements
+          if (element.elements.isEmpty) {
+            val value = element.getText
+            // Got one!
+            val localName = element.getName
+            val nodeType = InstanceData.getType(element)
+            if (XMLConstants.XS_ANYURI_QNAME == nodeType) { // Interpret value as xs:anyURI
+              if (InstanceData.getValid(element) && value.trimAllToOpt.isDefined) {
+                // Value is valid as per xs:anyURI
+                // Don't close the stream here, as it will get read later when the MultipartEntity
+                // we create here is written to an output stream
+                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(value), element, value.some)
+              } else {
+                // Value is invalid as per xs:anyURI
+                // Just use the value as is (could also ignore it)
+                multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+              }
+            } else if (XMLConstants.XS_BASE64BINARY_QNAME == nodeType) {
+              // Interpret value as xs:base64Binary
+              if (InstanceData.getValid(element) && value.trimAllToOpt.isDefined) {
+                // Value is valid as per xs:base64Binary
+                addPart(multipartEntity, new ByteArrayInputStream(Base64.decode(value)), element, None)
+              } else {
+                // Value is invalid as per xs:base64Binary
+                multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+              }
+            } else {
+              // Just use the value as is
+              multipartEntity.addPart(localName, new StringBody(value, Charset.forName(CharsetNames.Utf8)))
+            }
+          }
+        }
+      }
+    )
+    multipartEntity.writeTo(os)
+    multipartEntity.getContentType.getValue
+  }
+
+  private def addPart(
+    multipartEntity : MultipartEntity,
+    inputStream     : InputStream,
+    element         : Element,
+    url             : Option[String]
+  ): Unit = {
+
+    // Gather mediatype and filename if known
+    // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
+    // removed during the next recalculate.
+    // See this WG action item (which was decided but not carried out): "Clarify that upload activation produces
+    // content and possibly filename and mediatype info as metadata. If available, filename and mediatype are copied
+    // to instance data if upload filename and mediatype elements are specified. At serialization, filename and
+    // mediatype from instance data are used if upload filename and mediatype are specified; otherwise, filename and
+    // mediatype are drawn from upload metadata, if they were available at time of upload activation"
+    //
+    // See:
+    // http://lists.w3.org/Archives/Public/public-forms/2009May/0052.html
+    // http://lists.w3.org/Archives/Public/public-forms/2009Apr/att-0010/2009-04-22.html#ACTION2
+    // See also this clarification:
+    // http://lists.w3.org/Archives/Public/public-forms/2009May/0053.html
+    // http://lists.w3.org/Archives/Public/public-forms/2009Apr/att-0003/2009-04-01.html#ACTION1
+    // The bottom line is that if we can find the xf:upload control bound to a node to submit, we try to get
+    // metadata from that control. If that fails (which can be because the control is non-relevant, bound to another
+    // control, or never had nested xf:filename/xf:mediatype elements), we try URL metadata. URL metadata is only
+    // present on nodes written by xf:upload as temporary file: URLs. It is not present if the data is stored as
+    // xs:base64Binary. In any case, metadata can be absent.
+    // If an xf:upload control saved data to a node as xs:anyURI, has xf:filename/xf:mediatype elements, is still
+    // relevant and bound to the original node (as well as its children elements), and if the nodes pointed to by
+    // the children elements have not been modified (e.g. by xf:setvalue), then retrieving the metadata via
+    // xf:upload should be equivalent to retrieving it via the URL metadata.
+    // Benefits of URL metadata: a single xf:upload can be used to save data to multiple nodes over time, and it
+    // doesn't have to be relevant and bound upon submission.
+    // Benefits of using xf:upload metadata: it is possible to modify the filename and mediatype subsequently.
+    // URL metadata was added 2012-05-29.
+
+    // Get mediatype, first via `xf:upload` control, or, if not found, try URL metadata
+    val mediatype =
+      (InstanceData.findTransientAnnotation(element, "xxforms-mediatype"), url) match {
+        case (None, Some(url)) => PathUtils.getFirstQueryParameter(url, "mediatype")
+        case (mediatypeOpt, _) => mediatypeOpt
+      }
+
+    // Get filename, first via xf:upload control, or, if not found, try URL metadata
+    val filename =
+      (InstanceData.findTransientAnnotation(element, "xxforms-filename"), url) match {
+        case (None, Some(url)) => PathUtils.getFirstQueryParameter(url, "filename")
+        case (filenameOpt, _)  => filenameOpt
+      }
+
+    val contentBody = new InputStreamBody(inputStream, mediatype.orNull, filename.orNull)
+    multipartEntity.addPart(element.getName, contentBody)
+  }
 }

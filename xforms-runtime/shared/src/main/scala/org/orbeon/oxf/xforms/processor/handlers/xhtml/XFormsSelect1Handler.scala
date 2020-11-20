@@ -62,7 +62,7 @@ object XFormsSelect1Handler {
             isMultiple                 = isMultiple,
             dataValue                  = dataValue,
             itemValue                  = item.value,
-            compareAtt                 = XFormsSelect1Control.attCompare(control.boundNodeOpt, _),
+            compareAtt                 = SaxonUtils.attCompare(control.boundNodeOpt, _),
             excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
         }
@@ -456,7 +456,7 @@ class XFormsSelect1Handler(
           val ch = new XMLReceiverHelper(xmlReceiver)
           for {
             (dataValue, excludeWhitespaceTextNodes) <- XFormsSelect1Handler.dataValueFromControl(control).iterator
-            currentItem                             <- itemset.iterateSelectedItems(dataValue, XFormsSelect1Control.attCompare(control.boundNodeOpt, _), excludeWhitespaceTextNodes)
+            currentItem                             <- itemset.iterateSelectedItems(dataValue, SaxonUtils.attCompare(control.boundNodeOpt, _), excludeWhitespaceTextNodes)
           } locally {
             if (selectedFound)
               ch.text(" - ")

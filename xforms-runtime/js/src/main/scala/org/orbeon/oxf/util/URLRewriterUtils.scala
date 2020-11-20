@@ -16,5 +16,11 @@ object URLRewriterUtils {
     rewriteMode  : Int
   ): String = ???
 
+  def rewriteServiceURL(
+    request     : Request,
+    urlString   : String,
+    rewriteMode : Int
+  ): String = ???
+
   def getPathMatchers: ju.List[PathMatcher] = ???
 }

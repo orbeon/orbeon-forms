@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xml.SaxonUtilsDependsOnXPath
+import org.orbeon.oxf.xml.{SaxonUtils, SaxonUtilsDependsOnXPath}
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.saxon.om._
 import org.orbeon.xforms.XFormsId
@@ -150,11 +150,9 @@ object XFormsEvent {
     def apply(name: String)       = m(name)(e)
   }
 
-  import SingletonIterator.makeIterator
-
-  def emptyIterator = EmptyIterator.getInstance
-  def itemIterator   (i: Item)      = if (i ne null)  makeIterator(i)            else emptyIterator
-  def listIterator   (s: Seq[Item]) = if (s.nonEmpty) new ListIterator(s.asJava) else emptyIterator
+  private def emptyIterator = SaxonUtils.emptyIterator
+  private def itemIterator   (i: Item)      = if (i ne null)  SaxonUtils.itemIterator(i) else emptyIterator
+  private def listIterator   (s: Seq[Item]) = if (s.nonEmpty) SaxonUtils.listIterator(s) else emptyIterator
 
   def xxfName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
 

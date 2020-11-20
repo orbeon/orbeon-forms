@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.itemset.{Item, Itemset, ItemsetSupport, StaticItems
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
@@ -130,7 +130,7 @@ class XFormsSelect1Control(
         case (item, itemValue) if StaticItemsetSupport.compareSingleItemValues(
           dataValue                  = current,
           itemValue                  = itemValue,
-          compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+          compareAtt                 = SaxonUtils.attCompare(boundNodeOpt, _),
           excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
         ) => item
       }
@@ -248,7 +248,7 @@ class XFormsSelect1Control(
           StaticItemsetSupport.compareSingleItemValues(
             dataValue                  = dataValue,
             itemValue                  = itemValue,
-            compareAtt                 = XFormsSelect1Control.attCompare(boundNodeOpt, _),
+            compareAtt                 = SaxonUtils.attCompare(boundNodeOpt, _),
             excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
           )
 
@@ -365,9 +365,6 @@ class XFormsSelect1Control(
 }
 
 object XFormsSelect1Control {
-
-  def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
-    boundNodeOpt exists (_.getAttributeValue(att.getFingerprint) == att.getStringValue)
 
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
   // lookup by id takes place and the control must have a static itemset or otherwise `None` is returned.

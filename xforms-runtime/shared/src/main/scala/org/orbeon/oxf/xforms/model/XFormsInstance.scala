@@ -30,8 +30,6 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
@@ -494,7 +492,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
-      XFormsInstanceSupport.wrapDocument(IOSupport.readDom4j(xmlString), exposeXPathTypes)
+      XFormsInstanceSupport.wrapDocument(XFormsCrossPlatformSupport.readDom4j(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {

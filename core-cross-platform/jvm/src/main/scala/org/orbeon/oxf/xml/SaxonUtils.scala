@@ -15,20 +15,26 @@ package org.orbeon.oxf.xml
 
 import java.net.URI
 
+import cats.syntax.option._
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.{Expression, ExpressionTool}
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, Type}
+import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContextMajor}
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
+import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.saxon.value._
-import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.saxon.{Configuration, om}
 import org.orbeon.scaxon.Implicits
 
 import scala.jdk.CollectionConverters._
+import scala.util.Try
+import scala.util.control.Breaks.{break, breakable}
 
 
 object SaxonUtils {
@@ -266,5 +272,99 @@ object SaxonUtils {
         DeepEqual.INCLUDE_PROCESSING_INSTRUCTIONS |
         (if (excludeWhitespaceTextNodes) DeepEqual.EXCLUDE_WHITESPACE_TEXT_NODES else 0)
     )
+  }
+
+  // These are here to abstract some differences between Saxon 9 and 10
+  def getStructuredQNameLocalPart(qName: om.StructuredQName): String = qName.getLocalName
+  def getStructuredQNameURI      (qName: om.StructuredQName): String = qName.getNamespaceURI
+
+  def itemIterator(i: om.Item): SequenceIterator = SingletonIterator.makeIterator(i)
+  def listIterator(s: Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
+  def emptyIterator: SequenceIterator = EmptyIterator.getInstance
+  def valueAsIterator(v: ValueRepresentationType): SequenceIterator = Value.asIterator(v)
+
+  val ChildAxisInfo: Byte = Axis.CHILD
+  val AttributeAxisInfo: Byte = Axis.ATTRIBUTE
+
+  val NamespaceType: Short = org.orbeon.saxon.`type`.Type.NAMESPACE
+
+  // Given a display path, get an internal path (for unit tests).
+  def getInternalPathForDisplayPath(namespaces: Map[String, String], path: String): String = {
+
+    // Special case of empty path
+    if (path.isEmpty)
+      return path
+
+    val pool = StaticXPath.GlobalNamePool
+
+    {
+      for (token <- path split '/') yield {
+        if (token.startsWith("instance(")) {
+          // instance(...)
+          token
+        } else {
+          val (optionalAt, qName) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
+
+          optionalAt + {
+
+            val prefix = XMLUtils.prefixFromQName(qName)
+            val localname = XMLUtils.localNameFromQName(qName)
+
+            // Get number from pool based on QName
+            pool.allocate(prefix, namespaces(prefix), localname)
+          }
+        }
+      }
+    } mkString "/"
+  }
+
+  def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
+    boundNodeOpt exists (_.getAttributeValue(att.getFingerprint) == att.getStringValue)
+
+  def xsiType(elem: om.NodeInfo): Option[QName] = {
+    // NOTE: Saxon 9 has new code to resolve such QNames
+    val typeQName = elem.getAttributeValue(om.StandardNames.XSI_TYPE)
+    if (typeQName ne null) {
+      val checker = elem.getConfiguration.getNameChecker
+      val parts = checker.getQNameParts(typeQName)
+
+      // No prefix
+      if (parts(0).isEmpty)
+        return QName(parts(1)).some
+
+      // There is a prefix, resolve it
+      val namespaceNodes = elem.iterateAxis(StaticXPath.NamespaceAxisType)
+      breakable {
+        while (true) {
+          val currentNamespaceNode = namespaceNodes.next.asInstanceOf[om.NodeInfo]
+          if (currentNamespaceNode eq null)
+            break()
+          val prefix = currentNamespaceNode.getLocalPart
+          if (prefix == parts(0))
+            return QName(parts(1), "", currentNamespaceNode.getStringValue).some
+        }
+      }
+    }
+    None
+  }
+
+  def convertType(
+    value               : StringValue,
+    newTypeNamespaceURI : String,
+    newTypeLocalName    : String,
+    config              : SaxonConfiguration
+  ): Try[Option[AtomicValue]] = Try {
+
+    val requiredTypeFingerprint = om.StandardNames.getFingerprint(newTypeNamespaceURI, newTypeLocalName)
+    require(requiredTypeFingerprint != -1)
+
+    value.convertPrimitive(
+      BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType],
+      true,
+      new XPathContextMajor(value, new XPathEvaluator(config).getExecutable)
+    ) match {
+        case v: AtomicValue => v.some
+        case _              => None
+    }
   }
 }

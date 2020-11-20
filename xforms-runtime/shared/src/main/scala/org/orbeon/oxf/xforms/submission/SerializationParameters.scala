@@ -17,9 +17,7 @@ import java.io.ByteArrayOutputStream
 import java.net.{URI, URLEncoder}
 
 import cats.syntax.option._
-import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
-import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.URLRewriter
@@ -27,7 +25,7 @@ import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{ContentTypes, XPath}
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
@@ -87,30 +85,23 @@ object SerializationParameters {
           }
         case serialization @ ContentTypes.XmlContentType =>
           try {
-            val identity = TransformerUtils.getIdentityTransformer
-            TransformerUtils.applyOutputProperties(
-              identity,
-              "xml",
-              p2.versionOpt.orNull,
-              null,
-              null,
-              p2.encoding,
-              p2.omitXmlDeclaration,
-              p2.standaloneOpt map java.lang.Boolean.valueOf orNull,
-              p2.indent,
-              4
-            )
 
-            // TODO: use cdata-section-elements
-
-            val os = new ByteArrayOutputStream
-            identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
+            val bytes =
+              XFormsCrossPlatformSupport.serializeToByteArray(
+                documentToSubmit,
+                "xml",
+                p2.encoding,
+                p2.versionOpt,
+                p2.indent,
+                p2.omitXmlDeclaration,
+                p2.standaloneOpt
+              )
 
             SerializationParameters(
-                messageBody            = os.toByteArray.some,
-                queryString            = null,
-                actualRequestMediatype = actualRequestMediatype(serialization)
-              )
+              messageBody            = bytes.some,
+              queryString            = null,
+              actualRequestMediatype = actualRequestMediatype(serialization)
+            )
           } catch {
             case NonFatal(throwable) =>
               throw new XFormsSubmissionException(
@@ -142,15 +133,14 @@ object SerializationParameters {
           )
         case "multipart/form-data" =>
           // Build multipart/form-data body
-          val multipartFormData = SubmissionUtils.createMultipartFormData(documentToSubmit)
           val os = new ByteArrayOutputStream
-          multipartFormData.writeTo(os)
+          val multipartContentType = XFormsCrossPlatformSupport.writeMultipartFormData(documentToSubmit, os)
 
           // The mediatype also contains the boundary
           SerializationParameters(
             messageBody            = os.toByteArray.some,
             queryString            = null,
-            actualRequestMediatype = actualRequestMediatype(multipartFormData.getContentType.getValue)
+            actualRequestMediatype = actualRequestMediatype(multipartContentType)
           )
         case serialization @ "application/octet-stream" =>
           // Binary serialization
@@ -196,27 +186,20 @@ object SerializationParameters {
         case serialization @ (ContentTypes.HtmlContentType | ContentTypes.XhtmlContentType) =>
           // HTML or XHTML serialization
           try {
-            val identity = TransformerUtils.getIdentityTransformer
-            TransformerUtils.applyOutputProperties(
-              identity,
-              if (serialization == ContentTypes.HtmlContentType) "html" else "xhtml",
-              p2.versionOpt.orNull,
-              null,
-              null,
-              p2.encoding,
-              p2.omitXmlDeclaration,
-              p2.standaloneOpt map java.lang.Boolean.valueOf orNull,
-              p2.indent,
-              4
-            )
 
-            // TODO: use cdata-section-elements
-
-            val os = new ByteArrayOutputStream
-            identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
+            val bytes =
+              XFormsCrossPlatformSupport.serializeToByteArray(
+                documentToSubmit,
+                if (serialization == ContentTypes.HtmlContentType) "html" else "xhtml",
+                p2.encoding,
+                p2.versionOpt,
+                p2.indent,
+                p2.omitXmlDeclaration,
+                p2.standaloneOpt
+              )
 
             SerializationParameters(
-              messageBody            = os.toByteArray.some,
+              messageBody            = bytes.some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )
@@ -232,24 +215,19 @@ object SerializationParameters {
         case serialization if ContentTypes.isTextOrJSONContentType(serialization) =>
           // Text serialization
           try {
-            val identity = TransformerUtils.getIdentityTransformer
-            TransformerUtils.applyOutputProperties(
-              identity,
-              "text",
-              null,
-              null,
-              null,
-              p2.encoding,
-              true,
-              false,
-              false,
-              0
-            )
-            val os = new ByteArrayOutputStream
-            identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os))
+            val bytes =
+              XFormsCrossPlatformSupport.serializeToByteArray(
+                documentToSubmit,
+                "text",
+                p2.encoding,
+                None,
+                false,
+                true,
+                false.some
+              )
 
             SerializationParameters(
-              messageBody            = os.toByteArray.some,
+              messageBody            = bytes.some,
               queryString            = null,
               actualRequestMediatype = actualRequestMediatype(serialization)
             )

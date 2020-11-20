@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 
 /**

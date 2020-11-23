@@ -15,7 +15,7 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.2"
+val ScalatTestVersion             = "3.1.4"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
@@ -29,7 +29,7 @@ val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
 val ScalaLoggingVersion           = "3.9.2"
-val ScalaCollectionCompatVersion  = "2.1.6"
+val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
@@ -94,7 +94,7 @@ val CoreLibraryDependencies = Seq(
   ),
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
-  "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
+  "org.apache.commons"          % "commons-dbcp2"                   % "2.8.0"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
   "com.google.guava"            % "guava"                           % "29.0-jre"          % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,

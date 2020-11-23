@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<portlet-app version="2.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
+<portlet-app version="3.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
     <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
     <portlet>

@@ -39,7 +39,6 @@ object LangRef {
   case class  AVT(att: AttributeControl) extends LangRef
 }
 
-
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */

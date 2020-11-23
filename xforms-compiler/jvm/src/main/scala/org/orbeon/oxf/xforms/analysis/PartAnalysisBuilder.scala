@@ -123,6 +123,7 @@ object PartAnalysisBuilder {
     val startScope = new Scope(None, "")
 
     def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
+
       val staticStateDocument = new StaticStateDocument(staticStateXML)
 
       new XFormsStaticStateImpl(

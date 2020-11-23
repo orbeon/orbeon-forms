@@ -144,8 +144,6 @@ case class StaticPartAnalysisImpl(
   def baselineResources: (List[String], List[String]) =
     metadata.baselineResources
 
-
-
   /**
    * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not
    * cached, compute the mapping on the fly. Note that in this case, the resulting mapping is not added to the cache

@@ -40,7 +40,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     val doc = XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true)
 
     doc.afterInitialResponse()
-    doc.beforeExternalEvents(null, true)
+    doc.beforeExternalEvents(null, isAjaxRequest = true)
 
     _document = doc
 
@@ -50,7 +50,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   def setupDocument(doc: XFormsContainingDocument): Unit = {
 
     doc.afterInitialResponse()
-    doc.beforeExternalEvents(null, true)
+    doc.beforeExternalEvents(null, isAjaxRequest = true)
 
     _document = doc
   }
@@ -64,7 +64,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   }
 
   private def disposeDocument(doc: XFormsContainingDocument): Unit = {
-    doc.afterExternalEvents(true)
+    doc.afterExternalEvents(isAjaxRequest = true)
     doc.afterUpdateResponse()
   }
 

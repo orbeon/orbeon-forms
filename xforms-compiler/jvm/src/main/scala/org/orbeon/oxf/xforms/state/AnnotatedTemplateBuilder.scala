@@ -16,6 +16,6 @@ object AnnotatedTemplateBuilder {
   // used by `XFormsExtractor`
   def asBase64(annotatedTemplate: AnnotatedTemplate): String = {
     val asByteArray = toByteArray(annotatedTemplate.saxStore)
-    Base64.encode(asByteArray, false)
+    Base64.encode(asByteArray, useLineBreaks = false)
   }
 }

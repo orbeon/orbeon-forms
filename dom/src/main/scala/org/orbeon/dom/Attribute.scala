@@ -9,7 +9,6 @@ import org.orbeon.dom.tree.ConcreteAttribute
 trait Attribute extends Node {
   def getQName: QName
   def getNamespace: Namespace
-  def setNamespace(namespace: Namespace): Unit
   def getNamespacePrefix: String
   def getNamespaceURI: String
   def getQualifiedName: String

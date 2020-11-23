@@ -10,11 +10,6 @@ class ConcreteAttribute(qname: QName, var value: String)
   def getValue: String = value
   def setValue(value: String): Unit = this.value = value
 
-  def setNamespace(namespace: Namespace): Unit = {
-    val msg = "This Attribute is read only and cannot be changed"
-    throw new UnsupportedOperationException(msg)
-  }
-
   override def getText: String = getValue
   override def setText(text: String): Unit = setValue(text)
 
@@ -28,10 +23,10 @@ class ConcreteAttribute(qname: QName, var value: String)
   def accept(visitor: Visitor): Unit =
     visitor.visit(this)
 
-  def getNamespace       = getQName.namespace
-  def getNamespacePrefix = getQName.namespace.prefix
-  def getNamespaceURI    = getQName.namespace.uri
+  def getNamespace       = qname.namespace
+  def getNamespacePrefix = qname.namespace.prefix
+  def getNamespaceURI    = qname.namespace.uri
 
-  override def getName   = getQName.localName
-  def getQualifiedName   = getQName.qualifiedName
+  override def getName   = qname.localName
+  def getQualifiedName   = qname.qualifiedName
 }

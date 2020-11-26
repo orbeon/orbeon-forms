@@ -103,8 +103,8 @@ object StaticStateBits {
               template.some,
               ".",
               XXBLScope.Inner,
-              true,
-              false
+              isTopLevel           = true,
+              outputSingleTemplate = false
             ),
             metadata,
             true

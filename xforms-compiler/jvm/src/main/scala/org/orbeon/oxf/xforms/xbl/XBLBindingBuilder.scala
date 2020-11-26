@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
-import org.orbeon.oxf.xforms.{XFormsGlobalProperties, _}
+import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
@@ -349,7 +349,7 @@ object XBLBindingBuilder {
         Global(globalTemplateTree, globalCompactShadowTree)
       }
 
-    def hasFullUpdate(shadowTreeDocument: Document) =
+    def hasFullUpdate(shadowTreeDocument: Document): Boolean =
       if (Version.isPE) {
         var hasUpdateFull = false
 
@@ -361,8 +361,8 @@ object XBLBindingBuilder {
                 hasUpdateFull = true
             }
 
-            def endElement(element: Element) = ()
-            def text(text: Text) = ()
+            def endElement(element: Element): Unit = ()
+            def text(text: Text)            : Unit = ()
           },
           mutable = true
         )
@@ -373,12 +373,12 @@ object XBLBindingBuilder {
 
     class ScopeExtractor(
       partAnalysisCtx : PartAnalysisContextForTree, // for `Metadata` and `mapScopeIds`
-      xmlReceiver     : Option[XMLReceiver], // output of transformation or `None`
-      innerScope      : Scope,               // inner scope
-      outerScope      : Scope,               // outer scope, i.e. scope of the bound
-      startScope      : XXBLScope,           // scope of root element
-      prefix          : String,              // prefix of the ids within the new shadow tree
-      baseURI         : String               // base URI of new tree
+      xmlReceiver     : Option[XMLReceiver],        // output of transformation or `None`
+      innerScope      : Scope,                      // inner scope
+      outerScope      : Scope,                      // outer scope, i.e. scope of the bound
+      startScope      : XXBLScope,                  // scope of root element
+      prefix          : String,                     // prefix of the ids within the new shadow tree
+      baseURI         : String                      // base URI of new tree
     ) extends XFormsExtractor(
       xmlReceiverOpt               = xmlReceiver,
       metadata                     = partAnalysisCtx.metadata,

@@ -49,7 +49,7 @@ object XFormsStaticStateImpl {
           Version.instance.isPEFeatureEnabled(featureRequested, featureName)
       }
 
-    val topLevelPart: TopLevelPartAnalysis =
+    val topLevelPart =
       PartAnalysisBuilder(staticProperties, None, startScope, metadata, staticStateDocument)
 
     val dynamicProperties =
@@ -89,6 +89,8 @@ class XFormsStaticStateImpl(
   with XFormsStaticStateDynamicProperties {
 
   // Delegate (Scala 3's `export` would be nice!)
+  // export staticProperties._
+  // export dynamicProperties._
   def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
   def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
   def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis

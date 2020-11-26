@@ -460,6 +460,8 @@ object XFormsStaticStateImpl {
       def nonDefaultProperties: Map[String, (String, Boolean)] = _nonDefaultProperties
 
       // Delegate (Scala 3's `export` would be nice!)
+      // export staticProperties._
+      // export dynamicProperties._
       def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
       def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis

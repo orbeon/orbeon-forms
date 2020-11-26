@@ -169,7 +169,7 @@ object PartAnalysisBuilder {
     outputSingleTemplate         = false
   ) {
 
-    override def getPrefixedId(staticId: String) = prefix + staticId
+    override def getPrefixedId(staticId: String): String = prefix + staticId
 
     override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XXBLScope): Unit = {
       val staticId = attributes.getValue("id")
@@ -206,7 +206,7 @@ object PartAnalysisBuilder {
     protected override def rewriteId(id: String) = prefix + id
   }
 
-  // Used by `xxf:dynamic` and tests.
+  // Used by `xxf:dynamic`, offline compiler, and tests.
   private def createFromDocument[T](
     formDocument : Document,
     startScope   : Scope,
@@ -367,7 +367,7 @@ object PartAnalysisBuilder {
   private def analyze(
     partAnalysisCtx : PartAnalysisContextAfterTree,
     rootElem        : Element
-  )(implicit logger: IndentedLogger): Unit =
+  )(implicit logger : IndentedLogger): Unit =
     withDebug("performing static analysis") {
 
       partAnalysisCtx.initializeScopes()

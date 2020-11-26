@@ -34,6 +34,7 @@ import org.xml.sax.{Attributes, Locator}
 
 import scala.collection.{mutable => m}
 
+
 object XFormsExtractor {
 
   val LastIdQName = QName("last-id")
@@ -125,7 +126,7 @@ class XFormsExtractor(
   val baseURI                      : String,
   val startScope                   : XXBLScope,
   val isTopLevel                   : Boolean,
-  val outputSingleTemplate         : Boolean
+  val outputSingleTemplate         : Boolean // `true` only for `XBLBindingBuilder.ScopeExtractor`
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents
      with ExtractorProperties
@@ -228,7 +229,7 @@ class XFormsExtractor(
           if (metadata.hasTopLevelMarks)
             templateUnderConstructionOpt foreach { templateUnderConstruction =>
               withElement(localName = "template") {
-                // NOTE: At this point, the template has just received endDocument(), so is no longer under under
+                // NOTE: At this point, the template has just received `endDocument()`, so is no longer under under
                 // construction and can be serialized safely.
                 text(AnnotatedTemplateBuilder.asBase64(templateUnderConstruction))
               }

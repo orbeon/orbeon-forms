@@ -846,6 +846,56 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     Compile / unmanagedClasspath := Nil
   )
 
+lazy val xformsOffline = (project in file("xforms-offline"))
+  .settings(commonSettings: _*)
+  .settings(commonScalaJsSettings)
+  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(JSDependenciesPlugin)
+  .dependsOn(
+    xformsRuntimeJS
+  )
+  .settings(
+    name := "orbeon-xforms-offline",
+
+    // TODO: review
+    libraryDependencies            ++= Seq(
+      "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
+      "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
+      "com.outr"               %%% "scribe"           % ScribeVersion,
+      "com.outr"               %%% "perfolation"      % PerfolationVersion, // to avoid dependency on `scala-java-locales`
+      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz"      %%% "scala-java-time"  % "2.0.0"
+    ),
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion),
+
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+
+    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
+    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
+
+    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+
+    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (Compile / fastOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
+      XFormsResourcesPathInWar
+    ),
+
+    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (Compile / fullOptJS).value.data,
+      (ThisBuild / baseDirectory).value,
+      XFormsResourcesPathInWar
+    )
+  )
+
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)

@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xml
 
-import java.{io, lang => jl, util => ju}
+import java.{lang => jl, util => ju}
 
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator, SAXException}
 
 import scala.annotation.tailrec
-import scala.jdk.CollectionConverters._
 import scala.util.control.Breaks.{break, breakable}
+
 
 /**
  * SAXStore keeps a compact representation of SAX events sent to the ContentHandler interface.
@@ -47,43 +47,41 @@ private object SAXStore {
   val InitialSize          : Int  = 10
 }
 
-final class SAXStore
-  extends ForwardingXMLReceiver
-     with io.Externalizable {
+final class SAXStore extends ForwardingXMLReceiver {
 
   thisSAXStore =>
 
-  private var eventBuffer                  : Array[Byte] = null
-  private var eventBufferPosition          : Int = 0
+  private[oxf] var eventBuffer                  : Array[Byte] = null
+  private[oxf] var eventBufferPosition          : Int = 0
 
-  private var charBuffer                   : Array[Char] = null
-  private var charBufferPosition           : Int = 0
+  private[oxf] var charBuffer                   : Array[Char] = null
+  private[oxf] var charBufferPosition           : Int = 0
 
-  private var intBuffer                    : Array[Int] = null
-  private var intBufferPosition            : Int = 0
+  private[oxf] var intBuffer                    : Array[Int] = null
+  private[oxf] var intBufferPosition            : Int = 0
 
-  private var lineBuffer                   : Array[Int] = null
-  private var lineBufferPosition           : Int = 0
+  private[oxf] var lineBuffer                   : Array[Int] = null
+  private[oxf] var lineBufferPosition           : Int = 0
 
-  private var systemIdBuffer               : Array[String] = null
-  private var systemIdBufferPosition       : Int = 0
+  private[oxf] var systemIdBuffer               : Array[String] = null
+  private[oxf] var systemIdBufferPosition       : Int = 0
 
-  private var attributeCountBuffer         : Array[Int] = null
-  private var attributeCountBufferPosition : Int = 0
-  private var attributeCount               : Int = 0
+  private[oxf] var attributeCountBuffer         : Array[Int] = null
+  private[oxf] var attributeCountBufferPosition : Int = 0
+  private[oxf] var attributeCount               : Int = 0
 
-  private val stringBuilder                 = new ju.ArrayList[String]
+  private[oxf] var stringBuilder                 = new ju.ArrayList[String]
 
-  private var hasDocumentLocator           : Boolean = false
-  private var publicId                     : String = null
+  private[oxf] var hasDocumentLocator           : Boolean = false
+  private[oxf] var publicId                     : String = null
 
-  private var locator                      : Locator = null // used only for recording events, MUST be cleared afterwards
+  private[oxf] var locator                      : Locator = null // used only for recording events, MUST be cleared afterwards
 
-  private val StartMark = new Mark
+  private[oxf] val StartMark = new Mark
 
-  private var marks: ju.ArrayList[Mark] = null
+  private[oxf] var marks: ju.ArrayList[Mark] = null
 
-  private def init() {
+  private def init(): Unit = {
     eventBufferPosition = 0
     eventBuffer = new Array[Byte](SAXStore.InitialSize)
 
@@ -109,28 +107,24 @@ final class SAXStore
   // Main constructor initializes arrays
   init()
 
-  def this(input: io.ObjectInput) {
-    this() // FIXME: This will call `init()` and allocate the arrays. Was not the case with Java version.
-    readExternal(input)
-  }
 
-  def this(xmlReceiver: XMLReceiver) {
+  def this(xmlReceiver: XMLReceiver) = {
     this()
     super.setXMLReceiver(xmlReceiver)
   }
 
   class Mark private[SAXStore] () {
 
-    private[SAXStore] var _id: String = null
+    private[oxf] var _id: String = null
     def id: String = _id
 
-    private[SAXStore] var eventBufferPosition          = 0
-    private[SAXStore] var charBufferPosition           = 0
-    private[SAXStore] var intBufferPosition            = 0
-    private[SAXStore] var lineBufferPosition           = 0
-    private[SAXStore] var systemIdBufferPosition       = 0
-    private[SAXStore] var attributeCountBufferPosition = 0
-    private[SAXStore] var StringBuilderPosition        = 0
+    private[oxf] var eventBufferPosition          = 0
+    private[oxf] var charBufferPosition           = 0
+    private[oxf] var intBufferPosition            = 0
+    private[oxf] var lineBufferPosition           = 0
+    private[oxf] var systemIdBufferPosition       = 0
+    private[oxf] var attributeCountBufferPosition = 0
+    private[oxf] var stringBuilderPosition        = 0
 
     def this(store: SAXStore, id: String) {
       this()
@@ -141,7 +135,7 @@ final class SAXStore
       this.lineBufferPosition           = store.lineBufferPosition
       this.systemIdBufferPosition       = store.systemIdBufferPosition
       this.attributeCountBufferPosition = store.attributeCountBufferPosition
-      this.StringBuilderPosition        = store.stringBuilder.size
+      this.stringBuilderPosition        = store.stringBuilder.size
       rememberMark()
     }
 
@@ -162,7 +156,7 @@ final class SAXStore
       i+=1
       this.attributeCountBufferPosition = values(i)
       i+=1
-      this.StringBuilderPosition = values(i)
+      this.stringBuilderPosition = values(i)
       i+=1
 
       rememberMark()
@@ -181,6 +175,9 @@ final class SAXStore
 
     def saxStore: SAXStore = thisSAXStore
   }
+
+  def newMark(values: Array[Int], id: String): Unit =
+    new Mark(values, id)
 
   // For debugging only
   def getApproximateSize: Int = {
@@ -224,7 +221,7 @@ final class SAXStore
   def replay(xmlReceiver: XMLReceiver, mark: Mark): Unit = {
     var intBufferPos = mark.intBufferPosition
     var charBufferPos = mark.charBufferPosition
-    var stringBuilderPos = mark.StringBuilderPosition
+    var stringBuilderPos = mark.stringBuilderPosition
     var attributeCountBufferPos = mark.attributeCountBufferPosition
     val lineBufferPos = Array(mark.lineBufferPosition)
     val systemIdBufferPos = Array(mark.systemIdBufferPosition)
@@ -611,108 +608,4 @@ final class SAXStore
         stringBuilder.add(attributes.getValue(i))
       }
     }
-
-  @throws[io.IOException]
-  def writeExternal(out: io.ObjectOutput) {
-    out.writeInt(eventBufferPosition)
-    out.write(eventBuffer, 0, eventBufferPosition)
-    out.writeInt(charBufferPosition)
-    for (i <- 0 until charBufferPosition) {
-      out.writeChar(charBuffer(i))
-    }
-    out.writeInt(intBufferPosition)
-    for (i <- 0 until intBufferPosition) {
-      out.writeInt(intBuffer(i))
-    }
-    out.writeInt(lineBufferPosition)
-    for (i <- 0 until lineBufferPosition) {
-      out.writeInt(lineBuffer(i))
-    }
-    out.writeInt(systemIdBufferPosition)
-    for (i <- 0 until systemIdBufferPosition) {
-      val systemId = systemIdBuffer(i)
-      out.writeObject(if (systemId == null) ""
-      else systemId
-      )
-    }
-    out.writeInt(attributeCountBufferPosition)
-    for (i <- 0 until attributeCountBufferPosition) {
-      out.writeInt(attributeCountBuffer(i))
-    }
-    out.writeInt(stringBuilder.size)
-    for (i <- 0 until stringBuilder.size) {
-      out.writeObject(stringBuilder.get(i))
-    }
-    out.writeBoolean(hasDocumentLocator)
-    out.writeObject(if (publicId == null) ""
-    else publicId
-    )
-    if (marks == null || marks.isEmpty)
-      out.writeInt(0)
-    else {
-      out.writeInt(marks.size)
-      for (mark <- marks.asScala) {
-        out.writeObject(mark._id)
-        out.writeInt(mark.eventBufferPosition)
-        out.writeInt(mark.charBufferPosition)
-        out.writeInt(mark.intBufferPosition)
-        out.writeInt(mark.lineBufferPosition)
-        out.writeInt(mark.systemIdBufferPosition)
-        out.writeInt(mark.attributeCountBufferPosition)
-        out.writeInt(mark.StringBuilderPosition)
-      }
-    }
-    out.flush()
-  }
-
-  @throws[io.IOException]
-  @throws[ClassNotFoundException]
-  def readExternal(in: io.ObjectInput): Unit = {
-    eventBufferPosition = in.readInt()
-    eventBuffer = new Array[Byte](eventBufferPosition)
-    for (i <- 0 until eventBufferPosition)
-      eventBuffer(i) = in.readByte()
-    charBufferPosition = in.readInt()
-    charBuffer = new Array[Char](charBufferPosition)
-    for (i <- 0 until charBufferPosition)
-      charBuffer(i) = in.readChar()
-    intBufferPosition = in.readInt()
-    intBuffer = new Array[Int](intBufferPosition)
-    for (i <- 0 until intBufferPosition)
-      intBuffer(i) = in.readInt()
-    lineBufferPosition = in.readInt()
-    lineBuffer = new Array[Int](lineBufferPosition)
-    for (i <- 0 until lineBufferPosition)
-      lineBuffer(i) = in.readInt()
-    systemIdBufferPosition = in.readInt()
-    systemIdBuffer = new Array[String](systemIdBufferPosition)
-    for (i <- 0 until systemIdBufferPosition) {
-      systemIdBuffer(i) = in.readObject().asInstanceOf[String]
-      if ("" == systemIdBuffer(i))
-        systemIdBuffer(i) = null
-    }
-    attributeCountBufferPosition = in.readInt()
-    attributeCountBuffer = new Array[Int](attributeCountBufferPosition)
-    for (i <- 0 until attributeCountBufferPosition) {
-      val count = in.readInt()
-      attributeCountBuffer(i) = count
-      attributeCount += count
-    }
-    val stringBuilderSize = in.readInt()
-    for (_ <- 0 until stringBuilderSize)
-      stringBuilder.add(in.readObject().asInstanceOf[String])
-    hasDocumentLocator = in.readBoolean()
-    publicId = in.readObject().asInstanceOf[String]
-    if ("" == publicId)
-      publicId = null
-    val marksCount = in.readInt()
-    if (marksCount > 0)
-      for (_ <- 0 until marksCount) {
-        val id = in.readObject().asInstanceOf[String]
-        val values = new Array[Int](7)
-        for (j <- 0 until 7)
-          values(j) = in.readInt()
-        new Mark(values, id)
-      }
-  }
 }

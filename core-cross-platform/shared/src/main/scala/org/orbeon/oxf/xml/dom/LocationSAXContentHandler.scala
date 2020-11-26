@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xml.dom
 
-import javax.xml.transform.sax.SAXResult
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.xml.XMLReceiver
 import org.xml.sax.{Attributes, Locator}
+
 
 class LocationSAXContentHandler
   extends SAXContentHandler(

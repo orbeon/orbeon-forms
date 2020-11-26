@@ -65,6 +65,7 @@ abstract case class Namespace private[Namespace] (prefix: String, uri: String) e
   // 2018-03-21: We checked that there are "few" namespaces created with Form Builder and Form Runner.
   // For example, editing and running a large form, I get a total of 122 namespace created. So checking
   // for validity is not a problem at all. We should use tested logic, like that of Saxon's `Name10Checker`.
+  // 2020-11-23: For Saxon 10, it's just `NameChecker`
 
   private def readResolve()            : Object    = Namespace.apply(prefix, uri)
   def copy(prefix: String, uri: String): Namespace = Namespace.apply(prefix, uri)

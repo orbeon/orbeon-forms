@@ -38,7 +38,7 @@ case class BindingContext(
   position                  : Int,
   elementId                 : String,
   newBind                   : Boolean,
-  controlElement            : Element,
+  controlElement            : Element, // only used to determine if it's a repeat or a grouping element
   private val _locationData : LocationData,
   hasOverriddenContext      : Boolean,
   contextItem               : om.Item,

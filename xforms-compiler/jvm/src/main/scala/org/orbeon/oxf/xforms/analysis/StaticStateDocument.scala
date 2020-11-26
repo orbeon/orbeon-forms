@@ -38,7 +38,7 @@ class StaticStateDocument(val xmlDocument: Document) {
   def template: Option[String] = staticStateElement.elementOpt("template") map (_.getText)
 
   // Extract properties
-  // NOTE: XFormsExtractor takes care of propagating only non-default properties
+  // NOTE: `XFormsExtractor` takes care of propagating only non-default properties
   val nonDefaultProperties: Map[String, (String, Boolean)] = {
     for {
       element       <- staticStateElement.elements(STATIC_STATE_PROPERTIES_QNAME)
@@ -70,7 +70,7 @@ class StaticStateDocument(val xmlDocument: Document) {
   // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
   // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
   def asBase64: String =
-    EncodeDecode.encodeXML(xmlDocument, true, isClientStateHandling, true) // compress = true, encrypt = isClientStateHandling, location = true
+    EncodeDecode.encodeXML(xmlDocument, true, isClientStateHandling, true) // `compress = true, encrypt = isClientStateHandling, location = true`
 
   def dump(): Unit =
     println(xmlDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))

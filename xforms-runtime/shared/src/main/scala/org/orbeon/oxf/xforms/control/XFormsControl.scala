@@ -331,7 +331,8 @@ object XFormsControl {
         XMLConstants.XHTML_NAMESPACE_URI
       ),
       rawValue,
-      locationData, "xhtml"
+      locationData,
+      "xhtml"
     )
 
     sb.toString

@@ -34,9 +34,9 @@ object StringReplacer extends Logging {
             case JsObject(fields) =>
               fields collect {
                 case (k, v: JsString) => k -> v.value
-                case other => throw new IllegalArgumentException
+                case _ => throw new IllegalArgumentException
               }
-            case other => throw new IllegalArgumentException
+            case _ => throw new IllegalArgumentException
           }
         catch {
           case NonFatal(t) =>

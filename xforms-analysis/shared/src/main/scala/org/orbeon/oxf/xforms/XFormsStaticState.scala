@@ -18,15 +18,17 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.xforms.analysis.TopLevelPartAnalysis
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.saxon.functions.FunctionLibrary
 
-trait XFormsStaticState {
+
+trait XFormsStaticState
+  extends XFormsStaticStateStaticProperties
+     with XFormsStaticStateDynamicProperties {
 
   def getIndentedLogger                       : IndentedLogger
 
   // State
-  def digest                                  : String
   def encodedState                            : String
+  def digest                                  : String
 
   // Static representation
   def topLevelPart                            : TopLevelPartAnalysis
@@ -36,31 +38,37 @@ trait XFormsStaticState {
   def isHTMLDocument                          : Boolean
 
   // Other configurations
-  def functionLibrary                         : FunctionLibrary
   def assets                                  : XFormsAssets
-
-  // General configuration via properties
-  def isClientStateHandling                   : Boolean
-  def isServerStateHandling                   : Boolean
-
-  def isXPathAnalysis                         : Boolean
-  def isCalculateDependencies                 : Boolean
-
   def sanitizeInput                           : String => String
-  def isInlineResources                       : Boolean
+}
 
-  def uploadMaxSize                           : MaximumSize
-  def uploadMaxSizeAggregate                  : MaximumSize
-  def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]
+trait XFormsStaticStateStaticProperties {
 
-  def staticProperty       (name: String)     : Any
-  def staticStringProperty (name: String)     : String
-  def staticBooleanProperty(name: String)     : Boolean
-  def staticIntProperty    (name: String)     : Int
+  def nonDefaultProperties                : Map[String, (String, Boolean)]
 
-  def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
-  def clientNonDefaultProperties              : Map[String, Any]
+  def isClientStateHandling               : Boolean
+  def isServerStateHandling               : Boolean
+
+  def isXPathAnalysis                     : Boolean
+  def isCalculateDependencies             : Boolean
+
+  def isInlineResources                   : Boolean
+
+  def uploadMaxSize                       : MaximumSize
+  def uploadMaxSizeAggregate              : MaximumSize
+
+  def staticProperty       (name: String) : Any
+  def staticStringProperty (name: String) : String
+  def staticBooleanProperty(name: String) : Boolean
+  def staticIntProperty    (name: String) : Int
+
+  def clientNonDefaultProperties          : Map[String, Any]
 
   // Probably obsolete
-  def allowedExternalEvents                   : Set[String]
+  def allowedExternalEvents               : Set[String]
+}
+
+trait XFormsStaticStateDynamicProperties {
+  def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]
+  def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
 }

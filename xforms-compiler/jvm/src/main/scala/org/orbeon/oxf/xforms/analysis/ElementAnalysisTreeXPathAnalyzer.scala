@@ -338,7 +338,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         // keep bindAnalysis as those can be used independently from each other
       }
 
-      if (partAnalysisCtx.isCalculateDependencies) {
+      if (partAnalysisCtx.staticProperties.isCalculateDependencies) {
         model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Calculate))
         model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Default))
       }

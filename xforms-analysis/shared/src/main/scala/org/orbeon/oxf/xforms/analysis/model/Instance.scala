@@ -13,39 +13,51 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.orbeon.datatypes.ExtendedLocationData
-import org.orbeon.dom.{Document, Element, QName}
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable._
 
 
+case class InstanceMetadata(
+  readonly              : Boolean,
+  cache                 : Boolean,
+  timeToLive            : Long,
+  handleXInclude        : Boolean,
+  exposeXPathTypes      : Boolean,
+  indexIds              : Boolean,
+  indexClasses          : Boolean,
+  isLaxValidation       : Boolean,
+  isStrictValidation    : Boolean,
+  isSchemaValidation    : Boolean,
+  credentials           : Option[BasicCredentials],
+  excludeResultPrefixes : Set[String],
+  inlineRootElemOpt     : Option[Element],
+  useInlineContent      : Boolean,
+  useExternalContent    : Boolean,
+  instanceSource        : Option[String],
+  dependencyURL         : Option[String]
+)
 
-/**
- * Static analysis of an XForms instance.
- */
 class Instance(
-  index                    : Int,
-  element                  : Element,
-  parent                   : Option[ElementAnalysis],
-  preceding                : Option[ElementAnalysis],
-  staticId                 : String,
-  prefixedId               : String,
-  namespaceMapping         : NamespaceMapping,
-  scope                    : Scope,
-  containerScope           : Scope,
-  val partExposeXPathTypes : Boolean
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope,
+  instanceMetadata : InstanceMetadata
 ) extends ElementAnalysis(
   index,
   element,
@@ -56,15 +68,7 @@ class Instance(
   namespaceMapping,
   scope,
   containerScope
-) with InstanceMetadata with Logging {
-
-  override def extendedLocationData =
-    XmlExtendedLocationData(
-      locationData,
-      Some("processing XForms instance"),
-      List("id" -> staticId),
-      Option(element)
-    )
+) with Logging {
 
   // Get constant inline content from `CommonBinding` if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of a `CommonBinding` and
@@ -111,87 +115,35 @@ class Instance(
           Instance.extractReadonlyDocument(inlineRootElemOpt.get, excludeResultPrefixes)
       }
     }
-}
 
-// Separate trait that can also be used by AbstractBinding to extract instance metadata
-trait InstanceMetadata {
-
-  def element: Element
-  def partExposeXPathTypes: Boolean
-  def extendedLocationData: ExtendedLocationData
-
-  import ElementAnalysis._
-
-  val readonly         = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
-  val cache            = element.attributeValue(XXFORMS_CACHE_QNAME) == "true"
-  val timeToLive       = Instance.timeToLiveOrDefault(element)
-  val handleXInclude   = false
-
-  // lazy because depends on property, which depends on top-level model being set in XFormsStaticStateImpl!
-  lazy val exposeXPathTypes =
-    Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map
-    (_ == "true") getOrElse
-    ! readonly && partExposeXPathTypes
-
-  val (indexIds, indexClasses) = {
-    val tokens = attSet(element, XXFORMS_INDEX_QNAME)
-    (tokens("id"), tokens("class"))
-  }
-
-  private val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
-
-  def isLaxValidation    = (validation eq null) || validation == "lax"
-  def isStrictValidation = validation == "strict"
-  def isSchemaValidation = isLaxValidation || isStrictValidation
-
-  val credentials: Option[BasicCredentials] = {
-    // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
-    def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
-    def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
-    def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
-    def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
-
-    Option(username) map (BasicCredentials(_, password, preemptiveAuth, domain))
-  }
-
-  val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
-
-  // Inline root element if any
-  // TODO: When not needed, we should not keep a reference on this.
-  // TODO: When needed, wwe should just keep a detached template.
-  val inlineRootElemOpt: Option[Element] = element.elements.headOption
-  private def hasInlineContent = inlineRootElemOpt.isDefined
-
-  // Don't allow more than one child element
-  if (element.elements.size > 1)
-    throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
-
-  private def getAttributeEncode(qName: QName): Option[String] =
-    element.attributeValueOpt(qName) map (att => att.trimAllToEmpty.encodeHRRI(processSpace = true))
-
-  private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
-  private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)
-
-  // `@src` always wins, `@resource` always loses
-  val useInlineContent = src.isEmpty && hasInlineContent
-  val useExternalContent = src.isDefined || ! hasInlineContent && resource.isDefined
-
-  val (instanceSource, dependencyURL) =
-    (if (useInlineContent) None else src orElse resource) match {
-      case someSource @ Some(source) if Instance.isProcessorOutputScheme(source) =>
-        someSource -> None // input:* doesn't add a URL dependency, but is handled by the pipeline engine
-      case someSource @ Some(_) =>
-        someSource -> someSource
-      case _ =>
-        None -> None
-    }
-
-  // Don't allow a blank `src` attribute
-  if (useExternalContent && instanceSource.exists(_.isAllBlank))
-    throw new ValidationException("`xf:instance` must not specify a blank URL", extendedLocationData)
+  def readonly              : Boolean                  = instanceMetadata.readonly
+  def cache                 : Boolean                  = instanceMetadata.cache
+  def timeToLive            : Long                     = instanceMetadata.timeToLive
+  def handleXInclude        : Boolean                  = instanceMetadata.handleXInclude
+  def exposeXPathTypes      : Boolean                  = instanceMetadata.exposeXPathTypes
+  def indexIds              : Boolean                  = instanceMetadata.indexIds
+  def indexClasses          : Boolean                  = instanceMetadata.indexClasses
+  def isLaxValidation       : Boolean                  = instanceMetadata.isLaxValidation
+  def isStrictValidation    : Boolean                  = instanceMetadata.isStrictValidation
+  def isSchemaValidation    : Boolean                  = instanceMetadata.isSchemaValidation
+  def credentials           : Option[BasicCredentials] = instanceMetadata.credentials
+  def excludeResultPrefixes : Set[String]              = instanceMetadata.excludeResultPrefixes
+  def inlineRootElemOpt     : Option[Element]          = instanceMetadata.inlineRootElemOpt
+  def useInlineContent      : Boolean                  = instanceMetadata.useInlineContent
+  def useExternalContent    : Boolean                  = instanceMetadata.useExternalContent
+  def instanceSource        : Option[String]           = instanceMetadata.instanceSource
+  def dependencyURL         : Option[String]           = instanceMetadata.dependencyURL
 }
 
 object Instance {
+
+  // Copy this here as we don't want a dependency on the processor stuff
+  private val ProcessorInputScheme  = "input:"
+  private val ProcessorOutputScheme = "output:"
+
+  def isProcessorInputScheme(uri: String): Boolean =
+    uri.startsWith(ProcessorInputScheme) &&
+      ! uri.startsWith(ProcessorInputScheme + "/")
 
   def isProcessorOutputScheme(uri: String): Boolean =
     uri.startsWith(ProcessorOutputScheme) &&
@@ -223,7 +175,4 @@ object Instance {
         // No exclusion
         element.createDocumentCopyParentNamespaces(detach = false)
     }
-
-  // Copy this here as we don't want a dependency on the processor stuff
-  private val ProcessorOutputScheme = "output:"
 }

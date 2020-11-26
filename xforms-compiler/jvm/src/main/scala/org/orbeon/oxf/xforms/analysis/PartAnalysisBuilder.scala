@@ -49,11 +49,11 @@ object PartAnalysisBuilder {
 
   // Create and analyze an entire part, whether a top-level, immutable part or a nested, mutable part.
   def apply[T >: TopLevelPartAnalysis with NestedPartAnalysis](
-    staticState         : XFormsStaticState,
+    staticProperties    : XFormsStaticStateStaticProperties,
     parent              : Option[PartAnalysis],
     startScope          : Scope,
     metadata            : Metadata,
-    staticStateDocument : StaticStateDocument)(implicit
+    staticStateDocument : StaticStateDocument)(implicit // for `nonDefaultProperties`, `xblElements`, `rootControl`
     logger              : IndentedLogger
   ): T = {
 
@@ -68,7 +68,7 @@ object PartAnalysisBuilder {
           loadClassByName[FunctionLibrary](XFormsFunctionLibraryClassName) getOrElse
             (throw new IllegalStateException)
 
-        loadClassFromProperty[FunctionLibrary](staticStateDocument, FunctionLibraryProperty) match {
+        loadClassFromProperty[FunctionLibrary](staticStateDocument.nonDefaultProperties, FunctionLibraryProperty) match {
           case Some(library) =>
             new FunctionLibraryList                         |!>
               (_.addFunctionLibrary(xformsFunctionLibrary)) |!>
@@ -83,14 +83,14 @@ object PartAnalysisBuilder {
       (parent.iterator flatMap (_.ancestorOrSelfIterator)).lastOption() collect {
         case impl: StaticPartAnalysisImpl => impl.xblSupport
       } getOrElse
-        loadClassFromProperty[XBLSupport](staticStateDocument, XblSupportProperty)
+        loadClassFromProperty[XBLSupport](staticStateDocument.nonDefaultProperties, XblSupportProperty)
 
     // We now know all inline XBL bindings, which we didn't in `XFormsAnnotator`.
     // NOTE: Inline bindings are only extracted at the top level of a part. We could imagine extracting them within
     // all XBL components. They would then have to be properly scoped.
     metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
 
-    val partAnalysisCtx = StaticPartAnalysisImpl(staticState, parent, startScope, metadata, xblSupport, functionLibrary)
+    val partAnalysisCtx = StaticPartAnalysisImpl(staticProperties, parent, startScope, metadata, xblSupport, functionLibrary)
     analyze(partAnalysisCtx, staticStateDocument.rootControl)
 
     if (XFormsGlobalProperties.getDebugLogXPathAnalysis)
@@ -106,7 +106,7 @@ object PartAnalysisBuilder {
     val startScope = new Scope(None, "")
     val staticStateDocument = new StaticStateDocument(staticStateBits.staticStateDocument)
 
-    new XFormsStaticStateImpl(
+    XFormsStaticStateImpl(
       staticStateDocument.asBase64,
       staticStateBits.staticStateDigest,
       startScope,
@@ -126,7 +126,7 @@ object PartAnalysisBuilder {
 
       val staticStateDocument = new StaticStateDocument(staticStateXML)
 
-      new XFormsStaticStateImpl(
+      XFormsStaticStateImpl(
         staticStateDocument.asBase64,
         digest,
         startScope,
@@ -255,9 +255,11 @@ object PartAnalysisBuilder {
     (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
   }
 
-  private def loadClassFromProperty[T <: AnyRef : ClassTag](staticStateDocument: StaticStateDocument, propertyName: String): Option[T] =
-    staticStateDocument
-      .nonDefaultProperties
+  private def loadClassFromProperty[T <: AnyRef : ClassTag](
+    nonDefaultProperties : Map[String, (String, Boolean)],
+    propertyName         : String
+  ): Option[T] =
+    nonDefaultProperties
       .get(propertyName) map
       (_._1)             flatMap
       (_.trimAllToOpt)   flatMap
@@ -306,7 +308,8 @@ object PartAnalysisBuilder {
         LHHAAnalysisBuilder.attachToControl(partAnalysisCtx, lhha)
 
       partAnalysisCtx.registerEventHandlers(eventHandlers)
-      partAnalysisCtx.analyzeCustomControls(attributes)
+      partAnalysisCtx.gatherScripts()
+      partAnalysisCtx.indexAttributeControls(attributes)
 
       ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, container)
 
@@ -438,7 +441,8 @@ object PartAnalysisBuilder {
         LHHAAnalysisBuilder.attachToControl(partAnalysisCtx, lhha)
 
       partAnalysisCtx.registerEventHandlers(eventHandlers)
-      partAnalysisCtx.analyzeCustomControls(attributes)
+      partAnalysisCtx.gatherScripts()
+      partAnalysisCtx.indexAttributeControls(attributes)
 
       // Language on the root element is handled differently, but it must be done after the tree has been built
       // as we need access to attribute controls
@@ -464,7 +468,7 @@ object PartAnalysisBuilder {
       ElementAnalysisTreeBuilder.setModelAndLangOnAllDescendants(partAnalysisCtx, rootControlAnalysis)
 
       // NOTE: For now, we don't analyze the XPath of nested (dynamic) parts
-      if (partAnalysisCtx.isTopLevelPart && partAnalysisCtx.isXPathAnalysis) {
+      if (partAnalysisCtx.isTopLevelPart && partAnalysisCtx.staticProperties.isXPathAnalysis) {
         ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, rootControlAnalysis) // first as nested models might ask for its context
         partAnalysisCtx.iterateModels ++ partAnalysisCtx.iterateControlsNoModels foreach
           (ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, _))

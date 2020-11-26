@@ -167,12 +167,12 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     Assume.assumeTrue(Version.isPE)
 
     val doc = this setupDocument simpleDoc
-    val staticStateXML = doc.staticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
+    val staticStateXML = doc.staticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocumentForTests.xmlDocument
 
     // Serialize/deserialize
     val serialized = doc.staticState.encodedState
     val restored = XFormsContainingDocumentBuilder.restoreStaticState(None, serialized, forceEncryption = false)
-    val restoredXML = restored.staticStateDocument.xmlDocument
+    val restoredXML = restored.staticStateDocumentForTests.xmlDocument
 
     // Compare expected/actual XML representation of the static state
     assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML)

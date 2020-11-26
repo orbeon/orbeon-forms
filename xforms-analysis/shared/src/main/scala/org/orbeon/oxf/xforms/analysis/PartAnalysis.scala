@@ -53,7 +53,6 @@ trait PartAnalysis
 
   // TODO for serialization
   val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis]
-
 }
 
 trait PartAnalysisRuntimeOps extends PartGlobalOps {

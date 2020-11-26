@@ -14,12 +14,14 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.saxon.om
 
+import scala.collection.mutable
 import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
+
 
 trait PartControlsAnalysis extends TransientState {
 
@@ -27,24 +29,18 @@ trait PartControlsAnalysis extends TransientState {
 
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
 
-  // For deindexing
-  def metadata            : Metadata
-  def unmapScopeIds(control: ElementAnalysis): Unit
-  def deindexModel(model: Model): Unit
-  def deregisterEventHandler(eventHandler: EventHandler): Unit
-
-  val controlAnalysisMap     = LinkedHashMap[String, ElementAnalysis]()
-  val controlTypes = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
+  val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis] = LinkedHashMap[String, ElementAnalysis]()
+  val controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]] = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
   def iterateControlsNoModels: Iterator[ElementAnalysis] =
     for (control <- controlAnalysisMap.valuesIterator if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
       yield control
 
   // Special handling of attributes
-  private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
+  var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
 
-  def analyzeCustomControls(attributes: Buffer[AttributeControl]): Unit =
-    if (attributes.nonEmpty) { // index attribute controls
+  def indexAttributeControls(attributes: Buffer[AttributeControl]): Unit =
+    if (attributes.nonEmpty) {
 
       case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
 
@@ -68,22 +64,22 @@ trait PartControlsAnalysis extends TransientState {
       }
     }
 
-  def getControlAnalysis(prefixedId: String) =
+  def getControlAnalysis(prefixedId: String): ElementAnalysis =
     controlAnalysisMap.get(prefixedId) orNull
 
   def controlElement(prefixedId: String): Option[om.NodeInfo] =
     findControlAnalysis(prefixedId) map { control =>
-      val wrapper = new DocumentWrapper(control.element.getDocument, null, XPath.GlobalConfiguration)
+      val wrapper = new DocumentWrapper(control.element.getDocument, null, StaticXPath.GlobalConfiguration)
       wrapper.wrap(control.element)
     }
 
-  def hasAttributeControl(prefixedForAttribute: String) =
-    _attributeControls.get(prefixedForAttribute).isDefined
+  def hasAttributeControl(prefixedForAttribute: String): Boolean =
+    _attributeControls.contains(prefixedForAttribute)
 
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl =
     _attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
 
-  def hasControlByName(controlName: String) =
+  def hasControlByName(controlName: String): Boolean =
     controlTypes.get(controlName) exists (_.nonEmpty)
 
   def controlsByName(controlName: String): Iterable[ElementAnalysis] =
@@ -116,47 +112,5 @@ trait PartControlsAnalysis extends TransientState {
 
     for (controlAnalysis <- controlAnalysisMap.values)
       controlAnalysis.freeTransientState()
-  }
-
-  // Deindex the given control
-  def deindexControl(control: ElementAnalysis): Unit = {
-    val controlName = control.localName
-    val prefixedId = control.prefixedId
-
-    controlAnalysisMap -= prefixedId
-    controlTypes.get(controlName) foreach (_ -= prefixedId)
-
-    metadata.removeNamespaceMapping(prefixedId)
-    metadata.removeBindingByPrefixedId(prefixedId)
-    unmapScopeIds(control)
-
-    control match {
-      case model: Model          => deindexModel(model)
-      case handler: EventHandler => deregisterEventHandler(handler)
-      case att: AttributeControl => _attributeControls -= att.forPrefixedId
-      case _                     =>
-    }
-
-    // NOTE: Can't update controlAppearances and _hasInputPlaceholder without checking all controls again, so for now leave that untouched
-  }
-
-  // Remove the given control and its descendants
-  def deindexTree(tree: ElementAnalysis, self: Boolean): Unit = {
-
-    if (self) {
-      deindexControl(tree)
-      tree.removeFromParent()
-    }
-
-    tree match {
-      case childrenBuilder: WithChildrenTrait =>
-        childrenBuilder.descendants foreach deindexControl
-
-        if (! self)
-          childrenBuilder.children foreach
-            (_.removeFromParent())
-
-      case _ =>
-    }
   }
 }

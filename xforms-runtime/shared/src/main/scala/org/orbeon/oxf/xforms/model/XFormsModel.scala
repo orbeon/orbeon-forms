@@ -418,7 +418,6 @@ trait XFormsModelInstances {
 
     assert(instance.useInlineContent)
 
-
     val inlineContent =
       instance.constantContent getOrElse
         XFormsInstanceSupport.extractDocument(
@@ -488,7 +487,7 @@ trait XFormsModelInstances {
   private def loadInitialExternalInstanceFromCacheIfNeeded(instance: Instance): Unit = {
     val instanceResource = instance.instanceSource.get
     try {
-      if (instance.cache && ! isProcessorInputScheme(instanceResource)) {
+      if (instance.cache && ! Instance.isProcessorInputScheme(instanceResource)) {
         // Instance 1) has cache hint and 2) is not input:*, so it can be cached
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
         val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
@@ -536,7 +535,7 @@ trait XFormsModelInstances {
         case None =>
           // Connect directly if there is no resolver or if the instance is globally cached
           // NOTE: If there is no resolver, URLs of the form input:* are not allowed
-          assert(! isProcessorInputScheme(absoluteURLString))
+          assert(! Instance.isProcessorInputScheme(absoluteURLString))
 
           if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
@@ -596,10 +595,4 @@ trait XFormsModelInstances {
       )
     )
   }
-
-  // Duplicated from `ProcessorImpl` but we don't want that dependency.
-  private val ProcessorInputScheme = "input:"
-
-  private def isProcessorInputScheme(uri: String): Boolean =
-    uri.startsWith(ProcessorInputScheme) && ! uri.startsWith(ProcessorInputScheme + "/")
 }

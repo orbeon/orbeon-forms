@@ -5,16 +5,19 @@ import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
-import org.orbeon.oxf.xforms.analysis.model.{Instance, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, StaticBind}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisContextForTree}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
@@ -120,7 +123,7 @@ object LHHAAnalysisBuilder {
         case LHHA.Label | LHHA.Hint =>
           hasLocalMinimalAppearance || (
             ! hasLocalFullAppearance &&
-              partAnalysisCtx.staticStringProperty(
+              partAnalysisCtx.staticProperties.staticStringProperty(
                 if (lhhaType == LHHA.Hint) HintAppearanceProperty else LabelAppearanceProperty
               )
             .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
@@ -561,7 +564,16 @@ object InstanceBuilder {
       namespaceMapping,
       scope,
       containerScope,
-      partAnalysisCtx.staticBooleanProperty(ExposeXpathTypesProperty)
+      InstanceMetadataBuilder(
+        element,
+        partAnalysisCtx.staticProperties.staticBooleanProperty(ExposeXpathTypesProperty),
+        XmlExtendedLocationData(
+          ElementAnalysis.createLocationData(element),
+          Some("processing XForms instance"),
+          List("id" -> staticId),
+          Option(element)
+        )
+      )
     )
 }
 
@@ -617,4 +629,93 @@ object ComponentControlBuilder {
       case (true,  false) => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait                       )
       case (true,  true)  => (new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait with StaticLHHASupport)
     }
+}
+
+object InstanceMetadataBuilder {
+
+  def apply(
+    element              : Element,
+    partExposeXPathTypes : Boolean,
+    extendedLocationData : => ExtendedLocationData
+  ): InstanceMetadata = {
+
+    import ElementAnalysis._
+
+    val (indexIds, indexClasses) = {
+      val tokens = attSet(element, XXFORMS_INDEX_QNAME)
+      (tokens("id"), tokens("class"))
+    }
+
+    val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
+
+    val isLaxValidation    = (validation eq null) || validation == "lax"
+    val isStrictValidation = validation == "strict"
+
+    val credentials: Option[BasicCredentials] = {
+      // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
+      def usernameOpt    = element.attributeValueOpt(XXFORMS_USERNAME_QNAME)
+      def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
+      def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
+      def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
+
+      usernameOpt map (BasicCredentials(_, password, preemptiveAuth, domain))
+    }
+
+    // Inline root element if any
+    // TODO: When not needed, we should not keep a reference on this.
+    // TODO: When needed, wwe should just keep a detached template.
+    val inlineRootElemOpt: Option[Element] = element.elements.headOption
+    val hasInlineContent = inlineRootElemOpt.isDefined
+
+    // Don't allow more than one child element
+    if (element.elements.size > 1)
+      throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
+
+    def getAttributeEncode(qName: QName): Option[String] =
+      element.attributeValueOpt(qName) map (att => att.trimAllToEmpty.encodeHRRI(processSpace = true))
+
+    val src      = getAttributeEncode(SRC_QNAME)
+    val resource = getAttributeEncode(RESOURCE_QNAME)
+
+    // `@src` always wins, `@resource` always loses
+    val useInlineContent   : Boolean = src.isEmpty && hasInlineContent
+    val useExternalContent : Boolean = src.isDefined || ! hasInlineContent && resource.isDefined
+
+    val (instanceSource, dependencyURL) =
+      (if (useInlineContent) None else src orElse resource) match {
+        case someSource @ Some(source) if Instance.isProcessorOutputScheme(source) =>
+          someSource -> None // `input:*` doesn't add a URL dependency, but is handled by the pipeline engine
+        case someSource @ Some(_) =>
+          someSource -> someSource
+        case _ =>
+          None -> None
+      }
+
+    // Don't allow a blank `src` attribute
+    if (useExternalContent && instanceSource.exists(_.isAllBlank))
+      throw new ValidationException("`xf:instance` must not specify a blank URL", extendedLocationData)
+
+    val localExposeXPathTypes = element.attributeValueOpt(XXFORMS_EXPOSE_XPATH_TYPES_QNAME) contains "true"
+    val readonly              = element.attributeValueOpt(XXFORMS_READONLY_ATTRIBUTE_QNAME) contains "true"
+
+    InstanceMetadata(
+      readonly              = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true",
+      cache                 = element.attributeValue(XXFORMS_CACHE_QNAME) == "true",
+      timeToLive            = Instance.timeToLiveOrDefault(element),
+      handleXInclude        = false,
+      exposeXPathTypes      = localExposeXPathTypes || ! readonly && partExposeXPathTypes,
+      indexIds              = indexIds,
+      indexClasses          = indexClasses,
+      isLaxValidation       = isLaxValidation,
+      isStrictValidation    = isStrictValidation,
+      isSchemaValidation    = isLaxValidation || isStrictValidation,
+      credentials           = credentials,
+      excludeResultPrefixes = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet,
+      inlineRootElemOpt     = inlineRootElemOpt,
+      useInlineContent      = useInlineContent,
+      useExternalContent    = useExternalContent,
+      instanceSource        = instanceSource,
+      dependencyURL         = dependencyURL
+    )
+  }
 }

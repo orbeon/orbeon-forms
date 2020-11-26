@@ -14,67 +14,25 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
-import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.XFormsNames._
 
 import scala.collection.compat._
 import scala.collection.mutable
 
 
-// Part analysis: event handlers information
-trait PartEventHandlerAnalysis {
+trait PartEventHandlerScripts {
 
-  self =>
+  import PartEventHandlerScripts._
 
   def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]
 
-  import PartEventHandlerAnalysis._
-
-  private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map.empty
-  private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set.empty
-  private[PartEventHandlerAnalysis] var _keyboardHandlers: List[EventHandler] = Nil
-
-  // Scripts
-  private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map.empty
+  private[PartEventHandlerScripts] var _scriptsByPrefixedId: Map[String, StaticScript] = Map.empty
   def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
-  private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
+  private[PartEventHandlerScripts] var _uniqueJsScripts: List[ShareableScript] = Nil
   def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
 
-  // Register new event handlers
-  def registerEventHandlers(eventHandlers: Seq[EventHandler])(implicit logger: IndentedLogger): Unit = {
-
-    val tuples =
-      for {
-        handler <- eventHandlers
-        observerPrefixedId <- {
-          handler.analyzeEventHandler()
-          handler.observersPrefixedIds
-        }
-      } yield
-        (observerPrefixedId, handler)
-
-    // Group event handlers by observer
-    val newHandlers = tuples groupBy (_._1) map { case (k, v) => k -> (v map (_._2) toList) }
-
-    // Accumulate new handlers into existing map by combining values for a given observer
-    _handlersForObserver = newHandlers.foldLeft(_handlersForObserver) {
-      case (existingMap, (observerId, newHandlers)) =>
-        val existingHandlers = existingMap.getOrElse(observerId, Nil)
-        existingMap + (observerId -> (existingHandlers ::: newHandlers))
-    }
-
-    // Gather all event names (NOTE: #all is also included if present)
-    _eventNames ++= eventHandlers flatMap (_.eventNames)
-
-    // Gather all keyboard handlers
-    _keyboardHandlers ++= eventHandlers filter (_.eventNames intersect EventNames.KeyboardEvents nonEmpty)
-
-    gatherScripts()
-  }
-
-  private def gatherScripts(): Unit = {
+  def gatherScripts(): Unit = {
 
     // Used to eliminate duplicates: we store a single copy of each ShareableScript per digest
     val shareableByDigest = mutable.LinkedHashMap[String, ShareableScript]()
@@ -129,41 +87,16 @@ trait PartEventHandlerAnalysis {
     _uniqueJsScripts ++= jsScripts.keepDistinctBy(_.shared.digest) map (_.shared)
   }
 
-  // Deregister the given handler
-  def deregisterEventHandler(eventHandler: EventHandler): Unit = {
-    eventHandler.observersPrefixedIds foreach (_handlersForObserver -= _)
-
-    if (eventHandler.eventNames intersect EventNames.KeyboardEvents nonEmpty)
-      _keyboardHandlers = _keyboardHandlers filterNot (_ eq eventHandler)
+  def deregisterScript(eventHandler: EventHandler): Unit = {
 
     if (ActionNames(eventHandler.localName))
       _scriptsByPrefixedId -= eventHandler.prefixedId
 
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
   }
-
-  def getEventHandlersForObserver(observerPrefixedId: String): List[EventHandler] =
-    _handlersForObserver.getOrElse(observerPrefixedId, Nil)
-
-  def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean =
-    _handlersForObserver.get(observerPrefixedId) exists
-      (handlers => handlers exists (_.isMatchByName(eventName)))
-
-  def keyboardHandlers: List[EventHandler] = _keyboardHandlers
-
-  /**
-   * Returns whether there is any event handler registered anywhere in the controls for the given event name.
-   */
-  def hasHandlerForEvent(eventName: String): Boolean = hasHandlerForEvent(eventName, includeAllEvents = true)
-
-  /**
-   * Whether there is any event handler registered anywhere in the controls for the given event name.
-   */
-  def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean =
-    includeAllEvents && _eventNames.contains(XXFORMS_ALL_EVENTS) || _eventNames.contains(eventName)
 }
 
-private object PartEventHandlerAnalysis {
+private object PartEventHandlerScripts {
 
   val ActionActionName  = "action"
   val ScriptActionName  = "script"

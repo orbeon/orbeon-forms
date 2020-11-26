@@ -34,13 +34,12 @@ trait PartAnalysisContextImmutable {
   def startScope: Scope
   def isTopLevelPart: Boolean
 
+  def staticProperties: XFormsStaticStateStaticProperties
+
   def metadata: Metadata // NOTE: Using this will have side-effects like XBL registrations!
 
   def scopeForPrefixedId(prefixedId: String): Scope
-
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
-  def staticBooleanProperty(name: String): Boolean
-  def staticStringProperty (name: String): String
 }
 
 trait PartAnalysisContextMutable extends TransientState {
@@ -79,12 +78,10 @@ trait PartAnalysisContextForTree
 
 trait PartAnalysisContextAfterTree extends PartAnalysisContextForTree {
 
-  def isXPathAnalysis        : Boolean
-  def isCalculateDependencies: Boolean
-
   def indexModel(model: Model): Unit
   def registerEventHandlers(eventHandlers: Seq[EventHandler])(implicit logger: IndentedLogger): Unit
-  def analyzeCustomControls(attributes: mutable.Buffer[AttributeControl]): Unit
+  def gatherScripts(): Unit
+  def indexAttributeControls(attributes: mutable.Buffer[AttributeControl]): Unit
 
   def iterateControlsNoModels: Iterator[ElementAnalysis]
   def iterateModels: Iterator[Model]
@@ -107,27 +104,24 @@ trait NestedPartAnalysis
 
 // Context for building the tree, including immutable and mutable parts
 case class StaticPartAnalysisImpl(
-  protected val staticState: XFormsStaticState,
-  parent                   : Option[PartAnalysis],
-  startScope               : Scope,
-  metadata                 : Metadata,
-  xblSupport               : Option[XBLSupport],
-  functionLibrary          : FunctionLibrary
+  staticProperties : XFormsStaticStateStaticProperties,
+  parent           : Option[PartAnalysis],
+  startScope       : Scope,
+  metadata         : Metadata,
+  xblSupport       : Option[XBLSupport],
+  functionLibrary  : FunctionLibrary
 ) extends PartAnalysis
      with TopLevelPartAnalysis
      with NestedPartAnalysis
      with PartModelAnalysis
      with PartEventHandlerAnalysis
+     with PartEventHandlerScripts
      with PartControlsAnalysis
+     with PartControlsAnalysisForUpdate
      with PartXBLAnalysis {
 
   def isTopLevelPart: Boolean = startScope.isTopLevelScope
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] = metadata.getNamespaceMapping(prefixedId)
-  def staticBooleanProperty(name: String): Boolean = staticState.staticBooleanProperty(name)
-  def staticStringProperty (name: String): String  = staticState.staticStringProperty(name)
-
-  def isXPathAnalysis: Boolean = staticState.isXPathAnalysis
-  def isCalculateDependencies: Boolean = staticState.isCalculateDependencies
 
   def hasControls: Boolean =
     getTopLevelControls.nonEmpty || (iterateGlobals map (_.compactShadowTree.getRootElement)).nonEmpty

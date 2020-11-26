@@ -217,7 +217,7 @@ object XFormsContainingDocumentBuilder {
     // Restore metadata
     val metadata = Metadata(staticStateDocument, template)
 
-    new XFormsStaticStateImpl(
+    XFormsStaticStateImpl(
       encodedState,
       staticStateDocument.getOrComputeDigest(digest),
       new Scope(None, ""),

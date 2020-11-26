@@ -67,7 +67,7 @@ class XFormsContainingDocument(
 ) extends XFormsContainingDocumentSupport {
 
   // Members that depends from `staticState`
-  val functionLibrary   : FunctionLibrary      = staticState.functionLibrary
+  val functionLibrary   : FunctionLibrary      = staticState.topLevelPart.functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
   val xpathDependencies : XPathDependencies    =
     if (CoreCrossPlatformSupport.isPE && staticState.isXPathAnalysis)

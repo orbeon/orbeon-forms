@@ -474,8 +474,8 @@ object XFormsStaticStateImpl {
       def clientNonDefaultProperties          : Map[String, Any] = staticProperties.clientNonDefaultProperties
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
-      def uploadMaxSizeAggregateExpression       : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
-      def propertyMaybeAsExpression(name: String): Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
+      def uploadMaxSizeAggregateExpression        : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
+      def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
     }
   }
 }

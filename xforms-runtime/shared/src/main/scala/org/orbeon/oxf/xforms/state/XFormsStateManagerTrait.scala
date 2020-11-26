@@ -22,5 +22,4 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
   // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
   // strategy without session.
   protected val ForceSessionCreation = true
-
 }

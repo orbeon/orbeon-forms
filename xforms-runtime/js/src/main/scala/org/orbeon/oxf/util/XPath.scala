@@ -6,12 +6,19 @@ import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.utils.Configuration
 import org.orbeon.xml.NamespaceMapping
 
 
 object XPath extends XPathTrait {
 
-  val GlobalConfiguration: StaticXPath.SaxonConfiguration = ???
+  val GlobalConfiguration: StaticXPath.SaxonConfiguration = new Configuration {
+
+    super.setNamePool(StaticXPath.GlobalNamePool)
+    super.setDocumentNumberAllocator(StaticXPath.GlobalDocumentNumberAllocator)
+
+    // TODO
+  }
 
   def evaluateAsString(
     contextItems        : ju.List[om.Item],

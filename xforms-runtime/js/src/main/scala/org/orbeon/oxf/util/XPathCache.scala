@@ -2,16 +2,24 @@ package org.orbeon.oxf.util
 
 import java.{util => ju}
 
-import org.orbeon.datatypes.LocationData
-import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPath.Reporter
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType, makeStringExpression}
+import org.orbeon.oxf.util.XPath.{Reporter, withFunctionContext}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
+import org.orbeon.saxon.expr.XPathContextMajor
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.value.SequenceExtent
+import org.orbeon.saxon.om.{Item, SequenceIterator, SequenceTool}
+import org.orbeon.saxon.sxpath.{IndependentContext, XPathDynamicContext, XPathEvaluator, XPathExpression, XPathStaticContext, XPathVariable}
+import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent}
+import org.orbeon.scaxon.Implicits
 import org.orbeon.xml.NamespaceMapping
 
+import scala.collection.compat._
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+import scala.util.control.NonFatal
 
 
 object XPathCache extends XPathCacheTrait {
@@ -31,7 +39,10 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): Item = ???
+  ): Item = {
+    println(s"xxx XPathCache.evaluateSingleKeepItems for `$xpathString`")
+    ???
+  }
 
   def evaluateAsExtent(
     contextItems       : ju.List[om.Item],
@@ -44,7 +55,10 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): SequenceExtent = ???
+  ): SequenceExtent = {
+    println(s"xxx XPathCache.evaluateAsExtent for `$xpathString`")
+    ???
+  }
 
   def evaluateKeepItemsJava(
     contextItems       : ju.List[Item],
@@ -57,14 +71,47 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): ju.List[Item] = ???
+  ): ju.List[Item] = {
+    println(s"xxx XPathCache.evaluateKeepItemsJava for `$xpathString`")
+
+    val (xpathExpression, variables) =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+
+    println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+
+    withEvaluation(xpathString, locationData, reporter) {
+      withFunctionContext(functionContext) {
+        val r = scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate(xpathExpression, contextItem, contextPos, variableToValueMap, variables)))
+
+        println(s"xxxx ${r.size}")
+
+        r
+      }
+    }
+  }
 
   def evaluateKeepItems(
     xpathString     : String,
     contextItem     : Item,
     contextPosition : Int = 1)(implicit
     xpathContext    : XPathContext
-  ): Seq[Item] = ???
+  ): Seq[Item] = {
+    println(s"xxx XPathCache.evaluateKeepItems for `$xpathString`")
+    ???
+  }
 
   def evaluateKeepItems(
     contextItems       : ju.List[Item],
@@ -77,7 +124,10 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): List[Item] = ???
+  ): List[Item] = {
+    println(s"xxx XPathCache.evaluateKeepItems 2 for `$xpathString`")
+    ???
+  }
 
   def evaluateAsStringOpt(
     contextItems       : ju.List[Item],
@@ -90,7 +140,44 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): Option[String] = ???
+  ): Option[String] = {
+    println(s"xxx XPathCache.evaluateAsStringOpt for `$xpathString`")
+
+    val (xpathExpression, variables) =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        makeStringExpression(xpathString),
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    if (true) {
+      import _root_.java.io.PrintStream
+      import org.orbeon.saxon.lib.StandardLogger
+
+      xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
+    }
+
+    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+
+    println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+
+    withEvaluation(xpathString, locationData, reporter) {
+      withFunctionContext(functionContext) {
+        val r =
+          Option(singleItemToJavaKeepNodeInfoOrNull(evaluate(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next())) map (_.toString)
+        println(s"xxx result = $r")
+
+        r
+      }
+    }
+  }
 
   def evaluate(
     contextItem        : Item,
@@ -102,7 +189,10 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): ju.List[AnyRef] = ???
+  ): ju.List[AnyRef] = {
+    println(s"xxx XPathCache.evaluate for `$xpathString`")
+    ???
+  }
 
   def evaluate(
     contextItems       : ju.List[Item],
@@ -115,7 +205,10 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): ju.List[AnyRef] = ???
+  ): ju.List[AnyRef] = {
+    println(s"xxx XPathCache.evaluate 2 for `$xpathString`")
+    ???
+  }
 
   def evaluateAsAvt(
     xpathContext : XPathContext,
@@ -171,12 +264,227 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ) : String = ???
+  ) : String = {
+    println(s"xxx XPathCache.evaluateAsAvt for `$xpathString`")
+    ???
+  }
 
   def evaluateSingleWithContext(
     xpathContext : XPathContext,
     contextItem  : Item,
     xpathString  : String,
     reporter     : Reporter
-  ): AnyRef = ???
+  ): AnyRef = {
+    println(s"xxx XPathCache.evaluateSingleWithContext for `$xpathString`")
+    ???
+  }
+
+    private def newDynamicAndMajorContexts(
+    expression      : XPathExpression,
+    contextItem     : Item,
+    contextPosition : Int
+  ): (XPathDynamicContext, XPathContextMajor) = {
+    val dynamicContext = expression.createDynamicContext(contextItem) // XXX TODO: `contextPosition`
+    (dynamicContext, dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor])
+  }
+
+  private def evaluate(
+    expression         : XPathExpression,
+    contextItem        : Item,
+    contextPosition    : Int,
+    variableToValueMap : ju.Map[String, ValueRepresentationType],
+    variables          : List[(String, XPathVariable)]
+  ): SequenceIterator = {
+    val (dynamicContext, xpathContext) = newDynamicAndMajorContexts(expression, contextItem, contextPosition)
+    prepareDynamicContext(xpathContext, variableToValueMap, variables)
+    expression.iterate(dynamicContext)
+  }
+
+  private def prepareDynamicContext(
+    xpathContext       : XPathContextMajor,
+    variableToValueMap : ju.Map[String, ValueRepresentationType],
+    variables          : List[(String, XPathVariable)]
+  ): Unit =
+    if (variableToValueMap ne null)
+      for ((name, variable) <- variables) {
+        val value = variableToValueMap.get(name)
+        if (value ne null) // FIXME: this should never happen, right?
+          xpathContext.setLocalVariable(variable. getLocalSlotNumber, value)
+      }
+
+  private def scalaIteratorToJavaList[T](i: Iterator[T]): ju.List[T] =
+    new ju.ArrayList(i.to(mutable.ArrayBuffer).asJava)
+
+  private def getXPathExpression(
+    configuration      : SaxonConfiguration,
+    contextItems       : ju.List[Item],
+    contextPosition    : Int,
+    xpathString        : String,
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : ju.Map[String, ValueRepresentationType],
+    functionLibrary    : FunctionLibrary,
+    baseURI            : String,
+    isAVT              : Boolean,
+    locationData       : LocationData
+  ): (XPathExpression, List[(String, XPathVariable)]) = {
+    try {
+      // Find pool from cache
+//      val validity = 0L
+//      val cache = ObjectCache.instance(XPathCacheName, XPathCacheDefaultSize)
+//      val cacheKeyString = new StringBuilder(xpathString)
+//
+//      if (functionLibrary ne null) {// This is ok
+//        cacheKeyString.append('|')
+//        cacheKeyString.append(functionLibrary.hashCode.toString)
+//      }
+//      // NOTE: Mike Kay confirms on 2007-07-04 that compilation depends on the namespace context, so we need
+//      // to use it as part of the cache key.
+//      if (namespaceMapping ne null) {
+//        // NOTE: Hash is mandatory in NamespaceMapping
+//        cacheKeyString.append('|')
+//        cacheKeyString.append(namespaceMapping.hash)
+//      }
+
+      // NOTE: Make sure to copy the values in the key set, as the set returned by the map keeps a pointer to the
+      // Map! This can cause the XPath cache to keep a reference to variable values, which in turn can keep a
+      // reference all the way to e.g. an XFormsContainingDocument.
+      val variableNames = Option(variableToValueMap) map (_.keySet.asScala.toList) getOrElse List()
+
+//      if (variableNames.nonEmpty) {
+//        // There are some variables in scope. They must be part of the key
+//        // TODO: Put this in static state as this can be determined statically once and for all
+//        for (variableName <- variableNames) {
+//          cacheKeyString.append('|')
+//          cacheKeyString.append(variableName)
+//        }
+//      }
+//
+//      // Add this to the key as evaluating "name" as XPath or as AVT is very different!
+//      cacheKeyString.append('|')
+//      cacheKeyString.append(isAVT.toString)
+
+      // TODO: Add baseURI to cache key (currently, baseURI is pretty much unused)
+//
+//      val pooledXPathExpression = {
+//        val cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString)
+//        var pool = cache.findValid(cacheKey, validity).asInstanceOf[ObjectPool[PooledXPathExpression]]
+//        if (pool eq null) {
+//          pool = createXPathPool(configuration, xpathString, namespaceMapping, variableNames, functionLibrary, baseURI, isAVT, locationData)
+//          cache.add(cacheKey, validity, pool)
+//        }
+//        // Get object from pool
+//        pool.borrowObject
+//      }
+
+
+      val independentContext = new IndependentContext(configuration)
+//          independentContext.getConfiguration.setURIResolver(XPath.URIResolver)
+
+      // Set the base URI if specified
+      if (baseURI ne null)
+        independentContext.setBaseURI(baseURI)
+
+      // Declare namespaces
+      if (namespaceMapping ne null)
+        for ((prefix, uri) <- namespaceMapping.mapping)
+          independentContext.declareNamespace(prefix, uri)
+
+      // Declare variables (we don't use the values here, just the names)
+      val variables: List[(String, XPathVariable)] =
+        if (variableNames ne null)
+          for {
+            name <- variableNames
+            variable = independentContext.declareVariable("", name)
+          } yield
+            name -> variable
+        else
+          Nil
+
+      // Add function library
+      if (functionLibrary ne null)
+        independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
+
+      val expr = compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
+
+      // Set context items and position
+//      pooledXPathExpression.setContextItems(contextItems, contextPosition)
+//
+//      // Set variables
+//      pooledXPathExpression.setVariables(variableToValueMap)
+//
+//      pooledXPathExpression
+      (expr, variables)
+    } catch {
+      case NonFatal(t) => throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)
+    }
+  }
+
+  private def getContextItem(contextItems: ju.List[Item], contextPosition: Int): (Item, Int) =
+    if (contextPosition > 0 && contextPosition <= contextItems.size)
+      (contextItems.get(contextPosition - 1), contextPosition)
+    else
+      (null, 0)
+
+  private def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
+
+    val validationException =
+      OrbeonLocationException.wrapException(
+        t,
+        XmlExtendedLocationData(locationData, Option(description), List("expression" -> xpathString))
+      )
+
+    // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
+    // so we need to explicitly add them.
+    if (locationData.isInstanceOf[ExtendedLocationData])
+      validationException.addLocationData(locationData)
+
+    validationException
+  }
+
+  private def withEvaluation[T](xpathString: String, locationData: LocationData, reporter: Reporter)(body: => T): T =
+    try {
+      if (reporter ne null) {
+
+        val startTime = System.nanoTime
+
+        val result = body
+
+        val totalTimeMicroSeconds = (System.nanoTime - startTime) / 1000 // never smaller than 1000 ns on OS X
+        if (totalTimeMicroSeconds > 0)
+          reporter(xpathString, totalTimeMicroSeconds)
+
+        result
+      } else
+        body
+    } catch {
+      case NonFatal(t) =>
+        throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
+    }
+
+  def compileExpressionWithStaticContext(
+    staticContext : XPathStaticContext,
+    xpathString   : String,
+    avt           : Boolean
+  ): XPathExpression =
+    if (avt) {
+//      val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
+//      prepareExpressionForAVT(staticContext, tempExpression)
+      // XXX TODO must convert `AttributeValueTemplate` to Scala
+      ???
+    } else {
+      val evaluator = new XPathEvaluator(GlobalConfiguration)
+      evaluator.setStaticContext(staticContext)
+      evaluator.createExpression(xpathString)
+    }
+
+  private def singleItemToJavaKeepNodeInfoOrNull(item: Item) = item match {
+    case null => null
+    case item => itemToJavaKeepNodeInfoOrNull(item)
+  }
+
+  private def itemToJavaKeepNodeInfoOrNull(item: Item) = item match {
+    case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
+    case v: AtomicValue    => SequenceTool.convertToJava(v)
+    case v                 => v
+  }
 }

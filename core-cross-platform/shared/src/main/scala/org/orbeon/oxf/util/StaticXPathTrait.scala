@@ -31,9 +31,12 @@ trait StaticXPathTrait {
   type ValueRepresentationType
   type AxisType
   type PathMapType
+  type SchemaTypeType
 
   def PrecedingSiblingAxisType: AxisType
   def NamespaceAxisType: AxisType
+
+  def IntegerType: SchemaTypeType
 
   // Used by `ShareableXPathStaticContext`
   type VariableResolver

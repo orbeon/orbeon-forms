@@ -24,7 +24,7 @@ import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
-import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.`type`.{BuiltInAtomicType, ItemType, Type}
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.{FunctionLibrary, JavaExtensionLibrary}
@@ -45,9 +45,11 @@ object StaticXPath extends StaticXPathTrait {
   type ValueRepresentationType = om.ValueRepresentation
   type AxisType                = Byte
   type PathMapType             = PathMap
+  type SchemaTypeType          = ItemType
 
   def PrecedingSiblingAxisType: AxisType = om.Axis.PRECEDING_SIBLING
   def NamespaceAxisType: AxisType = om.Axis.NAMESPACE
+  def IntegerType: SchemaTypeType = BuiltInAtomicType.INTEGER
 
   type VariableResolver = (om.StructuredQName, XPathContext) => ValueRepresentationType
 
@@ -242,5 +244,10 @@ object StaticXPath extends StaticXPathTrait {
     new XPathExpression(evaluator, newExpression) {
       setStackFrameMap(map, numberOfExternalVariables)
     }
+  }
+
+  def expressionType(xpe: XPathExpression): SchemaTypeType = {
+    val internalExpr = xpe.getInternalExpression
+    internalExpr.getItemType(internalExpr.getExecutable.getConfiguration.getTypeHierarchy)
   }
 }

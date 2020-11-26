@@ -15,14 +15,15 @@ package org.orbeon.oxf.xforms.event.events
 
 import java.util.{List => JList}
 
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath._
 
 import scala.jdk.CollectionConverters._
+
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_INSERT, target, properties, bubbles = true, cancelable = false)
@@ -53,5 +54,5 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def position            = property[String]("position").get
 
   // Whether this event was dispatched when the root element of an instance was replaced
-  def isRootElementReplacement = insertLocationNode.isInstanceOf[DocumentNodeInfoType]
+  def isRootElementReplacement = insertLocationNode.isDocument
 }

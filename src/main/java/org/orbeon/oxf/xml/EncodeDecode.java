@@ -19,17 +19,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.util.Compressor;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.WhitelistObjectInputStream;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.xml.sax.SAXException;
-import scala.collection.immutable.Nil$;
 
 import javax.xml.transform.Source;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+
 
 public class EncodeDecode {
 
@@ -45,14 +40,7 @@ public class EncodeDecode {
 
         // Serialize SAXStore to bytes
         // TODO: This is not optimal since we create a third in-memory representation. Should stream instead.
-        final byte[] bytes;
-        try {
-            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            saxStore.writeExternal(new ObjectOutputStream(byteArrayOutputStream));
-            bytes = byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
+        final byte[] bytes = SAXStoreBinaryFormat.serialize(saxStore);
 
         // Encode bytes
         return encodeBytes(bytes, compress, encrypt);
@@ -92,8 +80,7 @@ public class EncodeDecode {
 
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        final SAXStore saxStore = new SAXStore(WhitelistObjectInputStream.apply(byteArrayInputStream, SAXStore.class, scala.collection.immutable.List.empty()));
+        final SAXStore saxStore = SAXStoreBinaryFormat.deserialize(bytes);
 
         // Deserialize SAXStore to dom4j document
         // TODO: This is not optimal

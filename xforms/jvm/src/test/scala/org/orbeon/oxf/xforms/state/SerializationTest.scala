@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.state
 import org.junit.{Assume, Test}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xforms.{XFormsContainingDocumentBuilder, XFormsStaticStateImpl}
-import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xforms.{XFormsContainingDocumentBuilder, XFormsStaticStateImpl}
+import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatestplus.junit.AssertionsForJUnit

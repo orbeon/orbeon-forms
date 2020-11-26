@@ -20,9 +20,9 @@ import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}
 import sbinary.Operations._

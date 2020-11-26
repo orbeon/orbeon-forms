@@ -1,9 +1,10 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.util.Base64
-import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import sbinary.Operations.{fromByteArray, toByteArray}
+
 
 object AnnotatedTemplateBuilder {
 

@@ -139,4 +139,7 @@ trait XFormsCrossPlatformSupportTrait {
   def getRootThrowable(t : Throwable) : Throwable
 
   def causesIterator(t : Throwable) : Iterator[Throwable]
+
+  def tempFileSize(filePath: String): Long
+  def deleteFileIfPossible(urlString: String): Unit
 }

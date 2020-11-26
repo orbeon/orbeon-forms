@@ -19,16 +19,25 @@ import java.net.URI
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
+import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.containingDocumentDyn
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
-  def externalContext: ExternalContext = ???
+  private val externalContextDyn  = new DynamicVariable[ExternalContext]
+
+  def withExternalContext[T](ec: ExternalContext)(body: => T): T = {
+    externalContextDyn.withValue(ec) {
+      body
+    }
+  }
+
+  def externalContext: ExternalContext = externalContextDyn.value.getOrElse(throw new IllegalStateException)
 
   def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress[Unit]] = ???
 
@@ -141,7 +150,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String = ???
 
-  def getRootThrowable(t : Throwable) : Throwable = ???
+  def getRootThrowable(t : Throwable) : Throwable = t // XXX TODO
+  def causesIterator(t : Throwable) : Iterator[Throwable] = Iterator(t) // XXX TODO
 
-  def causesIterator(t : Throwable) : Iterator[Throwable] = ???
+  def tempFileSize(filePath: String): Long = ???
+
+  def deleteFileIfPossible(urlString: String): Unit = ???
 }

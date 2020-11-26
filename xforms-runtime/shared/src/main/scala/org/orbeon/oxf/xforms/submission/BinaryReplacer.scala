@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import java.io.File
 import java.net.URI
 
 import cats.Eval
@@ -59,7 +58,7 @@ class BinaryReplacer(
 
     contentUrlOpt foreach { contentUrl =>
 
-      val sizeFromContentOpt = FileUtils.findFileUriPath(new URI(contentUrl)) map (new File(_).length)
+      val sizeFromContentOpt = FileUtils.findFileUriPath(new URI(contentUrl)) map XFormsCrossPlatformSupport.tempFileSize
 
       val macValue = hmacURL(contentUrl, filenameOpt, mediatypeOpt, sizeFromContentOpt map (_.toString))
 

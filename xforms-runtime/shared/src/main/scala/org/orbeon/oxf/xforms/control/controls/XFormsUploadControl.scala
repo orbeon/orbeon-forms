@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.io.File
-import java.net.{URI, URLEncoder}
+import java.net.URI
 
 import org.orbeon.dom.Element
-import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
+import org.orbeon.io.{CharsetNames, FileUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentHandlerOutputStream, PathUtils}
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -251,21 +250,8 @@ object XFormsUploadControl {
   //
   //@XPathFunction
   def deleteFileIfPossible(urlString: String): Unit =
-    IOUtils.runQuietly {
-      for {
-        nonBlankUrlString <- urlString.trimAllToOpt
-        uri               = new URI(nonBlankUrlString)
-        temporaryFilePath <- FileUtils.findTemporaryFilePath(uri)
-      } locally {
-        val file = new File(temporaryFilePath)
-        if (file.exists) {
-          if (file.delete())
-            Loggers.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
-          else
-            Loggers.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
-        }
-      }
-    }
+    XFormsCrossPlatformSupport.deleteFileIfPossible(urlString)
+
 
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
   def mediatypeToAccept(s: String): String = s.splitTo() mkString ","
@@ -289,7 +275,7 @@ object XFormsUploadControl {
 
     val query = candidates collect {
       case (name, Some(value)) =>
-        name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
+        name + '=' + value.encode
     } mkString "&"
 
     val urlWithQuery = PathUtils.appendQueryString(url, query)
@@ -312,7 +298,7 @@ object XFormsUploadControl {
     val filteredQuery =
       query filterNot (_._1 == MacParamName) map {
         case (name, value) =>
-          name + '=' + URLEncoder.encode(value, CharsetNames.Utf8)
+          name + '=' + value.encode
       } mkString "&"
 
     PathUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)

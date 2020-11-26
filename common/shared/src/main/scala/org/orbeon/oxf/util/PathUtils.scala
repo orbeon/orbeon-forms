@@ -29,6 +29,9 @@ object PathUtils {
     def dropStartingSlash: String = if (s.isEmpty || s.head != '/')  s else s.tail
     def appendSlash      : String = if (s.nonEmpty && s.last == '/') s else s + '/'
     def prependSlash     : String = if (s.nonEmpty && s.head == '/') s else "/" + s
+
+    def encode(implicit ed: UrlEncoderDecoder): String = ed.encode(s)
+    def decode(implicit ed: UrlEncoderDecoder): String = ed.decode(s)
   }
 
   // Split out a URL's query part

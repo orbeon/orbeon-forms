@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayOutputStream
-import java.net.{URI, URLEncoder}
+import java.net.URI
 
 import cats.syntax.option._
 import org.orbeon.dom.Document
@@ -24,6 +24,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{ContentTypes, XPath}
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -65,7 +66,7 @@ object SerializationParameters {
           } else {
             SerializationParameters(
               messageBody            = None,
-              queryString            = URLEncoder.encode(overriddenSerializedData, CharsetNames.Utf8),
+              queryString            = overriddenSerializedData.encode,
               actualRequestMediatype = actualRequestMediatype(null)
             )
           }

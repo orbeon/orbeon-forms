@@ -1,10 +1,9 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.common.OXFException
-import org.xml.sax.Attributes
-import org.xml.sax.SAXException
+import org.xml.sax.{Attributes, SAXException}
 import org.xml.sax.helpers.AttributesImpl
-import java.util
+
 
 /**
  * Wrapper to an XML receiver. Provides more high-level methods to send events to a XML receiver.
@@ -26,7 +25,7 @@ object XMLReceiverHelper {
 
 class XMLReceiverHelper(xmlReceiver: XMLReceiver) {
 
-  private val elements = new util.Stack[XMLReceiverHelper.ElementInfo]
+  private var elements: List[XMLReceiverHelper.ElementInfo] = Nil
   private val attributesImpl = new AttributesImpl
 
   /**
@@ -63,7 +62,7 @@ class XMLReceiverHelper(xmlReceiver: XMLReceiver) {
     try {
       val qName = XMLUtils.buildQName(prefix, name)
       xmlReceiver.startElement(namespaceURI, name, qName, attributes)
-      elements.add(XMLReceiverHelper.ElementInfo(namespaceURI, name, qName))
+      elements ::= XMLReceiverHelper.ElementInfo(namespaceURI, name, qName)
     } catch {
       case e: SAXException =>
         throw new OXFException(e)
@@ -83,7 +82,8 @@ class XMLReceiverHelper(xmlReceiver: XMLReceiver) {
 
   def endElement(): Unit =
     try {
-      val elementInfo = elements.pop
+      val elementInfo = elements.head
+      elements = elements.tail
       xmlReceiver.endElement(elementInfo.uri, elementInfo.name, elementInfo.qName)
     } catch {
       case e: SAXException =>
@@ -151,7 +151,8 @@ class XMLReceiverHelper(xmlReceiver: XMLReceiver) {
 
   def endDocument(): Unit =
     try {
-      if (!elements.isEmpty) throw new OXFException("Element '" + elements.peek + "' not closed")
+      if (elements.nonEmpty)
+        throw new OXFException(s"Element `${elements.head}` not closed")
       xmlReceiver.endDocument()
     } catch {
       case e: SAXException =>

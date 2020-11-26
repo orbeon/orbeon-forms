@@ -70,7 +70,7 @@ object XFormsContainingDocumentSupport {
 
   def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): Try[T] = {
 
-    implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
+    implicit val ec: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
@@ -575,7 +575,8 @@ trait ContainingDocumentRequest {
   def isEmbedded                 = _requestInformation.isEmbedded
   def isServeInlineResources     = staticState.isInlineResources || _requestInformation.isPortletContainerOrRemote
 
-  protected[xforms] def setRequestInformation(requestInformation: RequestInformation): Unit =
+  // Was `protected[xforms]` but we need to call from offline. Find better solution.
+  def setRequestInformation(requestInformation: RequestInformation): Unit =
     this._requestInformation = requestInformation
 
   def namespaceId(id: CharSequence): String =

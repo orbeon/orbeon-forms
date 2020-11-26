@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream, StringReader, Writer}
+import java.io._
 import java.net.{URI, URISyntaxException}
 import java.nio.charset.Charset
 
@@ -26,11 +26,11 @@ import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
 import org.orbeon.dom.io.DocumentSource
+import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
@@ -41,13 +41,13 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, PathUtils, SecureUtils, URLRewriterUtils, UploadProgress}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.orbeon.oxf.xml.{HTMLBodyXMLReceiver, ParserConfiguration, PlainHTMLOrXHTMLReceiver, SkipRootElement, TransformerUtils, XMLConstants, XMLParsing, XMLReceiver}
+import org.orbeon.oxf.xml._
 import org.xml.sax.InputSource
 
 import scala.util.control.NonFatal
@@ -432,4 +432,24 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def causesIterator(t : Throwable) : Iterator[Throwable] =
     Exceptions.causesIterator(t)
+
+  def tempFileSize(filePath: String): Long =
+    new File(filePath).length
+
+  def deleteFileIfPossible(urlString: String): Unit =
+    IOUtils.runQuietly {
+      for {
+        nonBlankUrlString <- urlString.trimAllToOpt
+        uri               = new URI(nonBlankUrlString)
+        temporaryFilePath <- FileUtils.findTemporaryFilePath(uri)
+      } locally {
+        val file = new File(temporaryFilePath)
+        if (file.exists) {
+          if (file.delete())
+            Loggers.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
+          else
+            Loggers.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
+        }
+      }
+    }
 }

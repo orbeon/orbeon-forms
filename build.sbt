@@ -953,8 +953,8 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .enablePlugins(JSDependenciesPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.xml"    %%% "sax"       % "2.0.2.2-SNAPSHOT",
-      "org.orbeon" %%% "saxon"     % "10.0.0.8-SNAPSHOT",
+      "org.xml"    %%% "sax"       % "2.0.2.4-SNAPSHOT",
+      "org.orbeon" %%% "saxon"     % "10.0.0.14-SNAPSHOT",
       "org.orbeon" %%% "xerces"    % "2.11.0.1-SNAPSHOT",
       "com.chuusai" %% "shapeless" % ShapelessVersion,
     ),

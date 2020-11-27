@@ -262,7 +262,7 @@ class XFormsContainingDocument(
 
     getRequestStats.afterUpdateResponse()
 
-    if (!staticState.isInlineResources)
+    if (! staticState.isInlineResources)
       clearInitialClientScript()
 
     clearClientState()

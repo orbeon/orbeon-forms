@@ -17,7 +17,7 @@ import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.xforms.AjaxClient.{handleFailure, logAndShowError}
 import org.orbeon.xforms.facade.Properties
-import org.orbeon.xforms.{AjaxRequest, EventNames, Page, Support}
+import org.orbeon.xforms.{AjaxRequest, Page, Support}
 import org.scalajs.dom
 import org.scalajs.dom.FormData
 import org.scalajs.dom.experimental.AbortController
@@ -28,6 +28,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
+
 
 object LightClientServerChannel extends ClientServerChannel[dom.Document] {
 

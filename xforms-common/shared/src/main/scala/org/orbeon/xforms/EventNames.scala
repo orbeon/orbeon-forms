@@ -47,8 +47,8 @@ object EventNames {
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
 
-  val InteractiveReadyState = "interactive"
-  val CompleteReadyState = "complete"
+  val InteractiveReadyState    = "interactive"
+  val CompleteReadyState       = "complete"
 
   val EventsWithoutTargetId: Set[String] = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
   val EventsWithoutSequence: Set[String] = Set(XXFormsUploadProgress, XXFormsSessionHeartbeat)

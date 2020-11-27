@@ -23,7 +23,8 @@ trait RebuildBindOps {
 
   self: XFormsModelBinds =>
 
-  import Private._
+  // TEMP: Picked a different name or `fullOptJS` fails!
+  import Private1._
 
   final def topLevelBinds = _topLevelBinds
 
@@ -108,7 +109,7 @@ trait RebuildBindOps {
         it.nextOption()
     }
 
-  private object Private {
+  private object Private1 {
     var _topLevelBinds          : List[RuntimeBind] = Nil
     var _isFirstRebuildForModel : Boolean           = model.containingDocument.initializing
   }

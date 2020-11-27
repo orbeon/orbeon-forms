@@ -571,9 +571,9 @@ trait ContainingDocumentRequest {
 
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
-  def isPortletContainer         = _requestInformation.containerType == "portlet"
-  def isEmbedded                 = _requestInformation.isEmbedded
-  def isServeInlineResources     = staticState.isInlineResources || _requestInformation.isPortletContainerOrRemote
+  def isPortletContainer       = _requestInformation.containerType == "portlet"
+  def isEmbedded               = _requestInformation.isEmbedded
+  def isServeInlineResources   = staticState.isInlineResources || _requestInformation.forceInlineResources
 
   // Was `protected[xforms]` but we need to call from offline. Find better solution.
   def setRequestInformation(requestInformation: RequestInformation): Unit =
@@ -771,7 +771,6 @@ trait ContainingDocumentClientState {
 
     _initialClientScript = Some(scripts.fold("")(_ + _))
   }
-
 
   def clearInitialClientScript(): Unit =
     _initialClientScript = None

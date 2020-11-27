@@ -105,33 +105,33 @@ object XFormsContainingDocumentBuilder {
             ju.Collections.emptyList[PathMatcher]
 
         RequestInformation(
-          deploymentType             = deploymentType,
-          requestMethod              = request.getMethod,
-          requestContextPath         = request.getClientContextPath("/"),
-          requestPath                = Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse request.getRequestPath,
-          requestHeaders             = requestHeaders,
-          requestParameters          = request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
-          containerType              = containerType,
-          containerNamespace         = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
-          versionedPathMatchers      = versionedPathMatchers.asScala.toList,
-          isEmbedded                 = isEmbeddedFromHeaders(requestHeaders),
-          isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
+          deploymentType        = deploymentType,
+          requestMethod         = request.getMethod,
+          requestContextPath    = request.getClientContextPath("/"),
+          requestPath           = Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse request.getRequestPath,
+          requestHeaders        = requestHeaders,
+          requestParameters     = request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
+          containerType         = containerType,
+          containerNamespace    = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
+          versionedPathMatchers = versionedPathMatchers.asScala.toList,
+          isEmbedded            = isEmbeddedFromHeaders(requestHeaders),
+          forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
         )
 
       case None =>
         // Special case when we run outside the context of a request
         RequestInformation(
-          deploymentType             = DeploymentType.Standalone,
-          requestMethod              = HttpMethod.GET,
-          requestContextPath         = "",
-          requestPath                = "/",
-          requestHeaders             = Map.empty,
-          requestParameters          = Map.empty,
-          containerType              = "servlet",
-          containerNamespace         = "",
-          versionedPathMatchers      = Nil,
-          isEmbedded                 = false,
-          isPortletContainerOrRemote = false
+          deploymentType        = DeploymentType.Standalone,
+          requestMethod         = HttpMethod.GET,
+          requestContextPath    = "",
+          requestPath           = "/",
+          requestHeaders        = Map.empty,
+          requestParameters     = Map.empty,
+          containerType         = "servlet",
+          containerNamespace    = "",
+          versionedPathMatchers = Nil,
+          isEmbedded            = false,
+          forceInlineResources  = false
         )
     }
 
@@ -176,17 +176,17 @@ object XFormsContainingDocumentBuilder {
           dynamicState.focusedControl,
           deploymentTypeOpt map (deploymentType =>
             RequestInformation(
-              deploymentType             = deploymentType,
-              requestMethod              = dynamicState.requestMethod.orNull,
-              requestContextPath         = dynamicState.requestContextPath.orNull,
-              requestPath                = dynamicState.requestPath.orNull,
-              requestHeaders             = requestHeaders,
-              requestParameters          = dynamicState.requestParameters.toMap,
-              containerType              = containerType,
-              containerNamespace         = dynamicState.containerNamespace.orNull,
-              versionedPathMatchers      = dynamicState.decodePathMatchers,
-              isEmbedded                 = isEmbeddedFromHeaders(requestHeaders),
-              isPortletContainerOrRemote = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
+              deploymentType        = deploymentType,
+              requestMethod         = dynamicState.requestMethod.orNull,
+              requestContextPath    = dynamicState.requestContextPath.orNull,
+              requestPath           = dynamicState.requestPath.orNull,
+              requestHeaders        = requestHeaders,
+              requestParameters     = dynamicState.requestParameters.toMap,
+              containerType         = containerType,
+              containerNamespace    = dynamicState.containerNamespace.orNull,
+              versionedPathMatchers = dynamicState.decodePathMatchers,
+              isEmbedded            = isEmbeddedFromHeaders(requestHeaders),
+              forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
             )
           ) getOrElse
             createInitialRequestInformation

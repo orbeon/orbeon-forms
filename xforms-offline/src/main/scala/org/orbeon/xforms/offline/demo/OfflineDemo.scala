@@ -29,17 +29,17 @@ object OfflineDemo {
 
     val req =
       RequestInformation(
-        deploymentType             = DeploymentType.Standalone,
-        requestMethod              = HttpMethod.GET,
-        requestContextPath         = "/orbeon",
-        requestPath                = "/demo",
-        requestHeaders             = Map.empty,
-        requestParameters          = Map.empty,
-        containerType              = "servlet", // TODO: not really used except for `isPortletContainer`
-        containerNamespace         = "orbeon-", // TODO
-        versionedPathMatchers      = Nil,
-        isEmbedded                 = true,
-        isPortletContainerOrRemote = false
+        deploymentType        = DeploymentType.Standalone,
+        requestMethod         = HttpMethod.GET,
+        requestContextPath    = "/orbeon",
+        requestPath           = "/demo",
+        requestHeaders        = Map.empty,
+        requestParameters     = Map.empty,
+        containerType         = "servlet", // TODO: not really used except for `isPortletContainer`
+        containerNamespace    = "orbeon-", // TODO
+        versionedPathMatchers = Nil,
+        isEmbedded            = true,
+        forceInlineResources  = true
       )
 
     containingDocument.setRequestInformation(req)

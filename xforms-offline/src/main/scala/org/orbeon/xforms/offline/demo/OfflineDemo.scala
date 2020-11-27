@@ -8,14 +8,30 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
-import org.orbeon.xforms.{DeploymentType, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.EventNames.DOMContentLoaded
+import org.orbeon.xforms.{App, DeploymentType, EventNames, MessageDialog, XFormsApp, XFormsCrossPlatformSupport}
 import org.scalajs.dom
+import org.scalajs.dom.ext._
+import org.scalajs.dom.html
 import org.xml.sax.Attributes
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
-object OfflineDemo {
 
-  def main(args: Array[String]): Unit = {
+object OfflineDemo extends App {
+
+
+  def onOrbeonApiLoaded(): Unit = {
+    XFormsApp.onOrbeonApiLoaded()
+  }
+
+  def onPageContainsFormsMarkup(): Unit = {
+    initializeOffline()
+  }
+
+  private def initializeOffline(): Unit = {
 
     import org.log4s.log4sjs.Log4sConfig._
     setLoggerThreshold("", AllThreshold)
@@ -81,16 +97,26 @@ object OfflineDemo {
               val rcv = new DomDocumentFragmentXMLReceiver
               XHTMLOutput.send(containingDocument, staticState.template.get, XFormsCrossPlatformSupport.externalContext)(rcv)
 
-              dom.window.document.removeChild(dom.window.document.childNodes(0))
-              dom.window.document.appendChild(rcv.frag.childNodes(0))
+              println(s"xxxx before updating the DOM")
 
-              println(s"xxxx name = ${dom.window.document.documentElement.innerHTML}")
+              List("body", "head") foreach { elemName =>
+
+                val dst = dom.window.document.querySelectorAll(s"html $elemName")(0)
+                val src = rcv.frag.querySelectorAll(s"html $elemName > *")
+
+                src foreach dst.appendChild
+              }
+
+//              println(s"xxxx doc innerHTML = ${dom.window.document.documentElement.innerHTML}")
+
+              XFormsApp.onPageContainsFormsMarkup()
+
+              containingDocument.afterInitialResponse()
 
             case unknown =>
               throw new OXFException(s"Unknown host language specified: $unknown")
           }
         }
-        containingDocument.afterInitialResponse()
       }
     }
   }

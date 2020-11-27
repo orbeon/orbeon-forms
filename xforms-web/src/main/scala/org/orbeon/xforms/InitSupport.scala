@@ -271,7 +271,8 @@ object InitSupport {
       }
 
       // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
-      val hasOtherScripts = ! js.isUndefined(g.xformsPageLoadedServer)
+      // 2020-11-26: Using Scala.js 1.0 way of detecting the global variable.
+      val hasOtherScripts = js.typeOf(g.xformsPageLoadedServer) != "undefined"
 
       // Run user scripts
       initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>

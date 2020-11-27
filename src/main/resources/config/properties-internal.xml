@@ -142,6 +142,13 @@
         xh|body
     </property>
 
+    <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.offline">
+        -/ops/javascript/scalajs/orbeon-xforms.js
+        -/apps/fr/resources/scalajs/orbeon-form-runner.js
+        -/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
+        +/ops/javascript/scalajs/orbeon-xforms-offline.js
+    </property>
+
     <!-- ==== Internal Form Runner properties ===================================================================== -->
 
     <!-- CSS/JavaScript update to the Form Runner baseline -->

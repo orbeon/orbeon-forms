@@ -14,13 +14,25 @@
 package org.orbeon.xforms
 
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
+import org.orbeon.xforms.rpc.{ClientServerChannel, RemoteClientServerChannel}
+import org.scalajs.dom
+
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+
 
 // Scala.js starting point for XForms
 object XFormsApp extends App {
 
-  def onOrbeonApiLoaded(): Unit = {
+  private var _clientServerChannel: ClientServerChannel[dom.Document] = _
+  def clientServerChannel: ClientServerChannel[dom.Document] = _clientServerChannel
+
+  def onOrbeonApiLoaded(): Unit =
+    onOrbeonApiLoaded(RemoteClientServerChannel)
+
+  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel[dom.Document]): Unit = {
+
+    _clientServerChannel = clientServerChannel
 
     // By this point, `window.ORBEON` is already defined by our jQuery wrapper
     val orbeonDyn = g.window.ORBEON

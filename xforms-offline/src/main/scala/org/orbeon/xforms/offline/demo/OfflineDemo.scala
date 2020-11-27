@@ -8,28 +8,21 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
-import org.orbeon.xforms.EventNames.DOMContentLoaded
-import org.orbeon.xforms.{App, DeploymentType, EventNames, MessageDialog, XFormsApp, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.{App, DeploymentType, XFormsApp, XFormsCrossPlatformSupport}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html
 import org.xml.sax.Attributes
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
-import scala.scalajs.js
 
 
 object OfflineDemo extends App {
 
+  def onOrbeonApiLoaded(): Unit =
+    XFormsApp.onOrbeonApiLoaded(LocalClientServerChannel)
 
-  def onOrbeonApiLoaded(): Unit = {
-    XFormsApp.onOrbeonApiLoaded()
-  }
-
-  def onPageContainsFormsMarkup(): Unit = {
+  def onPageContainsFormsMarkup(): Unit =
     initializeOffline()
-  }
 
   private def initializeOffline(): Unit = {
 

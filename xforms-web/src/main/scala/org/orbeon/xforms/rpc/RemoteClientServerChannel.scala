@@ -30,7 +30,7 @@ import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
 
 
-object LightClientServerChannel extends ClientServerChannel[dom.Document] {
+object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
 
   import Private._
 

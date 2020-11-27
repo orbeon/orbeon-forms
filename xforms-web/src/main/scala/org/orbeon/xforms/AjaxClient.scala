@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
-import org.orbeon.xforms.rpc.LightClientServerChannel
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
@@ -510,7 +509,7 @@ object AjaxClient {
 
       val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentFormId).toInt
 
-      LightClientServerChannel.sendEvents(
+      XFormsApp.clientServerChannel.sendEvents(
         requestFormId     = currentFormId,
         eventsToSend      = eventsToSend,
         sequenceNumberOpt = sequenceNumberOpt,

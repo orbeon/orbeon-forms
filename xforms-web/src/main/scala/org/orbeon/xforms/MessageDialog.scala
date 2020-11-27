@@ -24,9 +24,10 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.Dynamic.{newInstance => jsnew}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
+
 @JSExportTopLevel("OrbeonMessage")
 @JSExportAll
-object Message {
+object MessageDialog {
 
   private val messageQueue                            = new mutable.Queue[String]
   private var yuiMessageDialogOpt: Option[js.Dynamic] = None
@@ -38,10 +39,10 @@ object Message {
     g.YAHOO.util.Event.onAvailable("xforms-message-dialog", showMessage _)
   }
 
-  // Called when handling Ajax response, with the <xxf:message> from the Ajax response
+  // Called when handling Ajax response, with the `<xxf:message>` from the Ajax response
   def execute(element: raw.Element): Unit = {
     if (element.getAttribute("level") == "modal") {
-      var message = element.textContent
+      val message = element.textContent
       messageQueue.enqueue(message)
       if (messageQueue.length == 1)
         showMessage()

@@ -14,13 +14,22 @@ object URLRewriterUtils {
     urlString    : String,
     pathMatchers : ju.List[PathMatcher],
     rewriteMode  : Int
-  ): String = ???
+  ): String = {
+    println(s"xxx URLRewriterUtils.rewriteResourceURL called for $urlString")
+    ???
+  }
 
   def rewriteServiceURL(
     request     : Request,
     urlString   : String,
     rewriteMode : Int
-  ): String = ???
+  ): String = {
+    println(s"xxx URLRewriterUtils.rewriteServiceURL called for $urlString")
+    ???
+  }
 
-  def getPathMatchers: ju.List[PathMatcher] = ???
+  def getPathMatchers: ju.List[PathMatcher] = {
+    println(s"xxx URLRewriterUtils.getPathMatchers called")
+    ???
+  }
 }

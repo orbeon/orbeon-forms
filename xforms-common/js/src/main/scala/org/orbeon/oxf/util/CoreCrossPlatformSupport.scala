@@ -32,7 +32,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   def randomHexId: String =
     0 until 40 map (_ => hexDigits((Math.random() * 16).floor.toInt)) mkString
 
-  def getApplicationResourceVersion: Option[String] = ???
+  def getApplicationResourceVersion: Option[String] = None // TODO: CHECK
 
   def properties: PropertySet =
     PropertySet(

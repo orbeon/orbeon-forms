@@ -562,7 +562,7 @@ object TopLevelPartAnalysisImpl {
 
         def scopeForPrefixedId(prefixedId: String): Scope = ???
 
-        def scriptsByPrefixedId: Map[String, StaticScript] = ???
+        def scriptsByPrefixedId: Map[String, StaticScript] = Map.empty // XXX TODO
 
         def uniqueJsScripts: List[ShareableScript] = Nil // XXX TODO
 

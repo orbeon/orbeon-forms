@@ -18,6 +18,8 @@ object DemoExternalContext {
   def externalContext: ExternalContext =
     new ExternalContext {
 
+      selfExternalContext =>
+
       def getWebAppContext: WebAppContext = new WebAppContext {
         def getResource(s: String): URL = ???
         def getResourceAsStream(s: String): InputStream = ???
@@ -64,7 +66,7 @@ object DemoExternalContext {
         def getMethod: HttpMethod = ???
         def getServerName: String = ???
         def getServerPort: Int = ???
-        def getSession(create: Boolean): ExternalContext.Session = getSession(create)
+        def getSession(create: Boolean): ExternalContext.Session = selfExternalContext.getSession(create)
         def sessionInvalidate(): Unit = ???
         def isRequestedSessionIdValid: Boolean = ???
         def getRequestedSessionId: String = ???

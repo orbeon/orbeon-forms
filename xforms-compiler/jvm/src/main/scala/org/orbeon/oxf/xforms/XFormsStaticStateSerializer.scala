@@ -55,7 +55,7 @@ object XFormsStaticStateSerializer {
 
   implicit val encodeAnnotatedTemplate : Encoder[AnnotatedTemplate] = deriveEncoder
 
-  def serialize(staticState: XFormsStaticState): String = {
+  def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
       "parent"  -> None.asJson, // must be parent scope id TODO
@@ -157,7 +157,7 @@ object XFormsStaticStateSerializer {
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
-      "template"             -> a.template.asJson,
+      "template"             -> template.asJson,
     )
 
     staticState.asJson.noSpaces

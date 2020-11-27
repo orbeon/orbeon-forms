@@ -2,6 +2,7 @@ package org.orbeon.oxf.xforms
 
 import java.{util => ju}
 
+import cats.syntax.option._
 import io.circe.generic.semiauto._
 import io.circe.parser.decode
 import io.circe.{Decoder, HCursor}
@@ -411,9 +412,9 @@ object XFormsStaticStateDeserializer {
       for {
         nonDefaultProperties <- c.get[Map[String, (String, Boolean)]]("nonDefaultProperties")
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
-        template             <- c.get[Option[AnnotatedTemplate]]("template")
+        template             <- c.get[SAXStore]("template")
       } yield
-        XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, template) // TODO: serialize `globalMaxSizeProperty` from server
+        XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, AnnotatedTemplate(template).some) // TODO: serialize `globalMaxSizeProperty` from server
 
     decode[XFormsStaticState](jsonString) match {
       case Left(error) =>

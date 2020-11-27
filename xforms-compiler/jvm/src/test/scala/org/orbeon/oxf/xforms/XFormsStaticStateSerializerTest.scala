@@ -39,14 +39,13 @@ class XFormsStaticStateSerializerTest
         </xh:body>
     </xh:html>.toDocument
 
-    it("xxx") {
+    it("must serialize without errors") {
       withTestExternalContext { _ =>
 
-        val staticState = PartAnalysisBuilder.createFromDocument(form)
 
-        println(s"xxx ${staticState.template}")
+        val (template, staticState) = PartAnalysisBuilder.createFromDocument(form)
 
-        val s = XFormsStaticStateSerializer.serialize(staticState)
+        val s = XFormsStaticStateSerializer.serialize(template, staticState)
 
         println(s"xxxx $s")
       }

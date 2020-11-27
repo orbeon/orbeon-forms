@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.XMLReceiver
 class XPathAnalysisProcessor extends SimpleProcessor {
   def generateAnalysis(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
     val formDocument = readInputAsOrbeonDom(pipelineContext, "form")
-    val staticState = PartAnalysisBuilder.createFromDocument(formDocument)
+    val staticState = PartAnalysisBuilder.createFromDocument(formDocument)._2
 
     PartAnalysisDebugSupport.writePart(staticState.topLevelPart)(xmlReceiver)
   }

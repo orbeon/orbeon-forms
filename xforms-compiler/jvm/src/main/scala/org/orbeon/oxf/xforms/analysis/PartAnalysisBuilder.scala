@@ -117,8 +117,8 @@ object PartAnalysisBuilder {
   }
 
   // Create analyzed static state for the given XForms document.
-  // Used by tests.
-  def createFromDocument(formDocument: Document): XFormsStaticState = {
+  // Used by offline compiler and tests.
+  def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
 
     val startScope = new Scope(None, "")
 
@@ -136,7 +136,7 @@ object PartAnalysisBuilder {
       )
     }
 
-    createFromDocument(formDocument, startScope, create)._2
+    createFromDocument(formDocument, startScope, create)
   }
 
   // Create template and analyzed part for the given XForms document.

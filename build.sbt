@@ -852,7 +852,8 @@ lazy val xformsOffline = (project in file("xforms-offline"))
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
-    xformsRuntimeJS
+    xformsRuntimeJS,
+    xformsWeb
   )
   .settings(
     name := "orbeon-xforms-offline",
@@ -1114,6 +1115,7 @@ lazy val root = (project in file("."))
     core,
     xformsJVM,
     xformsWeb,
+    xformsOffline,
     formRunnerJVM,
     formRunnerJS,
     formBuilderJVM,

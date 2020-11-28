@@ -437,7 +437,7 @@ object XFormsStaticStateImpl {
   ): XFormsStaticState = {
 
     val staticProperties = new XFormsStaticStateStaticPropertiesImpl(_nonDefaultProperties, globalMaxSizeProperty) {
-      protected def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = true
+      protected def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = featureRequested
     }
 
     val dynamicProperties = new XFormsStaticStateDynamicPropertiesImpl(_nonDefaultProperties, staticProperties, _topLevelPart)

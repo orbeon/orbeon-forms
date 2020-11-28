@@ -12,7 +12,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.{debug, debugResults, error, info, withDebug}
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
 import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.oxf.xforms.action.XFormsAPI

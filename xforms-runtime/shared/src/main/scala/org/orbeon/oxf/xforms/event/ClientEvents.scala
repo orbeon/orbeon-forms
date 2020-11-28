@@ -43,7 +43,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     clientFocusControlIdOpt        : Option[Option[String]]
   )
 
-  val EmptyEventsFindings = EventsFindings(Map.empty, None)
+  val EmptyEventsFindings: EventsFindings = EventsFindings(Map.empty, None)
 
   // Entry point called by the server: process a sequence of incoming client events.
   def processEvents(

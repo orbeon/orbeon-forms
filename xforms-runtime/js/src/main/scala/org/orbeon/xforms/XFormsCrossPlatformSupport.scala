@@ -37,7 +37,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     }
   }
 
-  def externalContext: ExternalContext = externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+  def externalContext: ExternalContext =
+    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
 
   def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress[Unit]] = ???
 

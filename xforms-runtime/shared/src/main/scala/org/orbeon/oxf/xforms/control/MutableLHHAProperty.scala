@@ -120,23 +120,27 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   // Can return null
   protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] =
     if (lhhaAnalysis.isLocal) {
+      lhhaAnalysis.staticValue match {
+        case staticValueOpt @ Some(_) =>
+          staticValueOpt
+        case None =>
+          implicit val contextStack = control.getContextStack
 
-      implicit val contextStack = control.getContextStack
+          val lhhaElement = lhhaAnalysis.element
 
-      val lhhaElement = lhhaAnalysis.element
-
-      // LHHA is direct child of control, evaluate within context
-      contextStack.setBinding(control.bindingContext)
-      withBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope) { _ =>
-        XFormsElementValue.getElementValue(
-          control.lhhaContainer,
-          contextStack,
-          control.effectiveId,
-          lhhaElement,
-          supportsHTML,
-          lhhaAnalysis.defaultToHTML,
-          Array[Boolean](false)
-        )
+          // LHHA is direct child of control, evaluate within context
+          contextStack.setBinding(control.bindingContext)
+          withBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope) { _ =>
+            XFormsElementValue.getElementValue(
+              control.lhhaContainer,
+              contextStack,
+              control.effectiveId,
+              lhhaElement,
+              supportsHTML,
+              lhhaAnalysis.defaultToHTML,
+              Array[Boolean](false)
+            )
+          }
       }
     } else {
       // LHHA is somewhere else. We resolve the control and ask for its value.

@@ -368,23 +368,26 @@ trait NodeWrapper
 
   def getParent: NodeWrapper = {
     if (parent eq null) {
+      parent =
         node match {
           case elem: dom.Element =>
             if (elem.isRootElement)
-              parent = makeWrapper(node.getDocument, docWrapper, null)
+              makeWrapper(node.getDocument, docWrapper, null)
             else {
               val parentNode = node.getParent
               // This checks the case of an element detached from a Document
               if (parentNode ne null)
-                parent = makeWrapper(parentNode, docWrapper, null)
+                makeWrapper(parentNode, docWrapper, null)
+              else
+                null
             }
-          case _: dom.Text                  => parent = makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.Comment               => parent = makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.ProcessingInstruction => parent = makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.Attribute             => parent = makeWrapper(node.getParent, docWrapper, null)
-          case _: dom.Document              => parent = null
+          case _: dom.Text                  => makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Comment               => makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.ProcessingInstruction => makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Attribute             => makeWrapper(node.getParent, docWrapper, null)
+          case _: dom.Document              => null
           case _: dom.Namespace             => throw new UnsupportedOperationException("Cannot find parent of a Namespace node")
-          case _ => throw new IllegalStateException
+          case _                            => throw new IllegalStateException
         }
     }
     parent

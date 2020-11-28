@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.event.ClientEvents
+import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsServer}
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
@@ -110,7 +110,7 @@ object XFormsToXHTML {
         allEvents                 = false,
         beforeFocusedControlIdOpt = None,
         repeatHierarchyOpt        = None,
-        requestDocument           = null,
+        requestParametersForAll   = null,
         testOutputAllActions      = true)(
         xmlReceiver               = xmlReceiver,
         indentedLogger            = indentedLogger

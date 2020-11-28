@@ -464,7 +464,7 @@
 
     <!-- XForms processors -->
     <processor name="oxf:xforms-server">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsServer"/>
+        <class name="org.orbeon.oxf.xforms.processor.XFormsServerProcessor"/>
     </processor>
 
     <processor name="oxf:xforms-to-xhtml">

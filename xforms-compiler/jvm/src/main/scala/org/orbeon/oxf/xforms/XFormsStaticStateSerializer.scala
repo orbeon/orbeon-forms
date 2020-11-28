@@ -119,7 +119,15 @@ object XFormsStaticStateSerializer {
           )
         case c: InputControl  => Nil // inputControlFields(c)
         case c: OutputControl => Nil // outputControlFields(c)
-        case c: LHHAAnalysis  => Nil // lhhaAnalysisFields(c)
+        case c: LHHAAnalysis  =>
+          List(
+            "staticValue"               -> c.staticValue.asJson,
+            "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder),
+            "containsHTML"              -> Json.fromBoolean(c.containsHTML),
+            "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
+            "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance),
+            "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
+          )
         case c                => Nil
       }
 

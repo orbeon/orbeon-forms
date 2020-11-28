@@ -305,7 +305,7 @@ object PartAnalysisBuilder {
         partAnalysisCtx.indexModel(model)
 
       for (lhha <- lhhas)
-        LHHAAnalysisBuilder.attachToControl(partAnalysisCtx, lhha)
+        PartAnalysisSupport.attachToControl(partAnalysisCtx.findControlAnalysis, lhha)
 
       partAnalysisCtx.registerEventHandlers(eventHandlers)
       partAnalysisCtx.gatherScripts()
@@ -438,7 +438,7 @@ object PartAnalysisBuilder {
         partAnalysisCtx.indexModel(model)
 
       for (lhha <- lhhas)
-        LHHAAnalysisBuilder.attachToControl(partAnalysisCtx, lhha)
+        PartAnalysisSupport.attachToControl(partAnalysisCtx.findControlAnalysis, lhha)
 
       partAnalysisCtx.registerEventHandlers(eventHandlers)
       partAnalysisCtx.gatherScripts()

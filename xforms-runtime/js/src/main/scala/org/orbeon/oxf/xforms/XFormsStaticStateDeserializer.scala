@@ -335,9 +335,7 @@ object XFormsStaticStateDeserializer {
                   r
                 }
 
-              println(s"xxxx instance $instance")
-
-              instance.right.get
+              instance.right.get // XXX TODO
 
             case "input" =>
 
@@ -357,21 +355,26 @@ object XFormsStaticStateDeserializer {
               )
             case "label" =>
 
-              val staticValue               : Option[String] = None
-              val isPlaceholder             : Boolean = false
-              val containsHTML              : Boolean = false
-              val hasLocalMinimalAppearance : Boolean = false
-              val hasLocalFullAppearance    : Boolean = false
-              val hasLocalLeftAppearance    : Boolean = false
+              val lhha =
+                for {
+                  staticValue                <- c.get[Option[String]]("staticValue")
+                  isPlaceholder              <- c.get[Boolean]("isPlaceholder")
+                  containsHTML               <- c.get[Boolean]("containsHTML")
+                  hasLocalMinimalAppearance  <- c.get[Boolean]("hasLocalMinimalAppearance")
+                  hasLocalFullAppearance     <- c.get[Boolean]("hasLocalFullAppearance")
+                  hasLocalLeftAppearance     <- c.get[Boolean]("hasLocalLeftAppearance")
+                } yield
+                  new LHHAAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                    staticValue,
+                    isPlaceholder,
+                    containsHTML,
+                    hasLocalMinimalAppearance,
+                    hasLocalFullAppearance,
+                    hasLocalLeftAppearance
+                  )
 
-              new LHHAAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
-                staticValue,
-                isPlaceholder,
-                containsHTML,
-                hasLocalMinimalAppearance,
-                hasLocalFullAppearance,
-                hasLocalLeftAppearance
-              )
+              lhha.right.get // XXX TODO
+
             case "root" =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
             case _ =>
@@ -572,8 +575,8 @@ object TopLevelPartAnalysisImpl {
     for (model <- models)
       partAnalysis.indexModel(model)
 
-//    for (lhha <- lhhas)
-//      LHHAAnalysisBuilder.attachToControl(partAnalysisCtx, lhha)
+    for (lhha <- lhhas)
+      PartAnalysisSupport.attachToControl(partAnalysis.findControlAnalysis, lhha)
 
     partAnalysis.registerEventHandlers(eventHandlers)
     partAnalysis.indexAttributeControls(attributes)
@@ -582,5 +585,4 @@ object TopLevelPartAnalysisImpl {
 
     partAnalysis
   }
-
 }

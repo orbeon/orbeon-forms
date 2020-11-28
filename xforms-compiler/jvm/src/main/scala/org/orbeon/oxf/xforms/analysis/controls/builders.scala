@@ -10,8 +10,8 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
-import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
+import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, StaticBind}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisContextForTree}
@@ -21,12 +21,11 @@ import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
-import scala.annotation.tailrec
 
 object OutputControlBuilder {
 
@@ -148,70 +147,6 @@ object LHHAAnalysisBuilder {
       hasLocalFullAppearance,
       hasLocalLeftAppearance
     )
-  }
-
-  // Attach this LHHA to its target control if any
-  def attachToControl(partAnalysisCtx : PartAnalysisContextForTree, lhhaAnalysis: LHHAAnalysis): Unit = {
-
-    val (targetControl, effectiveTargetControlOrPrefixedIdOpt) = {
-
-      def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
-        partAnalysisCtx.findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e}
-
-      @tailrec
-      def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
-        e match {
-          case xbl: ComponentControl =>
-            xbl.commonBinding.labelFor match {
-              case Some(nestedLabelForStaticId) =>
-                searchLHHAControlInScope(xbl.bindingOrThrow.innerScope, nestedLabelForStaticId) match {
-                  case Some(nestedLabelForTarget) => searchXblLabelFor(nestedLabelForTarget) // recurse
-                  case None                       => Some(Right(xbl.bindingOrThrow.innerScope.fullPrefix + nestedLabelForStaticId)) // assuming id of an HTML element
-                }
-              case None =>
-                Some(Left(xbl))
-            }
-          case _ =>
-            Some(Left(e))
-        }
-
-      def initialElemFromForOpt =
-        lhhaAnalysis.forStaticIdOpt map  { forStaticId =>
-          searchLHHAControlInScope(lhhaAnalysis.scope, forStaticId) getOrElse (
-            throw new ValidationException(
-              s"`for` attribute with value `$forStaticId` doesn't point to a control supporting label, help, hint or alert.",
-              ElementAnalysis.createLocationData(lhhaAnalysis.element)
-            )
-          )
-        }
-
-      val initialElem = initialElemFromForOpt getOrElse {
-        lhhaAnalysis.getParent match {
-          case e: StaticLHHASupport => e
-          case _ =>
-            throw new ValidationException(
-              s"parent control must support label, help, hint or alert.",
-              ElementAnalysis.createLocationData(lhhaAnalysis.element)
-            )
-        }
-      }
-
-      (initialElem, searchXblLabelFor(initialElem))
-    }
-
-    // NOTE: We don't support a reference to an effective control within an XBL which is in a repeat nested within the XBL!
-    val repeatNesting = targetControl.ancestorRepeats.size - lhhaAnalysis.ancestorRepeats.size
-
-    lhhaAnalysis._isForRepeat                           = ! lhhaAnalysis.isLocal && repeatNesting > 0
-    lhhaAnalysis._forRepeatNesting                      = if (lhhaAnalysis._isForRepeat && repeatNesting > 0) repeatNesting else 0
-    lhhaAnalysis._directTargetControlOpt                = Some(targetControl)
-    lhhaAnalysis._effectiveTargetControlOrPrefixedIdOpt = effectiveTargetControlOrPrefixedIdOpt
-
-    // We attach the LHHA to one, and possibly two target controls
-    targetControl.attachLHHA(lhhaAnalysis)
-    effectiveTargetControlOrPrefixedIdOpt foreach {
-      _.left.toOption filter (_ ne targetControl) foreach (_.attachLHHABy(lhhaAnalysis))
-    }
   }
 
   private def containsHTML(lhhaElement: Element) = {

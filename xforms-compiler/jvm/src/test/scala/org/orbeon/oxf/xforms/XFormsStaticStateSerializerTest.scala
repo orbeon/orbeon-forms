@@ -29,12 +29,12 @@ class XFormsStaticStateSerializerTest
         </xh:head>
         <xh:body>
             <xh:p>
-                <xf:input ref="/first-name" incremental="true">
+                <xf:input ref="/*" incremental="true">
                     <xf:label>Please enter your first name:</xf:label>
                 </xf:input>
             </xh:p>
             <xh:p>
-                <xf:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
+                <xf:output value="if (normalize-space(string(.)) = '') then '' else concat('Hello, ', string(.), '!')"/>
             </xh:p>
         </xh:body>
     </xh:html>.toDocument

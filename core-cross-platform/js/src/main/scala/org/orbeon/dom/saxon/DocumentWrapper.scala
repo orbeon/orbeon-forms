@@ -19,11 +19,13 @@ class DocumentWrapper(
   var parent     : NodeWrapper     = null
 
   this.setRootNode(docWrapper)
+  treeInfo = docWrapper
+
+  override def getConfiguration: Configuration = config
 
   // These overrides are necessary as these are in two of the super traits and the ocmpiler complains otherwise
   override def getSystemId              : String        = super.getSystemId
   override def setSystemId(uri: String) : Unit          = super.setSystemId(uri)
-  override def getConfiguration         : Configuration = super.getConfiguration
   override def getPublicId              : String        = super.getPublicId
   override def isStreamed               : Boolean       = super.isStreamed
 

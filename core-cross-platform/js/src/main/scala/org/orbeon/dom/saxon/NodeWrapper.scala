@@ -11,6 +11,7 @@ import org.orbeon.saxon.pattern.{AnyNodeTest, NameTest, NodeTest}
 import org.orbeon.saxon.tree.iter.{AxisIterator, LookaheadIterator}
 import org.orbeon.saxon.tree.util.{FastStringBuffer, Navigator, SteppingNode}
 import org.orbeon.saxon.tree.wrapper.{AbstractNodeWrapper, SiblingCountingNode}
+import org.orbeon.saxon.utils.Configuration
 
 
 trait NodeWrapper
@@ -21,6 +22,8 @@ trait NodeWrapper
   val node       : dom.Node
   val docWrapper : DocumentWrapper
   var parent     : NodeWrapper // null means unknown
+
+  override def getConfiguration: Configuration = docWrapper.getConfiguration
 
   protected def makeWrapper(
     node       : dom.Node,

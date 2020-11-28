@@ -46,7 +46,7 @@ object LocalClientServerChannel extends ClientServerChannel[dom.Document] {
       val doc = dom.document.implementation.createDocument(Namespaces.XXF, "xxf:event-response", null)
 
       // Append the content
-      xmlReceiver.frag.childNodes foreach
+      xmlReceiver.frag.childNodes flatMap (_.childNodes) foreach
         doc.documentElement.appendChild
 
       Future(doc)

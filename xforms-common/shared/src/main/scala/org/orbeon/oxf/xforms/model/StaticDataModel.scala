@@ -59,9 +59,9 @@ object StaticDataModel {
    */
   def isWritableItem(item: Item): VirtualNodeType Either Reason = item match {
     case _: AtomicValue                                => Right(ReadonlyNodeReason)
-    case _: DocumentNodeInfoType                       => Right(DisallowedNodeReason)
     case node: VirtualNodeType if node.hasChildElement => Right(DisallowedNodeReason)
     case node: VirtualNodeType                         => Left(node)
+    case _: DocumentNodeInfoType                       => Right(DisallowedNodeReason) // XXX TODO: review this test
     case _                                             => Right(ReadonlyNodeReason)
   }
 }

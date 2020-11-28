@@ -98,16 +98,9 @@ class ConcreteElement(var qname: QName)
     if (_parentBranch.isInstanceOf[Document] || (document ne null))
       _parentBranch = document
 
-
   def isRootElement: Boolean = {
     val document = getDocument
-    if (document ne null) {
-      val root = document.getRootElement
-      if (root == this) {
-        return true
-      }
-    }
-    false
+    (document ne null) && (document.getRootElement eq this)
   }
 
   def accept(visitor: Visitor): Unit = {
@@ -122,11 +115,10 @@ class ConcreteElement(var qname: QName)
   override def toString: String = {
     val uri = getNamespaceURI
     val result =
-      if ((uri ne null) && (uri.length > 0)) {
+      if ((uri ne null) && (uri.length > 0))
         super.toString + " [Element: <" + getQualifiedName + " uri: " + uri + " attributes: " + _attributes + "/>]"
-      } else {
+      else
         super.toString + " [Element: <" + getQualifiedName + " attributes: " + _attributes + "/>]"
-      }
      result + " userData: " + getData
   }
 

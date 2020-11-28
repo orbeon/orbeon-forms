@@ -73,7 +73,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
     containingDocument.setGotSubmissionReplaceAll()
 
     val replaceAllResponse =
-      new AllReplacer.ReplaceAllResponse(containingDocument.response getOrElse (throw new IllegalStateException))
+      new AllReplacer.ReplaceAllResponse(containingDocument.responseForReplaceAll getOrElse (throw new IllegalStateException))
 
     AllReplacer.forwardResultToResponse(cxr, replaceAllResponse)
 

@@ -1,28 +1,45 @@
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.locks.{Lock, ReentrantLock}
+import java.util.concurrent.locks.ReentrantLock
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 
 object XFormsStateManager extends XFormsStateManagerTrait {
 
-  def getDocumentLockOrNull(uuid: String): ReentrantLock = null
+  private var documents: Map[String, XFormsContainingDocument] = Map.empty
+
+  // TODO: CHECK what we should do here
+  def getDocumentLock(uuid: String): Option[ReentrantLock] = Some(new ReentrantLock)
+  def addDocumentToSession(uuid: String): Unit = ()
+
+  def cacheOrStore(
+    containingDocument   : XFormsContainingDocument,
+    isInitialState       : Boolean, // TODO: handle `isInitialState = true`
+    disableDocumentCache : Boolean  // for testing only
+  ): Unit = {
+    println(s"xxx storing doc for ${containingDocument.uuid}")
+    documents += containingDocument.uuid -> containingDocument
+  }
 
   def getClientEncodedStaticState (containingDocument: XFormsContainingDocument): Option[String] = None
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] = None
 
-  def afterInitialResponse(containingDocument: XFormsContainingDocument, disableDocumentCache: Boolean): Unit = ()
+  def findOrRestoreDocument(
+    parameters           : RequestParameters,
+    disableUpdates       : Boolean,
+    disableDocumentCache : Boolean
+  ): XFormsContainingDocument =
+    documents.getOrElse(parameters.uuid, throw new IllegalStateException(s"XForms document not found for UUID `${parameters.uuid}]`"))
 
-  def findOrRestoreDocument(parameters: RequestParameters, updates: Boolean, disableDocumentCache: Boolean): XFormsContainingDocument = ??? // TODO
+  def afterUpdate(
+    containingDocument   : XFormsContainingDocument,
+    keepDocument         : Boolean,
+    disableDocumentCache : Boolean
+  ): Unit = ()
 
-  def acquireDocumentLock(uuid: String, timeout: Long): Option[Lock] = ??? // TODO
+  def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument = ???
 
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument = ??? // TODO
-  def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit = ()
-  def afterUpdateResponse(containingDocument: XFormsContainingDocument): Unit = ()
-  def afterUpdate(containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit = ()
-  def releaseDocumentLock(lock: Lock): Unit = ()
   def onAddedToCache(uuid: String): Unit = ()
   def onRemovedFromCache(uuid: String): Unit = ()
   def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit = ()

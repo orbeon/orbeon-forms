@@ -96,8 +96,8 @@ class XFormsContainingDocument(
   private var _uriResolver: Option[XFormsURIResolver] = None
   def uriResolver: Option[XFormsURIResolver] = _uriResolver
 
-  private var _response: Option[ExternalContext.Response] = None
-  def response: Option[ExternalContext.Response] = _response
+  private var _responseForReplaceAll: Option[ExternalContext.Response] = None
+  def responseForReplaceAll: Option[ExternalContext.Response] = _responseForReplaceAll
 
   private var _initializing = false
   def initializing: Boolean = _initializing
@@ -129,7 +129,7 @@ class XFormsContainingDocument(
 
       // These are cleared in `afterInitialResponse()`
       this._uriResolver  = uriResolver
-      this._response     = response
+      this._responseForReplaceAll     = response
       this._initializing = true
 
       addAllModels()
@@ -200,7 +200,7 @@ class XFormsContainingDocument(
   private def clearClientState(): Unit = {
 
     assert(! _initializing)
-    assert(_response.isEmpty)
+    assert(_responseForReplaceAll.isEmpty)
     assert(_uriResolver.isEmpty)
 
     clearRequestStats()
@@ -224,7 +224,7 @@ class XFormsContainingDocument(
     getRequestStats.afterInitialResponse()
 
     this._uriResolver  = None // URI resolver is of no use after initialization and it may keep dangerous references (`PipelineContext`)
-    this._response     = None // same as above
+    this._responseForReplaceAll     = None // same as above
     this._initializing = false
 
     // Do this before clearing the client state
@@ -236,10 +236,10 @@ class XFormsContainingDocument(
     xpathDependencies.afterInitialResponse()
   }
 
-  override def beforeExternalEvents(response: ExternalContext.Response, isAjaxRequest: Boolean): Unit = {
+  override def beforeExternalEvents(responseForReplaceAll: ExternalContext.Response, isAjaxRequest: Boolean): Unit = {
 
     xpathDependencies.beforeUpdateResponse()
-    this._response = response.some
+    this._responseForReplaceAll = responseForReplaceAll.some
 
     if (isAjaxRequest) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = false)
@@ -255,7 +255,7 @@ class XFormsContainingDocument(
       processDueDelayedEvents(false)
     }
 
-    this._response = None
+    this._responseForReplaceAll = None
   }
 
   def afterUpdateResponse(): Unit = {

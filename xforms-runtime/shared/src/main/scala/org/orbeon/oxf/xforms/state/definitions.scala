@@ -69,18 +69,19 @@ trait XFormsStateLifecycle {
 
   def findOrRestoreDocument(
     parameters           : RequestParameters,
-    updates              : Boolean,
+    disableUpdates       : Boolean,
     disableDocumentCache : Boolean
   ): XFormsContainingDocument
 
   def acquireDocumentLock (uuid: String, timeout: Long): LockResponse
-  def beforeUpdate        (parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
+  def releaseDocumentLock (lock: Lock): Unit
 
+  def beforeUpdate        (parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit
   def afterUpdateResponse (containingDocument: XFormsContainingDocument): Unit
   def afterUpdate         (containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit
 
-  def releaseDocumentLock (lock: Lock): Unit
+  def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument
 
   def onAddedToCache      (uuid: String): Unit
   def onRemovedFromCache  (uuid: String): Unit

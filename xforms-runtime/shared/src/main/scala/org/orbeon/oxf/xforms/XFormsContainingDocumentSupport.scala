@@ -788,7 +788,7 @@ trait ContainingDocumentCacheable extends Cacheable {
     XFormsStateManager.onRemovedFromCache(uuid)
 
   // Return lock or `null` in case session just expired
-  def getEvictionLock: Lock = XFormsStateManager.getDocumentLockOrNull(uuid)
+  def getEvictionLock: Lock = XFormsStateManager.getDocumentLock(uuid).orNull
 
   // Called when cache expires this document from the document cache.
   // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains

@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.state
 
 import java.util.concurrent.locks.{Lock, ReentrantLock}
 import java.util.concurrent.{ConcurrentLinkedQueue, TimeUnit}
-import org.orbeon.oxf.common.{OXFException, Version}
+
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -24,7 +25,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.jdk.CollectionConverters._
@@ -38,6 +39,20 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
   if (ReplicationEnabled)
      Version.instance.requirePEFeature("State replication")
+
+  def getDocumentLock(uuid: String): Option[ReentrantLock] =
+    getSessionDocument(uuid) map (_.lock)
+
+  def addDocumentToSession(uuid: String): Unit =
+    Private.addDocumentToSession(uuid)
+
+  def cacheOrStore(
+    containingDocument   : XFormsContainingDocument,
+    isInitialState       : Boolean,
+    disableDocumentCache : Boolean // for testing only
+  ): Unit =
+    Private.cacheOrStore(containingDocument, isInitialState, disableDocumentCache)
+
 
   // This must be called once exactly when the session is created
   def sessionCreated(session: ExternalContext.Session): Unit =
@@ -54,9 +69,6 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       }
   }
 
-  val LogType = "state manager"
-  val Logger  = Loggers.getIndentedLogger("state")
-
   // Information about a document tied to the session.
   case class SessionDocument(uuid: String) {
     val lock = new ReentrantLock
@@ -69,26 +81,6 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       session.removeAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application)
     }
   }
-
-  def getDocumentLock(uuid: String): Option[ReentrantLock] =
-    getSessionDocument(uuid) map (_.lock)
-
-  def getDocumentLockOrNull(uuid: String): ReentrantLock =
-    getDocumentLock(uuid).orNull
-
-  /**
-    * Called after the initial response is sent without error.
-    *
-    * Implementation: cache the document and/or store its initial state.
-    */
-  def afterInitialResponse(
-    containingDocument   : XFormsContainingDocument,
-    disableDocumentCache : Boolean
-  ): Unit =
-    if (! containingDocument.isNoUpdates) {
-      addDocumentToSession(containingDocument.uuid)
-      cacheOrStore(containingDocument, isInitialState = true, disableDocumentCache = disableDocumentCache)
-    }
 
   def onAddedToCache(uuid: String): Unit = addUuidToSession(uuid)
 
@@ -113,46 +105,6 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     if (containingDocument.staticState.isServerStateHandling)
       storeDocumentState(containingDocument, isInitialState = false)
   }
-
-  // Return the locked document lock. Must be called before `beforeUpdate()`.
-  def acquireDocumentLock(uuid: String, timeout: Long): LockResponse =
-    // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
-    // for a given UUID must belong to the same session that created the document. If the session expires, the
-    // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
-    // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
-    // which is not desirable. Further, we now have a lock stored in the session.
-    getDocumentLock(uuid ensuring (_ ne null)) match {
-      case Some(lock) =>
-        try {
-          if (lock.tryLock(timeout, TimeUnit.MILLISECONDS))
-            LockResponse.Success(lock)
-          else
-            LockResponse.Timeout
-        } catch {
-          case e: InterruptedException =>
-            LockResponse.Failure(e)
-        }
-      case None =>
-        LockResponse.Failure(SessionExpiredException("Unknown form document requested."))
-    }
-
-  // Release the given document lock. Must be called after afterUpdate() in a finally block.
-  def releaseDocumentLock(lock: Lock): Unit =
-    lock.unlock()
-
-  /**
-    * Called before an incoming update.
-    *
-    * If found in cache, document is removed from cache.
-    *
-    * @return document, either from cache or from state information
-    */
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument =
-    findOrRestoreDocument(
-      parameters           = parameters,
-      disableUpdates       = false,
-      disableDocumentCache = disableDocumentCache
-    )
 
   /**
     * Called after an update.
@@ -221,30 +173,20 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     containingDocument.staticState.isClientStateHandling option
       DynamicState.encodeDocumentToString(containingDocument, XFormsGlobalProperties.isGZIPState, isForceEncryption = true)
 
-  // Update the document's change sequence.
-  def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit = {
-    if (containingDocument.isDirtySinceLastRequest) {
-      Logger.logDebug(LogType, "Document is dirty. Generating new dynamic state.")
-    } else {
-      // The document is not dirty: no real encoding takes place here
-      Logger.logDebug(LogType, "Document is not dirty. Keep existing dynamic state.")
-    }
-    // Tell the document to update its state
-    if (! ignoreSequence)
-      containingDocument.incrementSequence()
-  }
-
-  // Cache the document and/or store its current state.
-  def afterUpdateResponse(containingDocument: XFormsContainingDocument): Unit =
-    containingDocument.afterUpdateResponse()
-
   // The UUID list is added once upon session creation so it is expected to be found here
   def getUuidListInSession(session: ExternalContext.Session): ConcurrentLinkedQueue[String] =
     session.getAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application) map
       (_.asInstanceOf[ConcurrentLinkedQueue[String]]) getOrElse
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
 
-  def createDocumentFromStore(
+  def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument =
+    createDocumentFromStore(
+      parameters,
+      isInitialState = true,
+      disableUpdates = true
+    )
+
+  private[state] def createDocumentFromStore(
     parameters     : RequestParameters,
     isInitialState : Boolean,
     disableUpdates : Boolean

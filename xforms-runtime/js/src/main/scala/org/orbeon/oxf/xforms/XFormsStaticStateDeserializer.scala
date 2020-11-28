@@ -552,7 +552,7 @@ object TopLevelPartAnalysisImpl {
             (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${element.toDebugString}`"))
         }
 
-        def getMark(prefixedId: String): Option[SAXStore#Mark] = ???
+        def getMark(prefixedId: String): Option[SAXStore#Mark] = None // XXX TODO
 
         def iterateGlobals: Iterator[Global] = Iterator.empty // XXX TODO
 

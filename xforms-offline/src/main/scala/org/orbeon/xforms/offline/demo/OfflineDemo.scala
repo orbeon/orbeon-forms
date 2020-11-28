@@ -6,6 +6,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.xforms.{App, DeploymentType, XFormsApp, XFormsCrossPlatformSupport}
@@ -54,7 +55,7 @@ object OfflineDemo extends App {
     containingDocument.setRequestInformation(req)
     containingDocument.initialize(uriResolver = None, response = None)
 
-    XFormsCrossPlatformSupport.withExternalContext(DemoExternalContext.externalContext) {
+    XFormsCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
       // See also `XFormsToXHTML.outputResponseDocument`
       XFormsAPI.withContainingDocument(containingDocument) {
 
@@ -105,6 +106,9 @@ object OfflineDemo extends App {
               XFormsApp.onPageContainsFormsMarkup()
 
               containingDocument.afterInitialResponse()
+
+              // Notify state manager
+              XFormsStateManager.afterInitialResponse(containingDocument, disableDocumentCache = false)
 
             case unknown =>
               throw new OXFException(s"Unknown host language specified: $unknown")

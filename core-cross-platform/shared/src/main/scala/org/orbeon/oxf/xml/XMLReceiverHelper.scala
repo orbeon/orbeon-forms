@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.common.OXFException
-import org.xml.sax.{Attributes, SAXException}
+import org.xml.sax.{Attributes, ContentHandler, SAXException}
 import org.xml.sax.helpers.AttributesImpl
 
 
@@ -21,6 +21,18 @@ object XMLReceiverHelper {
         val attributeValue = attributes(i * 2 + 1)
         if (attributeName != null && attributeValue != null) attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue)
       }
+
+  // Copied from `SAXUtils`
+  def streamNullDocument(contentHandler: ContentHandler): Unit = {
+    contentHandler.startDocument()
+    contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI)
+    val attributes = new AttributesImpl
+    attributes.addAttribute(XMLConstants.XSI_URI, "nil", "xsi:nil", "CDATA", "true")
+    contentHandler.startElement("", "null", "null", attributes)
+    contentHandler.endElement("", "null", "null")
+    contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX)
+    contentHandler.endDocument()
+  }
 }
 
 class XMLReceiverHelper(xmlReceiver: XMLReceiver) {

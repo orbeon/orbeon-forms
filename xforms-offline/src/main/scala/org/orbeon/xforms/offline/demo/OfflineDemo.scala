@@ -33,7 +33,7 @@ object OfflineDemo extends App {
     implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
 
     val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState = XFormsStaticStateDeserializer.deserialize(DemoForms.HelloForm)
+    val staticState = XFormsStaticStateDeserializer.deserialize(DemoForms.TestForm2)
 
     val containingDocument = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
 

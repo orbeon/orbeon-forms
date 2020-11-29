@@ -83,15 +83,19 @@ object XFormsStaticStateSerializer {
       "uri"                -> Json.fromString(a.namespace.uri),
     )
 
-    // TODO: Just for local element name/attributes, so find another way
-  //  implicit val encodeElement: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
-  //    "atts" -> (a.attributeIterator map (a => a.getQName) toList).asJson
-  //  )
-
   //  implicit val encodeElement: Encoder[dom.Element] = (a: dom.Element) =>
   //    Json.fromString(TransformerUtils.dom(a))
 
-    implicit val encodeElement: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
+    implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
+      "name"     -> a.getQName.asJson,
+      "atts"     -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson,
+      "children" -> Json.arr(a.content collect {
+        case n: dom.Element               => n.asJson
+        case n: dom.Text                  => Json.fromString(n.getStringValue)
+      }: _*)
+    )
+
+    val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
       "name" -> a.getQName.asJson,
       "atts" -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson,
     )
@@ -136,7 +140,7 @@ object XFormsStaticStateSerializer {
         List(
           "index"             -> Json.fromInt(a.index),
           "name"              -> Json.fromString(a.localName),
-          "element"           -> a.element.asJson,
+          "element"           -> encodeLocalElementOnly(a.element),
           "staticId"          -> Json.fromString(a.staticId),
           "prefixedId"        -> Json.fromString(a.prefixedId),
           "namespaceMapping"  -> a.namespaceMapping.asJson,

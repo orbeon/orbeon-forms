@@ -161,18 +161,6 @@ object XFormsStaticStateDeserializer {
   //    "mapping" -> a.mapping.asJson
   //  )
   //
-  //  // NOTE: `deriveDecoder` doesn't work because of `private` case class constructor.
-  //  implicit val decodeQName: Decoder[dom.QName] = (a: dom.QName) => Json.obj(
-  //    "localName"          -> Json.fromString(a.localName),
-  //    "prefix"             -> Json.fromString(a.namespace.prefix),
-  //    "uri"                -> Json.fromString(a.namespace.uri),
-  //  )
-  //
-  //    implicit val decodeElement: Decoder[dom.Element] = (a: dom.Element) => Json.obj(
-  //      "name" -> a.getQName.asJson,
-  //      "atts" -> (a.attributeIterator map (a => a.getQName) toList).asJson,
-  //  )
-  //
   //  def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
   //    a match {
   //      case c: Model         => Nil // modelFields(c)
@@ -240,13 +228,23 @@ object XFormsStaticStateDeserializer {
       } yield
         NamespaceMapping(hash, mapping)
 
-    implicit val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
+    implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {
-        name <- c.get[dom.QName]("name")
-        atts <- c.get[List[(dom.QName, String)]]("atts")
+        name     <- c.get[dom.QName]("name")
+        atts     <- c.get[List[(dom.QName, String)]]("atts")
+        children <- {
+          val childIt =
+            c.downField("children").values.toIterator.flatten map {
+              case s if s.isString => s.asString.map(dom.Text.apply).toRight(throw new IllegalArgumentException)
+              case s if s.isObject => decodeElement.decodeJson(s)
+              case _ => throw new IllegalArgumentException
+            }
+          Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
+        }
       } yield {
         val r = dom.Element(name)
         atts foreach { case (name, value) => r.addAttribute(name, value) }
+        children foreach r.add
         r
       }
 

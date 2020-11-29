@@ -8,7 +8,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.instruct.SlotManager
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.{NamespaceResolver, Sequence, StructuredQName}
-import org.orbeon.saxon.s9api.Location
+import org.orbeon.saxon.s9api.{HostLanguage, Location}
 import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext}
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.utils.Configuration
@@ -30,8 +30,19 @@ class ShareableXPathStaticContext(
    with XPathStaticContext
    with Logging {
 
-  // This also creates an Executable
-  setConfiguration(config)
+  // Primary constructor
+  locally {
+    setConfiguration(config) // also sets `defaultCollationName`
+
+    this.packageData = {
+      val pd = new PackageData(config)
+      pd.setHostLanguage(HostLanguage.XPATH)
+      pd.setSchemaAware(false)
+      pd
+    }
+
+    this.usingDefaultFunctionLibrary = true
+  }
 
   // Add function library
   setDefaultFunctionLibrary()

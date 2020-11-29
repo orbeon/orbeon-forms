@@ -3,6 +3,7 @@ package org.orbeon.oxf.util
 import java.{util => ju}
 
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType, makeStringExpression}
 import org.orbeon.oxf.util.XPath.{Reporter, withFunctionContext}
@@ -91,6 +92,20 @@ object XPathCache extends XPathCacheTrait {
     val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
 
     println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+
+    if (true) {
+      import _root_.java.io.PrintStream
+      import org.orbeon.saxon.lib.StandardLogger
+
+      xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
+    }
+
+    contextItem match {
+      case n: NodeWrapper =>
+        println(s"xxx NodeWrapper for ${n.node}")
+      case _ =>
+        println(s"xxx other contextItem")
+    }
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
@@ -404,7 +419,7 @@ object XPathCache extends XPathCacheTrait {
       if (functionLibrary ne null)
         independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
 
-      val expr = compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
+      val expr = StaticXPath.compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
 
       // Set context items and position
 //      pooledXPathExpression.setContextItems(contextItems, contextPosition)
@@ -461,30 +476,19 @@ object XPathCache extends XPathCacheTrait {
         throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
     }
 
-  def compileExpressionWithStaticContext(
-    staticContext : XPathStaticContext,
-    xpathString   : String,
-    avt           : Boolean
-  ): XPathExpression =
-    if (avt) {
-//      val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
-//      prepareExpressionForAVT(staticContext, tempExpression)
-      // XXX TODO must convert `AttributeValueTemplate` to Scala
-      ???
-    } else {
-      val evaluator = new XPathEvaluator(GlobalConfiguration)
-      evaluator.setStaticContext(staticContext)
-      evaluator.createExpression(xpathString)
-    }
-
   private def singleItemToJavaKeepNodeInfoOrNull(item: Item) = item match {
     case null => null
     case item => itemToJavaKeepNodeInfoOrNull(item)
   }
 
-  private def itemToJavaKeepNodeInfoOrNull(item: Item) = item match {
+  private def itemToJavaKeepNodeInfoOrNull(item: Item) = {
+
+    println(s"xxx itemToJavaKeepNodeInfoOrNull $item")
+
+    item match {
     case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
     case v: AtomicValue    => SequenceTool.convertToJava(v)
     case v                 => v
+  }
   }
 }

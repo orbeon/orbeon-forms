@@ -19,7 +19,7 @@ import org.orbeon.dom.io.SAXWriter
 import org.orbeon.saxon.tree.util.DocumentNumberAllocator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
-import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLReceiver}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.expr.parser
 import org.orbeon.saxon.expr.parser.OptimizerOptions
@@ -28,9 +28,10 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.model.{BuiltInAtomicType, ItemType}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
+
 
 object StaticXPath extends StaticXPathTrait {
 
@@ -66,7 +67,16 @@ object StaticXPath extends StaticXPathTrait {
     functionLibrary  : FunctionLibrary,
     avt              : Boolean)(implicit
     logger           : IndentedLogger
-  ): CompiledExpression = ???
+  ): CompiledExpression =
+    CompiledExpression(
+      compileExpressionWithStaticContext(
+        new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
+        xpathString,
+        avt
+      ),
+      xpathString,
+      locationData
+    )
 
   def orbeonDomToTinyTree(doc: dom.Document): DocumentNodeInfoType = {
 
@@ -130,7 +140,17 @@ object StaticXPath extends StaticXPathTrait {
     staticContext : XPathStaticContext,
     xpathString   : String,
     avt           : Boolean
-  ): XPathExpression = ???
+  ): XPathExpression =
+    if (avt) {
+//      val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
+//      prepareExpressionForAVT(staticContext, tempExpression)
+      // XXX TODO must convert `AttributeValueTemplate` to Scala
+      ???
+    } else {
+      val evaluator = new XPathEvaluator(GlobalConfiguration)
+      evaluator.setStaticContext(staticContext)
+      evaluator.createExpression(xpathString)
+    }
 
   def expressionType(xpe: XPathExpression): SchemaTypeType =
     xpe.getInternalExpression.getItemType

@@ -184,15 +184,16 @@ object StaticXPath extends StaticXPathTrait {
     functionLibrary  : FunctionLibrary,
     avt              : Boolean)(implicit
     logger           : IndentedLogger
-  ): CompiledExpression = CompiledExpression(
-    compileExpressionWithStaticContext(
-      new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
+  ): CompiledExpression =
+    CompiledExpression(
+      compileExpressionWithStaticContext(
+        new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary),
+        xpathString,
+        avt
+      ),
       xpathString,
-      avt
-    ),
-    xpathString,
-    locationData
-  )
+      locationData
+    )
 
   // Create and compile an expression
   def compileExpressionWithStaticContext(

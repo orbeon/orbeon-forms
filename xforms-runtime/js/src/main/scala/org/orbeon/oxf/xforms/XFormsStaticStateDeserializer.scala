@@ -340,17 +340,23 @@ object XFormsStaticStateDeserializer {
               new InputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
 
             case "output" =>
-              val isImageMediatype    : Boolean = false
-              val isHtmlMediatype     : Boolean = false
-              val isDownloadAppearance: Boolean = false
-              val staticValue         : Option[String] = None
 
-              new OutputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
-                isImageMediatype,
-                isHtmlMediatype,
-                isDownloadAppearance,
-                staticValue
-              )
+              val output =
+                for {
+                  isImageMediatype     <- c.get[Boolean]("isImageMediatype")
+                  isHtmlMediatype      <- c.get[Boolean]("isHtmlMediatype")
+                  isDownloadAppearance <- c.get[Boolean]("isDownloadAppearance")
+                  staticValue          <- c.get[Option[String]]("staticValue")
+                } yield
+                  new OutputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                    isImageMediatype,
+                    isHtmlMediatype,
+                    isDownloadAppearance,
+                    staticValue
+                  )
+
+              output.right.get // XXX TODO
+
             case "label" =>
 
               val lhha =

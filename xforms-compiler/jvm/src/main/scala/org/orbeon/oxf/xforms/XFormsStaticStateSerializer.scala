@@ -122,7 +122,13 @@ object XFormsStaticStateSerializer {
             "inlineRootElem"        -> c.inlineRootElemOpt.asJson
           )
         case c: InputControl  => Nil // inputControlFields(c)
-        case c: OutputControl => Nil // outputControlFields(c)
+        case c: OutputControl =>
+          List(
+            "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype),
+            "isHtmlMediatype"      -> Json.fromBoolean(c.isHtmlMediatype),
+            "isDownloadAppearance" -> Json.fromBoolean(c.isDownloadAppearance),
+            "staticValue"          -> c.staticValue.asJson
+          )
         case c: LHHAAnalysis  =>
           List(
             "staticValue"               -> c.staticValue.asJson,

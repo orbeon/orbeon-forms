@@ -36,6 +36,14 @@ object XFormsStaticStateDeserializer {
 
     var controlStack: List[ElementAnalysis] = Nil
 
+    // XXX TODO
+    val functionLibrary: FunctionLibrary = new FunctionLibrary {
+      def bind(functionName: SymbolicName.F, staticArgs: Array[Expression], env: StaticContext, reasons: java.util.List[String]): Expression = null
+      def getFunctionItem(functionName: SymbolicName.F,staticContext: StaticContext): om.Function = null
+      def isAvailable(functionName: org.orbeon.saxon.trans.SymbolicName.F): Boolean = false
+      def copy: FunctionLibrary = this
+    }
+
     object Index {
 
       val controlAnalysisMap = mutable.LinkedHashMap[String, ElementAnalysis]()
@@ -412,7 +420,8 @@ object XFormsStaticStateDeserializer {
           Index.lhhas,
           Index.eventHandlers,
           Index.models,
-          Index.attributes
+          Index.attributes,
+          functionLibrary
         )
 
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
@@ -500,7 +509,8 @@ object TopLevelPartAnalysisImpl {
     lhhas               : mutable.Buffer[LHHAAnalysis],
     eventHandlers       : mutable.Buffer[EventHandler],
     models              : mutable.Buffer[Model],
-    attributes          : mutable.Buffer[AttributeControl])(implicit
+    attributes          : mutable.Buffer[AttributeControl],
+    _functionLibrary    : FunctionLibrary)(implicit
     logger              : IndentedLogger
   ): TopLevelPartAnalysis = {
 
@@ -526,13 +536,7 @@ object TopLevelPartAnalysisImpl {
         def parent: Option[PartAnalysis] = None
         def isTopLevelPart: Boolean = true
 
-        // XXX TODO
-        val functionLibrary: FunctionLibrary = new FunctionLibrary {
-          def bind(functionName: SymbolicName.F, staticArgs: Array[Expression], env: StaticContext, reasons: java.util.List[String]): Expression = null
-          def getFunctionItem(functionName: SymbolicName.F,staticContext: StaticContext): om.Function = null
-          def isAvailable(functionName: org.orbeon.saxon.trans.SymbolicName.F): Boolean = false
-          def copy: FunctionLibrary = this
-        }
+        val functionLibrary: FunctionLibrary = _functionLibrary
 
         // XXX TODO
         def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] =
@@ -560,7 +564,10 @@ object TopLevelPartAnalysisImpl {
 
         def containingScope(prefixedId: String): Scope = ???
 
-        def scopeForPrefixedId(prefixedId: String): Scope = ???
+        def scopeForPrefixedId(prefixedId: String): Scope =
+          findControlAnalysis(prefixedId) map
+            (_.scope)                     getOrElse
+            (throw new IllegalStateException(s"missing scope information for $prefixedId"))
 
         def scriptsByPrefixedId: Map[String, StaticScript] = Map.empty // XXX TODO
 

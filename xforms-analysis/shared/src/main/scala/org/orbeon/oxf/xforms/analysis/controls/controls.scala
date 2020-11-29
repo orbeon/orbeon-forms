@@ -89,8 +89,6 @@ class SelectionControl(
 ) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with SelectionControlTrait {
 
-  def hasStaticItemset: Boolean = staticItemset.isDefined
-
   override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) + XXFORMS_TITLE_QNAME
 }
 

@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.model.StaticDataModel
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 
+
 trait SelectionControlTrait
   extends InputValueControl
      with SelectAppearanceTrait
@@ -37,7 +38,6 @@ trait SelectionControlTrait
 
   final var itemsetAnalysis: Option[XPathAnalysis] = None
 
-  def hasStaticItemset: Boolean
   def staticItemset: Option[Itemset]
   def useCopy: Boolean
   def mustEncodeValues: Option[Boolean]

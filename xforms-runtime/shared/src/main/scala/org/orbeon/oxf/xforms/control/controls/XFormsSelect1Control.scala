@@ -295,7 +295,7 @@ class XFormsSelect1Control(
     }
 
   private def mustSendItemsetUpdate(otherSelect1Control: XFormsSelect1Control): Boolean =
-    if (staticControl.hasStaticItemset) {
+    if (staticControl.staticItemset.isDefined) {
       // There is no need to send an update:
       //
       // 1. Items are static...

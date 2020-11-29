@@ -8,6 +8,7 @@ node_js:
 env:
   global:
   - ANT_OPTS=-Xmx2048m
+  - SBT_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=2G -Xmx8G -Xms1G"
   - secure: duj2NzncZG+oNk8ISitO697mne1EzAajvdRjw39yevKTMdMbf6cbMa+beo/3JW8xMbGxMLovfI4zK0Bykoo98VQVJan87tLGTQVmOKGboi0sYvOeun9jXUoT66tQAEtlL48S5nNoHKyF/dRaGgPRPMkfXiPdElAU9FDklm3rwQs=
   - secure: gWPaj/3IUfFU/MGqcB6AkD3MsAlLT9uBP5YZhgCZrgHXYIvyhEH9F+it17b5ibWq+i7boSs9G8HcCRwNdaNrlcN1ONDOVRW1f3syK2+HC947/FfzHE6jnamVbEAZMYr77WgR5eeqLQRl94Q2CRa3eW/6QERM99kt5nbRo3oPT/c=
   - secure: X+82NUnipRkzqBAt4IOgVuW/kDd/m85MEExAxRAxqZ2R6ALCHRMYKpCSv47dW7qnX89EkkN8vEDQ1/5h8bnGY5i1a6b8mMVLS3tkRUtuqW9bL59TzEyVTS6hsWoNNKWL4rzqnDAXTyy4RB881ZGdkTR3nRjrmEZtbfVWLXQCQ+A=

@@ -12,7 +12,6 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <controller xmlns="http://www.orbeon.com/oxf/controller"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             instance-passing="forward" matcher="regexp">
 
     <page path="/xforms-sandbox/" view="upload-view.xhtml"/>

@@ -272,7 +272,6 @@ abstract class XFormsBaseHandlerXHTML (
           }
         }
 
-
       implicit val classes: jl.StringBuilder = new jl.StringBuilder(30)
       // Put user classes first if any
       if (staticLHHAAttributes ne null) {

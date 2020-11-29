@@ -13,27 +13,26 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import org.apache.commons.fileupload.FileItem
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
-import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties, XFormsProperties}
+import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties}
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+
 class UploaderProcessor extends ProcessorImpl {
-  override def createOutput(name: String) =
+  override def createOutput(name: String): ProcessorOutput =
     addOutput(
       name,
       new ProcessorOutputImpl(UploaderProcessor.this, name) {
-        override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) = {
+        override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
           UploaderServer.processUpload(XFormsCrossPlatformSupport.externalContext.getRequest) match {
             case (nameValues, None) =>

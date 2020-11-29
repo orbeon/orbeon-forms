@@ -60,7 +60,9 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
       case DynamicResourceRegex(_) =>
         serveDynamicResource(requestPath)
 
-      case BaselineResourcePath =>
+      case BaselineResourceRegex(ext) =>
+
+        val isCSS = ext == "css"
 
         def redirect(path: String): Unit = {
           val pathWithContext = response.rewriteRenderURL(path)
@@ -73,9 +75,9 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         val updates               = updatesPropertyValue.getOrElse("")
         val assets                = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJSONProperty, excludesProp = "", updates)
         val isMinimal             = XFormsGlobalProperties.isMinimalResources
-        val resources             = assets.js.map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+        val resources             = (if (isCSS) assets.css else assets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
 
-        AssetsAggregator.aggregate(resources, redirect, None, isCSS = false)
+        AssetsAggregator.aggregate(resources, redirect, None, isCSS)
 
       case FormDynamicResourcesRegex(uuid) =>
 

@@ -39,12 +39,15 @@ object AssetPath {
 object XFormsAssetPaths {
 
   val XFormServerPrefix         = "/xforms-server/"
+  val DynamicResourcesPath      = XFormServerPrefix + "dynamic/"
 
-  val DynamicResourceRegex      = (XFormServerPrefix + "dynamic/(.+)").r
+  val DynamicResourceRegex      = (DynamicResourcesPath + "(.+)").r
 
   val FormDynamicResourcesPath  = XFormServerPrefix + "form/dynamic/"
   val FormDynamicResourcesRegex = s"$FormDynamicResourcesPath(.+).js".r
 
   val FormStaticResourcesPath   = XFormServerPrefix + "form/static/"
   val FormStaticResourcesRegex  =  s"$FormStaticResourcesPath(.+).js".r
+
+  val BaselineResourceRegex     = (XFormServerPrefix + "baseline\\.(js|css)").r
 }

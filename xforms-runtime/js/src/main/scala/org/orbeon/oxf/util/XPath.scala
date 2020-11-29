@@ -3,6 +3,7 @@ package org.orbeon.oxf.util
 import java.{util => ju}
 
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
+import org.orbeon.saxon.expr.parser.OptimizerOptions
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.Item
@@ -16,6 +17,7 @@ object XPath extends XPathTrait {
 
     super.setNamePool(StaticXPath.GlobalNamePool)
     super.setDocumentNumberAllocator(StaticXPath.GlobalDocumentNumberAllocator)
+    optimizerOptions = new OptimizerOptions("vmt") // FIXME: temporarily remove the "l" option which fails
 
     // TODO
   }

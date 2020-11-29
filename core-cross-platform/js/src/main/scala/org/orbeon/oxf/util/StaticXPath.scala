@@ -22,6 +22,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLReceiver}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.expr.parser
+import org.orbeon.saxon.expr.parser.OptimizerOptions
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
@@ -53,6 +54,7 @@ object StaticXPath extends StaticXPathTrait {
   val GlobalConfiguration: SaxonConfiguration = new Configuration {
     super.setNamePool(GlobalNamePool)
     super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
+    optimizerOptions = new OptimizerOptions("vmt") // FIXME: temporarily remove the "l" option which fails
 
     // TODO
   }

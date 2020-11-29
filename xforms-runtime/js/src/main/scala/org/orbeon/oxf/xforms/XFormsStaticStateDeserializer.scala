@@ -526,17 +526,10 @@ object TopLevelPartAnalysisImpl {
         def parent: Option[PartAnalysis] = None
         def isTopLevelPart: Boolean = true
 
-        // TODO
+        // XXX TODO
         val functionLibrary: FunctionLibrary = new FunctionLibrary {
-
-          def bind(functionName: SymbolicName.F, staticArgs: Array[Expression], env: StaticContext, reasons: java.util.List[String]): Expression = {
-            println(s"xxx functionLibrary.bind $functionName")
-            null
-          }
-          def getFunctionItem(functionName: SymbolicName.F,staticContext: StaticContext): om.Function = {
-            println(s"xxx functionLibrary.getFunctionItem $functionName")
-            null
-          }
+          def bind(functionName: SymbolicName.F, staticArgs: Array[Expression], env: StaticContext, reasons: java.util.List[String]): Expression = null
+          def getFunctionItem(functionName: SymbolicName.F,staticContext: StaticContext): om.Function = null
           def isAvailable(functionName: org.orbeon.saxon.trans.SymbolicName.F): Boolean = false
           def copy: FunctionLibrary = this
         }

@@ -475,6 +475,10 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsAssetServer"/>
     </processor>
 
+    <processor name="oxf:xforms-compiler">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsCompiler"/>
+    </processor>
+
     <processor name="oxf:xforms-upload">
         <class name="org.orbeon.oxf.xforms.processor.UploaderProcessor"/>
     </processor>

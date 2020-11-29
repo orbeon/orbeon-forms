@@ -1,0 +1,10 @@
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
+
+    <service
+        path="/xforms-compiler/service/compile/(.+)"
+        model="forms/${1}"
+        view="compile.xpl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</controller>

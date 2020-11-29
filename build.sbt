@@ -689,7 +689,8 @@ lazy val xformsJVM = xforms.jvm
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb / Compile / fullOptJS).value.data, XFormsResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
   )
 
 lazy val xformsJS = xforms.js
@@ -1105,7 +1106,6 @@ lazy val orbeonWarJS = orbeonWar.js
       Tests.Setup(() => OrbeonSupport.dummyDependency(packageFile))
     }
   )
-
 
 lazy val root = (project in file("."))
   .aggregate(

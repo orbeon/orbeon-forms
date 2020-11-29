@@ -9,31 +9,62 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
-import org.orbeon.xforms.{App, DeploymentType, XFormsApp, XFormsCrossPlatformSupport}
+import org.orbeon.xforms.EmbeddingSupport._
+import org.orbeon.xforms._
 import org.scalajs.dom
-import org.scalajs.dom.ext._
+import org.scalajs.dom.html
 import org.xml.sax.Attributes
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
+@JSExportTopLevel("OrbeonOffline")
 object OfflineDemo extends App {
 
-  def onOrbeonApiLoaded(): Unit =
+  type CompiledForm = String
+  type RuntimeForm  = String
+
+  def onOrbeonApiLoaded(): Unit = {
     XFormsApp.onOrbeonApiLoaded(LocalClientServerChannel)
 
-  def onPageContainsFormsMarkup(): Unit =
-    initializeOffline()
+    // Expose the API in the usual place
+    val orbeonDyn = g.window.ORBEON
+    orbeonDyn.xforms.Offline = js.Dynamic.global.OrbeonOffline
 
-  private def initializeOffline(): Unit = {
-
+    // Initialize logging
     import org.log4s.log4sjs.Log4sConfig._
     setLoggerThreshold("", AllThreshold)
+  }
+
+  def onPageContainsFormsMarkup(): Unit =
+    XFormsApp.onPageContainsFormsMarkup()
+
+  @JSExport
+  def helloDemoForm: String = DemoForms.HelloForm
+
+  @JSExport
+  def multipleFieldsDemoForm: String = DemoForms.MultipleFieldsForm
+
+  @JSExport
+  def destroyForm(container: html.Element): Unit =
+    EmbeddingSupport.destroyForm(container)
+    // TODO: Remove from `XFormsStateManager`.
+
+  @JSExport
+  def renderDemoForm(
+    container    : html.Element,
+    compiledForm : CompiledForm,
+  ): RuntimeForm = {
 
     implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
 
+    destroyForm(container)
+
     val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState = XFormsStaticStateDeserializer.deserialize(DemoForms.TestForm2)
+    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm)
 
     val containingDocument = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
 
@@ -46,7 +77,7 @@ object OfflineDemo extends App {
         requestHeaders        = Map.empty,
         requestParameters     = Map.empty,
         containerType         = "servlet", // TODO: not really used except for `isPortletContainer`
-        containerNamespace    = "orbeon-", // TODO
+        containerNamespace    = "", // TODO: no prefix for now, so the CSS works
         versionedPathMatchers = Nil,
         isEmbedded            = true,
         forceInlineResources  = true
@@ -81,7 +112,7 @@ object OfflineDemo extends App {
           // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
   //        SAXUtils.streamNullDocument(xmlReceiver)
 
-          println(s"xxx `nonJavaScriptLoads`")
+          println(s"xxx `nonJavaScriptLoad s`")
 
         } else {
           // 3. Regular case: produce a document
@@ -91,19 +122,16 @@ object OfflineDemo extends App {
               val rcv = new DomDocumentFragmentXMLReceiver
               XHTMLOutput.send(containingDocument, staticState.template.get, XFormsCrossPlatformSupport.externalContext)(rcv)
 
-              println(s"xxxx before updating the DOM")
+              // Find CSS/JS to load
+              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
+              val scriptsToLoad     = findAndDetachJsToLoad (rcv.frag)
 
-              List("body", "head") foreach { elemName =>
-
-                val dst = dom.window.document.querySelectorAll(s"html $elemName")(0)
-                val src = rcv.frag.querySelectorAll(s"html $elemName > *")
-
-                src foreach dst.appendChild
-              }
-
-//              println(s"xxxx doc innerHTML = ${dom.window.document.documentElement.innerHTML}")
-
-              XFormsApp.onPageContainsFormsMarkup()
+              // Asynchronously load styles, insert HTML, then load scripts
+              for {
+                _ <- loadStylesheets(stylesheetsToLoad)
+                _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
+                _ <- loadScripts(scriptsToLoad)
+              } yield ()
 
               containingDocument.afterInitialResponse()
 
@@ -116,6 +144,8 @@ object OfflineDemo extends App {
         }
       }
     }
+
+    uuid
   }
 }
 

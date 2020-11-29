@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.Element
+import org.orbeon.xforms.HeadElement
 
 import scala.collection.mutable
 

@@ -13,8 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
+import org.orbeon.xforms.HeadElement
+
 import scala.collection.mutable
 import scala.collection.compat._
+
 
 case class XBLAssets(cssName: Option[String], scripts: Seq[HeadElement], styles: Seq[HeadElement])
 
@@ -30,10 +33,4 @@ object XBLAssets {
     getHeadElements : XBLAssets => Seq[HeadElement]
   ): List[HeadElement] =
     (bindings.toList sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
-}
-
-sealed trait HeadElement
-object HeadElement {
-  case class Reference(src: String) extends HeadElement
-  case class Inline(text: String)   extends HeadElement
 }

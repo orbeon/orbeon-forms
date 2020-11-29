@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.{EventNames, HeadElement}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 

@@ -21,10 +21,11 @@ import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.XFormsAssetPaths
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.xbl.{HeadElement, XBLAssetsSupport}
+import org.orbeon.oxf.xforms.xbl.XBLAssetsSupport
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.HeadElement
 import org.xml.sax.Attributes
 
 

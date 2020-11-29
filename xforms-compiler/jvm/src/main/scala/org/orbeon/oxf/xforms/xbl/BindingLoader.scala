@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.xforms.HeadElement
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
 

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xforms.AssetPath
+import org.orbeon.xforms.HeadElement
 
 import scala.collection.compat._
 import scala.collection.mutable

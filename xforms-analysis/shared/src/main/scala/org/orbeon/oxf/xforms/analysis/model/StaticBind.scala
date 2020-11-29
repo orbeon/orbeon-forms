@@ -71,10 +71,10 @@ class StaticBind(
 
   // Represent an XPath MIP
   class XPathMIP(
-    val id     : String,
-    val name   : String,
-    val level  : ValidationLevel,
-    expression : String
+    val id         : String,
+    val name       : String,
+    val level      : ValidationLevel,
+    val expression : String // public for serialization
   ) extends MIP {
 
     // Compile the expression right away
@@ -145,7 +145,7 @@ class StaticBind(
   }
 
   // Type MIP is special as it is not an XPath expression
-  val typeMIPOpt: Option[TypeMIP] = {
+  var typeMIPOpt: Option[TypeMIP] = {
 
     def fromAttribute =
       for (value <- Option(element.attributeValue(TYPE_QNAME)))
@@ -182,7 +182,8 @@ class StaticBind(
   }
 
   // Built-in XPath MIPs
-  val mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
+  // TODO: Must be passed by builder
+  var mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
 
     def fromAttribute(name: QName) =
       for (value <- Option(element.attributeValue(name)).toList)
@@ -218,7 +219,8 @@ class StaticBind(
   }
 
   // Custom XPath MIPs
-  val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?
+  // TODO: Must be passed by builder
+  var customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?
 
     def attributeCustomMIP =
       for {

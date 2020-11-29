@@ -23,7 +23,7 @@ import org.orbeon.saxon
 object Whitespace  {
 
   sealed trait Policy extends EnumEntry with Lowercase
-  object Policy extends Enum[Policy] {
+  object Policy extends Enum[Policy] with CirceEnum[Policy] {
 
     val values     = findValues
     val valuesList = values.toList

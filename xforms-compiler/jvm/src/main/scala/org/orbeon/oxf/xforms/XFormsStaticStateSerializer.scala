@@ -11,7 +11,8 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.jdk.CollectionConverters._
 
@@ -102,7 +103,8 @@ object XFormsStaticStateSerializer {
 
     def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
       a match {
-        case c: Model         => Nil // modelFields(c)
+        case c: Model         =>
+          Nil
         case c: Instance      =>
           List(
             "readonly"              -> Json.fromBoolean(c.readonly),
@@ -121,7 +123,35 @@ object XFormsStaticStateSerializer {
             "instanceSource"        -> c.instanceSource.asJson,
             "inlineRootElem"        -> c.inlineRootElemOpt.asJson
           )
-        case c: InputControl  => Nil // inputControlFields(c)
+        case c: StaticBind    =>
+
+          implicit val encodeTypeMIP: Encoder[c.TypeMIP] = (a: c.TypeMIP) => Json.obj(
+            "id"         -> Json.fromString(a.id),
+            "datatype"   -> Json.fromString(a.datatype)
+          )
+
+          implicit val encodeWhitespaceMIP: Encoder[c.WhitespaceMIP] = (a: c.WhitespaceMIP) => Json.obj(
+            "id"         -> Json.fromString(a.id),
+            "policy"     -> a.policy.asJson
+          )
+
+          implicit val encodeXPathMIP: Encoder[c.XPathMIP] = (a: c.XPathMIP) => Json.obj(
+            "id"         -> Json.fromString(a.id),
+            "name"       -> Json.fromString(a.name),
+            "level"      -> a.level.asJson,
+            "expression" -> Json.fromString(a.expression)
+          )
+
+          List(
+            "typeMIPOpt"                  -> c.typeMIPOpt.asJson,
+            "dataType"                    -> c.dataType.asJson,
+            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
+            "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson,
+            "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
+//            //allMIPNameToXPathMIP combines both above
+//            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
+          )
+        case c: InputControl  => Nil
         case c: OutputControl =>
           List(
             "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype),

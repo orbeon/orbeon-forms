@@ -12,7 +12,7 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, Model}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLAssets
@@ -22,6 +22,7 @@ import org.orbeon.saxon.expr.{Expression, StaticContext}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.trans.SymbolicName
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -117,10 +118,6 @@ object XFormsStaticStateDeserializer {
         a
       }
     }
-
-
-
-
 
 //    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
 //      "_id"                          -> Json.fromString(m._id),
@@ -342,6 +339,66 @@ object XFormsStaticStateDeserializer {
                 }
 
               instance.right.get // XXX TODO
+
+            case "bind" =>
+
+              val staticBind =
+                new StaticBind(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                  isTopLevelPart  = true,
+                  functionLibrary = functionLibrary
+                )
+
+              implicit val decodeTypeMIP: Decoder[staticBind.TypeMIP] = (c: HCursor) =>
+                for {
+                  id         <- c.get[String]("id")
+                  datatype   <- c.get[String]("datatype")
+                } yield
+                  new staticBind.TypeMIP(id, datatype)
+
+              implicit val decodeXPathMIP: Decoder[staticBind.XPathMIP] = (c: HCursor) =>
+                for {
+                  id         <- c.get[String]("id")
+                  name       <- c.get[String]("name")
+                  level      <- c.get[ValidationLevel]("level")
+                  expression <- c.get[String]("expression")
+                } yield
+                  new staticBind.XPathMIP(id, name, level, expression)
+
+              //              implicit val encodeTypeMIP: Encoder[c.TypeMIP] = (a: c.TypeMIP) => Json.obj(
+//                "id"         -> Json.fromString(a.id),
+//                "datatype"   -> Json.fromString(a.datatype)
+//              )
+//
+//              implicit val encodeWhitespaceMIP: Encoder[c.WhitespaceMIP] = (a: c.WhitespaceMIP) => Json.obj(
+//                "id"         -> Json.fromString(a.id),
+//                "policy"     -> a.policy.asJson
+//              )
+//
+//              implicit val encodeXPathMIP: Encoder[c.XPathMIP] = (a: c.XPathMIP) => Json.obj(
+//                "id"         -> Json.fromString(a.id),
+//                "name"       -> Json.fromString(a.name),
+//                "level"      -> a.level.asJson,
+//                "expression" -> Json.fromString(a.expression)
+//              )
+
+              for {
+                typeMIPOpt                  <- c.get[Option[staticBind.TypeMIP]]("typeMIPOpt")
+//                dataType                    <- c.get[]("dataType")
+//                nonPreserveWhitespaceMIPOpt <- c.get[]("nonPreserveWhitespaceMIPOpt")
+                mipNameToXPathMIP           <- c.get[Iterable[(String, List[staticBind.XPathMIP])]]("mipNameToXPathMIP")
+                customMIPNameToXPathMIP     <- c.get[Map[String, List[staticBind.XPathMIP]]]("customMIPNameToXPathMIP")
+              } yield {
+                staticBind.typeMIPOpt              = typeMIPOpt
+                staticBind.mipNameToXPathMIP       = mipNameToXPathMIP
+                staticBind.customMIPNameToXPathMIP = customMIPNameToXPathMIP
+              }
+
+            //              var figuredAllBindRefAnalysis: Boolean = false
+//
+//              var recalculateOrder : Option[List[StaticBind]] = None
+//              var defaultValueOrder: Option[List[StaticBind]] = None
+
+              staticBind
 
             case "input" =>
 

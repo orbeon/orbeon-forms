@@ -486,9 +486,9 @@ object XPathCache extends XPathCacheTrait {
     println(s"xxx itemToJavaKeepNodeInfoOrNull $item")
 
     item match {
-    case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
-    case v: AtomicValue    => SequenceTool.convertToJava(v)
-    case v                 => v
-  }
+      case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
+      case v: AtomicValue    => SequenceTool.convertToJava(v)
+      case v                 => v
+    }
   }
 }

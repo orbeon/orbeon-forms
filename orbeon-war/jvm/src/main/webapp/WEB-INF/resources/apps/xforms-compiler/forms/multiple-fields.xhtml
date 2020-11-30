@@ -10,22 +10,21 @@
                     <control-4/>
                 </_>
             </xf:instance>
-            <xf:bind ref="*[3]" relevant="normalize-space(../*[1])"/>
+            <xf:bind ref="*[4]" relevant="normalize-space(../*[3])"/>
         </xf:model>
     </xh:head>
     <xh:body>
-        <xh:p>
+        <xh:div>
             <xf:input ref="*[1]">
                 <xf:label>Control 1:</xf:label>
             </xf:input>
             <xf:input ref="*[2]">
                 <xf:label>Control 2:</xf:label>
             </xf:input>
-            <xf:input ref="*[3]">
-                <xf:label>Control 3:</xf:label>
-            </xf:input>
-            <xf:select1 ref="*[4]" appearance="full">
-                <xf:label>Control 4:</xf:label>
+        </xh:div>
+        <xh:div>
+            <xf:select1 ref="*[3]" appearance="full">
+                <xf:label>Flavor:</xf:label>
                 <xf:item>
                     <xf:label>Chocolate</xf:label>
                     <xf:value>chocolate</xf:value>
@@ -39,11 +38,16 @@
                     <xf:value>strawberry</xf:value>
                 </xf:item>
             </xf:select1>
-        </xh:p>
-        <xh:p>
-            <xf:output value="string-join((*[1]/string(), *[2]/string()), ' and ')">
-                <xf:label>Result:</xf:label>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="*[4]">
+                <xf:label>Control 3:</xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:output value="string-join((*[1]/string(), *[2]/string(), *[3]/string(), *[4]/string()), ' and ')">
+                <xf:label>Concatenation:</xf:label>
             </xf:output>
-        </xh:p>
+        </xh:div>
     </xh:body>
 </xh:html>

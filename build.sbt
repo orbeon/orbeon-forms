@@ -83,7 +83,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.13",
+  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.14",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,

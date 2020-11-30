@@ -8,12 +8,14 @@ import io.circe.parser.decode
 import io.circe.{Decoder, HCursor}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
+import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xml.SAXStore
@@ -152,70 +154,11 @@ object XFormsStaticStateDeserializer {
           r
         })
 
-  //  implicit val encodeAttributeControl: Decoder[AttributeControl] = (a: AttributeControl) => Json.obj(
-  //    "foo" -> Json.fromString("bar")
-  //  )
-
     implicit val decodeAnnotatedTemplate : Decoder[AnnotatedTemplate] = deriveDecoder
   //  implicit val decodeLangRef           : Decoder[LangRef]           = deriveDecoder
     implicit val decodeNamespace         : Decoder[dom.Namespace]     = deriveDecoder
     implicit val decodeBasicCredentials  : Decoder[BasicCredentials]  = deriveDecoder
-
-  //  implicit val decodeNamespaceMapping: Decoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
-  //    "hash" -> Json.fromString(a.hash),
-  //    "mapping" -> a.mapping.asJson
-  //  )
-  //
-  //  def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
-  //    a match {
-  //      case c: Model         => Nil // modelFields(c)
-  //      case c: Instance      =>
-  //        List(
-  //          "readonly"              -> Json.fromBoolean(c.readonly),
-  //          "cache"                 -> Json.fromBoolean(c.cache),
-  //          "exposeXPathTypes"      -> Json.fromBoolean(c.exposeXPathTypes),
-  //          "credentials"           -> c.credentials.asJson,
-  //          "excludeResultPrefixes" -> c.excludeResultPrefixes.asJson,
-  //          "useInlineContent"      -> Json.fromBoolean(c.useInlineContent),
-  //          "useExternalContent"    -> Json.fromBoolean(c.useExternalContent),
-  //          "instanceSource"        -> c.instanceSource.asJson,
-  //          "inlineRootElem"        -> c.inlineRootElemOpt.asJson
-  //
-  //
-  //          // TODO: `timeToLive`, `indexIds`, `indexClasses`
-  //
-  //        )
-  //      case c: InputControl  => Nil // inputControlFields(c)
-  //      case c: OutputControl => Nil // outputControlFields(c)
-  //      case c: LHHAAnalysis  => Nil // lhhaAnalysisFields(c)
-  //      case c                => Nil
-  //    }
-  //
-  //  def maybeWithChildrenFields(a: ElementAnalysis): List[(String, Json)] =
-  //    a match {
-  //      case w: WithChildrenTrait if w.children.nonEmpty => List("children" -> withChildrenDecoder(w))
-  //      case _                                           => Nil
-  //    }
-  //
-  //  def withChildrenDecoder(a: WithChildrenTrait): Json = a.children.asJson
-  //
-  //  implicit val encodeElementAnalysis: Decoder[ElementAnalysis] = (a: ElementAnalysis) =>
-  //    Json.fromFields(
-  //      List(
-  //        "index"             -> Json.fromInt(a.index),
-  //        "name"              -> Json.fromString(a.localName),
-  //        "element"           -> a.element.asJson,
-  //        "staticId"          -> Json.fromString(a.staticId),
-  //        "prefixedId"        -> Json.fromString(a.prefixedId),
-  //        "namespaceMapping"  -> a.namespaceMapping.asJson,
-  //        "scopeRef"          -> Json.fromString(a.scope.scopeId),
-  //        "containerScopeRef" -> Json.fromString(a.containerScope.scopeId),
-  //        "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
-  //        "langRef"           -> a.lang.asJson,
-  //      ) ++
-  //        maybeWithSpecificElementAnalysisFields(a) ++
-  //        maybeWithChildrenFields(a)
-  //    )
+    implicit val decodeLHHAValue         : Decoder[LHHAValue]         = deriveDecoder
 
     implicit val decodeQName: Decoder[dom.QName] = (c: HCursor) =>
       for {
@@ -250,6 +193,41 @@ object XFormsStaticStateDeserializer {
         val r = dom.Element(name)
         atts foreach { case (name, value) => r.addAttribute(name, value) }
         children foreach r.add
+        r
+      }
+
+
+    implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => ???
+
+    implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = {
+      val left:  Decoder[Either[A, B]] = a.map(Left.apply)
+      val right: Decoder[Either[A, B]] = b.map(Right.apply)
+      left or right
+    }
+
+    //decodeValueNode.asInstanceOf[Decoder[Item.ValueNode]]
+    implicit val decodeValueNode: Decoder[Item.ValueNode] = (c: HCursor) =>
+      for {
+        label      <- c.get[LHHAValue]("label")
+        attributes <- c.get[List[(QName, String)]]("attributes")
+        position   <- c.get[Int]("position")
+
+        help       <- c.get[Option[LHHAValue]]("help")
+        hint       <- c.get[Option[LHHAValue]]("hint")
+        value      <- c.get[Either[String, List[om.Item]]]("value")
+
+      } yield {
+        Item.ValueNode(label, help, hint, value, attributes)(position)
+      }
+
+    implicit val decodeItemset: Decoder[Itemset] = (c: HCursor) =>
+      for {
+        multiple <- c.get[Boolean]("multiple")
+        hasCopy  <- c.get[Boolean]("hasCopy")
+        children <- c.get[Iterable[Item.ValueNode]]("children") // TODO: ChoiceNode
+      } yield {
+        val r = new Itemset(multiple, hasCopy)
+        children foreach r.addChildItem
         r
       }
 
@@ -421,6 +399,22 @@ object XFormsStaticStateDeserializer {
                   )
 
               output.right.get // XXX TODO
+
+            case "select" | "select1" =>
+
+              val select =
+                for {
+                  staticItemset    <- c.get[Option[Itemset]]("staticItemset")
+                  useCopy          <- c.get[Boolean]("useCopy")
+                  mustEncodeValues <- c.get[Option[Boolean]]("mustEncodeValues")
+                } yield
+                  new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                    staticItemset,
+                    useCopy,
+                    mustEncodeValues
+                  )
+
+              select.right.get // XXX TODO
 
             case "label" =>
 

@@ -50,6 +50,7 @@ class XFormsStaticStateSerializerTest
                           <control-1/>
                           <control-2/>
                           <control-3/>
+                          <control-4/>
                       </_>
                   </xf:instance>
                   <xf:bind ref="*[3]" relevant="normalize-space(../*[1])"/>
@@ -66,6 +67,21 @@ class XFormsStaticStateSerializerTest
                   <xf:input ref="*[3]">
                       <xf:label>Control 3:</xf:label>
                   </xf:input>
+                  <xf:select1 ref="*[4]" appearance="full">
+                      <xf:label>Control 4:</xf:label>
+                      <xf:item>
+                          <xf:label>Chocolate</xf:label>
+                          <xf:value>chocolate</xf:value>
+                      </xf:item>
+                      <xf:item>
+                          <xf:label>Vanilla</xf:label>
+                          <xf:value>vanilla</xf:value>
+                      </xf:item>
+                      <xf:item>
+                          <xf:label>Strawberry</xf:label>
+                          <xf:value>strawberry</xf:value>
+                      </xf:item>
+                  </xf:select1>
               </xh:p>
               <xh:p>
                   <xf:output value="string-join((*[1]/string(), *[2]/string()), ' and ')">

@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms
 import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import io.circe.generic.semiauto._
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, InputControl, LHHAAnalysis, OutputControl}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, InputControl, LHHAAnalysis, OutputControl, SelectionControl}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef, TopLevelPartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.SAXStore
@@ -12,7 +12,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
-import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 
 import scala.jdk.CollectionConverters._
 
@@ -101,6 +101,32 @@ object XFormsStaticStateSerializer {
       "atts" -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson,
     )
 
+    implicit val encodeLHHAValue: Encoder[LHHAValue] = deriveEncoder
+    implicit val encodeItemNode: Encoder[ItemNode] = (a: ItemNode) => Json.fromFields(
+      List(
+        "label"      -> a.label.asJson,
+        "attributes" -> a.attributes.asJson,
+        "position"   -> Json.fromInt(a.position)
+      ) ++ (
+        a match {
+          case vn: Item.ValueNode =>
+            List(
+              "help"       -> vn.help.asJson,
+              "hint"       -> vn.hint.asJson,
+              "value"      -> vn.value.left.getOrElse(throw new IllegalStateException).asJson
+            )
+          case _: Item.ChoiceNode =>
+            Nil
+        }
+      )
+    )
+
+    implicit val encodeItemset: Encoder[Itemset] = (a: Itemset) => Json.obj(
+      "multiple" -> Json.fromBoolean(a.multiple),
+      "hasCopy"  -> Json.fromBoolean(a.hasCopy),
+      "children" -> a.children.asJson
+    )
+
     def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
       a match {
         case c: Model         =>
@@ -167,6 +193,12 @@ object XFormsStaticStateSerializer {
             "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
             "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance),
             "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
+          )
+        case c: SelectionControl =>
+          List(
+            "staticItemset"    -> c.staticItemset.asJson,
+            "useCopy"          -> Json.fromBoolean(c.useCopy),
+            "mustEncodeValues" -> c.mustEncodeValues.asJson
           )
         case c                => Nil
       }

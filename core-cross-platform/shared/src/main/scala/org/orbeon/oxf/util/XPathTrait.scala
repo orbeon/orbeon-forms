@@ -49,7 +49,7 @@ trait XPathTrait {
     functionContext     : FunctionContext,
     variableResolver    : StaticXPath.VariableResolver)(implicit
     reporter            : Reporter
-  ): AnyRef
+  ): Any
 
   def isXPath2ExpressionOrValueTemplate(
     xpathString      : String,

@@ -274,8 +274,7 @@ object XPath extends XPathTrait {
     functionContext     : FunctionContext,
     variableResolver    : VariableResolver)(implicit
     reporter            : Reporter
-  ): AnyRef = {
-
+  ): Any =
     withEvaluation(compiledExpression) { xpathExpression =>
 
       val (contextItem, position) =
@@ -303,7 +302,6 @@ object XPath extends XPathTrait {
         }
       }
     }
-  }
 
   // Return a string, or null if the expression returned an empty sequence
   // TODO: Should always return a string!

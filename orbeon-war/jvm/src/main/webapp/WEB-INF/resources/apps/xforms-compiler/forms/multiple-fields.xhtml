@@ -8,9 +8,10 @@
                     <control-2/>
                     <control-3/>
                     <control-4/>
+                    <control-5/>
                 </_>
             </xf:instance>
-            <xf:bind ref="*[4]" relevant="normalize-space(../*[3])"/>
+            <xf:bind ref="*[5]" relevant="normalize-space(../*[3])"/>
         </xf:model>
     </xh:head>
     <xh:body>
@@ -40,12 +41,33 @@
             </xf:select1>
         </xh:div>
         <xh:div>
-            <xf:input ref="*[4]">
+            <xf:select1 ref="*[4]">
+                <xf:label>Flavor:</xf:label>
+                <xf:item>
+                    <xf:label>Cat</xf:label>
+                    <xf:value>cat</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Dog</xf:label>
+                    <xf:value>dog</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Bird</xf:label>
+                    <xf:value>bird</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Fish</xf:label>
+                    <xf:value>fish</xf:value>
+                </xf:item>
+            </xf:select1>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="*[5]">
                 <xf:label>Control 3:</xf:label>
             </xf:input>
         </xh:div>
         <xh:div>
-            <xf:output value="string-join((*[1]/string(), *[2]/string(), *[3]/string(), *[4]/string()), ' and ')">
+            <xf:output value="string-join((*[1]/string(), *[2]/string(), *[3]/string(), *[4]/string(), *[5]/string()), ' and ')">
                 <xf:label>Concatenation:</xf:label>
             </xf:output>
         </xh:div>

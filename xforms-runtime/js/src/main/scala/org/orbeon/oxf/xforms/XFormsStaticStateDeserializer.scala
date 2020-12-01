@@ -196,7 +196,7 @@ object XFormsStaticStateDeserializer {
         r
       }
 
-
+    // Dummy as the source must not contain the `om.Item` case
     implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => ???
 
     implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = {

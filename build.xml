@@ -94,6 +94,7 @@
 
     <target name="sbt-clean" depends="init" description="Remove all sbt-generated files">
         <exec executable="sbt" failonerror="true">
+            <!-- sbt options are in `.sbtopts` -->
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
@@ -333,8 +334,9 @@
     <target name="war-common" depends="prepare">
 
         <exec executable="sbt" failonerror="true">
-            <arg value="-J-Xmx8G"/>
-            <arg value="-J-Xss1M"/>
+            <!-- sbt options are in `.sbtopts` -->
+<!--            <arg value="-J-Xmx8G"/>-->
+<!--            <arg value="-J-Xss1M"/>-->
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
@@ -487,11 +489,12 @@
 
     <target name="test-unit" depends="init">
         <exec executable="sbt" failonerror="true">
-            <arg value="-J-Xmx8G"/>
-            <arg value="-J-Xss1M"/>
+            <!-- sbt options are in `.sbtopts` -->
+<!--            <arg value="-J-Xmx8G"/>-->
+<!--            <arg value="-J-Xss1M"/>-->
             <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->
-            <arg value="-J-XX:+CMSClassUnloadingEnabled"/>
-            <arg value="-J-XX:+UseConcMarkSweepGC"/>
+<!--            <arg value="-J-XX:+CMSClassUnloadingEnabled"/>-->
+<!--            <arg value="-J-XX:+UseConcMarkSweepGC"/>-->
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
@@ -627,11 +630,12 @@
 
                 <!-- Run sbt tests -->
                 <exec executable="sbt" failonerror="true">
-                    <arg value="-J-Xmx8G"/>
-                    <arg value="-J-Xss1M"/>
+                    <!-- sbt options are in `.sbtopts` -->
+<!--                    <arg value="-J-Xmx8G"/>-->
+<!--                    <arg value="-J-Xss1M"/>-->
                     <!--<arg value="-J-XX:MaxMetaspaceSize=1G"/>-->
-                    <arg value="-J-XX:+CMSClassUnloadingEnabled"/>
-                    <arg value="-J-XX:+UseConcMarkSweepGC"/>
+<!--                    <arg value="-J-XX:+CMSClassUnloadingEnabled"/>-->
+<!--                    <arg value="-J-XX:+UseConcMarkSweepGC"/>-->
                     <arg value="-Dorbeon.version=${release.number}"/>
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project root"/>

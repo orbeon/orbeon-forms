@@ -303,29 +303,6 @@ object XPath extends XPathTrait {
       }
     }
 
-  // Return a string, or null if the expression returned an empty sequence
-  // TODO: Should always return a string!
-  // TODO: Check what we do upon NodeInfo
-  // NOTE: callers tend to use string(foo), so issue of null/NodeInfo should not occur
-  // 2 XForms usages
-  def evaluateAsString(
-    contextItems        : JList[Item],
-    contextPosition     : Int,
-    compiledExpression  : CompiledExpression,
-    functionContext     : FunctionContext,
-    variableResolver    : VariableResolver)(implicit
-    reporter            : Reporter
-  ): String =
-    Option(
-      evaluateSingle(
-        contextItems,
-        contextPosition,
-        compiledExpression,
-        functionContext,
-        variableResolver
-      )
-    ) map (_.toString) orNull
-
   private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression => T)(implicit reporter: Reporter): T =
     try {
       if (reporter ne null) {

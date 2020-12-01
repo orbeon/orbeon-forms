@@ -5,18 +5,20 @@ import java.{util => ju}
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
-import org.orbeon.saxon.expr.XPathContextMajor
-import org.orbeon.saxon.expr.parser.OptimizerOptions
+import org.orbeon.saxon.expr.parser.{ExpressionTool, OptimizerOptions}
+import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceTool}
-import org.orbeon.saxon.sxpath.XPathExpression
+import org.orbeon.saxon.style.AttributeValueTemplate
+import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.xml.NamespaceMapping
 
+import scala.util.Try
 import scala.util.control.NonFatal
 
 
@@ -31,17 +33,8 @@ object XPath extends XPathTrait {
     // TODO
   }
 
-  def evaluateAsString(
-    contextItems        : ju.List[om.Item],
-    contextPosition     : Int,
-    compiledExpression  : CompiledExpression,
-    functionContext     : FunctionContext,
-    variableResolver    : VariableResolver)(implicit
-    reporter            : Reporter
-  ): String = ???
-
   def evaluateSingle(
-    contextItems        : ju.List[Item],
+    contextItems        : ju.List[om.Item],
     contextPosition     : Int,
     compiledExpression  : CompiledExpression,
     functionContext     : FunctionContext,
@@ -68,8 +61,8 @@ object XPath extends XPathTrait {
       withFunctionContext(functionContext) {
         val iterator = xpathExpression.iterate(dynamicContext)
         iterator.next() match {
-          case atomicValue: AtomicValue => SequenceTool.convertToJava(atomicValue)
-          case nodeInfo: NodeInfo       => nodeInfo
+          case atomicValue: AtomicValue => om.SequenceTool.convertToJava(atomicValue)
+          case nodeInfo: om.NodeInfo    => nodeInfo
           case null                     => null
           case _                        => throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
         }
@@ -82,7 +75,30 @@ object XPath extends XPathTrait {
     functionLibrary  : FunctionLibrary,
     avt              : Boolean)(implicit
     logger           : IndentedLogger
-  ): Boolean = ???
+  ): Boolean =
+    (avt || xpathString.nonAllBlank) &&
+    Try(
+      compileExpressionMinimal(
+        staticContext = new ShareableXPathStaticContext(
+          XPath.GlobalConfiguration,
+          namespaceMapping,
+          functionLibrary
+        ),
+        xpathString   = xpathString,
+        avt           = avt
+      )
+    ).isSuccess
+
+  def compileExpressionMinimal(
+    staticContext : XPathStaticContext,
+    xpathString   : String,
+    avt           : Boolean
+  ): Expression =
+    if (avt)
+      AttributeValueTemplate.make(xpathString, staticContext)
+    else
+      ExpressionTool.make(xpathString, staticContext, 0, -1, null)
+
   private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression => T)(implicit reporter: Reporter): T =
     try {
       if (reporter ne null) {
@@ -100,7 +116,7 @@ object XPath extends XPathTrait {
         throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
     }
 
-  def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
+  private def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
 
     val validationException =
       OrbeonLocationException.wrapException(

@@ -33,6 +33,11 @@ trait XPathTrait {
 
   val GlobalConfiguration: StaticXPath.SaxonConfiguration
 
+  // Return a string, or null if the expression returned an empty sequence
+  // TODO: Should always return a string!
+  // TODO: Check what we do upon NodeInfo
+  // NOTE: callers tend to use string(foo), so issue of null/NodeInfo should not occur
+  // 2 XForms usages
   def evaluateAsString(
     contextItems        : ju.List[om.Item],
     contextPosition     : Int,
@@ -40,7 +45,16 @@ trait XPathTrait {
     functionContext     : FunctionContext,
     variableResolver    : StaticXPath.VariableResolver)(implicit
     reporter            : Reporter
-  ): String
+  ): String =
+    Option(
+      evaluateSingle(
+        contextItems,
+        contextPosition,
+        compiledExpression,
+        functionContext,
+        variableResolver
+      )
+    ) map (_.toString) orNull
 
   def evaluateSingle(
     contextItems        : ju.List[om.Item],

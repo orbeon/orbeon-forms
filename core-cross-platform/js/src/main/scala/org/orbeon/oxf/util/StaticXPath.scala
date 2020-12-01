@@ -16,12 +16,12 @@ package org.orbeon.oxf.util
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
+import org.orbeon.io.StringBuilderWriter
 import org.orbeon.saxon.tree.util.DocumentNumberAllocator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.expr.parser
+import org.orbeon.saxon.expr.{XPathContext, parser}
 import org.orbeon.saxon.expr.parser.OptimizerOptions
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -31,6 +31,10 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration
+import java.{lang => jl}
+
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.stream.StreamResult
 
 
 object StaticXPath extends StaticXPathTrait {
@@ -105,7 +109,13 @@ object StaticXPath extends StaticXPathTrait {
     documentResult.getDocument
   }
 
-  def tinyTreeToString(nodeInfo: om.NodeInfo): String = ???
+  def tinyTreeToString(nodeInfo: om.NodeInfo): String = {
+    val identity = new SaxonTransformerFactory(GlobalConfiguration).newTransformer
+    identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+    val writer = new StringBuilderWriter(new jl.StringBuilder)
+    identity.transform(nodeInfo, new StreamResult(writer))
+    writer.result
+  }
 
   def newTinyTreeReceiver: (XMLReceiver, () => DocumentNodeInfoType) = {
 
@@ -140,17 +150,14 @@ object StaticXPath extends StaticXPathTrait {
     staticContext : XPathStaticContext,
     xpathString   : String,
     avt           : Boolean
-  ): XPathExpression =
-    if (avt) {
-//      val tempExpression = AttributeValueTemplate.make(xpathString, -1, staticContext)
-//      prepareExpressionForAVT(staticContext, tempExpression)
-      // XXX TODO must convert `AttributeValueTemplate` to Scala
-      ???
-    } else {
-      val evaluator = new XPathEvaluator(GlobalConfiguration)
-      evaluator.setStaticContext(staticContext)
+  ): XPathExpression = {
+    val evaluator = new XPathEvaluator(GlobalConfiguration)
+    evaluator.setStaticContext(staticContext)
+    if (avt)
+      evaluator.createValueTemplateExpression(xpathString)
+    else
       evaluator.createExpression(xpathString)
-    }
+  }
 
   def expressionType(xpe: XPathExpression): SchemaTypeType =
     xpe.getInternalExpression.getItemType

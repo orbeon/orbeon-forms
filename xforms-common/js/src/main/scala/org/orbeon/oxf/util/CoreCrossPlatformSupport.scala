@@ -61,5 +61,14 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
       )
     )
 
-  def externalContext: ExternalContext = ??? // TODO: unused on JS side
+  private val externalContextDyn  = new DynamicVariable[ExternalContext]
+
+  def withExternalContext[T](ec: ExternalContext)(body: => T): T = {
+    externalContextDyn.withValue(ec) {
+      body
+    }
+  }
+
+  def externalContext: ExternalContext =
+    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
 }

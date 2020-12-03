@@ -83,10 +83,11 @@ object OfflineDemo extends App {
         forceInlineResources  = true
       )
 
-    containingDocument.setRequestInformation(req)
-    containingDocument.initialize(uriResolver = None, response = None)
+    CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
 
-    XFormsCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
+      containingDocument.setRequestInformation(req)
+      containingDocument.initialize(uriResolver = None, response = None)
+
       // See also `XFormsToXHTML.outputResponseDocument`
       XFormsAPI.withContainingDocument(containingDocument) {
 
@@ -120,7 +121,7 @@ object OfflineDemo extends App {
             case "xhtml" =>
 
               val rcv = new DomDocumentFragmentXMLReceiver
-              XHTMLOutput.send(containingDocument, staticState.template.get, XFormsCrossPlatformSupport.externalContext)(rcv)
+              XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
 
               // Find CSS/JS to load
               val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)

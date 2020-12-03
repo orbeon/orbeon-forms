@@ -13,32 +13,22 @@
  */
 package org.orbeon.xforms
 
-import java.io.{InputStream, OutputStream, Writer}
-import java.net.URI
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.util.{DynamicVariable, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.util.StaticXPath._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI.containingDocumentDyn
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
+
+import java.io.{InputStream, OutputStream, Writer}
+import java.net.URI
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
-  private val externalContextDyn  = new DynamicVariable[ExternalContext]
-
-  def withExternalContext[T](ec: ExternalContext)(body: => T): T = {
-    externalContextDyn.withValue(ec) {
-      body
-    }
-  }
-
-  def externalContext: ExternalContext =
-    externalContextDyn.value.getOrElse(throw new IllegalStateException("missing ExternalContext"))
+  def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
   def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress[Unit]] = ???
 

@@ -742,6 +742,12 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
     libraryDependencies += "com.chuusai" %% "shapeless" % ShapelessVersion,
     libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion
   )
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scala212,
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+    )
+  )
 
 lazy val xformsCommonJVM = xformsCommon.jvm
   .dependsOn(
@@ -805,6 +811,9 @@ lazy val xformsCompilerJVM = xformsCompiler.jvm
     coreCrossPlatformJVM // implied
   )
   .settings(jUnitTestOptions: _*)
+  .settings(
+    libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" % Test cross CrossVersion.full)
+  )
 
 lazy val xformsCompilerJS = xformsCompiler.js
   .dependsOn(
@@ -848,6 +857,12 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   .settings(
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scala212,
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+    )
   )
 
 lazy val xformsOffline = (project in file("xforms-offline"))
@@ -990,6 +1005,12 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-core-cross-platform"
+  )
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scala212,
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+    )
   )
 
 lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm

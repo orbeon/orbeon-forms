@@ -1,4 +1,8 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
     <xh:head>
         <xh:title>Multiple Fields</xh:title>
         <xf:model>
@@ -69,6 +73,11 @@
         <xh:div>
             <xf:output value="string-join((*[1]/string(), *[2]/string(), *[3]/string(), *[4]/string(), *[5]/string()), ' and ')">
                 <xf:label>Concatenation:</xf:label>
+            </xf:output>
+        </xh:div>
+        <xh:div>
+            <xf:output value="xxf:get-request-path()">
+                <xf:label>Request path:</xf:label>
             </xf:output>
         </xh:div>
     </xh:body>

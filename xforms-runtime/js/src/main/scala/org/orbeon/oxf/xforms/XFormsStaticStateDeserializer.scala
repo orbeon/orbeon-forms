@@ -1,7 +1,5 @@
 package org.orbeon.oxf.xforms
 
-import java.{util => ju}
-
 import cats.syntax.option._
 import io.circe.generic.semiauto._
 import io.circe.parser.decode
@@ -10,24 +8,25 @@ import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, Model, StaticBind}
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.library.{XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.XBLAssets
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.expr.{Expression, StaticContext}
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.trans.SymbolicName
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+import java.{util => ju}
 import scala.collection.mutable
 
 
@@ -39,13 +38,11 @@ object XFormsStaticStateDeserializer {
 
     var controlStack: List[ElementAnalysis] = Nil
 
-    // XXX TODO
-    val functionLibrary: FunctionLibrary = new FunctionLibrary {
-      def bind(functionName: SymbolicName.F, staticArgs: Array[Expression], env: StaticContext, reasons: java.util.List[String]): Expression = null
-      def getFunctionItem(functionName: SymbolicName.F,staticContext: StaticContext): om.Function = null
-      def isAvailable(functionName: org.orbeon.saxon.trans.SymbolicName.F): Boolean = false
-      def copy: FunctionLibrary = this
-    }
+    // TODO: We'll need a mechanism to plug the Form Runner function library.
+    val functionLibrary: FunctionLibrary =
+      new FunctionLibraryList |!>
+        (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+        (_.addFunctionLibrary(XXFormsFunctionLibrary))
 
     object Index {
 

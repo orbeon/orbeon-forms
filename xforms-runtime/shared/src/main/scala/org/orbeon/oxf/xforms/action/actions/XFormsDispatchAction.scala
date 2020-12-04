@@ -44,24 +44,24 @@ class XFormsDispatchAction extends XFormsAction {
       (throw new OXFException("Missing mandatory targetid attribute on xf:dispatch element."))
 
     val resolvedNewEventName =
-      Option(interpreter.resolveAVTProvideValue(actionElement, newEventNameAttributeValue)) getOrElse (return)
+      Option(interpreter.resolveAVTProvideValue(actionContext.analysis, newEventNameAttributeValue)) getOrElse (return)
 
     val resolvedNewEventTargetStaticId =
-      Option(interpreter.resolveAVTProvideValue(actionElement, newEventTargetIdValue)) getOrElse (return)
+      Option(interpreter.resolveAVTProvideValue(actionContext.analysis, newEventTargetIdValue)) getOrElse (return)
 
     // Optional attributes
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventBubbles =
-      (Option(interpreter.resolveAVT(actionElement, "bubbles")) getOrElse true.toString).toBoolean
+      (Option(interpreter.resolveAVT(actionContext.analysis, "bubbles")) getOrElse true.toString).toBoolean
 
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventCancelable =
-      (Option(interpreter.resolveAVT(actionElement, "cancelable")) getOrElse true.toString).toBoolean
+      (Option(interpreter.resolveAVT(actionContext.analysis, "cancelable")) getOrElse true.toString).toBoolean
 
     val resolvedDelayOpt =
-      Option(interpreter.resolveAVT(actionElement, "delay")) filter
+      Option(interpreter.resolveAVT(actionContext.analysis, "delay")) filter
       (_.nonAllBlank)              flatMap // "The default is the empty string, which indicates no delay"
       (s => Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
       (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
@@ -69,14 +69,14 @@ class XFormsDispatchAction extends XFormsAction {
     // Whether to allow duplicates by name/targetid if the event has a non-negative delay
     // See https://github.com/orbeon/orbeon-forms/issues/3208.
     val allowDuplicates =
-      interpreter.resolveAVT(actionElement, XXFORMS_ALLOW_DUPLICATES_QNAME) == true.toString
+      interpreter.resolveAVT(actionContext.analysis, XXFORMS_ALLOW_DUPLICATES_QNAME) == true.toString
 
     // Whether to tell the client to show a progress indicator when sending this event
     val showProgress =
-      interpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != false.toString
+      interpreter.resolveAVT(actionContext.analysis, XXFORMS_SHOW_PROGRESS_QNAME) != false.toString
 
     // Find actual target
-    interpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
+    interpreter.resolveObject(actionContext.analysis, resolvedNewEventTargetStaticId) match {
       case xformsEventTarget: XFormsEventTarget =>
         // Execute the dispatch proper
         XFormsDispatchAction.dispatch(
@@ -84,7 +84,7 @@ class XFormsDispatchAction extends XFormsAction {
           target          = xformsEventTarget,
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
-          properties      = XFormsAction.eventProperties(interpreter, actionElement),
+          properties      = XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement),
           delayOpt        = resolvedDelayOpt,
           showProgress    = showProgress,
           allowDuplicates = allowDuplicates

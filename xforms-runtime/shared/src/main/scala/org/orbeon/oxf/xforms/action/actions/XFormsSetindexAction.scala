@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -33,7 +33,7 @@ class XFormsSetindexAction extends XFormsAction {
   override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter = context.interpreter
-    val element = context.analysis.element
+    val element     = context.analysis.element
 
     val repeatStaticId =
       resolveStringAVT("repeat")(context) getOrElse
@@ -45,6 +45,7 @@ class XFormsSetindexAction extends XFormsAction {
       val contextStack = interpreter.actionXPathContext
 
       val indexString = interpreter.evaluateAsString(
+        context.analysis,
         element,
         contextStack.getCurrentBindingContext.nodeset,
         contextStack.getCurrentBindingContext.position,
@@ -55,7 +56,7 @@ class XFormsSetindexAction extends XFormsAction {
     }
 
     indexOpt foreach
-      (XFormsSetindexAction.executeSetindexAction(interpreter, element, repeatStaticId, _))
+      (XFormsSetindexAction.executeSetindexAction(interpreter, context.analysis, repeatStaticId, _))
   }
 }
 
@@ -63,7 +64,7 @@ object XFormsSetindexAction {
 
   def executeSetindexAction(
     interpreter    : XFormsActionInterpreter,
-    actionElement  : Element,
+    actionAnalysis : ActionTrait,
     repeatStaticId : String,
     index          : Int)(implicit
     logger         : IndentedLogger
@@ -71,11 +72,11 @@ object XFormsSetindexAction {
 
     // "This XForms Action begins by invoking the deferred update behavior."
     // See also `synchronizeAndRefreshIfNeeded`
-    if (interpreter.mustHonorDeferredUpdateFlags(actionElement))
+    if (interpreter.mustHonorDeferredUpdateFlags(actionAnalysis))
       interpreter.containingDocument.synchronizeAndRefresh()
 
     // Find repeat control
-    interpreter.resolveObject(actionElement, repeatStaticId) match {
+    interpreter.resolveObject(actionAnalysis, repeatStaticId) match {
       case control: XFormsControl =>
 
         val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl => repeat }

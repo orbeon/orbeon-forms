@@ -270,7 +270,7 @@ object Dispatch extends Logging {
         XFormsAPI.withScalaAction(
           new XFormsActionInterpreter(
             container           = container,
-            outerActionElement  = eventHandler.element,
+            outerAction         = eventHandler,
             handlerEffectiveId  = handlerEffectiveId,
             event               = event,
             eventObserver       = eventObserver)(

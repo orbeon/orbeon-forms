@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
+import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
@@ -31,6 +32,7 @@ class XFormsActionAction extends XFormsAction {
 
     val actionInterpreter = actionContext.interpreter
     val actionElement     = actionContext.element
+    val actionAnalysis    = actionContext.analysis
     val bindingContext    = actionContext.bindingContext
 
     def observerAncestorsOrSelfIterator(observer: XFormsEventTarget) =
@@ -46,7 +48,7 @@ class XFormsActionAction extends XFormsAction {
     def firstClientRepresentation(observer: XFormsEventTarget) =
       observerAncestorsOrSelfIterator(observer) find hasClientRepresentation
 
-    actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
+    actionContext.partAnalysis.scriptsByPrefixedId.get(actionAnalysis.prefixedId) match {
       case Some(script @ StaticScript(_, ScriptType.JavaScript, paramExpressions, _)) =>
         // Evaluate script parameters if any and schedule the script to run
         actionInterpreter.containingDocument.addScriptToRun(
@@ -57,6 +59,7 @@ class XFormsActionAction extends XFormsAction {
             paramValues         = paramExpressions map { expr =>
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(
+                actionAnalysis,
                 actionElement,
                 bindingContext.nodeset,
                 bindingContext.position,
@@ -68,7 +71,7 @@ class XFormsActionAction extends XFormsAction {
       case Some(StaticScript(_, ScriptType.XPath, _, ShareableScript(_, _, body, _))) =>
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
-          actionElement,
+          actionAnalysis,
           bindingContext.nodeset,
           bindingContext.position,
           body
@@ -77,20 +80,17 @@ class XFormsActionAction extends XFormsAction {
         // Grouping XForms action which executes its children actions
 
         val contextStack = actionInterpreter.actionXPathContext
-        val partAnalysis = actionContext.partAnalysis
 
         // Iterate over child actions
         var variablesCount = 0
-        for (childActionElement <- actionElement.elements) {
 
-          val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
-
-          partAnalysis.findControlAnalysis(childPrefixedId) match {
-            case Some(variable: VariableAnalysisTrait) =>
+        for (childActionAnalysis <- actionAnalysis.asInstanceOf[WithChildrenTrait].children) {
+          childActionAnalysis match {
+            case variable: VariableAnalysisTrait =>
               // Scope variable
-              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), handleNonFatal = false)
+              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionAnalysis), handleNonFatal = false)
               variablesCount += 1
-            case Some(action: ActionTrait) =>
+            case action: ActionTrait =>
               // Run child action
               // NOTE: We execute children actions even if they happen to have `observer` or `target` attributes.
               actionInterpreter.runAction(action)

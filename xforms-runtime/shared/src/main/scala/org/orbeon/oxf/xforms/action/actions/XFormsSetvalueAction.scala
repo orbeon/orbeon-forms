@@ -45,6 +45,7 @@ class XFormsSetvalueAction extends XFormsAction {
         case Some(valueExpression) =>
           // Value to set is computed with an XPath expression
           actionInterpreter.evaluateAsString(
+            actionContext.analysis,
             actionElement,
             contextStack.getCurrentBindingContext.nodeset,
             contextStack.getCurrentBindingContext.position,

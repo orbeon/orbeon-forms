@@ -73,7 +73,7 @@ class XFormsMessageAction extends XFormsAction {
       XFormsElementValue.getElementValue(
         actionContext.interpreter.container,
         actionContext.interpreter.actionXPathContext,
-        actionContext.interpreter.getSourceEffectiveId(actionContext.element),
+        actionContext.interpreter.getSourceEffectiveId(actionContext.analysis),
         actionContext.element,
         acceptHTML = false,
         defaultHTML = false,

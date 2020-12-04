@@ -101,7 +101,7 @@ object XFormsAPI {
   // - Some(index) otherwise, where index is the control's new index
   def setindex(repeatStaticId: String, index: Int): Option[Int] =
     actionInterpreterDyn.value map { interpreter =>
-      XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index)(interpreter.indentedLogger)
+      XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerAction, repeatStaticId, index)(interpreter.indentedLogger)
     } collect {
       case newIndex if newIndex >= 0 => newIndex
     }

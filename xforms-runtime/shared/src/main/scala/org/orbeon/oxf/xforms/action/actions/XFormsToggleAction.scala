@@ -31,7 +31,7 @@ class XFormsToggleAction extends XFormsAction {
     resolveControlAvt("case")(actionContext) match {
       case Some(caseControl: XFormsCaseControl) =>
         // Perform the actual toggle action
-        XFormsToggleAction.toggle(caseControl, interpreter.mustHonorDeferredUpdateFlags(actionElement))
+        XFormsToggleAction.toggle(caseControl, interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis))
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

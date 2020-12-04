@@ -462,10 +462,10 @@ class XFormsInsertAction extends XFormsAction {
     val contextAttributeOpt = actionContext.element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
 
     // Extension: allow position to be an AVT
-    val resolvedPositionAttributeOpt = Option(actionContext.interpreter.resolveAVT(actionContext.element, "position"))
+    val resolvedPositionAttributeOpt = Option(actionContext.interpreter.resolveAVT(actionContext.analysis, "position"))
 
     // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
-    val setRequireDefaultValues = actionContext.interpreter.resolveAVT(actionContext.element, XFormsNames.XXFORMS_DEFAULTS_QNAME) == "true"
+    val setRequireDefaultValues = actionContext.interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_DEFAULTS_QNAME) == "true"
 
     // "2. The Node Set Binding node-set is determined."
     val currentBindingContext = contextStack.getCurrentBindingContext
@@ -520,7 +520,7 @@ class XFormsInsertAction extends XFormsAction {
         // origin attribute in the insert context."
         val originObjects =
           actionContext.interpreter.evaluateKeepItems(
-            actionContext.element,
+            actionContext.analysis,
             Collections.singletonList(insertContextItem),
             1,
             originAttribute
@@ -550,6 +550,7 @@ class XFormsInsertAction extends XFormsAction {
             // "b. The return value is processed according to the rules of the XPath function round()"
             val insertionIndexString =
               actionContext.interpreter.evaluateAsString(
+                actionContext.analysis,
                 actionContext.element,
                 currentBindingContext.nodeset,
                 1,

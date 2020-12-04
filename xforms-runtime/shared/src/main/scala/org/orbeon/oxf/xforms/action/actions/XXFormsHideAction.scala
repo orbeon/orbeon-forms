@@ -31,7 +31,7 @@ class XXFormsHideAction extends XFormsAction {
 
     resolveControlAvt("dialog")(actionContext) match {
       case Some(targetDialog: XFormsEventTarget) =>
-        XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionElement))
+        XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement))
       case _ =>
         debug(
           "xxf:hide: dialog does not refer to an existing xxf:dialog element, ignoring action",

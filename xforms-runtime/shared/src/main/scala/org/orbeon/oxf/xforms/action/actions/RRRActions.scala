@@ -15,11 +15,12 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
+import org.orbeon.xforms.XFormsNames._
+
 
 trait RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean)
@@ -27,7 +28,7 @@ trait RRRFunctions {
 }
 
 trait XFormsRebuildFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean) = model.deferredActionContext.markRebuild()
+  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit = model.deferredActionContext.markRebuild()
   def createEvent(model: XFormsModel) = new XFormsRebuildEvent(model)
 }
 
@@ -36,7 +37,7 @@ trait XFormsRebuildFunctions extends RRRFunctions {
 // - https://github.com/orbeon/orbeon-forms/issues/1650
 // - https://github.com/orbeon/orbeon-forms/issues/4506
 trait XFormsRecalculateRevalidateFunctions extends RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean) =
+  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit =
     model.deferredActionContext.markRecalculateRevalidate(
       defaultsStrategy = if (applyDefaults) AllDefaultsStrategy else NoDefaultsStrategy,
       instanceIdOpt    = None
@@ -58,7 +59,7 @@ trait RRRAction extends XFormsAction with RRRFunctions {
     val modelOpt    = interpreter.actionXPathContext.getCurrentBindingContext.modelOpt
 
     def resolve(qName: QName) =
-      (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
+      (Option(interpreter.resolveAVT(context.analysis, qName)) getOrElse "false").toBoolean
 
     modelOpt foreach { model =>
       val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
@@ -85,9 +86,9 @@ object RRRAction {
   private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
   private object ConcreteRecalculateFunctions extends XFormsRecalculateRevalidateFunctions
 
-  def rebuild(model: XFormsModel, deferred: Boolean = false) =
+  def rebuild(model: XFormsModel, deferred: Boolean = false): Unit =
     execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
 
-  def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false) =
+  def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit =
     execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)
 }

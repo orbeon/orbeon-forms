@@ -37,16 +37,16 @@ class XFormsSendAction extends XFormsAction {
       throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 
     // Resolve AVT
-    val resolvedSubmissionStaticId = interpreter.resolveAVTProvideValue(actionElement, submissionId)
+    val resolvedSubmissionStaticId = interpreter.resolveAVTProvideValue(actionContext.analysis, submissionId)
 
     if (resolvedSubmissionStaticId eq null)
       return
 
     // Find actual target
-    interpreter.resolveObject(actionElement, resolvedSubmissionStaticId) match {
+    interpreter.resolveObject(actionContext.analysis, resolvedSubmissionStaticId) match {
       case submission: XFormsModelSubmission =>
         // Dispatch event to submission object
-        val newEvent = new XFormsSubmitEvent(submission, XFormsAction.eventProperties(interpreter, actionElement))
+        val newEvent = new XFormsSubmitEvent(submission, XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement))
         Dispatch.dispatchEvent(newEvent)
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as

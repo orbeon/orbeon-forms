@@ -18,7 +18,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
-import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
@@ -82,27 +82,31 @@ abstract class XFormsAction extends Logging {
   }
 
   def resolveControl(controlId: String)(implicit context: DynamicActionContext): Option[XFormsControl] =
-    collectByErasedType[XFormsControl](context.interpreter.resolveObject(context.element, controlId))
+    collectByErasedType[XFormsControl](context.interpreter.resolveObject(context.analysis, controlId))
 
   // Resolve an optional boolean AVT
   // Return None if there is no attribute or if the AVT cannot be evaluated
   def resolveStringAVT(att: String)(implicit context: DynamicActionContext): Option[String] =
     context.element.attributeValueOpt(att) flatMap
-      (avt => Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
+      (avt => Option(context.interpreter.resolveAVTProvideValue(context.analysis, avt)))
 
   // Resolve an optional boolean AVT
   def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext): Boolean =
     resolveStringAVT(att)(context) map (_ == "true") getOrElse default
 
   def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
-    if (context.interpreter.mustHonorDeferredUpdateFlags(context.element))
+    if (context.interpreter.mustHonorDeferredUpdateFlags(context.analysis))
       context.containingDocument.synchronizeAndRefresh()
 }
 
 object XFormsAction {
 
   // Obtain context attributes based on nested xf:property elements.
-  def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): Map[String, Option[AnyRef]] = {
+  def eventProperties(
+    actionInterpreter : XFormsActionInterpreter,
+    actionAnalysis    : ActionTrait,
+    actionElement     : Element
+  ): Map[String, Option[AnyRef]] = {
 
     val contextStack = actionInterpreter.actionXPathContext
 
@@ -125,7 +129,7 @@ object XFormsAction {
             val currentActionScope = actionInterpreter.getActionScope(element)
             contextStack.pushBinding(
               bindingElement    = element,
-              sourceEffectiveId = actionInterpreter.getSourceEffectiveId(element),
+              sourceEffectiveId = actionInterpreter.getSourceEffectiveId(actionAnalysis),
               scope             = currentActionScope,
               handleNonFatal    = false
             )
@@ -140,7 +144,7 @@ object XFormsAction {
                   namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
                   functionLibrary    = actionInterpreter.containingDocument.functionLibrary,
-                  functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
+                  functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(actionAnalysis)),
                   baseURI            = null,
                   locationData       = element.getData.asInstanceOf[LocationData],
                   reporter           = actionInterpreter.containingDocument.getRequestStats.addXPathStat

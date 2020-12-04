@@ -55,6 +55,7 @@ class XFormsDeleteAction extends XFormsAction {
             // "The return value is processed according to the rules of the XPath function round()"
             val insertionIndexString =
               actionContext.interpreter.evaluateAsString(
+                actionContext.analysis,
                 actionContext.element,
                 collectionToUpdate.asJava,
                 1,

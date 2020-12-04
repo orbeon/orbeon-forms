@@ -21,10 +21,9 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -44,7 +43,7 @@ import scala.util.control.{Breaks, NonFatal}
 // Execute a top-level XForms action and the included nested actions if any.
 class XFormsActionInterpreter(
   val container          : XBLContainer,
-  val outerActionElement : Element,
+  val outerAction        : ActionTrait,
   val handlerEffectiveId : String,
   val event              : XFormsEvent,
   val eventObserver      : XFormsEventTarget)(implicit
@@ -58,8 +57,8 @@ class XFormsActionInterpreter(
     container.getPartAnalysis.getNamespaceMapping(getActionScope(actionElement), getActionStaticId(actionElement))
 
   // Return the source against which id resolutions are made for the given action element.
-  def getSourceEffectiveId(actionElement: Element): String =
-    XFormsId.getRelatedEffectiveId(handlerEffectiveId, getActionStaticId(actionElement))
+  def getSourceEffectiveId(actionAnalysis: ActionTrait): String =
+    XFormsId.getRelatedEffectiveId(handlerEffectiveId, actionAnalysis.staticId)
 
   def getActionPrefixedId(actionElement: Element): String =
     container.getFullPrefix + getActionStaticId(actionElement)
@@ -71,9 +70,9 @@ class XFormsActionInterpreter(
     container.getPartAnalysis.scopeForPrefixedId(getActionPrefixedId(actionElement))
 
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
-  def mustHonorDeferredUpdateFlags(actionElement: Element): Boolean =
+  def mustHonorDeferredUpdateFlags(actionAnalysis: ActionTrait): Boolean =
     actionXPathContext.getCurrentBindingContext.singleItemOpt.isEmpty ||
-      resolveAVT(actionElement, XFormsNames.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
+      resolveAVT(actionAnalysis, XFormsNames.XXFORMS_DEFERRED_UPDATES_QNAME) != "false"
 
   def runAction(staticAction: ActionTrait): Unit =
     try {
@@ -89,7 +88,7 @@ class XFormsActionInterpreter(
         bindId                         = None,
         bindingElement                 = staticAction.element,
         bindingElementNamespaceMapping = staticAction.namespaceMapping,
-        sourceEffectiveId              = getSourceEffectiveId(staticAction.element),
+        sourceEffectiveId              = getSourceEffectiveId(staticAction),
         scope                          = staticAction.scope,
         handleNonFatal                 = false
       ) {
@@ -141,7 +140,7 @@ class XFormsActionInterpreter(
     }
 
   private def runSingleIteration(
-    actionAnalysis          : ElementAnalysis,
+    actionAnalysis          : ActionTrait,
     actionQName             : QName,
     ifConditionAttribute    : Option[String],
     whileIterationAttribute : Option[String],
@@ -159,7 +158,7 @@ class XFormsActionInterpreter(
 
         def conditionOrBreak(conditionOpt: Option[String], name: String): Unit =
           conditionOpt foreach { condition =>
-            if (! evaluateCondition(actionAnalysis.element, actionQName.qualifiedName, condition, name, contextItem))
+            if (! evaluateCondition(actionAnalysis, actionQName.qualifiedName, condition, name, contextItem))
               break()
           }
 
@@ -186,7 +185,7 @@ class XFormsActionInterpreter(
             bindId                         = actionAnalysis.bind,
             bindingElement                 = actionAnalysis.element,
             bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
-            sourceEffectiveId              = getSourceEffectiveId(actionAnalysis.element),
+            sourceEffectiveId              = getSourceEffectiveId(actionAnalysis),
             scope                          = actionAnalysis.scope,
             handleNonFatal                 = false,
           ) {
@@ -207,7 +206,7 @@ class XFormsActionInterpreter(
   }
 
   private def evaluateCondition(
-    actionElement      : Element,
+    actionAnalysis     : ActionTrait,
     actionName         : String,
     conditionAttribute : String,
     conditionType      : String,
@@ -227,7 +226,7 @@ class XFormsActionInterpreter(
     }
     val conditionResult =
       evaluateKeepItems(
-        actionElement   = actionElement,
+        actionAnalysis  = actionAnalysis,
         nodeset         = contextNodeset,
         position        = contextPosition,
         xpathExpression = StaticXPath.makeBooleanExpression(conditionAttribute)
@@ -253,7 +252,8 @@ class XFormsActionInterpreter(
   // Evaluate an expression as a string. This returns "" if the result is an empty sequence.
   // TODO: Pass `DynamicActionContext`.
   def evaluateAsString(
-    actionElement   : Element,
+    actionAnalysis  : ActionTrait,
+    actionElement   : Element, // only used for `LocationData`; useful at all?
     nodeset         : ju.List[om.Item],
     position        : Int,
     xpathExpression : String
@@ -262,10 +262,10 @@ class XFormsActionInterpreter(
       contextItems       = nodeset,
       contextPosition    = position,
       xpathString        = xpathExpression,
-      namespaceMapping   = getNamespaceMappings(actionElement),
+      namespaceMapping   = actionAnalysis.namespaceMapping,
       variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
       functionLibrary    = containingDocument.functionLibrary,
-      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
       baseURI            = null,
       locationData       = actionElement.getData.asInstanceOf[LocationData],
       reporter           = containingDocument.getRequestStats.getReporter
@@ -273,7 +273,7 @@ class XFormsActionInterpreter(
 
   // TODO: Pass `DynamicActionContext`.
   def evaluateKeepItems(
-    actionElement   : Element,
+    actionAnalysis  : ActionTrait,
     nodeset         : ju.List[om.Item],
     position        : Int,
     xpathExpression : String
@@ -282,19 +282,22 @@ class XFormsActionInterpreter(
       contextItems       = nodeset,
       contextPosition    = position,
       xpathString        = xpathExpression,
-      namespaceMapping   = getNamespaceMappings(actionElement),
+      namespaceMapping   = actionAnalysis.namespaceMapping,
       variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
       functionLibrary    = containingDocument.functionLibrary,
-      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+      functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
       baseURI            = null,
-      locationData       = actionElement.getData.asInstanceOf[LocationData],
+      locationData       = actionAnalysis.element.getData.asInstanceOf[LocationData],
       reporter           = containingDocument.getRequestStats.getReporter
     )
 
   // Resolve a value which may be an AVT.
   // Return the resolved attribute value, null if the value is null or if the XPath context item is missing.
   // TODO: Pass `DynamicActionContext`.
-  def resolveAVTProvideValue(actionElement: Element, attributeValue: String): String = {
+  def resolveAVTProvideValue(
+    actionAnalysis : ActionTrait,
+    attributeValue : String
+  ): String = {
 
     if (attributeValue eq null)
       return null
@@ -314,12 +317,12 @@ class XFormsActionInterpreter(
         contextItems       = bindingContext.nodeset,
         contextPosition    = bindingContext.position,
         xpathString        = attributeValue,
-        namespaceMapping   = getNamespaceMappings(actionElement),
+        namespaceMapping   = actionAnalysis.namespaceMapping,
         variableToValueMap = actionXPathContext.getCurrentBindingContext.getInScopeVariables,
         functionLibrary    = containingDocument.functionLibrary,
-        functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement)),
+        functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
         baseURI            = null,
-        locationData       = actionElement.getData.asInstanceOf[LocationData],
+        locationData       = actionAnalysis.element.getData.asInstanceOf[LocationData],
         reporter           = containingDocument.getRequestStats.getReporter
       )
     } else {
@@ -330,24 +333,24 @@ class XFormsActionInterpreter(
 
   // Resolve the value of an attribute which may be an AVT.
   // TODO: Pass `DynamicActionContext`.
-  def resolveAVT(actionElement: Element, attributeName: QName): String =
-    resolveAVTProvideValue(actionElement, actionElement.attributeValue(attributeName))
+  def resolveAVT(actionAnalysis: ActionTrait, attributeName: QName): String =
+    resolveAVTProvideValue(actionAnalysis, actionAnalysis.element.attributeValue(attributeName))
 
   // Resolve the value of an attribute which may be an AVT.
   // TODO: Pass `DynamicActionContext`.
-  def resolveAVT(actionElement: Element, attributeName: String): String =
-    actionElement.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionElement, _)) orNull
+  def resolveAVT(actionAnalysis: ActionTrait, attributeName: String): String =
+    actionAnalysis.element.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionAnalysis, _)) orNull
 
   // Find an effective object based on either the xxf:repeat-indexes attribute, or on the current repeat indexes.
-  def resolveObject(actionElement: Element, targetStaticOrAbsoluteId: String): XFormsObject = {
-    container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject =>
-      resolveAVT(actionElement, XFormsNames.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
+  def resolveObject(actionAnalysis: ActionTrait, targetStaticOrAbsoluteId: String): XFormsObject = {
+    container.resolveObjectByIdInScope(getSourceEffectiveId(actionAnalysis), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject =>
+      resolveAVT(actionAnalysis, XFormsNames.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
         case None =>
           // Most common case
           resolvedObject
         case Some(repeatIndexes) =>
           containingDocument.getControlByEffectiveId(
-            Dispatch.resolveRepeatIndexes(container, resolvedObject, getActionPrefixedId(actionElement), repeatIndexes)
+            Dispatch.resolveRepeatIndexes(container, resolvedObject, actionAnalysis.prefixedId, repeatIndexes)
           )
       }
     } orNull

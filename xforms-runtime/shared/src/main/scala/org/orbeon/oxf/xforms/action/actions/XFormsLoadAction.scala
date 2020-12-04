@@ -36,7 +36,7 @@ class XFormsLoadAction extends XFormsAction {
     val actionElem  = actionContext.analysis.element
 
     val show =
-      Option(interpreter.resolveAVT(actionElem, "show")) map
+      Option(interpreter.resolveAVT(actionContext.analysis, "show")) map
         LegacyShow.withNameLowercaseOnly                 getOrElse
         LegacyShow.Replace
 
@@ -44,15 +44,15 @@ class XFormsLoadAction extends XFormsAction {
     val targetOpt =
       actionElem.attributeValueOpt(XFormsNames.TARGET_QNAME)         orElse
       actionElem.attributeValueOpt(XFormsNames.XXFORMS_TARGET_QNAME) flatMap
-      (v => Option(interpreter.resolveAVTProvideValue(actionElem, v)))
+      (v => Option(interpreter.resolveAVTProvideValue(actionContext.analysis, v)))
 
     val urlType =
-      Option(interpreter.resolveAVT(actionElem, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
+      Option(interpreter.resolveAVT(actionContext.analysis, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
       UrlType.withNameLowercaseOnly getOrElse
       UrlType.Render
 
     val urlNorewrite   = resolveUrlNorewrite(actionElem)
-    val isShowProgress = interpreter.resolveAVT(actionElem, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+    val isShowProgress = interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
 
     // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
 
@@ -71,13 +71,13 @@ class XFormsLoadAction extends XFormsAction {
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
           isShowProgress     = isShowProgress,
-          mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
+          mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
         )
       case None =>
         actionElem.attributeValueOpt(XFormsNames.RESOURCE_QNAME) match {
           case Some(resourceAttValue) =>
 
-            Option(interpreter.resolveAVTProvideValue(actionElem, resourceAttValue)) match {
+            Option(interpreter.resolveAVTProvideValue(actionContext.analysis, resourceAttValue)) match {
               case Some(resolvedResource) =>
                 resolveStoreLoadValue(
                   containingDocument = actionContext.containingDocument,
@@ -88,7 +88,7 @@ class XFormsLoadAction extends XFormsAction {
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
                   isShowProgress     = isShowProgress,
-                  mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionElem)
+                  mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
                 )
               case None =>
                 if (interpreter.indentedLogger.debugEnabled)

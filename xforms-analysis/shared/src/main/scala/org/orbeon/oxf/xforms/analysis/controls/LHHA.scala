@@ -21,9 +21,9 @@ object LHHA extends Enum[LHHA] {
 
   val size = values.size
 
-  val QNameForValue = values map (value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
-  val NamesSet      : Set[String] = values.map(_.entryName).toSet
-  val QNamesSet     : Set[QName] = QNameForValue.values.toSet
+  val QNameForValue: Map[LHHA, QName] = values map (value => value -> QName(value.entryName, XFORMS_NAMESPACE_SHORT)) toMap
+  val NamesSet     : Set[String]      = values.map(_.entryName).toSet
+  val QNamesSet    : Set[QName]       = QNameForValue.values.toSet
 
   // By default all controls support HTML LHHA
   val DefaultLHHAHTMLSupport: Set[LHHA] = values.toSet

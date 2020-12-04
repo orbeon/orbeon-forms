@@ -101,6 +101,8 @@ object XFormsNames {
   val XFORMS_TRIGGER_QNAME          = xformsQName("trigger")
   val XFORMS_BIND_QNAME             = xformsQName("bind")
 
+  val ROOT_QNAME                    = QName("root")
+
   // eXForms at http://www.exforms.org/
   val EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0"
   val EXFORMS_PREFIX = "exf"

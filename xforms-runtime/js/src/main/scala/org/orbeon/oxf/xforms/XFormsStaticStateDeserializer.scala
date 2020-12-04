@@ -9,11 +9,11 @@ import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.util.{IndentedLogger, Modifier, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.library.{XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -231,7 +232,6 @@ object XFormsStaticStateDeserializer {
     implicit lazy val decodeElementAnalysis: Decoder[ElementAnalysis] = (c: HCursor) =>
       for {
         index             <- c.get[Int]("index")
-        name              <- c.get[String]("name")
         element           <- c.get[dom.Element]("element")
         staticId          <- c.get[String]("staticId")
         prefixedId        <- c.get[String]("prefixedId")
@@ -250,13 +250,15 @@ object XFormsStaticStateDeserializer {
 
         val containerScope = scope // TODO
 
-        println(s"xxx decoding element for $name / $prefixedId")
+        println(s"xxx decoding element for $element / $prefixedId")
+
+        import org.orbeon.xforms.XFormsNames._
 
         val newControl =
-          name match { // XXX TODO: use QName
-            case "model" =>
+          element.getQName match {
+            case XFORMS_MODEL_QNAME =>
               new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
-            case "instance" =>
+            case XFORMS_INSTANCE_QNAME =>
 
               val instance =
                 for {
@@ -315,7 +317,7 @@ object XFormsStaticStateDeserializer {
 
               instance.right.get // XXX TODO
 
-            case "bind" =>
+            case XFORMS_BIND_QNAME =>
 
               val staticBind =
                 new StaticBind(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
@@ -375,11 +377,11 @@ object XFormsStaticStateDeserializer {
 
               staticBind
 
-            case "input" =>
+            case XFORMS_INPUT_QNAME =>
 
               new InputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
 
-            case "output" =>
+            case XFORMS_OUTPUT_QNAME =>
 
               val output =
                 for {
@@ -397,7 +399,7 @@ object XFormsStaticStateDeserializer {
 
               output.right.get // XXX TODO
 
-            case "select" | "select1" =>
+            case XFORMS_SELECT_QNAME | XFORMS_SELECT1_QNAME =>
 
               val select =
                 for {
@@ -413,7 +415,7 @@ object XFormsStaticStateDeserializer {
 
               select.right.get // XXX TODO
 
-            case "label" =>
+            case qName if LHHA.QNamesSet(qName) =>
 
               val lhha =
                 for {
@@ -435,8 +437,98 @@ object XFormsStaticStateDeserializer {
 
               lhha.right.get // XXX TODO
 
-            case "root" =>
+            case ROOT_QNAME =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
+            case XFORMS_TRIGGER_QNAME =>
+              new TriggerControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case qName: QName if EventHandler.isAction(qName) =>
+
+              if (EventHandler.isEventHandler(element)) {
+
+                val eventHandler =
+                  for {
+                    keyText                <- c.get[Option[String]]("keyText")
+                    keyModifiers           <- c.get[Set[Modifier]]("keyModifiers")
+                    eventNames             <- c.get[Set[String]]("eventNames")
+                    isAllEvents            <- c.get[Boolean]("isAllEvents")
+                    isCapturePhaseOnly     <- c.get[Boolean]("isCapturePhaseOnly")
+                    isTargetPhase          <- c.get[Boolean]("isTargetPhase")
+                    isBubblingPhase        <- c.get[Boolean]("isBubblingPhase")
+                    propagate              <- c.get[Propagate]("propagate")
+                    isPerformDefaultAction <- c.get[Perform]("isPerformDefaultAction")
+                    isPhantom              <- c.get[Boolean]("isPhantom")
+                    isIfNonRelevant        <- c.get[Boolean]("isIfNonRelevant")
+                    isXBLHandler           <- c.get[Boolean]("isXBLHandler")
+                    observersPrefixedIds   <- c.get[Set[String]]("observersPrefixedIds")
+                    targetPrefixedIds   <- c.get[Set[String]]("targetPrefixedIds")
+                  } yield {
+                    val eh =
+                      if (EventHandler.isContainerAction(element.getQName)) {
+                        println(s"xxx is container action")
+                        new EventHandler(
+                          index,
+                          element,
+                          controlStack.headOption,
+                          None,
+                          staticId,
+                          prefixedId,
+                          namespaceMapping,
+                          scope,
+                          containerScope,
+                          keyText,
+                          Set.empty,//keyModifiers,
+                          eventNames,
+                          isAllEvents,
+                          isCapturePhaseOnly,
+                          isTargetPhase,
+                          isBubblingPhase,
+                          Propagate.Continue,// propagate,
+                          Perform.Perform,//isPerformDefaultAction,
+                          isPhantom,
+                          isIfNonRelevant,
+                          isXBLHandler
+                        ) with WithChildrenTrait
+                      } else
+                        new EventHandler(
+                          index,
+                          element,
+                          controlStack.headOption,
+                          None,
+                          staticId,
+                          prefixedId,
+                          namespaceMapping,
+                          scope,
+                          containerScope,
+                          keyText,
+                          keyModifiers,
+                          eventNames,
+                          isAllEvents,
+                          isCapturePhaseOnly,
+                          isTargetPhase,
+                          isBubblingPhase,
+                          propagate,
+                          isPerformDefaultAction,
+                          isPhantom,
+                          isIfNonRelevant,
+                          isXBLHandler
+                        )
+                    eh.observersPrefixedIds = observersPrefixedIds
+                    eh.targetPrefixedIds    = targetPrefixedIds
+
+                    eh
+                  }
+
+                println(eventHandler)
+
+                eventHandler.right.get // XXX TODO
+
+              } else {
+                if (EventHandler.isContainerAction(element.getQName))
+                  new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
+                else
+                  new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait
+              }
+
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}
           }
@@ -445,6 +537,8 @@ object XFormsStaticStateDeserializer {
 
         newControl match {
           case withChildren: WithChildrenTrait =>
+
+            println(s"xxx checking children")
 
             controlStack ::= withChildren
             c.get[Iterable[ElementAnalysis]]("children") foreach withChildren.addChildren

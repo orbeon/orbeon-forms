@@ -24,9 +24,9 @@ trait ActionTrait extends ElementAnalysis {
 
   private def find(qNames: Seq[QName]): Option[String] = qNames.iterator map element.attributeValue find (_ ne null)
 
-  val ifCondition   : Option[String] = find(IfQNames)
-  val whileCondition: Option[String] = find(WhileQNames)
-  val iterate       : Option[String] = find(IterateQNames)
+  var ifCondition   : Option[String] = find(IfQNames)
+  var whileCondition: Option[String] = find(WhileQNames)
+  var iterate       : Option[String] = find(IterateQNames)
 }
 
 private object ActionTrait {

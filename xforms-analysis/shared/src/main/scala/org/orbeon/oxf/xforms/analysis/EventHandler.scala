@@ -14,14 +14,15 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.Logging.warn
 import org.orbeon.oxf.util.{IndentedLogger, Modifier}
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
+import org.orbeon.oxf.xforms.analysis.EventHandler.{ObserverIsPrecedingSibling, TargetIsObserver, isDispatchAction}
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{EventNames, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -40,7 +41,21 @@ class EventHandler(
   prefixedId        : String,
   namespaceMapping  : NamespaceMapping,
   scope             : Scope,
-  containerScope    : Scope
+  containerScope    : Scope,
+
+  val keyText               : Option[String],
+  val keyModifiers          : Set[Modifier],
+  val eventNames            : Set[String],
+  //c.actualEventNames // unused
+  val isAllEvents           : Boolean,
+  val isCapturePhaseOnly    : Boolean,
+  val isTargetPhase         : Boolean,
+  val isBubblingPhase       : Boolean,
+  val propagate             : Propagate,
+  val isPerformDefaultAction: Perform,
+  val isPhantom             : Boolean,
+  val isIfNonRelevant       : Boolean,
+  val isXBLHandler          : Boolean
 ) extends ElementAnalysis(
   index,
   element,
@@ -53,87 +68,25 @@ class EventHandler(
   containerScope
 ) with ActionTrait {
 
-  import EventHandler._
+  // Set later via `analyzeEventHandler()` or deserialization
+  var observersPrefixedIds: Set[String] = _ // Q: should we just point to the ElementAnalysis instead of using ids?
+  var targetPrefixedIds   : Set[String] = _ // Q: should we just point to the ElementAnalysis instead of using ids?
 
-  // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
-  private def att   (name: QName)               : String         = element.attributeValue(name)
-  private def attOpt(name: QName)               : Option[String] = element.attributeValueOpt(name)
-  private def attOpt(name1: QName, name2: QName): Option[String] = attOpt(name1) orElse attOpt(name2)
+  final def isMatchByName(eventName: String): Boolean =
+    isAllEvents || eventNames(eventName)
 
-  // These are only relevant when listening to keyboard events
-  val keyText      : Option[String] = attOpt(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
-  val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOpt(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
+  // Match if no target id is specified, or if any specified target matches
+  private def isMatchTarget(targetPrefixedId: String) =
+    targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
 
-  val eventNames: Set[String] = {
+  // Match both name and target
+  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean =
+    isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 
-    val names =
-      attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++
-        attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
-
-    // For backward compatibility, still support `keypress` even with modifiers, but translate that to `keydown`,
-    // as modifiers require `keydown` in browsers.
-    if (keyModifiers.nonEmpty)
-      names map {
-        case EventNames.KeyPress => EventNames.KeyDown
-        case other               => other
-      }
-    else
-      names
-  }
-
-  // NOTE: If #all is present, ignore all other specific events
-  val (actualEventNames, isAllEvents) =
-    if (eventNames(XXFORMS_ALL_EVENTS))
-      (Set(XXFORMS_ALL_EVENTS), true)
-    else
-      (eventNames, false)
-
-  val (
-    isCapturePhaseOnly: Boolean,
-    isTargetPhase     : Boolean,
-    isBubblingPhase   : Boolean
-  ) = {
-    val phaseAsSet = attOpt(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME).toSet
-
-    val capture  = phaseAsSet("capture")
-    val target   = phaseAsSet.isEmpty || phaseAsSet.exists(TargetPhaseTestSet)
-    val bubbling = phaseAsSet.isEmpty || phaseAsSet.exists(BubblingPhaseTestSet)
-
-    (capture, target, bubbling)
-  }
-
-  val propagate: Propagate =
-    if (attOpt(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) contains "stop")
-      Propagate.Stop
-    else
-      Propagate.Continue
-
-  val isPerformDefaultAction: Perform =
-    if (attOpt(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) contains "cancel")
-      Perform.Cancel
-    else
-      Perform.Perform
-
-  val isPhantom             : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
-  val isIfNonRelevant       : Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
-  val isXBLHandler          : Boolean = element.getQName == XBL_HANDLER_QNAME
-
-  // Observers and targets
-
-  // Temporarily mutable until after analyzeEventHandler() has run
-  private var _observersPrefixedIds: Set[String] = _
-  private var _targetPrefixedIds: Set[String] = _
-
-  // Question: should we just point to the ElementAnalysis instead of using ids?
-  def observersPrefixedIds: Set[String] = _observersPrefixedIds
-  def targetPrefixedIds: Set[String] = _targetPrefixedIds
-
-  // Analyze the handler
+      // Analyze the handle, setting:
+    // - `observersPrefixedIds`
+    // - `targetPrefixedIds`
   def analyzeEventHandler()(implicit logger: IndentedLogger): Unit = {
-
-    // This must run only once
-    assert(_observersPrefixedIds eq null)
-    assert(_targetPrefixedIds eq null)
 
     def unknownTargetId(id: String) = {
       warn("unknown id", Seq("id" -> id))
@@ -220,24 +173,13 @@ class EventHandler(
       ignoringHandler("target")
 
     if (ignoreDueToObservers || ignoreDueToTarget) {
-      _observersPrefixedIds = Set.empty[String]
-      _targetPrefixedIds    = Set.empty[String]
+      this.observersPrefixedIds = Set.empty
+      this.targetPrefixedIds    = Set.empty
     } else {
-      _observersPrefixedIds = observersPrefixedIds
-      _targetPrefixedIds    = targetsPrefixedIdsAndHashes
+      this.observersPrefixedIds = observersPrefixedIds
+      this.targetPrefixedIds    = targetsPrefixedIdsAndHashes
     }
   }
-
-  final def isMatchByName(eventName: String): Boolean =
-    isAllEvents || eventNames(eventName)
-
-  // Match if no target id is specified, or if any specified target matches
-  private def isMatchTarget(targetPrefixedId: String) =
-    targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
-
-  // Match both name and target
-  final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean =
-    isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 }
 
 object EventHandler {
@@ -249,9 +191,6 @@ object EventHandler {
 
   // Special target id indicating that the target is the observer
   val TargetIsObserver = "#observer"
-
-  private val TargetPhaseTestSet   = Set("target", "default")
-  private val BubblingPhaseTestSet = Set("bubbling", "default")
 
   // Whether the element is an event handler (a known action element with @*:event)
   def isEventHandler(element: Element): Boolean =

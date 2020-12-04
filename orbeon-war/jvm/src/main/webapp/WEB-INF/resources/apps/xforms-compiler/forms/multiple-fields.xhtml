@@ -80,5 +80,15 @@
                 <xf:label>Request path:</xf:label>
             </xf:output>
         </xh:div>
+        <xh:div>
+            <xf:trigger>
+                <xf:label>Do it!</xf:label>
+                <xf:action event="DOMActivate">
+                    <!-- TODO: inline text is not serialized -->
+<!--                    <xf:message>I was activated!</xf:message>-->
+                    <xf:message value="'I was activated!'"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:div>
     </xh:body>
 </xh:html>

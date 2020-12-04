@@ -3,8 +3,8 @@ package org.orbeon.oxf.xforms
 import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import io.circe.generic.semiauto._
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, InputControl, LHHAAnalysis, OutputControl, SelectionControl}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LangRef, TopLevelPartAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, LangRef, TopLevelPartAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
@@ -33,7 +33,6 @@ object XFormsStaticStateSerializer {
     )
 
     Json.obj(
-
       "eventBufferPosition"          -> Json.fromInt(a.eventBufferPosition),
       "eventBuffer"                  -> a.eventBuffer.slice(0, a.eventBufferPosition).asJson,
       "charBufferPosition"           -> Json.fromInt(a.charBufferPosition),
@@ -200,14 +199,47 @@ object XFormsStaticStateSerializer {
             "useCopy"          -> Json.fromBoolean(c.useCopy),
             "mustEncodeValues" -> c.mustEncodeValues.asJson
           )
-        case c                => Nil
+
+        case c: UploadControl          => Nil
+        case c: SecretControl          => Nil
+        case c: TextareaControl        => Nil
+        case c: SwitchControl          => Nil
+        case c: CaseControl            => Nil
+        case c: GroupControl           => Nil
+        case c: DialogControl          => Nil
+        case c: AttributeControl       => Nil
+        case c: ComponentControl       => Nil
+        case c: RepeatControl          => Nil
+        case c: RepeatIterationControl => Nil
+        case c: VariableControl        => Nil
+        case c: EventHandler           =>
+          List(
+            "keyText"                -> c.keyText.asJson,
+            "keyModifiers"           -> c.keyModifiers.asJson,
+            "eventNames"             -> c.eventNames.asJson,
+            "isAllEvents"            -> Json.fromBoolean(c.isAllEvents),
+            "isCapturePhaseOnly"     -> Json.fromBoolean(c.isCapturePhaseOnly),
+            "isTargetPhase"          -> Json.fromBoolean(c.isTargetPhase),
+            "isBubblingPhase"        -> Json.fromBoolean(c.isBubblingPhase),
+            "propagate"              -> c.propagate.asJson,
+            "isPerformDefaultAction" -> c.isPerformDefaultAction.asJson,
+            "isPhantom"              -> Json.fromBoolean(c.isPhantom),
+            "isIfNonRelevant"        -> Json.fromBoolean(c.isIfNonRelevant),
+            "isXBLHandler"           -> Json.fromBoolean(c.isXBLHandler),
+            "observersPrefixedIds"   -> c.observersPrefixedIds.asJson,
+            "targetPrefixedIds"      -> c.targetPrefixedIds.asJson
+          )
+          // xbl:template
+          // xf:range (skip!)
+          // actions that are not `EventHandler`
+        case c: TriggerControl         => Nil // ok
+        case c                         => Nil
       }
 
     implicit lazy val encodeElementAnalysis: Encoder[ElementAnalysis] = (a: ElementAnalysis) =>
       Json.fromFields(
         List(
           "index"             -> Json.fromInt(a.index),
-          "name"              -> Json.fromString(a.localName),
           "element"           -> encodeLocalElementOnly(a.element),
           "staticId"          -> Json.fromString(a.staticId),
           "prefixedId"        -> Json.fromString(a.prefixedId),

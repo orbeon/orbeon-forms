@@ -97,17 +97,19 @@ object ControlAnalysisFactory {
     XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait)
   ) ++ variableFactory
 
-  private val ControlFactory: PartialFunction[Element, ControlFactory] =
+  private val ControlFactoryPf: PartialFunction[Element, ControlFactory] =
     { case e: Element if byQNameFactory.isDefinedAt(e.getQName) => byQNameFactory(e.getQName) }
 
-  private val ActionFactory: PartialFunction[Element, ControlFactory] = {
-    case e if isContainerAction(e.getQName) && isEventHandler(e) => new EventHandler(_, _, _, _, _, _, _, _, _)    with WithChildrenTrait
+  private val ActionFactoryPf: PartialFunction[Element, ControlFactory] = {
+    case e if isContainerAction(e.getQName) && isEventHandler(e) => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = true)
     case e if isContainerAction(e.getQName)                      => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
-    case e if isAction(e.getQName) && isEventHandler(e)          => new EventHandler(_, _, _, _, _, _, _, _, _)
+    case e if isAction(e.getQName) && isEventHandler(e)          => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = false)
     case e if isAction(e.getQName)                               => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait
   }
 
-  private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
+  val actionFactory: Element => Option[ControlFactory] = ActionFactoryPf.lift
+
+  private val ControlOrActionFactory = ControlFactoryPf orElse ActionFactoryPf lift
 
   def create(
     partAnalysisCtx   : PartAnalysisContextForTree,

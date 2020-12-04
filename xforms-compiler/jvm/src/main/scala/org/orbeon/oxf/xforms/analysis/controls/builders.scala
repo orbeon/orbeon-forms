@@ -9,12 +9,14 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{Modifier, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticElementValue
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
+import org.orbeon.oxf.xforms.analysis.EventHandler._
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, StaticBind}
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeBuilder, PartAnalysisContextForTree}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -22,8 +24,9 @@ import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{BasicNamespaceMapping, XFormsNames}
+import org.orbeon.xforms.{BasicNamespaceMapping, EventNames, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -653,4 +656,136 @@ object InstanceMetadataBuilder {
       dependencyURL         = dependencyURL
     )
   }
+}
+
+object EventHandlerBuilder {
+
+  def apply(
+    index             : Int,
+    element           : Element,
+    parent            : Option[ElementAnalysis],
+    preceding         : Option[ElementAnalysis],
+    staticId          : String,
+    prefixedId        : String,
+    namespaceMapping  : NamespaceMapping,
+    scope             : Scope,
+    containerScope    : Scope,
+    withChildren      : Boolean
+  ): ElementAnalysis = {
+
+    // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
+    def att         (name: QName)               : String         = element.attributeValue(name)
+    def attOpt      (name: QName)               : Option[String] = element.attributeValueOpt(name)
+    def eitherAttOpt(name1: QName, name2: QName): Option[String] = attOpt(name1) orElse attOpt(name2)
+
+    // These are only relevant when listening to keyboard events
+    val keyText      : Option[String] = attOpt(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+    val keyModifiers : Set[Modifier]  = parseKeyModifiers(attOpt(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME))
+
+    val eventNames: Set[String] = {
+
+      val names =
+        attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++
+          attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
+
+      // For backward compatibility, still support `keypress` even with modifiers, but translate that to `keydown`,
+      // as modifiers require `keydown` in browsers.
+      if (keyModifiers.nonEmpty)
+        names map {
+          case EventNames.KeyPress => EventNames.KeyDown
+          case other               => other
+        }
+      else
+        names
+    }
+
+    // NOTE: If `#all` is present, ignore all other specific events
+    val (_, isAllEvents) =
+      if (eventNames(XXFORMS_ALL_EVENTS))
+        (Set(XXFORMS_ALL_EVENTS), true)
+      else
+        (eventNames, false)
+
+    val (
+      isCapturePhaseOnly: Boolean,
+      isTargetPhase     : Boolean,
+      isBubblingPhase   : Boolean
+    ) = {
+      val phaseAsSet = eitherAttOpt(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME).toSet
+
+      val capture  = phaseAsSet("capture")
+      val target   = phaseAsSet.isEmpty || phaseAsSet.exists(TargetPhaseTestSet)
+      val bubbling = phaseAsSet.isEmpty || phaseAsSet.exists(BubblingPhaseTestSet)
+
+      (capture, target, bubbling)
+    }
+
+    val propagate: Propagate =
+      if (eitherAttOpt(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) contains "stop")
+        Propagate.Stop
+      else
+        Propagate.Continue
+
+    val isPerformDefaultAction: Perform =
+      if (eitherAttOpt(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) contains "cancel")
+        Perform.Cancel
+      else
+        Perform.Perform
+
+    val isPhantom      : Boolean = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
+    val isIfNonRelevant: Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
+    val isXBLHandler   : Boolean = element.getQName == XBL_HANDLER_QNAME
+
+    if (withChildren)
+      new EventHandler(
+        index,
+        element,
+        parent,
+        preceding,
+        staticId,
+        prefixedId,
+        namespaceMapping,
+        scope,
+        containerScope,
+        keyText,
+        keyModifiers,
+        eventNames,
+        isAllEvents,
+        isCapturePhaseOnly,
+        isTargetPhase,
+        isBubblingPhase,
+        propagate,
+        isPerformDefaultAction,
+        isPhantom,
+        isIfNonRelevant,
+        isXBLHandler
+      ) with WithChildrenTrait
+    else
+      new EventHandler(
+        index,
+        element,
+        parent,
+        preceding,
+        staticId,
+        prefixedId,
+        namespaceMapping,
+        scope,
+        containerScope,
+        keyText,
+        keyModifiers,
+        eventNames,
+        isAllEvents,
+        isCapturePhaseOnly,
+        isTargetPhase,
+        isBubblingPhase,
+        propagate,
+        isPerformDefaultAction,
+        isPhantom,
+        isIfNonRelevant,
+        isXBLHandler
+      )
+  }
+
+  private val TargetPhaseTestSet   = Set("target", "default")
+  private val BubblingPhaseTestSet = Set("bubbling", "default")
 }

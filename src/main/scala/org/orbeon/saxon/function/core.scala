@@ -23,6 +23,8 @@ import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 
+import java.lang.SecurityException
+
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =
     Property.property(stringArgument(0)(xpathContext)).orNull
@@ -79,4 +81,19 @@ object RewriteResourceURI {
       else
         URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
     )
+}
+
+class EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    val enabled = Properties.instance.getPropertySet.getBoolean("oxf.xpath.environment-variable.enabled")
+    if (enabled)
+      try
+        System.getenv(stringArgument(0)(xpathContext))
+      catch {
+        // If forbidden by the security manager, do as if the `enabled` property was set to `false`
+        case _: SecurityException => null
+      }
+    else
+      null
+  }
 }

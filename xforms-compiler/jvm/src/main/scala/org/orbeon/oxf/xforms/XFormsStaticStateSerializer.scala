@@ -201,8 +201,6 @@ object XFormsStaticStateSerializer {
           )
 
         case c: UploadControl          => Nil
-        case c: SecretControl          => Nil
-        case c: TextareaControl        => Nil
         case c: SwitchControl          => Nil
         case c: CaseControl            => Nil
         case c: GroupControl           => Nil
@@ -233,6 +231,8 @@ object XFormsStaticStateSerializer {
           // xf:range (skip!)
           // actions that are not `EventHandler`
         case c: TriggerControl         => Nil // ok
+        case c: TextareaControl        => Nil // ok
+        case c: SecretControl          => Nil // ok
         case c                         => Nil
       }
 

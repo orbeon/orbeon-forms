@@ -378,9 +378,7 @@ object XFormsStaticStateDeserializer {
               staticBind
 
             case XFORMS_INPUT_QNAME =>
-
               new InputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
-
             case XFORMS_OUTPUT_QNAME =>
 
               val output =
@@ -415,6 +413,10 @@ object XFormsStaticStateDeserializer {
 
               select.right.get // XXX TODO
 
+            case XFORMS_TEXTAREA_QNAME =>
+              new TextareaControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_SECRET_QNAME =>
+              new SecretControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case qName if LHHA.QNamesSet(qName) =>
 
               val lhha =

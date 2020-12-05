@@ -29,6 +29,7 @@
     <property as="xs:boolean" name="oxf.show-version"                                value="false"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
+    <property as="xs:boolean" name="oxf.xpath.environment-variable.enabled"          value="false"/>
 
     <!-- HTTP client -->
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>

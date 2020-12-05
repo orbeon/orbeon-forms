@@ -22,22 +22,17 @@ trait VariableAnalysisTrait
 
   variableSelf =>
 
-  // Variable name and value
-  val name: String =
-    variableSelf.element.attributeValueOpt(NAME_QNAME) getOrElse
-      (
-        throw new ValidationException(
-          s"`${element.getQualifiedName}` element must have a `name` attribute",
-          ElementAnalysis.createLocationData(element)
-        )
-      )
+  val name: String
+  val expressionStringOpt: Option[String]
 
+  // Used by `Variable`
   val valueElement: Element = VariableAnalysis.valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
-  val expressionStringOpt: Option[String] = VariableAnalysis.valueOrSelectAttribute(valueElement)
 
+  // Used below and by `ElementAnalysisTreeXPathAnalyzer`
   def nestedValueAnalysis: Option[ElementAnalysis] = children.find(_.localName == "value")
 
   // `lazy` because the children are evaluated after the container
+  // All used by `Variable`
   lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
     nestedValueAnalysis match {
       case Some(valueElem) =>
@@ -51,7 +46,20 @@ trait VariableAnalysisTrait
 
 object VariableAnalysis {
 
-  val ValueOrSequenceQNames = Set(XXFORMS_VALUE_QNAME, XXFORMS_SEQUENCE_QNAME)
+  val VariableQNames =
+    Set(
+      XXFORMS_VARIABLE_QNAME,
+      XXFORMS_VAR_QNAME,
+      XFORMS_VARIABLE_QNAME,
+      XFORMS_VAR_QNAME,
+      EXFORMS_VARIABLE_QNAME
+    )
+
+  val ValueOrSequenceQNames =
+    Set(
+      XXFORMS_VALUE_QNAME,
+      XXFORMS_SEQUENCE_QNAME
+    )
 
   def valueOrSelectAttribute(element: Element): Option[String] =
     element.attributeValueOpt(VALUE_QNAME) orElse element.attributeValueOpt(SELECT_QNAME)

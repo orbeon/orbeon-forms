@@ -17,11 +17,12 @@ import cats.syntax.option._
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.EventHandler.{isAction, isContainerAction, isEventHandler}
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.{Model, ModelVariable, Submission}
+import org.orbeon.oxf.xforms.analysis.model.{Model, Submission}
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames.{XXFORMS_VALUE_QNAME, _}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
+
 
 object ControlAnalysisFactory {
 
@@ -32,13 +33,13 @@ object ControlAnalysisFactory {
   type ControlFactoryWithPart =
     (PartAnalysisContextForTree, Int, Element,  Option[ElementAnalysis], Option[ElementAnalysis], String, String, NamespaceMapping, Scope, Scope) => ElementAnalysis
 
-  private val VariableControlFactory: ControlFactory         = new VariableControl(_, _, _, _, _, _, _, _, _)
+  private val VariableControlFactory: ControlFactory         = VariableAnalysisBuilder(_, _, _, _, _, _, _, _, _, forModel = false)
   private val LHHAControlFactory    : ControlFactoryWithPart = LHHAAnalysisBuilder(_, _, _, _, _, _, _, _, _, _)
 
   // Variable factories indexed by QName
   // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xf:var>)
-  private val variableFactory =
-    Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
+  private val VariableFactory =
+    VariableAnalysis.VariableQNames.iterator map
       (qName => qName -> VariableControlFactory) toMap
 
   private val byQNameFactoryWithPart = Map[QName, ControlFactoryWithPart](
@@ -95,7 +96,7 @@ object ControlAnalysisFactory {
     // Variable nested value
     XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),
     XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait)
-  ) ++ variableFactory
+  ) ++ VariableFactory
 
   private val ControlFactoryPf: PartialFunction[Element, ControlFactory] =
     { case e: Element if byQNameFactory.isDefinedAt(e.getQName) => byQNameFactory(e.getQName) }
@@ -144,8 +145,8 @@ object ControlAnalysisFactory {
           abstractBinding.modeLHHA
         ).some
       case None =>
-        if (parent.exists(_.localName == "model") && isVariable(controlElement.getQName))
-          (new ModelVariable(
+        if (parent.exists(_.localName == "model") && VariableAnalysis.VariableQNames(controlElement.getQName))
+          VariableAnalysisBuilder(
             index,
             controlElement,
             parent,
@@ -154,7 +155,8 @@ object ControlAnalysisFactory {
             controlPrefixedId,
             namespaceMapping,
             scope,
-            containerScope)
+            containerScope,
+            forModel = true
           ).some
         else {
           byQNameFactoryWithPart.get(controlElement.getQName) map {
@@ -188,6 +190,4 @@ object ControlAnalysisFactory {
         }
     }
   }
-
-  def isVariable(qName: QName): Boolean = variableFactory.contains(qName)
 }

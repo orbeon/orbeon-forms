@@ -209,7 +209,11 @@ object XFormsStaticStateSerializer {
         case c: ComponentControl       => Nil
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
-        case c: VariableControl        => Nil
+        case c: VariableAnalysisTrait  =>
+          List(
+            "name"                   -> Json.fromString(c.name),
+            "expressionStringOpt"    -> c.expressionStringOpt.asJson
+          )
         case c: EventHandler           =>
           List(
             "keyText"                -> c.keyText.asJson,

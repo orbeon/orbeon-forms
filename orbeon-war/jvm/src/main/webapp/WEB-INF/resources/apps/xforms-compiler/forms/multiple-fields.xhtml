@@ -13,12 +13,19 @@
                     <control-3/>
                     <control-4/>
                     <control-5/>
+                    <control-6/>
                 </_>
             </xf:instance>
             <xf:bind ref="*[5]" relevant="normalize-space(../*[3])"/>
+            <xf:var name="model-variable">
+                <xxf:value value="42"/>
+            </xf:var>
         </xf:model>
     </xh:head>
     <xh:body>
+        <xf:var name="view-variable">
+            <xxf:value value="43"/>
+        </xf:var>
         <xh:div>
             <xf:input ref="*[1]">
                 <xf:label>Control 1:</xf:label>
@@ -71,6 +78,11 @@
             </xf:input>
         </xh:div>
         <xh:div>
+            <xf:textarea ref="*[6]">
+                <xf:label>Control 3:</xf:label>
+            </xf:textarea>
+        </xh:div>
+        <xh:div>
             <xf:output value="string-join((*[1]/string(), *[2]/string(), *[3]/string(), *[4]/string(), *[5]/string()), ' and ')">
                 <xf:label>Concatenation:</xf:label>
             </xf:output>
@@ -89,6 +101,11 @@
                     <xf:message value="'I was activated!'"/>
                 </xf:action>
             </xf:trigger>
+        </xh:div>
+        <xh:div>
+            <xf:output value="$model-variable + $view-variable">
+                <xf:label>Variables:</xf:label>
+            </xf:output>
         </xh:div>
     </xh:body>
 </xh:html>

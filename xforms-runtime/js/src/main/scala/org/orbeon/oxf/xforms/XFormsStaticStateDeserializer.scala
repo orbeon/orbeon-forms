@@ -520,8 +520,6 @@ object XFormsStaticStateDeserializer {
                     eh
                   }
 
-                println(eventHandler)
-
                 eventHandler.right.get // XXX TODO
 
               } else {
@@ -530,6 +528,45 @@ object XFormsStaticStateDeserializer {
                 else
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait
               }
+
+            case qName if VariableAnalysis.VariableQNames(qName) =>
+
+              val variable =
+                for {
+                  name                <- c.get[String]("name")
+                  expressionStringOpt <- c.get[Option[String]]("expressionStringOpt")
+                } yield {
+                  if (controlStack.headOption exists (_.localName == XFORMS_MODEL_QNAME.localName))
+                    new ModelVariable(
+                      index,
+                      element,
+                      controlStack.headOption,
+                      None,
+                      staticId,
+                      prefixedId,
+                      namespaceMapping,
+                      scope,
+                      containerScope,
+                      name,
+                      expressionStringOpt
+                    )
+                  else
+                    new VariableControl(
+                      index,
+                      element,
+                      controlStack.headOption,
+                      None,
+                      staticId,
+                      prefixedId,
+                      namespaceMapping,
+                      scope,
+                      containerScope,
+                      name,
+                      expressionStringOpt
+                    )
+                }
+
+              variable.right.get // XXX TODO
 
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}

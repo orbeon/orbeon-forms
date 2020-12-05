@@ -300,7 +300,7 @@ object ElementAnalysisTreeBuilder {
       indentedLogger  : IndentedLogger
     ): Seq[(Element, Scope)] = {
 
-      import ControlAnalysisFactory.isVariable
+      import VariableAnalysis.VariableQNames
       import EventHandler.isAction
       import LHHA.isLHHA
       import SelectionControlUtil.TopLevelItemsetQNames
@@ -315,7 +315,7 @@ object ElementAnalysisTreeBuilder {
           }
         case _: Model =>
           allChildren collect {
-            case t @ (e, _) if isAction(e.getQName) || isVariable(e.getQName) || ModelChildrenToKeep(e.getQName) => t
+            case t @ (e, _) if isAction(e.getQName) || VariableQNames(e.getQName) || ModelChildrenToKeep(e.getQName) => t
           }
         case _: Submission =>
           allChildren collect {
@@ -335,7 +335,7 @@ object ElementAnalysisTreeBuilder {
           }
         case _: ActionTrait =>
           allChildren collect {
-            case (e, s) if isAction(e.getQName) || isVariable(e.getQName) => (e, s)
+            case (e, s) if isAction(e.getQName) || VariableQNames(e.getQName) => (e, s)
           }
         case _: StaticBind =>
           // Q: `xf:bind` can also have nested `<xf:constraint>`, etc. Should those also be collected to `ElementAnalysis`?

@@ -16,7 +16,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
-import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -788,4 +788,45 @@ object EventHandlerBuilder {
 
   private val TargetPhaseTestSet   = Set("target", "default")
   private val BubblingPhaseTestSet = Set("bubbling", "default")
+}
+
+object VariableAnalysisBuilder {
+
+  def apply(
+    index             : Int,
+    element           : Element,
+    parent            : Option[ElementAnalysis],
+    preceding         : Option[ElementAnalysis],
+    staticId          : String,
+    prefixedId        : String,
+    namespaceMapping  : NamespaceMapping,
+    scope             : Scope,
+    containerScope    : Scope,
+    forModel          : Boolean
+  ): VariableAnalysisTrait = {
+
+    // Variable name and value
+    val name: String =
+      element.attributeValueOpt(NAME_QNAME) getOrElse
+        (
+          throw new ValidationException(
+            s"`${element.getQualifiedName}` element must have a `name` attribute",
+            ElementAnalysis.createLocationData(element)
+          )
+        )
+
+    val valueElement        = VariableAnalysis.valueOrSequenceElement(element) getOrElse element
+    val expressionStringOpt = VariableAnalysis.valueOrSelectAttribute(valueElement)
+
+    if (forModel)
+      new ModelVariable(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope,
+        name,
+        expressionStringOpt
+      )
+    else
+      new VariableControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope,
+        name,
+        expressionStringOpt
+      )
+  }
 }

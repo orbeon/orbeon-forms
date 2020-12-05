@@ -102,7 +102,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
         }
 
         if (pushContext)
-          contextStack.popBinding
+          contextStack.popBinding()
 
         result
     }

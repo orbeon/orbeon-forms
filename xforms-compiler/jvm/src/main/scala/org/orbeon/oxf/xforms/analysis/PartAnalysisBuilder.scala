@@ -495,7 +495,7 @@ object PartAnalysisBuilder {
 
     // Index special controls
     elementAnalysis match {
-      case e: LHHAAnalysis if ! TopLevelItemsetQNames(e.getParent.element.getQName) => lhhas += e
+      case e: LHHAAnalysis if ! TopLevelItemsetQNames(e.getParent.element.getQName) => lhhas         += e
       case e: EventHandler                                                          => eventHandlers += e
       case e: Model                                                                 => models        += e
       case e: AttributeControl                                                      => attributes    += e

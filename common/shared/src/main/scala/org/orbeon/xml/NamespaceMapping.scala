@@ -17,18 +17,18 @@ import java.{util => ju}
 
 import scala.jdk.CollectionConverters._
 
-case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
+case class NamespaceMapping private (hash: String, mapping: Map[String, String]) {
   require((hash ne null) && (mapping ne null))
 }
 
-// We used to compute a has with `SecureUtils.defaultMessageDigest`. The hash was used for 2
+// We used to compute a hash with `SecureUtils.defaultMessageDigest`. The hash was used for 2
 // purposes:
 //
 // 1. XPathCache uses the hash as part of the cache key
 // 2. reducing the number of namespace objects in `XFormsAnnotator` and `Metadata`.
 //
 // Now we address #2 by using Scala immutable maps. This doesn't reduce the number of objects as much
-// has using a strong hash and reusing the `NamespaceMapping` but it's good enough, and we don't need
+// as using a strong hash and reusing the `NamespaceMapping` but it's good enough, and we don't need
 // the hash anymore for this.
 //
 // Remains #1, the hash from `hashCode` is computed with MurmurHash 3, which is not as strong but
@@ -37,11 +37,23 @@ case class NamespaceMapping(hash: String, mapping: Map[String, String]) {
 //
 object NamespaceMapping {
 
+  // 2020-12-04: Introducing a cache, similar to the `QName` and `Namespace` caches. Counting 178
+  // distinct instances total for a reasonable form in Form Builder. That actually seems like a lot.
+  // We should be able to reduce that number by making namespaces more consistent among files.
+  private val cache = new ju.concurrent.ConcurrentHashMap[Map[String, String], NamespaceMapping]()
+
   val EmptyMapping: NamespaceMapping = apply(Map.empty[String, String])
 
-  def apply(mapping: Map[String, String]): NamespaceMapping =
-    NamespaceMapping(mapping.hashCode.toString, mapping)
+  def apply(mapping: Map[String, String]): NamespaceMapping = {
+    var result = cache.get(mapping)
+    if (result eq null) {
+      result = NamespaceMapping(mapping.hashCode.toString, mapping)
+      cache.put(mapping, result)
+    }
+    result
+  }
 
+  // For legacy callers
   def apply(mapping: ju.Map[String, String]): NamespaceMapping =
     apply(mapping.asScala.toMap)
 }

@@ -14,6 +14,7 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
@@ -57,6 +58,22 @@ object XFormsStaticStateSerializer {
 
   def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
+    // We want to serialize the namespace mappings ony once to save space
+    val (
+      collectedNamespacesInOrder      : Iterable[Map[String, String]],
+      collectedNamespacesWithPositions: Map[Map[String, String], Int]
+    ) = {
+
+      val distinct = mutable.LinkedHashSet[Map[String, String]]()
+
+      staticState.topLevelPart.getTopLevelControls.iterator flatMap
+        (ElementAnalysis.iterateDescendants(_, includeSelf = true)) foreach { e =>
+        distinct += e.namespaceMapping.mapping
+      }
+
+      (distinct, distinct.zipWithIndex.toMap)
+    }
+
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
       "parent"  -> None.asJson, // must be parent scope id TODO
       "scopeId" -> Json.fromString(a.scopeId),
@@ -71,6 +88,10 @@ object XFormsStaticStateSerializer {
     implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
     implicit val encodeBasicCredentials  : Encoder[BasicCredentials]  = deriveEncoder
 
+    // Only pass the position which identifies a namespace mapping
+    val encodeNamespaceMappingHashOnly: Encoder[NamespaceMapping] = (a: NamespaceMapping) =>
+      Json.fromInt(collectedNamespacesWithPositions(a.mapping))
+
     implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
       "hash" -> Json.fromString(a.hash),
       "mapping" -> a.mapping.asJson
@@ -82,9 +103,6 @@ object XFormsStaticStateSerializer {
       "prefix"             -> Json.fromString(a.namespace.prefix),
       "uri"                -> Json.fromString(a.namespace.uri),
     )
-
-  //  implicit val encodeElement: Encoder[dom.Element] = (a: dom.Element) =>
-  //    Json.fromString(TransformerUtils.dom(a))
 
     implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
       "name"     -> a.getQName.asJson,
@@ -247,7 +265,7 @@ object XFormsStaticStateSerializer {
           "element"           -> encodeLocalElementOnly(a.element),
           "staticId"          -> Json.fromString(a.staticId),
           "prefixedId"        -> Json.fromString(a.prefixedId),
-          "namespaceMapping"  -> a.namespaceMapping.asJson,
+          "nsRef"             -> encodeNamespaceMappingHashOnly(a.namespaceMapping),
           "scopeRef"          -> Json.fromString(a.scope.scopeId),
           "containerScopeRef" -> Json.fromString(a.containerScope.scopeId),
           "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
@@ -271,6 +289,7 @@ object XFormsStaticStateSerializer {
     )
 
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
+      "namespaces"           -> collectedNamespacesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
       "template"             -> template.asJson,

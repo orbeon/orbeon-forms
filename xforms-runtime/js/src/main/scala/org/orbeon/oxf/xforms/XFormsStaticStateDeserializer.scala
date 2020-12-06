@@ -35,6 +35,8 @@ object XFormsStaticStateDeserializer {
 
   def deserialize(jsonString: String)(implicit logger: IndentedLogger): XFormsStaticState = {
 
+    var collectedNamespaces = IndexedSeq[Map[String, String]]()
+
     val scopes = mutable.Map[String, Scope]()
 
     var controlStack: List[ElementAnalysis] = Nil
@@ -235,12 +237,14 @@ object XFormsStaticStateDeserializer {
         element           <- c.get[dom.Element]("element")
         staticId          <- c.get[String]("staticId")
         prefixedId        <- c.get[String]("prefixedId")
-        namespaceMapping  <- c.get[NamespaceMapping]("namespaceMapping")
+        nsRef             <- c.get[Int]("nsRef")
         scopeRef          <- c.get[String]("scopeRef")
         containerScopeRef <- c.get[String]("containerScopeRef")
         modelRef          <- c.get[String]("modelRef")
   //      "langRef"           <- a.lang.asJson,
       } yield {
+
+        val namespaceMapping = NamespaceMapping(collectedNamespaces(nsRef))
 
         val scope = scopes.getOrElseUpdate(scopeRef, {
           val newScope = new Scope(None, scopeRef)
@@ -607,11 +611,16 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
       for {
+        namespaces           <- c.get[IndexedSeq[Map[String, String]]]("namespaces")
+        _ = {
+          collectedNamespaces = namespaces
+        }
         nonDefaultProperties <- c.get[Map[String, (String, Boolean)]]("nonDefaultProperties")
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")
-      } yield
+      } yield {
         XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, AnnotatedTemplate(template).some) // TODO: serialize `globalMaxSizeProperty` from server
+      }
 
     decode[XFormsStaticState](jsonString) match {
       case Left(error) =>

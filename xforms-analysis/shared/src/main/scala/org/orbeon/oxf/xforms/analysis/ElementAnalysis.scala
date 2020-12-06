@@ -258,6 +258,54 @@ object ElementAnalysis {
     }
   }
 
+  // Iterator over the given control and its descendants
+  // See also `ControlsIterator` which has the same logic! Should abstract that.
+  class ElemIterator(
+    private val start         : ElementAnalysis,
+    private val includeSelf   : Boolean
+  ) extends Iterator[ElementAnalysis] {
+
+    private val children = start match {
+      case c: WithChildrenTrait => c.children.iterator
+      case _                    => Iterator.empty
+    }
+
+    private var descendants: Iterator[ElementAnalysis] = Iterator.empty
+
+    private def findNext(): ElementAnalysis =
+      if (descendants.hasNext)
+        // Descendants of current child
+        descendants.next()
+      else if (children.hasNext) {
+        // Move to next child
+        val next = children.next()
+        if (next.isInstanceOf[WithChildrenTrait])
+          descendants = new ElemIterator(next, includeSelf = false)
+        next
+      } else
+        null
+
+    private var current =
+      if (includeSelf)
+        start
+      else
+        findNext()
+
+    def next(): ElementAnalysis = {
+      val result = current
+      current = findNext()
+      result
+    }
+
+    def hasNext: Boolean = current ne null
+  }
+
+  def iterateDescendants(
+    start         : ElementAnalysis,
+    includeSelf   : Boolean
+  ): Iterator[ElementAnalysis] =
+    new ElemIterator(start, includeSelf)
+
   /**
    * Return an iterator over all the element's ancestors.
    */

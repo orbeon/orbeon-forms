@@ -25,6 +25,8 @@ import scala.util.control.NonFatal
 
 object XPathCache extends XPathCacheTrait {
 
+  private val Explain = false
+
   // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
   // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
   def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
@@ -58,7 +60,26 @@ object XPathCache extends XPathCacheTrait {
     reporter           : Reporter
   ): SequenceExtent = {
     println(s"xxx XPathCache.evaluateAsExtent for `$xpathString`")
-    ???
+
+    val (xpathExpression, variables) =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+
+    withEvaluation(xpathString, locationData, reporter) {
+      new SequenceExtent(evaluate(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+    }
   }
 
   def evaluateKeepItemsJava(
@@ -93,7 +114,7 @@ object XPathCache extends XPathCacheTrait {
 
     println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
-    if (true) {
+    if (Explain) {
       import _root_.java.io.PrintStream
       import org.orbeon.saxon.lib.StandardLogger
 
@@ -172,7 +193,7 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    if (true) {
+    if (Explain) {
       import _root_.java.io.PrintStream
       import org.orbeon.saxon.lib.StandardLogger
 

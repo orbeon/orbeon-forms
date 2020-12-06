@@ -46,6 +46,10 @@ class XFormsVariableControl(
   private var _bindingContextForChild: BindingContext = null
   private var _bindingContextForFollowing: BindingContext = null
 
+  // 2020-12-05: With Saxon 10, this will be one of :
+  //   - `SequenceExtent` reduced to `AtomicValue`, `NodeInfo`, or `Function` (unsupported yet)
+  //   - `SequenceExtent` with more than one item
+  //   - `EmptySequence`
   private var _value: ValueRepresentationType = null
   // Previous value for refresh
   private var _previousValue: ValueRepresentationType = null

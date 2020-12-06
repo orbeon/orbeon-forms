@@ -108,53 +108,65 @@ object SaxonUtils {
     }
   }
 
+  // 2020-12-05:
+  //
+  // - Called only from `XFormsVariableControl`
+  // - With Saxon 10, this will be one of :
+  //   - `SequenceExtent` reduced to `AtomicValue`, `NodeInfo`, or `Function` (unsupported yet below)
+  //   - `SequenceExtent` with more than one item
+  //   - `EmptySequence`
+  // - Also, if a sequence, it's already reduced.
+  //
   def compareValueRepresentations(valueRepr1: GroundedValue, valueRepr2: GroundedValue): Boolean =
-    (valueRepr1, valueRepr2) match {
-      // Ideally we wouldn't support null here (XFormsVariableControl passes null)
-      case (null,             null)            => true
-      case (null,             _)               => false
-      case (_,                null)            => false
-      case (v1: AtomicValue, v2: AtomicValue)  => compareValues(v1, v2)
-      case (v1: NodeInfo, v2: NodeInfo)        => v1 == v2
-      // 2014-08-18: Checked Saxon class hierarchy
-      // Saxon type hierarchy is closed (`ValueRepresentation = NodeInfo | Value`)
-      // TODO
-      // 2020-10-15: With Saxon 10, we have `GroundedValue` -> `Item` -> `AtomicValue | NodeInfo | Function | ExternalObject `
-      case _                                   => throw new IllegalStateException
+    (
+      // Ideally we wouldn't support `null` here but `XFormsVariableControl` can pass `null`
+      if (valueRepr1 ne null) valueRepr1 else EmptySequence,
+      if (valueRepr2 ne null) valueRepr2 else EmptySequence
+    ) match {
+      case (v1: Item,           v2: Item)           => compareItems(v1, v2)
+      case ( _: Item,           _)                  => false
+      case (_,                  _ : Item)           => false
+      case (v1: SequenceExtent, v2: SequenceExtent) => compareSequenceExtents(v1, v2)
+      case (_ : SequenceExtent, _)                  => false
+      case (_,                  _: SequenceExtent)  => false
+      case _                                        => throw new IllegalStateException
     }
 
-  def compareValues(value1: AtomicValue, value2: AtomicValue): Boolean = {
-    val iter1 = Implicits.asScalaIterator(value1.iterate)
-    val iter2 = Implicits.asScalaIterator(value2.iterate)
+  def compareSequenceExtents(v1: SequenceExtent, v2: SequenceExtent): Boolean =
+    v1.getLength == v2.getLength &&
+      (v1.iterator.asScala.zip(v2.iterator.asScala) forall (compareItems _).tupled)
 
-    iter1.zipAll(iter2, null, null) forall (compareItems _).tupled
-  }
-
-  // Whether two sequences contain identical items
   def compareItemSeqs(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean =
     nodeset1.size == nodeset2.size &&
       (nodeset1.iterator.zip(nodeset2.iterator) forall (compareItems _).tupled)
 
-  def compareItems(item1: Item, item2: Item): Boolean =
-    (item1, item2) match {
-      // We probably shouldn't support null at all here!
-      case (null,             null)            => true
-      case (null,             _)               => false
-      case (_,                null)            => false
-      // StringValue.equals() throws (Saxon equality requires a collation)
-      case (v1: StringValue,  v2: StringValue) => v1.codepointEquals(v2)
-      case (v1: StringValue,  v2 )             => false
-      case (v1,               v2: StringValue) => false
-      // AtomicValue.equals() may throw (Saxon changes the standard equals() contract)
-      case (v1: AtomicValue,  v2: AtomicValue) => v1 == v2
-      case (v1,               v2: AtomicValue) => false
-      case (v1: AtomicValue,  v2)              => false
-      // NodeInfo
-      case (v1: NodeInfo,     v2: NodeInfo)    => v1 == v2
-      // 2014-08-18: Checked Saxon class hierarchy
-      // Saxon type hierarchy is closed (Item = NodeInfo | AtomicValue)
-      case _                                   => throw new IllegalStateException
+  def compareItems(item1: Item, item2: Item): Boolean = {
+
+    val Empty = EmptySequence // TODO: replace once `EmptySequence` no longer quires
+
+    (
+      if (item1 ne null) item1 else Empty,
+      if (item2 ne null) item2 else Empty
+    ) match {
+      case (Empty,                     Empty)                     => true
+      case (Empty,                     _)                         => false
+      case (_,                         Empty)                     => false
+      // `StringValue.equals()` throws (Saxon equality requires a collation)
+      case (v1: StringValue,           v2: StringValue)           => v1.codepointEquals(v2)
+      case ( _: StringValue,           _ )                        => false
+      case ( _,                        _: StringValue)            => false
+      case (v1: AtomicValue,           v2: AtomicValue)           => v1 == v2
+      case ( _: AtomicValue,           _)                         => false
+      case (_,                         _ : AtomicValue)           => false
+      case (v1: NodeInfo,              v2: NodeInfo)              => v1 == v2
+      case (_ : NodeInfo,              _)                         => false
+      case (_,                         _ : NodeInfo)              => false
+      case ( _: Function,              _ : Function)              => throw new UnsupportedOperationException
+      case ( _: Function,              _)                         => throw new UnsupportedOperationException
+      case (_,                         _ : Function)              => throw new UnsupportedOperationException
+      case _                                                      => throw new IllegalStateException
     }
+  }
 
   def buildNodePath(node: NodeInfo): List[String] = {
 

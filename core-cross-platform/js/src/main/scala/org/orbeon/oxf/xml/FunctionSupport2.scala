@@ -55,7 +55,7 @@ object FunctionSupport2 {
   implicit def OptionEncode[U : Encode]: Encode[Option[U]] = (v: Option[U]) =>
     v match {
       case Some(i) => implicitly[Encode[U]].apply(i)
-      case None    => EmptySequence.getInstance[om.Item]
+      case None    => EmptySequence
     }
 
   implicit def IterableEncode[U : Encode]: Encode[Iterable[U]] = (v: Iterable[U]) => {

@@ -82,5 +82,4 @@ object ResourceManagerSupport {
     PipelineUtils.connect(config, "data", registry, "config")
     registry.start(new PipelineContext)
   }
-
 }

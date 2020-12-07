@@ -21,13 +21,11 @@ import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.analysis.{PartAnalysis, PartAnalysisContextForTree, PartAnalysisContextImmutable, PartAnalysisContextMutable, PartAnalysisForStaticMetadataAndProperties, PartAnalysisForXblSupport, model}
-import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
+import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
@@ -42,11 +40,13 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
+import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import shapeless.syntax.typeable._
 
 import scala.collection.compat._
 
-// The Form Runner function library
+
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
   import FormRunnerFunctions._

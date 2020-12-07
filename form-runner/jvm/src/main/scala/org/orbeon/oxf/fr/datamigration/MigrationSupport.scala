@@ -24,12 +24,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 
 import scala.collection.{immutable => i}
+
 
 object MigrationSupport {
 

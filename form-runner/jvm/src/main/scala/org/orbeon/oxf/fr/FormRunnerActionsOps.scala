@@ -33,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import scala.collection.compat._
 
+
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
   // Resolve target data nodes from an action source and a target control.

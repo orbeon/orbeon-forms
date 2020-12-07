@@ -41,9 +41,9 @@ import scala.util.control.Breaks.{break, breakable}
 
 object SaxonUtils {
 
-  // Version of StringValue which supports equals().
-  // Saxon throws on equals() to make a point that a collation should be used for StringValue comparison.
-  // Here, we don't really care about equality, but we want to implement equals() as e.g. Jetty calls equals() on
+  // Version of `StringValue` which supports `equals()` (universal equality).
+  // Saxon throws on `equals()` to make a point that a collation should be used for `StringValue` comparison.
+  // Here, we don't really care about equality, but we want to implement `equals()` as e.g. Jetty calls `equals()` on
   // objects stored into the session. See:
   // http://forge.ow2.org/tracker/index.php?func=detail&aid=315528&group_id=168&atid=350207
   class StringValueWithEquals(value: CharSequence) extends StringValue(value) {

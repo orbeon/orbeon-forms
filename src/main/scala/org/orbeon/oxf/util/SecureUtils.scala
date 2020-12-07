@@ -23,6 +23,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
 
+
 object SecureUtils extends SecureUtilsTrait {
 
   // Properties
@@ -97,9 +98,9 @@ object SecureUtils extends SecureUtilsTrait {
     }
 
   // Cipher is not thread-safe, see:
-  // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
+  // https://stackoverflow.com/questions/6957406/is-cipher-thread-safe
   private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
-    def makeObject() = preferredProviderOpt match {
+    def makeObject(): Cipher = preferredProviderOpt match {
       case Some(preferred) => Cipher.getInstance(EncryptionCipherTransformation, preferred)
       case None            => Cipher.getInstance(EncryptionCipherTransformation)
     }
@@ -121,13 +122,13 @@ object SecureUtils extends SecureUtilsTrait {
         case Some(iv) =>
           cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv))
           // Don't prepend IV
-          Base64.encode(cipher.doFinal(bytes), false)
+          Base64.encode(cipher.doFinal(bytes), useLineBreaks = false)
         case None =>
           cipher.init(Cipher.ENCRYPT_MODE, secretKey)
           val params = cipher.getParameters
           val iv = params.getParameterSpec(classOf[IvParameterSpec]).getIV
           // Prepend the IV to the ciphertext
-          Base64.encode(iv ++ cipher.doFinal(bytes), false)
+          Base64.encode(iv ++ cipher.doFinal(bytes), useLineBreaks = false)
       }
     }
 
@@ -178,7 +179,7 @@ object SecureUtils extends SecureUtilsTrait {
   def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: String): String = {
 
     // See standard names:
-    // http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
+    // https://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
     val fullAlgorithmName = "Hmac" + algorithm.toUpperCase.replace("-", "")
 
     val mac = Mac.getInstance(fullAlgorithmName)
@@ -191,7 +192,7 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
-    case "base64" => Base64.encode(bytes, false)
+    case "base64" => Base64.encode(bytes, useLineBreaks = false)
     case "hex"    => byteArrayToHex(bytes)
     case _        => throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$encoding`")
   }
@@ -211,13 +212,13 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   // Length of a value returned by randomHexId
-  lazy val HexIdLength = randomHexId.size
+  lazy val HexIdLength: Int = randomHexId.size
 
   // Generate a random 128-bit value hashed to hex
   //@XPathFunction
   def randomHexId: String = {
     // It's unclear whether there is a real benefit to re-seed once in a while:
-    // http://stackoverflow.com/questions/295628/securerandom-init-once-or-every-time-it-is-needed
+    // https://stackoverflow.com/questions/295628/securerandom-init-once-or-every-time-it-is-needed
     val bytes = new Array[Byte](16)
     secureRandom.nextBytes(bytes)
     // We hash on top so that the actual random sequence won't be known if the id is made public

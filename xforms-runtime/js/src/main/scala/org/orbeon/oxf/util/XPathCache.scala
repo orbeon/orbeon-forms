@@ -5,14 +5,14 @@ import java.{util => ju}
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType, makeStringExpression}
+import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType, makeStringExpression}
 import org.orbeon.oxf.util.XPath.{Reporter, withFunctionContext}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, SequenceIterator, SequenceTool}
-import org.orbeon.saxon.sxpath.{IndependentContext, XPathDynamicContext, XPathEvaluator, XPathExpression, XPathStaticContext, XPathVariable}
+import org.orbeon.saxon.sxpath.{IndependentContext, XPathDynamicContext, XPathExpression, XPathVariable}
 import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xml.NamespaceMapping
@@ -497,19 +497,15 @@ object XPathCache extends XPathCacheTrait {
         throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
     }
 
-  private def singleItemToJavaKeepNodeInfoOrNull(item: Item) = item match {
+  private def singleItemToJavaKeepNodeInfoOrNull(item: Item): Any = item match {
     case null => null
     case item => itemToJavaKeepNodeInfoOrNull(item)
   }
 
-  private def itemToJavaKeepNodeInfoOrNull(item: Item) = {
-
-    println(s"xxx itemToJavaKeepNodeInfoOrNull $item")
-
+  private def itemToJavaKeepNodeInfoOrNull(item: Item): Any =
     item match {
       case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
       case v: AtomicValue    => SequenceTool.convertToJava(v)
       case v                 => v
     }
-  }
 }

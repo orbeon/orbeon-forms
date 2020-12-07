@@ -62,10 +62,10 @@ object XFormsAPI {
   }
 
   // Return the action interpreter
-  def inScopeActionInterpreter = actionInterpreterDyn.value.get
+  def inScopeActionInterpreter: XFormsActionInterpreter = actionInterpreterDyn.value.get
 
   // Return the containing document
-  def inScopeContainingDocument = inScopeContainingDocumentOpt.get
+  def inScopeContainingDocument: XFormsContainingDocument = inScopeContainingDocumentOpt.get
 
   def inScopeContainingDocumentOpt: Option[XFormsContainingDocument] = containingDocumentDyn.value
 
@@ -195,6 +195,7 @@ object XFormsAPI {
     }
   }
 
+  // TODO: Move next 3 methods to a more general place.
   // Move the given element before another element
   def moveElementBefore(element: om.NodeInfo, other: om.NodeInfo) = {
     val inserted = insert(into = element parent *, before = other, origin = element)
@@ -242,7 +243,7 @@ object XFormsAPI {
     XFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
-  def topLevelInstance(modelId: String, instanceId: String) =
+  def topLevelInstance(modelId: String, instanceId: String): Option[XFormsInstance] =
     topLevelModel(modelId) flatMap (_.findInstance(instanceId))
 
   // Return a top-level model by static id
@@ -321,7 +322,7 @@ object XFormsAPI {
     }
 
   // NOTE: There is no source id passed so we resolve relative to the document
-  def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
+  def resolveAs[T: ClassTag](staticOrAbsoluteId: String): Option[T] =
     inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
@@ -355,7 +356,12 @@ object XFormsAPI {
       (XXFormsHideAction.hideDialog(_, properties = properties))
 
   // xf:load
-  def load(url: String, target: Option[String] = None, progress: Boolean = true, mustHonorDeferredUpdateFlags: Boolean = true): Unit =
+  def load(
+    url                          : String,
+    target                       : Option[String] = None,
+    progress                     : Boolean        = true,
+    mustHonorDeferredUpdateFlags : Boolean        = true
+  ): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = inScopeContainingDocument,
       currentElem                  = None,

@@ -258,10 +258,36 @@ object XFormsStaticStateDeserializer {
 
         import org.orbeon.xforms.XFormsNames._
 
+        // TODO: Review how we do this. Maybe we should use a map to builders, like `ControlAnalysisFactory`.
         val newControl =
           element.getQName match {
-            case XFORMS_MODEL_QNAME =>
-              new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_MODEL_QNAME            => new Model                 (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_INPUT_QNAME            => new InputControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_TEXTAREA_QNAME         => new TextareaControl       (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_SECRET_QNAME           => new SecretControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_TRIGGER_QNAME          => new TriggerControl        (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_SWITCH_QNAME           => new SwitchControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_GROUP_QNAME            => new GroupControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_UPLOAD_QNAME           => new UploadControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XXFORMS_DIALOG_QNAME          => new DialogControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XXFORMS_ATTRIBUTE_QNAME       => new AttributeControl      (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_REPEAT_QNAME           => new RepeatControl         (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_REPEAT_ITERATION_QNAME => new RepeatIterationControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+
+            case XFORMS_CASE_QNAME =>
+
+              val caseControl =
+                for {
+                  valueExpression <- c.get[Option[String]]("valueExpression")
+                  valueLiteral    <- c.get[Option[String]]("valueLiteral")
+                } yield
+                  new CaseControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
+                    valueExpression,
+                    valueLiteral
+                  )
+
+              caseControl.right.get // XXX TODO
+
             case XFORMS_INSTANCE_QNAME =>
 
               val instance =
@@ -381,8 +407,6 @@ object XFormsStaticStateDeserializer {
 
               staticBind
 
-            case XFORMS_INPUT_QNAME =>
-              new InputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_OUTPUT_QNAME =>
 
               val output =
@@ -417,10 +441,6 @@ object XFormsStaticStateDeserializer {
 
               select.right.get // XXX TODO
 
-            case XFORMS_TEXTAREA_QNAME =>
-              new TextareaControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
-            case XFORMS_SECRET_QNAME =>
-              new SecretControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case qName if LHHA.QNamesSet(qName) =>
 
               val lhha =
@@ -443,10 +463,6 @@ object XFormsStaticStateDeserializer {
 
               lhha.right.get // XXX TODO
 
-            case ROOT_QNAME =>
-              new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
-            case XFORMS_TRIGGER_QNAME =>
-              new TriggerControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case qName: QName if EventHandler.isAction(qName) =>
 
               if (EventHandler.isEventHandler(element)) {
@@ -571,6 +587,9 @@ object XFormsStaticStateDeserializer {
                 }
 
               variable.right.get // XXX TODO
+
+            case ROOT_QNAME =>
+              new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
 
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}

@@ -18,6 +18,16 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
+//
+// TODO: Optimize output size.
+//
+// We already output namespaces only once. Ideas for the rest:
+//
+// - don't output attribute prefix/namespace when they are blank
+// - optimize `SAXStore`/template
+// - don't output common default values, including `null`, `None`, and `""`
+// - XML: omit `"atts": []`
+//
 object XFormsStaticStateSerializer {
 
   implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
@@ -58,7 +68,9 @@ object XFormsStaticStateSerializer {
 
   def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
-    // We want to serialize the namespace mappings ony once to save space
+    // We serialize the namespace mappings only once to save space. To give an idea, a basic Form Runner
+    // form has 34 distinct namespace mappings. We should be able to reduce that by being more consistent
+    // in how we declare namespaces in various files.
     val (
       collectedNamespacesInOrder      : Iterable[Map[String, String]],
       collectedNamespacesWithPositions: Map[Map[String, String], Int]
@@ -220,7 +232,11 @@ object XFormsStaticStateSerializer {
 
         case c: UploadControl          => Nil
         case c: SwitchControl          => Nil
-        case c: CaseControl            => Nil
+        case c: CaseControl            =>
+          List(
+            "valueExpression" -> c.valueExpression.asJson,
+            "valueLiteral"    -> c.valueLiteral.asJson
+          )
         case c: GroupControl           => Nil
         case c: DialogControl          => Nil
         case c: AttributeControl       => Nil

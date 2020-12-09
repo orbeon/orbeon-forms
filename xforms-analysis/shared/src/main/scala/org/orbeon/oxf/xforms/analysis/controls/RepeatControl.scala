@@ -34,11 +34,11 @@ class RepeatControl(
 ) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with AppearanceTrait { // for separator appearance
 
-  val iterationElement: Element = element.element(XFORMS_REPEAT_ITERATION_QNAME) ensuring (_ ne null)
+  lazy val iteration: Option[RepeatIterationControl] =
+    children collectFirst { case i: RepeatIterationControl => i }
 
-  lazy val iteration: Option[RepeatIterationControl] = children collectFirst { case i: RepeatIterationControl => i }
-
-  val isAroundTableOrListElement: Boolean = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
+  val isAroundTableOrListElement: Boolean =
+    appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
   def isDnD: Boolean =
     element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")

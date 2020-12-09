@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.Whitespace.Policy
 import org.orbeon.oxf.util.WhitespaceMatching.PolicyMatcher
 import org.xml.sax.Attributes
 
+
 // This receiver can perform transformations on incoming character data based on a few policies.
 //
 // Example of configuration for whitespace preservation in XForms, showing the 3 types of selectors supported:
@@ -54,24 +55,21 @@ class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, polic
     super.endElement(uri, localname, qName)
   }
 
-  override def characters(ch: Array[Char], start: Int, length: Int) = {
+  override def characters(ch: Array[Char], start: Int, length: Int): Unit =
     acc.append(stack.head.policy, ch, start, length)
-  }
 
-  override def processingInstruction(target: String, data: String) = {
+  override def processingInstruction(target: String, data: String): Unit = {
     flushCharacters()
     super.processingInstruction(target, data)
   }
 
-  override def comment(ch: Array[Char], start: Int, length: Int) = {
+  override def comment(ch: Array[Char], start: Int, length: Int): Unit = {
     flushCharacters()
     super.comment(ch, start, length)
   }
 
-  override def endDocument() = {
-    // Could debug log characters saved here
-    super.endDocument()
-  }
+  override def endDocument(): Unit =
+    super.endDocument() // could debug log characters saved here
 
   private def flushCharacters(): Unit = {
 

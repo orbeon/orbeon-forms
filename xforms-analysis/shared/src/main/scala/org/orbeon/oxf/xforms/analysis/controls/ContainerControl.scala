@@ -44,6 +44,7 @@ class ContainerControl(
   with WithChildrenTrait {
 
   // For `<xf:group xxf:element="xh:div">`
+  // TODO: serialize/builder
   val elementQName: Option[QName] =
     element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)
 }

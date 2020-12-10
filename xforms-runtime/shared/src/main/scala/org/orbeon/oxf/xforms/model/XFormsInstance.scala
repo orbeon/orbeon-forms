@@ -120,9 +120,9 @@ class XFormsInstance(
 
   // Getters
   def instanceCaching = _instanceCaching
-  def documentInfo = _documentInfo
-  def readonly = _readonly
-  def modified = _modified
+  def documentInfo    = _documentInfo
+  def readonly        = _readonly
+  def modified        = _modified
 
   // Mark the instance as modified
   // This is used so we can optimize serialization: if an instance is inline and not modified, we don't need to

@@ -20,7 +20,6 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-    xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"
 
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
@@ -31,10 +30,10 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
     <!-- Don't duplicate constants between Scala/XSLT -->
-    <xsl:variable name="att-x" select="ClientNames:AttX()"/>
-    <xsl:variable name="att-y" select="ClientNames:AttY()"/>
-    <xsl:variable name="att-w" select="ClientNames:AttW()"/>
-    <xsl:variable name="att-h" select="ClientNames:AttH()"/>
+    <xsl:variable name="att-x" select="ClientNames:AttX()" xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"/>
+    <xsl:variable name="att-y" select="ClientNames:AttY()" xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"/>
+    <xsl:variable name="att-w" select="ClientNames:AttW()" xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"/>
+    <xsl:variable name="att-h" select="ClientNames:AttH()" xmlns:ClientNames="java:org.orbeon.oxf.fr.ClientNames"/>
 
     <xsl:variable name="root" select="/*[1]"/>
 

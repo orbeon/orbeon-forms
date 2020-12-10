@@ -16,7 +16,7 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"
+    xmlns:grid-migration="java:org.orbeon.oxf.fr.GridDataMigration"
     xmlns:metadata="java:org.orbeon.oxf.fr.FormRunnerMetadata">
 
     <!-- ==== Form Runner send submissions ========================================================================= -->
@@ -39,7 +39,7 @@
                 else if ($params = 'metadata') then
                    metadata:createFormMetadataDocument()
                 else
-                   migration:dataMaybeMigratedFromEdge(
+                   grid-migration:dataMaybeMigratedFromEdge(
                        fr:app-name(),
                        fr:form-name(),
                        xxf:instance('fr-form-instance')/root(),

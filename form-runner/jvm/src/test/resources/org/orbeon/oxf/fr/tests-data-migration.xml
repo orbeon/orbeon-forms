@@ -106,7 +106,7 @@
                         </xf:instance>
 
                         <xf:submission
-                            xmlns:migration="java:org.orbeon.oxf.fr.GridDataMigration"
+                            xmlns:grid-migration="java:org.orbeon.oxf.fr.GridDataMigration"
 
                             id="fr-test-submission"
                             resource="echo:"
@@ -120,7 +120,7 @@
                             serialization="application/xml"
 
                             ref="
-                                migration:dataMaybeMigratedFromEdge(
+                                grid-migration:dataMaybeMigratedFromEdge(
                                     xxf:instance('fr-form-metadata')/application-name,
                                     xxf:instance('fr-form-metadata')/form-name,
                                     xxf:instance('fr-form-instance')/root(),

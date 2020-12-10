@@ -85,32 +85,24 @@ object MigrationOps48 extends MigrationOps {
     jsonString : String
   ): MigrationSet48 = {
 
-    import spray.json._
-    val json = jsonString.parseJson
+    import io.circe.parser
+    import io.circe.generic.auto._
 
-    // Ouch, a lot of boilerplate!
-    // For `MigrationSet20191`, we use Circe's automatic serialization. We could do this here, but we'd need to support
-    // the "old" format as well for backward compatibility.
-    val migrations =
-      Iterator(json) collect {
-        case JsArray(m) =>
-          m.iterator collect {
-            case JsObject(fields) =>
+    case class PathAndName(path: String, `iteration-name`: String)
 
-              val path          = fields("path").asInstanceOf[JsString].value
-              val iterationName = fields("iteration-name").asInstanceOf[JsString].value
-
-              Migration48(
-                path.splitTo[List]("/") map {
-                  case PathElem.TrimPathElementRE(p) => PathElem(p)
-                  case name                          => throw new IllegalArgumentException(s"invalid migration name: `$name`")
-                },
-                PathElem(iterationName)
-              )
-          }
-      }
-
-    MigrationSet48(migrations.flatten.to(List))
+    MigrationSet48(
+      for {
+        pathAnNames                      <- parser.decode[Iterable[PathAndName]](jsonString).toOption.toList
+        PathAndName(path, iterationName) <- pathAnNames
+      } yield
+        Migration48(
+          path.splitTo[List]("/") map {
+            case PathElem.TrimPathElementRE(p) => PathElem(p)
+            case name                          => throw new IllegalArgumentException(s"invalid migration name: `$name`")
+          },
+          PathElem(iterationName)
+        )
+    )
   }
 
   def migrateDataDown(

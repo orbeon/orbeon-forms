@@ -753,6 +753,10 @@ div.orbeon.orbeon-portlet-div {
                     @optionsWidth : 700px;
                     @2colWidth    : @optionsWidth/2;
                     @3colWidth    : @optionsWidth/3;
+
+                    // So all the options are on the same line
+                    min-width: @optionsWidth;
+
                     .fb-action-option-2-col-span-1 { width: @2colWidth }
                     .fb-action-option-3-col-span-1 { width: @3colWidth }
                     .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }

@@ -34,6 +34,19 @@
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
+            <!-- TODO: Duplicated in view.xhtml -->
+            <xf:var
+                name="tz"
+                value="
+                    (: Convert from for example `+05:30` to `PT05H30M` :)
+                    for $p in xxf:trim(xxf:property('oxf.fr.default-timezone'))[xxf:non-blank()]
+                    return
+                        let $prefix  := if (starts-with($p, '+')) then 'PT' else '-PT',
+                            $hours   := substring($p, 2, 2),
+                            $minutes := substring($p, 5, 2)
+                        return
+                            xs:dayTimeDuration(concat($prefix, $hours, 'H', $minutes, 'M'))"/>
+
             <xf:action event="xforms-model-construct-done">
 
                 <!-- Initialize remote servers information only if user is logged in and has at least one matching role -->
@@ -1045,13 +1058,22 @@
                                             <xf:output
                                                     ref="last-modified-time"
                                                     value="
-                                                        for $v in adjust-dateTime-to-timezone(xs:dateTime(.))
-                                                            return
-                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
-                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
-                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+                                                        for $v in
+                                                            if (exists($tz)) then
+                                                                adjust-dateTime-to-timezone(
+                                                                    xs:dateTime(.),
+                                                                    $tz
+                                                                )
+                                                            else
+                                                                adjust-dateTime-to-timezone(
+                                                                    xs:dateTime(.)
+                                                                )
+                                                        return
+                                                            if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                            then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                            else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                            then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
+                                                            else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                         </xh:td>
                                         <xf:group ref=".[$remote-successful]">
                                             <xf:group ref=".[$any-has-admin-permission]">
@@ -1074,13 +1096,22 @@
                                                 <xf:output
                                                     ref="remote-last-modified-time"
                                                     value="
-                                                        for $v in adjust-dateTime-to-timezone(xs:dateTime(.))
-                                                            return
-                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
-                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
-                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+                                                        for $v in
+                                                            if (exists($tz)) then
+                                                                adjust-dateTime-to-timezone(
+                                                                    xs:dateTime(.),
+                                                                    $tz
+                                                                )
+                                                            else
+                                                                adjust-dateTime-to-timezone(
+                                                                    xs:dateTime(.)
+                                                                )
+                                                        return
+                                                            if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                            then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                            else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                            then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
+                                                            else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                             </xh:td>
                                         </xf:group>
                                         <xh:td>

@@ -73,6 +73,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.*.data-format-version"                   value="4.0.0"/>
     <property as="xs:boolean" name="oxf.fr.persistence.*.escape-non-ascii-characters"           value="false"/>
 
+    <property as="xs:string"  name="oxf.fr.default-timezone"                                    value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-navbar-logo.png

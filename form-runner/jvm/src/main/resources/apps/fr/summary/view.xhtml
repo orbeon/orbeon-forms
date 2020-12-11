@@ -40,6 +40,19 @@
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
             <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
+            <!-- TODO: Duplicated in home.xhtml -->
+            <xf:var
+                name="tz"
+                value="
+                    (: Convert from for example `+05:30` to `PT05H30M` :)
+                    for $p in xxf:trim(xxf:property('oxf.fr.default-timezone'))[xxf:non-blank()]
+                    return
+                        let $prefix  := if (starts-with($p, '+')) then 'PT' else '-PT',
+                            $hours   := substring($p, 2, 2),
+                            $minutes := substring($p, 5, 2)
+                        return
+                            xs:dayTimeDuration(concat($prefix, $hours, 'H', $minutes, 'M'))"/>
+
             <xf:var
                 name="app-query"
                 as="element(query)?"
@@ -912,14 +925,22 @@
                                                     <xf:var
                                                         name="created"
                                                         value="
-                                                            for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@created[. castable as xs:dateTime]))
-                                                                return
-                                                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
-                                                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
-                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-
+                                                            for $v in
+                                                                if (exists($tz)) then
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@created[. castable as xs:dateTime]),
+                                                                        $tz
+                                                                    )
+                                                                else
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@created[. castable as xs:dateTime])
+                                                                    )
+                                                            return
+                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
+                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-summary-created">
                                                         <xf:group ref=".[$edit-view != '']">
                                                             <xh:a href="{$current-document-href}">
@@ -935,14 +956,22 @@
                                                     <xf:var
                                                         name="last-modified"
                                                         value="
-                                                            for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@last-modified[. castable as xs:dateTime]))
-                                                                return
-                                                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
-                                                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
-                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
-
+                                                            for $v in
+                                                                if (exists($tz)) then
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime]),
+                                                                        $tz
+                                                                    )
+                                                                else
+                                                                    adjust-dateTime-to-timezone(
+                                                                        xs:dateTime($document/@last-modified[. castable as xs:dateTime])
+                                                                    )
+                                                            return
+                                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
+                                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-summary-modified">
                                                         <xf:group ref=".[$edit-view != '']">
                                                             <xh:a href="{$current-document-href}">

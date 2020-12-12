@@ -16,10 +16,34 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
+import java.time.{LocalDateTime, ZoneId}
+
 trait FormRunnerSummary {
+
+  private def zoneIdToOffsetAsOfNow(zoneId: String): String = {
+    // NOTE: It's unclear how right this is just around the time of transitioning from regular
+    // time to daylight saving time.
+    val zid = ZoneId.of(zoneId)
+    zid.getRules.getOffset(LocalDateTime.now(zid)).getId
+  }
+
+  private val OffsetR = """([+-])(\d{2}):(\d{2})""".r
+
+  private def offsetToDuration(offset: String): String = {
+    val OffsetR(sign, hours, minutes) = offset
+    (if (sign == "+") "PT" else "-PT") + hours + 'H' + minutes + 'M'
+  }
+
+  //@XPathFunction
+  def defaultTimezoneToOffsetString: Option[String] =
+    properties.getPropertyOpt("oxf.fr.default-timezone")
+      .flatMap(_.value.toString.trimAllToOpt)
+      .map(zoneIdToOffsetAsOfNow)
+      .map(offsetToDuration)
 
   //@XPathFunction
   def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =

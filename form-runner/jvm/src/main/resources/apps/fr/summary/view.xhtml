@@ -40,18 +40,11 @@
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
             <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
-            <!-- TODO: Duplicated in home.xhtml -->
             <xf:var
                 name="tz"
                 value="
-                    (: Convert from for example `+05:30` to `PT05H30M` :)
-                    for $p in xxf:trim(xxf:property('oxf.fr.default-timezone'))[xxf:non-blank()]
-                    return
-                        let $prefix  := if (starts-with($p, '+')) then 'PT' else '-PT',
-                            $hours   := substring($p, 2, 2),
-                            $minutes := substring($p, 5, 2)
-                        return
-                            xs:dayTimeDuration(concat($prefix, $hours, 'H', $minutes, 'M'))"/>
+                    for $offset in frf:defaultTimezoneToOffsetString()
+                    return xs:dayTimeDuration($offset)"/>
 
             <xf:var
                 name="app-query"

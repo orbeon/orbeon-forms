@@ -34,18 +34,11 @@
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
-            <!-- TODO: Duplicated in view.xhtml -->
             <xf:var
                 name="tz"
                 value="
-                    (: Convert from for example `+05:30` to `PT05H30M` :)
-                    for $p in xxf:trim(xxf:property('oxf.fr.default-timezone'))[xxf:non-blank()]
-                    return
-                        let $prefix  := if (starts-with($p, '+')) then 'PT' else '-PT',
-                            $hours   := substring($p, 2, 2),
-                            $minutes := substring($p, 5, 2)
-                        return
-                            xs:dayTimeDuration(concat($prefix, $hours, 'H', $minutes, 'M'))"/>
+                    for $offset in frf:defaultTimezoneToOffsetString()
+                    return xs:dayTimeDuration($offset)"/>
 
             <xf:action event="xforms-model-construct-done">
 

@@ -237,7 +237,7 @@ trait CreateUpdateDelete
               |""".stripMargin
 
         val orderByClause = req.provider match {
-          case Provider.MySQL => " ORDER BY data_id"
+          case Provider.MySQL => " ORDER BY last_modified_time"
           case _              => ""
         }
 

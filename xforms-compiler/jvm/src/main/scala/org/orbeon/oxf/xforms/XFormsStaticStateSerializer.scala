@@ -1,7 +1,9 @@
 package org.orbeon.oxf.xforms
 
+import io.circe.generic.auto._
 import io.circe.syntax._
-import io.circe.{Encoder, Json}
+import io.circe.{Encoder, Json, KeyEncoder}
+import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, LangRef, TopLevelPartAnalysis, WithChildrenTrait}
@@ -10,9 +12,11 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.dom
+import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -29,6 +33,19 @@ import scala.jdk.CollectionConverters._
 // - XML: omit `"atts": []`
 //
 object XFormsStaticStateSerializer {
+
+  // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.
+  implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => Json.obj(
+    "localName"          -> Json.fromString(a.localName),
+    "prefix"             -> Json.fromString(a.namespace.prefix),
+    "uri"                -> Json.fromString(a.namespace.uri),
+  )
+
+  implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
+    "parent"  -> None.asJson, // must be parent scope id TODO
+    "scopeId" -> Json.fromString(a.scopeId),
+    "idMap"   -> a.idMap.asJson
+  )
 
   implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
 
@@ -64,7 +81,43 @@ object XFormsStaticStateSerializer {
     )
   }
 
+//  implicit val qNameKeyEncoder         : KeyEncoder[QName]          = (qName: QName) => qName.localName // XXX FIXME
   implicit val encodeAnnotatedTemplate : Encoder[AnnotatedTemplate] = deriveEncoder
+
+  implicit val commonBindingEncoder: Encoder[CommonBinding]     = (a: CommonBinding) => Json.obj(
+    "bindingElemId"               -> a.bindingElemId.asJson,
+    "bindingElemNamespaceMapping" -> a.bindingElemNamespaceMapping.asJson,
+    "directName"                  -> a.directName.asJson,
+    "cssName"                     -> a.cssName.asJson,
+    "containerElementName"        -> Json.fromString(a.containerElementName),
+    "modeBinding"                 -> Json.fromBoolean(a.modeBinding),
+    "modeValue"                   -> Json.fromBoolean(a.modeValue),
+    "modeExternalValue"           -> Json.fromBoolean(a.modeExternalValue),
+    "modeJavaScriptLifecycle"     -> Json.fromBoolean(a.modeJavaScriptLifecycle),
+    "modeLHHA"                    -> Json.fromBoolean(a.modeLHHA),
+    "modeFocus"                   -> Json.fromBoolean(a.modeFocus),
+    "modeItemset"                 -> Json.fromBoolean(a.modeItemset),
+    "modeSelection"               -> Json.fromBoolean(a.modeSelection),
+    "modeHandlers"                -> Json.fromBoolean(a.modeHandlers),
+    "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson,
+    "standardLhhaAsSet"           -> a.standardLhhaAsSet.asJson,
+    "labelFor"                    -> a.labelFor.asJson,
+    "formatOpt"                   -> a.formatOpt.asJson,
+    "serializeExternalValueOpt"   -> a.serializeExternalValueOpt.asJson,
+    "deserializeExternalValueOpt" -> a.deserializeExternalValueOpt.asJson,
+    "debugBindingName"            -> Json.fromString(a.debugBindingName),
+    "cssClasses"                  -> Json.fromString(a.cssClasses),
+    "allowedExternalEvents"       -> a.allowedExternalEvents.asJson,
+    //"constantInstances"           -> a.constantInstances Map[(Int, Int), StaticXPath.DocumentNodeInfoType] // XXX FIXME
+  )
+
+  implicit val concreteBindingEncoder: Encoder[ConcreteBinding]   = (a: ConcreteBinding) => Json.obj(
+    "innerScope"   -> a.innerScope.asJson,
+    "templateTree" -> a.templateTree.asJson,
+    // We do not need to encode `boundElementAtts` as they are just a copy of the attributes on the bound
+    // element, and we already have those. So we can save that during serialization, at least until
+    // we decide to remove attributes on elements from the serialization.
+  )
 
   def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
@@ -86,14 +139,8 @@ object XFormsStaticStateSerializer {
       (distinct, distinct.zipWithIndex.toMap)
     }
 
-    implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
-      "parent"  -> None.asJson, // must be parent scope id TODO
-      "scopeId" -> Json.fromString(a.scopeId),
-      "idMap"   -> a.idMap.asJson
-    )
-
     implicit val encodeAttributeControl: Encoder[AttributeControl] = (a: AttributeControl) => Json.obj(
-      "foo" -> Json.fromString("bar")
+      "foo" -> Json.fromString("bar") // XXX FIXME
     )
 
     implicit val encodeLangRef           : Encoder[LangRef]           = deriveEncoder
@@ -107,13 +154,6 @@ object XFormsStaticStateSerializer {
     implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
       "hash" -> Json.fromString(a.hash),
       "mapping" -> a.mapping.asJson
-    )
-
-    // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.
-    implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => Json.obj(
-      "localName"          -> Json.fromString(a.localName),
-      "prefix"             -> Json.fromString(a.namespace.prefix),
-      "uri"                -> Json.fromString(a.namespace.uri),
     )
 
     implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
@@ -240,7 +280,11 @@ object XFormsStaticStateSerializer {
         case c: GroupControl           => Nil
         case c: DialogControl          => Nil
         case c: AttributeControl       => Nil
-        case c: ComponentControl       => Nil
+        case c: ComponentControl       =>
+          List(
+            "commonBinding" -> c.commonBinding.asJson,
+            "bindingOpt"    -> c.bindingOpt.asJson
+          )
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
         case c: VariableAnalysisTrait  =>

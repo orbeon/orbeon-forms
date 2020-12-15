@@ -875,7 +875,13 @@ lazy val xformsCommonJS = xformsCommon.js
 lazy val xformsAnalysis = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-analysis"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-xforms-analysis"
+    name := "orbeon-xforms-analysis",
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
   )
 
 lazy val xformsAnalysisJVM = xformsAnalysis.jvm

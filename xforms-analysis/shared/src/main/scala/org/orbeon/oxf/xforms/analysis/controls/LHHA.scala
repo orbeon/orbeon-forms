@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry}
+import enumeratum.{CirceEnum, Enum, EnumEntry}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_SHORT
@@ -9,7 +9,7 @@ import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_SHORT
 
 sealed trait LHHA extends EnumEntry with Lowercase
 
-object LHHA extends Enum[LHHA] {
+object LHHA extends Enum[LHHA] with CirceEnum[LHHA] {
 
   val values = findValues
 

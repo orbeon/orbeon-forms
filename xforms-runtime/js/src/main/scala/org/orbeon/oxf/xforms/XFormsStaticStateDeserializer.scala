@@ -591,6 +591,10 @@ object XFormsStaticStateDeserializer {
             case ROOT_QNAME =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
 
+            case qName => // must be component, then? xxx TODO
+
+
+
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}
           }

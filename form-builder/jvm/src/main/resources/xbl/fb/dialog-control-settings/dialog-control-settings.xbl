@@ -805,6 +805,10 @@
                         name="builtin-type"
                         value="$i/validations/validation[@type = 'datatype']/builtin-type/string()"/>
 
+                    <xf:var
+                        name="is-attachment"
+                        value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
+
                     <!-- TODO: Language selector like in `dialog-itemsets.xbl` (create XBL component and use native functions). -->
 
                     <fr:tabbable id="fb-tabbable">
@@ -871,10 +875,6 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-
-                                                <xf:var
-                                                    name="is-attachment"
-                                                    value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
 
                                                 <xf:var
                                                     name="is-static-attachment"
@@ -1034,14 +1034,15 @@
                                         value="
                                             'formula',
                                             (
-                                                if ($builtin-type = ('string', 'email')) then
+                                                if ($is-attachment) then
+                                                    (: For #4725: special case as multiple attachment is not an `anyURI` :)
+                                                    $attachment-constraints
+                                                else if ($builtin-type = ('string', 'email')) then
                                                     $string-constraints
                                                 else if ($builtin-type = 'integer') then
                                                     $integer-constraints
                                                 else if ($builtin-type = 'decimal') then
                                                     $decimal-constraints
-                                                else if ($builtin-type = 'anyURI') then
-                                                    $attachment-constraints
                                                 else if ($builtin-type = 'date') then
                                                     $date-constraints
                                                 else

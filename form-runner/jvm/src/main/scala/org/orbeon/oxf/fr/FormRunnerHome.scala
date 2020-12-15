@@ -236,7 +236,11 @@ trait FormRunnerHome {
           // Don't just use remoteNode, because we need `remote-` prefixes for remote data
           elementInfo(
             "form",
-            (remoteNode / Names.AppName head) :: (remoteNode / Names.FormName head) :: remoteElements(remoteNode)
+            (remoteNode /@ "operations")     ++:
+            (remoteNode / Names.FormVersion) ++:
+            (remoteNode / Names.AppName)     ++:
+            (remoteNode / Names.FormName)    ++:
+            remoteElements(remoteNode)
           )
         case (Some(localNode), Some(remoteNode)) =>
           insert(origin = remoteElements(remoteNode), into = localNode, after = localNode / *, doDispatch = false)

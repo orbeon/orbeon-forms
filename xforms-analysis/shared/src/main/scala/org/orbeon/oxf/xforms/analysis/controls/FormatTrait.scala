@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.xforms.XFormsNames
 
 trait FormatTrait extends ElementAnalysis {
+  // Leave as `def`s to avoid `fullOpt` compilation error
   def format  : Option[String] = element.attributeValueOpt(XFormsNames.XXFORMS_FORMAT_QNAME)
   def unformat: Option[String] = element.attributeValueOpt(XFormsNames.XXFORMS_UNFORMAT_QNAME)
 }

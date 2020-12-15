@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.library.{XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.XBLAssets
+import org.orbeon.oxf.xforms.xbl.{CommonBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -35,7 +35,8 @@ object XFormsStaticStateDeserializer {
 
   def deserialize(jsonString: String)(implicit logger: IndentedLogger): XFormsStaticState = {
 
-    var collectedNamespaces = IndexedSeq[Map[String, String]]()
+    var collectedNamespaces     = IndexedSeq[Map[String, String]]()
+    var collectedCommonBindings = IndexedSeq[CommonBinding]()
 
     val scopes = mutable.Map[String, Scope]()
 
@@ -77,8 +78,7 @@ object XFormsStaticStateDeserializer {
       }
     }
 
-    implicit val decodeSAXStore: Decoder[SAXStore] = (c: HCursor) => {
-
+    implicit val decodeSAXStore: Decoder[SAXStore] = (c: HCursor) =>
       for {
         eventBufferPosition          <- c.get[Int]("eventBufferPosition")
         eventBuffer                  <- c.get[Array[Byte]]("eventBuffer")
@@ -119,7 +119,6 @@ object XFormsStaticStateDeserializer {
 
         a
       }
-    }
 
 //    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
 //      "_id"                          -> Json.fromString(m._id),
@@ -142,6 +141,79 @@ object XFormsStaticStateDeserializer {
 //
 //    }
 
+    // TODO: Later must be optimized by sharing based on hash!
+    implicit val decodeNamespaceMapping: Decoder[NamespaceMapping] = (c: HCursor) =>
+      for {
+        hash    <- c.get[String]("hash")
+        mapping <- c.get[Map[String, String]]("mapping")
+      } yield
+        NamespaceMapping(hash, mapping)
+
+    implicit val decodeQName: Decoder[dom.QName] = (c: HCursor) =>
+      for {
+        localName <- c.get[String]("localName")
+        prefix    <- c.get[String]("prefix")
+        uri       <- c.get[String]("uri")
+      } yield
+        dom.QName(localName: String, prefix: String, uri: String)
+
+    implicit val decodeDocumentInfo: Decoder[StaticXPath.DocumentNodeInfoType] =
+      ???
+
+    implicit val decodeCommonBinding: Decoder[CommonBinding] = (c: HCursor) =>
+      for {
+        bindingElemId               <- c.get[Option[String]]("bindingElemId")
+        bindingElemNamespaceMapping <- c.get[NamespaceMapping]("bindingElemNamespaceMapping")
+        directName                  <- c.get[Option[QName]]("directName")
+        cssName                     <- c.get[Option[String]]("cssName")
+        containerElementName        <- c.get[String]("containerElementName")
+        modeBinding                 <- c.get[Boolean]("modeBinding")
+        modeValue                   <- c.get[Boolean]("modeValue")
+        modeExternalValue           <- c.get[Boolean]("modeExternalValue")
+        modeJavaScriptLifecycle     <- c.get[Boolean]("modeJavaScriptLifecycle")
+        modeLHHA                    <- c.get[Boolean]("modeLHHA")
+        modeFocus                   <- c.get[Boolean]("modeFocus")
+        modeItemset                 <- c.get[Boolean]("modeItemset")
+        modeSelection               <- c.get[Boolean]("modeSelection")
+        modeHandlers                <- c.get[Boolean]("modeHandlers")
+        standardLhhaAsSeq           <- c.get[Seq[LHHA]]("standardLhhaAsSeq")
+        standardLhhaAsSet           <- c.get[Set[LHHA]]("standardLhhaAsSet")
+        labelFor                    <- c.get[Option[String]]("labelFor")
+        formatOpt                   <- c.get[Option[String]]("formatOpt")
+        serializeExternalValueOpt   <- c.get[Option[String]]("serializeExternalValueOpt")
+        deserializeExternalValueOpt <- c.get[Option[String]]("deserializeExternalValueOpt")
+        debugBindingName            <- c.get[String]("debugBindingName")
+        cssClasses                  <- c.get[String]("cssClasses")
+        allowedExternalEvents       <- c.get[Set[String]]("allowedExternalEvents")
+        constantInstances           <- c.get[Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]]("constantInstances")
+      } yield
+        CommonBinding(
+          bindingElemId,
+          bindingElemNamespaceMapping,
+          directName,
+          cssName,
+          containerElementName,
+          modeBinding,
+          modeValue,
+          modeExternalValue,
+          modeJavaScriptLifecycle,
+          modeLHHA,
+          modeFocus,
+          modeItemset,
+          modeSelection,
+          modeHandlers,
+          standardLhhaAsSeq,
+          standardLhhaAsSet,
+          labelFor,
+          formatOpt,
+          serializeExternalValueOpt,
+          deserializeExternalValueOpt,
+          debugBindingName,
+          cssClasses,
+          allowedExternalEvents,
+          constantInstances.toMap,
+        )
+
     implicit val decodeScope: Decoder[Scope] = (c: HCursor) =>
       for {
 //        parent       <- c.get[Scope]("parent") // TODO
@@ -159,22 +231,6 @@ object XFormsStaticStateDeserializer {
     implicit val decodeNamespace         : Decoder[dom.Namespace]     = deriveDecoder
     implicit val decodeBasicCredentials  : Decoder[BasicCredentials]  = deriveDecoder
     implicit val decodeLHHAValue         : Decoder[LHHAValue]         = deriveDecoder
-
-    implicit val decodeQName: Decoder[dom.QName] = (c: HCursor) =>
-      for {
-        localName <- c.get[String]("localName")
-        prefix    <- c.get[String]("prefix")
-        uri       <- c.get[String]("uri")
-      } yield
-        dom.QName(localName: String, prefix: String, uri: String)
-
-    // TODO: Later must be optimized by sharing based on hash!
-    implicit val decodeNamespaceMapping: Decoder[NamespaceMapping] = (c: HCursor) =>
-      for {
-        hash    <- c.get[String]("hash")
-        mapping <- c.get[Map[String, String]]("mapping")
-      } yield
-        NamespaceMapping(hash, mapping)
 
     implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {
@@ -261,6 +317,24 @@ object XFormsStaticStateDeserializer {
         // TODO: Review how we do this. Maybe we should use a map to builders, like `ControlAnalysisFactory`.
         val newControl =
           element.getQName match {
+
+            case _ if c.downField("commonBindingRef").succeeded =>
+
+              val commonBindingRef = c.get[Int]("commonBindingRef").right.get // XXX TODO
+              val commonBinding = collectedCommonBindings(commonBindingRef)
+
+              val componentControl =
+                (commonBinding.modeValue, commonBinding.modeLHHA) match {
+                  case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true)
+                  case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with                          StaticLHHASupport
+                  case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait
+                  case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait with StaticLHHASupport
+                }
+
+              componentControl.setConcreteBinding(???)
+
+              componentControl
+
             case XFORMS_MODEL_QNAME            => new Model                 (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_INPUT_QNAME            => new InputControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_TEXTAREA_QNAME         => new TextareaControl       (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
@@ -591,10 +665,6 @@ object XFormsStaticStateDeserializer {
             case ROOT_QNAME =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
 
-            case qName => // must be component, then? xxx TODO
-
-
-
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}
           }
@@ -639,6 +709,10 @@ object XFormsStaticStateDeserializer {
           collectedNamespaces = namespaces
         }
         nonDefaultProperties <- c.get[Map[String, (String, Boolean)]]("nonDefaultProperties")
+        commonBindings       <- c.get[IndexedSeq[CommonBinding]]("commonBindings")
+        _ = {
+          collectedCommonBindings = commonBindings
+        }
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")
       } yield {

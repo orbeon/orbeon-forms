@@ -58,7 +58,8 @@ trait StaticLHHASupport extends ElementAnalysis {
 
     }
 
-  val beforeAfterTokensOpt: Option[(List[String], List[String])] =
+  // Make `var` for `fullOpt` error "Assignment to immutable field beforeAfterTokensOpt"
+  var beforeAfterTokensOpt: Option[(List[String], List[String])] =
     element.attributeValueOpt(XFormsNames.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
 
   // analyzeXPath(): this is done as part of control analysis, see:

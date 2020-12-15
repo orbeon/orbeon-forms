@@ -55,5 +55,5 @@ class ComponentControl(
 
 trait ValueComponentTrait extends ComponentControl with ValueTrait with FormatTrait {
   override def format  : Option[String] = commonBinding.formatOpt
-  override val unformat: Option[String] = None
+  override def unformat: Option[String] = None
 }

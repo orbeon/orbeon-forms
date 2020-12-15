@@ -14,6 +14,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
@@ -81,35 +82,11 @@ object XFormsStaticStateSerializer {
     )
   }
 
-//  implicit val qNameKeyEncoder         : KeyEncoder[QName]          = (qName: QName) => qName.localName // XXX FIXME
-  implicit val encodeAnnotatedTemplate : Encoder[AnnotatedTemplate] = deriveEncoder
+  implicit val encodeAnnotatedTemplate: Encoder[AnnotatedTemplate] = deriveEncoder
 
-  implicit val commonBindingEncoder: Encoder[CommonBinding]     = (a: CommonBinding) => Json.obj(
-    "bindingElemId"               -> a.bindingElemId.asJson,
-    "bindingElemNamespaceMapping" -> a.bindingElemNamespaceMapping.asJson,
-    "directName"                  -> a.directName.asJson,
-    "cssName"                     -> a.cssName.asJson,
-    "containerElementName"        -> Json.fromString(a.containerElementName),
-    "modeBinding"                 -> Json.fromBoolean(a.modeBinding),
-    "modeValue"                   -> Json.fromBoolean(a.modeValue),
-    "modeExternalValue"           -> Json.fromBoolean(a.modeExternalValue),
-    "modeJavaScriptLifecycle"     -> Json.fromBoolean(a.modeJavaScriptLifecycle),
-    "modeLHHA"                    -> Json.fromBoolean(a.modeLHHA),
-    "modeFocus"                   -> Json.fromBoolean(a.modeFocus),
-    "modeItemset"                 -> Json.fromBoolean(a.modeItemset),
-    "modeSelection"               -> Json.fromBoolean(a.modeSelection),
-    "modeHandlers"                -> Json.fromBoolean(a.modeHandlers),
-    "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson,
-    "standardLhhaAsSet"           -> a.standardLhhaAsSet.asJson,
-    "labelFor"                    -> a.labelFor.asJson,
-    "formatOpt"                   -> a.formatOpt.asJson,
-    "serializeExternalValueOpt"   -> a.serializeExternalValueOpt.asJson,
-    "deserializeExternalValueOpt" -> a.deserializeExternalValueOpt.asJson,
-    "debugBindingName"            -> Json.fromString(a.debugBindingName),
-    "cssClasses"                  -> Json.fromString(a.cssClasses),
-    "allowedExternalEvents"       -> a.allowedExternalEvents.asJson,
-    //"constantInstances"           -> a.constantInstances Map[(Int, Int), StaticXPath.DocumentNodeInfoType] // XXX FIXME
-  )
+  // Serialize as an XML string. Consider whether we are happy with this serialization.
+  implicit val encodeDocumentInfo: Encoder[StaticXPath.DocumentNodeInfoType] =
+    (a: StaticXPath.DocumentNodeInfoType) => Json.fromString(StaticXPath.tinyTreeToString(a))
 
   implicit val concreteBindingEncoder: Encoder[ConcreteBinding]   = (a: ConcreteBinding) => Json.obj(
     "innerScope"   -> a.innerScope.asJson,
@@ -131,9 +108,58 @@ object XFormsStaticStateSerializer {
 
       val distinct = mutable.LinkedHashSet[Map[String, String]]()
 
-      staticState.topLevelPart.getTopLevelControls.iterator flatMap
-        (ElementAnalysis.iterateDescendants(_, includeSelf = true)) foreach { e =>
-        distinct += e.namespaceMapping.mapping
+      staticState.topLevelPart.iterateControls foreach {
+        case e: ComponentControl =>
+          distinct += e.namespaceMapping.mapping
+          distinct += e.commonBinding.bindingElemNamespaceMapping.mapping
+        case e =>
+          distinct += e.namespaceMapping.mapping
+      }
+
+      (distinct, distinct.zipWithIndex.toMap)
+    }
+
+    // Only pass the position which identifies a namespace mapping
+    val encodeNamespaceMappingHashOnly: Encoder[NamespaceMapping] = (a: NamespaceMapping) =>
+      Json.fromInt(collectedNamespacesWithPositions(a.mapping))
+
+    implicit val commonBindingEncoder: Encoder[CommonBinding] = (a: CommonBinding) => Json.obj(
+      "bindingElemId"               -> a.bindingElemId.asJson,
+      "bindingElemNamespaceMapping" -> encodeNamespaceMappingHashOnly(a.bindingElemNamespaceMapping),
+      "directName"                  -> a.directName.asJson,
+      "cssName"                     -> a.cssName.asJson,
+      "containerElementName"        -> Json.fromString(a.containerElementName),
+      "modeBinding"                 -> Json.fromBoolean(a.modeBinding),
+      "modeValue"                   -> Json.fromBoolean(a.modeValue),
+      "modeExternalValue"           -> Json.fromBoolean(a.modeExternalValue),
+      "modeJavaScriptLifecycle"     -> Json.fromBoolean(a.modeJavaScriptLifecycle),
+      "modeLHHA"                    -> Json.fromBoolean(a.modeLHHA),
+      "modeFocus"                   -> Json.fromBoolean(a.modeFocus),
+      "modeItemset"                 -> Json.fromBoolean(a.modeItemset),
+      "modeSelection"               -> Json.fromBoolean(a.modeSelection),
+      "modeHandlers"                -> Json.fromBoolean(a.modeHandlers),
+      "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson,
+      "standardLhhaAsSet"           -> a.standardLhhaAsSet.asJson,
+      "labelFor"                    -> a.labelFor.asJson,
+      "formatOpt"                   -> a.formatOpt.asJson,
+      "serializeExternalValueOpt"   -> a.serializeExternalValueOpt.asJson,
+      "deserializeExternalValueOpt" -> a.deserializeExternalValueOpt.asJson,
+      "debugBindingName"            -> Json.fromString(a.debugBindingName),
+      "cssClasses"                  -> Json.fromString(a.cssClasses),
+      "allowedExternalEvents"       -> a.allowedExternalEvents.asJson,
+      "constantInstances"           -> a.constantInstances.toIterable.asJson
+    )
+
+    val (
+      collectedCommonBindingsInOrder      : Iterable[CommonBinding],
+      collectedCommonBindingsWithPositions: Map[CommonBinding, Int]
+    ) = {
+
+      val distinct = mutable.LinkedHashSet[CommonBinding]()
+
+      staticState.topLevelPart.iterateControls foreach {
+        case c: ComponentControl => distinct += c.commonBinding
+        case _ =>
       }
 
       (distinct, distinct.zipWithIndex.toMap)
@@ -147,12 +173,8 @@ object XFormsStaticStateSerializer {
     implicit val encodeNamespace         : Encoder[dom.Namespace]     = deriveEncoder
     implicit val encodeBasicCredentials  : Encoder[BasicCredentials]  = deriveEncoder
 
-    // Only pass the position which identifies a namespace mapping
-    val encodeNamespaceMappingHashOnly: Encoder[NamespaceMapping] = (a: NamespaceMapping) =>
-      Json.fromInt(collectedNamespacesWithPositions(a.mapping))
-
     implicit val encodeNamespaceMapping: Encoder[NamespaceMapping] = (a: NamespaceMapping) => Json.obj(
-      "hash" -> Json.fromString(a.hash),
+      "hash"    -> Json.fromString(a.hash),
       "mapping" -> a.mapping.asJson
     )
 
@@ -282,8 +304,8 @@ object XFormsStaticStateSerializer {
         case c: AttributeControl       => Nil
         case c: ComponentControl       =>
           List(
-            "commonBinding" -> c.commonBinding.asJson,
-            "bindingOpt"    -> c.bindingOpt.asJson
+            "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
+            "bindingOpt"       -> c.bindingOpt.asJson
           )
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
@@ -351,6 +373,7 @@ object XFormsStaticStateSerializer {
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
+      "commonBindings"       -> collectedCommonBindingsInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
       "template"             -> template.asJson,
     )

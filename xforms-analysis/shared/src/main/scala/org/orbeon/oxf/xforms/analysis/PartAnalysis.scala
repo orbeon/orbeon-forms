@@ -75,4 +75,8 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping =
     getNamespaceMapping(scope.prefixedIdForStaticId(id)) getOrElse
       (throw new IllegalStateException(s"namespace mappings not cached for scope `$scope` on element with id `$id`"))
+
+  def iterateControls: Iterator[ElementAnalysis] =
+    getTopLevelControls.iterator flatMap
+      (ElementAnalysis.iterateDescendants(_, includeSelf = true))
 }

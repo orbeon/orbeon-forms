@@ -17,6 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -25,12 +26,13 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+
 import scala.collection.compat._
 
 
@@ -73,7 +75,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     actionSourceAbsoluteId : String,
     targetControlName      : String,
     followIndexes          : Boolean
-  ): ValueRepresentation =
+  ): ValueRepresentationType =
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId,
       targetControlName,
@@ -84,7 +86,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def resolveTargetRelativeToActionSourceFromBinds(
     actionSourceAbsoluteId : String,
     targetControlName      : String
-  ): ValueRepresentation = {
+  ): ValueRepresentationType = {
 
     val functionContext = XFormsFunction.context
 
@@ -259,7 +261,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     if (allMappings.isEmpty) {
       template
     } else {
-      val newDoc = TransformerUtils.extractAsMutableDocument(template)
+      val newDoc = NodeInfoConversions.extractAsMutableDocument(template)
 
       val map = allMappings.toMap
       val allNames = map.keySet

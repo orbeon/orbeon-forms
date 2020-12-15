@@ -13,7 +13,7 @@
   */
 package org.orbeon.saxon
 
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, SaxonUtils, XMLConstants}
 import org.orbeon.saxon.MapFunctions._
 import org.orbeon.saxon.`type`._
@@ -104,6 +104,7 @@ object MapFunctions {
 
   val UnderlyingClass = classOf[UnderlyingType]
 
+  // `Configuration` is used for the `NamePool` only
   def saxonTypeForMap(config: Configuration) = new ExternalObjectType(UnderlyingClass, config)
 
   def collectMapValues(it: SequenceIterator)(implicit context: XPathContext): Iterator[UnderlyingType] = {
@@ -117,7 +118,8 @@ object MapFunctions {
     }
   }
 
-  def createValue(value: UnderlyingType, config: Configuration = XPath.GlobalConfiguration): ObjectValue =
+  // `Configuration` is used for the `NamePool` only
+  def createValue(value: UnderlyingType, config: Configuration = StaticXPath.GlobalConfiguration): ObjectValue =
     new ObjectValue(
       value,
       saxonTypeForMap(config)
@@ -142,5 +144,4 @@ trait MapFunctions extends OrbeonFunctionLibrary {
       Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE)
     )
   }
-
 }

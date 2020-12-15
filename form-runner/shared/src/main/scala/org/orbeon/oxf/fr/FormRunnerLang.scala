@@ -14,18 +14,19 @@
 package org.orbeon.oxf.fr
 
 import java.util.{List => JList}
-
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.instruct.NumberInstruction
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
 import scala.jdk.CollectionConverters._
+
 
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {
@@ -110,7 +111,7 @@ trait FormRunnerLang {
   // Public for unit tests
   def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
 
-    val request = NetUtils.getExternalContext.getRequest
+    val request = CoreCrossPlatformSupport.externalContext.getRequest
 
     def fromHeader  = request.getFirstHeader       (LiferayLanguageHeader) map cleanLanguage
     def fromRequest = request.getFirstParamAsString(LanguageParam)         map cleanLanguage
@@ -125,8 +126,8 @@ trait FormRunnerLang {
 
   // Whether there is a Saxon XPath numberer for the given language
   //@XPathFunction
-  def hasXPathNumberer(lang: String) =
-    NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
+  def hasXPathNumberer(lang: String): Boolean =
+    SaxonUtils.hasXPathNumberer(lang)
 
   private object Private {
 

@@ -15,7 +15,8 @@ package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
-import org.orbeon.saxon.om.{DocumentInfo, Name10Checker}
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.xml.SaxonUtils
 
 import scala.util.matching.Regex
 
@@ -25,7 +26,7 @@ trait MigrationSet {
 }
 
 case class PathElem(value: String) {
-  require(Name10Checker.getInstance.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value))
+  require(SaxonUtils.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value))
 }
 
 object PathElem {
@@ -68,8 +69,8 @@ trait MigrationOps {
   val version: MigrationVersion
 
   def buildMigrationSet(
-    outerDocument        : DocumentInfo,
-    availableXBLBindings : Option[DocumentInfo],
+    outerDocument        : DocumentNodeInfoType,
+    availableXBLBindings : Option[DocumentNodeInfoType],
     legacyGridsOnly      : Boolean
   ): Option[M]
 

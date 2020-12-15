@@ -34,6 +34,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = ???
 
+  def attachmentFileExists(holderValue: String): Boolean = ???
+
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = ???
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = ???
@@ -44,6 +46,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     url                : String,
     skipRewrite        : Boolean
   ): String = ???
+
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String = ???
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String = ???
 
@@ -109,6 +113,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     ???
 
   def getLastModifiedIfFast(absoluteURL: String): Long = ???
+
+  // Must not be called, see comment in trait
+  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
+    throw new UnsupportedOperationException
 
   def readTinyTree(
     configuration  : SaxonConfiguration,

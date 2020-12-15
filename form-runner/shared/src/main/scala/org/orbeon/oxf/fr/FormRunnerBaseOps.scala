@@ -20,18 +20,22 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger, NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.immutable
 import scala.util.Try
@@ -101,8 +105,8 @@ trait FormRunnerBaseOps {
   // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
   // only called from the functions above, which search in a form's view, model, or binds, which implies the
   // existence of a form model.
-  def formDefinitionHasIndex(doc: DocumentInfo): Boolean =
-    doc.selectID(FormModel) ne null
+  def formDefinitionHasIndex(inDoc: NodeInfo): Boolean =
+    SaxonUtils.selectID(inDoc, FormModel) ne null
 
   def isUnder(node: NodeInfo, under: NodeInfo, includeSelf: Boolean): Boolean =
     if (includeSelf)
@@ -112,7 +116,7 @@ trait FormRunnerBaseOps {
 
   private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
 
-    val hasIndex = formDefinitionHasIndex(inDoc.getDocumentRoot)
+    val hasIndex = formDefinitionHasIndex(inDoc)
 
     def fromSearch =
       if (includeSelf)
@@ -121,7 +125,7 @@ trait FormRunnerBaseOps {
         under descendant * find (_.id == id)
 
     def fromIndex =
-      Option(inDoc.getDocumentRoot.selectID(id)) match {
+      Option(SaxonUtils.selectID(inDoc, id)) match {
         case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) => elemOpt
         case Some(_)                                                   => fromSearch
         case None                                                      => None
@@ -145,7 +149,7 @@ trait FormRunnerBaseOps {
     def parentIsNotGridOrLegacyRepeat(n: NodeInfo) =
       n parent FRGridOrLegacyRepeatTest isEmpty
 
-    def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
+    def fromGroupById = Option(SaxonUtils.selectID(inDoc, "fb-body"))
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
     def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest  find parentIsNotGridOrLegacyRepeat
     def fromTemplate  = inDoc.rootElement / XBLTemplateTest headOption
@@ -203,8 +207,6 @@ trait FormRunnerBaseOps {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
       bind => TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
-
-  def properties: PropertySet = Properties.instance.getPropertySet
 
   def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
     if (hasAppForm(p.app, p.form))
@@ -297,7 +299,7 @@ trait FormRunnerBaseOps {
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
-    val logger                   = ProcessorImpl.logger
+    val logger                   = Loggers.logger // TODO: Form Runner logger?
     val captchaPropertyPrefix    = "oxf.fr.detail.captcha"
     val captchaPropertyShortName = captchaPropertyPrefix                :: app :: form :: Nil mkString "."
     val captchaPropertyLongName  = captchaPropertyPrefix :: "component" :: app :: form :: Nil mkString "."
@@ -375,7 +377,7 @@ trait FormRunnerBaseOps {
       propertySet.getNonBlankString("oxf.fr.external-base-url")
 
     def baseUrlFromContext: String =
-      URLRewriterUtils.rewriteURL(
+      XFormsCrossPlatformSupport.rewriteURL(
         req,
         "/",
         URLRewriter.REWRITE_MODE_ABSOLUTE

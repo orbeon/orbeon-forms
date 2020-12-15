@@ -21,10 +21,11 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -56,12 +57,12 @@ object MigrationOps20191 extends MigrationOps {
   val version: MigrationVersion = DataFormatVersion.V20191
 
   def buildMigrationSet(
-    outerDocument        : DocumentInfo,
-    availableXBLBindings : Option[DocumentInfo],
+    outerDocument        : DocumentNodeInfoType,
+    availableXBLBindings : Option[DocumentNodeInfoType],
     legacyGridsOnly      : Boolean
   ): Option[MigrationSet20191] = {
 
-    def migrationsForBinding(doc: DocumentInfo, topLevel: Boolean): Seq[Migration20191] =
+    def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): Seq[Migration20191] =
       for {
         gridElem           <- if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
         gridName           = getControlName(gridElem)

@@ -14,17 +14,19 @@
 package org.orbeon.oxf.xml
 
 import java.net.URI
-
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType}
+import org.orbeon.oxf.util.StaticXPath.{GlobalConfiguration, SaxonConfiguration, ValueRepresentationType}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.expr.parser.ExpressionTool
 import org.orbeon.saxon.expr.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression}
 import org.orbeon.saxon.functions.DeepEqual
+import org.orbeon.saxon.ma.arrays.ImmutableArrayItem
+import org.orbeon.saxon.ma.map.{DictionaryMap, HashTrieMap}
+import org.orbeon.saxon.ma.parray.ImmList
 import org.orbeon.saxon.model.{BuiltInAtomicType, BuiltInType, Converter, Type}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om._
@@ -297,6 +299,24 @@ object SaxonUtils {
   def listIterator(s: Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = if (v eq null) emptyIterator else v.iterate()
+
+  def selectID(node: NodeInfo, id: String): NodeInfo =
+    node.getTreeInfo.selectID(id, getParent = false)
+
+  def newMapItem(map: Map[AtomicValue, ValueRepresentationType]): Item = {
+    val m = new HashTrieMap
+    map foreach { case (k, v) => m.initialPut(k, v)}
+    m
+  }
+
+  def newArrayItem(v: Seq[GroundedValue]): Item =
+    new ImmutableArrayItem(ImmList.fromList(v.asJava))
+
+  def hasXPathNumberer(lang: String): Boolean =
+    GlobalConfiguration.makeNumberer(lang, null).getClass.getName.endsWith("Numberer_" + lang)
+
+  def isValidNCName(name: String): Boolean =
+    NameChecker.isValidNCName(name)
 
   val ChildAxisInfo: Int = AxisInfo.CHILD
   val AttributeAxisInfo: Int = AxisInfo.ATTRIBUTE

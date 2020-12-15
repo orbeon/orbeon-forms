@@ -16,8 +16,8 @@ package org.orbeon.xforms
 import java.io._
 import java.net.{URI, URISyntaxException}
 import java.nio.charset.Charset
-
 import cats.syntax.option._
+
 import javax.xml.transform.Result
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.stream.StreamResult
@@ -38,9 +38,10 @@ import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, PathUtils, SecureUtils, URLRewriterUtils, UploadProgress}
+import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, PathUtils, SecureUtils, URLRewriterUtils, UploadProgress, XPath}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
@@ -62,6 +63,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
     UploaderServer.removeUploadProgress(request, control)
+
+  def attachmentFileExists(holderValue: String): Boolean =
+    new File(URLFactory.createURL(splitQuery(holderValue)._1).getFile).exists()
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
@@ -92,6 +96,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     val resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI)
     externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
   }
+
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
+    URLRewriterUtils.rewriteURL(request, urlString, rewriteMode)
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
     if ((containingDocument.isPortletContainer || containingDocument.isEmbedded) && resolvedURI.getFragment != null) {
@@ -284,6 +291,19 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def getLastModifiedIfFast(absoluteURL: String): Long =
     NetUtils.getLastModifiedIfFast(absoluteURL)
+
+  // NOTE: Only referred to indirectly by Form Builder Summary page in order to load
+  // external resources. This will not be called when offline!
+  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
+    useAndClose(URLFactory.createURL(urlString).openStream()) { is =>
+      readTinyTree(
+        XPath.GlobalConfiguration,
+        is,
+        null,
+        handleXInclude = false,
+        handleLexical  = false
+      )
+    }
 
   def readTinyTree(
     configuration  : SaxonConfiguration,

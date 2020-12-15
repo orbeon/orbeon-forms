@@ -24,6 +24,9 @@ import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 
+import scala.jdk.CollectionConverters._
+
+
 trait ConnectionTrait {
 
   def connectNow(
@@ -73,6 +76,12 @@ trait ConnectionTrait {
 
   def headersToForwardFromProperty: Set[String]
   def cookiesToForwardFromProperty: List[String]
+
+  def getHeaderFromRequest(request: ExternalContext.Request): String => Option[List[String]] =
+    Option(request) match {
+      case Some(request) => name => request.getHeaderValuesMap.asScala.get(name) map (_.toList)
+      case None          => _    => None
+    }
 
   // TODO: `ExternalContext` must expose cookie directly
   def sessionCookieHeaderCapitalized(

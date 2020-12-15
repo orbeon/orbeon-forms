@@ -13,14 +13,19 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import scala.collection.compat._
+
 
 trait FormBuilderPermissionsOps {
 
@@ -41,7 +46,7 @@ trait FormBuilderPermissionsOps {
   }
 
   //@XPathFunction
-  def formBuilderPermissionsForCurrentUserXPath(configurationOpt: Option[NodeInfo]) =
+  def formBuilderPermissionsForCurrentUserXPath(configurationOpt: Option[NodeInfo]): NodeInfo =
     formBuilderPermissionsForCurrentUserAsXML(configurationOpt, orbeonRolesFromCurrentRequest)
 
   // Result document contains a tree structure of apps and forms if roles are configured
@@ -51,8 +56,8 @@ trait FormBuilderPermissionsOps {
       <apps has-roles="false"/>
     } else {
       <apps has-roles="true">{
-        formBuilderPermissions(configurationOpt, incomingRoleNames).to(List).sortBy(_._1) map { case (app, forms) =>
-          <app name={app}>{ forms.to(List).sorted map { form => <form name={form}/> } }</app>
+        formBuilderPermissions(configurationOpt, incomingRoleNames).toList.sortBy(_._1) map { case (app, forms) =>
+          <app name={app}>{ forms.toList.sorted map { form => <form name={form}/> } }</app>
         }
       }</apps>
     }
@@ -85,6 +90,73 @@ trait FormBuilderPermissionsOps {
             app -> forms) toMap
         }
     }
+
+  /** Given a list of forms metadata:
+   *  - determines the operations the current user can perform,
+   *  - annotates the `<form>` with an `operations="…"` attribute,
+   *  - filters out forms the current user can perform no operation on.
+   */
+  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo], allForms: Boolean): List[NodeInfo] = {
+
+    // We only need one wrapper; create it when we encounter the first <form>
+    var wrapperOpt: Option[DocumentWrapper] = None
+
+    val fbPermissions =
+      formBuilderPermissions(
+        FormRunner.formBuilderPermissionsConfiguration,
+        orbeonRolesFromCurrentRequest
+      )
+
+    formsEls.flatMap { formEl =>
+
+      val wrapper = wrapperOpt.getOrElse(
+        // Create wrapper we don't have one already
+        new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
+        // Save wrapper for following iterations
+        |!> (w => wrapperOpt = Some(w))
+      )
+
+      val appName  = formEl.elemValue(Names.AppName)
+      val formName = formEl.elemValue(Names.FormName)
+      val isAdmin  = {
+        def canAccessEverything = fbPermissions.contains("*")
+        def canAccessAppForm = {
+          val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
+          formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
+        }
+        canAccessEverything || canAccessAppForm
+      }
+
+      // For each form, compute the operations the user can potentially perform
+      val operations = {
+        val adminOperation = isAdmin.list("admin")
+        val permissionsElement = formEl.child("permissions").headOption.orNull
+        val otherOperations = FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
+        adminOperation ++ otherOperations
+      }
+
+      // Is this form metadata returned by the API?
+      val keepForm =
+        allForms ||                                // all forms are explicitly requested
+        isAdmin  ||                                // admins can see everything
+        ! (
+          formName == Names.LibraryFormName ||     // filter libraries
+          operations.isEmpty                ||     // filter forms on which user can't possibly do anything
+          formEl.elemValue("available") == "false" // filter forms marked as not available
+        )
+
+      // If kept, rewrite <form> to add operations="…" attribute
+      keepForm list {
+        val newFormEl      = wrapper.wrap(dom.Element("form"))
+        val operationsAttr = NodeInfoFactory.attributeInfo("operations", operations mkString " ")
+        val newFormContent = operationsAttr +: formEl.child(*)
+
+        insert(into = Seq(newFormEl), origin = newFormContent)
+
+        newFormEl
+      }
+    }
+  }
 
   private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
     case Some(configuration) => configuration.root / * / "role" toList

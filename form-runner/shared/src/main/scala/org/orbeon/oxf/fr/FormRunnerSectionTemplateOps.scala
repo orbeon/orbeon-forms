@@ -17,9 +17,10 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xml.TransformerUtils.extractAsMutableDocument
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeInfoConversions.extractAsMutableDocument
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
+
 
 trait FormRunnerSectionTemplateOps {
 

@@ -13,10 +13,10 @@
   */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
-import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -72,13 +72,13 @@ object NodeInfoCell {
       else
         1
 
-    ArrayFunctions.createValue(
+    SaxonUtils.newArrayItem(
       allRowCells.cells.to(Vector) map { row =>
         new SequenceExtent(
             row collect {
               case Cell(u, None, x, y, h, w) =>
-                MapFunctions.createValue(
-                  Map[AtomicValue, ValueRepresentation](
+                SaxonUtils.newMapItem(
+                  Map[AtomicValue, ValueRepresentationType](
                     (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
                     (SaxonUtils.fixStringValue("x"), (x - 1) * ratio + 1),
                     (SaxonUtils.fixStringValue("y"), y),
@@ -99,13 +99,13 @@ object NodeInfoCell {
   //
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
-    ArrayFunctions.createValue(
+    SaxonUtils.newArrayItem(
       Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row =>
         new SequenceExtent(
           row collect {
             case Cell(u, None, x, y, h, w) =>
-              MapFunctions.createValue(
-                Map[AtomicValue, ValueRepresentation](
+              SaxonUtils.newMapItem(
+                Map[AtomicValue, ValueRepresentationType](
                   (SaxonUtils.fixStringValue("c"), u getOrElse EmptySequence.getInstance),
                   (SaxonUtils.fixStringValue("x"), x),
                   (SaxonUtils.fixStringValue("y"), y),

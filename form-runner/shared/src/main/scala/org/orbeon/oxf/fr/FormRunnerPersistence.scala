@@ -13,36 +13,40 @@
  */
 package org.orbeon.oxf.fr
 
+
+import java.net.URI
+import java.{util => ju}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.BasicNamespaceMapping
+import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
 
 import java.{util => ju}
 import scala.jdk.CollectionConverters._
@@ -165,7 +169,7 @@ object FormRunnerPersistence {
     (uri, headers)
   }
 
-  def getPersistenceHeadersAsXML(app: String, form: String, formOrData: FormOrData): DocumentInfo = {
+  def getPersistenceHeadersAsXML(app: String, form: String, formOrData: FormOrData): DocumentNodeInfoType = {
 
     val (_, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
@@ -179,7 +183,12 @@ object FormRunnerPersistence {
       }</headers>.toString
 
     // Convert to TinyTree
-    TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, headersXML, false, false)
+    XFormsCrossPlatformSupport.stringToTinyTree(
+      XPath.GlobalConfiguration,
+      headersXML,
+      handleXInclude = false,
+      handleLexical  = false
+    )
   }
 
   def providerDataFormatVersionOrThrow(app: String, form: String): DataFormatVersion = {
@@ -333,9 +342,10 @@ trait FormRunnerPersistence {
     urlString       : String,
     customHeaders   : Map[String, List[String]])(
     implicit logger : IndentedLogger
-  ): ConnectionResult = {
-    implicit val externalContext          = NetUtils.getExternalContext
-    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+  ): Option[DocumentNodeInfoType] = {
+
+    implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
     val request = externalContext.getRequest
 
@@ -383,8 +393,13 @@ trait FormRunnerPersistence {
     // required).
     //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
     ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
-      // do process XInclude, so FB's model gets included
-      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, urlString, true, false)
+      XFormsCrossPlatformSupport.readTinyTree(
+        XPath.GlobalConfiguration,
+        is,
+        urlString,
+        handleXInclude = true, // do process XInclude, so FB's model gets included
+        handleLexical  = false
+      )
     } toOption
   }
 
@@ -403,7 +418,7 @@ trait FormRunnerPersistence {
     formName        : String,
     version         : FormDefinitionVersion)(
     implicit logger : IndentedLogger
-  ): Option[DocumentInfo] = {
+  ): Option[DocumentNodeInfoType] = {
     val path = createFormDefinitionBasePath(appName, formName) + "form.xhtml"
     val customHeaders = version match {
       case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
@@ -412,14 +427,13 @@ trait FormRunnerPersistence {
     readDocument(path, customHeaders)
   }
 
-  // Retrieves the `<form>` element with the metadata for a form from the persistence layer
-  def readFormMetadataOpt(
-    appName         : String,
-    formName        : String,
-    version         : FormDefinitionVersion)(
-    implicit logger : IndentedLogger
-  ): Option[NodeInfo] = {
-
+  // Retrieves the metadata for a form from the persistence layer
+  def readFormMetadata(
+    appName  : String,
+    formName : String,
+    version  : FormDefinitionVersion)((implicit
+    logger   : IndentedLogger
+  ): Option[DocumentNodeInfoType] = {
     val formsDoc = readDocument(
       createFormMetadataPathAndQuery(
         app         = appName,
@@ -469,7 +483,7 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true).map(_.holder).asJava
+    collectAttachments(data.getRoot, fromBasePath, fromBasePath, forceAttachments = true).map(_.holder).asJava
 
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
@@ -482,7 +496,7 @@ trait FormRunnerPersistence {
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
-          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false).map(_.holder)
+          collectAttachments(data.getRoot, basePath, basePath, forceAttachments = false).map(_.holder)
         case _ =>
           Nil
       }
@@ -491,7 +505,7 @@ trait FormRunnerPersistence {
       for {
         holder   <- unsavedAttachmentHolders
         filename = holder attValue "filename"
-        if ! new File(URLFactory.createURL(splitQuery(holder.stringValue)._1).getFile).exists()
+        if ! XFormsCrossPlatformSupport.attachmentFileExists(holder.stringValue)
       } yield {
 
         setvalue(holder, "")
@@ -519,7 +533,7 @@ trait FormRunnerPersistence {
   )
 
   def collectAttachments(
-    data             : DocumentInfo,
+    data             : NodeInfo,
     fromBasePath     : String,
     toBasePath       : String,
     forceAttachments : Boolean
@@ -539,7 +553,7 @@ trait FormRunnerPersistence {
       // we just use .bin as an extension.
       val filename =
         if (isUploaded)
-          SecureUtils.randomHexId + ".bin"
+          CoreCrossPlatformSupport.randomHexId + ".bin"
         else
           getAttachmentPathFilenameRemoveQuery(beforeURL)
 
@@ -551,8 +565,8 @@ trait FormRunnerPersistence {
   }
 
   def putWithAttachments(
-    liveData          : DocumentInfo,
-    migrate           : Option[DocumentInfo => DocumentInfo],
+    liveData          : DocumentNodeInfoType,
+    migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType],
     toBaseURI         : String,
     fromBasePath      : String,
     toBasePath        : String,
@@ -584,7 +598,7 @@ trait FormRunnerPersistence {
 
       attachmentsWithHolder.map { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
         // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
-        val holderCopy   = TransformerUtils.extractAsMutableDocument(migratedHolder).rootElement
+        val holderCopy   = NodeInfoConversions.extractAsMutableDocument(migratedHolder).rootElement
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
         val isEncryptedAtRestOpt =
           sendThrowOnError("fr-create-update-attachment-submission", Map(
@@ -612,7 +626,7 @@ trait FormRunnerPersistence {
       }
     }
 
-    def saveXmlData(migratedData: DocumentInfo) =
+    def saveXmlData(migratedData: DocumentNodeInfoType) =
       sendThrowOnError("fr-create-update-submission", Map(
         "holder"         -> Some(migratedData.rootElement),
         "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),

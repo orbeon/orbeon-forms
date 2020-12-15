@@ -227,12 +227,6 @@ object Connection extends ConnectionTrait {
   def cookiesToForwardFromProperty: List[String] =
     valueAs[List](getPropertyHandleCustom(HttpForwardCookiesProperty)).distinct
 
-  def getHeaderFromRequest(request: ExternalContext.Request): String => Option[List[String]] =
-    Option(request) match {
-      case Some(request) => name => request.getHeaderValuesMap.asScala.get(name) map (_.to(List))
-      case None          => _    => None
-    }
-
   def sessionCookieHeaderCapitalized(
     externalContext  : ExternalContext,
     cookiesToForward : List[String])(implicit

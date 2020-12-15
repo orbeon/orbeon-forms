@@ -19,6 +19,7 @@ object FormRunner
   with FormRunnerPermissionsOps
   with FormRunnerPDF
   with FormRunnerEmail
+  with FormRunnerEmailBackend
   with FormRunnerLang
   with FormRunnerBaseOps
   with FormRunnerControlOps

@@ -14,13 +14,13 @@
 package org.orbeon.oxf.fr.permission
 
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.util.NetUtils
-import scala.collection.compat._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
+
 
 object PermissionsAuthorization {
 
   def currentUserFromSession: Option[Credentials] =
-    NetUtils.getExternalContext.getRequest.credentials
+    CoreCrossPlatformSupport.externalContext.getRequest.credentials
 
   sealed trait PermissionsCheck
   case class CheckWithDataUser(
@@ -84,7 +84,7 @@ object PermissionsAuthorization {
         }
       case RolesAnyOf(permissionRoles) =>
         permissionRoles.exists(permissionRoleName =>
-          currentUser.to(List) flatMap (_.roles) exists {
+          currentUser.toList flatMap (_.roles) exists {
             case SimpleRole(userRoleName) =>
               userRoleName == permissionRoleName
             case ParametrizedRole(userRoleName, userOrganizationName) =>
@@ -100,5 +100,4 @@ object PermissionsAuthorization {
           }
         )
     }
-
 }

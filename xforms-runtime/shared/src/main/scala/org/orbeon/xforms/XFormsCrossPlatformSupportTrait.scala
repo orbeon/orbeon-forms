@@ -18,7 +18,6 @@ import java.net.URI
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
@@ -38,7 +37,10 @@ trait XFormsCrossPlatformSupportTrait {
   def externalContext: ExternalContext
 
   def getUploadProgress(request: Request, uuid: String, fieldName: String): Option[UploadProgress[FileItemType]]
+
   def removeUploadProgress(request: Request, control: XFormsValueControl): Unit
+
+  def attachmentFileExists(holderValue: String): Boolean
 
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
 
@@ -51,6 +53,8 @@ trait XFormsCrossPlatformSupportTrait {
     skipRewrite        : Boolean
   ): String
 
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String
+
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit
 
   def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver
@@ -59,7 +63,7 @@ trait XFormsCrossPlatformSupportTrait {
 
   def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document
 
-  def serializeToByteArray(
+    def serializeToByteArray(
     document           : dom.Document,
     method             : String,
     encoding           : String,
@@ -69,7 +73,7 @@ trait XFormsCrossPlatformSupportTrait {
     standaloneOpt      : Option[Boolean],
   ): Array[Byte]
 
-  def proxyURI(
+    def proxyURI(
     uri              : String,
     filename         : Option[String],
     contentType      : Option[String],
@@ -79,7 +83,7 @@ trait XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String
 
-  def proxyBase64Binary(
+    def proxyBase64Binary(
     value            : String,
     filename         : Option[String],
     mediatype        : Option[String],
@@ -88,22 +92,24 @@ trait XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String
 
-  def renameAndExpireWithSession(
+    def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
   ): URI
 
-  def inputStreamToRequestUri(
+    def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String]
 
-  def inputStreamToSessionUri(
+    def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String]
 
   def getLastModifiedIfFast(absoluteURL: String): Long
+
+  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType
 
   def readTinyTree(
     configuration  : SaxonConfiguration,
@@ -141,5 +147,5 @@ trait XFormsCrossPlatformSupportTrait {
   def causesIterator(t : Throwable) : Iterator[Throwable]
 
   def tempFileSize(filePath: String): Long
-  def deleteFileIfPossible(urlString: String): Unit
+    def deleteFileIfPossible(urlString: String): Unit
 }

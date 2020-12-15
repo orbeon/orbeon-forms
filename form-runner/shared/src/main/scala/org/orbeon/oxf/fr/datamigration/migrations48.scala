@@ -20,16 +20,18 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.BasicNamespaceMapping
 
 import scala.collection.compat._
+
 
 case class Migration48(
   containerPath : List[PathElem],
@@ -50,8 +52,8 @@ object MigrationOps48 extends MigrationOps {
   val version: MigrationVersion = DataFormatVersion.V480
 
   def buildMigrationSet(
-    outerDocument        : DocumentInfo,
-    availableXBLBindings : Option[DocumentInfo],
+    outerDocument        : DocumentNodeInfoType,
+    availableXBLBindings : Option[DocumentNodeInfoType],
     legacyGridsOnly      : Boolean
   ): Option[MigrationSet48] = {
 
@@ -270,7 +272,7 @@ object MigrationOps48 extends MigrationOps {
         findRepeatIterationName(grid, controlName).get
     }
 
-    def migrationsForBinding(doc: DocumentInfo, legacyGridsOnly: Boolean): Seq[Migration48] =
+    def migrationsForBinding(doc: DocumentNodeInfoType, legacyGridsOnly: Boolean): Seq[Migration48] =
       for {
         gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids(doc) else findAllGrids(doc, repeat = true)
         gridName               = getControlName(gridElem)

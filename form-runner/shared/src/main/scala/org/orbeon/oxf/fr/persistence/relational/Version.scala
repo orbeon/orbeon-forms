@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.persistence.relational
 
 sealed trait Version
 
+
 object Version {
 
   case object Unspecified                     extends Version

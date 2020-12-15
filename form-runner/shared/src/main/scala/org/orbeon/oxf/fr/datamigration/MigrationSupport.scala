@@ -20,11 +20,12 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, XMLNames}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{StaticXPath, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 
@@ -39,8 +40,8 @@ object MigrationSupport {
 
   // `val migrationsFromForm: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromForm(
-    outerDocument        : DocumentInfo,
-    availableXBLBindings : Option[DocumentInfo],
+    outerDocument        : DocumentNodeInfoType,
+    availableXBLBindings : Option[DocumentNodeInfoType],
     legacyGridsOnly      : Boolean
   ) extends MigrationGetter {
     def find(ops: MigrationOps): Option[ops.M] =
@@ -49,7 +50,7 @@ object MigrationSupport {
 
   // `val migrationsFromMetadata: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromMetadata(
-    metadataOpt : Option[DocumentInfo]
+    metadataOpt : Option[DocumentNodeInfoType]
   ) extends MigrationGetter {
     def find(ops: MigrationOps): Option[ops.M] =
       metadataOpt flatMap (metadata => findMigrationForVersion(metadata.rootElement, ops.version)) match {
@@ -59,13 +60,13 @@ object MigrationSupport {
       }
   }
 
-  def findAllGrids(doc: DocumentInfo, repeat: Boolean): Seq[NodeInfo] =
+  def findAllGrids(doc: DocumentNodeInfoType, repeat: Boolean): Seq[NodeInfo] =
     getFormRunnerBodyElem(doc) descendant * filter IsGrid filter (g => isRepeat(g) ^ ! repeat)
 
-  def findLegacyRepeatedGrids(doc: DocumentInfo): Seq[NodeInfo] =
+  def findLegacyRepeatedGrids(doc: DocumentNodeInfoType): Seq[NodeInfo] =
     findAllGrids(doc, repeat = true) filter isLegacyRepeat
 
-  def findLegacyUnrepeatedGrids(doc: DocumentInfo): Seq[NodeInfo] =
+  def findLegacyUnrepeatedGrids(doc: DocumentNodeInfoType): Seq[NodeInfo] =
     findAllGrids(doc, repeat = false) filter isLegacyUnrepeatedGrid
 
   def findMigrationForVersion(metadataRootElem: NodeInfo, version: MigrationVersion): Option[String] =
@@ -75,9 +76,9 @@ object MigrationSupport {
       (_.stringValue.trimAllToOpt)
 
   def buildGridMigrations[M](
-    outerDocument         : DocumentInfo,
-    availableXBLBindings  : Option[DocumentInfo],
-    migrationsForBinding  : (DocumentInfo, Boolean) => Seq[M],
+    outerDocument         : DocumentNodeInfoType,
+    availableXBLBindings  : Option[DocumentNodeInfoType],
+    migrationsForBinding  : (DocumentNodeInfoType, Boolean) => Seq[M],
     updateWithBindingPath : (M, List[PathElem]) => M
   ): Seq[M] = {
 
@@ -92,7 +93,7 @@ object MigrationSupport {
         case None =>
           (
             Nil,
-            Map.empty[URIQualifiedName, DocumentInfo]
+            Map.empty[URIQualifiedName, DocumentNodeInfoType]
           )
       }
 
@@ -113,8 +114,8 @@ object MigrationSupport {
   }
 
   def buildGridMigrationSet(
-    outerDocument        : DocumentInfo,
-    availableXBLBindings : Option[DocumentInfo],
+    outerDocument        : DocumentNodeInfoType,
+    availableXBLBindings : Option[DocumentNodeInfoType],
     legacyGridsOnly      : Boolean
   ): List[(MigrationVersion, String)] =
     for {
@@ -212,8 +213,8 @@ object MigrationSupport {
 
   def migrateDataWithFormMetadataMigrations(
     appForm       : AppForm,
-    data          : DocumentInfo,
-    metadataOpt   : Option[DocumentInfo],
+    data          : DocumentNodeInfoType,
+    metadataOpt   : Option[DocumentNodeInfoType],
     srcVersion    : DataFormatVersion,
     dstVersion    : DataFormatVersion,
     pruneMetadata : Boolean
@@ -261,16 +262,16 @@ object MigrationSupport {
     }
 
   // TODO: This is not strictly related to migration, maybe move somewhere else.
-  def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =
+  def copyDocumentKeepInstanceData(data: DocumentNodeInfoType): DocumentWrapper =
     new DocumentWrapper(
       data match {
-        case virtualNode: VirtualNode =>
+        case virtualNode: VirtualNodeType =>
           virtualNode.getUnderlyingNode match {
             case doc: Document => Document(doc.getRootElement.createCopy)
             case _             => throw new IllegalStateException
           }
         case _ =>
-          TransformerUtils.tinyTreeToDom4j(data)
+          StaticXPath.tinyTreeToOrbeonDom(data)
       },
       null,
       XPath.GlobalConfiguration

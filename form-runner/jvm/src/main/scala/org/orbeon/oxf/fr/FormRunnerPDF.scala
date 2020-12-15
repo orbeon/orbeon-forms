@@ -93,6 +93,12 @@ trait FormRunnerPDF {
      } orNull
   }
 
+  // Used by:
+  //
+  // - `print-pdf-notemplate.xsl`
+  // - Form Builder
+  // - form compilation in `view.xsl`
+  //
   //@XPathFunction
   def optionFromMetadataOrPropertiesXPath(
     metadataInstanceRootElem : NodeInfo,

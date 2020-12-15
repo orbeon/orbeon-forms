@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._

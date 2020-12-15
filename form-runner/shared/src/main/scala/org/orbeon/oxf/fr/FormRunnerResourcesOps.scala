@@ -15,12 +15,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names.FormResources
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 
 trait FormRunnerResourcesOps {
@@ -31,12 +28,6 @@ trait FormRunnerResourcesOps {
 
   //@XPathFunction
   def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElem(inDoc, FormResources)
-
-  def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
-    instanceElem(inDoc, FormResources) flatMap
-      (_.attValueOpt("src"))              map
-      readUrlAsImmutableXmlDocument       map
-      (_.rootElement)
 
   def allLangsWithResources(resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     allLangs(resourcesRootElem) zip allResources(resourcesRootElem)
@@ -64,10 +55,16 @@ trait FormRunnerResourcesOps {
     } yield
       (lang, holder)
 
+  // Support for `<xf:instance id="" src=""/>`, only for Form Builder's Summary page
+  private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
+    instanceElem(inDoc, FormResources) flatMap
+      (_.attValueOpt("src"))           map
+      readUrlAsImmutableXmlDocument    map
+      (_.rootElement)
+
+  // Also used by tests!
   private def readUrlAsImmutableXmlDocument(url: String) =
-    useAndClose(URLFactory.createURL(url).openStream()) { is =>
-      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-    }
+    XFormsCrossPlatformSupport.readTinyTreeFromUrl(url)
 }
 
 object FormRunnerResourcesOps extends FormRunnerResourcesOps

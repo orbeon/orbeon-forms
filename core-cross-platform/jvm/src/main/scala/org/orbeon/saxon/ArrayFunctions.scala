@@ -13,7 +13,7 @@
   */
 package org.orbeon.saxon
 
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, XMLConstants}
 import org.orbeon.saxon.`type`._
 import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_MORE, EXACTLY_ONE}
@@ -181,6 +181,7 @@ object ArrayFunctions {
 
   val UnderlyingClass = classOf[UnderlyingType]
 
+  // `Configuration` is used for the `NamePool` only
   def saxonTypeForArray(config: Configuration) = new ExternalObjectType(UnderlyingClass, config)
 
   def collectArrayValues(it: SequenceIterator)(implicit context: XPathContext): Iterator[UnderlyingType] = {
@@ -194,11 +195,11 @@ object ArrayFunctions {
     }
   }
 
-  def createValue(value: UnderlyingType, config: Configuration = XPath.GlobalConfiguration): ObjectValue = {
+  // `Configuration` is used for the `NamePool` only
+  def createValue(value: UnderlyingType, config: Configuration = StaticXPath.GlobalConfiguration): ObjectValue = {
     new ObjectValue(
       value,
       saxonTypeForArray(config)
     )
   }
-
 }

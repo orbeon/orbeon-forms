@@ -15,12 +15,10 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 
@@ -82,44 +80,14 @@ trait FormRunnerEmail {
     }
 
   //@XPathFunction
-  def emailAttachmentFilename(
-    data           : NodeInfo,
-    attachmentType : String,
-    app            : String,
-    form           : String
-  ): Option[String] = {
-
-    // NOTE: We don't use `FormRunnerParams()` for that this works in tests.
-    // Callees only require, as of 2018-05-31, `app` and `form`.
-    implicit val params =
-      FormRunnerParams(
-        app         = app,
-        form        = form,
-        formVersion = 1,
-        document    = None,
-        mode        = "email"
-      )
-
-    for {
-      (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
-      trimmedExpr     <- expr.trimAllToOpt
-      name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
-    } yield {
-      // This appears necessary for non-ASCII characters to make it through.
-      // Verified that this works with GMail.
-      javax.mail.internet.MimeUtility.encodeText(name, CharsetNames.Utf8, null)
-    }
-  }
-
-  //@XPathFunction
   def buildLinkBackToFormRunner(linkType: String): String = {
 
     val FormRunnerParams(app, form, version, documentOpt, _) = FormRunnerParams()
 
     val baseUrlNoSlash =
       formRunnerStandaloneBaseUrl(
-        Properties.instance.getPropertySet,
-        NetUtils.getExternalContext.getRequest
+        CoreCrossPlatformSupport.properties,
+        CoreCrossPlatformSupport.externalContext.getRequest
       ).dropTrailingSlash
 
     def build(mode: String, documentId: Option[String]) =

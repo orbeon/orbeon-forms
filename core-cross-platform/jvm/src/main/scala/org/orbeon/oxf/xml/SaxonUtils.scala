@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xml
 
 import java.net.URI
-
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
@@ -24,12 +23,13 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, Type}
 import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContextMajor}
 import org.orbeon.saxon.functions.DeepEqual
+import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.saxon.value._
-import org.orbeon.saxon.{Configuration, om}
+import org.orbeon.saxon.{ArrayFunctions, Configuration, MapFunctions, om}
 import org.orbeon.scaxon.Implicits
 
 import scala.jdk.CollectionConverters._
@@ -282,6 +282,21 @@ object SaxonUtils {
   def listIterator(s: Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = Value.asIterator(v)
+
+  def selectID(node: NodeInfo, id: String): NodeInfo =
+    node.getDocumentRoot.selectID(id)
+
+  def newMapItem(map: Map[AtomicValue, ValueRepresentationType]): Item =
+    MapFunctions.createValue(map)
+
+  def newArrayItem(v: Vector[ValueRepresentationType]): Item =
+    ArrayFunctions.createValue(v)
+
+  def hasXPathNumberer(lang: String): Boolean =
+    NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
+
+  def isValidNCName(name: String): Boolean =
+    Name10Checker.getInstance.isValidNCName(name)
 
   val ChildAxisInfo: Byte = Axis.CHILD
   val AttributeAxisInfo: Byte = Axis.ATTRIBUTE

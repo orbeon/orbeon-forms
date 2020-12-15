@@ -13,21 +13,18 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.jdk.CollectionConverters._
+
 
 trait FormRunnerPermissionsOps {
 
@@ -50,7 +47,7 @@ trait FormRunnerPermissionsOps {
    */
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
-    currentUser         : Option[Credentials] = NetUtils.getExternalContext.getRequest.credentials
+    currentUser         : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
   ): List[String] = {
     val permissions = PermissionsXML.parse(permissionsElOrNull)
     val operations  = PermissionsAuthorization.authorizedOperations(
@@ -69,7 +66,7 @@ trait FormRunnerPermissionsOps {
     // TODO: take additional organization parameter
   ): Seq[String] = {
     val permissions = PermissionsXML.parse(permissionsElement)
-    val user        = NetUtils.getExternalContext.getRequest.credentials
+    val user        = CoreCrossPlatformSupport.externalContext.getRequest.credentials
     val check       = CheckWithDataUser(Option(dataUsername), Option(dataGroupname), None)
     Operations.serialize(PermissionsAuthorization.authorizedOperations(permissions, user, check))
   }
@@ -81,7 +78,7 @@ trait FormRunnerPermissionsOps {
     dataUsername        : Option[String],
     dataGroupname       : Option[String],
     dataOrganization    : Option[Organization],
-    currentUser         : Option[Credentials] = NetUtils.getExternalContext.getRequest.credentials
+    currentUser         : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
@@ -120,82 +117,15 @@ trait FormRunnerPermissionsOps {
    */
   //@XPathFunction
   def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
-    val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
+    val headers  = CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.asScala
     val username = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
     val group    = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
 
     allAuthorizedOperations(permissionsElement, username, group, None)
   }
 
-  /** Given a list of forms metadata:
-   *  - determines the operations the current user can perform,
-   *  - annotates the `<form>` with an `operations="…"` attribute,
-   *  - filters out forms the current user can perform no operation on.
-   */
-  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo], allForms: Boolean): List[NodeInfo] = {
-
-    // We only need one wrapper; create it when we encounter the first <form>
-    var wrapperOpt: Option[DocumentWrapper] = None
-
-    val fbPermissions =
-      FormRunner.formBuilderPermissions(
-        FormRunner.formBuilderPermissionsConfiguration,
-        orbeonRolesFromCurrentRequest
-      )
-
-    formsEls.flatMap { formEl =>
-
-      val wrapper = wrapperOpt.getOrElse(
-        // Create wrapper we don't have one already
-        new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
-        // Save wrapper for following iterations
-        |!> (w => wrapperOpt = Some(w))
-      )
-
-      val appName  = formEl.elemValue(Names.AppName)
-      val formName = formEl.elemValue(Names.FormName)
-      val isAdmin  = {
-        def canAccessEverything = fbPermissions.contains("*")
-        def canAccessAppForm = {
-          val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
-          formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)
-        }
-        canAccessEverything || canAccessAppForm
-      }
-
-      // For each form, compute the operations the user can potentially perform
-      val operations = {
-        val adminOperation = isAdmin.list("admin")
-        val permissionsElement = formEl.child("permissions").headOption.orNull
-        val otherOperations = allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
-        adminOperation ++ otherOperations
-      }
-
-      // Is this form metadata returned by the API?
-      val keepForm =
-        allForms ||                                // all forms are explicitly requested
-        isAdmin  ||                                // admins can see everything
-        ! (
-          formName == Names.LibraryFormName ||     // filter libraries
-          operations.isEmpty                ||     // filter forms on which user can't possibly do anything
-          formEl.elemValue("available") == "false" // filter forms marked as not available
-        )
-
-      // If kept, rewrite <form> to add operations="…" attribute
-      keepForm list {
-        val newFormEl      = wrapper.wrap(dom.Element("form"))
-        val operationsAttr = NodeInfoFactory.attributeInfo("operations", operations mkString " ")
-        val newFormContent = operationsAttr +: formEl.child(*)
-
-        insert(into = Seq(newFormEl), origin = newFormContent)
-
-        newFormEl
-      }
-    }
-  }
-
   def orbeonRolesFromCurrentRequest: Set[String] =
-    NetUtils.getExternalContext.getRequest.credentials.toList.flatMap(_.roles).map(_.roleName).toSet
+    CoreCrossPlatformSupport.externalContext.getRequest.credentials.toList.flatMap(_.roles).map(_.roleName).toSet
 
   //@XPathFunction
   def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =
@@ -203,8 +133,8 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def redirectToHomePageIfLoggedIn(): Unit = {
-    val request  = NetUtils.getExternalContext.getRequest
-    val response = NetUtils.getExternalContext.getResponse
+    val request  = CoreCrossPlatformSupport.externalContext.getRequest
+    val response = CoreCrossPlatformSupport.externalContext.getResponse
     if (request.credentials.isDefined) {
       response.sendRedirect(
         response.rewriteRenderURL("/fr/"),

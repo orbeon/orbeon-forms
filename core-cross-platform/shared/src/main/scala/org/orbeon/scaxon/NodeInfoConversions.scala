@@ -14,7 +14,7 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom
-import org.orbeon.dom.{Attribute, Namespace, Node, QName}
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
 import shapeless.syntax.typeable._
@@ -35,16 +35,19 @@ object NodeInfoConversions {
   def unwrapNode(nodeInfo: om.NodeInfo): Option[dom.Node] =
     nodeInfo.narrowTo[VirtualNodeType] flatMap (_.getUnderlyingNode.cast[dom.Node])
 
-  def getNodeFromNodeInfoConvert(nodeInfo: om.NodeInfo): Node =
+  def getNodeFromNodeInfoConvert(nodeInfo: om.NodeInfo): dom.Node =
     nodeInfo match {
-      case vn: VirtualNodeType => vn.getUnderlyingNode.asInstanceOf[Node]
+      case vn: VirtualNodeType => vn.getUnderlyingNode.asInstanceOf[dom.Node]
       case _ =>
         if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
-          Attribute(QName(nodeInfo.getLocalPart, Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
+          dom.Attribute(dom.QName(nodeInfo.getLocalPart, dom.Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
         else
           StaticXPath.tinyTreeToOrbeonDom(if (nodeInfo.getParent.isInstanceOf[DocumentNodeInfoType]) nodeInfo.getParent
         else
           nodeInfo
       )
     }
+
+  def extractAsMutableDocument(elementOrDocument: om.NodeInfo): DocumentWrapper =
+    new DocumentWrapper(StaticXPath.tinyTreeToOrbeonDom(elementOrDocument), null, StaticXPath.GlobalConfiguration)
 }

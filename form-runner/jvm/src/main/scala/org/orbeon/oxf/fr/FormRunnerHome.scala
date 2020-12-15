@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringReplacer._

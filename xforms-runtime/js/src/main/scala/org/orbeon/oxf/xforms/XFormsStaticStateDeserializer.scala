@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.library.{XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.xbl.{CommonBinding, XBLAssets}
+import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -38,7 +38,7 @@ object XFormsStaticStateDeserializer {
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
 
-    val scopes = mutable.Map[String, Scope]()
+    var collectedScopes         = IndexedSeq[Scope]()
 
     var controlStack: List[ElementAnalysis] = Nil
 
@@ -163,7 +163,7 @@ object XFormsStaticStateDeserializer {
     implicit val decodeCommonBinding: Decoder[CommonBinding] = (c: HCursor) =>
       for {
         bindingElemId               <- c.get[Option[String]]("bindingElemId")
-        bindingElemNamespaceMapping <- c.get[NamespaceMapping]("bindingElemNamespaceMapping")
+        bindingElemNamespaceMapping <- c.get[Int]("bindingElemNamespaceMapping")
         directName                  <- c.get[Option[QName]]("directName")
         cssName                     <- c.get[Option[String]]("cssName")
         containerElementName        <- c.get[String]("containerElementName")
@@ -189,7 +189,7 @@ object XFormsStaticStateDeserializer {
       } yield
         CommonBinding(
           bindingElemId,
-          bindingElemNamespaceMapping,
+          NamespaceMapping(collectedNamespaces(bindingElemNamespaceMapping)),
           directName,
           cssName,
           containerElementName,
@@ -214,17 +214,33 @@ object XFormsStaticStateDeserializer {
           constantInstances.toMap,
         )
 
+    // This is only used by `decodeScope`, with the assumption that we
+    // decode `Scope`s in order.
+    val parentScopesById = mutable.Map[String, Scope]()
+
     implicit val decodeScope: Decoder[Scope] = (c: HCursor) =>
       for {
-//        parent       <- c.get[Scope]("parent") // TODO
-        scopeId <- c.get[String]("scopeId")
-        idMap   <- c.get[Map[String, String]]("idMap")
+        parentRef <- c.get[Option[String]]("parentRef")
+        scopeId   <- c.get[String]("scopeId")
+        idMap     <- c.get[Map[String, String]]("idMap")
+      } yield {
+
+        val r = new Scope(parentRef.map(parentScopesById), scopeId)
+        idMap foreach (kv => r += kv)
+        parentScopesById += r.scopeId -> r
+        r
+      }
+
+    implicit val decodeConcreteBinding: Decoder[ConcreteBinding] = (c: HCursor) =>
+      for {
+        innerScope   <- c.get[Int]("innerScopeRef").map(collectedScopes)
+        templateTree <- c.get[SAXStore]("templateTree")
       } yield
-        scopes.getOrElseUpdate(scopeId, {
-          val r = new Scope(None, scopeId)
-          idMap foreach (kv => r += kv)
-          r
-        })
+        ConcreteBinding(
+          innerScope,
+          templateTree,
+          Map.empty // replaced later
+        )
 
     implicit val decodeAnnotatedTemplate : Decoder[AnnotatedTemplate] = deriveDecoder
   //  implicit val decodeLangRef           : Decoder[LangRef]           = deriveDecoder
@@ -293,22 +309,12 @@ object XFormsStaticStateDeserializer {
         element           <- c.get[dom.Element]("element")
         staticId          <- c.get[String]("staticId")
         prefixedId        <- c.get[String]("prefixedId")
-        nsRef             <- c.get[Int]("nsRef")
-        scopeRef          <- c.get[String]("scopeRef")
-        containerScopeRef <- c.get[String]("containerScopeRef")
+        namespaceMapping  <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
+        scope             <- c.get[Int]("scopeRef").map(collectedScopes)
+        containerScope    <- c.get[Int]("containerScopeRef").map(collectedScopes)
         modelRef          <- c.get[String]("modelRef")
   //      "langRef"           <- a.lang.asJson,
       } yield {
-
-        val namespaceMapping = NamespaceMapping(collectedNamespaces(nsRef))
-
-        val scope = scopes.getOrElseUpdate(scopeRef, {
-          val newScope = new Scope(None, scopeRef)
-          // TODO: scopes must first be deserialized…
-          newScope
-        }) // TODO: parent scope
-
-        val containerScope = scope // TODO
 
         println(s"xxx decoding element for $element / $prefixedId")
 
@@ -320,20 +326,32 @@ object XFormsStaticStateDeserializer {
 
             case _ if c.downField("commonBindingRef").succeeded =>
 
-              val commonBindingRef = c.get[Int]("commonBindingRef").right.get // XXX TODO
-              val commonBinding = collectedCommonBindings(commonBindingRef)
-
               val componentControl =
-                (commonBinding.modeValue, commonBinding.modeLHHA) match {
-                  case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true)
-                  case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with                          StaticLHHASupport
-                  case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait
-                  case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait with StaticLHHASupport
+                for {
+                  commonBindingRef <- c.get[Int]("commonBindingRef")
+                  commonBinding    = collectedCommonBindings(commonBindingRef)
+                  concreteBinding  <- c.get[ConcreteBinding]("binding")
+                } yield {
+                  val componentControl =
+                    (commonBinding.modeValue, commonBinding.modeLHHA) match {
+                      case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true)
+                      case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with                          StaticLHHASupport
+                      case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait
+                      case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait with StaticLHHASupport
+                    }
+
+                  componentControl.commonBinding = commonBinding
+
+                  // We don't serialize the attributes separately as we have them on the bound element, so we
+                  // copy them again here.
+                  componentControl.setConcreteBinding(
+                    concreteBinding.copy(boundElementAtts = element.attributes map { att => att.getQName -> att.getValue } toMap)
+                  )
+
+                  componentControl
                 }
 
-              componentControl.setConcreteBinding(???)
-
-              componentControl
+              componentControl.right.get // XXX TODO
 
             case XFORMS_MODEL_QNAME            => new Model                 (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_INPUT_QNAME            => new InputControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
@@ -687,7 +705,7 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysis] = (c: HCursor) =>
       for {
-        startScope       <- c.get[Scope]("startScope")
+        startScope       <- c.get[Int]("startScopeRef").map(collectedScopes)
         topLevelControls <- c.get[Iterable[ElementAnalysis]]("topLevelControls") // TODO
       } yield
         TopLevelPartAnalysisImpl(
@@ -712,6 +730,10 @@ object XFormsStaticStateDeserializer {
         commonBindings       <- c.get[IndexedSeq[CommonBinding]]("commonBindings")
         _ = {
           collectedCommonBindings = commonBindings
+        }
+        scopes               <- c.get[IndexedSeq[Scope]]("scopes")
+        _ = {
+          collectedScopes = scopes
         }
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")

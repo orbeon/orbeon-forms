@@ -1,23 +1,21 @@
 package org.orbeon.oxf.xforms
 
 import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.{Encoder, Json, KeyEncoder}
-import io.circe.generic.auto._
 import io.circe.generic.semiauto._
+import io.circe.syntax._
+import io.circe.{Encoder, Json}
+import org.orbeon.dom
+import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, LangRef, TopLevelPartAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
-import org.orbeon.dom
-import org.orbeon.dom.QName
-import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.util.StaticXPath
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
-import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -40,12 +38,6 @@ object XFormsStaticStateSerializer {
     "localName"          -> Json.fromString(a.localName),
     "prefix"             -> Json.fromString(a.namespace.prefix),
     "uri"                -> Json.fromString(a.namespace.uri),
-  )
-
-  implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
-    "parent"  -> None.asJson, // must be parent scope id TODO
-    "scopeId" -> Json.fromString(a.scopeId),
-    "idMap"   -> a.idMap.asJson
   )
 
   implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
@@ -88,14 +80,6 @@ object XFormsStaticStateSerializer {
   implicit val encodeDocumentInfo: Encoder[StaticXPath.DocumentNodeInfoType] =
     (a: StaticXPath.DocumentNodeInfoType) => Json.fromString(StaticXPath.tinyTreeToString(a))
 
-  implicit val concreteBindingEncoder: Encoder[ConcreteBinding]   = (a: ConcreteBinding) => Json.obj(
-    "innerScope"   -> a.innerScope.asJson,
-    "templateTree" -> a.templateTree.asJson,
-    // We do not need to encode `boundElementAtts` as they are just a copy of the attributes on the bound
-    // element, and we already have those. So we can save that during serialization, at least until
-    // we decide to remove attributes on elements from the serialization.
-  )
-
   def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
     // We serialize the namespace mappings only once to save space. To give an idea, a basic Form Runner
@@ -119,13 +103,44 @@ object XFormsStaticStateSerializer {
       (distinct, distinct.zipWithIndex.toMap)
     }
 
-    // Only pass the position which identifies a namespace mapping
-    val encodeNamespaceMappingHashOnly: Encoder[NamespaceMapping] = (a: NamespaceMapping) =>
-      Json.fromInt(collectedNamespacesWithPositions(a.mapping))
+    val (
+      collectedScopesInOrder      : Iterable[Scope],
+      collectedScopesWithPositions: Map[Scope, Int]
+    ) = {
+
+      val distinct = mutable.LinkedHashSet[Scope]()
+
+      // Top-level scope
+      staticState.topLevelPart.getTopLevelControls.headOption foreach { c =>
+        distinct += c.scope
+      }
+
+      // Only `ComponentControl` (and `xxf:dynamic` which is not yet supported here) create nested scopes
+      staticState.topLevelPart.iterateControls foreach {
+        case c: ComponentControl => distinct += c.bindingOrThrow.innerScope
+        case _ =>
+      }
+
+      (distinct, distinct.zipWithIndex.toMap)
+    }
+
+    implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
+      "parentRef" -> a.parent.map(_.scopeId).asJson,
+      "scopeId"   -> Json.fromString(a.scopeId),
+      "idMap"     -> a.idMap.asJson
+    )
+
+    implicit val concreteBindingEncoder: Encoder[ConcreteBinding]   = (a: ConcreteBinding) => Json.obj(
+      "innerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.innerScope)),
+      "templateTree"  -> a.templateTree.asJson,
+      // We do not need to encode `boundElementAtts` as they are just a copy of the attributes on the bound
+      // element, and we already have those. So we can save that during serialization, at least until
+      // we decide to remove attributes on elements from the serialization.
+    )
 
     implicit val commonBindingEncoder: Encoder[CommonBinding] = (a: CommonBinding) => Json.obj(
       "bindingElemId"               -> a.bindingElemId.asJson,
-      "bindingElemNamespaceMapping" -> encodeNamespaceMappingHashOnly(a.bindingElemNamespaceMapping),
+      "bindingElemNamespaceMapping" -> Json.fromInt(collectedNamespacesWithPositions(a.bindingElemNamespaceMapping.mapping)),
       "directName"                  -> a.directName.asJson,
       "cssName"                     -> a.cssName.asJson,
       "containerElementName"        -> Json.fromString(a.containerElementName),
@@ -305,7 +320,7 @@ object XFormsStaticStateSerializer {
         case c: ComponentControl       =>
           List(
             "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
-            "bindingOpt"       -> c.bindingOpt.asJson
+            "binding"          -> c.bindingOrThrow.asJson
           )
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
@@ -347,9 +362,9 @@ object XFormsStaticStateSerializer {
           "element"           -> encodeLocalElementOnly(a.element),
           "staticId"          -> Json.fromString(a.staticId),
           "prefixedId"        -> Json.fromString(a.prefixedId),
-          "nsRef"             -> encodeNamespaceMappingHashOnly(a.namespaceMapping),
-          "scopeRef"          -> Json.fromString(a.scope.scopeId),
-          "containerScopeRef" -> Json.fromString(a.containerScope.scopeId),
+          "nsRef"             -> Json.fromInt(collectedNamespacesWithPositions(a.namespaceMapping.mapping)),
+          "scopeRef"          -> Json.fromInt(collectedScopesWithPositions(a.scope)),
+          "containerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.containerScope)),
           "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
           "langRef"           -> a.lang.asJson,
         ) ++
@@ -366,7 +381,7 @@ object XFormsStaticStateSerializer {
     def withChildrenEncoder(a: WithChildrenTrait): Json = a.children.asJson
 
     implicit val encodeTopLevelPartAnalysis: Encoder[TopLevelPartAnalysis] = (a: TopLevelPartAnalysis) => Json.obj(
-      "startScope"       -> a.startScope.asJson,
+      "startScopeRef"    -> Json.fromInt(collectedScopesWithPositions(a.startScope)),
       "topLevelControls" -> a.getTopLevelControls.asJson
     )
 
@@ -374,6 +389,7 @@ object XFormsStaticStateSerializer {
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
       "commonBindings"       -> collectedCommonBindingsInOrder.asJson,
+      "scopes"               -> collectedScopesInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
       "template"             -> template.asJson,
     )

@@ -15,8 +15,8 @@ package org.orbeon.xbl
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsCustomMIP
-import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.saxon.om
 
 import scala.util.{Failure, Success}
 
@@ -31,13 +31,13 @@ object DateSupportJava {
 
   //@XPathFunction
   def serializeExternalValueJava(
-    binding : Item,
+    binding : om.Item,
     format  : String
   ): String =
     DateExternalValue(
       value         = binding.getStringValue,
       format        = format,
-      excludedDates = XXFormsCustomMIP.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil
+      excludedDates = InstanceData.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil
     ).asJson.noSpaces
 
   //@XPathFunction

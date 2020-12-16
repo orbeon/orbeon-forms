@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import java.{lang => jl, util => ju}
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
@@ -80,6 +79,12 @@ object InstanceData {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
   }
+
+  def findCustomMip(binding: om.Item, qName: QName): Option[String] =
+    binding match {
+      case nodeInfo: om.NodeInfo => InstanceData.findCustomMip(nodeInfo, ModelDefs.buildInternalCustomMIPName(qName))
+      case _                     => None
+    }
 
   def getInheritedRelevant(nodeInfo: om.NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNodeType])

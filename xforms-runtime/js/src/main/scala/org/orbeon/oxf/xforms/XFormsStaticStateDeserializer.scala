@@ -21,11 +21,13 @@ import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
+import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
+import org.xml.sax.helpers.AttributesImpl
 
 import java.{util => ju}
 import scala.collection.mutable
@@ -41,7 +43,6 @@ object XFormsStaticStateDeserializer {
 
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
-
     var collectedScopes         = IndexedSeq[Scope]()
 
     var controlStack: List[ElementAnalysis] = Nil
@@ -162,8 +163,24 @@ object XFormsStaticStateDeserializer {
       } yield
         dom.QName(localName: String, prefix: String, uri: String)
 
-    implicit val decodeDocumentInfo: Decoder[StaticXPath.DocumentNodeInfoType] =
-      ???
+    implicit val decodeDocumentInfo: Decoder[StaticXPath.DocumentNodeInfoType] = (c: HCursor) => {
+
+      // XXX FIXME this is just so we have a doc and things don't crash, but we must parse!
+      val treeBuilder = om.TreeModel.TINY_TREE.makeBuilder(StaticXPath.GlobalConfiguration.makePipelineConfiguration)
+
+      val handler = {
+        val handler = new SaxonTransformerFactory(StaticXPath.GlobalConfiguration).newTransformerHandler
+        handler.setResult(treeBuilder)
+        handler
+      }
+
+      handler.startDocument()
+      handler.startElement("", "DUMMY", "DUMMY", new AttributesImpl)
+      handler.endElement("", "DUMMY", "DUMMY")
+      handler.endDocument()
+
+      Right(treeBuilder.getCurrentRoot)
+    }
 
     implicit val decodeCommonBinding: Decoder[CommonBinding] = (c: HCursor) =>
       for {

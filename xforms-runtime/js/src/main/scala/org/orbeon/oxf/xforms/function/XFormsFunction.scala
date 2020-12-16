@@ -45,7 +45,7 @@ import scala.collection.{mutable => m}
  * TODO: context should contain PropertyContext directly
  * TODO: context should contain BindingContext directly if any
  */
-abstract class XFormsFunction extends DefaultFunctionSupport {
+object XFormsFunction extends DefaultFunctionSupport {
 
   import XFormsFunction._
 

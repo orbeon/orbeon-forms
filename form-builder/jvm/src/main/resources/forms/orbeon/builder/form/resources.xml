@@ -382,7 +382,7 @@
                 <item id="3">Don't show subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label>Maximum Attachment Size per Control</label>
+                <label>Maximum Attachment Size per File</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -2956,7 +2956,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -4263,7 +4263,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -5570,7 +5570,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -8171,7 +8171,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -9470,7 +9470,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -12049,7 +12049,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -13355,7 +13355,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>

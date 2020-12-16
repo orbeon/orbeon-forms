@@ -145,8 +145,10 @@
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.offline">
         -/ops/javascript/scalajs/orbeon-xforms.js
         -/apps/fr/resources/scalajs/orbeon-form-runner.js
+        -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
         -/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
-        +/ops/javascript/scalajs/orbeon-xforms-offline.js
+<!--        +/ops/javascript/scalajs/orbeon-xforms-offline.js-->
+        +/ops/javascript/scalajs/orbeon-form-runner-offline.js
     </property>
 
     <!-- ==== Internal Form Runner properties ===================================================================== -->
@@ -158,7 +160,7 @@
         +/apps/fr/style/form-runner-orbeon.css
 
         -/ops/javascript/scalajs/orbeon-xforms.js
-        +/apps/fr/resources/scalajs/orbeon-form-runner.js
+        +/apps/fr/resources/scalajs/orbeon-form-runner-web.js
     </property>
 
     <!-- Additional CSS/JavaScript for the detail page -->
@@ -403,7 +405,7 @@
         +/forms/orbeon/builder/resources/form-builder.css
 
         +/ops/dragula/dragula.min.js
-        -/apps/fr/resources/scalajs/orbeon-form-runner.js
+        -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
         +/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
     </property>
 

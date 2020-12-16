@@ -9,6 +9,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.EmbeddingSupport._
 import org.orbeon.xforms._
 import org.scalajs.dom
@@ -57,6 +58,13 @@ object OfflineDemo extends App {
   def renderDemoForm(
     container    : html.Element,
     compiledForm : CompiledForm,
+  ): RuntimeForm =
+    renderCompiledForm(container, compiledForm, Nil)
+
+  def renderCompiledForm(
+    container    : html.Element,
+    compiledForm : CompiledForm,
+    libraries    : Iterable[FunctionLibrary]
   ): RuntimeForm = {
 
     implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
@@ -64,7 +72,7 @@ object OfflineDemo extends App {
     destroyForm(container)
 
     val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm)
+    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm, libraries)
 
     val containingDocument = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
 

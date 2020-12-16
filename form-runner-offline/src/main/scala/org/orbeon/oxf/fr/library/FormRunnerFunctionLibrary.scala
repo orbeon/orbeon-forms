@@ -1,37 +1,16 @@
 package org.orbeon.oxf.fr.library
 
-import org.orbeon.dom.QName
-import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerMetadata, FormRunnerParams, Names, XMLNames}
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
-import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
-import org.orbeon.oxf.xforms.function
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
-import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
-import org.orbeon.saxon.`type`.BuiltInAtomicType.{ANY_ATOMIC, BOOLEAN, DATE_TIME, INTEGER, STRING}
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_MORE, ALLOWS_ZERO_OR_ONE, EXACTLY_ONE}
-import org.orbeon.saxon.expr.{Expression, ExpressionTool, ExpressionVisitor, StringLiteral, XPathContext}
-import org.orbeon.saxon.functions.SystemFunction
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams, XMLNames}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.saxon.functions.registry.BuiltInFunctionSet
-import org.orbeon.saxon.om.{EmptyIterator, Item, NodeInfo, SequenceIterator, StructuredQName, ValueRepresentation}
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, EmptySequence, IntegerValue, StringValue}
-import org.orbeon.scaxon.Implicits.stringToStringValue
-import org.orbeon.xbl.Wizard
-import org.orbeon.xforms.{Namespaces, XFormsId}
-import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
-import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
+import org.orbeon.xforms.XFormsId
 
 
 object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
 
-  override def getNamespace: String = XMLNames.FR
-  override def getConventionalPrefix: String = XMLNames.FRPrefix
+  override def getNamespace          : String = XMLNames.FR
+  override def getConventionalPrefix : String = XMLNames.FRPrefix
 
   @XPathFunction def mode                     : String         = FormRunnerParams().mode
   @XPathFunction def appName                  : String         = FormRunnerParams().app
@@ -42,19 +21,19 @@ object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
   @XPathFunction def workflowStageValue       : Option[String] = FormRunner.documentWorkflowStage
   @XPathFunction def username                 : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials map     (_.username)
   @XPathFunction def userGroup                : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.group)
-  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false)
-  @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
+//  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false)
+//  @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
 
   @XPathFunction def isPe                     : Boolean        = CoreCrossPlatformSupport.isPE
   @XPathFunction def isDesignTime             : Boolean        = FormRunner.isDesignTime(FormRunnerParams())
   @XPathFunction def isReadonlyMode           : Boolean        = FormRunner.isReadonlyMode(FormRunnerParams())
   @XPathFunction def isNoscript               : Boolean        = false
-  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0
+//  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0
   @XPathFunction def isFormDataSaved          : Boolean        = FormRunner.isFormDataSaved
-  @XPathFunction def isWizardTocShown         : Boolean        = Wizard.isWizardTocShown
-  @XPathFunction def isWizardBodyShown        : Boolean        = Wizard.isWizardBodyShown
-  @XPathFunction def isWizardFirstPage        : Boolean        = Wizard.isWizardFirstPage
-  @XPathFunction def isWizardLastPage         : Boolean        = Wizard.isWizardLastPage
+//  @XPathFunction def isWizardTocShown         : Boolean        = Wizard.isWizardTocShown
+//  @XPathFunction def isWizardBodyShown        : Boolean        = Wizard.isWizardBodyShown
+//  @XPathFunction def isWizardFirstPage        : Boolean        = Wizard.isWizardFirstPage
+//  @XPathFunction def isWizardLastPage         : Boolean        = Wizard.isWizardLastPage
   @XPathFunction def canCreate                : Boolean        = FormRunner.canCreate
   @XPathFunction def canRead                  : Boolean        = FormRunner.canRead
   @XPathFunction def canUpdate                : Boolean        = FormRunner.canUpdate
@@ -64,9 +43,9 @@ object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
   @XPathFunction def formVersion              : Int            = FormRunnerParams().formVersion
 
   @XPathFunction(name = "created-dateTime")
-  def createdDateTime                         : Long           = FormRunner.documentCreatedDate
+  def createdDateTime                         : Option[java.time.Instant] = FormRunner.documentCreatedDate.map(java.time.Instant.ofEpochMilli)
   @XPathFunction(name = "modified-dateTime")
-  def modifiedDateTime                        : Long           = FormRunner.documentModifiedDate
+  def modifiedDateTime                        : Option[java.time.Instant] = FormRunner.documentModifiedDate.map(java.time.Instant.ofEpochMilli)
 
   @XPathFunction
   def userRoles: List[String] =
@@ -99,42 +78,56 @@ object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
       }
     }
 
-  @XPathFunction
-  def runProcessByName(scope: String, name: String) =
-    SimpleProcess.runProcessByName(scope, name).isSuccess
+//  @XPathFunction
+//  def runProcessByName(scope: String, name: String) =
+//    SimpleProcess.runProcessByName(scope, name).isSuccess
+//
+//  @XPathFunction
+//  def runProcess(scope: String, process: String) =
+//    SimpleProcess.runProcess(scope, process).isSuccess
 
-  @XPathFunction
-  def runProcess(scope: String, process: String) =
-    SimpleProcess.runProcess(scope, process).isSuccess
+  // TODO: How to deal with the rewrite
+//    Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+//      Arg(STRING, EXACTLY_ONE)
+//    )
 
-  Namespace(List(XMLNames.FR)) {
+//  // TODO: Handle `XFormsFunction.Context` parameter
+//  @XPathFunction
+//  def controlStringValue(targetControlName: String, followIndexes: Boolean = false)(ctx: XFormsFunction.Context): Option[String] =
+//    FormRunner.resolveTargetRelativeToActionSourceOpt(
+//      actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(ctx.sourceEffectiveId),
+//      targetControlName      = targetControlName,
+//      followIndexes          = followIndexes
+//    ) flatMap
+//      (_.nextOption()) map
+//      (_.getStringValue)
+//
+//  // TODO: Handle `XFormsFunction.Context` parameter
+//  @XPathFunction
+//  def controlTypedValue(targetControlName: String, followIndexes: Boolean = false)(ctx: XFormsFunction.Context): Option[AtomicValue] = {
+//
+//  }
 
-    Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
-      Arg(STRING, EXACTLY_ONE)
-    )
+//  Namespace(List(XMLNames.FR)) {
 
-    Fun("control-string-value", classOf[FRControlStringValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-      Arg(STRING, EXACTLY_ONE),
-      Arg(BOOLEAN, EXACTLY_ONE)
-    )
-
-    Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-      Arg(STRING, EXACTLY_ONE),
-      Arg(BOOLEAN, EXACTLY_ONE)
-    )
-
-    Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-      Arg(STRING, EXACTLY_ONE)
-    )
-
-    Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
-
-    Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-      Arg(STRING, EXACTLY_ONE)
-    )
-  }
+//    Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+//      Arg(STRING, EXACTLY_ONE),
+//      Arg(BOOLEAN, EXACTLY_ONE)
+//    )
+//
+//    Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+//      Arg(STRING, EXACTLY_ONE)
+//    )
+//
+//    Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+//
+//    Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+//      Arg(STRING, EXACTLY_ONE)
+//    )
+//  }
 }
 
+/*
 private object FormRunnerFunctions {
 
 
@@ -200,23 +193,6 @@ private object FormRunnerFunctions {
       instanceFn.simplify(visitor)
 
       instanceFn
-    }
-  }
-
-  class FRControlStringValue extends FunctionSupport with RuntimeDependentFunction {
-
-    override def iterate(context: XPathContext): SequenceIterator = {
-
-      implicit val ctx = context
-
-      FormRunner.resolveTargetRelativeToActionSourceOpt(
-        actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
-        targetControlName      = stringArgument(0),
-        followIndexes          = booleanArgumentOpt(1) getOrElse false
-      ) map {
-        _ map (_.getStringValue): SequenceIterator
-      } getOrElse
-        EmptyIterator.getInstance
     }
   }
 
@@ -402,3 +378,4 @@ object FRComponentParam {
       fromPropertiesWithoutSuffix
   }
 }
+*/

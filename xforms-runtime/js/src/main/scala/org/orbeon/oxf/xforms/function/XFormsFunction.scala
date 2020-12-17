@@ -45,24 +45,24 @@ import scala.collection.{mutable => m}
  * TODO: context should contain PropertyContext directly
  * TODO: context should contain BindingContext directly if any
  */
-object XFormsFunction extends DefaultFunctionSupport {
+object XFormsFunction { // extends DefaultFunctionSupport
 
   import XFormsFunction._
 
   // Resolve the relevant control by argument expression
   // TODO: Check callers and consider using `relevantControls`.
-  def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    findRelevantControls(arguments(i).evaluateAsString(xpathContext).toString, followIndexes = true).headOption
-
-  def relevantControls(
-    i             : Int,
-    followIndexes : Boolean)(implicit
-    xpathContext  : XPathContext
-  ): List[XFormsControl] =
-    findRelevantControls(
-      arguments(i).evaluateAsString(xpathContext).toString,
-      followIndexes
-    )
+//  def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
+//    findRelevantControls(arguments(i).evaluateAsString(xpathContext).toString, followIndexes = true).headOption
+//
+//  def relevantControls(
+//    i             : Int,
+//    followIndexes : Boolean)(implicit
+//    xpathContext  : XPathContext
+//  ): List[XFormsControl] =
+//    findRelevantControls(
+//      arguments(i).evaluateAsString(xpathContext).toString,
+//      followIndexes
+//    )
 
   // Resolve a relevant control by id
   def findRelevantControls(
@@ -73,8 +73,8 @@ object XFormsFunction extends DefaultFunctionSupport {
     findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes) collect
       { case control: XFormsControl if control.isRelevant => control }
 
-  def findControls(i: Int, followIndexes: Boolean)(implicit xpathContext: XPathContext): List[XFormsControl] =
-    findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpathContext).toString, followIndexes)
+//  def findControls(i: Int, followIndexes: Boolean)(implicit xpathContext: XPathContext): List[XFormsControl] =
+//    findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpathContext).toString, followIndexes)
 
   // Resolve a control by id
   def findControlsByStaticOrAbsoluteId(
@@ -281,10 +281,7 @@ object XFormsFunction extends DefaultFunctionSupport {
 //      }
 //
 //    (xpe.getInternalExpression, newXPathContext)
-//  }
-}
-
-object XFormsFunction {
+//  }{
 
   case class Context(
     container         : XBLContainer,

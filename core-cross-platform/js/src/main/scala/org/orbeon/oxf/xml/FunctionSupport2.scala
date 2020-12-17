@@ -3,7 +3,8 @@ package org.orbeon.oxf.xml
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.Chain
-import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, EmptySequence, Int64Value, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, EmptySequence, Int64Value, StringValue}
+import org.orbeon.scaxon.Implicits
 
 import java.time.Instant
 import scala.jdk.CollectionConverters._
@@ -22,8 +23,13 @@ trait FunctionSupport2 extends SystemFunction {
 
 object FunctionSupport2 {
 
-  type Decode[T] = om.Sequence => T
-  type Encode[T] = T => om.Sequence
+  trait Decode[T] {
+    def apply(v: om.Sequence): T
+  }
+
+  trait Encode[T] {
+    def apply(t: T): om.Sequence
+  }
 
   implicit val IntDecode: Decode[Int] = (s: om.Sequence) =>
     s.iterate().next() match {
@@ -49,6 +55,12 @@ object FunctionSupport2 {
       case _          => throw new IllegalArgumentException
     }
 
+  implicit val AtomicValueDecode: Decode[AtomicValue] = (s: om.Sequence) =>
+    s.iterate().next() match {
+      case v: AtomicValue => v
+      case _              => throw new IllegalArgumentException
+    }
+
   implicit val InstantDecode: Decode[Instant] = (s: om.Sequence) =>
     s.iterate().next() match {
       case v: DateTimeValue => v.toJavaInstant
@@ -61,47 +73,29 @@ object FunctionSupport2 {
       case v     => Some(implicitly[Decode[U]].apply(v))
     }
 
-  implicit val IntEncode     : Encode[Int]     = (v: Int)     => om.One.integer(v.toLong)
-  implicit val StringEncode  : Encode[String]  = (v: String)  => om.One.string(v)
-  implicit val BooleanEncode : Encode[Boolean] = (v: Boolean) => om.One.bool(v)
-  implicit val ItemEncode    : Encode[om.Item] = (v: om.Item) => new om.One(v)
-  implicit val InstantEncode : Encode[Instant] = (v: Instant) => new om.One(DateTimeValue.fromJavaInstant(v))
+  implicit def IterableDecode[U : Decode]: Decode[Iterable[U]] = (s: om.Sequence) =>
+    Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList
 
-  implicit def OptionEncode[U : Encode]: Encode[Option[U]] = (v: Option[U]) =>
-    v match {
-      case Some(i) => implicitly[Encode[U]].apply(i)
-      case None    => EmptySequence
-    }
+  implicit val IntEncode         : Encode[Int]         = (v: Int)         => om.One.integer(v.toLong)
+  implicit val StringEncode      : Encode[String]      = (v: String)      => om.One.string(v)
+  implicit val BooleanEncode     : Encode[Boolean]     = (v: Boolean)     => om.One.bool(v)
+  implicit val ItemEncode        : Encode[om.Item]     = (v: om.Item)     => new om.One(v)
+  implicit val AtomicValueEncode : Encode[AtomicValue] = (v: AtomicValue) => new om.One(v)
+  implicit val InstantEncode     : Encode[Instant]     = (v: Instant)     => new om.One(DateTimeValue.fromJavaInstant(v))
 
-  implicit def IterableEncode[U : Encode]: Encode[Iterable[U]] = (v: Iterable[U]) => {
+  implicit def OptionEncode[U : Encode]: Encode[Option[U]] = {
+    case Some(i) => implicitly[Encode[U]].apply(i)
+    case None => EmptySequence
+  }
 
-//    // TODO: Move to `SaxonUtils` or `Implicits` (or a new place).
-//    class IteratorFromSequence(s: om.Sequence) extends Iterator[om.Item] {
-//
-//      private val seqIt = s.iterate()
-//      private var n = seqIt.next()
-//
-//      def hasNext: Boolean = n ne null
-//      def next(): om.Item = {
-//        val r = n
-//        n = seqIt.next()
-//        r
-//      }
-//    }
-//
-//    class SequenceFromIterator(it: Iterator[om.Item]) extends om.Sequence {
-//
-//      def head: Item = ???
-//
-//      def iterate(): SequenceIterator = new SequenceIterator {
-//        def next(): Item = ???
-//      }
-//    }
-
+  // We want to support not only `Iterable` but `List`, `Vector`, etc. We first tried:
+  //
+  //   implicit final def IterableEncode[T <: Iterable[U], U : Encode]: Encode[T]
+  //
+  // But this caused a "diverging implicit expansion" error. Instead, the following works.
+  //
+  implicit final def IterableEncode[T[_], U : Encode](implicit ev: T[U] => Iterable[U]): Encode[T[U]] = (v: T[U]) => {
     // Dealing directly with iterators would probably be more efficient
-//    new SequenceFromIterator(v.iterator map implicitly[Encode[U]].apply flatMap (new IteratorFromSequence(_)))
-
-
-  new Chain(v.toList map implicitly[Encode[U]].apply map (_.materialize) asJava)
+    new Chain(v.toList map implicitly[Encode[U]].apply map (_.materialize) asJava)
   }
 }

@@ -1,10 +1,21 @@
 package org.orbeon.oxf.fr.library
 
+
+import org.orbeon.saxon.om
+import org.orbeon.dom.QName
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams, XMLNames}
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, Names, XMLNames}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.functions.registry.BuiltInFunctionSet
+import org.orbeon.saxon.value.{AtomicValue, StringValue}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.scaxon.Implicits._
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import shapeless.syntax.typeable._
+import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 
 
 object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
@@ -115,10 +126,45 @@ object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
 //
-//    Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  // Example: `fr:component-param-value('decimal-separator')`
+  //
+  // This searches bound element attributes, the `fr-form-metadata` instance, and properties.
+  //
+  // We search `fr-form-metadata` statically, since we know that it is readonly and inline.
+  //
+  @XPathFunction
+  def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] = {
+
+    val paramName = QName(paramNameString)
+
+    import XXFormsComponentParam._
+
+    findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
+
+      val staticControl   = sourceComponent.staticControl
+      val concreteBinding = staticControl.bindingOrThrow
+
+      def fromAttributes: Option[AtomicValue] =
+        fromElem(
+          atts        = concreteBinding.boundElementAtts.lift,
+          paramName   = paramName
+        )
+
+      def fromMetadataAndProperties: Option[AtomicValue] =
+        FRComponentParam.fromMetadataAndProperties(
+          partAnalysis  = sourceComponent.container.partAnalysis,
+          directNameOpt = staticControl.commonBinding.directName,
+          paramName     = paramName
+        )
+
+      fromAttributes orElse fromMetadataAndProperties map {
+        case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
+        case paramValue              => paramValue
+      }
+    }
+  }
+
 //    Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
 //
 //    Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
@@ -224,49 +270,6 @@ private object FormRunnerFunctions {
     }
   }
 
-  // For instance, `fr:component-param-value('decimal-separator')`
-  //
-  // This searches bound element attributes, the `fr-form-metadata` instance, and properties.
-  //
-  // We search `fr-form-metadata` statically, since we know that it is readonly and inline.
-  //
-  class FRComponentParam extends FunctionSupport with RuntimeDependentFunction {
-
-    override def evaluateItem(context: XPathContext): AtomicValue = {
-
-      implicit val ctx  = context
-
-      val paramName = QName(stringArgument(0))
-
-      import XXFormsComponentParam._
-
-      findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
-
-        val staticControl   = sourceComponent.staticControl
-        val concreteBinding = staticControl.bindingOrThrow
-
-        def fromAttributes: Option[AtomicValue] =
-          fromElem(
-            atts        = concreteBinding.boundElementAtts.lift,
-            paramName   = paramName
-          )
-
-        def fromMetadataAndProperties: Option[AtomicValue] =
-          FRComponentParam.fromMetadataAndProperties(
-            partAnalysis  = sourceComponent.container.partAnalysis,
-            directNameOpt = staticControl.commonBinding.directName,
-            paramName     = paramName
-          )
-
-        fromAttributes orElse fromMetadataAndProperties map {
-            case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
-            case paramValue              => paramValue
-          }
-
-      } orNull
-    }
-  }
-
   class FRListPdfTemplates extends FunctionSupport with RuntimeDependentFunction {
 
     override def iterate(context: XPathContext): SequenceIterator =
@@ -305,11 +308,13 @@ private object FormRunnerFunctions {
   }
 }
 
+*/
+
 object FRComponentParam {
 
   import org.orbeon.scaxon.SimplePath._
 
-  def findConstantMetadataRootElem(part: PartAnalysisForStaticMetadataAndProperties): Option[NodeInfo] = {
+  def findConstantMetadataRootElem(part: PartAnalysisForStaticMetadataAndProperties): Option[om.NodeInfo] = {
 
     // Tricky: When asking for the instance, the instance might not yet have been indexed, while the
     // `ElementAnalysis` has been. So we get the element instead of using `findInstanceInScope`.
@@ -325,15 +330,15 @@ object FRComponentParam {
 
   // Find in a hierarchical structure, such as:
   //
-  // <metadata>
-  //   <xbl>
-  //     <fr:number>
-  //       <decimal-separator>'</decimal-separator>
-  //     </fr:number>
-  //   </xbl>
-  // </metadata>
+  //   <metadata>
+  //     <xbl>
+  //       <fr:number>
+  //         <decimal-separator>'</decimal-separator>
+  //       </fr:number>
+  //     </xbl>
+  //   </metadata>
   //
-  def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: NodeInfo): Option[String] =
+  def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: om.NodeInfo): Option[String] =
     for {
       directName    <- directNameOpt
       xblElem       <- rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
@@ -344,7 +349,7 @@ object FRComponentParam {
 
   // Instead of using `FormRunnerParams()`, we use the form definition metadata.
   // This also allows support of the edited form in Form Builder.
-  def appFormFromMetadata(constantMetadataRootElem: NodeInfo): Option[AppForm] =
+  def appFormFromMetadata(constantMetadataRootElem: om.NodeInfo): Option[AppForm] =
     for {
       appName                  <- constantMetadataRootElem elemValueOpt Names.AppName
       formName                 <- constantMetadataRootElem elemValueOpt Names.FormName
@@ -378,4 +383,3 @@ object FRComponentParam {
       fromPropertiesWithoutSuffix
   }
 }
-*/

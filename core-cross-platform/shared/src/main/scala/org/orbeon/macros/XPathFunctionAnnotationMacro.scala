@@ -1,5 +1,6 @@
 package org.orbeon.macros
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
 import scala.annotation.{StaticAnnotation, compileTimeOnly, tailrec}
@@ -23,144 +24,157 @@ object XPathFunctionAnnotationMacro {
     import c.universe._
 
     val results = {
-      annottees.map(_.tree).toList match {
-        case q"$mods def $methodName[..$tpes](...$args): $returnType = { ..$body }" :: Nil =>
 
-          val kebabMethodNameString = camelToKebab(methodName.toString)
+      val (methodName, tpes, regularArgs, implicitArgs, returnType, body) =
+        annottees.map(_.tree).toList match {
+          case q"$mods def $methodName[..$tpes](..$args)(implicit ..$implicitArgs): $returnType = { ..$body }" :: Nil if implicitArgs.nonEmpty =>
+            // Not sure why I am getting a match sometimes, but not always, with `implicitArgs.isEmpty`.
+            // So adding above the check for `implicitArgs.nonEmpty`.
+            (methodName, tpes, args, implicitArgs.some, returnType, body)
+          case q"$mods def $methodName[..$tpes](...$args): $returnType = { ..$body }" :: Nil =>
+            (methodName, tpes, args.flatten, None, returnType, body)
+          case _ => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` can be used only on methods")
+        }
 
-          // See https://stackoverflow.com/questions/32631372/getting-parameters-from-scala-macro-annotation
-          val resolvedMethodName =
-            c.prefix.tree match {
-              case q"new XPathFunction(name = $nameArg)" => nameArg
-              case q"new XPathFunction($nameArg)"        => nameArg
-              case q"new XPathFunction()"                => q"""$kebabMethodNameString"""
-              case _                                     => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` has incorrect parameters")
-            }
+      val kebabMethodNameString = camelToKebab(methodName.toString)
 
-          val (returnTypeIsOption, returnTypeString) =
-            returnType match {
-              case tq"Option[Int]"               => (true,  "int")
-              case tq"Option[String]"            => (true,  "string")
-              case tq"Option[Boolean]"           => (true,  "boolean")
-              case tq"Option[java.time.Instant]" => (true,  "instant")
-              case tq"Option[$tpe]"              => (true,  "item")
-              case tq"Int"                       => (false, "int")
-              case tq"String"                    => (false, "string")
-              case tq"Boolean"                   => (false, "boolean")
-              case tq"java.time.Instant"         => (false, "instant")
-              case tq"$tpe"                      => (false, "item")
-            }
+      // See https://stackoverflow.com/questions/32631372/getting-parameters-from-scala-macro-annotation
+      val resolvedMethodName =
+        c.prefix.tree match {
+          case q"new XPathFunction(name = $nameArg)" => nameArg
+          case q"new XPathFunction($nameArg)"        => nameArg
+          case q"new XPathFunction()"                => q"""$kebabMethodNameString"""
+          case _                                     => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` has incorrect parameters")
+        }
 
-          val returnTypeCard =
-            if (returnTypeIsOption)
-              q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
-            else
-              q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
+      val (returnTypeIsOption, returnTypeString) =
+        returnType match {
+          case tq"Option[Int]"               => (true,  "int")
+          case tq"Option[String]"            => (true,  "string")
+          case tq"Option[Boolean]"           => (true,  "boolean")
+          case tq"Option[java.time.Instant]" => (true,  "instant")
+          case tq"Option[$tpe]"              => (true,  "item")
+          case tq"Int"                       => (false, "int")
+          case tq"String"                    => (false, "string")
+          case tq"Boolean"                   => (false, "boolean")
+          case tq"java.time.Instant"         => (false, "instant")
+          case tq"$tpe"                      => (false, "item")
+        }
 
-          val arguments =
-            (args: Iterable[Iterable[Tree]]).zipWithIndex map { case (argList, argListPos) =>
-              argList.zipWithIndex map {
-                case (arg: ValDef, argPosInList) =>
+      val returnTypeCard =
+        if (returnTypeIsOption)
+          q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
+        else
+          q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
 
-                  val (isOption, typeString) =
-                    arg match {
-                      case q"$mods val $name: Option[Int]               = $rhs" => (true,  "int")
-                      case q"$mods val $name: Option[String]            = $rhs" => (true,  "string")
-                      case q"$mods val $name: Option[Boolean]           = $rhs" => (true,  "boolean")
-                      case q"$mods val $name: Option[java.time.Instant] = $rhs" => (true,  "instant")
-                      case q"$mods val $name: Option[$tpe]              = $rhs" => (true,  "item")
-                      case q"$mods val $name: Int                       = $rhs" => (false, "int")
-                      case q"$mods val $name: String                    = $rhs" => (false, "string")
-                      case q"$mods val $name: Boolean                   = $rhs" => (false, "boolean")
-                      case q"$mods val $name: java.time.Instant         = $rhs" => (false, "instant")
-                      case q"$mods val $name: $tpe                      = $rhs" => (false, "item")
-                    }
+      val argumentsDetails =
+        regularArgs.zipWithIndex map {
+          case (arg: ValDef, argPosInList) =>
 
-                  val (decodeCall, defaultOpt) = {
-                    val q"$mods val $name: $tpt = $rhs" = arg
-                    (q"""decodeSaxonArg[$tpt](args($argPosInList))""", rhs != EmptyTree option rhs)
-                  }
-
-                  (argPosInList, isOption, typeString, decodeCall, defaultOpt)
-
-                case _ => throw new IllegalArgumentException
-              }
-            }
-
-          val flattenedArguments = arguments.flatten
-
-          val minArity = flattenedArguments.count(_._5.isEmpty)
-          val maxArity = flattenedArguments.size
-
-          if (flattenedArguments.takeWhile(_._5.isEmpty).size != minArity)
-            throw new IllegalArgumentException(s"arguments with default values must be last")
-
-          def getSaxonType(typeString: String) =
-            typeString match {
-              case "int"     => q"""org.orbeon.saxon.model.BuiltInAtomicType.INTEGER"""
-              case "string"  => q"""org.orbeon.saxon.model.BuiltInAtomicType.STRING"""
-              case "boolean" => q"""org.orbeon.saxon.model.BuiltInAtomicType.BOOLEAN"""
-              case "instant" => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE_TIME"""
-              case "item"    => q"""org.orbeon.saxon.pattern.AnyNodeTest"""
-            }
-
-          // Register one entry per distinct arity
-          for (arity <- minArity to maxArity) yield {
-
-            val classNameWithArity          = methodName.toString + "_xpathFunction" + arity
-            val flattenedArgumentsUpToArity = flattenedArguments.take(arity)
-
-            val register =
-              q"""
-                register(
-                  $resolvedMethodName,
-                  $arity,
-                  () => new ${TypeName(classNameWithArity)},
-                  ${getSaxonType(returnTypeString)},
-                  $returnTypeCard,
-                  0
-                )
-               """
-
-            val registerWithArgs =
-              flattenedArgumentsUpToArity.foldLeft(register) { case (result, (pos, isOption, typeString, _, _)) =>
-
-                val card =
-                  if (isOption)
-                    q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
-                  else
-                    q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
-
-                q"""
-                   $result.arg(
-                     $pos,
-                     ${getSaxonType(typeString)},
-                     $card,
-                     null
-                   )
-                 """
+            val (isOption, typeString) =
+              arg match {
+                case q"$mods val $name: Option[Int]               = $rhs" => (true,  "int")
+                case q"$mods val $name: Option[String]            = $rhs" => (true,  "string")
+                case q"$mods val $name: Option[Boolean]           = $rhs" => (true,  "boolean")
+                case q"$mods val $name: Option[java.time.Instant] = $rhs" => (true,  "instant")
+                case q"$mods val $name: Option[$tpe]              = $rhs" => (true,  "item")
+                case q"$mods val $name: Int                       = $rhs" => (false, "int")
+                case q"$mods val $name: String                    = $rhs" => (false, "string")
+                case q"$mods val $name: Boolean                   = $rhs" => (false, "boolean")
+                case q"$mods val $name: java.time.Instant         = $rhs" => (false, "instant")
+                case q"$mods val $name: $tpe                      = $rhs" => (false, "item")
               }
 
-            val flattenedTrees   = flattenedArgumentsUpToArity.map(_._4)
-            val defaultArgsTrees = flattenedArguments.drop(arity).flatMap(_._5)
+            val (decodeCall, defaultOpt) = {
+              val q"$mods val $name: $tpt = $rhs" = arg
+              (q"""decodeSaxonArg[$tpt](args($argPosInList))""", rhs != EmptyTree option rhs)
+            }
 
-            val encodedCall =
-              if (args.isEmpty) // no parameter list!
-                q"""
-                  encodeSaxonArg[$returnType](
-                    $methodName[..$tpes]
-                  )
-                 """
+            (argPosInList, isOption, typeString, decodeCall, defaultOpt)
+
+          case _ => throw new IllegalArgumentException
+      }
+
+      val minArity = argumentsDetails.count(_._5.isEmpty)
+      val maxArity = argumentsDetails.size
+
+      println(s"xxxx min/max arity $minArity/$maxArity")
+
+      if (argumentsDetails.takeWhile(_._5.isEmpty).size != minArity)
+        throw new IllegalArgumentException(s"arguments with default values must be last")
+
+      def getSaxonType(typeString: String) =
+        typeString match {
+          case "int"     => q"""org.orbeon.saxon.model.BuiltInAtomicType.INTEGER"""
+          case "string"  => q"""org.orbeon.saxon.model.BuiltInAtomicType.STRING"""
+          case "boolean" => q"""org.orbeon.saxon.model.BuiltInAtomicType.BOOLEAN"""
+          case "instant" => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE_TIME"""
+          case "item"    => q"""org.orbeon.saxon.pattern.AnyNodeTest"""
+        }
+
+      // Register one entry per distinct arity
+      for (arity <- minArity to maxArity) yield {
+
+        val classNameWithArity          = methodName.toString + "_xpathFunction" + arity
+        val flattenedArgumentsUpToArity = argumentsDetails.take(arity)
+
+        val register =
+          q"""
+            register(
+              $resolvedMethodName,
+              $arity,
+              () => new ${TypeName(classNameWithArity)},
+              ${getSaxonType(returnTypeString)},
+              $returnTypeCard,
+              0
+            )
+           """
+
+        val registerWithArgs =
+          flattenedArgumentsUpToArity.foldLeft(register) { case (result, (pos, isOption, typeString, _, _)) =>
+
+            val card =
+              if (isOption)
+                q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
               else
-                q"""
-                  encodeSaxonArg[$returnType](
-                    $methodName[..$tpes](
-                      ..$flattenedTrees,..$defaultArgsTrees
-                    )
-                  )
-                """
+                q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
 
-            // We use `...$args` which means `Iterable[Iterable[Tree]]`
+            q"""
+               $result.arg(
+                 $pos,
+                 ${getSaxonType(typeString)},
+                 $card,
+                 null
+               )
+             """
+          }
+
+        val flattenedTrees   = flattenedArgumentsUpToArity.map(_._4)
+        val defaultArgsTrees = argumentsDetails.drop(arity).flatMap(_._5)
+
+        val encodedCall =
+          if (regularArgs.isEmpty) { // no parameter list!
+            println(s"xxxx no parameter list")
+            q"""
+              encodeSaxonArg[$returnType](
+                $methodName[..$tpes]
+              )
+             """
+          } else {
+            println(s"xxxx WITH parameter list")
+            q"""
+              encodeSaxonArg[$returnType](
+                $methodName[..$tpes](
+                  ..$flattenedTrees,..$defaultArgsTrees
+                )
+              )
+            """
+          }
+
+        // We use `...$args` which means `Iterable[Iterable[Tree]]`
+        implicitArgs match {
+          case None =>
+            println(s"xxxx no implicitArgs")
             q"""
               $registerWithArgs
 
@@ -170,7 +184,7 @@ object XPathFunctionAnnotationMacro {
                   args   : Array[org.orbeon.saxon.om.Sequence]
                 ): org.orbeon.saxon.om.Sequence = {
 
-                  def $methodName[..$tpes](...$args): $returnType = {..$body}
+                  def $methodName[..$tpes](..$regularArgs): $returnType = {..$body}
 
                   import org.orbeon.oxf.xml.FunctionSupport2._
 
@@ -178,8 +192,30 @@ object XPathFunctionAnnotationMacro {
                 }
               }
             """
-          }
-        case _ => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` can be used only on methods")
+          case Some(implicitArgs) =>
+            println(s"xxxx HAS implicitArgs")
+            q"""
+              $registerWithArgs
+
+              class ${TypeName(classNameWithArity)} extends org.orbeon.oxf.xml.FunctionSupport2 {
+                def call(
+                  context: org.orbeon.saxon.expr.XPathContext,
+                  args   : Array[org.orbeon.saxon.om.Sequence]
+                ): org.orbeon.saxon.om.Sequence = {
+
+                  implicit val xpathContext : org.orbeon.saxon.expr.XPathContext = context
+                  implicit val xformsContext: org.orbeon.oxf.xforms.function.XFormsFunction.Context =
+                    org.orbeon.oxf.xforms.function.XFormsFunction.context
+
+                  def $methodName[..$tpes](..$regularArgs)(..$implicitArgs): $returnType = {..$body}
+
+                  import org.orbeon.oxf.xml.FunctionSupport2._
+
+                  $encodedCall
+                }
+              }
+            """
+        }
       }
     }
 

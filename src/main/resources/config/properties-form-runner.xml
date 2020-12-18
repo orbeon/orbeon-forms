@@ -152,7 +152,6 @@
     </property>
 
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
-    <property as="xs:string"  name="oxf.fr.detail.captcha.component.*.*"                        value=""/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                          value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                         value="form-bottom"/>
 

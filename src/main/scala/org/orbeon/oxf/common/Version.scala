@@ -46,33 +46,22 @@ object Version {
   def versionStringIfAllowed: Option[String] =
     Properties.instance.getPropertySet.getBoolean("oxf.show-version", default = false) option VersionString
 
+  // From XSLT only.
   //@XPathFunction
   def versionStringIfAllowedOrEmpty: String =
     versionStringIfAllowed.orNull
 
+  // TODO: Remove?
   // For backward compatibility
   def getVersionString =
     versionStringIfAllowedOrEmpty
 
   val logger = LoggerFactory.createLogger(classOf[Version])
 
+  // From XSLT only.
   //@XPathFunction
-  def compare(leftVersion: String, rightVersion: String): Option[Int] = {
-    (majorMinor(leftVersion), majorMinor(rightVersion)) match {
-      case (Some((leftMajor, leftMinor)), Some((rightMajor, rightMinor))) =>
-        if      (leftMajor > rightMajor || (leftMajor == rightMajor && leftMinor > rightMinor)) Some( 1)
-        else if (leftMajor < rightMajor || (leftMajor == rightMajor && leftMinor < rightMinor)) Some(-1)
-        else                                                                                    Some( 0)
-      case _ =>
-        None
-    }
-  }
-
-  def majorMinor(versionString: String): Option[(Int, Int)] = {
-    // Allow `-` as separator as well so we can handle things like "2016.3-SNAPSHOT"
-    val ints = versionString.splitTo[Array](sep = ".-") take 2 map (_.toInt)
-    if (ints.size == 2) Some(ints(0), ints(1)) else None
-  }
+  def compare(leftVersion: String, rightVersion: String): Option[Int] =
+    VersionSupport.compare(leftVersion, rightVersion)
 
   // Create a Version instance using reflection
   lazy val instance: Version = {

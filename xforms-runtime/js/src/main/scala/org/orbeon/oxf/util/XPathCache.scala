@@ -78,7 +78,9 @@ object XPathCache extends XPathCacheTrait {
     val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
 
     withEvaluation(xpathString, locationData, reporter) {
-      new SequenceExtent(evaluate(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+      withFunctionContext(functionContext) {
+        new SequenceExtent(evaluate(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+      }
     }
   }
 

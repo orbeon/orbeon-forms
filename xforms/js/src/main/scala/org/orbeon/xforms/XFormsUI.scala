@@ -61,23 +61,19 @@ object XFormsUI {
 
       AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("modal panel") foreach { details =>
 
-        // If neither of these two conditions is met, hide the modal progress panel:
-        //
-        //      1. There is another Ajax request in the queue, which could be the one that triggered the
-        //         display of the modal progress panel, so we don't want to hide before that request ran.
-        //      2. The server tells us to do a submission or load, so we don't want to remove it otherwise
-        //         users could start interacting with a page which is going to be replaced shortly.
+        // Hide the modal progress panel, unless the server tells us to do a submission or load, so we don't want
+        // to remove it otherwise users could start interacting with a page which is going to be replaced shortly.
         //
         // We remove the modal progress panel before handling DOM response, as script actions may dispatch
         // events and we don't want them to be filtered. If there are server events, we don't remove the
         // panel until they have been processed, i.e. the request sending the server events returns.
         val mustHideProgressDialog =
-          ! AjaxClient.hasShowProgressEvent && ! (
+          ! (
             // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
             details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
               details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "load").iterator exists
               (e => ! e.hasAttribute("target") && e.getAttribute("show-progress") != "false")
-            )
+          )
 
         if (mustHideProgressDialog)
           Private.hideModalProgressPanel(timerIdOpt, focusControlIdOpt)

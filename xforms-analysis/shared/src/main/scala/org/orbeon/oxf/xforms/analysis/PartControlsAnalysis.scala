@@ -29,6 +29,9 @@ trait PartControlsAnalysis extends TransientState {
 
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
 
+  def getControlAnalysis(prefixedId: String): ElementAnalysis =
+    controlAnalysisMap.get(prefixedId) orNull
+
   val controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis] = LinkedHashMap[String, ElementAnalysis]()
   val controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]] = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
@@ -63,9 +66,6 @@ trait PartControlsAnalysis extends TransientState {
           existingMap + (forId -> (existingAttributes ++ newAttributes))
       }
     }
-
-  def getControlAnalysis(prefixedId: String): ElementAnalysis =
-    controlAnalysisMap.get(prefixedId) orNull
 
   def controlElement(prefixedId: String): Option[om.NodeInfo] =
     findControlAnalysis(prefixedId) map { control =>

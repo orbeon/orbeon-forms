@@ -715,9 +715,6 @@ object XFormsStaticStateDeserializer {
 
         newControl match {
           case withChildren: WithChildrenTrait =>
-
-            println(s"xxx checking children")
-
             controlStack ::= withChildren
             c.get[Iterable[ElementAnalysis]]("children") foreach withChildren.addChildren
             controlStack = controlStack.tail
@@ -864,7 +861,8 @@ object TopLevelPartAnalysisImpl {
 
         val startScope: Scope = _startScope
 
-        def findControlAnalysis(prefixedId: String): Option[ElementAnalysis] = controlAnalysisMap.get(prefixedId)
+        def findControlAnalysis(prefixedId: String): Option[ElementAnalysis] =
+          controlAnalysisMap.get(prefixedId)
 
         def parent: Option[PartAnalysis] = None
         def isTopLevelPart: Boolean = true

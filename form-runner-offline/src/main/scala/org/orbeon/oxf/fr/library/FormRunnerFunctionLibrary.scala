@@ -1,21 +1,24 @@
 package org.orbeon.oxf.fr.library
 
 
-import org.orbeon.saxon.om
+import cats.syntax.option._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.dom.QName
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, Names, XMLNames}
+import org.orbeon.oxf.common.VersionSupport
+import org.orbeon.oxf.fr._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.xforms.XFormsId
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
-import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 
 
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -164,12 +167,47 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     }
   }
 
-//    Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+  // TODO: Macro to handle `Map` results.
+//  @XPathFunction
+//  def pdfTemplates: Iterable[Map[String, Option[String]]] =
+//    FormRunnerRenderedFormat.listPdfTemplates map { case PdfTemplate(path, nameOpt, langOpt) =>
+//      Map(
+//        "path" -> path.some,
+//        "name" -> nameOpt,
+//        "lang" -> langOpt
+//      )
+//    }
 //
-//    Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//  }
+//  def iterate(context: XPathContext): SequenceIterator =
+//    FormRunnerRenderedFormat.listPdfTemplates map { template =>
+//      MapFunctions.createValue(
+//        Map[AtomicValue, ValueRepresentation](
+//          (SaxonUtils.fixStringValue("path"), template.path),
+//          (SaxonUtils.fixStringValue("name"), template.nameOpt map stringToStringValue getOrElse EmptySequence.getInstance),
+//          (SaxonUtils.fixStringValue("lang"), template.langOpt map stringToStringValue getOrElse EmptySequence.getInstance)
+//        )
+//      )
+//    }
+
+  @XPathFunction
+  def createdWithOrNewer(paramVersion: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Boolean = {
+    val metadataVersionOpt =
+      for {
+        sourceControl      <- xfc.container.associatedControlOpt
+        part               = sourceControl.container.partAnalysis
+        metadata           <- FRComponentParam.findConstantMetadataRootElem(part)
+        createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
+      } yield
+        createdWithVersion
+
+    metadataVersionOpt match {
+      case None =>
+        // If no version info the metadata, or no metadata, do as if the form was created with an old version
+        false
+      case Some(metadataVersion) =>
+        VersionSupport.compare(metadataVersion, paramVersion).exists(_ >= 0)
+    }
+  }
 }
 
 /*
@@ -269,42 +307,6 @@ private object FormRunnerFunctions {
     }
   }
 
-  class FRListPdfTemplates extends FunctionSupport with RuntimeDependentFunction {
-
-    override def iterate(context: XPathContext): SequenceIterator =
-      FormRunnerRenderedFormat.listPdfTemplates map { template =>
-        MapFunctions.createValue(
-          Map[AtomicValue, ValueRepresentation](
-            (SaxonUtils.fixStringValue("path"), template.path),
-            (SaxonUtils.fixStringValue("name"), template.nameOpt map stringToStringValue getOrElse EmptySequence.getInstance),
-            (SaxonUtils.fixStringValue("lang"), template.langOpt map stringToStringValue getOrElse EmptySequence.getInstance)
-          )
-        )
-      }
-  }
-
-  class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): BooleanValue = {
-
-      val metadataVersionOpt =
-        for {
-          sourceControl      <- XFormsFunction.context.container.associatedControlOpt
-          part               = sourceControl.container.partAnalysis
-          metadata           <- FRComponentParam.findConstantMetadataRootElem(part)
-          createdWithVersion <- metadata elemValueOpt Names.CreatedWithVersion
-        } yield
-          createdWithVersion
-
-      metadataVersionOpt match {
-        case None =>
-          // If no version info the metadata, or no metadata, do as if the form was created with an old version
-          false
-        case Some(metadataVersion) =>
-          val paramVersion = stringArgument(0)(context)
-          Version.compare(metadataVersion, paramVersion).exists(_ >= 0)
-      }
-    }
-  }
 }
 
 */

@@ -81,7 +81,7 @@ final class SAXStore extends ForwardingXMLReceiver {
 
   private[oxf] var marks: ju.ArrayList[Mark] = null
 
-  private def init(): Unit = {
+  def clear(): Unit = {
     eventBufferPosition = 0
     eventBuffer = new Array[Byte](SAXStore.InitialSize)
 
@@ -104,9 +104,10 @@ final class SAXStore extends ForwardingXMLReceiver {
     locator = null
   }
 
-  // Main constructor initializes arrays
-  init()
-
+  // Main constructor
+  locally {
+    clear()
+  }
 
   def this(xmlReceiver: XMLReceiver) = {
     this()
@@ -392,9 +393,6 @@ final class SAXStore extends ForwardingXMLReceiver {
 //        throw new OXFException(e)
 //    }
 //  }
-
-  def clear(): Unit =
-    init()
 
 //  def getDocument = try {
 //    val ch = new LocationSAXContentHandler

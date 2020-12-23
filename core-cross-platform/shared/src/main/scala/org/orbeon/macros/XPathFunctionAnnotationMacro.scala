@@ -8,8 +8,55 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
 
-// TODO: function flags (focus, etc.)
-
+// The purpose of this macro is to create bridges to the Saxon XPath library simply using
+// the `@XPathFunction` annotation placed on a method. The macro analyzes the method's
+// signature, and:
+//
+// - builds a call to a `register()` function that must be in scope, typically because the
+//   methods are in a trait or class extending `OrbeonFunctionLibrary` or `BuiltInFunctionSet`.
+//     - create one `register()` call for each arity of the function, where there can be
+//       multiple arities depending on whether the method has one more more parameters with
+//       default values
+// - creates a new local class that extends `FunctionSupport2` and implements the `call()`
+//   method
+//     - parameters and the return value are converted using support in `FunctionSupport2`
+// - locally scopes implicits for `XPathContext` and `XFormsFunction.Context`
+//     - these are inserted only if there is at least one implicit parameter list
+//
+// The original methods are not removed from the original scope.
+//
+// The XPath function is named by kebab-casing the Scala method name. You can override this
+// by passing a `name` parameter to the annotation.
+//
+// Supported types so far:
+//
+// - `Int`
+// - `Long`
+// - `String`
+// - `Boolean`
+// - `Item`
+// - `NodeInfo`
+// - `AtomicValue`
+// - `Instant`
+// - `Option`
+// - `Iterable`
+//
+// This allows writing new XPath functions in a very lightweight and safe way.
+//
+// The only drawback we see if that macro annotations are not supported by Scala 3. But moving
+// to Scala 3 is still quite a way off, and we hope that a solution will be available at some
+// point. In the worst case scenario, XPath functions interfaces will have to be remain written
+// with Scala 2 for longer.
+//
+// TODO:
+//
+// - [ ] support `Map` types
+// - [ ] rename `FunctionSupport2`
+// - [ ] rename `XFormsFunction.Context`
+// - [ ] avoid copying the method!
+// - [ ] function flags (focus, etc.)
+// - [ ] allow specifying super trait like `InstanceTrait` for `PathMapXPathAnalysisBuilder`
+//
 @compileTimeOnly("enable macro paradise to expand macro annotations")
 class XPathFunction(name: String = null) extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro XPathFunctionAnnotationMacro.impl
@@ -96,8 +143,6 @@ object XPathFunctionAnnotationMacro {
       val minArity = argumentsDetails.count(_._5.isEmpty)
       val maxArity = argumentsDetails.size
 
-      println(s"xxxx min/max arity $minArity/$maxArity")
-
       if (argumentsDetails.takeWhile(_._5.isEmpty).size != minArity)
         throw new IllegalArgumentException(s"arguments with default values must be last")
 
@@ -152,14 +197,12 @@ object XPathFunctionAnnotationMacro {
 
         val encodedCall =
           if (regularArgs.isEmpty) { // no parameter list!
-            println(s"xxxx no parameter list")
             q"""
               encodeSaxonArg[$returnType](
                 fn[..$tpes]
               )
              """
           } else {
-            println(s"xxxx WITH parameter list")
             q"""
               encodeSaxonArg[$returnType](
                 fn[..$tpes](
@@ -172,7 +215,6 @@ object XPathFunctionAnnotationMacro {
         // We use `...$args` which means `Iterable[Iterable[Tree]]`
         implicitArgs match {
           case None =>
-            println(s"xxxx no implicitArgs")
             q"""
               $registerWithArgs
 
@@ -191,7 +233,6 @@ object XPathFunctionAnnotationMacro {
               }
             """
           case Some(implicitArgs) =>
-            println(s"xxxx HAS implicitArgs")
             q"""
               $registerWithArgs
 

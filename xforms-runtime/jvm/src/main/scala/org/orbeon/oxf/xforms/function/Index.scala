@@ -28,14 +28,14 @@ class Index extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Int64Value =
     findIndexForRepeatId(stringArgument(0)(xpathContext))
 
-  protected def findIndexForRepeatId(repeatStaticId: String): Int64Value = {
-    val index = XFormsFunction.context.container.getRepeatIndex(getSourceEffectiveId, repeatStaticId)
-    if (index == -1)
-      throw new ValidationException(
-        s"Function index uses repeat id `$repeatStaticId` which is not in scope",
-        BasicLocationData(getSystemId, getLineNumber, getColumnNumber)
-      )
-    else
-      new Int64Value(index)
-  }
+  protected def findIndexForRepeatId(repeatStaticId: String): Int64Value =
+    XFormsFunction.context.container.getRepeatIndex(getSourceEffectiveId, repeatStaticId) match {
+      case Some(index) =>
+        new Int64Value(index)
+      case None =>
+        throw new ValidationException(
+          s"Function index uses repeat id `$repeatStaticId` which is not in scope",
+          BasicLocationData(getSystemId, getLineNumber, getColumnNumber)
+        )
+    }
 }

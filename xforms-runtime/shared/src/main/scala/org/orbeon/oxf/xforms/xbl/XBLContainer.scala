@@ -325,9 +325,9 @@ trait ContainerResolver {
    *
    * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...), or null
    * @param repeatStaticId    static id of the target
-   * @return                  repeat index, -1 if repeat is not found
+   * @return                  repeat index, `None` if repeat is not found
    */
-  def getRepeatIndex(sourceEffectiveId: String, repeatStaticId: String): Int = {
+  def getRepeatIndex(sourceEffectiveId: String, repeatStaticId: String): Option[Int] = {
 
     def fromConcreteRepeat = {
 
@@ -352,7 +352,7 @@ trait ContainerResolver {
       }
     }
 
-    fromConcreteRepeat orElse fromStaticRepeat getOrElse -1
+    fromConcreteRepeat orElse fromStaticRepeat
   }
 
   def resolveObjectByIdInScope(

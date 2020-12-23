@@ -293,6 +293,9 @@ object XFormsFunction { // extends DefaultFunctionSupport
 
     def containingDocument = container.containingDocument
 
+    def sourceEffectiveIdOrThrow: String =
+      sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
+
     private var _properties: Option[m.Map[String, Option[String]]] = None
     def properties = _properties
 

@@ -376,9 +376,9 @@ object SimplePath {
         localName == name.getLocalPart
 
       // This is probably not called
+      // 2020-12-22: It *is* called.
       def getUType: UType =
-        ???
-//        UType.ELEMENT.union(UType.ATTRIBUTE)
+        UType.ELEMENT.union(UType.ATTRIBUTE)
 
       // This is probably not called
       def getDefaultPriority: Double =
@@ -397,7 +397,7 @@ object SimplePath {
         ElementOrAttribute(nodeKind.toShort) && (name.getFingerprint & NamePool.FP_MASK) == this.fingerPrintInt
 
       override def getUType: UType =
-        ???
+        UType.ELEMENT.union(UType.ATTRIBUTE)
 
       // This is probably not called
       def getDefaultPriority: Double =

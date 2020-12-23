@@ -16,7 +16,10 @@ package org.orbeon.oxf.xforms.library
 import cats.syntax.option._
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function._
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
@@ -79,9 +82,64 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
+  // XXX TODO: must extend `InstanceTrait`
   @XPathFunction
-  def instance(instanceId: Option[String]): Option[om.Item] = {
-    ???
+  def instance(
+    instanceId : String = "")(implicit
+    xpc        : XPathContext,
+    xfc        : XFormsFunction.Context
+  ): Option[om.NodeInfo] = {
+
+    // "If the argument is omitted or is equal to the empty string, then the root element node (also called the
+    // document element node) is returned for the default instance in the model that contains the current context
+    // node."
+
+    val instanceIdOpt = instanceId.trimAllToOpt
+
+    // Get model and instance with given id for that model only
+
+    // "If a match is located, and the matching instance data is associated with the same XForms Model as the
+    // current context node, this function returns a node-set containing just the root element node (also called
+    // the document element node) of the referenced instance data. In all other cases, an empty node-set is
+    // returned."
+
+    // NOTE: Model can be null when there is no model in scope at all
+    val rootElemOptOpt =
+      xfc.modelOpt match {
+        case Some(model) =>
+
+          // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
+          // exists statically. If it does exist statically only, we return an empty sequence, but we don't warn
+          // as the instance actually exists. The case where the instance might exist statically but not
+          // dynamically is when this function is used during xforms-model-construct. At that time, instances in
+          // this or other models might not yet have been constructed, however they might be referred to, for
+          // example with model variables.
+
+          def dynamicInstanceOpt = instanceIdOpt match {
+            case Some(instanceId) => model.findInstance(instanceId)
+            case None             => model.defaultInstanceOpt
+          }
+
+          def staticInstanceOpt = instanceIdOpt match {
+            case Some(instanceId) => model.staticModel.instances.get(instanceId)
+            case None             => model.staticModel.defaultInstanceOpt
+          }
+
+          def findDynamic = dynamicInstanceOpt map (_.rootElement.some)
+          def findStatic  = staticInstanceOpt.isDefined option None
+
+          findDynamic orElse findStatic
+        case _ => None
+      }
+
+    rootElemOptOpt match {
+      case Some(rootElemOpt) =>
+        rootElemOpt
+      case None =>
+        xfc.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
+          .logWarning("instance()", "instance not found", "instance id", instanceIdOpt.orNull)
+        None
+    }
   }
 
   @XPathFunction

@@ -1,6 +1,5 @@
 package org.orbeon.oxf.xforms.library
 
-import cats.syntax.option._
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils._
@@ -9,13 +8,14 @@ import org.orbeon.oxf.xforms.function.XFormsFunction._
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.CoreSupport
-import org.orbeon.saxon.{IndependentRequestFunctions, om}
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.saxon.{IndependentRequestFunctions, om}
 import org.orbeon.xforms.{Namespaces, XFormsNames}
 
 
 object XXFormsFunctionLibrary
   extends OrbeonFunctionLibrary
+    with XXFormsEnvFunctions
     with IndependentRequestFunctions {
 
   private val XFormsPropertyPrefix = "oxf.xforms."

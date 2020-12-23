@@ -702,6 +702,8 @@ object XFormsStaticStateDeserializer {
 
               variable.right.get // XXX TODO
 
+            case XBL_TEMPLATE_QNAME =>
+              new ContainerControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case ROOT_QNAME =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
 

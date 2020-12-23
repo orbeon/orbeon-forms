@@ -37,6 +37,12 @@ object FunctionSupport2 {
       case _             => throw new IllegalArgumentException
     }
 
+  implicit val LongDecode: Decode[Long] = (s: om.Sequence) =>
+    s.iterate().next() match {
+      case v: Int64Value => v.longValue
+      case _             => throw new IllegalArgumentException
+    }
+
   implicit val StringDecode: Decode[String] = (s: om.Sequence) =>
     s.iterate().next() match {
       case v: StringValue => v.getStringValue
@@ -53,6 +59,12 @@ object FunctionSupport2 {
     s.iterate().next() match {
       case v: om.Item => v
       case _          => throw new IllegalArgumentException
+    }
+
+  implicit val NodeInfoDecode: Decode[om.NodeInfo] = (s: om.Sequence) =>
+    s.iterate().next() match {
+      case v: om.NodeInfo => v
+      case _              => throw new IllegalArgumentException
     }
 
   implicit val AtomicValueDecode: Decode[AtomicValue] = (s: om.Sequence) =>
@@ -77,9 +89,11 @@ object FunctionSupport2 {
     Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList
 
   implicit val IntEncode         : Encode[Int]         = (v: Int)         => om.One.integer(v.toLong)
+  implicit val LongEncode        : Encode[Long]        = (v: Long)        => om.One.integer(v)
   implicit val StringEncode      : Encode[String]      = (v: String)      => om.One.string(v)
   implicit val BooleanEncode     : Encode[Boolean]     = (v: Boolean)     => om.One.bool(v)
   implicit val ItemEncode        : Encode[om.Item]     = (v: om.Item)     => new om.One(v)
+  implicit val NodeInfoEncode    : Encode[om.NodeInfo] = (v: om.NodeInfo) => new om.One(v)
   implicit val AtomicValueEncode : Encode[AtomicValue] = (v: AtomicValue) => new om.One(v)
   implicit val InstantEncode     : Encode[Instant]     = (v: Instant)     => new om.One(DateTimeValue.fromJavaInstant(v))
 

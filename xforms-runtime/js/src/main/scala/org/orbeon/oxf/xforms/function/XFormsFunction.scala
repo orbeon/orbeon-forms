@@ -87,7 +87,14 @@ object XFormsFunction { // extends DefaultFunctionSupport
     val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = context.container.findScopeRoot(sourcePrefixedId)
 
-    resolutionScopeContainer.resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt = None, followIndexes) collect { case c: XFormsControl => c }
+    resolutionScopeContainer.resolveObjectsById(
+      sourceEffectiveId,
+      staticOrAbsoluteId,
+      contextItemOpt = None,
+      followIndexes
+    ) collect {
+      case c: XFormsControl => c
+    }
   }
 
   // Resolve an object by id

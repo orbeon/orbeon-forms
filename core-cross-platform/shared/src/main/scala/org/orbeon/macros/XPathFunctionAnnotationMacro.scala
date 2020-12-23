@@ -8,8 +8,6 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
 
-// TODO: `Iterable[]` return param/type
-// TODO: `XPathContext` and `XFormsFunction.Context` implicits (or explicits)
 // TODO: function flags (focus, etc.)
 
 @compileTimeOnly("enable macro paradise to expand macro annotations")
@@ -39,7 +37,7 @@ object XPathFunctionAnnotationMacro {
       val kebabMethodNameString = camelToKebab(methodName.toString)
 
       // See https://stackoverflow.com/questions/32631372/getting-parameters-from-scala-macro-annotation
-      val resolvedMethodName =
+      val resolvedFunctionName =
         c.prefix.tree match {
           case q"new XPathFunction(name = $nameArg)" => nameArg
           case q"new XPathFunction($nameArg)"        => nameArg
@@ -121,7 +119,7 @@ object XPathFunctionAnnotationMacro {
         val register =
           q"""
             register(
-              $resolvedMethodName,
+              $resolvedFunctionName,
               $arity,
               () => new ${TypeName(classNameWithArity)},
               ${getSaxonType(returnTypeString)},
@@ -157,14 +155,14 @@ object XPathFunctionAnnotationMacro {
             println(s"xxxx no parameter list")
             q"""
               encodeSaxonArg[$returnType](
-                $methodName[..$tpes]
+                fn[..$tpes]
               )
              """
           } else {
             println(s"xxxx WITH parameter list")
             q"""
               encodeSaxonArg[$returnType](
-                $methodName[..$tpes](
+                fn[..$tpes](
                   ..$flattenedTrees,..$defaultArgsTrees
                 )
               )
@@ -184,7 +182,7 @@ object XPathFunctionAnnotationMacro {
                   args   : Array[org.orbeon.saxon.om.Sequence]
                 ): org.orbeon.saxon.om.Sequence = {
 
-                  def $methodName[..$tpes](..$regularArgs): $returnType = {..$body}
+                  def fn[..$tpes](..$regularArgs): $returnType = {..$body}
 
                   import org.orbeon.oxf.xml.FunctionSupport2._
 
@@ -203,15 +201,17 @@ object XPathFunctionAnnotationMacro {
                   args   : Array[org.orbeon.saxon.om.Sequence]
                 ): org.orbeon.saxon.om.Sequence = {
 
-                  implicit val xpathContext : org.orbeon.saxon.expr.XPathContext = context
-                  implicit val xformsContext: org.orbeon.oxf.xforms.function.XFormsFunction.Context =
-                    org.orbeon.oxf.xforms.function.XFormsFunction.context
+                  def fn[..$tpes](..$regularArgs)(..$implicitArgs): $returnType = {..$body}
 
-                  def $methodName[..$tpes](..$regularArgs)(..$implicitArgs): $returnType = {..$body}
+                  locally {
+                    implicit val xpathContext : org.orbeon.saxon.expr.XPathContext = context
+                    implicit val xformsContext: org.orbeon.oxf.xforms.function.XFormsFunction.Context =
+                      org.orbeon.oxf.xforms.function.XFormsFunction.context
 
-                  import org.orbeon.oxf.xml.FunctionSupport2._
+                    import org.orbeon.oxf.xml.FunctionSupport2._
 
-                  $encodedCall
+                    $encodedCall
+                  }
                 }
               }
             """

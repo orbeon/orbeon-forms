@@ -412,7 +412,7 @@ object XFormsBaseHandlerXHTML {
     elementName              : String,
     labelValue               : String,
     mustOutputHTMLFragment   : Boolean,
-    addIds: Boolean
+    addIds                   : Boolean
   ): Unit = {
     outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
     outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)

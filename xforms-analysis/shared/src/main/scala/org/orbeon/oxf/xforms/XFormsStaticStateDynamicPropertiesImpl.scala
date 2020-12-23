@@ -57,6 +57,7 @@ class XFormsStaticStateDynamicPropertiesImpl(
     }
 
   // For properties which can be AVTs
+  // `Any` stands for `Int | Boolean | String`
   def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression] =
     nonDefaultPropertiesOnly.getOrElse(name, Left(P.SupportedDocumentProperties(name).defaultValue))
 }

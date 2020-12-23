@@ -390,14 +390,16 @@ trait ContainingDocumentProperties {
   private lazy val _supportUpdates = ! (disableUpdates || isNoUpdates)
   def supportUpdates = _supportUpdates
 
-  // Used by the property() function
-  def getProperty(propertyName: String): Any = propertyName match {
-    case ReadonlyAppearanceProperty => if (staticReadonly) ReadonlyAppearanceStaticValue else ReadonlyAppearanceDynamicValue
-    case NoscriptProperty           => false
-    case EncryptItemValuesProperty  => encodeItemValues
-    case OrderProperty              => lhhacOrder
-    case _                          => staticState.propertyMaybeAsExpression(propertyName).left.get
-  }
+  // Used by the `property()` function
+  // Returns: `Int | Boolean | String`
+  def getProperty(propertyName: String): Any =
+    propertyName match {
+      case ReadonlyAppearanceProperty => if (staticReadonly) ReadonlyAppearanceStaticValue else ReadonlyAppearanceDynamicValue
+      case NoscriptProperty           => false
+      case EncryptItemValuesProperty  => encodeItemValues
+      case OrderProperty              => lhhacOrder // `(List[String], List[String])` FIXME
+      case _                          => staticState.propertyMaybeAsExpression(propertyName).left.get // `Int | Boolean | String`
+    }
 
   private object Memo {
     private val cache = mutable.Map.empty[String, Any]
@@ -442,19 +444,19 @@ trait ContainingDocumentProperties {
   import Memo._
 
   // Dynamic properties
-  def staticReadonly =
+  def staticReadonly: Boolean =
     dynamicProperty(
       ReadonlyAppearanceProperty,
       _ == ReadonlyAppearanceStaticValue
     )
 
-  def encodeItemValues =
+  def encodeItemValues: Boolean =
     dynamicProperty(
       EncryptItemValuesProperty,
       _.toBoolean
     )
 
-  def lhhacOrder =
+  def lhhacOrder: (List[String], List[String]) =
     dynamicProperty(
       OrderProperty,
       LHHA.getBeforeAfterOrderTokens
@@ -472,13 +474,13 @@ trait ContainingDocumentProperties {
       _.toBoolean
     )
 
-  def hostLanguage =
+  def hostLanguage: String =
     dynamicProperty(
       HostLanguage,
       identity
     )
 
-  def isNoUpdates =
+  def isNoUpdates: Boolean =
     dynamicProperty(
       NoUpdates,
       _.toBoolean

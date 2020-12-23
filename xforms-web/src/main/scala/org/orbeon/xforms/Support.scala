@@ -104,15 +104,20 @@ object Support {
 
   def stopFocusOutPropagation(
     element     : Element,
-    eventTarget : (FocusEvent) => EventTarget,
+    eventTarget : FocusEvent => EventTarget,
     targetClass : String
   ): Unit = {
     element.addEventListener(
       "focusout",
       (event: FocusEvent) => {
-        val relatedTarget = eventTarget(event).asInstanceOf[dom.html.Element]
-        if (relatedTarget.classList.contains(targetClass))
-          event.stopPropagation()
+        // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
+        // Not sure why, but protecting against crash here with pattern match.
+        eventTarget(event) match {
+          case relatedTarget: dom.html.Element =>
+            if (relatedTarget.classList.contains(targetClass))
+              event.stopPropagation()
+          case _ =>
+        }
       },
       useCapture = true
     )

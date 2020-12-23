@@ -125,6 +125,9 @@ object SaxonUtils {
       if (valueRepr1 ne null) valueRepr1 else EmptySequence,
       if (valueRepr2 ne null) valueRepr2 else EmptySequence
     ) match {
+      case (EmptySequence,      EmptySequence)      => true // NOTE: `EmptySequence` is not an item.
+      case (EmptySequence,      _)                  => false
+      case (_,                  EmptySequence)      => false
       case (v1: Item,           v2: Item)           => compareItems(v1, v2)
       case ( _: Item,           _)                  => false
       case (_,                  _ : Item)           => false
@@ -134,25 +137,22 @@ object SaxonUtils {
       case _                                        => throw new IllegalStateException
     }
 
-  def compareSequenceExtents(v1: SequenceExtent, v2: SequenceExtent): Boolean =
-    v1.getLength == v2.getLength &&
-      (v1.iterator.asScala.zip(v2.iterator.asScala) forall (compareItems _).tupled)
-
   def compareItemSeqs(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean =
     nodeset1.size == nodeset2.size &&
       (nodeset1.iterator.zip(nodeset2.iterator) forall (compareItems _).tupled)
 
-  def compareItems(item1: Item, item2: Item): Boolean = {
+  private def compareSequenceExtents(v1: SequenceExtent, v2: SequenceExtent): Boolean =
+    v1.getLength == v2.getLength &&
+      (v1.iterator.asScala.zip(v2.iterator.asScala) forall (compareItems _).tupled)
 
-    val Empty = EmptySequence // TODO: replace once `EmptySequence` no longer quires
-
+  def compareItems(item1: Item, item2: Item): Boolean =
     (
-      if (item1 ne null) item1 else Empty,
-      if (item2 ne null) item2 else Empty
+      if (item1 ne null) item1 else EmptySequence, // TODO: I don't think any caller passes `null`. If so, get rid of this once we test.
+      if (item2 ne null) item2 else EmptySequence
     ) match {
-      case (Empty,                     Empty)                     => true
-      case (Empty,                     _)                         => false
-      case (_,                         Empty)                     => false
+      case (EmptySequence,             EmptySequence)             => true
+      case (EmptySequence,             _)                         => false
+      case (_,                         EmptySequence)             => false
       // `StringValue.equals()` throws (Saxon equality requires a collation)
       case (v1: StringValue,           v2: StringValue)           => v1.codepointEquals(v2)
       case ( _: StringValue,           _ )                        => false
@@ -168,7 +168,6 @@ object SaxonUtils {
       case (_,                         _ : Function)              => throw new UnsupportedOperationException
       case _                                                      => throw new IllegalStateException
     }
-  }
 
   def buildNodePath(node: NodeInfo): List[String] = {
 

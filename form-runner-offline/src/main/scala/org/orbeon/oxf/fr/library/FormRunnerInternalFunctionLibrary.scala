@@ -1,15 +1,14 @@
 package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
-import org.orbeon.saxon.functions.registry.BuiltInFunctionSet
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xbl.DateSupportJava
 
 
-object FormRunnerInternalFunctionLibrary extends BuiltInFunctionSet {
+object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
 
-  override def getNamespace          : String = "java:org.orbeon.oxf.fr.FormRunner"
-  override def getConventionalPrefix : String = "frf"
+  lazy val namespaces = List( "java:org.orbeon.xbl.DateSupportJava" -> "DateSupport")
 
   @XPathFunction(name = "serializeExternalValueJava")
   def serializeExternalValueJava(

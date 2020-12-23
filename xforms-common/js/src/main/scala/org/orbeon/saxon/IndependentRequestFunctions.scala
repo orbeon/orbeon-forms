@@ -2,13 +2,10 @@ package org.orbeon.saxon
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.saxon.functions.registry.BuiltInFunctionSet
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 
 
-trait IndependentRequestFunctions extends BuiltInFunctionSet {
-
-  override def getNamespace: String = super.getNamespace
-  override def getConventionalPrefix: String = super.getConventionalPrefix
+trait IndependentRequestFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def getRequestMethod: String =

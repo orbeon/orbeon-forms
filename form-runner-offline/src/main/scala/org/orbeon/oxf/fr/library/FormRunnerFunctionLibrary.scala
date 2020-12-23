@@ -7,8 +7,8 @@ import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, Names, XMLNames}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.functions.registry.BuiltInFunctionSet
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.xforms.XFormsId
@@ -18,10 +18,9 @@ import shapeless.syntax.typeable._
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 
 
-object FormRunnerFunctionLibrary extends BuiltInFunctionSet {
+object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
-  override def getNamespace          : String = XMLNames.FR
-  override def getConventionalPrefix : String = XMLNames.FRPrefix
+  lazy val namespaces = List(XMLNames.FR -> XMLNames.FRPrefix)
 
   @XPathFunction def mode                     : String         = FormRunnerParams().mode
   @XPathFunction def appName                  : String         = FormRunnerParams().app

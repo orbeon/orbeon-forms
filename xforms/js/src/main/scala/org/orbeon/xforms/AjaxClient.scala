@@ -361,7 +361,6 @@ object AjaxClient {
         // `require(EventQueue.ajaxRequestInProgress == false)`
 
         EventQueue.ajaxRequestInProgress = false
-        Page.loadingIndicator().requestEnded(showProgress)
 
         // Notify listeners that we are done processing this request
         ajaxResponseProcessed.fire(details)

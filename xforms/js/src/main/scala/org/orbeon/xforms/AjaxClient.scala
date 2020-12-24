@@ -355,7 +355,6 @@ object AjaxClient {
         ServerValueStore.purgeExpired()
 
         EventQueue.ajaxRequestInProgress = false
-        Page.loadingIndicator().requestEnded(showProgress)
 
         // Notify listeners that we are done processing this request
         ajaxResponseProcessed.fire(details)
@@ -395,7 +394,6 @@ object AjaxClient {
       }
 
       EventQueue.ajaxRequestInProgress = true
-      Page.loadingIndicator().requestStarted(showProgress)
 
       Support.fetchText(
         url         = requestForm.xformsServerPath,
@@ -410,16 +408,19 @@ object AjaxClient {
           response match {
             case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
               // We ignore HTTP status and just check that we have a well-formed response document
+              Page.loadingIndicator().requestEnded(showProgress)
               handleResponse(responseXml, requestFormId, showProgress, ignoreErrors)
             case Success((503, _, _)) =>
               // We return an explicit 503 when the Ajax server is still busy
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors))
             case Success((_, responseText, responseXmlOpt)) =>
               if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, requestBody, ignoreErrors))
-                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
+                retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors))
+              else
+                Page.loadingIndicator().requestEnded(showProgress)
             case Failure(_) =>
               logAndShowError(_, requestFormId, ignoreErrors)
-              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors))
+              retryRequestAfterDelay(() => asyncAjaxRequest(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors))
           }
         }
       }
@@ -550,6 +551,7 @@ object AjaxClient {
       // Don't ignore errors if any of the events tell us not to ignore errors
       // So we only ignore errors if all of the events tell us to ignore errors
       val ignoreErrors = events.forall(_.ignoreErrors)
+      Page.loadingIndicator().requestStarted(showProgress)
       asyncAjaxRequest(currentFormId, AjaxRequest.buildXmlRequest(currentFormId, events), showProgress, ignoreErrors)
     }
   }

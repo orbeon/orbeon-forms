@@ -12,6 +12,7 @@ import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.xforms.EmbeddingSupport._
 import org.orbeon.xforms._
+import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.xml.sax.Attributes
@@ -59,12 +60,13 @@ object OfflineDemo extends App {
     container    : html.Element,
     compiledForm : CompiledForm,
   ): RuntimeForm =
-    renderCompiledForm(container, compiledForm, Nil)
+    renderCompiledForm(container, compiledForm, Nil, None)
 
   def renderCompiledForm(
     container    : html.Element,
     compiledForm : CompiledForm,
-    libraries    : Iterable[FunctionLibrary]
+    libraries    : Iterable[FunctionLibrary],
+    uriResolver  : Option[XFormsURIResolver]
   ): RuntimeForm = {
 
     implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
@@ -94,7 +96,7 @@ object OfflineDemo extends App {
     CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
 
       containingDocument.setRequestInformation(req)
-      containingDocument.initialize(uriResolver = None, response = None)
+      containingDocument.initialize(uriResolver, response = None)
 
       // See also `XFormsToXHTML.outputResponseDocument`
       XFormsAPI.withContainingDocument(containingDocument) {

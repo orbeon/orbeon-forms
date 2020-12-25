@@ -36,7 +36,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def attachmentFileExists(holderValue: String): Boolean = ???
 
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = ???
+  // Form Runner: called with `input:instance`
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
+    url match {
+      case "input:instance" => url
+      case _ =>
+        println(s"xxx resolveServiceURL: `$url`")
+        ???
+    }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = ???
 

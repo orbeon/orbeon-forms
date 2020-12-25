@@ -1,9 +1,13 @@
 package org.orbeon.fr.offline
 
-import org.orbeon.fr.FormRunnerAPI
-import org.orbeon.oxf.fr.library.{FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
+import org.orbeon.dom.{Document, Element}
+import org.orbeon.oxf.fr.library.{FormRunnerDateSupportFunctionLibrary, FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.xforms.App
 import org.orbeon.xforms.offline.demo.OfflineDemo
+import org.orbeon.oxf.xforms.processor.XFormsURIResolver
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.utils.Configuration
 import org.scalajs.dom.{XMLHttpRequest, html}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +42,8 @@ object FormRunnerOffline extends App {
   def renderDemoForm(
     container : html.Element,
     appName   : String,
-    formName  : String
+    formName  : String,
+    mode      : String
   ): Unit = {
 
 //    fetchCompiledForm(s"http://localhost:9090/orbeon/fr/service/$appName/$formName/compile") foreach { text =>
@@ -46,7 +51,29 @@ object FormRunnerOffline extends App {
       OfflineDemo.renderCompiledForm(
         container,
         text,
-        List(FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary)
+        List(FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary, FormRunnerDateSupportFunctionLibrary),
+        Some(
+          new XFormsURIResolver {
+            def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+              urlString match {
+                case "input:instance" =>
+
+                  val root = Element("request")
+
+                  root.addElement("app").addText(appName)
+                  root.addElement("form").addText(formName)
+                  root.addElement("form-version").addText("1") // TODO
+                  root.addElement("document")
+                  root.addElement("mode").addText(mode)
+
+                  Document(root)
+                case _ =>
+                  throw new UnsupportedOperationException(s"resolving `$urlString")
+              }
+
+            def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo = ???
+          }
+        )
       )
     }
   }

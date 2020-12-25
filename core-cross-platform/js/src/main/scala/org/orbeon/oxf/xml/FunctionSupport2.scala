@@ -31,6 +31,8 @@ object FunctionSupport2 {
     def apply(t: T): om.Sequence
   }
 
+  implicit val UnitDecode: Decode[Unit] = (_: om.Sequence) => ()
+
   implicit val IntDecode: Decode[Int] = (s: om.Sequence) =>
     s.iterate().next() match {
       case v: Int64Value => v.longValue.toInt // WARNING: value truncation is possible
@@ -88,6 +90,7 @@ object FunctionSupport2 {
   implicit def IterableDecode[U : Decode]: Decode[Iterable[U]] = (s: om.Sequence) =>
     Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList
 
+  implicit val UnitEncode        : Encode[Unit]        = (_: Unit)        => EmptySequence
   implicit val IntEncode         : Encode[Int]         = (v: Int)         => om.One.integer(v.toLong)
   implicit val LongEncode        : Encode[Long]        = (v: Long)        => om.One.integer(v)
   implicit val StringEncode      : Encode[String]      = (v: String)      => om.One.string(v)

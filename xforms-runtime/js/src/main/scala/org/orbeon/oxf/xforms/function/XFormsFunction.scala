@@ -13,21 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import java.util.{Locale, Iterator => JIterator}
-
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{FunctionContext, StaticXPath, XPath}
+import org.orbeon.oxf.util.{FunctionContext, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-//import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
-//import org.orbeon.saxon.`type`.AtomicType
-import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{Expression, _}
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
@@ -35,7 +30,6 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
-import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
 
 
@@ -46,8 +40,6 @@ import scala.collection.{mutable => m}
  * TODO: context should contain BindingContext directly if any
  */
 object XFormsFunction { // extends DefaultFunctionSupport
-
-  import XFormsFunction._
 
   // Resolve the relevant control by argument expression
   // TODO: Check callers and consider using `relevantControls`.

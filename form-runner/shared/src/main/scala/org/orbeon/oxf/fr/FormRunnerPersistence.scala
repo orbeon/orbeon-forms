@@ -318,9 +318,10 @@ trait FormRunnerPersistence {
   def providerPropertyAsBoolean(provider: String, property: String, default: Boolean): Boolean =
     properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
 
+  // 2020-12-23: If the provider is not configured, return `false` (for offline FIXME).
   //@XPathFunction
   def isAutosaveSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "autosave", default = false)
+    findProvider(app, form, FormOrData.Data) exists (providerPropertyAsBoolean(_, "autosave", default = false))
 
   //@XPathFunction
   def isOwnerGroupPermissionsSupported(app: String, form: String): Boolean =

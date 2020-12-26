@@ -767,9 +767,13 @@ private object PathMapXPathDependencies {
     val pathElements =
       if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
         ancestorOrSelf.tail map { node =>
+          // 2020-12-25: TODO: Fix case where there is no fingerprint.
+          // For example `foo:bar` could match two different
+          // nodes depending on namespace mappings. It's unlikely to happen but it can happen. Should we use an
+          // EQName instead? The benefit of using fingerprints was that the resulting path was quite short.
           node.getNodeKind match {
-            case ELEMENT_NODE   => node.getFingerprint
-            case ATTRIBUTE_NODE => "@" + node.getFingerprint
+            case ELEMENT_NODE   => if (node.hasFingerprint) node.getFingerprint else node.getDisplayName
+            case ATTRIBUTE_NODE => "@" + (if (node.hasFingerprint) node.getFingerprint else node.getDisplayName)
           }
         }
       else

@@ -404,6 +404,8 @@ object XFormsStaticStateDeserializer {
 
             case XFORMS_INSTANCE_QNAME =>
 
+              implicit val decodeBasicCredentials: Decoder[BasicCredentials] = deriveDecoder
+
               val instance =
                 for {
                   readonly              <- c.get[Boolean]("readonly")
@@ -416,7 +418,7 @@ object XFormsStaticStateDeserializer {
                   isStrictValidation    <- c.get[Boolean]("isStrictValidation")
                   isSchemaValidation    <- c.get[Boolean]("isSchemaValidation")
                   indexClasses          <- c.get[Boolean]("indexClasses")
-//                  credentials           <- c.get[BasicCredentials]("credentials")
+                  credentials           <- c.get[Option[BasicCredentials]]("credentials")
                   excludeResultPrefixes <- c.get[Set[String]]("excludeResultPrefixes")
                   useInlineContent      <- c.get[Boolean]("useInlineContent")
                   useExternalContent    <- c.get[Boolean]("useExternalContent")
@@ -446,7 +448,7 @@ object XFormsStaticStateDeserializer {
                         isLaxValidation       = isLaxValidation,
                         isStrictValidation    = isStrictValidation,
                         isSchemaValidation    = isSchemaValidation,
-                        credentials           = null, // XXX TODO
+                        credentials           = credentials,
                         excludeResultPrefixes = excludeResultPrefixes,
                         inlineRootElemOpt     = inlineRootElemOpt,
                         useInlineContent      = useInlineContent,

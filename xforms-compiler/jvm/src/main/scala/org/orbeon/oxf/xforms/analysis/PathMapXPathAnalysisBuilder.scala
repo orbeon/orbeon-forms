@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.VariableTrait
 import org.orbeon.oxf.xforms.function.{InstanceTrait, XXFormsInstanceTrait}
-import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.PathMap.PathMapArc
 import org.orbeon.saxon.expr._

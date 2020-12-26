@@ -400,10 +400,11 @@ trait NodeWrapper
       // 2020-08-31: Confirming that just removing this code causes tests to fail.
       val document = p.node.asInstanceOf[dom.Document]
       val content = document.jContent
-      if (content.isEmpty && (document.getRootElement ne null))
+      if (content.isEmpty && (document.getRootElement ne null)) {
         ju.Collections.singletonList(document.getRootElement: dom.Node).listIterator
-      else
+      } else {
         content.listIterator
+      }
     } else {
       p.node.asInstanceOf[dom.Element].jContent.listIterator // content contains Namespace nodes (which is broken)!
     }

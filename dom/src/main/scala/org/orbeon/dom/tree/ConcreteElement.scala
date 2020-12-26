@@ -439,11 +439,10 @@ class ConcreteElement(var qname: QName)
       namespace = getNamespaceForPrefix("")
     }
     val node =
-      if (namespace ne null) {
+      if (namespace ne null)
         Element(QName(localName, namespace))
-      } else {
+      else
         Element(name)
-      }
     addNewNode(node)
     node
   }

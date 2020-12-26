@@ -263,6 +263,7 @@ class XFormsContextStack {
    * @param sourceEffectiveId effective id of source control for id resolution of models and binds
    * @param scope             XBL scope
    */
+  // TODO: Could all callers use the `ElementAnalysis`?
   def pushBinding(bindingElement: Element, sourceEffectiveId: String, scope: Scope): Unit =
     pushBinding(bindingElement, sourceEffectiveId, scope, handleNonFatal = true)
 

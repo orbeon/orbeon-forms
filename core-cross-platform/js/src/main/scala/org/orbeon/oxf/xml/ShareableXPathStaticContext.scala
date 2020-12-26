@@ -1,26 +1,29 @@
 package org.orbeon.oxf.xml
 
-import java.{util => ju}
-
-import org.orbeon.oxf.util.CoreUtils.PipeOps
-import org.orbeon.oxf.util.{IndentedLogger, Logging, StaticXPath}
+import org.orbeon.oxf.util.StaticXPath.VariableResolver
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.saxon.expr.Expression.ITERATE_METHOD
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.instruct.SlotManager
+import org.orbeon.saxon.expr.parser.RebindingMap
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
-import org.orbeon.saxon.om.{NamespaceResolver, Sequence, StructuredQName}
+import org.orbeon.saxon.model.{AnyItemType, ItemType}
+import org.orbeon.saxon.om.{NamespaceResolver, Sequence, SequenceIterator, StructuredQName}
 import org.orbeon.saxon.s9api.{HostLanguage, Location}
-import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext}
-import org.orbeon.saxon.trans.XPathException
+import org.orbeon.saxon.sxpath.{AbstractStaticContext, XPathStaticContext, XPathVariable}
+import org.orbeon.saxon.trace.ExpressionPresenter
 import org.orbeon.saxon.utils.Configuration
-import org.orbeon.saxon.value.{IntegerValue, QNameValue, SequenceType}
+import org.orbeon.saxon.value.QNameValue
 import org.orbeon.xml.NamespaceMapping
 
+import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.
+// Updated to take https://saxonica.plan.io/issues/2554 into account for Saxon 10.
 class ShareableXPathStaticContext(
   config           : Configuration,
   namespaceMapping : NamespaceMapping,
@@ -42,71 +45,64 @@ class ShareableXPathStaticContext(
     }
 
     this.usingDefaultFunctionLibrary = true
+
+    // Add function library
+    setDefaultFunctionLibrary()
+    getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
   }
 
-  // Add function library
-  setDefaultFunctionLibrary()
-  getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
-
-  // This should be unused as we handle global variables differently
-  private val stackFrameMap = config.makeSlotManager
-  def getStackFrameMap: SlotManager = stackFrameMap
-
-  private val variables = mutable.HashMap[StructuredQName, VariableBinding]()
+  private val variables = mutable.HashMap[StructuredQName, Expression]()
   def referencedVariables: Iterable[StructuredQName] = variables.keys
 
   // NOTE: We do the same that `IndependentContext` does, to make sure only one `LocalBinding` is created.
-  // It's unclear if it's absolutely necessary but it shouldn't hrut.
-  private def declareVariableIfNeeded(qName: StructuredQName): VariableBinding =
-    variables.getOrElseUpdate(qName,
-      new VariableBinding(qName) |!>
-        (_.setLocalSlotNumber(variables.size))
-    )
+  // It's unclear if it's absolutely necessary but it shouldn't hurt.
+  private def declareVariableIfNeeded(qName: StructuredQName): Expression =
+    variables.getOrElseUpdate(qName, new OrbeonVariableReference(qName))
 
-  def bindVariable(qName: StructuredQName): VariableReference =
-    new LocalVariableReference(declareVariableIfNeeded(qName))
+  class OrbeonVariableReference(val name: StructuredQName) extends Expression with Callable {
 
-  def declareVariable(qname: QNameValue) = throw new IllegalStateException                       // shouldn't be called in our case
-  def declareVariable(namespaceURI: String, localName: String) = throw new IllegalStateException // never used in Saxon XPath
-  def isContextItemParentless: Boolean = false                                                   // never set to `true` in Saxon XPath
+    def getImplementationMethod            : Int      = ITERATE_METHOD
+    def getItemType                        : ItemType = AnyItemType
+    def computeCardinality()               : Int      = StaticProperty.ALLOWS_ZERO_OR_MORE
+    override def computeSpecialProperties(): Int      = StaticProperty.NO_NODES_NEWLY_CREATED // since we are returning an already-evaluated expression
 
-  // Per Saxon: "used to represent the run-time properties and methods associated with a variable: specifically, a
-  // method to get the value of the variable".
-  class VariableBinding(qName: StructuredQName) extends LocalBinding {
-
-    def isGlobal = true
-    def isAssignable = false
-
-    private var slotNumber: Int = -1
-    def getLocalSlotNumber: Int = slotNumber
-    def setLocalSlotNumber(slot: Int): Unit = slotNumber = slot
-
-    def getVariableQName: StructuredQName = qName
-    def getRequiredType: SequenceType = SequenceType.ANY_SEQUENCE
-
-    // Saxon does something similar but different in XPathVariable, where it stores variables in the the dynamic
-    // context. That uses slots however, which means we cannot resolve variables fully dynamically. So I think
-    // our approach below is ok.
-    def evaluateVariable(context: XPathContext): Sequence = {
-
-      if (context.getController eq null)
-        throw new NullPointerException
+    def call(context  : XPathContext, arguments: Array[Sequence]): Sequence = {
+//      println(s"xxxx evaluating $name")
 
       val variableResolver =
         context.getController.getUserData(
           classOf[ShareableXPathStaticContext].getName,
           "variableResolver"
-        ).asInstanceOf[StaticXPath.VariableResolver]
+        ).asInstanceOf[VariableResolver]
 
-      variableResolver(qName, context)
+      variableResolver(name, context)
     }
 
-    // Same as in `XPathVariable`
-    def addReference(ref: VariableReference, isLoopingReference: Boolean): Unit = ()
-    def getIntegerBoundsForVariable: Array[IntegerValue] = null
-    def setIndexedVariable(): Unit = ()
-    def isIndexedVariable: Boolean = false
+    override def iterate(context: XPathContext): SequenceIterator =
+      call(context, null).iterate()
+
+    override def equals(other: Any): Boolean =
+      other match {
+        case o: OrbeonVariableReference => name == o.name // && resolver eq other.resolver
+        case _ => false
+      }
+
+    override def computeHashCode: Int = name.hashCode
+
+    override def getExpressionName: String = "$" + name.getDisplayName
+
+    def copy(rebindings: RebindingMap) =
+      new OrbeonVariableReference(name)
+
+    def `export`(destination: ExpressionPresenter): Unit = {
+      destination.startElement("orbeonVar", this)
+      destination.emitAttribute("name", name)
+      destination.endElement()
+    }
   }
+
+  def bindVariable(qName: StructuredQName): Expression =
+    declareVariableIfNeeded(qName)
 
   // Namespace resolver
   object NSResolver extends NamespaceResolver {
@@ -123,21 +119,20 @@ class ShareableXPathStaticContext(
       namespaceMapping.mapping.keySet.iterator.asJava
   }
 
-  def getURIForPrefix(prefix: String): String = {
-    val uri = NSResolver.getURIForPrefix(prefix, useDefault = false)
-    if (uri == null)
-      throw new XPathException("Prefix " + prefix + " has not been declared")
-    uri
-  }
-
   def getNamespaceResolver: NamespaceResolver = NSResolver
-  def setNamespaceResolver(resolver: NamespaceResolver): Unit = throw new IllegalStateException
+
+  override def issueWarning(s: String, locator: Location): Unit =
+    if (logger ne null)
+      debug(s)
 
   // Schema stuff which we don't support
   def isImportedSchema(namespace: String): Boolean = getConfiguration.isSchemaAvailable(namespace)
   def getImportedSchemaNamespaces: ju.Set[String] = getConfiguration.getImportedNamespaces
 
-  override def issueWarning(s: String, locator: Location): Unit =
-    if (logger ne null)
-      debug(s)
+  // Should not be used
+  def setNamespaceResolver(resolver: NamespaceResolver): Unit = ???
+  def declareVariable(qname: QNameValue): XPathVariable = ???
+  def declareVariable(namespaceURI: String, localName   : String): XPathVariable = ???
+  val getStackFrameMap: SlotManager = config.makeSlotManager
+  def isContextItemParentless: Boolean = false
 }

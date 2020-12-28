@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.{SaxonUtils, XMLUtils}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -30,6 +30,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node._
 
 import scala.collection.{mutable => m}
+
 
 class PathMapXPathDependencies(
   containingDocument: XFormsContainingDocument
@@ -75,7 +76,7 @@ class PathMapXPathDependencies(
         val instance = containingDocument.instanceForNodeOpt(node).orNull // TODO: `Option`
 
         def processNode(n: om.NodeInfo): Unit = {
-          val path = createFingerprintedPath(n)
+          val path = SaxonUtils.createFingerprintedPath(n)
 
           val instanceKey  = ModelOrInstanceKey(instance)
           val instancePath = instanceKey -> path
@@ -750,35 +751,5 @@ private object PathMapXPathDependencies {
 
     def apply(instance: XFormsInstance): ModelOrInstanceKey =
       ModelOrInstanceKey(instance.getPrefixedId, instance.model.sequenceNumber)
-  }
-
-  // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
-  def createFingerprintedPath(node: om.NodeInfo): String = {
-
-    // Create an immutable list with ancestor-or-self nodes up to but not including the document node
-    var ancestorOrSelf: List[om.NodeInfo] = Nil
-    var currentNode = node
-    while (currentNode != null && currentNode.getNodeKind != DOCUMENT_NODE) {
-      ancestorOrSelf = currentNode :: ancestorOrSelf
-      currentNode = currentNode.getParent
-    }
-
-    // Fingerprint representation of the element and attribute nodes
-    val pathElements =
-      if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
-        ancestorOrSelf.tail map { node =>
-          // 2020-12-25: TODO: Fix case where there is no fingerprint.
-          // For example `foo:bar` could match two different
-          // nodes depending on namespace mappings. It's unlikely to happen but it can happen. Should we use an
-          // EQName instead? The benefit of using fingerprints was that the resulting path was quite short.
-          node.getNodeKind match {
-            case ELEMENT_NODE   => if (node.hasFingerprint) node.getFingerprint else node.getDisplayName
-            case ATTRIBUTE_NODE => "@" + (if (node.hasFingerprint) node.getFingerprint else node.getDisplayName)
-          }
-        }
-      else
-        Nil
-
-    pathElements mkString "/"
   }
 }

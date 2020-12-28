@@ -35,6 +35,7 @@ import org.orbeon.saxon.tree.iter.{EmptyIterator, ListIterator, SingletonIterato
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits
+import org.w3c.dom.Node._
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try
@@ -367,5 +368,35 @@ object SaxonUtils {
       BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType]
 
     Try(Converter.convert(value, targetType, config.getConversionRules)).toOption
+  }
+
+  // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
+  def createFingerprintedPath(node: om.NodeInfo): String = {
+
+    // Create an immutable list with ancestor-or-self nodes up to but not including the document node
+    var ancestorOrSelf: List[om.NodeInfo] = Nil
+    var currentNode = node
+    while (currentNode != null && currentNode.getNodeKind != DOCUMENT_NODE) {
+      ancestorOrSelf = currentNode :: ancestorOrSelf
+      currentNode = currentNode.getParent
+    }
+
+    // Fingerprint representation of the element and attribute nodes
+    val pathElements =
+      if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
+        ancestorOrSelf.tail map { node =>
+          // 2020-12-25: TODO: Fix case where there is no fingerprint.
+          // For example `foo:bar` could match two different
+          // nodes depending on namespace mappings. It's unlikely to happen but it can happen. Should we use an
+          // EQName instead? The benefit of using fingerprints was that the resulting path was quite short.
+          node.getNodeKind match {
+            case ELEMENT_NODE   => if (node.hasFingerprint) node.getFingerprint else node.getDisplayName
+            case ATTRIBUTE_NODE => "@" + (if (node.hasFingerprint) node.getFingerprint else node.getDisplayName)
+          }
+        }
+      else
+        Nil
+
+    pathElements mkString "/"
   }
 }

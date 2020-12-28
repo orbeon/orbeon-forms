@@ -31,6 +31,7 @@ import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.{ArrayFunctions, Configuration, MapFunctions, om}
 import org.orbeon.scaxon.Implicits
+import org.w3c.dom.Node._
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try
@@ -381,5 +382,31 @@ object SaxonUtils {
         case v: AtomicValue => v.some
         case _              => None
     }
+  }
+
+  // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
+  def createFingerprintedPath(node: om.NodeInfo): String = {
+
+    // Create an immutable list with ancestor-or-self nodes up to but not including the document node
+    var ancestorOrSelf: List[om.NodeInfo] = Nil
+    var currentNode = node
+    while (currentNode != null && currentNode.getNodeKind != DOCUMENT_NODE) {
+      ancestorOrSelf = currentNode :: ancestorOrSelf
+      currentNode = currentNode.getParent
+    }
+
+    // Fingerprint representation of the element and attribute nodes
+    val pathElements =
+      if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
+        ancestorOrSelf.tail map { node =>
+          node.getNodeKind match {
+            case ELEMENT_NODE   => node.getFingerprint
+            case ATTRIBUTE_NODE => "@" + node.getFingerprint
+          }
+        }
+      else
+        Nil
+
+    pathElements mkString "/"
   }
 }

@@ -4,7 +4,7 @@ Orbeon Forms
 Web Forms for the Enterprise. Done the Right Way.
 -------------------------------------------------
 
-Last updated for Orbeon Forms 2020.1 (September 2020)
+Last updated for Orbeon Forms 2020.1 (December 2020)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 

@@ -99,6 +99,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       write(output, delayedEvent.time)
       write(output, delayedEvent.showProgress)
       write(output, delayedEvent.browserTarget)
+      write(output, delayedEvent.isResponseResourceType)
     }
 
     def reads(input: Input): DelayedEvent =
@@ -109,7 +110,8 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
         read[Boolean](input),
         read[Option[Long]](input),
         read[Boolean](input),
-        read[Option[String]](input)
+        read[Option[String]](input),
+        read[Boolean](input)
       )
   }
 

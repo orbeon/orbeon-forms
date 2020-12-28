@@ -2,7 +2,7 @@ package org.orbeon.oxf.xml
 
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.Chain
+import org.orbeon.saxon.om.{Chain, SequenceTool}
 import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, EmptySequence, Int64Value, StringValue}
 import org.orbeon.scaxon.Implicits
 
@@ -90,6 +90,9 @@ object FunctionSupport2 {
   implicit def IterableDecode[U : Decode]: Decode[Iterable[U]] = (s: om.Sequence) =>
     Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList
 
+  implicit def IteratorDecode[U : Decode]: Decode[Iterator[U]] = (s: om.Sequence) =>
+    Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply)
+
   implicit val UnitEncode        : Encode[Unit]        = (_: Unit)        => EmptySequence
   implicit val IntEncode         : Encode[Int]         = (v: Int)         => om.One.integer(v.toLong)
   implicit val LongEncode        : Encode[Long]        = (v: Long)        => om.One.integer(v)
@@ -111,8 +114,14 @@ object FunctionSupport2 {
   //
   // But this caused a "diverging implicit expansion" error. Instead, the following works.
   //
-  implicit final def IterableEncode[T[_], U : Encode](implicit ev: T[U] => Iterable[U]): Encode[T[U]] = (v: T[U]) => {
+  implicit final def IterableEncode[T[_], U : Encode](implicit ev: T[U] => Iterable[U]): Encode[T[U]] = (v: T[U]) =>
     // Dealing directly with iterators would probably be more efficient
     new Chain(v.toList map implicitly[Encode[U]].apply map (_.materialize) asJava)
-  }
+
+  implicit final def IteratorEncode[T[_], U : Encode](implicit ev: T[U] => Iterator[U]): Encode[T[U]] = (v: T[U]) =>
+    SequenceTool.toLazySequence(
+      Implicits.asSequenceIterator(
+        ev(v) map implicitly[Encode[U]].apply flatMap (s => Implicits.asScalaIterator(s.iterate()))
+      )
+    )
 }

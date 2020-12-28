@@ -72,11 +72,12 @@ case class Load(
 }
 
 case class DelayedEvent(
-  eventName         : String,
-  targetEffectiveId : String,
-  bubbles           : Boolean,
-  cancelable        : Boolean,
-  time              : Option[Long],
-  showProgress      : Boolean,       // whether to show the progress indicator when submitting the event
-  browserTarget     : Option[String] // optional browser target for submit events
+  eventName              : String,
+  targetEffectiveId      : String,
+  bubbles                : Boolean,
+  cancelable             : Boolean,
+  time                   : Option[Long],
+  showProgress           : Boolean,        // whether to show the progress indicator when submitting the event
+  browserTarget          : Option[String], // optional browser target for submit events
+  isResponseResourceType : Boolean
 )

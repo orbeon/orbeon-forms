@@ -21,6 +21,7 @@ import org.orbeon.dom.io.XMLWriter
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -363,8 +364,16 @@ object XFormsServer {
          twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
       val actionAtt =
-        isPortletContainer list
-          "action" -> response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
+        isPortletContainer list {
+
+          val actionUrl =
+            if (twoPassSubmitEvent.isResponseResourceType)
+              response.rewriteResourceURL(XFORMS_SERVER_SUBMIT, URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT) // NOTE: mode ignored in portlet mode
+            else
+              response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
+
+          "action" -> actionUrl
+        }
 
       // Signal that we want a POST to the XForms server
       element(

@@ -680,13 +680,14 @@ trait ContainingDocumentDelayedEvents {
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
-      eventName         = XFormsEvents.XXFORMS_SUBMIT,
-      targetEffectiveId = p.submissionEffectiveId,
-      bubbles           = true,
-      cancelable        = false,
-      time              = None,
-      showProgress      = p.showProgress,
-      browserTarget     = p.target
+      eventName              = XFormsEvents.XXFORMS_SUBMIT,
+      targetEffectiveId      = p.submissionEffectiveId,
+      bubbles                = true,
+      cancelable             = false,
+      time                   = None,
+      showProgress           = p.showProgress,
+      browserTarget          = p.target,
+      isResponseResourceType = p.isResponseResourceType
     )
 
   def findTwoPassSubmitEvent: Option[DelayedEvent] =
@@ -715,13 +716,14 @@ trait ContainingDocumentDelayedEvents {
 
     if (allowDuplicates || ! (_delayedEvents exists isDuplicate))
       _delayedEvents += DelayedEvent(
-        eventName         = eventName,
-        targetEffectiveId = targetEffectiveId,
-        bubbles           = bubbles,
-        cancelable        = cancelable,
-        time              = time.some,
-        showProgress      = showProgress,
-        browserTarget     = None
+        eventName              = eventName,
+        targetEffectiveId      = targetEffectiveId,
+        bubbles                = bubbles,
+        cancelable             = cancelable,
+        time                   = time.some,
+        showProgress           = showProgress,
+        browserTarget          = None,
+        isResponseResourceType = false
       )
   }
 

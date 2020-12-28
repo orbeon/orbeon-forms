@@ -63,9 +63,6 @@ object Implicits {
 
       currentItem
     }
-//    def current    : Item             = currentItem
-//    def position   : Int              = _position
-//    def getAnother : SequenceIterator = null
   }
 
   implicit def asScalaIterator(i: SequenceIterator): coll.Iterator[Item] = new coll.Iterator[Item] {

@@ -57,8 +57,8 @@ object RequestReader {
     "available"
   )
 
-  // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is
-  // called 17 times and IdAtt.unapply 2 times until the match is found, which is what is expected.
+  // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, `JQName.unapply` is
+  // called 17 times and `IdAtt.unapply` 2 times until the match is found, which is what is expected.
   def isMetadataElement(stack: List[StartElement]): Boolean =
     stack match {
       case

@@ -16,7 +16,7 @@ object XMLUtils {
 
   def localNameFromQName(qName: String): String = {
     val colonIndex = qName.indexOf(':')
-    if (colonIndex == -(1))
+    if (colonIndex == -1)
       qName
     else
       qName.substring(colonIndex + 1)

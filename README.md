@@ -207,10 +207,10 @@ locations:
 
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/*.xsd
 
-This product makes use of the [Silk Icons](<http://www.famfamfam.com/lab/icons/silk/>), released
+This product makes use of the [Silk Icons](http://www.famfamfam.com/lab/icons/silk/), released
 under a Creative Commons Attribution 2.5 License.
 
-This product makes use of the [PixelMixer icons](http://www.iconarchive.com/artist/pixelmixer.html).
+This product makes use of the [PixelMixer icons](https://www.iconarchive.com/artist/pixelmixer.html).
 
 Please consult the `third-party-licenses` directory for more information
 about individual licenses.

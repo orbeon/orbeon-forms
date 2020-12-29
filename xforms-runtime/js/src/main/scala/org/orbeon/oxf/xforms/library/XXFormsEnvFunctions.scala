@@ -3,14 +3,15 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
+import org.orbeon.oxf.xforms.function.XFormsFunction.resolveOrFindByStaticOrAbsoluteId
+import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.xml.FunctionSupport._
+import org.orbeon.xforms.XFormsId
+
+import scala.jdk.CollectionConverters._
 
 
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
@@ -131,22 +132,44 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //  Fun("index", classOf[XXFormsIndex], op = 0, min = 0, INTEGER, EXACTLY_ONE,
 //      Arg(STRING, ALLOWS_ZERO_OR_ONE)
 //    )
-//
-//    Fun("list-models", classOf[XXFormsListModels], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
-//
-//    Fun("list-instances", classOf[XXFormsListInstances], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def listModels()(implicit xfc: XFormsFunction.Context): Iterator[String] =
+    for {
+      model       <- xfc.containingDocument.allModels
+      effectiveId = model.getEffectiveId
+      absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
+    } yield
+      absoluteId
+
+  def listInstances(modelId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterator[String] = {
+
+    val modelOpt =
+      resolveOrFindByStaticOrAbsoluteId(modelId) collect { case model: XFormsModel => model }
+
+    for {
+      model       <- modelOpt.iterator
+      instance    <- model.instancesIterator
+      effectiveId = instance.getEffectiveId
+      absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
+    } yield
+      absoluteId
+  }
+
+  //
 //    Fun("list-variables", classOf[XXFormsListVariables], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("get-variable", classOf[XXFormsGetVariable], op = 0, min = 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def getVariable(modelEffectiveId: String, variableName: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] = {
+    xfc.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
+      case model: XFormsModel => model.getTopLevelVariables(variableName).asIterable().asScala
+      case _                  => Nil
+    }
+  }
+
+  //
 //    Fun("itemset", classOf[XXFormsItemset], op = 0, min = 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE),

@@ -723,7 +723,7 @@
         </fr:alert-dialog>
 
         <!-- Generic confirmation dialog (message must be passed dynamically) -->
-        <fr:alert-dialog id="fr-confirmation-dialog" close="true">
+        <fr:alert-dialog id="fr-confirmation-dialog">
             <fr:label ref="$fr-resources/detail/messages/confirmation-dialog-title"/>
             <fr:negative-choice>
                 <xf:action event="DOMActivate" type="xpath">

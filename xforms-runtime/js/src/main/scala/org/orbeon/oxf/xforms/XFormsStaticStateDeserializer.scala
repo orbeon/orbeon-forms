@@ -28,6 +28,7 @@ import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable.typeableOps
 
 import java.{util => ju}
 import scala.collection.mutable
@@ -44,6 +45,7 @@ object XFormsStaticStateDeserializer {
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
     var collectedScopes         = IndexedSeq[Scope]()
+    var collectedModelRefs      = Map[String, List[ElementAnalysis]]()
 
     var controlStack: List[ElementAnalysis] = Nil
 
@@ -337,7 +339,7 @@ object XFormsStaticStateDeserializer {
         namespaceMapping  <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
         scope             <- c.get[Int]("scopeRef").map(collectedScopes)
         containerScope    <- c.get[Int]("containerScopeRef").map(collectedScopes)
-        modelRef          <- c.get[Option[String]]("modelRef")
+        modelOptRef       <- c.get[Option[String]]("modelRef")
   //      "langRef"           <- a.lang.asJson,
       } yield {
 
@@ -717,6 +719,11 @@ object XFormsStaticStateDeserializer {
 
         Index.indexNewControl(newControl)
 
+        // We can't set `Model`s immdiately, so we store the mapping and do it once the whole tree has been built
+        modelOptRef foreach { modelRef =>
+          collectedModelRefs += modelRef -> (newControl :: collectedModelRefs.getOrElse(modelRef, Nil))
+        }
+
         newControl match {
           case withChildren: WithChildrenTrait =>
             controlStack ::= withChildren
@@ -764,6 +771,16 @@ object XFormsStaticStateDeserializer {
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")
       } yield {
+
+        // Set collected `Model` information on elements
+        for {
+          (modelRef, elems) <- collectedModelRefs
+          modelOpt          = Index.controlAnalysisMap.get(modelRef) flatMap (_.narrowTo[Model])
+          elem              <- elems
+        } locally {
+          elem.model = modelOpt
+        }
+
         XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, AnnotatedTemplate(template).some) // TODO: serialize `globalMaxSizeProperty` from server
       }
 

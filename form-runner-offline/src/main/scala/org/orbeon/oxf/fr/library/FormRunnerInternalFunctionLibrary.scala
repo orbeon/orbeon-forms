@@ -41,6 +41,10 @@ object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
   def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: om.NodeInfo): Iterable[String] =
     FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
 
+  @XPathFunction(name = "authorizedOperationsBasedOnRolesXPath")
+  def authorizedOperationsBasedOnRolesXPath(permissionsEl: Option[om.NodeInfo]): List[String] =
+    FormRunner.authorizedOperationsBasedOnRolesXPath(permissionsEl.orNull)
+
   @XPathFunction(name = "selectFormLang")
   def selectFormLang(app: String, form: String, requestedLang: String, formLangs: Iterable[String]): String =
     FormRunner.selectFormLang(app, form, requestedLang, formLangs.toList.asJava) // TODO: change `.toList.asJava` once JVM side uses Saxon 10

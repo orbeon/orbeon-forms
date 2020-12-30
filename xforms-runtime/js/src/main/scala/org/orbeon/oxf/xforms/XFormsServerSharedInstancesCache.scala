@@ -13,7 +13,11 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       instanceCaching : InstanceCaching,
       readonly        : Boolean)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType = ???
+  ): DocumentNodeInfoType = {
+    // XXX TODO
+    println(s"xxx findContentOrNull TODO for `${instanceCaching.pathOrAbsoluteURI}`")
+    null
+  }
 
   def findContentOrLoad(
       instance        : Instance,
@@ -21,14 +25,23 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       readonly        : Boolean,
       loadInstance    : InstanceLoader)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType = ???
+  ): DocumentNodeInfoType = {
+    // XXX TODO: cache
+    loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
+  }
 
   def remove(
     instanceSourceURI : String,
     requestBodyHash   : String,
     handleXInclude    : Boolean)(implicit
     indentedLogger    : IndentedLogger
-  ): Unit = ???
+  ): Unit = {
+    // XXX TODO
+    ()
+  }
 
-  def removeAll(implicit indentedLogger: IndentedLogger): Unit = ???
+  def removeAll(implicit indentedLogger: IndentedLogger): Unit = {
+    // XXX TODO
+    ()
+  }
 }

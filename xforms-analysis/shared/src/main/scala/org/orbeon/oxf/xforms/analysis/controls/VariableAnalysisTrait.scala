@@ -1,8 +1,8 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.isValueOrSequenceElement
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 
@@ -25,20 +25,17 @@ trait VariableAnalysisTrait
   val name: String
   val expressionStringOpt: Option[String]
 
-  // Used by `Variable`
-  val valueElement: Element = VariableAnalysis.valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
-
   // Used below and by `ElementAnalysisTreeXPathAnalyzer`
-  def nestedValueAnalysis: Option[ElementAnalysis] = children.find(_.localName == "value")
+  def nestedValueAnalysis: Option[ElementAnalysis] = children.find(e => isValueOrSequenceElement(e.element))
 
   // `lazy` because the children are evaluated after the container
   // All used by `Variable`
-  lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
+  lazy val (valueElement, hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
     nestedValueAnalysis match {
       case Some(valueElem) =>
-        (true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId)
+        (valueElem.element, true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId)
       case None =>
-        (false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
+        (variableSelf.element, false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
     }
 
   def variableAnalysis: Option[XPathAnalysis] = valueAnalysis
@@ -66,6 +63,9 @@ object VariableAnalysis {
 
   def valueOrSequenceElement(element: Element): Option[Element] =
     element.elementOpt(XXFORMS_VALUE_QNAME) orElse element.elementOpt(XXFORMS_SEQUENCE_QNAME)
+
+  def isValueOrSequenceElement(element: Element): Boolean =
+    element.getQName == XXFORMS_VALUE_QNAME || element.getQName == XXFORMS_SEQUENCE_QNAME
 
   // See https://github.com/orbeon/orbeon-forms/issues/1104 and https://github.com/orbeon/orbeon-forms/issues/1132
   def variableScopesModelVariables(v: VariableAnalysisTrait): Boolean =

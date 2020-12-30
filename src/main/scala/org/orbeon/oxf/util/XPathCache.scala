@@ -117,27 +117,6 @@ object XPathCache extends XPathCacheTrait {
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
   // 2 external usages
-  def evaluateKeepItems(
-    xpathString     : String,
-    contextItem     : Item,
-    contextPosition : Int = 1)(implicit
-    xpathContext    : XPathContext
-  ): Seq[Item] =
-    evaluateKeepItems(
-      contextItems       = List(contextItem).asJava,
-      contextPosition    = contextPosition,
-      xpathString        = xpathString,
-      namespaceMapping   = xpathContext.namespaceMapping,
-      variableToValueMap = xpathContext.variableToValueMap,
-      functionLibrary    = xpathContext.functionLibrary,
-      functionContext    = xpathContext.functionContext,
-      baseURI            = xpathContext.baseURI,
-      locationData       = xpathContext.locationData,
-      reporter           = null
-    )
-
-  // Evaluate an XPath expression on the document and keep Item objects in the result
-  // 2 external usages
   def evaluateKeepItemsJava(
     contextItems       : JList[Item],
     contextPosition    : Int,

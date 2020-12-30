@@ -63,6 +63,8 @@ object XFormsStaticStateDeserializer {
       val models             = mutable.Buffer[Model]()
       val attributes         = mutable.Buffer[AttributeControl]()
 
+      var namespaces         = Map[String, NamespaceMapping]()
+
       def indexNewControl(elementAnalysis : ElementAnalysis): Unit = {
 
         // Index by prefixed id
@@ -72,6 +74,9 @@ object XFormsStaticStateDeserializer {
         val controlName = elementAnalysis.localName
         val controlsMap = controlTypes.getOrElseUpdate(controlName, mutable.LinkedHashMap[String, ElementAnalysis]())
         controlsMap += elementAnalysis.prefixedId -> elementAnalysis
+
+        // Index namespaces
+        namespaces += elementAnalysis.prefixedId -> elementAnalysis.namespaceMapping
 
         // Index special controls
         elementAnalysis match {
@@ -102,8 +107,6 @@ object XFormsStaticStateDeserializer {
         stringBuilder                <- c.get[Array[String]]("stringBuilder")
         hasDocumentLocator           <- c.get[Boolean]("hasDocumentLocator")
 //        marks                        <- c.get[Array[]]("hasDocumentLocator")
-        //    "systemIdBufferPosition" -> Json.fromInt(a.systemIdBufferPosition),
-      //    "systemIdBuffer"         -> a.systemIdBuffer.slice(0, a.systemIdBufferPosition).asJson,
 
       } yield {
         val a = new SAXStore
@@ -334,11 +337,11 @@ object XFormsStaticStateDeserializer {
         namespaceMapping  <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
         scope             <- c.get[Int]("scopeRef").map(collectedScopes)
         containerScope    <- c.get[Int]("containerScopeRef").map(collectedScopes)
-        modelRef          <- c.get[String]("modelRef")
+        modelRef          <- c.get[Option[String]]("modelRef")
   //      "langRef"           <- a.lang.asJson,
       } yield {
 
-        println(s"xxx decoding element for $element / $prefixedId")
+//        println(s"xxx decoding element for `${element.getQualifiedName}` with id `$prefixedId`")
 
         import org.orbeon.xforms.XFormsNames._
 
@@ -523,7 +526,7 @@ object XFormsStaticStateDeserializer {
 
               staticBind
 
-            case XFORMS_OUTPUT_QNAME =>
+            case XFORMS_OUTPUT_QNAME | XXFORMS_TEXT_QNAME =>
 
               val output =
                 for {
@@ -602,7 +605,6 @@ object XFormsStaticStateDeserializer {
                   } yield {
                     val eh =
                       if (EventHandler.isContainerAction(element.getQName)) {
-                        println(s"xxx is container action")
                         new EventHandler(
                           index,
                           element,
@@ -740,6 +742,7 @@ object XFormsStaticStateDeserializer {
           Index.eventHandlers,
           Index.models,
           Index.attributes,
+          Index.namespaces,
           functionLibrary
         )
 
@@ -842,6 +845,7 @@ object TopLevelPartAnalysisImpl {
     eventHandlers       : mutable.Buffer[EventHandler],
     models              : mutable.Buffer[Model],
     attributes          : mutable.Buffer[AttributeControl],
+    namespaces          : Map[String, NamespaceMapping],
     _functionLibrary    : FunctionLibrary)(implicit
     logger              : IndentedLogger
   ): TopLevelPartAnalysis = {
@@ -871,9 +875,8 @@ object TopLevelPartAnalysisImpl {
 
         val functionLibrary: FunctionLibrary = _functionLibrary
 
-        // XXX TODO
         def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] =
-          Some(NamespaceMapping(Map("xf" -> "http://www.w3.org/2002/xforms", "xh" -> "http://www.w3.org/1999/xhtml")))
+          namespaces.get(prefixedId)
 
         def hasControls: Boolean =
           getTopLevelControls.nonEmpty || (iterateGlobals map (_.compactShadowTree.getRootElement)).nonEmpty // TODO: duplicated from `StaticPartAnalysisImpl`
@@ -903,9 +906,7 @@ object TopLevelPartAnalysisImpl {
             (throw new IllegalStateException(s"missing scope information for $prefixedId"))
 
         def scriptsByPrefixedId: Map[String, StaticScript] = Map.empty // XXX TODO
-
         def uniqueJsScripts: List[ShareableScript] = Nil // XXX TODO
-
         def baselineResources: (List[String], List[String]) = (Nil, Nil) // XXX TODO
       }
 

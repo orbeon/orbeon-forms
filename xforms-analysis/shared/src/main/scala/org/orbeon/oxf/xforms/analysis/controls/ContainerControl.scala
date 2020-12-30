@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.xbl.Scope
@@ -47,5 +48,9 @@ class ContainerControl(
   // For `<xf:group xxf:element="xh:div">`
   // TODO: serialize/builder
   val elementQName: Option[QName] =
-    element.resolveAttValueQName(XFormsNames.XXFORMS_ELEMENT_QNAME, unprefixedIsNoNamespace = true)
+    Extensions.resolveQName(
+      namespaceMapping.mapping,
+      element.attributeValue(XFormsNames.XXFORMS_ELEMENT_QNAME),
+      unprefixedIsNoNamespace = true
+    )
 }

@@ -92,23 +92,35 @@ object XPathFunctionAnnotationMacro {
           case _                                     => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` has incorrect parameters")
         }
 
-      val (returnTypeIsOption, returnTypeString) =
+      val (returnTypeIsOption, returnTypeIsIterable, returnTypeString) =
         returnType match {
-          case tq"Option[Int]"               => (true,  "int")
-          case tq"Option[String]"            => (true,  "string")
-          case tq"Option[Boolean]"           => (true,  "boolean")
-          case tq"Option[java.time.Instant]" => (true,  "instant")
-          case tq"Option[$tpe]"              => (true,  "item")
-          case tq"Int"                       => (false, "int")
-          case tq"String"                    => (false, "string")
-          case tq"Boolean"                   => (false, "boolean")
-          case tq"java.time.Instant"         => (false, "instant")
-          case tq"$tpe"                      => (false, "item")
+          case tq"Option[Int]"                 => (true,  false, "int")
+          case tq"Option[String]"              => (true,  false, "string")
+          case tq"Option[Boolean]"             => (true,  false, "boolean")
+          case tq"Option[java.time.Instant]"   => (true,  false, "instant")
+          case tq"Option[$tpe]"                => (true,  false, "item")
+          case tq"Iterable[Int]"               => (false, true,  "int")
+          case tq"Iterable[String]"            => (false, true,  "string")
+          case tq"Iterable[Boolean]"           => (false, true,  "boolean")
+          case tq"Iterable[java.time.Instant]" => (false, true,  "instant")
+          case tq"Iterable[$tpe]"              => (false, true,  "item")
+          case tq"List[Int]"                   => (false, true,  "int")
+          case tq"List[String]"                => (false, true,  "string")
+          case tq"List[Boolean]"               => (false, true,  "boolean")
+          case tq"List[java.time.Instant]"     => (false, true,  "instant")
+          case tq"List[$tpe]"                  => (false, true,  "item")
+          case tq"Int"                         => (false, false, "int")
+          case tq"String"                      => (false, false, "string")
+          case tq"Boolean"                     => (false, false, "boolean")
+          case tq"java.time.Instant"           => (false, false, "instant")
+          case tq"$tpe"                        => (false, false, "item")
         }
 
       val returnTypeCard =
         if (returnTypeIsOption)
           q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
+        else if (returnTypeIsIterable)
+          q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.STAR"""
         else
           q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
 
@@ -116,18 +128,28 @@ object XPathFunctionAnnotationMacro {
         regularArgs.zipWithIndex map {
           case (arg: ValDef, argPosInList) =>
 
-            val (isOption, typeString) =
+            val (isOption, isIterable, typeString) =
               arg match {
-                case q"$mods val $name: Option[Int]               = $rhs" => (true,  "int")
-                case q"$mods val $name: Option[String]            = $rhs" => (true,  "string")
-                case q"$mods val $name: Option[Boolean]           = $rhs" => (true,  "boolean")
-                case q"$mods val $name: Option[java.time.Instant] = $rhs" => (true,  "instant")
-                case q"$mods val $name: Option[$tpe]              = $rhs" => (true,  "item")
-                case q"$mods val $name: Int                       = $rhs" => (false, "int")
-                case q"$mods val $name: String                    = $rhs" => (false, "string")
-                case q"$mods val $name: Boolean                   = $rhs" => (false, "boolean")
-                case q"$mods val $name: java.time.Instant         = $rhs" => (false, "instant")
-                case q"$mods val $name: $tpe                      = $rhs" => (false, "item")
+                case q"$mods val $name: Option[Int]                 = $rhs" => (true,  false, "int")
+                case q"$mods val $name: Option[String]              = $rhs" => (true,  false, "string")
+                case q"$mods val $name: Option[Boolean]             = $rhs" => (true,  false, "boolean")
+                case q"$mods val $name: Option[java.time.Instant]   = $rhs" => (true,  false, "instant")
+                case q"$mods val $name: Option[$tpe]                = $rhs" => (true,  false, "item")
+                case q"$mods val $name: Iterable[Int]               = $rhs" => (false, true,  "int")
+                case q"$mods val $name: Iterable[String]            = $rhs" => (false, true,  "string")
+                case q"$mods val $name: Iterable[Boolean]           = $rhs" => (false, true,  "boolean")
+                case q"$mods val $name: Iterable[java.time.Instant] = $rhs" => (false, true,  "instant")
+                case q"$mods val $name: Iterable[$tpe]              = $rhs" => (false, true,  "item")
+                case q"$mods val $name: List[Int]                   = $rhs" => (false, true,  "int")
+                case q"$mods val $name: List[String]                = $rhs" => (false, true,  "string")
+                case q"$mods val $name: List[Boolean]               = $rhs" => (false, true,  "boolean")
+                case q"$mods val $name: List[java.time.Instant]     = $rhs" => (false, true,  "instant")
+                case q"$mods val $name: List[$tpe]                  = $rhs" => (false, true,  "item")
+                case q"$mods val $name: Int                         = $rhs" => (false, false, "int")
+                case q"$mods val $name: String                      = $rhs" => (false, false, "string")
+                case q"$mods val $name: Boolean                     = $rhs" => (false, false, "boolean")
+                case q"$mods val $name: java.time.Instant           = $rhs" => (false, false, "instant")
+                case q"$mods val $name: $tpe                        = $rhs" => (false, false, "item")
               }
 
             val (decodeCall, defaultOpt) = {
@@ -135,15 +157,15 @@ object XPathFunctionAnnotationMacro {
               (q"""decodeSaxonArg[$tpt](args($argPosInList))""", rhs != EmptyTree option rhs)
             }
 
-            (argPosInList, isOption, typeString, decodeCall, defaultOpt)
+            (argPosInList, isOption, isIterable, typeString, decodeCall, defaultOpt)
 
           case _ => throw new IllegalArgumentException
       }
 
-      val minArity = argumentsDetails.count(_._5.isEmpty)
+      val minArity = argumentsDetails.count(_._6.isEmpty)
       val maxArity = argumentsDetails.size
 
-      if (argumentsDetails.takeWhile(_._5.isEmpty).size != minArity)
+      if (argumentsDetails.takeWhile(_._6.isEmpty).size != minArity)
         throw new IllegalArgumentException(s"arguments with default values must be last")
 
       def getSaxonType(typeString: String) =
@@ -174,11 +196,13 @@ object XPathFunctionAnnotationMacro {
            """
 
         val registerWithArgs =
-          flattenedArgumentsUpToArity.foldLeft(register) { case (result, (pos, isOption, typeString, _, _)) =>
+          flattenedArgumentsUpToArity.foldLeft(register) { case (result, (pos, isOption, isIterable, typeString, _, _)) =>
 
             val card =
               if (isOption)
                 q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.OPT"""
+              else if (isIterable)
+                q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.STAR"""
               else
                 q"""org.orbeon.saxon.functions.registry.BuiltInFunctionSet.ONE"""
 
@@ -192,8 +216,8 @@ object XPathFunctionAnnotationMacro {
              """
           }
 
-        val flattenedTrees   = flattenedArgumentsUpToArity.map(_._4)
-        val defaultArgsTrees = argumentsDetails.drop(arity).flatMap(_._5)
+        val flattenedTrees   = flattenedArgumentsUpToArity.map(_._5)
+        val defaultArgsTrees = argumentsDetails.drop(arity).flatMap(_._6)
 
         val encodedCall =
           if (regularArgs.isEmpty) { // no parameter list!

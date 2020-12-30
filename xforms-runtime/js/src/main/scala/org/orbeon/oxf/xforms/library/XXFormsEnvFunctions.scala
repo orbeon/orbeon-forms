@@ -4,13 +4,15 @@ import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction.resolveOrFindByStaticOrAbsoluteId
+import org.orbeon.oxf.xforms.function.XFormsFunction.{currentLocale, relevantControl, resolveOrFindByStaticOrAbsoluteId}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.SequenceTool
 import org.orbeon.xforms.XFormsId
 
+import java.text.MessageFormat
 import scala.jdk.CollectionConverters._
 
 
@@ -126,10 +128,13 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     instanceId : String)(implicit
     xpc        : XPathContext,
     xfc        : XFormsFunction.Context
-  ): Option[om.NodeInfo] =
-    instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
+  ): Option[om.NodeInfo] = {
+    val r = instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
+    println(s"xxx result of `xxf:instance('$instanceId')` is ${r map (_.getDisplayName)}")
+    r
+  }
 
-//  Fun("index", classOf[XXFormsIndex], op = 0, min = 0, INTEGER, EXACTLY_ONE,
+  //  Fun("index", classOf[XXFormsIndex], op = 0, min = 0, INTEGER, EXACTLY_ONE,
 //      Arg(STRING, ALLOWS_ZERO_OR_ONE)
 //    )
 
@@ -175,13 +180,16 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
-//
-//    Fun("format-message", classOf[XXFormsFormatMessage], op = 0, min = 2, STRING, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-//    )
-//
-//    Fun("lang", classOf[XXFormsLang], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+
+  @XPathFunction
+  def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext): String = {
+    // TODO: `MessageFormat` is not supported by Scala.js as of now (2020-12-29).
+    s"[TODO] $template"
+//    new MessageFormat(template, currentLocale)
+//      .format(args map SequenceTool.convertToJava toArray)
+  }
+
+  //    Fun("lang", classOf[XXFormsLang], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
 //
 //    Fun("r", classOf[XXFormsResource], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE),
@@ -215,11 +223,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun("alert", classOf[XXFormsLHHA], op = 3, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("visited", classOf[XXFormsVisited], op = 0, min = 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def visited(controlId: String)(implicit xpc: XPathContext): Option[Boolean] =
+    relevantControl(controlId) map (_.visited)
+
 //    Fun("focusable", classOf[XXFormsFocusable], op = 0, min = 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING,  EXACTLY_ONE),
 //      Arg(BOOLEAN, EXACTLY_ONE)

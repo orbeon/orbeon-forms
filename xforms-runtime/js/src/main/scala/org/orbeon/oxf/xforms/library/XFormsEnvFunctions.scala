@@ -20,12 +20,14 @@ import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function._
 import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
+import org.orbeon.scaxon.Implicits
+import org.orbeon.xforms.Namespaces
 
 
 /**
@@ -40,7 +42,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     findIndexForRepeatId(repeatStaticId)
 
   @XPathFunction
-  def property(propertyName: String)(implicit xpc: XPathContext,  xfc: XFormsFunction.Context): Option[om.Item] = {
+  def property(propertyName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.Item] = {
 
     import Property._
 
@@ -60,7 +62,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     // XXX FIXME hardcoding `xxf` prefix for now
     val uriLocal = {
       SaxonUtils.parseQName(propertyName) match {
-        case ("xxf", local) => (XXFORMS_NAMESPACE_URI, local)
+        case ("xxf", local) => (Namespaces.XXF, local)
         case other => other
       }
     }
@@ -73,7 +75,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
         StringValue.makeStringValue(Version).some
       case ("", ConformanceLevelProperty) =>
         StringValue.makeStringValue(ConformanceLevel) .some
-      case (XXFORMS_NAMESPACE_URI, local) =>
+      case (Namespaces.XXF, local) =>
         // Property in the `xxf` namespace: return our properties
         Option(xfc.containingDocument.getProperty(local)) map
           (v => SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[om.Item])
@@ -143,13 +145,33 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   }
 
   @XPathFunction
-  def current: Option[om.Item] = ???
+  def current()(implicit xpc: XPathContext): Option[om.Item] = {
+    // Go up the stack to find the top-level context
+    var currentContext = xpc
+    while (currentContext.getCaller ne null)
+      currentContext = currentContext.getCaller
+    Option(currentContext.getContextItem)
+  }
 
   @XPathFunction
-  def context: Option[om.Item] = ???
+  def context()(implicit xfc: XFormsFunction.Context): Option[om.Item] =
+    Option(xfc.bindingContext.contextItem)
 
   @XPathFunction
-  def event(name: String): Option[om.Item] = ???
+  def event(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterator[om.Item] = {
+
+    // XXX FIXME hardcoding `xxf` prefix for now. Extract namespaces from the static state or `xfc`.
+    val namespaceMappings = Map(
+      "xxf" -> Namespaces.XXF
+    )
+
+    for {
+      currentEvent <- xfc.containingDocument.currentEventOpt.iterator
+      qName        <- Extensions.resolveQName(namespaceMappings, name, unprefixedIsNoNamespace = true).iterator
+      item         <- Implicits.asScalaIterator(currentEvent.getAttribute(qName.clarkName))
+    } yield
+      item
+  }
 
   // TODO: Should be `Iterator`?
   @XPathFunction

@@ -6,6 +6,8 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xbl.DateSupportJava
 
+import scala.jdk.CollectionConverters._
+
 
 object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
 
@@ -26,8 +28,32 @@ object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
     dataGroupname      : String
   ): Iterable[String] =
     FormRunner.xpathAllAuthorizedOperations(permissionsElement, dataUsername, dataGroupname)
-}
 
+  @XPathFunction(name = "xpathFormRunnerStringProperty")
+  def xpathFormRunnerStringProperty(name: String): Option[String] =
+    FormRunner.xpathFormRunnerStringProperty(name)
+
+  @XPathFunction(name = "xpathOrbeonRolesFromCurrentRequest")
+  def xpathOrbeonRolesFromCurrentRequest: Iterable[String] =
+    FormRunner.orbeonRolesFromCurrentRequest
+
+  @XPathFunction(name = "allAuthorizedOperationsAssumingOwnerGroupMember")
+  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: om.NodeInfo): Iterable[String] =
+    FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
+
+  @XPathFunction(name = "selectFormLang")
+  def selectFormLang(app: String, form: String, requestedLang: String, formLangs: Iterable[String]): String =
+    FormRunner.selectFormLang(app, form, requestedLang, formLangs.toList.asJava) // TODO: change `.toList.asJava` once JVM side uses Saxon 10
+
+  @XPathFunction(name = "selectFormRunnerLang")
+  def selectFormRunnerLang(app: String, form: String, requestedLang: String, formRunnerLangs: Iterable[String]): String =
+    FormRunner.selectFormLang(app, form, requestedLang, formRunnerLangs.toList.asJava) // TODO: change `.toList.asJava` once JVM side uses Saxon 10
+
+  @XPathFunction(name = "getFormLangSelection")
+  def getFormLangSelection(app: String, form: String, formLanguages: Iterable[String]): List[String] =
+    FormRunner.getFormLangSelection(app, form, formLanguages.toList.asJava) // TODO: change `.toList.asJava` once JVM side uses Saxon 10
+
+}
 
 object FormRunnerDateSupportFunctionLibrary extends OrbeonFunctionLibrary {
 

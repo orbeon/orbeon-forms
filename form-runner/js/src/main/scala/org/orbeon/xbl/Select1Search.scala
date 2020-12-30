@@ -70,6 +70,9 @@ private class Select1SearchCompanion extends XBLCompanion {
             initialOption.value    = initialValue
             initialOption.selected = true
             htmlSelect.appendChild(initialOption)
+          } else {
+            while (htmlSelect.hasChildNodes())
+              htmlSelect.removeChild(htmlSelect.firstChild)
           }
         }
 

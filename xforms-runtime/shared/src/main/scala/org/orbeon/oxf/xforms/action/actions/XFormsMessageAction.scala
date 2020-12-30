@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.xxformsQName
 
@@ -64,8 +64,13 @@ class XFormsMessageAction extends XFormsAction {
     val containingDocument = actionContext.containingDocument
 
     val levelQName =
-      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap
-        (_ => actionContext.element.resolveAttValueQName(XFormsNames.LEVEL_QNAME, unprefixedIsNoNamespace = true)) getOrElse
+      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap { levelQName =>
+        Extensions.resolveQName(
+          actionContext.analysis.namespaceMapping.mapping,
+          levelQName,
+          unprefixedIsNoNamespace = true
+        )
+      } getOrElse
         ModalQName // "The default is "modal" if the attribute is not specified."
 
     // Get message value

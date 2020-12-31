@@ -87,8 +87,8 @@ object FunctionSupport2 {
       case v     => Some(implicitly[Decode[U]].apply(v))
     }
 
-  implicit def IterableDecode[U : Decode]: Decode[Iterable[U]] = (s: om.Sequence) =>
-    Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList
+  implicit def IterableDecode[T[_], U : Decode](implicit ev: Iterable[U] => T[U]): Decode[T[U]] = (s: om.Sequence) =>
+    ev(Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply).toList)
 
   implicit def IteratorDecode[U : Decode]: Decode[Iterator[U]] = (s: om.Sequence) =>
     Implicits.asScalaIterator(s.iterate()).map(implicitly[Decode[U]].apply)

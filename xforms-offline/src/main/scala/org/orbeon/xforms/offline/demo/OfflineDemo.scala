@@ -1,5 +1,7 @@
 package org.orbeon.xforms.offline.demo
 
+import org.log4s.Info
+import org.log4s.log4sjs.LevelThreshold
 import org.log4s.log4sjs.LogThreshold.AllThreshold
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.HttpMethod
@@ -38,7 +40,7 @@ object OfflineDemo extends App {
 
     // Initialize logging
     import org.log4s.log4sjs.Log4sConfig._
-    setLoggerThreshold("", AllThreshold)
+    setLoggerThreshold("", LevelThreshold(Info))
   }
 
   def onPageContainsFormsMarkup(): Unit =

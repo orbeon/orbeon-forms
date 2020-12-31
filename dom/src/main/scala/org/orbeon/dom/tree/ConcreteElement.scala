@@ -653,22 +653,6 @@ class ConcreteElement(var qname: QName)
     clone
   }
 
-  def getQName(qualifiedName: String): QName = {
-    var prefix = ""
-    var localName = qualifiedName
-    val index = qualifiedName.indexOf(":")
-    if (index > 0) {
-      prefix = qualifiedName.substring(0, index)
-      localName = qualifiedName.substring(index + 1)
-    }
-    val namespace = getNamespaceForPrefix(prefix)
-    if (namespace ne null) {
-      QName(localName, namespace)
-    } else {
-      QName(localName)
-    }
-  }
-
   def getNamespaceForPrefix(_prefix: String): Namespace = {
 
     val prefix = if (_prefix eq null) "" else _prefix

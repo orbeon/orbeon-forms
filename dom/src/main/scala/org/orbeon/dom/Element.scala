@@ -14,7 +14,6 @@ trait Element extends Branch {
 
   def getQName: QName
   def getNamespace: Namespace
-  def getQName(qualifiedName: String): QName
   def getNamespaceForPrefix(prefix: String): Namespace
   def getNamespacePrefix: String
   def getNamespaceURI: String

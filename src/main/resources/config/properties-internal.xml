@@ -143,11 +143,27 @@
     </property>
 
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.offline">
+        <!-- Not sure if all of these are needed but listing them all won't hurt -->
         -/ops/javascript/scalajs/orbeon-xforms.js
+        -/ops/javascript/scalajs/orbeon-xforms-offline.js
         -/apps/fr/resources/scalajs/orbeon-form-runner.js
         -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
         -/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
-<!--        +/ops/javascript/scalajs/orbeon-xforms-offline.js-->
+
+        <!-- Form Runner CSS -->
+        +/apps/fr/style/form-runner-common.css
+        +/apps/fr/style/form-runner-base.css
+        +/apps/fr/style/form-runner-orbeon.css
+        +/apps/fr/style/form-runner-responsive.css
+
+        <!-- Temporary until we can create a baseline that includes baseline XBL components -->
+        +/xbl/orbeon/section/section.css
+        +/xbl/orbeon/grid/grid.css
+
+        <!-- Temporary until we can create a baseline that includes baseline XBL components -->
+        +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js
+
+        <!-- Main offline JavaScript -->
         +/ops/javascript/scalajs/orbeon-form-runner-offline.js
     </property>
 

@@ -23,7 +23,7 @@ import scala.reflect.macros.whitebox
 // - locally scopes implicits for `XPathContext` and `XFormsFunction.Context`
 //     - these are inserted only if there is at least one implicit parameter list
 //
-// The original methods are not removed from the original scope.
+// The original methods are not removed from the original scope. (TODO)
 //
 // The XPath function is named by kebab-casing the Scala method name. You can override this
 // by passing a `name` parameter to the annotation.

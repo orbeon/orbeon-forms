@@ -25,7 +25,10 @@ object URLRewriterUtils {
     rewriteMode : Int
   ): String = {
     println(s"xxx URLRewriterUtils.rewriteServiceURL called for $urlString")
-    ???
+    if (PathUtils.urlHasProtocol(urlString))
+      urlString
+    else
+      ???
   }
 
   def getPathMatchers: ju.List[PathMatcher] = {

@@ -224,6 +224,11 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
       require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
 
+      // Maybe rename section template content
+      findControlByName(ctx.formDefinitionRootElem, oldName)
+        .filter(FormRunner.isSectionWithTemplateContent)
+        .foreach( _ => renameControlIfNeeded(oldName + TemplateContentSuffix, newName + TemplateContentSuffix))
+
       findDataHolders(oldName)     foreach (rename(_, newName))
       findResourceHolders(oldName) foreach (rename(_, newName))
 

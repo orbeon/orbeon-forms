@@ -69,7 +69,7 @@ trait FormRunnerBaseOps {
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
   val DefaultIterationSuffix = "-iteration"
-
+  val TemplateContentSuffix  = "-content"
   val TemplateSuffix         = "-template"
 
   // Get an id based on a name

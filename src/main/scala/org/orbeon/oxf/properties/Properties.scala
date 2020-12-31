@@ -23,7 +23,9 @@ import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.{DOMSerializer, ProcessorImpl}
 import org.orbeon.oxf.util.{LoggerFactory, PipelineUtils}
 
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 /**
  * This class provides access to global, configurable properties, as well as to processor-specific properties. This is
@@ -153,10 +155,10 @@ class Properties private () {
         null
     }
 
-  def keySet: ju.Set[_] =
+  def keySetJava: ju.Set[_] =
     propertyStore match {
       case Some(propertyStore) =>
-        propertyStore.getGlobalPropertySet.keySet
+        propertyStore.getGlobalPropertySet.keySet.asJava
       case None =>
         null
     }

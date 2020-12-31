@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.{AppForm, ResourcesPatcher}
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -260,10 +261,12 @@ class ResourcesPatcherTest
 
       val initial = newDoc
 
-
-
       val props =
-        PropertySet(List((null, "oxf.fr.resource.*.*.fr.authentication.login.password", XS_STRING_QNAME, "Mot de passe")))
+        PropertySet(
+          List(
+            PropertyParams(Map.empty, "oxf.fr.resource.*.*.fr.authentication.login.password", XS_STRING_QNAME, "Mot de passe")
+          )
+        )
 
       ResourcesPatcher.transform(initial, AppForm("*", "*"))(props)
 

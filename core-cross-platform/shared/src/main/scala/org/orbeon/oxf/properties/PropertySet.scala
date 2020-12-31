@@ -13,23 +13,24 @@
  */
 package org.orbeon.oxf.properties
 
-import java.net.URI
-import java.{lang => jl, util => ju}
-
 import cats.syntax.option._
-import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.dom.QName
+import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.properties.PropertySet._
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters._
-import scala.collection.compat._
+import java.net.{URI, URISyntaxException}
+import java.{lang => jl, util => ju}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
@@ -53,6 +54,8 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
  */
 object PropertySet {
 
+  import Private._
+
   private class PropertyNode {
     var property: Option[Property] = None
     var children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
@@ -60,16 +63,16 @@ object PropertySet {
 
   def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)
 
-  type PropertyParams = (Element, String, QName, AnyRef)
+  case class PropertyParams(namespaces: Map[String, String], name: String, typeQName: QName, stringValue: String)
 
   def apply(globalProperties: Iterable[PropertyParams]): PropertySet = {
 
     var exactProperties    = Map[String, Property]()
     val wildcardProperties = new PropertyNode
 
-    def setProperty(elem: Element, name: String, typ: QName, value: AnyRef): Unit = {
+    def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
 
-      val property = Property(typ, value, if (elem eq null) Map.empty else elem.allInScopeNamespacesAsStrings)
+      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces) // shouldn't be null!
 
       // Store exact property name anyway
       exactProperties += name -> property
@@ -89,19 +92,104 @@ object PropertySet {
       currentNode.property = property.some
     }
 
-    globalProperties foreach { case (elem, name, typ, value) => setProperty(elem, name, typ, value) }
+    globalProperties foreach { case PropertyParams(namespaces, name, typ, stringValue) =>
+      setProperty(namespaces, name, typ, getObjectFromStringValue(stringValue, typ, namespaces))
+    }
 
     new PropertySet(exactProperties, wildcardProperties)
+  }
+
+  def isSupportedType(typeQName: QName): Boolean =
+    SupportedTypes.contains(typeQName)
+
+  private object Private {
+
+    val SupportedTypes =
+      Map[QName, (String, Map[String, String]) => AnyRef](
+        XS_STRING_QNAME             -> convertString,
+        XS_INTEGER_QNAME            -> convertInteger,
+        XS_BOOLEAN_QNAME            -> convertBoolean,
+//        XS_DATE_QNAME               -> convertDate,
+//        XS_DATETIME_QNAME           -> convertDate,
+        XS_QNAME_QNAME              -> convertQName,
+        XS_ANYURI_QNAME             -> convertURI,
+        XS_NCNAME_QNAME             -> convertNCName,
+        XS_NMTOKEN_QNAME            -> convertNMTOKEN,
+        XS_NMTOKENS_QNAME           -> convertNMTOKENS,
+//        XS_NONNEGATIVEINTEGER_QNAME -> convertNonNegativeInteger
+      )
+
+    def getObjectFromStringValue(stringValue: String, typ: QName, namespaces: Map[String, String]): AnyRef =
+      SupportedTypes.get(typ) map (_(stringValue, namespaces)) orNull
+
+    def convertString (value: String, namespaces: Map[String, String]) = value
+    def convertInteger(value: String, namespaces: Map[String, String]) = jl.Integer.valueOf(value)
+    def convertBoolean(value: String, namespaces: Map[String, String]) = jl.Boolean.valueOf(value)
+//    def convertDate   (value: String, namespaces: Map[String, String]) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
+
+    def convertQName(value: String, namespaces: Map[String, String]): QName =
+      Extensions.resolveQName(namespaces, value, unprefixedIsNoNamespace = true) getOrElse
+        (throw new ValidationException("QName value not found ", null))
+
+    def convertURI(value: String, namespaces: Map[String, String]): URI =
+      try {
+        new URI(value)
+      } catch {
+        case e: URISyntaxException =>
+          throw new ValidationException(e, null)
+      }
+
+    def convertNCName(value: String, namespaces: Map[String, String]): String = {
+      if (! SaxonUtils.isValidNCName(value))
+        throw new ValidationException("Not an NCName: " + value, null)
+      value
+    }
+
+    def convertNMTOKEN(value: String, namespaces: Map[String, String]): String = {
+      if (! SaxonUtils.isValidNmtoken(value))
+        throw new ValidationException("Not an NMTOKEN: " + value, null)
+      value
+    }
+
+    def convertNMTOKENS(value: String, namespaces: Map[String, String]): ju.Set[String] = {
+      val tokens = value.splitTo[Set]()
+      for (token <- tokens) {
+        if (! SaxonUtils.isValidNmtoken(token))
+          throw new ValidationException(s"Not an NMTOKENS: $value" , null)
+      }
+      tokens.asJava
+    }
+
+//    def convertNonNegativeInteger(value: String, namespaces: Map[String, String]): jl.Integer = {
+//      val ret = convertInteger(value, element)
+//      if (ret < 0)
+//        throw new ValidationException(s"Not a non-negative integer: $value", null)
+//      ret
+//    }
   }
 }
 
 class PropertySet private (
   exactProperties    : Map[String, Property],
-  wildcardProperties : PropertyNode // this contains mutable nodes, but the don't mutate after construction
+  wildcardProperties : PropertyNode // this contains mutable nodes, but they don't mutate after construction
 ) {
 
-  def keySet: ju.Set[String] = exactProperties.keySet.asJava
+  def keySet: Set[String] = exactProperties.keySet
   def size: Int = exactProperties.size
+
+  def propertyParams: Iterable[PropertyParams] =
+    exactProperties map { case (name, prop) =>
+
+      // Custom serialization to String, not ideal
+      val stringValue = {
+        prop.value match {
+          case v: ju.Set[_] => v.asScala map (_.toString) mkString " "
+          case v            => v.toString
+        }
+      }
+
+      PropertyParams(prop.namespaces, name, prop.typ, stringValue)
+    }
 
   def allPropertiesAsJson: String = {
 

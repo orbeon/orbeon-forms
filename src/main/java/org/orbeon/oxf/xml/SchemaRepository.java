@@ -151,7 +151,7 @@ public class SchemaRepository {
      */
     public String getSchemaLocation(String publicId) {
         // First look in the properties
-        final Set keys = Properties.instance().keySet();
+        final Set keys = Properties.instance().keySetJava();
         if (keys != null) {
             for (Iterator i = keys.iterator(); i.hasNext();) {
                 final String currentKey = (String) i.next();

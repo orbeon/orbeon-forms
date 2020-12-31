@@ -318,6 +318,9 @@ object SaxonUtils {
   def isValidNCName(name: String): Boolean =
     NameChecker.isValidNCName(name)
 
+  def isValidNmtoken(name: String): Boolean =
+    NameChecker.isValidNmtoken(name)
+
   val ChildAxisInfo: Int = AxisInfo.CHILD
   val AttributeAxisInfo: Int = AxisInfo.ATTRIBUTE
 

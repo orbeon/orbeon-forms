@@ -23,7 +23,7 @@ trait VariableAnalysisTrait
   variableSelf =>
 
   val name: String
-  val expressionStringOpt: Option[String]
+  val expressionOrConstant: Either[String, String]
 
   // Used below and by `ElementAnalysisTreeXPathAnalyzer`
   def nestedValueAnalysis: Option[ElementAnalysis] = children.find(e => isValueOrSequenceElement(e.element))

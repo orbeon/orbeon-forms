@@ -21,17 +21,17 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
 class VariableControl(
-  index                   : Int,
-  element                 : Element,
-  parent                  : Option[ElementAnalysis],
-  preceding               : Option[ElementAnalysis],
-  staticId                : String,
-  prefixedId              : String,
-  namespaceMapping        : NamespaceMapping,
-  scope                   : Scope,
-  containerScope          : Scope,
-  val name                : String,
-  val expressionStringOpt : Option[String]
+  index                    : Int,
+  element                  : Element,
+  parent                   : Option[ElementAnalysis],
+  preceding                : Option[ElementAnalysis],
+  staticId                 : String,
+  prefixedId               : String,
+  namespaceMapping         : NamespaceMapping,
+  scope                    : Scope,
+  containerScope           : Scope,
+  val name                 : String,
+  val expressionOrConstant : Either[String, String]
 ) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with ViewTrait
   with OptionalSingleNode

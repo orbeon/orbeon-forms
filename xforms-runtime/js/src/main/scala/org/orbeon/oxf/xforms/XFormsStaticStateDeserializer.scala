@@ -673,10 +673,14 @@ object XFormsStaticStateDeserializer {
 
             case qName if VariableAnalysis.VariableQNames(qName) =>
 
+              implicit val eitherDecoder: Decoder[Either[String, String]] = {
+                Decoder.decodeEither("left", "right")
+              }
+
               val variable =
                 for {
-                  name                <- c.get[String]("name")
-                  expressionStringOpt <- c.get[Option[String]]("expressionStringOpt")
+                  name                 <- c.get[String]("name")
+                  expressionOrConstant <- c.get[Either[String, String]]("expressionOrConstant")
                 } yield {
                   if (controlStack.headOption exists (_.localName == XFORMS_MODEL_QNAME.localName))
                     new ModelVariable(
@@ -690,7 +694,7 @@ object XFormsStaticStateDeserializer {
                       scope,
                       containerScope,
                       name,
-                      expressionStringOpt
+                      expressionOrConstant
                     )
                   else
                     new VariableControl(
@@ -704,7 +708,7 @@ object XFormsStaticStateDeserializer {
                       scope,
                       containerScope,
                       name,
-                      expressionStringOpt
+                      expressionOrConstant
                     )
                 }
 

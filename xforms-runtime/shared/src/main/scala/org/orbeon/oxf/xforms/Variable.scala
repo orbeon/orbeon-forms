@@ -56,11 +56,11 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
     pushOuterContext  : Boolean,
     handleNonFatal    : Boolean
   ): ValueRepresentationType =
-    staticVariable.expressionStringOpt match {
-      case None =>
+    staticVariable.expressionOrConstant match {
+      case Right(constant) =>
         // Inline constructor (for now, only textual content, but in the future, we could allow xf:output in it? more?)
-        new StringValue(staticVariable.valueElement.getStringValue)
-      case Some(expression) =>
+        new StringValue(constant)
+      case Left(expression) =>
 
         // Push binding for evaluation, so that @context and @model are evaluated
         val pushContext = pushOuterContext || staticVariable.hasNestedValue

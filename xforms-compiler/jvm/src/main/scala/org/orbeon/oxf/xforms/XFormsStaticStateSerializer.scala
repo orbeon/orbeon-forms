@@ -331,9 +331,13 @@ object XFormsStaticStateSerializer {
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
         case c: VariableAnalysisTrait  =>
+
+          implicit val eitherEncoder: Encoder[Either[String, String]] =
+            Encoder.encodeEither("left", "right")
+
           List(
             "name"                   -> Json.fromString(c.name),
-            "expressionStringOpt"    -> c.expressionStringOpt.asJson
+            "expressionOrConstant"   -> c.expressionOrConstant.asJson
           )
         case c: EventHandler           =>
           List(

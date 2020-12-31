@@ -815,18 +815,20 @@ object VariableAnalysisBuilder {
           )
         )
 
-    val valueElement        = VariableAnalysis.valueOrSequenceElement(element) getOrElse element
-    val expressionStringOpt = VariableAnalysis.valueOrSelectAttribute(valueElement)
+    val valueElement  = VariableAnalysis.valueOrSequenceElement(element) getOrElse element
+    val expressionOpt = VariableAnalysis.valueOrSelectAttribute(valueElement)
+
+    val expressionOrConstant = expressionOpt.toLeft(valueElement.getStringValue)
 
     if (forModel)
       new ModelVariable(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope,
         name,
-        expressionStringOpt
+        expressionOrConstant
       )
     else
       new VariableControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope,
         name,
-        expressionStringOpt
+        expressionOrConstant
       )
   }
 }

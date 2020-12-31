@@ -79,12 +79,12 @@ class XFormsVariableControl(
         val contextStack = getContextStack
         contextStack.setBinding(bindingContext)
 
-        variable.staticVariable.expressionStringOpt match {
-          case Some(expression) =>
+        variable.staticVariable.expressionOrConstant match {
+          case Left(expression) =>
             containingDocument.getRequestStats.withXPath(expression) {
               _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
             }
-          case None =>
+          case Right(_) =>
             _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
         }
       }

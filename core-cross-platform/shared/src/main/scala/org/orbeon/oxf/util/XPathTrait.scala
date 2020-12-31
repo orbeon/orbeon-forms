@@ -12,6 +12,8 @@ trait FunctionContext
 
 trait XPathTrait {
 
+  val Logger = LoggerFactory.createLogger("org.orbeon.xpath")
+
   // To report timing information
   type Reporter = (String, Long) => Unit
 

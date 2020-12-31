@@ -3,7 +3,6 @@ package org.orbeon.oxf.util
 import java.{util => ju}
 
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
-import org.orbeon.dom.saxon.NodeWrapper
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType, makeStringExpression}
 import org.orbeon.oxf.util.XPath.withFunctionContext
@@ -45,7 +44,8 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): om.Item = {
-    println(s"xxx XPathCache.evaluateSingleKeepItems for `$xpathString`")
+
+    XPath.Logger.debug(s"xxx XPathCache.evaluateSingleKeepItems for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -82,7 +82,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): SequenceExtent = {
-    println(s"xxx XPathCache.evaluateAsExtent for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateAsExtent for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -119,7 +119,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): ju.List[om.Item] = {
-    println(s"xxx XPathCache.evaluateKeepItemsJava for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateKeepItemsJava for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -137,7 +137,7 @@ object XPathCache extends XPathCacheTrait {
 
     val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
 
-    println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+    XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     if (Explain) {
       import _root_.java.io.PrintStream
@@ -146,18 +146,11 @@ object XPathCache extends XPathCacheTrait {
       xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
     }
 
-//    contextItem match {
-//      case n: NodeWrapper =>
-//        println(s"xxx NodeWrapper for ${n.node}")
-//      case _ =>
-//        println(s"xxx other contextItem")
-//    }
-
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r = scalaIteratorToJavaList(Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)))
 
-        println(s"xxxx ${r.size}")
+        XPath.Logger.debug(s"xxxx ${r.size}")
 
         r
       }
@@ -176,7 +169,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): List[om.Item] = {
-    println(s"xxx XPathCache.evaluateKeepItems 2 for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateKeepItems 2 for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -198,7 +191,7 @@ object XPathCache extends XPathCacheTrait {
       withFunctionContext(functionContext) {
         val r = Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)).toList
 
-        println(s"xxxx ${r.size}")
+        XPath.Logger.debug(s"xxxx ${r.size}")
 
         r
       }
@@ -217,7 +210,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): Option[String] = {
-    println(s"xxx XPathCache.evaluateAsStringOpt for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateAsStringOpt for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -242,13 +235,13 @@ object XPathCache extends XPathCacheTrait {
 
     val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
 
-    println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+    XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r =
           Option(singleItemToJavaKeepNodeInfoOrNull(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next())) map (_.toString)
-        println(s"xxx result = $r")
+        XPath.Logger.debug(s"xxx result = $r")
 
         r
       }
@@ -266,7 +259,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): ju.List[AnyRef] = {
-    println(s"xxx XPathCache.evaluate for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluate for `$xpathString`")
     ???
   }
 
@@ -282,7 +275,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ): ju.List[AnyRef] = {
-    println(s"xxx XPathCache.evaluate 2 for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluate 2 for `$xpathString`")
     ???
   }
 
@@ -341,7 +334,7 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData,
     reporter           : Reporter
   ) : String = {
-    println(s"xxx XPathCache.evaluateAsAvt for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateAsAvt for `$xpathString`")
 
     val (xpathExpression, variables) =
       getXPathExpression(
@@ -366,13 +359,13 @@ object XPathCache extends XPathCacheTrait {
 
     val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
 
-    println(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
+    XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r =
           evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next()
-        println(s"xxx result = $r")
+        XPath.Logger.debug(s"xxx result = $r")
 
         r.getStringValue // it *should* always be a `StringValue` in the first place
       }

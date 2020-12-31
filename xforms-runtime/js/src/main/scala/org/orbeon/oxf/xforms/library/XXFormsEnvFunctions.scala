@@ -1,8 +1,10 @@
 package org.orbeon.oxf.xforms.library
 
+import cats.syntax.option._
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.{currentLocale, relevantControl, resolveOrFindByStaticOrAbsoluteId}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
@@ -130,7 +132,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     xfc        : XFormsFunction.Context
   ): Option[om.NodeInfo] = {
     val r = instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
-    println(s"xxx result of `xxf:instance('$instanceId')` is ${r map (_.getDisplayName)}")
+//    println(s"xxx result of `xxf:instance('$instanceId')` is ${r map (_.getDisplayName)}")
     r
   }
 
@@ -169,7 +171,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def getVariable(modelEffectiveId: String, variableName: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] = {
     xfc.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-      case model: XFormsModel => model.getTopLevelVariables(variableName).asIterable().asScala
+      case model: XFormsModel =>
+        val v = model.getTopLevelVariables(variableName)
+        XPath.Logger.debug(s"zzz getVariable: $modelEffectiveId, $variableName, $v")
+        v.asIterable().asScala
       case _                  => Nil
     }
   }
@@ -191,13 +196,24 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   //    Fun("lang", classOf[XXFormsLang], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
 //
+
+  // TODO: last arg is`map(*)`
+  @XPathFunction
+  def r(resourceKey: String, instanceArgumentOpt: Option[String] = None, templateParams: om.Item = null): Option[String] = {
+
+    // XXX TODO: implement
+    s"""[TODO: implement `xxf:r('$resourceKey')`]""".some
+
+//
+//
 //    Fun("r", classOf[XXFormsResource], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE),
-//      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE) // `map(*)`
+//      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE)
 //    )
-//
-//    Fun("resource-elements", classOf[XXFormsResourceElem], op = 0, min = 1, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+  }
+
+  //    Fun("resource-elements", classOf[XXFormsResourceElem], op = 0, min = 1, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE)
 //    )
@@ -341,11 +357,15 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun(ValidationFunctionNames.UploadMediatypes, classOf[UploadMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
 //      Arg(STRING, ALLOWS_ZERO_OR_ONE)
 //    )
-//
-//    Fun("evaluate-avt", classOf[XXFormsEvaluateAVT], op = 0, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def evaluateAvt(avt: String): Option[String] = {
+//    val (avtExpression, newXPathContext) = prepareExpressionSaxonNoPool(xpathContext, argument(0), isAVT = true)
+//    avtExpression.iterate(newXPathContext)
+    s"""[TODO: evaluateAvt] $avt""".some
+  }
+
+  //
 //    Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(NODE_TYPE, EXACTLY_ONE)
 //    )

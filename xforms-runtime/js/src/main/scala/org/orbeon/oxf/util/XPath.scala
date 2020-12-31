@@ -1,11 +1,11 @@
 package org.orbeon.oxf.util
 
 import java.{util => ju}
-
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
+import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver, compileExpression}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.XPathCache.Explain
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.parser.{ExpressionTool, OptimizerOptions}
@@ -23,6 +23,8 @@ import scala.util.control.NonFatal
 
 
 object XPath extends XPathTrait {
+
+  private val Explain = false
 
   val GlobalConfiguration: StaticXPath.SaxonConfiguration = new Configuration {
 
@@ -43,6 +45,8 @@ object XPath extends XPathTrait {
   ): Any =
     withEvaluation(compiledExpression) { xpathExpression =>
 
+      Logger.debug(s"xxxx evaluateSingle for `${compiledExpression.string}`")
+
       val (contextItem, position) =
         if (contextPosition > 0 && contextPosition <= contextItems.size)
           (contextItems.get(contextPosition - 1), contextPosition)
@@ -57,6 +61,21 @@ object XPath extends XPathTrait {
         "variableResolver",
         variableResolver
       )
+
+      if (Explain) {
+      import _root_.java.io.PrintStream
+        import org.orbeon.saxon.lib.StandardLogger
+
+        xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
+      }
+
+//      if (compiledExpression.string.contains("""oxf.fr.detail.pdf.disable-if-invalid""")) {
+//        println(s"xxxx evaluateSingle for `$compiledExpression`")
+//
+//        val r = variableResolver(new om.StructuredQName("", "", "app"), xpathContext)
+//
+//        println(s"xxxx result is $r, ${r.getClass.getName}")
+//      }
 
       withFunctionContext(functionContext) {
         val iterator = xpathExpression.iterate(dynamicContext)

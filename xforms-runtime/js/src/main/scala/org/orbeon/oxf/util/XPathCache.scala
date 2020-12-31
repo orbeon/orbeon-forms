@@ -102,7 +102,9 @@ object XPathCache extends XPathCacheTrait {
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        new SequenceExtent(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+        val r = new SequenceExtent(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+        XPath.Logger.debug(s"xxx XPathCache.evaluateAsExtent for `$xpathString`, r = `${r.asIterable.asScala map (_.getStringValue) mkString ", "}`")
+        r
       }
     }
   }
@@ -149,9 +151,7 @@ object XPathCache extends XPathCacheTrait {
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r = scalaIteratorToJavaList(Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)))
-
-        XPath.Logger.debug(s"xxxx ${r.size}")
-
+        XPath.Logger.debug(s"xxxx size = ${r.size} ${r.asScala map (_.toString) mkString ", "}")
         r
       }
     }
@@ -365,7 +365,8 @@ object XPathCache extends XPathCacheTrait {
       withFunctionContext(functionContext) {
         val r =
           evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next()
-        XPath.Logger.debug(s"xxx result = $r")
+
+        XPath.Logger.debug(s"xxx result = ${r.getStringValue}")
 
         r.getStringValue // it *should* always be a `StringValue` in the first place
       }
@@ -378,7 +379,7 @@ object XPathCache extends XPathCacheTrait {
     xpathString  : String,
     reporter     : Reporter
   ): AnyRef = {
-    println(s"xxx XPathCache.evaluateSingleWithContext for `$xpathString`")
+    XPath.Logger.debug(s"xxx XPathCache.evaluateSingleWithContext for `$xpathString`")
     ???
   }
 

@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -136,6 +137,9 @@ object XFormsError {
     handleNonFatalXFormsError(target.container, "exception while running action", t)
 
   private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
+
+    // XXX TMP
+    XPath.Logger.warn(s"xxx ${message} / ${t.getMessage}")
 
     // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
     // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of

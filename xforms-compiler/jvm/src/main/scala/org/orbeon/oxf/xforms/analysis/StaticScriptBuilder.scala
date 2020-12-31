@@ -9,11 +9,11 @@ import scala.collection.mutable
 object StaticScriptBuilder {
 
   def apply(
-    prefixedId: String,
-    scriptType: ScriptType,
-    body: String,
-    params: List[(String, String)],
-    shareableByDigest: mutable.Map[String, ShareableScript]
+    prefixedId        : String,
+    scriptType        : ScriptType,
+    body              : String,
+    params            : List[(String, String)],
+    shareableByDigest : mutable.Map[String, ShareableScript]
   ): StaticScript = {
 
     val paramNames = params map (_._1)
@@ -39,10 +39,10 @@ object StaticScriptBuilder {
   private val TypeExtractor = "(?:(?:text|application)/)?([a-z]+)".r
 
   def scriptTypeFromMediatype(mediatype: String, default: Option[ScriptType]): Option[ScriptType] = mediatype match {
-    case null => default
+    case null                        => default
     case TypeExtractor("javascript") => Some(ScriptType.JavaScript)
-    case TypeExtractor("xpath") => Some(ScriptType.XPath)
-    case _ => None
+    case TypeExtractor("xpath")      => Some(ScriptType.XPath)
+    case _                           => None
   }
 
   def scriptTypeFromElem(elem: ElementAnalysis, default: Option[ScriptType]): Option[ScriptType] =

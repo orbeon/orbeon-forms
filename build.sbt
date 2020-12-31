@@ -14,7 +14,7 @@ val DefaultOrbeonEdition          = "CE"
 // Scala libraries for Scala.js only
 val SaxonVersion                  = "10.0.0.31-SNAPSHOT"
 val XercesVersion                 = "2.11.0.2-SNAPSHOT"
-val SaxVersion                    = "2.0.2.5-SNAPSHOT"
+val SaxVersion                    = "2.0.2.6-SNAPSHOT"
 val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.13"
@@ -373,7 +373,8 @@ lazy val commonScalaJsSettings = Seq(
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
   scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
-//  scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withBatchMode(true) },
+
+  scalaJSLinkerConfig ~= { _.withOptimizer(false) },//XXX TMP
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,
@@ -562,7 +563,7 @@ lazy val formRunnerJVM = formRunner.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fastOptJS).value.data, FormRunnerResourcesPathInWar)
   )
 
 lazy val formRunnerJS = formRunner.js
@@ -722,7 +723,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fullOptJS).value.data, FormBuilderResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fastOptJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
@@ -796,8 +797,8 @@ lazy val xformsJVM = xforms.jvm
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fastOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fastOptJS).value.data, XFormsResourcesPathInWar),
   )
 
 lazy val xformsJS = xforms.js
@@ -1316,7 +1317,7 @@ lazy val root = (project in file("."))
     core,
     xformsJVM,
     xformsWeb,
-    xformsOffline,
+//    xformsOffline,
     formRunnerJVM,
     formRunnerJS,
     formRunnerWeb,

@@ -348,7 +348,7 @@ object XPathCache extends XPathCacheTrait {
         XPath.GlobalConfiguration,
         contextItems,
         contextPosition,
-        makeStringExpression(xpathString),
+        xpathString,
         namespaceMapping,
         variableToValueMap,
         functionLibrary,

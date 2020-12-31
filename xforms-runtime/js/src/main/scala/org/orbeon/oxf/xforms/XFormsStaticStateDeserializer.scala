@@ -128,7 +128,7 @@ object XFormsStaticStateDeserializer {
         a.attributeCountBuffer         = attributeCountBuffer
         a.attributeCount               = attributeCount
         a.stringBuilder                = new ju.ArrayList[String](ju.Arrays.asList(stringBuilder: _*))
-        a.hasDocumentLocator           = hasDocumentLocator
+        a.hasDocumentLocator           = hasDocumentLocator && false // XXX TODO: don't use location as there is a bug AND we don't need it
 
         a
       }
@@ -172,7 +172,7 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeDocumentInfo: Decoder[StaticXPath.DocumentNodeInfoType] = (c: HCursor) => {
 
-      // XXX FIXME this is just so we have a doc and things don't crash, but we must parse!
+      // XXX TODO: this is just so we have a doc and things don't crash, but we must parse!
       val treeBuilder = om.TreeModel.TINY_TREE.makeBuilder(StaticXPath.GlobalConfiguration.makePipelineConfiguration)
 
       val handler = {
@@ -798,6 +798,8 @@ object XFormsStaticStateDeserializer {
 
         CoreCrossPlatformSupport.properties = PropertySet(properties)
 
+        val enLangRef = LangRef.Literal("en")
+
         // Set collected `Model` information on elements
         for {
           (modelRef, elems) <- collectedModelRefs
@@ -805,6 +807,7 @@ object XFormsStaticStateDeserializer {
           elem              <- elems
         } locally {
           elem.model = modelOpt
+          elem.lang  = enLangRef // XXX TODO: must deserialize
         }
 
         XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, AnnotatedTemplate(template).some) // TODO: serialize `globalMaxSizeProperty` from server
@@ -859,7 +862,7 @@ object XFormsStaticStateImpl {
       // export dynamicProperties._
       def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
-      def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis
+      def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis && false // XXX TODO: disable for now until we serialize/desirialize analysis
       def isCalculateDependencies             : Boolean          = staticProperties.isCalculateDependencies
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
       def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize

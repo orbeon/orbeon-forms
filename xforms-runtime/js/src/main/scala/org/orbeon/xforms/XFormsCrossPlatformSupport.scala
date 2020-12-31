@@ -66,8 +66,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = ???
 
+  // XXX TODO: implement
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit = {
-    ???
+    val s = s"""[TODO: streamHTMLFragment] $value"""
+    xmlReceiver.characters(s.toCharArray, 0, s.length)
   }
 
   def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {

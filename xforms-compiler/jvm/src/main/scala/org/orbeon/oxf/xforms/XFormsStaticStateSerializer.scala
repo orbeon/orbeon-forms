@@ -419,6 +419,5 @@ object XFormsStaticStateSerializer {
     )
 
     staticState.asJson.noSpaces
-//    staticState.asJson.spaces2
   }
 }

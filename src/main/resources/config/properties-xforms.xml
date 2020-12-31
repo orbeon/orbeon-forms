@@ -223,6 +223,7 @@
 
     <property as="xs:string"  name="oxf.xforms.resources.baseline">
         fr:number
+        fr:date
     </property>
 
     <property as="xs:string"  name="oxf.xforms.assets.baseline">

@@ -16,10 +16,13 @@ package org.orbeon.oxf.xforms.library
 import cats.syntax.option._
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
+import org.orbeon.oxf.xforms.function.XFormsFunction.relevantControl
 import org.orbeon.oxf.xforms.function._
-import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
@@ -28,6 +31,8 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.Namespaces
+
+import scala.jdk.CollectionConverters._
 
 
 /**
@@ -179,32 +184,27 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   // XForms 2.0
   @XPathFunction
-  def bind(bindId: String): Iterable[om.NodeInfo] = ???
-//
-//  Namespace(XFormsEnvFunctionsNS) {
-//    Fun("instance", classOf[Instance], op = 0, min = 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    Fun("current", classOf[Current], op = 0, min = 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
-//
-//    Fun("context", classOf[Context], op = 0, min = 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
-//
-//    Fun("event", classOf[Event], op = 0, min = 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+  def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = // should be `om.NodeInfo`?
+    xfc.container.searchContainedModelsInScope(xfc.sourceEffectiveId, bindId, Option(xpc.getContextItem)) match {
+      case Some(bind: RuntimeBind) => bind.items.asScala
+      case _                       => Nil
+    }
+
+  // XForms 2.0
+  @XPathFunction
+  def `case`(caseId: String)(implicit xpc: XPathContext): Option[String] =
+    for {
+      control      <- relevantControl(caseId)
+      switch       <- collectByErasedType[XFormsSwitchControl](control)
+      selectedCase <- switch.selectedCaseIfRelevantOpt
+    } yield
+      selectedCase.getId
+
 //    Fun("valid", classOf[XFormsValid], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
 //      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
 //      Arg(BOOLEAN, EXACTLY_ONE),
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
-//
-//    // XForms 2.0
-//    Fun("bind", classOf[Bind], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//  }
 }
 
 object XFormsEnvFunctions {

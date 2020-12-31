@@ -25,11 +25,11 @@
     xmlns:d="DAV:">
 
     <xf:var name="parameters"           value="xxf:instance('fr-parameters-instance')"/>
-    <xf:var name="app"                  value="$parameters/app/string()"/>
-    <xf:var name="form"                 value="$parameters/form/string()"/>
+    <xf:var name="app"                  value="fr:app-name()"/>
+    <xf:var name="form"                 value="fr:form-name()"/>
     <xf:var name="document-element"     value="$parameters/document"/>
     <xf:var name="document"             value="$document-element/string()"/>
-    <xf:var name="mode"                 value="$parameters/mode/string()"/>
+    <xf:var name="mode"                 value="fr:mode()"/>
     <xf:var name="is-fb"                value="fr:is-design-time()"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>

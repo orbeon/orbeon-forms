@@ -741,14 +741,22 @@ object XFormsStaticStateDeserializer {
         newControl
       }
 
+    implicit val decodeScriptType     : Decoder[ScriptType] = deriveDecoder
+    implicit val decodeShareableScript: Decoder[ShareableScript] = deriveDecoder
+    implicit val decodeStaticScript   : Decoder[StaticScript]    = deriveDecoder
+
     implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysis] = (c: HCursor) =>
       for {
-        startScope       <- c.get[Int]("startScopeRef").map(collectedScopes)
-        topLevelControls <- c.get[Iterable[ElementAnalysis]]("topLevelControls") // TODO
+        startScope          <- c.get[Int]("startScopeRef").map(collectedScopes)
+        topLevelControls    <- c.get[Iterable[ElementAnalysis]]("topLevelControls")
+        scriptsByPrefixedId <- c.get[Map[String, StaticScript]]("scriptsByPrefixedId")
+        uniqueJsScripts     <- c.get[List[ShareableScript]]("uniqueJsScripts")
       } yield
         TopLevelPartAnalysisImpl(
           startScope,
           topLevelControls,
+          scriptsByPrefixedId,
+          uniqueJsScripts,
           Index.controlAnalysisMap,
           Index.controlTypes,
           Index.lhhas,
@@ -872,17 +880,19 @@ object XFormsStaticStateImpl {
 object TopLevelPartAnalysisImpl {
 
   def apply(
-    _startScope         : Scope,
-    _topLevelControls   : Iterable[ElementAnalysis],
-    _controlAnalysisMap : mutable.LinkedHashMap[String, ElementAnalysis],
-    _controlTypes       : mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]],
-    lhhas               : mutable.Buffer[LHHAAnalysis],
-    eventHandlers       : mutable.Buffer[EventHandler],
-    models              : mutable.Buffer[Model],
-    attributes          : mutable.Buffer[AttributeControl],
-    namespaces          : Map[String, NamespaceMapping],
-    _functionLibrary    : FunctionLibrary)(implicit
-    logger              : IndentedLogger
+    _startScope          : Scope,
+    _topLevelControls    : Iterable[ElementAnalysis],
+    _scriptsByPrefixedId :Map[String, StaticScript],
+    _uniqueJsScripts     :List[ShareableScript],
+    _controlAnalysisMap  : mutable.LinkedHashMap[String, ElementAnalysis],
+    _controlTypes        : mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]],
+    lhhas                : mutable.Buffer[LHHAAnalysis],
+    eventHandlers        : mutable.Buffer[EventHandler],
+    models               : mutable.Buffer[Model],
+    attributes           : mutable.Buffer[AttributeControl],
+    namespaces           : Map[String, NamespaceMapping],
+    _functionLibrary     : FunctionLibrary)(implicit
+    logger               : IndentedLogger
   ): TopLevelPartAnalysis = {
 
     val partAnalysis =
@@ -940,8 +950,8 @@ object TopLevelPartAnalysisImpl {
             (_.scope)                     getOrElse
             (throw new IllegalStateException(s"missing scope information for $prefixedId"))
 
-        def scriptsByPrefixedId: Map[String, StaticScript] = Map.empty // XXX TODO
-        def uniqueJsScripts: List[ShareableScript] = Nil // XXX TODO
+        def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
+        def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
         def baselineResources: (List[String], List[String]) = (Nil, Nil) // XXX TODO
       }
 

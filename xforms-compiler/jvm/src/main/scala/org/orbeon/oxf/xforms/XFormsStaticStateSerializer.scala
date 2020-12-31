@@ -390,9 +390,14 @@ object XFormsStaticStateSerializer {
 
     def withChildrenEncoder(a: WithChildrenTrait): Json = a.children.asJson
 
+    implicit val encodeShareableScript: Encoder[ShareableScript] = deriveEncoder
+    implicit val encodeStaticScript   : Encoder[StaticScript]    = deriveEncoder
+
     implicit val encodeTopLevelPartAnalysis: Encoder[TopLevelPartAnalysis] = (a: TopLevelPartAnalysis) => Json.obj(
-      "startScopeRef"    -> Json.fromInt(collectedScopesWithPositions(a.startScope)),
-      "topLevelControls" -> a.getTopLevelControls.asJson
+      "startScopeRef"       -> Json.fromInt(collectedScopesWithPositions(a.startScope)),
+      "topLevelControls"    -> a.getTopLevelControls.asJson,
+      "scriptsByPrefixedId" -> a.scriptsByPrefixedId.asJson,
+      "uniqueJsScripts"     -> a.uniqueJsScripts.asJson
     )
 
     implicit val encodePropertySet: Encoder[PropertyParams] = (a: PropertyParams) =>

@@ -15,9 +15,6 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.xml.XMLConstants.XS_NMTOKENS_QNAME
-
-import scala.jdk.CollectionConverters._
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
@@ -34,32 +31,9 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   def getApplicationResourceVersion: Option[String] = None // TODO: CHECK
 
-  def properties: PropertySet =
-    PropertySet(
-      List(
-        (
-          null,
-          "oxf.xforms.logging.debug",
-          XS_NMTOKENS_QNAME,
-          Set(
-            "document",
-            "model",
-            "submission",
-            "submission-details",
-            "control",
-            "control-tree",
-            "event",
-            "action",
-            "analysis",
-            "server",
-            "server-body",
-            "html",
-            "analysis",
-            "resources"
-          ).asJava
-        )
-      )
-    )
+  // Global and updated during deserialization
+  // Q: Multiple forms will update this. Are we ok with this?
+  var properties: PropertySet = PropertySet.empty
 
   private val externalContextDyn  = new DynamicVariable[ExternalContext]
 

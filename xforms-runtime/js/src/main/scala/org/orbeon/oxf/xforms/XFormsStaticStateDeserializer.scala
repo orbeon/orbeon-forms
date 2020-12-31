@@ -8,8 +8,10 @@ import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Modifier, StaticXPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -753,6 +755,15 @@ object XFormsStaticStateDeserializer {
           functionLibrary
         )
 
+    implicit val decodeProperty: Decoder[PropertyParams] = (c: HCursor) =>
+      for {
+        name        <- c.get[String]("name")
+        typeQName   <- c.get[QName]("type")
+        stringValue <- c.get[String]("value")
+        namespaces  <- c.get[Int]("namespaces")
+      } yield
+        PropertyParams(collectedNamespaces(namespaces), name, typeQName, stringValue)
+
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
       for {
         namespaces           <- c.get[IndexedSeq[Map[String, String]]]("namespaces")
@@ -760,6 +771,7 @@ object XFormsStaticStateDeserializer {
           collectedNamespaces = namespaces
         }
         nonDefaultProperties <- c.get[Map[String, (String, Boolean)]]("nonDefaultProperties")
+        properties           <- c.get[Iterable[PropertyParams]]("properties")
         commonBindings       <- c.get[IndexedSeq[CommonBinding]]("commonBindings")
         _ = {
           collectedCommonBindings = commonBindings
@@ -771,6 +783,8 @@ object XFormsStaticStateDeserializer {
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")
       } yield {
+
+        CoreCrossPlatformSupport.properties = PropertySet(properties)
 
         // Set collected `Model` information on elements
         for {

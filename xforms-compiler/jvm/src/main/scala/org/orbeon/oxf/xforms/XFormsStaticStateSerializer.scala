@@ -6,7 +6,8 @@ import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import org.orbeon.dom
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis._
@@ -98,6 +99,11 @@ object XFormsStaticStateSerializer {
           distinct += e.commonBinding.bindingElemNamespaceMapping.mapping
         case e =>
           distinct += e.namespaceMapping.mapping
+      }
+
+      // Namespaces associated with properties
+      CoreCrossPlatformSupport.properties.propertyParams foreach {
+        distinct += _.namespaces
       }
 
       (distinct, distinct.zipWithIndex.toMap)
@@ -385,9 +391,18 @@ object XFormsStaticStateSerializer {
       "topLevelControls" -> a.getTopLevelControls.asJson
     )
 
+    implicit val encodePropertySet: Encoder[PropertyParams] = (a: PropertyParams) =>
+      Json.obj(
+        "name"       -> Json.fromString(a.name),
+        "type"       -> a.typeQName.asJson,
+        "value"      -> Json.fromString(a.stringValue),
+        "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces))
+      )
+
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
+      "properties"           -> CoreCrossPlatformSupport.properties.propertyParams.asJson,
       "commonBindings"       -> collectedCommonBindingsInOrder.asJson,
       "scopes"               -> collectedScopesInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,

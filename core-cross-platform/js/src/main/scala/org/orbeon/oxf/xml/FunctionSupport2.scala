@@ -114,11 +114,11 @@ object FunctionSupport2 {
   //
   // But this caused a "diverging implicit expansion" error. Instead, the following works.
   //
-  implicit final def IterableEncode[T[_], U : Encode](implicit ev: T[U] => Iterable[U]): Encode[T[U]] = (v: T[U]) =>
+  implicit def IterableEncode[T[_], U : Encode](implicit ev: T[U] => Iterable[U]): Encode[T[U]] = (v: T[U]) =>
     // Dealing directly with iterators would probably be more efficient
     new Chain(v.toList map implicitly[Encode[U]].apply map (_.materialize) asJava)
 
-  implicit final def IteratorEncode[T[_], U : Encode](implicit ev: T[U] => Iterator[U]): Encode[T[U]] = (v: T[U]) =>
+  implicit def IteratorEncode[T[_], U : Encode](implicit ev: T[U] => Iterator[U]): Encode[T[U]] = (v: T[U]) =>
     SequenceTool.toLazySequence(
       Implicits.asSequenceIterator(
         ev(v) map implicitly[Encode[U]].apply flatMap (s => Implicits.asScalaIterator(s.iterate()))

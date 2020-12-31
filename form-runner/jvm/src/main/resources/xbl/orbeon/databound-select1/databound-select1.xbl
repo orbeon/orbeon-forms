@@ -139,9 +139,7 @@
                 <xxf:value value="$itemset" xxbl:scope="inner"/>
             </xf:var>
             <!-- When the component is initialized or when resources URL changes, update our internal itemset -->
-            <xf:var name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
-            <xf:var name="resource">
-                <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+            <xf:var name="resource" value="fr:component-param-value('resource')">
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
                     <xf:send if="xxf:non-blank($resource)" submission="get-itemset">

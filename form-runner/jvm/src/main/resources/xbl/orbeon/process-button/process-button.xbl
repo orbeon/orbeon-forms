@@ -24,10 +24,7 @@
         <xbl:template>
 
             <!-- Figure button label -->
-            <xf:var name="button-name-avt" xbl:attr="xbl:text=name" xxbl:scope="outer">save</xf:var>
-            <xf:var name="button-name">
-                <xxf:value xbl:attr="model context ref bind" value="xxf:evaluate-avt($button-name-avt)" xxbl:scope="outer"/>
-            </xf:var>
+            <xf:var name="button-name" value="fr:component-param-value('name')"/>
             <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
             <xf:var name="button-label" value="$fr-resources/buttons/*[name() = $button-name]"/>
 

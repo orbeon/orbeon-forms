@@ -486,8 +486,11 @@ class XFormsSelect1Handler(
     val containerAttributes =
       getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, !(appearanceTrait != null && appearanceTrait.isFull))
 
-    // To help with styling
-    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items")
+    // CSS classes:
+    // - `xforms-items` for styling
+    // - `xforms-help-popover-control` tells the help popover the element relative to which it should positioned,
+    //   needed for the case where we only have one
+    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items xforms-help-popover-control")
 
     // For accessibility, label the group, since the control label doesn't apply to a single input
     containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, if (isMultiple) "group" else "radiogroup")

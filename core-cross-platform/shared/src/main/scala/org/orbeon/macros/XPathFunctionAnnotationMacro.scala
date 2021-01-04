@@ -174,7 +174,7 @@ object XPathFunctionAnnotationMacro {
           case "string"  => q"""org.orbeon.saxon.model.BuiltInAtomicType.STRING"""
           case "boolean" => q"""org.orbeon.saxon.model.BuiltInAtomicType.BOOLEAN"""
           case "instant" => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE_TIME"""
-          case "item"    => q"""org.orbeon.saxon.pattern.AnyNodeTest"""
+          case "item"    => q"""org.orbeon.saxon.model.AnyItemType"""
         }
 
       // Register one entry per distinct arity

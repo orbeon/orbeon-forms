@@ -98,9 +98,9 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     SimpleProcess.runProcessByName(scope, name).isSuccess
   }
 
-//  @XPathFunction
-//  def runProcess(scope: String, process: String) =
-//    SimpleProcess.runProcess(scope, process).isSuccess
+  @XPathFunction
+  def runProcess(scope: String, process: String): Boolean =
+    SimpleProcess.runProcess(scope, process).isSuccess
 
   // TODO: How to deal with the rewrite
 //    Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,

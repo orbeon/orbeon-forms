@@ -119,8 +119,16 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 //
-//    Fun("component-context", classOf[XXFormsComponentContext], op = 0, min = 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-//
+
+  @XPathFunction
+  def componentContext()(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
+    for {
+      componentControl <- xfc.container.associatedControlOpt.toIterable
+      bindingContext   <- Option(componentControl.bindingContext.parent).toIterable
+      item             <- bindingContext.nodeset.asScala
+    } yield
+      item
+
 //    Fun("component-param-value", classOf[XXFormsComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
 //        Arg(STRING, EXACTLY_ONE)
 //    )
@@ -189,6 +197,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext): String = {
     // TODO: `MessageFormat` is not supported by Scala.js as of now (2020-12-29).
+    //
     s"[TODO] $template"
 //    new MessageFormat(template, currentLocale)
 //      .format(args map SequenceTool.convertToJava toArray)
@@ -223,22 +232,24 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def pendingUploads(): Int =
     XFormsFunction.context.containingDocument.countPendingUploads
 
-//
-//    Fun("document-id", classOf[XXFormsDocumentId], op = 0, min = 0, STRING, EXACTLY_ONE)
-//
-//    // TODO: This is the only place where we use `op`. Should remove it and remove the `op` from `Fun`.
-//    Fun("label", classOf[XXFormsLHHA], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//    Fun("help", classOf[XXFormsLHHA], op = 1, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//    Fun("hint", classOf[XXFormsLHHA], op = 2, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//    Fun("alert", classOf[XXFormsLHHA], op = 3, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
+  def documentId()(implicit xfc: XFormsFunction.Context): String =
+  xfc.containingDocument.uuid
+
+  @XPathFunction
+  def label(controlId: String)(implicit xpc: XPathContext): Option[String] =
+    relevantControl(controlId) map (_.getLabel)
+
+  @XPathFunction
+  def help(controlId: String)(implicit xpc: XPathContext): Option[String] =
+    relevantControl(controlId) map (_.getHelp)
+
+  @XPathFunction
+  def hint(controlId: String)(implicit xpc: XPathContext): Option[String] =
+    relevantControl(controlId) map (_.getHint)
+
+  @XPathFunction
+  def alert(controlId: String)(implicit xpc: XPathContext): Option[String] =
+    relevantControl(controlId) map (_.getAlert)
 
   @XPathFunction
   def visited(controlId: String)(implicit xpc: XPathContext): Option[Boolean] =

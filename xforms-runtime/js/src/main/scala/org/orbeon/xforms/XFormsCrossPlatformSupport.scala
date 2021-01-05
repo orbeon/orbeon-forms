@@ -18,18 +18,22 @@ import org.orbeon.apache.xerces.util.SymbolTable
 import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XMLParseException}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, StaticXPath, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.dom.XmlLocationData
-import org.xml.sax.{InputSource, SAXParseException}
+import org.orbeon.saxon.jaxp.SaxonTransformerFactory
+import org.xml.sax.InputSource
 
-import java.io.{InputStream, OutputStream, Writer}
+import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
 import java.net.URI
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{OutputKeys, Transformer}
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
@@ -85,7 +89,22 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     omitXmlDeclaration : Boolean,
     standaloneOpt      : Option[Boolean],
   ): Array[Byte] = {
-    ???
+
+    val identity = new SaxonTransformerFactory(GlobalConfiguration).newTransformer
+
+    applyOutputProperties(
+      identity,
+      method             = method,
+      encoding           = encoding,
+      indentAmountOpt    = indent option 4,
+      omitXmlDeclaration = omitXmlDeclaration,
+      versionOpt         = versionOpt,
+      standaloneOpt      = standaloneOpt
+    )
+
+    val os = new ByteArrayOutputStream
+    identity.transform(new DocumentSource(document), new StreamResult(os))
+    os.toByteArray
   }
 
   def proxyURI(

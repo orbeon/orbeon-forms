@@ -15,17 +15,19 @@ package org.orbeon.xforms
 
 import java.io.{InputStream, OutputStream, Writer}
 import java.net.URI
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.StaticXPath._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
+
+import javax.xml.transform.{OutputKeys, Transformer}
 
 
 //
@@ -147,5 +149,51 @@ trait XFormsCrossPlatformSupportTrait {
   def causesIterator(t : Throwable) : Iterator[Throwable]
 
   def tempFileSize(filePath: String): Long
-    def deleteFileIfPossible(urlString: String): Unit
+
+  def deleteFileIfPossible(urlString: String): Unit
+
+  def applyOutputProperties(
+    transformer        : Transformer,
+    method             : String,
+    encoding           : String,
+    indentAmountOpt    : Option[Int]     = None,
+    omitXmlDeclaration : Boolean         = false,
+    versionOpt         : Option[String]  = None,
+    publicDoctypeOpt   : Option[String]  = None,
+    systemDoctypeOpt   : Option[String]  = None,
+    standaloneOpt      : Option[Boolean] = None
+  ): Unit = {
+
+    if (method.nonAllBlank)
+      transformer.setOutputProperty(OutputKeys.METHOD, method)
+
+    if (encoding.nonAllBlank)
+      transformer.setOutputProperty(OutputKeys.ENCODING, encoding)
+
+    transformer.setOutputProperty(OutputKeys.INDENT, if (indentAmountOpt.isDefined) "yes" else "no")
+
+    indentAmountOpt foreach { indentAmount =>
+      transformer.setOutputProperty(IndentAmountProperty, indentAmount.toString)
+    }
+
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, if (omitXmlDeclaration) "yes" else "no")
+
+    versionOpt flatMap (_.trimAllToOpt) foreach { version =>
+      transformer.setOutputProperty(OutputKeys.VERSION, version)
+    }
+
+    publicDoctypeOpt flatMap (_.trimAllToOpt) foreach { publicDoctype =>
+      transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, publicDoctype)
+    }
+
+    systemDoctypeOpt flatMap (_.trimAllToOpt) foreach { systemDoctype =>
+      transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, systemDoctype)
+    }
+
+    standaloneOpt foreach { standalone =>
+      transformer.setOutputProperty(OutputKeys.STANDALONE, if (standalone) "yes" else "no")
+    }
+  }
+
+  private val IndentAmountProperty = "{http://orbeon.org/oxf/}indent-spaces"
 }

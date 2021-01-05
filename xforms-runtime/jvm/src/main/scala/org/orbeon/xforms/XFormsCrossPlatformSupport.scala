@@ -38,6 +38,7 @@ import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
@@ -170,25 +171,19 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
     val identity = TransformerUtils.getIdentityTransformerHandler
 
-    TransformerUtils.applyOutputProperties(
+    applyOutputProperties(
       identity.getTransformer,
-      Properties.instance.getPropertySet(
-        QName(
-          "html-converter",
-          XPLConstants.OXF_PROCESSORS_NAMESPACE
-        )
-      ).getQName(
-        TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
-        XMLConverter.DEFAULT_METHOD
-      ).clarkName,
-      null,
-      null,
-      null,
-      CharsetNames.Utf8,
-      true,
-      null,
-      false,
-      0
+      method             = Properties.instance.getPropertySet(
+                             QName(
+                               "html-converter",
+                               XPLConstants.OXF_PROCESSORS_NAMESPACE
+                             )
+                           ).getQName(
+                             TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
+                             XMLConverter.DEFAULT_METHOD
+                           ).clarkName,
+      encoding           = CharsetNames.Utf8,
+      omitXmlDeclaration = true
     )
 
     identity.setResult(new StreamResult(writer))
@@ -210,21 +205,19 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     omitXmlDeclaration : Boolean,
     standaloneOpt      : Option[Boolean],
   ): Array[Byte] = {
+
     val identity = TransformerUtils.getIdentityTransformer
-    TransformerUtils.applyOutputProperties(
-      identity,
-      method,
-      versionOpt.orNull,
-      null,
-      null,
-      encoding,
-      omitXmlDeclaration,
-      standaloneOpt map java.lang.Boolean.valueOf orNull,
-      indent,
-      4
-    )
 
     // TODO: use cdata-section-elements
+    applyOutputProperties(
+      identity,
+      method             = method,
+      encoding           = encoding,
+      indentAmountOpt    = indent option 4,
+      omitXmlDeclaration = omitXmlDeclaration,
+      versionOpt         = versionOpt,
+      standaloneOpt      = standaloneOpt
+    )
 
     val os = new ByteArrayOutputStream
     identity.transform(new DocumentSource(document), new StreamResult(os))
@@ -241,13 +234,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String =
     XFormsAssetServer.proxyURI(
-        uri              = uri,
-        filename         = filename,
-        contentType      = contentType,
-        lastModified     = lastModified,
-        customHeaders    = customHeaders,
-        headersToForward = Connection.headersToForwardFromProperty,
-        getHeader        = getHeader
+      uri              = uri,
+      filename         = filename,
+      contentType      = contentType,
+      lastModified     = lastModified,
+      customHeaders    = customHeaders,
+      headersToForward = Connection.headersToForwardFromProperty,
+      getHeader        = getHeader
     )
 
   def proxyBase64Binary(

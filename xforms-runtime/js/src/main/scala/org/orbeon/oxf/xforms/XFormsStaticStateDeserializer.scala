@@ -7,11 +7,12 @@ import io.circe.{Decoder, HCursor}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
-import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -745,6 +746,10 @@ object XFormsStaticStateDeserializer {
     implicit val decodeShareableScript: Decoder[ShareableScript] = deriveDecoder
     implicit val decodeStaticScript   : Decoder[StaticScript]    = deriveDecoder
 
+    case class Resource(key: String, value: String)
+
+    implicit val decodeResource       : Decoder[Resource]        = deriveDecoder
+
     implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysis] = (c: HCursor) =>
       for {
         startScope          <- c.get[Int]("startScopeRef").map(collectedScopes)
@@ -794,7 +799,27 @@ object XFormsStaticStateDeserializer {
         }
         topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
         template             <- c.get[SAXStore]("template")
+        resources            <- c.get[List[Resource]]("resources")
       } yield {
+
+        val resourcesMap = resources map (r => r.key -> r.value) toMap
+
+        // Store a connection resolver that resolves to resources included in the compiled form
+        Connection.resolver = (urlString: String) => {
+
+          resourcesMap.get(urlString) map { value =>
+
+            val DecodedDataURL(bytes, mediatype, charset) = DataURLDecoder.decode(value)
+
+            ConnectionResult(
+              url                = urlString,
+              statusCode         = StatusCode.Ok,
+              headers            = Map.empty,
+              content            = StreamedContent.fromBytes(bytes, (mediatype + (charset map ("; charset=" + _) getOrElse "")).some, None),
+              dontHandleResponse = false,
+            )
+          }
+        }
 
         CoreCrossPlatformSupport.properties = PropertySet(properties)
 

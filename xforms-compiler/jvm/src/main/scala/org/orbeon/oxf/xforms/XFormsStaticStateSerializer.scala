@@ -5,9 +5,11 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import org.orbeon.dom
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
+import org.orbeon.oxf.util.{Base64, Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
 import org.orbeon.oxf.xforms.analysis._
@@ -18,6 +20,7 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+import java.net.URI
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -33,6 +36,13 @@ import scala.jdk.CollectionConverters._
 // - XML: omit `"atts": []`
 //
 object XFormsStaticStateSerializer {
+
+  val Logger = LoggerFactory.createLogger(XFormsStaticStateSerializer.getClass)
+
+  val ResourcesToInclude = List(
+    "oxf:/apps/fr/i18n/languages.xml",         // TODO: this is global, should be part of the
+    "/fr/service/i18n/fr-resources/acme/order" // resources for the current form // TODO: app/name
+  )
 
   // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.
   implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => Json.obj(
@@ -408,6 +418,47 @@ object XFormsStaticStateSerializer {
         "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces))
       )
 
+    def encodeResources = {
+
+//      val appName  = ???
+//      val formName = ???
+
+      implicit val logger: IndentedLogger = new IndentedLogger(Logger)
+      implicit val ec: ExternalContext = NetUtils.getExternalContext
+
+      ResourcesToInclude map { resource =>
+
+        val resolvedAbsoluteUrl =
+          URLRewriterUtils.rewriteServiceURL(
+            ec.getRequest,
+            resource,
+            URLRewriter.REWRITE_MODE_ABSOLUTE
+          )
+
+        val cxr =
+          Connection.connectNow(
+            method          = GET,
+            url             = new URI(resolvedAbsoluteUrl),
+            credentials     = None,
+            content         = None,
+            headers         = Map.empty,
+            loadState       = true,
+            saveState       = true,
+            logBody         = false
+          )
+
+        val dataUrl =
+          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
+            "data:" + cxr.content.contentType.getOrElse("") + ";base64," + Base64.encode(NetUtils.inputStreamToByteArray(is), useLineBreaks = false)
+          }
+
+        Json.obj(
+          "key"    -> Json.fromString(resource),
+          "value" -> Json.fromString(dataUrl)
+        )
+      }
+    }
+
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
@@ -416,6 +467,7 @@ object XFormsStaticStateSerializer {
       "scopes"               -> collectedScopesInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
       "template"             -> template.asJson,
+      "resources"            -> Json.arr(encodeResources: _*)
     )
 
     staticState.asJson.noSpaces

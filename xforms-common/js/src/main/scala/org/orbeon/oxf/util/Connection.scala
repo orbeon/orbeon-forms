@@ -24,6 +24,8 @@ import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode, StreamedCo
 
 object Connection extends ConnectionTrait {
 
+  var resolver: String => Option[ConnectionResult] = _
+
   def connectNow(
     method          : HttpMethod,
     url             : URI,
@@ -35,28 +37,16 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): ConnectionResult = {
-    println(s"connectNow for $url")
-
-    url.toString match {
-      case urlString @ "oxf:/apps/fr/i18n/languages.xml" =>
-
-        val docString =
-          """<languages>
-            |    <language top="true" code="en" english-name="English" native-name="English"/>
-            |</languages>""".stripMargin
-
-        ConnectionResult(
-          url                = urlString,
-          statusCode         = StatusCode.Ok,
-          headers            = Map.empty,
-          content            = StreamedContent.fromBytes(docString.getBytes(CharsetNames.Utf8), "application/xml".some, None),
-          hasContent         = true,
-          dontHandleResponse = false,
-        )
-      case _ => ???
-    }
-  }
+  ): ConnectionResult =
+    connectLater(
+      method,
+      url,
+      credentials,
+      content,
+      headers,
+      loadState,
+      logBody
+    ).value
 
   def connectLater(
     method          : HttpMethod,
@@ -68,9 +58,49 @@ object Connection extends ConnectionTrait {
     logBody         : Boolean)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Eval[ConnectionResult] = {
+  ): Eval[ConnectionResult] = Eval.now { // Eval.later
+
     println(s"connectNow for $url")
-    ???
+
+    method match {
+      case HttpMethod.GET =>
+
+        url.toString match {
+          case urlString @ "oxf:/apps/fr/i18n/languages.xml" =>
+
+            val docString =
+              """<languages>
+                |    <language top="true" code="en" english-name="English" native-name="English"/>
+                |</languages>""".stripMargin
+
+            ConnectionResult(
+              url                = urlString,
+              statusCode         = StatusCode.Ok,
+              headers            = Map.empty,
+              content            = StreamedContent.fromBytes(docString.getBytes(CharsetNames.Utf8), "application/xml".some, None),
+              dontHandleResponse = false,
+            )
+
+          case urlString =>
+            resolver(urlString) getOrElse
+              ConnectionResult(
+                url                = urlString,
+                statusCode         = StatusCode.NotFound,
+                headers            = Map.empty,
+                content            = StreamedContent.Empty,
+                dontHandleResponse = false,
+              )
+        }
+
+      case _ =>
+        ConnectionResult(
+          url                = url.toString,
+          statusCode         = StatusCode.MethodNotAllowed,
+          headers            = Map.empty,
+          content            = StreamedContent.Empty,
+          dontHandleResponse = false
+        )
+    }
   }
 
   def isInternalPath(path: String): Boolean = false

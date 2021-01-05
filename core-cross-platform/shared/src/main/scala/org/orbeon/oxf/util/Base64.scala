@@ -275,16 +275,20 @@ object Base64 {
 
   /**
    * Decodes Base64 data into octets
-   *
-   * @param encoded String array containing Base64 data
-   * @return Array containing decoded data.
    */
-  def decode(encoded: String): Array[Byte] = {
+  def decode(base64Data: String): Array[Byte] =
+    if (base64Data eq null)
+      null
+    else
+      decode(base64Data.toCharArray)
 
-    if (encoded eq null)
+  /**
+   * Decodes Base64 data into octets
+   */
+  def decode(base64Data: Array[Char]): Array[Byte] = {
+
+    if (base64Data eq null)
       return null
-
-    val base64Data: Array[Char] = encoded.toCharArray
 
     val len = removeWhiteSpace(base64Data)
     if (len % FOURBYTE != 0)

@@ -1,22 +1,6 @@
-/**
- * Copyright (C) 2013 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-package org.orbeon.oxf.resources.handler
+package org.orbeon.oxf.util
 
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.codec.net.URLCodec
-import org.orbeon.oxf.util.ContentTypes
-
+// TODO: Mostly duplicated from `org.orbeon.oxf.resources.handler.DataURLDecoder`
 // Decode as per https://tools.ietf.org/html/rfc2397
 object DataURLDecoder {
 
@@ -29,7 +13,7 @@ object DataURLDecoder {
 
     val comma      = url.indexOf(',')
     val beforeData = url.substring("data:".length, comma)
-    val data       = url.substring(comma + 1).getBytes(DefaultCharset)
+    val data       = url.substring(comma + 1)
 
     val mediatype = ContentTypes.getContentTypeMediaType(beforeData) getOrElse DefaultMediatype
     val params    = parseContentTypeParameters(beforeData)
@@ -45,9 +29,9 @@ object DataURLDecoder {
     // See: https://github.com/orbeon/orbeon-forms/issues/1065
     val decodedData =
       if (isBase64)
-        Base64.decodeBase64(data)
+        Base64.decode(data)
       else
-        URLCodec.decodeUrl(data)
+        throw new IllegalArgumentException
 
     DecodedDataURL(decodedData, mediatype, charset)
   }

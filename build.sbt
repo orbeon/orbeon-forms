@@ -374,7 +374,7 @@ lazy val commonScalaJsSettings = Seq(
   scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
   scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
 
-  scalaJSLinkerConfig ~= { _.withOptimizer(false) },//XXX TMP
+//  scalaJSLinkerConfig ~= { _.withOptimizer(false) },//XXX TMP
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,

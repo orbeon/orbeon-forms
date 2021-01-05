@@ -1,7 +1,7 @@
 package org.orbeon.fr.offline
 
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.oxf.fr.library.{FormRunnerDateSupportFunctionLibrary, FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
+import org.orbeon.oxf.fr.library.{FormRunnerDateSupportFunctionLibrary, FormRunnerErrorSummaryFunctionLibrary, FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.xforms.App
@@ -51,7 +51,12 @@ object FormRunnerOffline extends App {
     OfflineDemo.renderCompiledForm(
       container,
       compiledForm,
-      List(FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary, FormRunnerDateSupportFunctionLibrary),
+      List(
+        FormRunnerFunctionLibrary,
+        FormRunnerInternalFunctionLibrary,
+        FormRunnerDateSupportFunctionLibrary,
+        FormRunnerErrorSummaryFunctionLibrary
+      ),
       Some(
         new XFormsURIResolver {
           def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =

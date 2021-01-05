@@ -18,6 +18,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -26,7 +27,8 @@ import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions._
@@ -116,8 +118,8 @@ object ErrorSummary {
 
   //@XPathFunction
   def removeUpdateOrInsertError(
-    errorsInstanceDoc : DocumentInfo,
-    stateInstanceDoc  : DocumentInfo
+    errorsInstanceDoc : DocumentNodeInfoType,
+    stateInstanceDoc  : DocumentNodeInfoType
   ): Unit = {
 
     // This can happen if the caller receives `xforms-disabled` when the dialog is closing, which causes
@@ -133,7 +135,7 @@ object ErrorSummary {
 
     val absoluteTargetId = XFormsId.effectiveIdToAbsoluteId(event.targetObject.getEffectiveId)
 
-    val currentErrorOpt = Option(errorsInstanceDoc.selectID(absoluteTargetId))
+    val currentErrorOpt = Option(SaxonUtils.selectID(errorsInstanceDoc, absoluteTargetId))
 
     def xxfProperty[T](name: String) =
       event.property[T](xxfName(name))
@@ -226,7 +228,7 @@ object ErrorSummary {
 
   //@XPathFunction
   def updateForMovedIteration(
-    errorsInstanceDoc : DocumentInfo,
+    errorsInstanceDoc : DocumentNodeInfoType,
     absoluteTargetId  : String,
     fromIterations    : Array[Int],
     toIterations      : Array[Int]
@@ -383,7 +385,7 @@ object ErrorSummary {
     // In order to make insertion efficient, the `<error>` elements are kept sorted, without
     // any other children nodes except namespace nodes at the beginning. We then use a binary
     // search to find the insertion point.
-    def insertNewError(errorsInstanceDoc: DocumentInfo, newErrorElem: NodeInfo): Unit = {
+    def insertNewError(errorsInstanceDoc: DocumentNodeInfoType, newErrorElem: NodeInfo): Unit = {
 
       val rootElem = errorsInstanceDoc.rootElement
 

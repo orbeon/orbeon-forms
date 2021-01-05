@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xbl.DateSupportJava
@@ -73,4 +74,33 @@ object FormRunnerDateSupportFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction(name = "deserializeExternalValueJava")
   def deserializeExternalValueJava(externalValue: String): String =
     DateSupportJava.deserializeExternalValueJava(externalValue)
+}
+
+object FormRunnerErrorSummaryFunctionLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.xbl.ErrorSummary" -> "ErrorSummary")
+
+  @XPathFunction(name = "updateForMovedIteration")
+  def updateForMovedIteration(
+    errorsInstanceDoc : DocumentNodeInfoType,
+    absoluteTargetId  : String,
+    fromIterations    : Iterable[Int],
+    toIterations      : Iterable[Int]
+  ): Unit =
+    org.orbeon.xbl.ErrorSummary.updateForMovedIteration(
+      errorsInstanceDoc,
+      absoluteTargetId,
+      fromIterations.toArray,
+      toIterations.toArray
+    )
+
+ @XPathFunction(name = "removeUpdateOrInsertError")
+  def removeUpdateOrInsertError(
+   errorsInstanceDoc : DocumentNodeInfoType,
+    stateInstanceDoc  : DocumentNodeInfoType
+  ): Unit =
+   org.orbeon.xbl.ErrorSummary.removeUpdateOrInsertError(
+     errorsInstanceDoc,
+     stateInstanceDoc
+   )
 }

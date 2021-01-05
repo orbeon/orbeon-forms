@@ -332,7 +332,7 @@ object XFormsStaticStateSerializer {
           )
         case c: GroupControl           => Nil
         case c: DialogControl          => Nil
-        case c: AttributeControl       => Nil
+        case c: AttributeControl       => Nil // ok, all extracted from attributes
         case c: ComponentControl       =>
           List(
             "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
@@ -366,7 +366,6 @@ object XFormsStaticStateSerializer {
             "observersPrefixedIds"   -> c.observersPrefixedIds.asJson,
             "targetPrefixedIds"      -> c.targetPrefixedIds.asJson
           )
-          // xbl:template
           // xf:range (skip!)
           // actions that are not `EventHandler`
         case c: TriggerControl         => Nil // ok

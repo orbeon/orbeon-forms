@@ -727,7 +727,7 @@ object XFormsStaticStateDeserializer {
 
         Index.indexNewControl(newControl)
 
-        // We can't set `Model`s immdiately, so we store the mapping and do it once the whole tree has been built
+        // We can't set `Model`s immediately, so we store the mapping and do it once the whole tree has been built
         modelOptRef foreach { modelRef =>
           collectedModelRefs += modelRef -> (newControl :: collectedModelRefs.getOrElse(modelRef, Nil))
         }

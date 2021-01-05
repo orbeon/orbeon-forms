@@ -232,6 +232,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def pendingUploads(): Int =
     XFormsFunction.context.containingDocument.countPendingUploads
 
+  @XPathFunction
   def documentId()(implicit xfc: XFormsFunction.Context): String =
   xfc.containingDocument.uuid
 

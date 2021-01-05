@@ -191,9 +191,10 @@ object XPathFunctionAnnotationMacro {
               () => new ${TypeName(classNameWithArity)},
               ${getSaxonType(returnTypeString)},
               $returnTypeCard,
-              0
+              org.orbeon.saxon.functions.registry.BuiltInFunctionSet.CITEM | org.orbeon.saxon.functions.registry.BuiltInFunctionSet.LATE
             )
            """
+         // TODO: flags must be configurable
 
         val registerWithArgs =
           flattenedArgumentsUpToArity.foldLeft(register) { case (result, (pos, isOption, isIterable, typeString, _, _)) =>

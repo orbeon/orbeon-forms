@@ -100,7 +100,7 @@ abstract class XFormsModelSubmissionBase
         xfcd              = containingDocument,
         ref               = currentNodeInfo,
         relevanceHandling = relevanceHandling,
-        namespaceContext  = staticSubmission.element.allInScopeNamespacesAsStrings,
+        namespaceContext  = staticSubmission.namespaceMapping.mapping,
         annotateWith      = annotateWith,
         relevantAttOpt    = relevantAttOpt
       )

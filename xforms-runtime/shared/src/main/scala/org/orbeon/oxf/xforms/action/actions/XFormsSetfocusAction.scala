@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
 
@@ -39,7 +40,7 @@ class XFormsSetfocusAction extends XFormsAction {
       resolveBooleanAVT("input-only", default = false)(context) option Set(XFORMS_INPUT_QNAME)
 
     def extractQNames(s: String) =
-      s.splitTo[Set]() flatMap (context.element.resolveStringQName(_, unprefixedIsNoNamespace = true))
+      s.splitTo[Set]() flatMap (Extensions.resolveQName(context.analysis.namespaceMapping.mapping, _, unprefixedIsNoNamespace = true))
 
     val includesQNamesOpt = resolveStringAVT("includes")(context) map extractQNames orElse fromInputOnlyAttribute getOrElse Set.empty
     val excludesQNamesOpt = resolveStringAVT("excludes")(context) map extractQNames getOrElse Set.empty

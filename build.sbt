@@ -1081,13 +1081,13 @@ lazy val formRunnerOffline = (project in file("form-runner-offline"))
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
       (ThisBuild / baseDirectory).value,
-      XFormsResourcesPathInWar
+      FormRunnerResourcesPathInWar
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fullOptJS).value.data,
       (ThisBuild / baseDirectory).value,
-      XFormsResourcesPathInWar
+      FormRunnerResourcesPathInWar
     )
   )
 

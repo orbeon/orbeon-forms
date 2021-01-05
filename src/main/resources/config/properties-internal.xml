@@ -164,7 +164,7 @@
         +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js
 
         <!-- Main offline JavaScript -->
-        +/ops/javascript/scalajs/orbeon-form-runner-offline.js
+        +/apps/fr/resources/scalajs/orbeon-form-runner-offline.js
     </property>
 
     <!-- ==== Internal Form Runner properties ===================================================================== -->

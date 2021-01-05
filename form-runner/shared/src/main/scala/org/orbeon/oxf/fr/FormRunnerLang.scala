@@ -31,7 +31,8 @@ import scala.jdk.CollectionConverters._
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {
 
-  import Private._
+  // TEMP: Picked a different name or `fullOptJS` fails!
+  import FormRunnerLangPrivate._
   import FormRunner._
 
   // The client passes "*" or blank to indicate that there is no current app/form name
@@ -129,7 +130,7 @@ trait FormRunnerLang {
   def hasXPathNumberer(lang: String): Boolean =
     SaxonUtils.hasXPathNumberer(lang)
 
-  private object Private {
+  private object FormRunnerLangPrivate {
 
     private val OldLocaleRe = "([a-z|A-Z]{2,3})(?:_.*)?".r
 

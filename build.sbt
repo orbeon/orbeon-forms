@@ -563,8 +563,8 @@ lazy val formRunnerJVM = formRunner.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fastOptJS).value.data, FormRunnerResourcesPathInWar),
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerOffline / Compile / fastOptJS).value.data, FormRunnerResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerOffline / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar)
   )
 
 lazy val formRunnerJS = formRunner.js
@@ -724,7 +724,7 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fastOptJS).value.data, FormBuilderResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fullOptJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
@@ -798,8 +798,8 @@ lazy val xformsJVM = xforms.jvm
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fastOptJS).value.data, XFormsResourcesPathInWar),
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fastOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
+    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
   )
 
 lazy val xformsJS = xforms.js

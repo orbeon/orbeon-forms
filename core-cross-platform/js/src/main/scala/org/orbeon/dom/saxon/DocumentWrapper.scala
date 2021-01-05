@@ -6,6 +6,8 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.utils.Configuration
 
 
+
+// TODO: Don't derive from `om.GenericTreeInfo` as it's causing more trouble than anything.
 class DocumentWrapper(
   val doc     : dom.Document,
   var baseURI : String,
@@ -21,13 +23,15 @@ class DocumentWrapper(
   this.setRootNode(docWrapper)
   treeInfo = docWrapper
 
+  private var docSystemId: String = null
+
   override def getConfiguration: Configuration = config
 
-  // These overrides are necessary as these are in two of the super traits and the ocmpiler complains otherwise
-  override def getSystemId              : String        = super.getSystemId
-  override def setSystemId(uri: String) : Unit          = super.setSystemId(uri)
-  override def getPublicId              : String        = super.getPublicId
-  override def isStreamed               : Boolean       = super.isStreamed
+  // These overrides are necessary as these are in two of the super traits and the compiler complains otherwise
+  override def getSystemId              : String        = docSystemId
+  override def setSystemId(uri: String) : Unit          = docSystemId = uri
+  override def getPublicId              : String        = null
+  override def isStreamed               : Boolean       = false
 
   // NOTE: Also used externally
   def wrap(node: Node): om.NodeInfo =

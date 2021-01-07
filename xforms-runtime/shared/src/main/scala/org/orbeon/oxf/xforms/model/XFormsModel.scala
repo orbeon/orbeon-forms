@@ -77,7 +77,7 @@ class XFormsModel(
           staticSubmission <- staticModel.submissions
         } yield
           (staticSubmission.staticId, new XFormsModelSubmission(selfModel.container, staticSubmission, selfModel))
-      ): _*
+        ): _*
     )
 
   private val _actions: Map[String, XFormsModelAction] =

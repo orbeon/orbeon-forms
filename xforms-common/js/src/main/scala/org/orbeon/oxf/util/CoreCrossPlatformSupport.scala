@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
 
@@ -34,6 +35,8 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   // Global and updated during deserialization
   // Q: Multiple forms will update this. Are we ok with this?
   var properties: PropertySet = PropertySet.empty
+
+  def getPropertySet(processorName: QName): PropertySet = PropertySet.empty
 
   private val externalContextDyn  = new DynamicVariable[ExternalContext]
 

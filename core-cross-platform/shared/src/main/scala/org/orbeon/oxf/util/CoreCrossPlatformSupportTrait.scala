@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
 
@@ -25,5 +26,6 @@ trait CoreCrossPlatformSupportTrait {
   def randomHexId: String
   def getApplicationResourceVersion: Option[String]
   def properties: PropertySet
+  def getPropertySet(processorName: QName): PropertySet
   def externalContext: ExternalContext
 }

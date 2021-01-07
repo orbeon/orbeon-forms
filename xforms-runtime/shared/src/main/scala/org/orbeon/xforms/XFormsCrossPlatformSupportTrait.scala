@@ -13,20 +13,30 @@
  */
 package org.orbeon.xforms
 
-import java.io.{InputStream, OutputStream, Writer}
-import java.net.URI
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
+import org.orbeon.dom.QName
+import org.orbeon.dom.io.DocumentSource
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
+import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{IndentedLogger, UploadProgress}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
+import org.xml.sax.ContentHandler
+import org.xml.sax.ext.LexicalHandler
 
+import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
+import java.net.URI
+import javax.xml.transform.sax.TransformerHandler
+import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, Transformer}
 
 
@@ -59,13 +69,43 @@ trait XFormsCrossPlatformSupportTrait {
 
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit
 
-  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver
+  val DEFAULT_METHOD_PROPERTY_NAME = "default-method"
+  val DEFAULT_METHOD               = QName("xml")
+
+  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
+
+    val identity = getIdentityTransformerHandler
+
+    applyOutputProperties(
+      identity.getTransformer,
+      method             = CoreCrossPlatformSupport.getPropertySet(
+                             QName(
+                               "html-converter",
+                               XPLConstants.OXF_PROCESSORS_NAMESPACE
+                             )
+                           ).getQName(
+                             DEFAULT_METHOD_PROPERTY_NAME,
+                             DEFAULT_METHOD
+                           ).clarkName,
+      encoding           = CharsetNames.Utf8,
+      omitXmlDeclaration = true
+    )
+
+    identity.setResult(new StreamResult(writer))
+
+    val htmlReceiver = new PlainHTMLOrXHTMLReceiver("", new ForwardingXMLReceiver(identity, identity))
+
+    if (skipRootElement)
+      new SkipRootElement(htmlReceiver)
+    else
+      htmlReceiver
+  }
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String
 
   def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document
 
-    def serializeToByteArray(
+  def serializeToByteArray(
     document           : dom.Document,
     method             : String,
     encoding           : String,
@@ -73,9 +113,26 @@ trait XFormsCrossPlatformSupportTrait {
     indent             : Boolean,
     omitXmlDeclaration : Boolean,
     standaloneOpt      : Option[Boolean],
-  ): Array[Byte]
+  ): Array[Byte] = {
 
-    def proxyURI(
+    val identity = getIdentityTransformer
+
+    applyOutputProperties(
+      identity,
+      method             = method,
+      encoding           = encoding,
+      indentAmountOpt    = indent option 4,
+      omitXmlDeclaration = omitXmlDeclaration,
+      versionOpt         = versionOpt,
+      standaloneOpt      = standaloneOpt
+    )
+
+    val os = new ByteArrayOutputStream
+    identity.transform(new DocumentSource(document), new StreamResult(os))
+    os.toByteArray
+  }
+
+  def proxyURI(
     uri              : String,
     filename         : Option[String],
     contentType      : Option[String],
@@ -85,7 +142,7 @@ trait XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String
 
-    def proxyBase64Binary(
+  def proxyBase64Binary(
     value            : String,
     filename         : Option[String],
     mediatype        : Option[String],
@@ -94,17 +151,17 @@ trait XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): String
 
-    def renameAndExpireWithSession(
+  def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
   ): URI
 
-    def inputStreamToRequestUri(
+  def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String]
 
-    def inputStreamToSessionUri(
+  def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String]
@@ -151,6 +208,9 @@ trait XFormsCrossPlatformSupportTrait {
   def tempFileSize(filePath: String): Long
 
   def deleteFileIfPossible(urlString: String): Unit
+
+  protected def getIdentityTransformer: Transformer
+  protected def getIdentityTransformerHandler: TransformerHandler
 
   def applyOutputProperties(
     transformer        : Transformer,

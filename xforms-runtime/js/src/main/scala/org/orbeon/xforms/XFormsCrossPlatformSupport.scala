@@ -20,6 +20,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.StringUtils.StringOps
@@ -28,10 +29,12 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
-import org.xml.sax.InputSource
+import org.xml.sax.ext.LexicalHandler
+import org.xml.sax.{ContentHandler, InputSource}
 
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
 import java.net.URI
+import javax.xml.transform.sax.TransformerHandler
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, Transformer}
 
@@ -74,37 +77,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit = {
     val s = s"""[TODO: streamHTMLFragment] $value"""
     xmlReceiver.characters(s.toCharArray, 0, s.length)
-  }
-
-  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
-    ???
-  }
-
-  def serializeToByteArray(
-    document           : dom.Document,
-    method             : String,
-    encoding           : String,
-    versionOpt         : Option[String],
-    indent             : Boolean,
-    omitXmlDeclaration : Boolean,
-    standaloneOpt      : Option[Boolean],
-  ): Array[Byte] = {
-
-    val identity = new SaxonTransformerFactory(GlobalConfiguration).newTransformer
-
-    applyOutputProperties(
-      identity,
-      method             = method,
-      encoding           = encoding,
-      indentAmountOpt    = indent option 4,
-      omitXmlDeclaration = omitXmlDeclaration,
-      versionOpt         = versionOpt,
-      standaloneOpt      = standaloneOpt
-    )
-
-    val os = new ByteArrayOutputStream
-    identity.transform(new DocumentSource(document), new StreamResult(os))
-    os.toByteArray
   }
 
   def proxyURI(
@@ -231,4 +203,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def tempFileSize(filePath: String): Long = ???
 
   def deleteFileIfPossible(urlString: String): Unit = ???
+
+  protected def getIdentityTransformer: Transformer =
+    new SaxonTransformerFactory(GlobalConfiguration).newTransformer
+
+  protected def getIdentityTransformerHandler: TransformerHandler =
+    new SaxonTransformerFactory(GlobalConfiguration).newTransformerHandler
 }

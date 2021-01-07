@@ -13,20 +13,12 @@
  */
 package org.orbeon.xforms
 
-import java.io._
-import java.net.{URI, URISyntaxException}
-import java.nio.charset.Charset
 import cats.syntax.option._
-
-import javax.xml.transform.Result
-import javax.xml.transform.dom.{DOMResult, DOMSource}
-import javax.xml.transform.stream.StreamResult
 import org.apache.http.entity.mime.MultipartEntity
 import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
@@ -34,11 +26,11 @@ import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
@@ -48,10 +40,18 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml._
-import org.xml.sax.InputSource
+import org.orbeon.oxf.xml.dom.IOSupport
+import org.xml.sax.{ContentHandler, InputSource}
+import org.xml.sax.ext.LexicalHandler
 
+import java.io._
+import java.net.{URI, URISyntaxException}
+import java.nio.charset.Charset
+import javax.xml.transform.dom.{DOMResult, DOMSource}
+import javax.xml.transform.sax.TransformerHandler
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{Result, Transformer}
 import scala.util.control.NonFatal
 
 
@@ -119,7 +119,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       val xmlReader = new org.ccil.cowan.tagsoup.Parser
       xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TagSoupHtmlSchema)
       xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
-      val identity = TransformerUtils.getIdentityTransformerHandler
+      val identity = getIdentityTransformerHandler
       identity.setResult(result)
       xmlReader.setContentHandler(identity)
       val inputSource = new InputSource
@@ -166,62 +166,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       if (htmlDocument != null)
         TransformerUtils.sourceToSAX(new DOMSource(htmlDocument), new HTMLBodyXMLReceiver(xmlReceiver, xhtmlPrefix))
     }
-  }
-
-  def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
-    val identity = TransformerUtils.getIdentityTransformerHandler
-
-    applyOutputProperties(
-      identity.getTransformer,
-      method             = Properties.instance.getPropertySet(
-                             QName(
-                               "html-converter",
-                               XPLConstants.OXF_PROCESSORS_NAMESPACE
-                             )
-                           ).getQName(
-                             TextConverterBase.DEFAULT_METHOD_PROPERTY_NAME,
-                             XMLConverter.DEFAULT_METHOD
-                           ).clarkName,
-      encoding           = CharsetNames.Utf8,
-      omitXmlDeclaration = true
-    )
-
-    identity.setResult(new StreamResult(writer))
-
-    val htmlReceiver = new PlainHTMLOrXHTMLReceiver("", identity)
-
-    if (skipRootElement)
-      new SkipRootElement(htmlReceiver)
-    else
-      htmlReceiver
-  }
-
-  def serializeToByteArray(
-    document           : dom.Document,
-    method             : String,
-    encoding           : String,
-    versionOpt         : Option[String],
-    indent             : Boolean,
-    omitXmlDeclaration : Boolean,
-    standaloneOpt      : Option[Boolean],
-  ): Array[Byte] = {
-
-    val identity = TransformerUtils.getIdentityTransformer
-
-    // TODO: use cdata-section-elements
-    applyOutputProperties(
-      identity,
-      method             = method,
-      encoding           = encoding,
-      indentAmountOpt    = indent option 4,
-      omitXmlDeclaration = omitXmlDeclaration,
-      versionOpt         = versionOpt,
-      standaloneOpt      = standaloneOpt
-    )
-
-    val os = new ByteArrayOutputStream
-    identity.transform(new DocumentSource(document), new StreamResult(os))
-    os.toByteArray
   }
 
   def proxyURI(
@@ -465,4 +409,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
         }
       }
     }
+
+  protected def getIdentityTransformer: Transformer =
+    TransformerUtils.getIdentityTransformer
+
+  protected def getIdentityTransformerHandler: TransformerHandler =
+    TransformerUtils.getIdentityTransformerHandler
 }

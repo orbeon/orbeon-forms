@@ -258,15 +258,15 @@ class XFormsInstance(
 //  def write(xmlReceiver: XMLReceiver): Unit =
 //    TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
 //
-//  // Log the instance
-//  def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
-//    implicit val logger = indentedLogger
-//    debug(message, Seq(
-//      "model effective id"    -> parent.getEffectiveId,
-//      "instance effective id" -> getEffectiveId,
-//      "instance"              -> XFormsCrossPlatformSupport.tinyTreeToString(rootElement)
-//    ))
-//  }
+  // Log the instance
+  def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
+    implicit val logger = indentedLogger
+    debug(message, Seq(
+      "model effective id"    -> parent.getEffectiveId,
+      "instance effective id" -> getEffectiveId,
+      "instance"              -> StaticXPath.tinyTreeToString(rootElement)
+    ))
+  }
 //
 //  // Print the instance with extra annotation attributes to Console.out. For debug only.
 //  def debugPrintOut(): Unit = {

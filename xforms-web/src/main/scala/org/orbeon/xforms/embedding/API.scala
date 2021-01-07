@@ -13,11 +13,10 @@
  */
 package org.orbeon.xforms.embedding
 
-import org.scalajs.dom.experimental.URL
+import org.scalajs.dom.experimental.{Headers, URL}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.typedarray.Uint8Array
 import scala.scalajs.js.|
 
 
@@ -25,10 +24,8 @@ import scala.scalajs.js.|
 object API {
 
   def configure(
-    configuration      : FormConfiguration,
     submissionProvider : SubmissionProvider
   ): FormProcessor = ???
-
 }
 
 trait FormProcessor {
@@ -37,7 +34,7 @@ trait FormProcessor {
     container    : html.Element,
     compiledForm : CompiledForm,
     location     : js.UndefOr[String | URL] = js.undefined, // or query string?
-    headers      : js.UndefOr[Headers]      = js.undefined, // pseudo-headers
+    headers      : js.UndefOr[Headers]      = js.undefined,
   ): RuntimeForm
 }
 
@@ -48,29 +45,4 @@ trait CompiledForm
 trait RuntimeForm {
   def uuid: String
   def close(): Unit
-}
-
-trait Headers extends js.Object
-
-// One question here is whether we can use the standard `Request` and `Response` interfaces of the
-// `Fetch` API. But these are not very easy to work with, and not all methods are supported by all
-// browsers.
-trait SubmissionRequest extends js.Object {
-  val url     : String | URL // `URL` not supported in IE but we don't care if we need it
-  val headers : Headers      // `Headers` object not supported in Safari for iOS for Fetch
-  val body    : Uint8Array   // or `ReadableStream`
-}
-
-trait SubmissionResponse extends js.Object {
-  val statusCode : Int
-  val headers    : Headers
-  val body       : Uint8Array
-}
-
-trait FormConfiguration
-
-// Trait to be implemented by the embedder to support offline submissions
-trait SubmissionProvider extends js.Object {
-  def submit     (req: SubmissionRequest): SubmissionResponse
-  def submitAsync(req: SubmissionRequest): js.Promise[SubmissionResponse]
 }

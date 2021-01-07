@@ -13,18 +13,29 @@
  */
 package org.orbeon.oxf.util
 
-import cats.syntax.option._
-
 import java.net.URI
 import cats.Eval
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, BufferedContent, HttpMethod, StatusCode, StreamedContent}
+import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest}
+import org.scalajs.dom.experimental.{Headers, URL => JSURL}
 
+import java.io.InputStream
+import scala.scalajs.js
+import scala.scalajs.js.Iterator
+import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.annotation.JSName
+import scala.scalajs.js.typedarray.{Int8Array, Uint8Array}
+
+import org.scalajs.dom.ext._
+import Logging._
 
 object Connection extends ConnectionTrait {
 
-  var resolver: String => Option[ConnectionResult] = _
+  var resourceResolver: String => Option[ConnectionResult] = _
+
+  var submissionProvider: Option[SubmissionProvider] = None
 
   def connectNow(
     method          : HttpMethod,
@@ -62,45 +73,118 @@ object Connection extends ConnectionTrait {
 
     println(s"connectNow for $url")
 
-    method match {
-      case HttpMethod.GET =>
+    val urlString = url.toString
 
-        url.toString match {
-          case urlString @ "oxf:/apps/fr/i18n/languages.xml" =>
+    def fromResourceResolver: Option[ConnectionResult] =
+      method match {
+        case HttpMethod.GET => resourceResolver(urlString)
+        case _              => None
+      }
 
-            val docString =
-              """<languages>
-                |    <language top="true" code="en" english-name="English" native-name="English"/>
-                |</languages>""".stripMargin
+    def fromSubmissionProvider: Option[ConnectionResult] = {
+      submissionProvider map { provider =>
 
-            ConnectionResult(
-              url                = urlString,
-              statusCode         = StatusCode.Ok,
-              headers            = Map.empty,
-              content            = StreamedContent.fromBytes(docString.getBytes(CharsetNames.Utf8), "application/xml".some, None),
-              dontHandleResponse = false,
-            )
+        val methodString = method.entryName
+        val jsUrl = new JSURL(urlString)
 
-          case urlString =>
-            resolver(urlString) getOrElse
-              ConnectionResult(
-                url                = urlString,
-                statusCode         = StatusCode.NotFound,
-                headers            = Map.empty,
-                content            = StreamedContent.Empty,
-                dontHandleResponse = false,
-              )
+        def inputStreamIterable(is: InputStream) =
+          new js.Iterable[Short] {
+            @JSName(js.Symbol.iterator)
+            def jsIterator(): js.Iterator[Short] = new js.Iterator[Short] {
+
+              var current = is.read()
+
+              val entry = new Iterator.Entry[Short] {
+                var done: Boolean = false
+                var value: Short = 0
+              }
+
+              def next(): Iterator.Entry[Short] = {
+                if (current == -1) {
+                  entry.done = true
+                  entry.value = 0
+                } else {
+                  entry.done = false
+                  entry.value = current.toShort
+                  current = is.read()
+                }
+                entry
+              }
+            }
+          }
+
+        val requestData =
+          content map (c => new Uint8Array(inputStreamIterable(c.inputStream))) orUndefined
+
+        // The `Headers` constructor expects key/value pairs, with only one value per header
+        // TODO: Check if we ever have more than one value per header
+        val requestHeaders =
+          new Headers(
+            headers collect { case (k, v @ head :: tail) =>
+              if (tail.nonEmpty)
+                warn(
+                  s"more than one header value for header",
+                  List(
+                    "name"   -> k,
+                    "values" -> v.mkString(", "),
+                    "url"    -> urlString
+                  )
+                )
+              js.Array(k, head)
+            } toJSArray
+          )
+
+        val response =
+          provider.submit(
+            new SubmissionRequest {
+              val method  = methodString
+              val url     = jsUrl
+              val headers = requestHeaders
+              val body    = requestData
+            }
+          )
+
+        val responseBody = (response.body.toOption) match {
+          case Some(v: Uint8Array)  => ???
+          case Some(v: js.Array[_]) => StreamedContent.fromBytes(v.asInstanceOf[js.Array[Byte]].toArray[Byte], ???)
+          case _                    => StreamedContent.Empty
         }
 
-      case _ =>
+        val responseHeaders =
+          response.headers.jsIterator().toIterator map { kv =>
+            kv(0) -> List(kv(1))
+          } toMap
+
         ConnectionResult(
-          url                = url.toString,
-          statusCode         = StatusCode.MethodNotAllowed,
-          headers            = Map.empty,
-          content            = StreamedContent.Empty,
-          dontHandleResponse = false
+          url                = urlString,
+          statusCode         = response.statusCode,
+          headers            = responseHeaders,
+          content            = responseBody,
+          dontHandleResponse = false,
         )
+      }
     }
+
+    def notFound =
+      ConnectionResult(
+        url                = urlString,
+        statusCode         = StatusCode.NotFound,
+        headers            = Map.empty,
+        content            = StreamedContent.Empty,
+        dontHandleResponse = false,
+      )
+
+//    def methodNotAllowed =
+//      ConnectionResult(
+//        url                = url.toString,
+//        statusCode         = StatusCode.MethodNotAllowed,
+//        headers            = Map.empty,
+//        content            = StreamedContent.Empty,
+//        dontHandleResponse = false
+//      )
+
+    fromResourceResolver orElse fromSubmissionProvider getOrElse notFound
+//    fromResourceResolver getOrElse notFound
   }
 
   def isInternalPath(path: String): Boolean = false

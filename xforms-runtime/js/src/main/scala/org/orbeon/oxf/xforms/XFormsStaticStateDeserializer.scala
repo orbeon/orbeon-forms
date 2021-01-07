@@ -806,7 +806,7 @@ object XFormsStaticStateDeserializer {
         val resourcesMap = resources map (r => r.key -> r.value) toMap
 
         // Store a connection resolver that resolves to resources included in the compiled form
-        Connection.resolver = (urlString: String) => {
+        Connection.resourceResolver = (urlString: String) => {
 
           resourcesMap.get(urlString) map { value =>
 

@@ -2,25 +2,80 @@ package org.orbeon.fr.offline
 
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.fr.library.{FormRunnerDateSupportFunctionLibrary, FormRunnerErrorSummaryFunctionLibrary, FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
-import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
+import org.orbeon.oxf.util
+import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
 import org.orbeon.xforms.App
 import org.orbeon.xforms.offline.demo.OfflineDemo
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
+import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
 import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
+import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 import org.scalajs.dom.{XMLHttpRequest, html}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.{JSON, UndefOr, |}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.typedarray.Uint8Array
 
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
+
+
+object DemoSubmissionProvider extends SubmissionProvider {
+
+  private var store = Map[String, (Option[String], Uint8Array)]()
+
+  def submit(req: SubmissionRequest): SubmissionResponse = {
+
+    HttpMethod.withNameInsensitive(req.method) match {
+      case HttpMethod.GET =>
+        // TODO: check pathname is persistence path
+        store.get(req.url.pathname) match {
+          case Some((responseContentTypeOpt, responseBody)) =>
+            new SubmissionResponse {
+              val statusCode = StatusCode.Ok
+              val headers    = new FetchHeaders(responseContentTypeOpt.toArray.toJSArray.map(x => js.Array(Headers.ContentType, x)))
+              val body       = responseBody
+            }
+          case None => ???
+        }
+      case HttpMethod.PUT =>
+        // TODO: check pathname is persistence path
+        val existing = store.contains(req.url.pathname)
+        store += req.url.pathname -> (req.headers.get(Headers.ContentType).toOption -> req.body.getOrElse(throw new IllegalArgumentException))
+
+        new SubmissionResponse {
+          val statusCode = if (existing) StatusCode.Ok else StatusCode.Created
+          val headers    = new FetchHeaders
+          val body       = new Uint8Array(0)
+        }
+      case _ => ???
+    }
+  }
+
+  def submitAsync(req: SubmissionRequest): js.Promise[SubmissionResponse] = ???
+}
+
+trait FormRunnerProcessor {
+
+  @JSExport
+  def renderForm(
+    container    : html.Element,
+    compiledForm : CompiledForm,
+    appName      : String,
+    formName     : String,
+    mode         : String
+  ): Unit
+}
 
 @JSExportTopLevel("FormRunnerOffline")
-object FormRunnerOffline extends App {
+object FormRunnerOffline extends App with FormRunnerProcessor {
 
   def onOrbeonApiLoaded(): Unit = {
     OfflineDemo.onOrbeonApiLoaded()
@@ -41,13 +96,21 @@ object FormRunnerOffline extends App {
     OfflineDemo.onPageContainsFormsMarkup()
 
   @JSExport
+  def configure(
+    submissionProvider : js.UndefOr[SubmissionProvider]
+  ): FormRunnerProcessor = {
+    util.Connection.submissionProvider = submissionProvider.toOption
+    this
+  }
+
+  @JSExport
   def renderForm(
     container    : html.Element,
     compiledForm : CompiledForm,
     appName      : String,
     formName     : String,
     mode         : String
-  ): Unit =
+  ): Unit = // TODO: js.Promise[Something]
     OfflineDemo.renderCompiledForm(
       container,
       compiledForm,

@@ -260,10 +260,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING,  EXACTLY_ONE),
 //      Arg(BOOLEAN, EXACTLY_ONE)
 //    )
-//
-//    Fun("absolute-id", classOf[XXFormsAbsoluteId], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
+
+  @XPathFunction
+  def absoluteId(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Option[String] =
+    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId
+
 //
 //    Fun("client-id", classOf[XXFormsClientId], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)

@@ -77,7 +77,7 @@ class PooledXPathExpression(
    *
    * NOTE: Used by XPathCache.
    */
-  def evaluateKeepNodeInfo(functionContext: FunctionContext): ju.List[AnyRef] =
+  def evaluateKeepNodeInfo(functionContext: FunctionContext): ju.List[Any] =
     withFunctionContext(functionContext) {
       scalaIteratorToJavaList(Implicits.asScalaIterator(evaluate()) map itemToJavaKeepNodeInfoOrNull)
     }

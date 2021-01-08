@@ -331,7 +331,7 @@ trait ProcessInterpreter extends Logging {
     )
 
   // TODO
-  def evaluate(expr: String, item: Item = xpathContext): Seq[AnyRef] =
+  def evaluate(expr: String, item: Item = xpathContext): Seq[Any] =
     eval(
       item            = item,
       expr            = expr,

@@ -51,33 +51,6 @@ object XPathCache extends XPathCacheTrait {
 
   // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
   // etc.), but NodeInfo wrappers are preserved.
-  // 7 external usages
-  def evaluate(
-    contextItem        : Item,
-    xpathString        : String,
-    namespaceMapping   : NamespaceMapping,
-    variableToValueMap : JMap[String, ValueRepresentation],
-    functionLibrary    : FunctionLibrary,
-    functionContext    : FunctionContext,
-    baseURI            : String,
-    locationData       : LocationData,
-    reporter           : Reporter
-  ): JList[AnyRef] =
-    evaluate(
-      Seq(contextItem).asJava,
-      1,
-      xpathString,
-      namespaceMapping,
-      variableToValueMap,
-      functionLibrary,
-      functionContext,
-      baseURI,
-      locationData,
-      reporter
-    )
-
-  // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
-  // etc.), but NodeInfo wrappers are preserved.
   // 2 external usages
   def evaluate(
     contextItems       : JList[Item],
@@ -90,7 +63,7 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): JList[AnyRef] = {
+  ): JList[Any] = {
 
     val xpathExpression =
       getXPathExpression(
@@ -110,10 +83,6 @@ object XPathCache extends XPathCacheTrait {
       xpathExpression.evaluateKeepNodeInfo(functionContext)
     }
   }
-
-  // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
-  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
-  def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
   // 2 external usages
@@ -256,7 +225,7 @@ object XPathCache extends XPathCacheTrait {
     contextItem  : Item,
     xpathString  : String,
     reporter     : Reporter
-  ): AnyRef =
+  ): Any =
     evaluateSingle(
       Seq(contextItem).asJava,
       1,
@@ -282,7 +251,7 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): AnyRef =
+  ): Any =
     evaluateSingle(
       Seq(contextItem).asJava,
       1,
@@ -309,7 +278,7 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): AnyRef = {
+  ): Any = {
 
     val xpathExpression =
       getXPathExpression(

@@ -61,7 +61,7 @@ object XPath {
       reporter        : Reporter                             = null,
       functionContext : FunctionContext                      = null)(
       implicit library: FunctionLibrary                      = null
-  ): Seq[AnyRef] =
+  ): Seq[Any] =
     evaluate(item,
       expr,
       namespaces,

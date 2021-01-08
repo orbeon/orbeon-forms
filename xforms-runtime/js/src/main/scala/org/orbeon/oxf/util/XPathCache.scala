@@ -28,10 +28,6 @@ object XPathCache extends XPathCacheTrait {
 
   import Private._
 
-  // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
-  // identical to a singleton sequence containing that item." It's easier for callers to switch on the item type.
-  def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
-
   def evaluateSingleKeepItems(
     contextItems       : ju.List[om.Item],
     contextPosition    : Int,
@@ -249,21 +245,6 @@ object XPathCache extends XPathCacheTrait {
   }
 
   def evaluate(
-    contextItem        : om.Item,
-    xpathString        : String,
-    namespaceMapping   : NamespaceMapping,
-    variableToValueMap : ju.Map[String, ValueRepresentationType],
-    functionLibrary    : FunctionLibrary,
-    functionContext    : FunctionContext,
-    baseURI            : String,
-    locationData       : LocationData,
-    reporter           : Reporter
-  ): ju.List[AnyRef] = {
-    XPath.Logger.debug(s"xxx XPathCache.evaluate for `$xpathString`")
-    ???
-  }
-
-  def evaluate(
     contextItems       : ju.List[om.Item],
     contextPosition    : Int,
     xpathString        : String,
@@ -274,9 +255,33 @@ object XPathCache extends XPathCacheTrait {
     baseURI            : String,
     locationData       : LocationData,
     reporter           : Reporter
-  ): ju.List[AnyRef] = {
+  ): ju.List[Any] = {
     XPath.Logger.debug(s"xxx XPathCache.evaluate 2 for `$xpathString`")
-    ???
+
+    val (xpathExpression, variables) =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        contextItems,
+        contextPosition,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+
+    withEvaluation(xpathString, locationData, reporter) {
+      withFunctionContext(functionContext) {
+        scalaIteratorToJavaList(
+          Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)) map
+            itemToJavaKeepNodeInfoOrNull
+        )
+      }
+    }
   }
 
   def evaluateAsAvt(
@@ -378,7 +383,7 @@ object XPathCache extends XPathCacheTrait {
     contextItem  : om.Item,
     xpathString  : String,
     reporter     : Reporter
-  ): AnyRef = {
+  ): Any = {
     XPath.Logger.debug(s"xxx XPathCache.evaluateSingleWithContext for `$xpathString`")
     ???
   }

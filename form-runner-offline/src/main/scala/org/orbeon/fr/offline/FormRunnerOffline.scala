@@ -1,16 +1,15 @@
 package org.orbeon.fr.offline
 
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.oxf.fr.library.{FormRunnerDateSupportFunctionLibrary, FormRunnerErrorSummaryFunctionLibrary, FormRunnerFunctionLibrary, FormRunnerInternalFunctionLibrary}
+import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.util
-import org.orbeon.oxf.util.{Connection, CoreCrossPlatformSupport}
-import org.orbeon.xforms.App
-import org.orbeon.xforms.offline.demo.OfflineDemo
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
+import org.orbeon.xforms.App
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
+import org.orbeon.xforms.offline.demo.OfflineDemo
 import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
 import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 import org.scalajs.dom.{XMLHttpRequest, html}
@@ -19,12 +18,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-import scala.scalajs.js.{JSON, UndefOr, |}
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.typedarray.Uint8Array
-
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
 
 
 object DemoSubmissionProvider extends SubmissionProvider {
@@ -70,7 +66,8 @@ trait FormRunnerProcessor {
     compiledForm : CompiledForm,
     appName      : String,
     formName     : String,
-    mode         : String
+    mode         : String,
+    documentId   : js.UndefOr[String]
   ): Unit
 }
 
@@ -109,7 +106,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     compiledForm : CompiledForm,
     appName      : String,
     formName     : String,
-    mode         : String
+    mode         : String,
+    documentId  : js.UndefOr[String]
   ): Unit = // TODO: js.Promise[Something]
     OfflineDemo.renderCompiledForm(
       container,
@@ -131,8 +129,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
                 root.addElement("app").addText(appName)
                 root.addElement("form").addText(formName)
                 root.addElement("form-version").addText("1") // TODO
-//                  root.addElement("document")
-                root.addElement("document").addText(CoreCrossPlatformSupport.randomHexId) // temp as mode is not read correctly!
+                val documentElem = root.addElement("document")
+                documentId foreach documentElem.addText
+//                root.addElement("document").addText(CoreCrossPlatformSupport.randomHexId) // temp as mode is not read correctly!
                 root.addElement("mode").addText(mode)
 
                 Document(root)
@@ -149,15 +148,20 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
   @JSExport
   def testLoadAndRenderForm(
-    container : html.Element,
-    appName   : String,
-    formName  : String,
-    mode      : String
-  ): Unit =
+    container  : html.Element,
+    appName    : String,
+    formName   : String,
+    mode       : String,
+    documentId : js.UndefOr[String]
+  ): Unit = {
+
+    configure(DemoSubmissionProvider)
+
 //    fetchCompiledForm(s"http://localhost:9090/orbeon/xforms-compiler/service/compile/date.xhtml") foreach { text =>
     fetchCompiledForm(s"http://localhost:9090/orbeon/fr/service/$appName/$formName/compile") foreach { compiledForm =>
-      renderForm(container, compiledForm, appName, formName, mode)
+      renderForm(container, compiledForm, appName, formName, mode, documentId)
     }
+  }
 
   private def fetchCompiledForm(url: String): Future[String] = {
     val p = Promise[String]()

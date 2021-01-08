@@ -9,7 +9,8 @@ import org.orbeon.xforms.{Namespaces, XFormsNames}
 object XFormsFunctionLibrary
   extends OrbeonFunctionLibrary
     with IndependentRequestFunctions
-    with XFormsEnvFunctions {
+    with XFormsEnvFunctions
+    with XFormsXXFormsEnvFunctions {
 
   lazy val namespaces = List(
     Namespaces.XF        -> XFormsNames.XFORMS_SHORT_PREFIX,

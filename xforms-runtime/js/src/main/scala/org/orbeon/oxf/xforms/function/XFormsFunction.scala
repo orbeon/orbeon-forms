@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{Expression, _}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
@@ -204,11 +205,10 @@ object XFormsFunction { // extends DefaultFunctionSupport
 //        Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
 //  }
 
-  protected def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName = {
+  def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName =
+    getQNameFromItem(qNameExpression.evaluateItem(xpathContext))
 
-    val evaluatedExpression =
-      qNameExpression.evaluateItem(xpathContext)
-
+  def getQNameFromItem(evaluatedExpression: om.Item)(implicit xpathContext: XPathContext): dom.QName =
     evaluatedExpression match {
       case qName: QNameValue =>
         // Directly got a QName so there is no need for namespace resolution
@@ -219,7 +219,6 @@ object XFormsFunction { // extends DefaultFunctionSupport
       case other =>
         throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
     }
-  }
 
   // See comments in Saxon Evaluate.java
   private var staticContext: IndependentContext = null

@@ -35,12 +35,26 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //    // TODO: Split this out into separate trait
 //    Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 //
+
+  @XPathFunction
+  def getSessionAttribute(attributeName: String): Iterable[om.Item] = {
+    // TODO: implement
+    println(s"xxx getSessionAttribute for $attributeName")
+    Iterable.empty
+  }
+
 //    // TODO: Split this out into separate trait
 //    Fun("get-session-attribute", classOf[GetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
+
+  @XPathFunction
+  def setSessionAttribute(attributeName: String, item: Iterable[om.Item]): Unit = {
+    // TODO: implement
+    println(s"xxx setSessionAttribute for $attributeName")
+  }
+
 //    // TODO: Split this out into separate trait
 //    Fun("set-session-attribute", classOf[SetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
 //      Arg(STRING, EXACTLY_ONE),

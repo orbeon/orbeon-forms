@@ -454,8 +454,8 @@ class ConcreteElement(var qname: QName)
   }
 
   def addText(text: String): Element = {
-    val node = Text(text)
-    addNewNode(node)
+    if (text.nonEmpty)
+      addNewNode(Text(text))
     this
   }
 

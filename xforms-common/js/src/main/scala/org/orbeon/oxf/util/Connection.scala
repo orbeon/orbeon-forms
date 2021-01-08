@@ -13,23 +13,21 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URI
 import cats.Eval
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.{BasicCredentials, BufferedContent, HttpMethod, StatusCode, StreamedContent}
+import org.orbeon.oxf.http._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest}
-import org.scalajs.dom.experimental.{Headers, URL => JSURL}
+import org.scalajs.dom.experimental.{Headers => JSHeaders, URL => JSURL}
 
 import java.io.InputStream
+import java.net.URI
 import scala.scalajs.js
 import scala.scalajs.js.Iterator
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSName
-import scala.scalajs.js.typedarray.{Int8Array, Uint8Array}
+import scala.scalajs.js.typedarray.Uint8Array
 
-import org.scalajs.dom.ext._
-import Logging._
 
 object Connection extends ConnectionTrait {
 
@@ -81,11 +79,25 @@ object Connection extends ConnectionTrait {
         case _              => None
       }
 
+    class IteratorEntry extends Iterator.Entry[Short] {
+
+      private var _done: Boolean = false
+      private var _value: Short = 0
+
+      def update(done: Boolean, value: Short): Unit = {
+        _done = done
+        _value = value
+      }
+
+      def done: Boolean = _done
+      def value: Short = _value
+    }
+
     def fromSubmissionProvider: Option[ConnectionResult] = {
       submissionProvider map { provider =>
 
         val methodString = method.entryName
-        val jsUrl = new JSURL(urlString)
+        val jsUrl = new JSURL(urlString, "http://invalid/") // URL needs to be absolute; using `invalid` as base, see RFC6761
 
         def inputStreamIterable(is: InputStream) =
           new js.Iterable[Short] {
@@ -94,18 +106,14 @@ object Connection extends ConnectionTrait {
 
               var current = is.read()
 
-              val entry = new Iterator.Entry[Short] {
-                var done: Boolean = false
-                var value: Short = 0
-              }
+              val entry = new IteratorEntry
 
               def next(): Iterator.Entry[Short] = {
+
                 if (current == -1) {
-                  entry.done = true
-                  entry.value = 0
+                  entry.update(true, 0)
                 } else {
-                  entry.done = false
-                  entry.value = current.toShort
+                  entry.update(false, current.toShort)
                   current = is.read()
                 }
                 entry
@@ -113,13 +121,13 @@ object Connection extends ConnectionTrait {
             }
           }
 
-        val requestData =
-          content map (c => new Uint8Array(inputStreamIterable(c.inputStream))) orUndefined
+        val requestDataOpt =
+          content map (c => new Uint8Array(inputStreamIterable(c.inputStream)))
 
         // The `Headers` constructor expects key/value pairs, with only one value per header
         // TODO: Check if we ever have more than one value per header
         val requestHeaders =
-          new Headers(
+          new JSHeaders(
             headers collect { case (k, v @ head :: tail) =>
               if (tail.nonEmpty)
                 warn(
@@ -140,20 +148,27 @@ object Connection extends ConnectionTrait {
               val method  = methodString
               val url     = jsUrl
               val headers = requestHeaders
-              val body    = requestData
+              val body    = requestDataOpt.orUndefined
             }
           )
-
-        val responseBody = (response.body.toOption) match {
-          case Some(v: Uint8Array)  => ???
-          case Some(v: js.Array[_]) => StreamedContent.fromBytes(v.asInstanceOf[js.Array[Byte]].toArray[Byte], ???)
-          case _                    => StreamedContent.Empty
-        }
 
         val responseHeaders =
           response.headers.jsIterator().toIterator map { kv =>
             kv(0) -> List(kv(1))
           } toMap
+
+        val responseContentTypeOpt =
+          responseHeaders.get(Headers.ContentType).flatMap(_.headOption)
+
+        def contentFromJsIterable(v: js.Iterable[_]) =
+          StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
+
+        // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
+        val responseBody = response.body.toOption match {
+          case Some(v: js.Array[_]) => contentFromJsIterable(v)
+          case Some(v: Uint8Array)  => contentFromJsIterable(v)
+          case _                    => warn("unrecognized response body type, considering empty body"); StreamedContent.Empty
+        }
 
         ConnectionResult(
           url                = urlString,

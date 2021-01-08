@@ -37,7 +37,7 @@ class XXFormsShowAction extends XFormsAction {
           targetDialog,
           neighborEffectiveId,
           constrainToViewport,
-          XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement)
+          XFormsAction.eventProperties(interpreter, actionContext.analysis)
         )
       case _ =>
         debug(

@@ -95,7 +95,10 @@ object ControlAnalysisFactory {
     XFORMS_COPY_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with RequiredSingleNode),
     // Variable nested value
     XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),
-    XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait)
+    XXFORMS_SEQUENCE_QNAME        -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),
+    // Event property
+    XFORMS_PROPERTY_QNAME         -> (new PropertyControl(_, _, _, _, _, _, _, _, _)),
+    XXFORMS_CONTEXT_QNAME         -> (new PropertyControl(_, _, _, _, _, _, _, _, _)) // legacy
   ) ++ VariableFactory
 
   private val ControlFactoryPf: PartialFunction[Element, ControlFactory] =

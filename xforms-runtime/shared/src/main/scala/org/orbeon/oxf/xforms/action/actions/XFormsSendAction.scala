@@ -46,7 +46,7 @@ class XFormsSendAction extends XFormsAction {
     interpreter.resolveObject(actionContext.analysis, resolvedSubmissionStaticId) match {
       case submission: XFormsModelSubmission =>
         // Dispatch event to submission object
-        val newEvent = new XFormsSubmitEvent(submission, XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement))
+        val newEvent = new XFormsSubmitEvent(submission, XFormsAction.eventProperties(interpreter, actionContext.analysis))
         Dispatch.dispatchEvent(newEvent)
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as

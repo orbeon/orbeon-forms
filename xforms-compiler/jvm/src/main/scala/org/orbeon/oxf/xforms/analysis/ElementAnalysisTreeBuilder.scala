@@ -18,6 +18,7 @@ import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, XPath, XPathCache}
+import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.controls.{SelectionControl, TriggerControl, ValueControl}
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.ValueOrSequenceQNames
@@ -332,6 +333,10 @@ object ElementAnalysisTreeBuilder {
         case _: ValueControl | _: TriggerControl =>
           allChildren collect {
             case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || isAction(e.getQName) => (e, s)
+          }
+        case e: ActionTrait if EventHandler.isPropertiesAction(e.element.getQName) =>
+          allChildren collect {
+            case (e, s) if PropertyQNames(e.getQName) => (e, s)
           }
         case _: ActionTrait =>
           allChildren collect {

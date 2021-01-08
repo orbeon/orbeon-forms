@@ -28,17 +28,16 @@ import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
-import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.{Breaks, NonFatal}
+
 
 // Execute a top-level XForms action and the included nested actions if any.
 class XFormsActionInterpreter(
@@ -53,21 +52,9 @@ class XFormsActionInterpreter(
 
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
 
-  def getNamespaceMappings(actionElement: Element): NamespaceMapping =
-    container.getPartAnalysis.getNamespaceMapping(getActionScope(actionElement), getActionStaticId(actionElement))
-
   // Return the source against which id resolutions are made for the given action element.
   def getSourceEffectiveId(actionAnalysis: ActionTrait): String =
     XFormsId.getRelatedEffectiveId(handlerEffectiveId, actionAnalysis.staticId)
-
-  def getActionPrefixedId(actionElement: Element): String =
-    container.getFullPrefix + getActionStaticId(actionElement)
-
-  private def getActionStaticId(actionElement: Element): String =
-    actionElement.idOrThrow
-
-  def getActionScope(actionElement: Element): Scope =
-    container.getPartAnalysis.scopeForPrefixedId(getActionPrefixedId(actionElement))
 
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
   def mustHonorDeferredUpdateFlags(actionAnalysis: ActionTrait): Boolean =

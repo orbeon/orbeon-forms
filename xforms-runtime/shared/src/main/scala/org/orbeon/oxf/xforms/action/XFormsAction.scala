@@ -18,12 +18,15 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
+import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
+import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
+import shapeless.syntax.typeable.typeableOps
 
 import scala.jdk.CollectionConverters._
 
@@ -104,17 +107,23 @@ object XFormsAction {
   // Obtain context attributes based on nested xf:property elements.
   def eventProperties(
     actionInterpreter : XFormsActionInterpreter,
-    actionAnalysis    : ActionTrait,
-    actionElement     : Element
-  ): Map[String, Option[AnyRef]] = {
+    actionAnalysis    : ActionTrait
+  ): Map[String, Option[Any]] = {
 
     val contextStack = actionInterpreter.actionXPathContext
+
+    val properties =
+      actionAnalysis.narrowTo[ActionTrait with WithChildrenTrait].toList flatMap
+        (_.children) collect {
+          case e if PropertyQNames(e.element.getQName) => e
+        }
 
     // Iterate over context information if any
     val tuples =
       for {
-        element <- actionElement.elements
-        if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // `xf:property` since XForms 2.0
+        property <- properties
+
+        element = property.element
 
         // Get and check attributes
         name =
@@ -126,11 +135,10 @@ object XFormsAction {
             // XPath expression
 
             // Set context on context element
-            val currentActionScope = actionInterpreter.getActionScope(element)
             contextStack.pushBinding(
               bindingElement    = element,
               sourceEffectiveId = actionInterpreter.getSourceEffectiveId(actionAnalysis),
-              scope             = currentActionScope,
+              scope             = property.scope,
               handleNonFatal    = false
             )
 
@@ -141,7 +149,7 @@ object XFormsAction {
                   contextItems       = actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
                   contextPosition    = actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
                   xpathString        = valueExpr,
-                  namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
+                  namespaceMapping   = property.namespaceMapping,
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
                   functionLibrary    = actionInterpreter.containingDocument.functionLibrary,
                   functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(actionAnalysis)),

@@ -41,7 +41,6 @@ abstract class CoreControl(
      with ViewTrait
      with StaticLHHASupport
 
-
 abstract class ValueControl(
   index            : Int,
   element          : Element,
@@ -272,3 +271,15 @@ class DialogControl(
   override val externalEvents =
     super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
 }
+
+class PropertyControl(
+  index            : Int,
+  element          : Element,
+  parent           : Option[ElementAnalysis],
+  preceding        : Option[ElementAnalysis],
+  staticId         : String,
+  prefixedId       : String,
+  namespaceMapping : NamespaceMapping,
+  scope            : Scope,
+  containerScope   : Scope
+) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)

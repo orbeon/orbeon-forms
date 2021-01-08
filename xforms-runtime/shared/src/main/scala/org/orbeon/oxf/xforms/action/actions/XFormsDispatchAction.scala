@@ -84,7 +84,7 @@ class XFormsDispatchAction extends XFormsAction {
           target          = xformsEventTarget,
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
-          properties      = XFormsAction.eventProperties(interpreter, actionContext.analysis, actionElement),
+          properties      = XFormsAction.eventProperties(interpreter, actionContext.analysis),
           delayOpt        = resolvedDelayOpt,
           showProgress    = showProgress,
           allowDuplicates = allowDuplicates

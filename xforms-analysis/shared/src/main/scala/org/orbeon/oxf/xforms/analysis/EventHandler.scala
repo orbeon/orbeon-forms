@@ -186,6 +186,8 @@ object EventHandler {
 
   import Private._
 
+  val PropertyQNames = Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)
+
   // Special observer id indicating that the observer is the preceding sibling control
   val ObserverIsPrecedingSibling = "#preceding-sibling"
 
@@ -202,52 +204,56 @@ object EventHandler {
       case None           => Set.empty[Modifier]
     }
 
-  def isDispatchAction (qName: QName): Boolean = qName == DispatchAction
-  def isAction         (qName: QName): Boolean = Actions(qName)
-  def isContainerAction(qName: QName): Boolean = ContainerActions(qName)
+  def isDispatchAction  (qName: QName): Boolean = qName == DispatchAction
+  def isAction          (qName: QName): Boolean = Actions(qName)
+  def isContainerAction (qName: QName): Boolean = ContainerActions(qName)
+  def isPropertiesAction(qName: QName): Boolean = PropertiesActions(qName)
 
   private object Private {
 
     val DispatchAction = xformsQName("dispatch")
 
+    // For nested `<xf:property>`
+    val PropertiesActions =
+      Set(
+        DispatchAction,
+        xformsQName("send"),
+        xxformsQName("show"),
+        xxformsQName("hide"),
+      )
+
     val ContainerActions =
       Set(
         xformsQName("action"),
-        XBL_HANDLER_QNAME
-      )
+        XBL_HANDLER_QNAME,    // `xbl:handler` as action container working like `xf:action`
+      ) ++
+        PropertiesActions
 
     val Actions =
-      Set(
-        // Standard XForms actions
-        xformsQName("action"),
-        DispatchAction,
-        xformsQName("rebuild"),
-        xformsQName("recalculate"),
-        xformsQName("revalidate"),
-        xformsQName("refresh"),
-        xformsQName("setfocus"),
-        xformsQName("load"),
-        xformsQName("setvalue"),
-        xformsQName("send"),
-        xformsQName("reset"),
-        xformsQName("message"),
-        xformsQName("toggle"),
-        xformsQName("insert"),
-        xformsQName("delete"),
-        xformsQName("setindex"),
+      ContainerActions ++
+        List(
+          // Standard XForms actions
+          xformsQName("rebuild"),
+          xformsQName("recalculate"),
+          xformsQName("revalidate"),
+          xformsQName("refresh"),
+          xformsQName("setfocus"),
+          xformsQName("load"),
+          xformsQName("setvalue"),
+          xformsQName("reset"),
+          xformsQName("message"),
+          xformsQName("toggle"),
+          xformsQName("insert"),
+          xformsQName("delete"),
+          xformsQName("setindex"),
 
-        // Extension actions
-        xxformsQName("script"),
-        xxformsQName("show"),
-        xxformsQName("hide"),
-        xxformsQName("invalidate-instance"),
-        xxformsQName("invalidate-instances"),
-        xxformsQName("join-submissions"),
-        xxformsQName("setvisited"),
-        xxformsQName("update-validity"),
-
-        // `xbl:handler` as action container working like `xf:action`
-        XBL_HANDLER_QNAME
-      )
+          // Extension actions
+          xxformsQName("script"),
+          xxformsQName("invalidate-instance"),
+          xxformsQName("invalidate-instances"),
+          xxformsQName("join-submissions"),
+          xxformsQName("setvisited"),
+          xxformsQName("update-validity")
+        )
   }
 }

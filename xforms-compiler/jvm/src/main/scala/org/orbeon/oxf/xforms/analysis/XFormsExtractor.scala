@@ -93,7 +93,7 @@ object XFormsExtractor {
   *
   * Structure:
   *
-  * <static-state xmlns:xxf="..." is-html="..." ...> 
+  * <static-state xmlns:xxf="..." is-html="..." ...>
   *   <root>
   *     <!-- E.g. AVT on xhtml:html -->
   *     <xxf:attribute .../>

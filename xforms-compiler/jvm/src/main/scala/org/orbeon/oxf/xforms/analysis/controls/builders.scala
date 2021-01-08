@@ -689,7 +689,7 @@ object EventHandlerBuilder {
           attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
 
       // For backward compatibility, still support `keypress` even with modifiers, but translate that to `keydown`,
-      // as modifiers require `keydown` in browsers.
+      // as modifiers require `keydown` in browsers.
       if (keyModifiers.nonEmpty)
         names map {
           case EventNames.KeyPress => EventNames.KeyDown

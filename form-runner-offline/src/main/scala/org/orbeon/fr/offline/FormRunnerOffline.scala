@@ -39,9 +39,15 @@ object DemoSubmissionProvider extends SubmissionProvider {
               val headers    = new FetchHeaders(responseContentTypeOpt.toArray.toJSArray.map(x => js.Array(Headers.ContentType, x)))
               val body       = responseBody
             }
-          case None => ???
+          case None =>
+            new SubmissionResponse {
+              val statusCode = StatusCode.NotFound
+              val headers    = new FetchHeaders
+              val body       = new Uint8Array(0)
+            }
         }
       case HttpMethod.PUT =>
+
         // TODO: check pathname is persistence path
         val existing = store.contains(req.url.pathname)
         store += req.url.pathname -> (req.headers.get(Headers.ContentType).toOption -> req.body.getOrElse(throw new IllegalArgumentException))
@@ -117,7 +123,10 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         FormRunnerInternalFunctionLibrary,
         FormRunnerDateSupportFunctionLibrary,
         FormRunnerErrorSummaryFunctionLibrary,
-        FormRunnerSecureUtilsFunctionLibrary
+        FormRunnerSecureUtilsFunctionLibrary,
+        FormRunnerPersistenceFunctionLibrary,
+        FormRunnerGridDataMigrationFunctionLibrary,
+        FormRunnerSimpleDataMigrationFunctionLibrary
       ),
       Some(
         new XFormsURIResolver {

@@ -2,6 +2,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
@@ -103,4 +104,14 @@ object FormRunnerErrorSummaryFunctionLibrary extends OrbeonFunctionLibrary {
      errorsInstanceDoc,
      stateInstanceDoc
    )
+}
+
+object FormRunnerSecureUtilsFunctionLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.oxf.util.SecureUtils" -> "secure")
+
+  @XPathFunction(name = "randomHexId")
+  def randomHexId: String =
+    CoreCrossPlatformSupport.randomHexId
+
 }

@@ -116,7 +116,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         FormRunnerFunctionLibrary,
         FormRunnerInternalFunctionLibrary,
         FormRunnerDateSupportFunctionLibrary,
-        FormRunnerErrorSummaryFunctionLibrary
+        FormRunnerErrorSummaryFunctionLibrary,
+        FormRunnerSecureUtilsFunctionLibrary
       ),
       Some(
         new XFormsURIResolver {

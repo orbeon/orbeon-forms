@@ -6,7 +6,6 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.utils.Configuration
 
 
-
 // TODO: Don't derive from `om.GenericTreeInfo` as it's causing more trouble than anything.
 class DocumentWrapper(
   val doc     : dom.Document,

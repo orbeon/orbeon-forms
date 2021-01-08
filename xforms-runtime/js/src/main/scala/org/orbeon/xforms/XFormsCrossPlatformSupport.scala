@@ -18,25 +18,19 @@ import org.orbeon.apache.xerces.util.SymbolTable
 import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XMLParseException}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.io.DocumentSource
+import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, StaticXPath, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
-import org.xml.sax.ext.LexicalHandler
-import org.xml.sax.{ContentHandler, InputSource}
 
-import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
+import java.io.{InputStream, OutputStream, Reader, StringReader}
 import java.net.URI
+import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
-import javax.xml.transform.stream.StreamResult
-import javax.xml.transform.{OutputKeys, Transformer}
 
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
@@ -147,48 +141,71 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
     val (receiver, result) = StaticXPath.newTinyTreeReceiver
 
-    val inputSource = new InputSource(inputStream)
-    inputSource.setSystemId(systemId)
-
-    locally {
-
-      val source = new XMLInputSource(publicId = null, systemId = systemId, baseSystemId = null, byteStream = inputStream, encoding = null)
-      val config = new NonValidatingConfiguration(new SymbolTable)
-      val parser = new SAXParser(config)
-
-      parser.setContentHandler(receiver)
-      if (handleLexical)
-        parser.setLexicalHandler(receiver)
-
-      config.setErrorHandler(new XMLErrorHandler {
-        def warning(domain: String, key: String, exception: XMLParseException): Unit =
-          println("Warning: " + exception.getMessage)
-        def error(domain: String, key: String, exception: XMLParseException): Unit =
-          println("Error: " + exception.getMessage)
-        def fatalError(domain: String, key: String, exception: XMLParseException): Unit =
-          println("Fatal: " + exception.getMessage)
-      })
-      parser.parse(source)
-    }
+    parseToReceiver(
+      Left(inputStream),
+      systemId,
+      handleXInclude,
+      handleLexical,
+      receiver
+    )
 
     result()
   }
 
   def stringToTinyTree(
     configuration  : SaxonConfiguration,
-    string         : String,
+    xmlString      : String,
     handleXInclude : Boolean,
     handleLexical  : Boolean
-  ): DocumentNodeInfoType = ???
+  ): DocumentNodeInfoType = {
 
-  def readDom4j(xmlString: String): dom.Document = ???
+    val (receiver, result) = StaticXPath.newTinyTreeReceiver
+
+    parseToReceiver(
+      Right(new StringReader(xmlString)),
+      systemId       = null,
+      handleXInclude = handleXInclude,
+      handleLexical  = handleLexical,
+      receiver       = receiver
+    )
+
+    result()
+  }
+
+  def readDom4j(xmlString: String): dom.Document = {
+
+    val (receiver, result) = newDomReceiver
+
+    parseToReceiver(
+      Right(new StringReader(xmlString)),
+      systemId       = null,
+      handleXInclude = false,
+      handleLexical  = true,
+      receiver       = receiver
+    )
+
+    result()
+  }
 
   def readDom4j(
     inputStream    : InputStream,
     systemId       : String,
     handleXInclude : Boolean,
     handleLexical  : Boolean
-  ): dom.Document = ???
+  ): dom.Document = {
+
+    val (receiver, result) = newDomReceiver
+
+    parseToReceiver(
+      Left(inputStream),
+      systemId,
+      handleXInclude,
+      handleLexical,
+      receiver
+    )
+
+    result()
+  }
 
   def hmacString(text: String, encoding: String): String = ???
   def digestBytes(bytes: Array[Byte], encoding: String): String = ???
@@ -209,4 +226,56 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   protected def getIdentityTransformerHandler: TransformerHandler =
     new SaxonTransformerFactory(GlobalConfiguration).newTransformerHandler
+
+  private def newDomReceiver: (XMLReceiver, () => dom.Document) = {
+    val receiver =
+      new SAXContentHandler(
+        systemIdOpt         = None,
+        mergeAdjacentText   = SAXReader.MergeAdjacentText,
+        stripWhitespaceText = SAXReader.StripWhitespaceText,
+        ignoreComments      = SAXReader.IgnoreComments
+      ) with XMLReceiver
+
+    (
+      receiver,
+      () => receiver.getDocument
+    )
+  }
+
+  private def parseToReceiver(
+    stream         : InputStream Either Reader,
+    systemId       : String,
+    handleXInclude : Boolean,
+    handleLexical  : Boolean,
+    receiver       : XMLReceiver
+  ): Unit = {
+
+    val source = {
+      stream match {
+        case Left(is) => new XMLInputSource(publicId = null, systemId = systemId, baseSystemId = null, byteStream = is, encoding = null)
+        case Right(r) => new XMLInputSource(publicId = null, systemId = systemId, baseSystemId = null, charStream = r,  encoding = null)
+      }
+    }
+
+    val config = new NonValidatingConfiguration(new SymbolTable)
+    val parser = new SAXParser(config)
+
+    parser.setContentHandler(receiver)
+    if (handleLexical)
+      parser.setLexicalHandler(receiver)
+
+    config.setErrorHandler(new XMLErrorHandler {
+      def warning(domain: String, key: String, exception: XMLParseException): Unit =
+        println("Warning: " + exception.getMessage)
+      def error(domain: String, key: String, exception: XMLParseException): Unit =
+        println("Error: " + exception.getMessage)
+      def fatalError(domain: String, key: String, exception: XMLParseException): Unit =
+        println("Fatal: " + exception.getMessage)
+    })
+    println(s"xxxx parsing $systemId")
+    val t1 = System.currentTimeMillis()
+    parser.parse(source)
+    val t2 = System.currentTimeMillis()
+    println(s"xxxx time = ${t2 - t1} ms")
+  }
 }

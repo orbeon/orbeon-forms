@@ -34,8 +34,12 @@ object ProcessParser  {
     def serialize = "TODO"
   }
 
-  def parse(process: String): GroupNode = {
-    // XXX hardcoded save
-    GroupNode(ActionNode("save", Map.empty), Nil)
-  }
+  // FIXME: actual parsing
+  def parse(process: String): GroupNode =
+    process match {
+      case "save-final" =>
+        GroupNode(ActionNode("save", Map.empty), Nil)
+      case _ =>
+        GroupNode(ActionNode("nop", Map.empty), Nil)
+    }
 }

@@ -14,15 +14,12 @@
 package org.orbeon.dom.saxon
 
 import org.orbeon.dom
-import org.orbeon.dom.{Document, Node}
+import org.orbeon.dom.Node
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.saxon.model.{SchemaType, Type}
-import org.orbeon.saxon.om
+import org.orbeon.saxon.model.{BuiltInAtomicType, SchemaType, Type, Untyped}
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.trans.{Err, XPathException}
-import org.orbeon.saxon.tree.iter.SingletonIterator
 import org.orbeon.saxon.value.UntypedAtomicValue
 import org.orbeon.xforms.XFormsNames
 
@@ -49,71 +46,57 @@ class TypedNodeWrapper private (node: dom.Node, docWrapper: DocumentWrapper, par
   override protected def makeWrapper(node: dom.Node, docWrapper: DocumentWrapper, parent: NodeWrapper): NodeWrapper =
     TypedNodeWrapper.makeTypedWrapper(node, docWrapper, parent)
 
-  // TODO
-  def getTypedValue: SequenceIterator = ???
-//    checkTypeAnnotation(s => SingletonIterator.makeIterator(new UntypedAtomicValue(s)), _.getTypedValue(this))
+  override def atomize(): AtomicSequence =
+    checkTypeAnnotation(new UntypedAtomicValue(_), _.atomize(this))
 
-  // TODO
-//  override def atomize: AtomicSequence =
-//    checkTypeAnnotation(new UntypedAtomicValue(_), _.atomize(this))
+  override def getSchemaType: SchemaType = {
+    val nodeType = InstanceData.getType(node.asInstanceOf[Node])
+    if (nodeType == null) {
+      getUntypedType
+    } else {
+      // Extract QName
+      var uri       = nodeType.namespace.uri
+      val localname = nodeType.localName
 
-  // TODO: check `getSchemaType`
-//  override def getTypeAnnotation: Int = {
-//    val nodeType = InstanceData.getType(node.asInstanceOf[Node])
-//    if (nodeType == null) {
-//      getUntypedType
-//    } else {
-//      // Extract QName
-//      var uri       = nodeType.namespace.uri
-//      val localname = nodeType.localName
-//
-//      // For type annotation purposes, `xf:integer` is translated into `xs:integer`. This is because XPath has no
-//      // knowledge of the XForms union types.
-//      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && ModelDefs.XFormsVariationTypeNames(localname))
-//        uri = XMLConstants.XSD_URI
-//
-//      val requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname)
-//      if (requestedTypeFingerprint == -1)
-//        getUntypedType // back to default case
-//      else
-//        requestedTypeFingerprint // return identified type
-//    }
-//  }
+      // For type annotation purposes, `xf:integer` is translated into `xs:integer`. This is because XPath has no
+      // knowledge of the XForms union types.
+      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && ModelDefs.XFormsVariationTypeNames(localname))
+        uri = XMLConstants.XSD_URI
 
-  // TODO
-//  private def checkTypeAnnotation[A](untyped: CharSequence => A, typed: SchemaType => A): A = {
-//    var annotation = getTypeAnnotation
-//    if ((annotation & om.NodeInfo.IS_DTD_TYPE) != 0)
-//      annotation = StandardNames.XS_UNTYPED_ATOMIC
-//    annotation &= NamePool.FP_MASK
-//    if (annotation == -1 || annotation == StandardNames.XS_UNTYPED_ATOMIC || annotation == StandardNames.XS_UNTYPED) {
-//      untyped(getStringValueCS)
-//    } else {
-//      val stype = getConfiguration.getSchemaType(annotation)
+      val schemaType = getConfiguration.getSchemaType(new StructuredQName(nodeType.namespace.prefix, uri, localname))
+
+      if (schemaType eq null)
+        getUntypedType // back to default case
+      else
+        schemaType // return identified type
+    }
+  }
+
+  private def checkTypeAnnotation[A](untyped: CharSequence => A, typed: SchemaType => A): A = {
+
+    val schemaType = getSchemaType
+
+    if (schemaType == null || schemaType == BuiltInAtomicType.UNTYPED_ATOMIC || schemaType == Untyped.getInstance) {
+      untyped(getStringValueCS)
+    } else {
+//      val stype = getConfiguration.getSchemaType(schemaType)
 //      if (stype eq null)
-//        throw new XPathException(s"Unknown type annotation `${Err.wrap(getAnnotationTypeName(annotation))}` in document")
+//        throw new XPathException(s"Unknown type annotation `${Err.wrap(getAnnotationTypeName(schemaType))}` in document")
 //      else
-//        try
-//          typed(stype)
-//        catch {
-//          case NonFatal(_) =>
-//            // TODO: Would be good to pass err.getMessage()
-//            throw new TypedNodeWrapper.TypedValueException(getDisplayName, getAnnotationTypeName(annotation), getStringValue)
-//        }
-//    }
-//  }
-//
-//  private def getAnnotationTypeName(annotation: Int): String =
-//    try
-//      getNamePool.getDisplayName(annotation)
-//    catch {
-//      case NonFatal(_) =>
-//        annotation.toString
-//    }
-//
-//  private def getUntypedType: Int =
-//    if (getNodeKind == Type.ATTRIBUTE)
-//      StandardNames.XS_UNTYPED_ATOMIC
-//    else
-//      StandardNames.XS_UNTYPED
+      try
+        typed(schemaType)
+      catch {
+        case NonFatal(_) =>
+          // TODO: Would be good to pass err.getMessage()
+          throw new TypedNodeWrapper.TypedValueException(getDisplayName, schemaType.getDisplayName, getStringValue)
+      }
+    }
+  }
+
+  private def getUntypedType: SchemaType =
+    getNodeKind match {
+      case Type.ATTRIBUTE               => BuiltInAtomicType.UNTYPED_ATOMIC
+      case Type.DOCUMENT | Type.ELEMENT => Untyped.getInstance
+      case _                            => null
+    }
 }

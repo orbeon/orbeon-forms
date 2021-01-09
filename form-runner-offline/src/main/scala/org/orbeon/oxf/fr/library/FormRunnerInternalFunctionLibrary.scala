@@ -42,8 +42,8 @@ object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
     FormRunner.orbeonRolesFromCurrentRequest
 
   @XPathFunction(name = "allAuthorizedOperationsAssumingOwnerGroupMember")
-  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: om.NodeInfo): Iterable[String] =
-    FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
+  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: Option[om.NodeInfo]): Iterable[String] =
+    FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement.orNull)
 
   @XPathFunction(name = "authorizedOperationsBasedOnRolesXPath")
   def authorizedOperationsBasedOnRolesXPath(permissionsEl: Option[om.NodeInfo]): List[String] =

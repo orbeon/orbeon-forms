@@ -492,7 +492,7 @@ trait XFormsModelInstances {
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
         val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
         val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(instance, caching, instance.readonly, loadInstance)
-        indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, false, true))
+        indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, _modified = false, valid = true))
       } else {
         // Instance cannot be cached
         // NOTE: Optimizing with include() for servlets has limitations, in particular

@@ -44,7 +44,8 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
 
     requestTryCount = 0
 
-  Page.loadingIndicator().requestStarted(showProgress)
+    Page.loadingIndicator().requestStarted(showProgress)
+
     asyncAjaxRequestWithRetry(
       requestFormId,
       AjaxRequest.buildXmlRequest(requestFormId, eventsToSend, sequenceNumberOpt),

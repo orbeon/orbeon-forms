@@ -1,12 +1,16 @@
 package org.orbeon.oxf.xforms.library
 
 import org.orbeon.macros.XPathFunction
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.ContentTypes.XmlContentType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.FunctionSupport._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
+import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.SimplePath._
 
 
@@ -37,44 +41,62 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //
 
   @XPathFunction
-  def getSessionAttribute(attributeName: String): Iterable[om.Item] = {
-    // TODO: implement
-    println(s"xxx getSessionAttribute for $attributeName")
-    Iterable.empty
+  def getSessionAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
+
+    // TODO: Handle XML tree
+    println(s"xxx getSessionAttribute `$attributeName`")
+
+    CoreCrossPlatformSupport.externalContext.getRequest.sessionOpt.toList flatMap { session =>
+      session.getAttribute(attributeName).toList collect {
+        case v: om.Item => List(v)
+      }
+    } flatten
   }
 
-//    // TODO: Split this out into separate trait
-//    Fun("get-session-attribute", classOf[GetSessionAttribute], op = 0, min = 1, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-
   @XPathFunction
-  def setSessionAttribute(attributeName: String, item: Iterable[om.Item]): Unit = {
-    // TODO: implement
-    println(s"xxx setSessionAttribute for $attributeName")
+  def setSessionAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
+
+    println(s"xxx setSessionAttribute `$attributeName` with type `${items map (_.getClass.getName) mkString ", "}`")
+
+    // NOTE: We take only the first item, even though the parameter is declared as supporting
+    // multiple items. This is incorrect but it's what we've done in the past. We could fix this.
+    val value =
+      items.headOption collect {
+        case v: StringValue => new StringValueWithEquals(v.getStringValueCS)
+        case v: AtomicValue => v
+//        case v: NodeInfo    => TransformerUtils.tinyTreeToSAXStore(v) // TODO: copy XML tree
+        case _ => throw new OXFException(s"xxf:set-*-attribute() does not support storing objects of type: ${items.getClass.getName}")
+      }
+
+    CoreCrossPlatformSupport.externalContext.getSession(true).setAttribute(attributeName, value)
   }
 
-//    // TODO: Split this out into separate trait
-//    Fun("set-session-attribute", classOf[SetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-//    )
-//
-//    // TODO: Split this out into separate trait
-
-  // TODO: For now, always return `()`
   @XPathFunction
-  def getRequestAttribute(attributeName: String, contentTypeOpt: Option[String] = None): Iterable[om.Item] = Nil
+  def getRequestAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
 
-//
-//    // TODO: Split this out into separate trait
-//    Fun("set-request-attribute", classOf[SetRequestAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-//    )
-//
-  // TODO: Split this out into separate trait
+    // TODO: Handle XML tree
+    println(s"xxx getRequestAttribute `$attributeName`")
+
+    Option(CoreCrossPlatformSupport.externalContext.getRequest.getAttributesMap.get(attributeName)).toList collect {
+        case v: om.Item => List(v)
+    } flatten
+  }
+
+  @XPathFunction
+  def setRequestAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
+
+    println(s"xxx setRequestAttribute `$attributeName` with type `${items map (_.getClass.getName) mkString ", "}`")
+
+    val request = CoreCrossPlatformSupport.externalContext.getRequest
+
+    // NOTE: We take only the first item, even though the parameter is declared as supporting
+    // multiple items. This is incorrect but it's what we've done in the past. We could fix this.
+    // See https://github.com/orbeon/orbeon-forms/issues/4116
+    items.toList match {
+      case Nil       => request.getAttributesMap.remove(attributeName)
+      case head :: _ => request.getAttributesMap.put(attributeName, head)
+    }
+  }
 
   @XPathFunction
   def username: Option[String] =

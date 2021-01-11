@@ -1,15 +1,18 @@
 package org.orbeon.fr.offline
 
+import org.log4s.Info
+import org.log4s.log4sjs.LevelThreshold
 import org.orbeon.dom.{Document, Element}
+import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
-import org.orbeon.xforms.App
+import org.orbeon.xforms.{App, XFormsApp}
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
-import org.orbeon.xforms.offline.demo.OfflineDemo
+import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
 import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
 import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 import org.scalajs.dom.{XMLHttpRequest, html}
@@ -81,7 +84,8 @@ trait FormRunnerProcessor {
 object FormRunnerOffline extends App with FormRunnerProcessor {
 
   def onOrbeonApiLoaded(): Unit = {
-    OfflineDemo.onOrbeonApiLoaded()
+    XFormsApp.onOrbeonApiLoaded(LocalClientServerChannel)
+    FormRunnerApp.onOrbeonApiLoaded2()
 
     // Expose the API in the usual place
     val orbeonDyn = g.window.ORBEON
@@ -93,10 +97,16 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     }
 
     frDyn.FormRunnerOffline = js.Dynamic.global.FormRunnerOffline
+
+    // Initialize logging
+    import org.log4s.log4sjs.Log4sConfig._
+    setLoggerThreshold("", LevelThreshold(Info))
   }
 
-  def onPageContainsFormsMarkup(): Unit =
-    OfflineDemo.onPageContainsFormsMarkup()
+  def onPageContainsFormsMarkup(): Unit = {
+    XFormsApp.onPageContainsFormsMarkup()
+    FormRunnerApp.onPageContainsFormsMarkup2()
+  }
 
   @JSExport
   def configure(

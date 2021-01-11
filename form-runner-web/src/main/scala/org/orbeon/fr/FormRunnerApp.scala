@@ -23,8 +23,11 @@ import scala.scalajs.js.Dynamic.{global => g}
 object FormRunnerApp extends App {
 
   def onOrbeonApiLoaded(): Unit = {
-
     XFormsApp.onOrbeonApiLoaded()
+    onOrbeonApiLoaded2()
+  }
+
+  def onOrbeonApiLoaded2(): Unit = {
 
     val orbeonDyn = g.window.ORBEON
 
@@ -60,6 +63,7 @@ object FormRunnerApp extends App {
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI
   }
+
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

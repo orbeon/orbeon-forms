@@ -369,12 +369,11 @@ object SaxonUtils {
 
   def convertType(
     value               : StringValue,
-    newTypeNamespaceURI : String,
     newTypeLocalName    : String,
     config              : SaxonConfiguration
   ): Try[Option[AtomicValue]] = Try {
 
-    val requiredTypeFingerprint = om.StandardNames.getFingerprint(newTypeNamespaceURI, newTypeLocalName)
+    val requiredTypeFingerprint = om.StandardNames.getFingerprint(XMLConstants.XSD_URI, newTypeLocalName)
     require(requiredTypeFingerprint != -1)
 
     value.convertPrimitive(

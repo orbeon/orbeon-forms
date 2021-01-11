@@ -27,7 +27,7 @@ import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.ma.arrays.ImmutableArrayItem
 import org.orbeon.saxon.ma.map.{DictionaryMap, HashTrieMap}
 import org.orbeon.saxon.ma.parray.ImmList
-import org.orbeon.saxon.model.{BuiltInAtomicType, BuiltInType, Converter, Type}
+import org.orbeon.saxon.model.{AtomicType, BuiltInAtomicType, BuiltInType, Converter, Type}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
@@ -175,16 +175,18 @@ object SaxonUtils {
     def findNodePosition(node: NodeInfo): Int = {
 
       val nodeTestForSameNode =
-        node.getFingerprint match {
-          case -1 => NodeKindTest.makeNodeKindTest(node.getNodeKind)
-          case _  => new NameTest(node.getNodeKind, node.getURI, node.getLocalPart, node.getConfiguration.getNamePool)
+        node.getNodeKind match {
+          case Type.ELEMENT | Type.ATTRIBUTE | Type.PROCESSING_INSTRUCTION | Type.NAMESPACE =>
+            new NameTest(node.getNodeKind, node.getURI, node.getLocalPart, node.getConfiguration.getNamePool)
+          case _ =>
+            NodeKindTest.makeNodeKindTest(node.getNodeKind)
         }
 
       val precedingAxis =
         node.iterateAxis(AxisInfo.PRECEDING_SIBLING, nodeTestForSameNode)
 
       var i = 1
-      while (precedingAxis.next ne null)
+      while (precedingAxis.next() ne null)
         i += 1
       i
     }
@@ -359,17 +361,10 @@ object SaxonUtils {
 
   def convertType(
     value               : StringValue,
-    newTypeNamespaceURI : String,
     newTypeLocalName    : String,
     config              : SaxonConfiguration
   ): Try[Option[AtomicValue]] = Try {
-
-    val requiredTypeFingerprint = om.StandardNames.getFingerprint(newTypeNamespaceURI, newTypeLocalName)
-    require(requiredTypeFingerprint != -1)
-
-    val targetType =
-      BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType]
-
+    val targetType = BuiltInType.getSchemaTypeByLocalName(newTypeLocalName).asInstanceOf[AtomicType]
     Try(Converter.convert(value, targetType, config.getConversionRules)).toOption
   }
 

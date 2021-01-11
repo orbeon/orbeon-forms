@@ -198,14 +198,11 @@ trait ValidationBindOps extends Logging {
       } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
         // Built-in schema or XForms type
 
-        // Use XML Schema namespace URI as Saxon doesn't know anything about XForms types
-        val newTypeNamespaceURI = XMLConstants.XSD_URI
-
         // Try to perform casting
         // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens.
         // Is that expected?
         val stringValue = StringValue.makeStringValue(nodeValue)
-        SaxonUtils.convertType(stringValue, newTypeNamespaceURI, typeLocalname, XPath.GlobalConfiguration)
+        SaxonUtils.convertType(stringValue, typeLocalname, XPath.GlobalConfiguration)
           .getOrElse(throwError())
           .isDefined
       } else if (isBuiltInXXFormsType) {

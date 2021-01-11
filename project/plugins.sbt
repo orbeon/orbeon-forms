@@ -8,6 +8,7 @@ addSbtPlugin     ("com.typesafe.sbt"    % "sbt-uglify"               % "2.0.0")
 //addSbtPlugin     ("net.virtual-void"    % "sbt-dependency-graph"     % "0.9.2")
 addSbtPlugin     ("com.codecommit"      % "sbt-github-packages"      % "0.5.2")
 addCompilerPlugin("org.scalamacros"     % "paradise"                 % "2.1.1" cross CrossVersion.full)
+addSbtPlugin     ("io.github.cquiroz"  % "sbt-tzdb"                  % "0.3.2")
 
 libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.0.0" // 1.1.0 "drops support for jsdom 9.x"
 

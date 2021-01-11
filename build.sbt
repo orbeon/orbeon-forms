@@ -20,6 +20,7 @@ val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.13"
 val PerfolationVersion            = "1.1.7"
 val ScalaJsStubsVersion           = "1.0.0" // can be different from Scala.js version
+val ScalaJsTimeVersion            = "2.0.0"
 
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
@@ -459,11 +460,11 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 
 lazy val commonJVM = common.jvm
 lazy val commonJS  = common.js
-//  .enablePlugins(TzdbPlugin)
+  .enablePlugins(TzdbPlugin)
   .settings(
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
-//    zonesFilter := {(z: String) => z == "America/Los_Angeles"} // Q: See if/how we do this filtering
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.0.0" % Test // for now, get the whole database
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time"      % ScalaJsTimeVersion,
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % ScalaJsTimeVersion,
+    zonesFilter := { (z: String) => z == "America/Los_Angeles" } // for now, keep only one timezone
   )
   .enablePlugins(JSDependenciesPlugin)
 

@@ -1,10 +1,11 @@
 package org.orbeon.oxf.xforms.library
 
 import cats.syntax.option._
-import org.orbeon.io.CharsetNames.Iso88591
+import org.orbeon.io.CharsetNames
+import org.orbeon.io.CharsetNames.{Iso88591, Utf8}
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{XPath, XPathCache}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.{currentLocale, relevantControl, resolveOrFindByStaticOrAbsoluteId}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
@@ -16,6 +17,8 @@ import org.orbeon.xforms.XFormsId
 
 import java.text.MessageFormat
 import scala.jdk.CollectionConverters._
+import scala.scalajs.js
+import scala.scalajs.js.Dynamic.global
 
 
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
@@ -83,11 +86,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun("binding", classOf[XXFormsBinding], op = 0, min = 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("binding-context", classOf[XXFormsBindingContext], op = 0, min = 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def bindingContext(staticOrAbsoluteId : String)(implicit xpc: XPathContext): Option[om.Item] =
+    relevantControl(staticOrAbsoluteId) flatMap (_.contextForBinding)
+
 //    Fun("is-control-relevant", classOf[XXFormsIsControlRelevant], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
@@ -138,11 +141,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     instanceId : String)(implicit
     xpc        : XPathContext,
     xfc        : XFormsFunction.Context
-  ): Option[om.NodeInfo] = {
-    val r = instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
-//    println(s"xxx result of `xxf:instance('$instanceId')` is ${r map (_.getDisplayName)}")
-    r
-  }
+  ): Option[om.NodeInfo] =
+    instanceId.trimAllToOpt flatMap (XFormsInstance.findInAncestorScopes(xfc.container, _))
 
   //  Fun("index", classOf[XXFormsIndex], op = 0, min = 0, INTEGER, EXACTLY_ONE,
 //      Arg(STRING, ALLOWS_ZERO_OR_ONE)
@@ -300,7 +300,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   // - This can take more than one item, but only the first one is considered.
   // - This is different from the XForms 2.0 functions.
   //
-  private def exformsMipFunction(items: Iterable[om.Item], operation: Int)(implicit xpc: XPathContext): Boolean = {
+  def exformsMipFunction(items: Iterable[om.Item], operation: Int)(implicit xpc: XPathContext): Boolean = {
 
     val resolvedItems =
       items match {
@@ -394,12 +394,20 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    )
 
   @XPathFunction
-  def getRequestHeader(name: String, encoding: String = Iso88591): Iterable[String] = ???
-//    GetRequestHeader.getAndDecodeHeader(
-//      name     = name,
-//      encoding = stringArgumentOpt(1),
-//      getter   = containingDocument.getRequestHeaders.get
-//    )
+  def getRequestHeader(name: String, encoding: String = Iso88591): Iterable[String] = {
+
+    import CharsetNames._
+
+    val decode: String => String =
+      encoding.toUpperCase match {
+        case Iso88591 => identity
+        case Utf8     => (s: String) => new String(s.getBytes(Iso88591), Utf8)
+        case other    => throw new IllegalArgumentException(s"invalid `$$encoding` argument `$other`")
+      }
+
+    Option(CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.get(name)).toList flatMap
+      (_.toList) map decode
+  }
 
   @XPathFunction
   def getRequestParameter(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =

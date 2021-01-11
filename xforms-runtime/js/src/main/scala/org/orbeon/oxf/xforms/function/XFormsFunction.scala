@@ -48,7 +48,7 @@ object XFormsFunction { // extends DefaultFunctionSupport
   // Resolve the relevant control by argument expression
   // TODO: Check callers and consider using `relevantControls`.
   def relevantControl(
-    staticOrAbsoluteId  : String)(implicit
+    staticOrAbsoluteId : String)(implicit
     xpathContext       : XPathContext
   ): Option[XFormsControl] =
     findRelevantControls(staticOrAbsoluteId, followIndexes = true).headOption

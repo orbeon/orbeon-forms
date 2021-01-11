@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItem
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.library.{XFormsFunctionLibrary, XXFormsFunctionLibrary}
+import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
@@ -57,6 +57,7 @@ object XFormsStaticStateDeserializer {
       new FunctionLibraryList |!>
         (_.addFunctionLibrary(XFormsFunctionLibrary))  |!>
         (_.addFunctionLibrary(XXFormsFunctionLibrary)) |!>
+        (_.addFunctionLibrary(EXFormsFunctions))       |!>
         (fll => libraries.foreach(fll.addFunctionLibrary))
 
     object Index {

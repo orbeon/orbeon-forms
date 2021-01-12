@@ -717,11 +717,19 @@ object XFormsStaticStateDeserializer {
 
               variable.right.get // XXX TODO
 
+            // Itemsets
+            case XFORMS_CHOICES_QNAME | XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
+              new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithChildrenTrait
+            case XFORMS_VALUE_QNAME =>
+              new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ValueTrait with OptionalSingleNode
+            case  XFORMS_COPY_QNAME =>
+              new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with RequiredSingleNode
+
+            // Roots
             case XBL_TEMPLATE_QNAME =>
               new ContainerControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case ROOT_QNAME =>
               new RootControl(index, element, staticId, prefixedId, namespaceMapping, scope, containerScope, None)
-
             case _ =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {}
           }

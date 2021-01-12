@@ -744,7 +744,7 @@ object XFormsStaticStateDeserializer {
         newControl
       }
 
-    implicit val decodeScriptType     : Decoder[ScriptType] = deriveDecoder
+    implicit val decodeScriptType     : Decoder[ScriptType]      = deriveDecoder
     implicit val decodeShareableScript: Decoder[ShareableScript] = deriveDecoder
     implicit val decodeStaticScript   : Decoder[StaticScript]    = deriveDecoder
 
@@ -982,6 +982,7 @@ object TopLevelPartAnalysisImpl {
 
         def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
         def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
+
         def baselineResources: (List[String], List[String]) = (Nil, Nil) // XXX TODO
       }
 

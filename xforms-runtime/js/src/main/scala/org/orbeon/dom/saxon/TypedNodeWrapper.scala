@@ -50,7 +50,7 @@ class TypedNodeWrapper private (node: dom.Node, docWrapper: DocumentWrapper, par
     checkTypeAnnotation(new UntypedAtomicValue(_), _.atomize(this))
 
   override def getSchemaType: SchemaType = {
-    val nodeType = InstanceData.getType(node.asInstanceOf[Node])
+    val nodeType = InstanceData.getType(node)
     if (nodeType == null) {
       getUntypedType
     } else {

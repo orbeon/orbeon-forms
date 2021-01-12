@@ -121,7 +121,7 @@
             fbf:updateSectionTemplateContentHolders($temp)
         </xf:action>
 
-        <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->
+        <!--<xf:message level="xxf:log-info" value="xxf:serialize($temp, 'xml')"/>-->
 
         <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
 

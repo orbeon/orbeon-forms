@@ -193,7 +193,7 @@
 
                         <!-- Log metadata permissions -->
                         <xf:action type="javascript" if="event('xxf:type') = 'fr-test'">
-                            <xf:param name="xml" value="saxon:serialize($metadata/permissions, 'xml')"/>
+                            <xf:param name="xml" value="xxf:serialize($metadata/permissions, 'xml')"/>
                             <xf:body>
                                 console.log(ORBEON.jQuery.parseXML(unescape(xml)));
                             </xf:body>

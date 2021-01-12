@@ -33,7 +33,7 @@
                 <xf:setvalue
                     ref="source"
                     value="
-                        saxon:serialize(
+                        xxf:serialize(
                             xxf:call-xpl(
                                 'oxf:/forms/orbeon/builder/form/deannotate.xpl',
                                 'data',

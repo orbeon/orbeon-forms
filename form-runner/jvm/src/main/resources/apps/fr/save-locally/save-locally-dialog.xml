@@ -25,7 +25,7 @@
     <xf:label ref="$fr-resources/save-locally/dialog-title"/>
 
     <xh:div class="fr-dialog-message">
-        <xf:output mediatype="text/html" value="saxon:serialize($fr-resources/save-locally/dialog-body/*, 'xml')"/>
+        <xf:output mediatype="text/html" value="xxf:serialize($fr-resources/save-locally/dialog-body/*, 'xml')"/>
     </xh:div>
 
     <xh:div class="fr-dialog-buttons">

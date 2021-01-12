@@ -117,7 +117,7 @@
                         <!-- Handle response body -->
                         <xf:var name="error-body" value="event('response-body')"/>
                         <xf:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
-                            then $error-body else saxon:serialize($error-body, xxf:instance('fr-xsl-output-instance'))"/>
+                            then $error-body else xxf:serialize($error-body, xxf:instance('fr-xsl-output-instance'))"/>
                     </xf:action>
                 </xf:action>
                 <!-- Error actions -->
@@ -163,7 +163,7 @@
                         <xf:delete ref="$sql-query/sql:query"/>
                         <xf:insert context="$sql-query" ref="*" origin="saxon:parse($instance/query-xml)/*"/>
                         <!-- Set request instance -->
-                        <xf:setvalue ref="." value="saxon:serialize($sql-query, xxf:instance('fr-xsl-output-instance'))"/>
+                        <xf:setvalue ref="." value="xxf:serialize($sql-query, xxf:instance('fr-xsl-output-instance'))"/>
                     </xf:action>
 
                     <!-- Hide dialog -->
@@ -203,7 +203,7 @@
                 <!-- Restore datasource -->
                 <xf:setvalue ref="$instance/datasource" value="$sql-query/sql:datasource"/>
                 <!-- Serialize sql:query and remove containing element -->
-                <xf:setvalue ref="$instance/query" value="substring-before(substring-after(saxon:serialize($sql-query/sql:query, xxf:instance('fr-xsl-output-instance')), '>'), '&lt;/sql:query>')"/>
+                <xf:setvalue ref="$instance/query" value="substring-before(substring-after(xxf:serialize($sql-query/sql:query, xxf:instance('fr-xsl-output-instance')), '>'), '&lt;/sql:query>')"/>
             </xf:action>
         </xf:action>
     </xf:action>

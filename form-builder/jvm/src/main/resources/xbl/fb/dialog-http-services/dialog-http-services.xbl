@@ -181,7 +181,7 @@
                         ref="body/original"
                         value="
                             if ($body instance of node()) then
-                                saxon:serialize($body, xxf:instance('fr-xsl-output-instance'))
+                                xxf:serialize($body, xxf:instance('fr-xsl-output-instance'))
                             else
                                 $body"/>
 
@@ -189,7 +189,7 @@
                         xmlns:ct="java:org.orbeon.oxf.util.ContentTypes"
                         if="ct:isJSONContentType(event('response-headers')[lower-case(name) = 'content-type']/value)"
                         ref="body/transformed"
-                        value="saxon:serialize(xxf:json-to-xml($body), xxf:instance('fr-xsl-output-instance'))"/>
+                        value="xxf:serialize(xxf:json-to-xml($body), xxf:instance('fr-xsl-output-instance'))"/>
 
                     <xf:setfocus control="fb-submission-response-headers-tab"/>
 
@@ -350,7 +350,7 @@
 
                             <xf:setvalue
                                 ref="*"
-                                value="saxon:serialize($body, xxf:instance('fr-xsl-output-instance'))"/>
+                                value="xxf:serialize($body, xxf:instance('fr-xsl-output-instance'))"/>
 
                         </xf:action>
                         <xf:action if="$has-request-body">

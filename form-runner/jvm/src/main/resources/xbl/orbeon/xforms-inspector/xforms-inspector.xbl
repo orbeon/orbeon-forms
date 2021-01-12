@@ -39,8 +39,8 @@
                         <xf:setvalue if="$position != 1" ref="$shown-output" value="concat(., ' ')"/>
                         <xf:setvalue ref="$shown-output" value="concat(., if ($is-xml) then
                             if (instance('inspector-instance')/mode = 'formatted')
-                                then ../xpath-output/*/saxon:serialize($current, $xml-indent)
-                                else ../xpath-output/*/saxon:serialize($current, $xml-noindent)
+                                then ../xpath-output/*/xxf:serialize($current, $xml-indent)
+                                else ../xpath-output/*/xxf:serialize($current, $xml-noindent)
                             else $current)"/>
                     </xf:action>
                 </xf:action>
@@ -241,14 +241,14 @@
                         <xf:var name="shown-output" value="
                                 if (function = 'view-instance') then
                                     if (mode = 'formatted')
-                                        then saxon:serialize($current-instance, $xml-indent)
-                                        else saxon:serialize($current-instance, $xml-noindent)
+                                        then xxf:serialize($current-instance, $xml-indent)
+                                        else xxf:serialize($current-instance, $xml-noindent)
                                 else if (function = 'evaluate-xpath') then
                                     if (exists(xpath-output/*))
                                         then string-join(
                                             if (mode = 'formatted')
-                                                then xpath-output/*/saxon:serialize(., $xml-indent)
-                                                else xpath-output/*/saxon:serialize(., $xml-noindent)
+                                                then xpath-output/*/xxf:serialize(., $xml-indent)
+                                                else xpath-output/*/xxf:serialize(., $xml-noindent)
                                             , '&#x0a;')
                                         else xpath-output
                                 else shown-output">

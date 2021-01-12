@@ -10,7 +10,7 @@
     <xh:head>
         <xh:title>XSLT Transformation in XForms</xh:title>
         <xf:model>
-            
+
             <!-- Instance to be transformed through XSLT -->
             <xf:instance id="input" xxf:exclude-result-prefixes="#all">
                 <sites>
@@ -27,7 +27,7 @@
                     </site>
                 </sites>
             </xf:instance>
-            
+
             <!-- Instance containing the output of the transformation -->
             <xf:instance id="output"><dummy/></xf:instance>
 
@@ -49,39 +49,39 @@
                     </xsl:template>
                 </xsl:stylesheet>
             </xf:instance>
-            
+
             <xf:instance id="ui">
                 <ui>
                     <xsl:output method="xml" omit-xml-declaration="yes" indent="no" saxon:indent-spaces="4"/>
                 </ui>
             </xf:instance>
             <xf:delete ev:event="xforms-model-construct-done" ref="instance('input')//text()[normalize-space() = '']"/>
-            
+
         </xf:model>
         <xh:style type="text/css">
-            pre { background-color: #eee; font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New; 
+            pre { background-color: #eee; font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
                   float: left; padding: .5em 2em; }
             .transform-trigger { float: left; margin: 5em 2em;  }
         </xh:style>
     </xh:head>
     <xh:body>
 
-        <xh:pre><xf:output value="saxon:serialize(instance('input'), instance('ui')/xsl:output)"/></xh:pre>
-        
+        <xh:pre><xf:output value="xxf:serialize(instance('input'), instance('ui')/xsl:output)"/></xh:pre>
+
         <xf:trigger appearance="minimal" class="transform-trigger">
             <xf:label>Run XSLT</xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:insert ref="instance('output')" origin="saxon:transform(
-                    saxon:compile-stylesheet(instance('stylesheet')/root()), 
-                    saxon:parse(saxon:serialize(instance('input'), 'xml')))"/>
+                    saxon:compile-stylesheet(instance('stylesheet')/root()),
+                    saxon:parse(xxf:serialize(instance('input'), 'xml')))"/>
                 <xf:toggle case="show-result"/>
             </xf:action>
         </xf:trigger>
-        
+
         <xf:switch>
             <xf:case/>
             <xf:case id="show-result">
-                <xh:pre><xf:output value="saxon:serialize(instance('output'), instance('ui')/xsl:output)"/></xh:pre>
+                <xh:pre><xf:output value="xxf:serialize(instance('output'), instance('ui')/xsl:output)"/></xh:pre>
             </xf:case>
         </xf:switch>
     </xh:body>

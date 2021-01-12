@@ -3036,7 +3036,7 @@
                     <xf:output
                         id="my-output"
                         value="
-                            saxon:serialize(
+                            xxf:serialize(
                                 saxon:parse(
                                     concat(
                                         '&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>',

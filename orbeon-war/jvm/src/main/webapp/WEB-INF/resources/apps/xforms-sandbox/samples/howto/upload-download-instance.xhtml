@@ -64,7 +64,7 @@
         </xf:trigger>
         <xxf:dialog id="upload-download-dialog" appearance="minimal" neighbor="upload-download-trigger">
             <xf:setvalue ev:event="xxforms-dialog-open" ref="instance('download')"
-                             value="saxon:string-to-base64Binary(saxon:serialize(instance('main-instance'), 'xml'), 'UTF-8')"/>
+                             value="saxon:string-to-base64Binary(xxf:serialize(instance('main-instance'), 'xml'), 'UTF-8')"/>
             <fr:tabview>
                 <fr:tab>
                     <fr:label>Download</fr:label>

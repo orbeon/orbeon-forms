@@ -28,7 +28,7 @@
 
         <xf:message level="xxf:log-debug">
             ORBEON FORM BUILDER ROLES DEBUG INFORMATION:
-            Resulting permissions: <xf:output value="saxon:serialize(instance('fb-permissions'), 'xml')"/>
+            Resulting permissions: <xf:output value="xxf:serialize(instance('fb-permissions'), 'xml')"/>
         </xf:message>
 
     </xf:action>

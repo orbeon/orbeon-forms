@@ -58,7 +58,7 @@
 
             <xf:action ev:event="xforms-value-changed">
                 <xf:var name="filtered" value="if (filter-broken-pi = 'true') then replace(html, '&lt;\?[^>]*>', '') else html" as="xs:string"/>
-                <xf:setvalue ref="xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
+                <xf:setvalue ref="xhtml-tagsoup" value="xxf:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
             </xf:action>
         </xf:group>
 

@@ -7,10 +7,9 @@ import io.circe.{Decoder, HCursor}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
-import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._

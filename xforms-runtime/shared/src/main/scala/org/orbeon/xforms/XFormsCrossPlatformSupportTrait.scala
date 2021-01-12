@@ -20,7 +20,6 @@ import org.orbeon.dom.io.DocumentSource
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.CoreUtils._
@@ -30,8 +29,6 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, UploadProg
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
-import org.xml.sax.ContentHandler
-import org.xml.sax.ext.LexicalHandler
 
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Writer}
 import java.net.URI

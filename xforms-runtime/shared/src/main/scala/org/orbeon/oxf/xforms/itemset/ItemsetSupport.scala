@@ -25,8 +25,9 @@ import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -45,6 +46,17 @@ import scala.util.control.NonFatal
 
 
 object ItemsetSupport {
+
+  def findSelectionControl(control: XFormsControl): Option[XFormsSelect1Control] =
+    control match {
+      case c: XFormsSelect1Control =>
+        Some(c)
+      case c: XFormsComponentControl if c.staticControl.commonBinding.modeSelection =>
+        // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
+        ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control => c }
+      case _ =>
+        None
+    }
 
   def getAttributeName(name: QName): String =
     if (name.namespace == Namespace.EmptyNamespace)

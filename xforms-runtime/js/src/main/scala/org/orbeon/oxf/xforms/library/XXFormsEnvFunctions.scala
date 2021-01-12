@@ -2,23 +2,23 @@ package org.orbeon.oxf.xforms.library
 
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
-import org.orbeon.io.CharsetNames.{Iso88591, Utf8}
+import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction.{currentLocale, relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.function.XFormsFunction.{relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.SequenceTool
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.xforms.XFormsId
+import shapeless.syntax.typeable._
 
-import java.text.MessageFormat
 import scala.jdk.CollectionConverters._
-import scala.scalajs.js
-import scala.scalajs.js.Dynamic.global
 
 
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
@@ -157,6 +157,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     } yield
       absoluteId
 
+  @XPathFunction
   def listInstances(modelId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterator[String] = {
 
     val modelOpt =
@@ -187,12 +188,45 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  //
-//    Fun("itemset", classOf[XXFormsItemset], op = 0, min = 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(BOOLEAN, EXACTLY_ONE)
-//    )
+  @XPathFunction
+  def itemset(controlId: String, format: String, selected: Boolean = false)(implicit xpc: XPathContext): Option[om.Item] =
+    for {
+      control        <- relevantControl(controlId)
+      valueControl   <- control.narrowTo[XFormsValueControl]
+      select1Control <- ItemsetSupport.findSelectionControl(valueControl)
+      itemset        = select1Control.getItemset
+    } yield {
+
+      val controlValueForSelection =
+        if (selected)
+          select1Control.boundItemOpt map select1Control.getCurrentItemValueFromData map { v =>
+            (v, SaxonUtils.attCompare(select1Control.boundNodeOpt, _))
+          }
+        else
+          None
+
+      if (format == "json") {
+        // Return a string
+        StringValue.makeStringValue(
+          ItemsetSupport.asJSON(
+            itemset                    = itemset,
+            controlValue               = controlValueForSelection,
+            encode                     = select1Control.mustEncodeValues,
+            excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+            locationData               = control.getLocationData
+          )
+        )
+      } else {
+        // Return an XML document
+        ItemsetSupport.asXML(
+          itemset                    = itemset,
+          configuration              = xpc.getConfiguration,
+          controlValue               = controlValueForSelection,
+          excludeWhitespaceTextNodes = select1Control.staticControl.excludeWhitespaceTextNodesForCopy,
+          locationData               = control.getLocationData
+        )
+      }
+    }
 
   @XPathFunction
   def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext): String = {

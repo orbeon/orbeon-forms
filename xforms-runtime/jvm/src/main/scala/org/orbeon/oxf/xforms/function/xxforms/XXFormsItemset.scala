@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.SaxonUtils
@@ -34,7 +32,7 @@ class XXFormsItemset extends XFormsFunction {
       for {
         control        <- relevantControl(0)
         valueControl   <- control.narrowTo[XFormsValueControl]
-        select1Control <- XXFormsItemset.findSelectionControl(valueControl)
+        select1Control <- ItemsetSupport.findSelectionControl(valueControl)
         itemset        = select1Control.getItemset
       } yield {
 
@@ -72,18 +70,4 @@ class XXFormsItemset extends XFormsFunction {
 
     jsonOrXMLOpt.orNull
   }
-}
-
-object XXFormsItemset {
-
-  def findSelectionControl(control: XFormsControl): Option[XFormsSelect1Control] =
-    control match {
-      case c: XFormsSelect1Control =>
-        Some(c)
-      case c: XFormsComponentControl if c.staticControl.commonBinding.modeSelection =>
-        // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
-        ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control => c }
-      case _ =>
-        None
-    }
 }

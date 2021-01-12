@@ -24,8 +24,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsItemset
-import org.orbeon.oxf.xforms.itemset.{ItemNode, LHHAValue}
+import org.orbeon.oxf.xforms.itemset.{ItemNode, ItemsetSupport, LHHAValue}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
@@ -416,7 +415,7 @@ object FormRunnerMetadata {
 
               case c: XFormsValueComponentControl if c.staticControl.commonBinding.modeSelection =>
 
-                val selectionControlOpt = XXFormsItemset.findSelectionControl(c)
+                val selectionControlOpt = ItemsetSupport.findSelectionControl(c)
 
                 selectionControlOpt match {
                   case Some(selectControl: XFormsSelectControl) =>

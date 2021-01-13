@@ -8,7 +8,9 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction.{relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.function.XFormsFunction.{elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
@@ -242,18 +244,51 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   // TODO: last arg is`map(*)`
   @XPathFunction
-  def r(resourceKey: String, instanceArgumentOpt: Option[String] = None, templateParams: om.Item = null): Option[String] = {
+  def r(
+    resourceKey         : String,
+    instanceArgumentOpt : Option[String] = None,
+    templateParams      : om.Item = null)(implicit
+    xpc                 : XPathContext,
+    xfc                 : XFormsFunction.Context
+  ): Option[String] = {
 
-    // XXX TODO: implement
-    s"""[TODO: implement `xxf:r('$resourceKey')`]""".some
+    // XXX TODO
+//    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
+    val templateParamsOpt: Option[_]   = None
 
+    def findInstance = instanceArgumentOpt match {
+      case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
+      case None               => resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
+    }
+
+    def findResourcesElement = findInstance collect { case instance: XFormsInstance => instance.rootElement }
+
+    def processResourceString(resourceOrTemplate: String): String =
+      templateParamsOpt match {
+        case Some(params) =>
 //
+//          val javaNamedParamsIt = params.iterator map {
+//            case (key, value) =>
+//              val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
+//              key.getStringValue -> javaParamOpt.orNull
+//          }
 //
-//    Fun("r", classOf[XXFormsResource], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE)
-//    )
+//          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
+
+          resourceOrTemplate
+
+        case None =>
+          resourceOrTemplate
+      }
+
+      for {
+        elementAnalysis <- elementAnalysisForSource
+        resources       <- findResourcesElement
+        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis)
+        resourceRoot    <- findResourceElementForLang(resources, requestedLang)
+        leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKey)).headOption
+      } yield
+        processResourceString(leaf.getStringValue)
   }
 
   //    Fun("resource-elements", classOf[XXFormsResourceElem], op = 0, min = 1, NODE_TYPE, ALLOWS_ZERO_OR_MORE,

@@ -21,7 +21,7 @@ import org.orbeon.scaxon.Implicits._
 
 class XXFormsResourceElem extends XFormsFunction {
 
-  import XXFormsResource._
+  import XXFormsResourceSupport._
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

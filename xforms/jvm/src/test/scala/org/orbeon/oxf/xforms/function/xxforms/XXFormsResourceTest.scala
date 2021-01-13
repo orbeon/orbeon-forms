@@ -48,7 +48,7 @@ class XXFormsResourceTest extends AnyFunSpec {
     for ((path, expected) <- Expected)
       it(s"must find the node with path `$path`") {
 
-        val result = XXFormsResource.pathFromTokens(resources.rootElement, XXFormsResource.splitResourceName(path))
+        val result = XXFormsResourceSupport.pathFromTokens(resources.rootElement, XXFormsResourceSupport.splitResourceName(path))
 
         assert(1 === result.size)
         assert(expected === result.stringValue)
@@ -65,7 +65,7 @@ class XXFormsResourceTest extends AnyFunSpec {
 
     for ((path, expected) <- Expected)
       it(s"must flatten path `$path`") {
-        assert(expected === XXFormsResource.flattenResourceName(path))
+        assert(expected === XXFormsResourceSupport.flattenResourceName(path))
       }
   }
 
@@ -100,7 +100,5 @@ class XXFormsResourceTest extends AnyFunSpec {
           expected === ProcessTemplate.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))
         )
       }
-
   }
-
 }

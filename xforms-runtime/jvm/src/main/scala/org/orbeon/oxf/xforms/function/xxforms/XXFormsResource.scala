@@ -33,6 +33,7 @@ import scala.collection.compat._
 class XXFormsResource extends XFormsFunction {
 
   import XXFormsResource._
+  import XXFormsResourceSupport._
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
@@ -94,49 +95,7 @@ class XXFormsResource extends XFormsFunction {
 
 object XXFormsResource {
 
-  private val IndexRegex = """(\d+)""".r
-
-  def splitResourceName(s: String): List[String] =
-    s.splitTo[List](".")
-
-  def flattenResourceName(s: String): List[String] =
-    splitResourceName(s) filter Name10Checker.getInstance.isValidNCName
-
-  // Hand-made simple path search
-  //
-  // - path *must* have the form `foo.bar.2.baz` (names with optional index parts)
-  // - each path element must be a NCName (non-qualified) except for indexes
-  // - as in XPath, non-qualified names mean "in no namespace"
-  //
-  // NOTE: Ideally should check if this is faster than using a pre-compiled Saxon XPath expression!
-  def pathFromTokens(context: NodeInfo, tokens: List[String]): List[NodeInfo] = {
-
-      @tailrec
-      def findChild(parents: List[NodeInfo], tokens: List[String]): List[NodeInfo] =
-        tokens match {
-          case Nil => parents
-          case token :: restTokens =>
-            parents match {
-              case Nil => Nil
-              case parents =>
-                token match {
-                  case IndexRegex(index) =>
-                    findChild(List(parents(index.toInt)), restTokens)
-                  case path if Name10Checker.getInstance.isValidNCName(token) =>
-                    findChild(parents / token toList, restTokens)
-                  case _ =>
-                    throw new IllegalArgumentException(s"invalid resource path `${tokens mkString "."}`")
-                }
-            }
-        }
-
-      findChild(List(context), tokens)
-  }
-
-  def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String): Option[NodeInfo] = {
-    val availableLangs = resourcesElement / "resource" /@ "lang"
-    availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
-  }
+  import XXFormsResourceSupport._
 
   def updatePathMap(
     namePool       : NamePool,

@@ -167,7 +167,7 @@ object XPath extends XPathTrait {
     }
 
   private def handleXPathException(
-    t            : Throwable,
+    throwable    : Throwable,
     xpathString  : String,
     description  : String,
     locationData : LocationData
@@ -175,7 +175,7 @@ object XPath extends XPathTrait {
 
     val validationException =
       OrbeonLocationException.wrapException(
-        t,
+        throwable,
         XmlExtendedLocationData(locationData, Option(description), List("expression" -> xpathString))
       )
 

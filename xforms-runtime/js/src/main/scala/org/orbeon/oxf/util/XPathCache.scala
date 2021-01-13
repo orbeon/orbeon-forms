@@ -45,8 +45,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -82,8 +80,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -121,8 +117,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -170,8 +164,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -211,8 +203,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         makeStringExpression(xpathString),
         namespaceMapping,
         variableToValueMap,
@@ -262,8 +252,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -345,8 +333,6 @@ object XPathCache extends XPathCacheTrait {
     val (xpathExpression, variables) =
       getXPathExpression(
         XPath.GlobalConfiguration,
-        contextItems,
-        contextPosition,
         xpathString,
         namespaceMapping,
         variableToValueMap,
@@ -392,6 +378,9 @@ object XPathCache extends XPathCacheTrait {
 
   private object Private {
 
+    // This is the in-memory XPath exprssion cache, simply implemented as a `Map`
+    private var cache = Map[String, (XPathExpression, IndependentContext)]()
+
     def evaluateImpl(
       expression         : XPathExpression,
       contextItem        : om.Item,
@@ -423,8 +412,6 @@ object XPathCache extends XPathCacheTrait {
 
     def getXPathExpression(
       configuration      : SaxonConfiguration,
-      contextItems       : ju.List[om.Item],
-      contextPosition    : Int,
       xpathString        : String,
       namespaceMapping   : NamespaceMapping,
       variableToValueMap : ju.Map[String, ValueRepresentationType],
@@ -434,68 +421,76 @@ object XPathCache extends XPathCacheTrait {
       locationData       : LocationData
     ): (XPathExpression, List[(String, XPathVariable)]) = {
       try {
-        // Find pool from cache
-  //      val validity = 0L
-  //      val cache = ObjectCache.instance(XPathCacheName, XPathCacheDefaultSize)
-  //      val cacheKeyString = new StringBuilder(xpathString)
-  //
-  //      if (functionLibrary ne null) {// This is ok
-  //        cacheKeyString.append('|')
-  //        cacheKeyString.append(functionLibrary.hashCode.toString)
-  //      }
-  //      // NOTE: Mike Kay confirms on 2007-07-04 that compilation depends on the namespace context, so we need
-  //      // to use it as part of the cache key.
-  //      if (namespaceMapping ne null) {
-  //        // NOTE: Hash is mandatory in NamespaceMapping
-  //        cacheKeyString.append('|')
-  //        cacheKeyString.append(namespaceMapping.hash)
-  //      }
+
+        val cacheKeyBuilder = new StringBuilder(xpathString)
+
+        if (functionLibrary ne null) {// This is ok
+          cacheKeyBuilder.append('|')
+          cacheKeyBuilder.append(functionLibrary.hashCode.toString) // works only if the `FunctionLibrary` is not recreated!
+        }
+
+        // NOTE: Mike Kay confirms on 2007-07-04 that compilation depends on the namespace context, so we need
+        // to use it as part of the cache key.
+        if (namespaceMapping ne null) {
+          // NOTE: Hash is mandatory in NamespaceMapping
+          cacheKeyBuilder.append('|')
+          cacheKeyBuilder.append(namespaceMapping.hash)
+        }
 
         // NOTE: Make sure to copy the values in the key set, as the set returned by the map keeps a pointer to the
         // Map! This can cause the XPath cache to keep a reference to variable values, which in turn can keep a
         // reference all the way to e.g. an XFormsContainingDocument.
         val variableNames = Option(variableToValueMap) map (_.keySet.asScala.toList) getOrElse List()
 
-  //      if (variableNames.nonEmpty) {
-  //        // There are some variables in scope. They must be part of the key
-  //        // TODO: Put this in static state as this can be determined statically once and for all
-  //        for (variableName <- variableNames) {
-  //          cacheKeyString.append('|')
-  //          cacheKeyString.append(variableName)
-  //        }
-  //      }
-  //
-  //      // Add this to the key as evaluating "name" as XPath or as AVT is very different!
-  //      cacheKeyString.append('|')
-  //      cacheKeyString.append(isAVT.toString)
+        if (variableNames.nonEmpty) {
+          // There are some variables in scope. They must be part of the key
+          // TODO: Put this in static state as this can be determined statically once and for all
+          for (variableName <- variableNames) {
+            cacheKeyBuilder.append('|')
+            cacheKeyBuilder.append(variableName)
+          }
+        }
 
-        // TODO: Add baseURI to cache key (currently, baseURI is pretty much unused)
-  //
-  //      val pooledXPathExpression = {
-  //        val cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString)
-  //        var pool = cache.findValid(cacheKey, validity).asInstanceOf[ObjectPool[PooledXPathExpression]]
-  //        if (pool eq null) {
-  //          pool = createXPathPool(configuration, xpathString, namespaceMapping, variableNames, functionLibrary, baseURI, isAVT, locationData)
-  //          cache.add(cacheKey, validity, pool)
-  //        }
-  //        // Get object from pool
-  //        pool.borrowObject
-  //      }
+        // Add this to the key as evaluating "name" as XPath or as AVT is very different!
+        cacheKeyBuilder.append('|')
+        cacheKeyBuilder.append(isAVT.toString)
 
+        // MAYBE: Add baseURI to cache key (currently, baseURI is pretty much unused)
 
-        val independentContext = new IndependentContext(configuration)
-  //          independentContext.getConfiguration.setURIResolver(XPath.URIResolver)
+        val cacheKeyString = cacheKeyBuilder.toString
 
-        // Set the base URI if specified
-        if (baseURI ne null)
-          independentContext.setBaseURI(baseURI)
+        val (expr, independentContext) =
+          cache.getOrElse(cacheKeyString, {
 
-        // Declare namespaces
-        if (namespaceMapping ne null)
-          for ((prefix, uri) <- namespaceMapping.mapping)
-            independentContext.declareNamespace(prefix, uri)
+            // 2021-01-13: Only use of `IndependentContext`. We use `ShareableXPathStaticContext` for
+            // `StaticXPath` and `XPath`.
+            val independentContext = new IndependentContext(configuration)
+//            independentContext.getConfiguration.setURIResolver(XPath.URIResolver)
 
-        // Declare variables (we don't use the values here, just the names)
+            // Set the base URI if specified
+            if (baseURI ne null)
+              independentContext.setBaseURI(baseURI)
+
+            // Declare namespaces
+            if (namespaceMapping ne null)
+              for ((prefix, uri) <- namespaceMapping.mapping)
+                independentContext.declareNamespace(prefix, uri)
+
+            // Declare variables
+            variableNames foreach (independentContext.declareVariable("", _))
+
+            // Add function library
+            if (functionLibrary ne null)
+              independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
+
+            val expr = StaticXPath.compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
+
+            // Store in cache as side-effect
+            cache += cacheKeyString -> (expr, independentContext)
+
+            (expr, independentContext)
+          })
+
         val variables: List[(String, XPathVariable)] =
           if (variableNames ne null)
             for {
@@ -506,19 +501,6 @@ object XPathCache extends XPathCacheTrait {
           else
             Nil
 
-        // Add function library
-        if (functionLibrary ne null)
-          independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.add(0, functionLibrary)
-
-        val expr = StaticXPath.compileExpressionWithStaticContext(independentContext, xpathString, isAVT)
-
-        // Set context items and position
-  //      pooledXPathExpression.setContextItems(contextItems, contextPosition)
-  //
-  //      // Set variables
-  //      pooledXPathExpression.setVariables(variableToValueMap)
-  //
-  //      pooledXPathExpression
         (expr, variables)
       } catch {
         case NonFatal(t) => throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)

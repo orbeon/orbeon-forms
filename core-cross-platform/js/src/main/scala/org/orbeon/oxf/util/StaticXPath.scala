@@ -16,7 +16,6 @@ package org.orbeon.oxf.util
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.saxon.tree.util.DocumentNumberAllocator
 import org.orbeon.oxf.util.CoreUtils._
@@ -29,7 +28,6 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.model.{BuiltInAtomicType, ItemType}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.tree.wrapper.VirtualNode
 import org.orbeon.saxon.utils.Configuration

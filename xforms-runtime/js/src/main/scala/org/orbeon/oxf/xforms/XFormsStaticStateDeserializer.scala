@@ -39,10 +39,12 @@ import scala.jdk.CollectionConverters._
 object XFormsStaticStateDeserializer {
 
   def deserialize(
-    jsonString : String,
-    libraries  : Iterable[FunctionLibrary])(implicit
-    logger     : IndentedLogger
+    jsonString      : String,
+    functionLibrary : FunctionLibrary)(implicit
+    logger          : IndentedLogger
   ): XFormsStaticState = {
+
+    require(functionLibrary ne null)
 
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedQNames         = IndexedSeq[QName]()
@@ -51,14 +53,6 @@ object XFormsStaticStateDeserializer {
     var collectedModelRefs      = Map[String, List[ElementAnalysis]]()
 
     var controlStack: List[ElementAnalysis] = Nil
-
-    // TODO: We'll need a mechanism to plug the Form Runner function library.
-    val functionLibrary: FunctionLibrary =
-      new FunctionLibraryList |!>
-        (_.addFunctionLibrary(XFormsFunctionLibrary))  |!>
-        (_.addFunctionLibrary(XXFormsFunctionLibrary)) |!>
-        (_.addFunctionLibrary(EXFormsFunctions))       |!>
-        (fll => libraries.foreach(fll.addFunctionLibrary))
 
     object Index {
 

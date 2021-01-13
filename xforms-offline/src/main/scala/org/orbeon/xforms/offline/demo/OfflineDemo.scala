@@ -2,21 +2,22 @@ package org.orbeon.xforms.offline.demo
 
 import org.log4s.Info
 import org.log4s.log4sjs.LevelThreshold
-import org.log4s.log4sjs.LogThreshold.AllThreshold
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
+import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.EmbeddingSupport._
 import org.orbeon.xforms._
-import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{XMLHttpRequest, html}
 import org.xml.sax.Attributes
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,18 +58,29 @@ object OfflineDemo extends App {
     EmbeddingSupport.destroyForm(container)
     // TODO: Remove from `XFormsStateManager`.
 
+  val XFormsFunctionLibraries =
+    List(
+      XFormsFunctionLibrary,
+      XXFormsFunctionLibrary,
+      EXFormsFunctions
+    )
+
+  private val XFormsFunctionLibraryList: FunctionLibrary =
+    new FunctionLibraryList |!>
+      (fll => XFormsFunctionLibraries.iterator.foreach(fll.addFunctionLibrary))
+
   @JSExport
   def renderDemoForm(
     container    : html.Element,
     compiledForm : CompiledForm,
   ): RuntimeForm =
-    renderCompiledForm(container, compiledForm, Nil, None)
+    renderCompiledForm(container, compiledForm, XFormsFunctionLibraryList, None)
 
   def renderCompiledForm(
-    container    : html.Element,
-    compiledForm : CompiledForm,
-    libraries    : Iterable[FunctionLibrary],
-    uriResolver  : Option[XFormsURIResolver]
+    container       : html.Element,
+    compiledForm    : CompiledForm,
+    functionLibrary : FunctionLibrary,
+    uriResolver     : Option[XFormsURIResolver]
   ): RuntimeForm = {
 
     implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
@@ -76,7 +88,7 @@ object OfflineDemo extends App {
     destroyForm(container)
 
     val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm, libraries)
+    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm, functionLibrary)
 
     val containingDocument = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
 

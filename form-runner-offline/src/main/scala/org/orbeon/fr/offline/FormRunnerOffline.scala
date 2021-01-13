@@ -7,7 +7,10 @@ import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.util
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.xforms.{App, XFormsApp}
@@ -25,6 +28,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.typedarray.Uint8Array
 
+import scala.jdk.CollectionConverters._
 
 object DemoSubmissionProvider extends SubmissionProvider {
 
@@ -120,6 +124,25 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     this
   }
 
+  private val FormRunnerFunctionLibraryList: FunctionLibrary = {
+
+    val formRunnerLibraries =
+      List(
+        FormRunnerFunctionLibrary,
+        FormRunnerInternalFunctionLibrary,
+        FormRunnerDateSupportFunctionLibrary,
+        FormRunnerErrorSummaryFunctionLibrary,
+        FormRunnerSecureUtilsFunctionLibrary,
+        FormRunnerPersistenceFunctionLibrary,
+        FormRunnerGridDataMigrationFunctionLibrary,
+        FormRunnerSimpleDataMigrationFunctionLibrary
+      )
+
+      new FunctionLibraryList |!> (fll =>
+        (OfflineDemo.XFormsFunctionLibraries.iterator ++ formRunnerLibraries).foreach(fll.addFunctionLibrary)
+      )
+  }
+
   @JSExport
   def renderForm(
     container    : html.Element,
@@ -132,16 +155,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     OfflineDemo.renderCompiledForm(
       container,
       compiledForm,
-      List(
-        FormRunnerFunctionLibrary,
-        FormRunnerInternalFunctionLibrary,
-        FormRunnerDateSupportFunctionLibrary,
-        FormRunnerErrorSummaryFunctionLibrary,
-        FormRunnerSecureUtilsFunctionLibrary,
-        FormRunnerPersistenceFunctionLibrary,
-        FormRunnerGridDataMigrationFunctionLibrary,
-        FormRunnerSimpleDataMigrationFunctionLibrary
-      ),
+      FormRunnerFunctionLibraryList,
       Some(
         new XFormsURIResolver {
           def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =

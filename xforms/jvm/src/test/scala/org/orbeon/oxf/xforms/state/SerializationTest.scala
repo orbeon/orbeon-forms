@@ -75,7 +75,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
         // Mark all elements with an id
         Option(attributes.getValue("id")) foreach
-          saxStore.getMark
+          saxStore.createAndRememberMark
 
         super.startElement(uri, localname, qName, attributes)
       }

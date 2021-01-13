@@ -129,7 +129,7 @@ abstract class XFormsAnnotatorBase(
         stackElement.isXForms && stackElement.localname == "repeat"
 
       def putMark(): Unit =
-        metadata.putMark(templateSAXStore.getMark(rewriteId(xformsElementId)))
+        metadata.putMark(templateSAXStore.createAndRememberMark(rewriteId(xformsElementId)))
 
       def attsWithNewClass =
         XMLReceiverSupport.appendToClassAttribute(atts, "xforms-update-full")

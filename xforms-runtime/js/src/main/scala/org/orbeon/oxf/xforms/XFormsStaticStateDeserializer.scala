@@ -34,7 +34,7 @@ import shapeless.syntax.typeable.typeableOps
 
 import java.{util => ju}
 import scala.collection.mutable
-
+import scala.jdk.CollectionConverters._
 
 object XFormsStaticStateDeserializer {
 
@@ -94,7 +94,39 @@ object XFormsStaticStateDeserializer {
       }
     }
 
-    implicit val decodeSAXStore: Decoder[SAXStore] = (c: HCursor) =>
+    // Update this as side-effect of deserializing a `Mark` as we need to index all of them
+    var collectedSAXStoreMarks: Map[String, SAXStore#Mark] = Map.empty
+
+    implicit val decodeSAXStore: Decoder[SAXStore] = (c: HCursor) => {
+
+      val a: SAXStore = new SAXStore
+
+      implicit val decodeMark: Decoder[a.Mark] = (c2: HCursor) => {
+        for {
+          _id                          <- c2.get[String]("_id")
+          eventBufferPosition          <- c2.get[Int]("eventBufferPosition")
+          charBufferPosition           <- c2.get[Int]("charBufferPosition")
+          intBufferPosition            <- c2.get[Int]("intBufferPosition")
+          lineBufferPosition           <- c2.get[Int]("lineBufferPosition")
+          systemIdBufferPosition       <- c2.get[Int]("systemIdBufferPosition")
+          attributeCountBufferPosition <- c2.get[Int]("attributeCountBufferPosition")
+          stringBuilderPosition        <- c2.get[Int]("stringBuilderPosition")
+        } yield
+          a.newMark(
+            Array(
+              eventBufferPosition,
+              charBufferPosition,
+              intBufferPosition,
+              lineBufferPosition,
+              systemIdBufferPosition,
+              attributeCountBufferPosition,
+              stringBuilderPosition
+            ),
+            _id
+          ) |!>
+            (collectedSAXStoreMarks += _id -> _) // collect as we go
+      }
+
       for {
         eventBufferPosition          <- c.get[Int]("eventBufferPosition")
         eventBuffer                  <- c.get[Array[Byte]]("eventBuffer")
@@ -111,10 +143,9 @@ object XFormsStaticStateDeserializer {
         attributeCount               <- c.get[Int]("attributeCount")
         stringBuilder                <- c.get[Array[String]]("stringBuilder")
         hasDocumentLocator           <- c.get[Boolean]("hasDocumentLocator")
-//        marks                        <- c.get[Array[]]("hasDocumentLocator")
-
+        _                            <- c.get[Iterable[a.Mark]]("marks") // decoding registers marks as side-effect!
       } yield {
-        val a = new SAXStore
+
         a.eventBufferPosition          = eventBufferPosition
         a.eventBuffer                  = eventBuffer
         a.charBufferPosition           = charBufferPosition
@@ -129,31 +160,11 @@ object XFormsStaticStateDeserializer {
         a.attributeCountBuffer         = attributeCountBuffer
         a.attributeCount               = attributeCount
         a.stringBuilder                = new ju.ArrayList[String](ju.Arrays.asList(stringBuilder: _*))
-        a.hasDocumentLocator           = hasDocumentLocator && false // XXX TODO: don't use location as there is a bug AND we don't need it
+        a.hasDocumentLocator           = hasDocumentLocator && false // XXX TODO: don't use location due to bug AND we don't need it
 
         a
       }
-
-//    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
-//      "_id"                          -> Json.fromString(m._id),
-//      "eventBufferPosition"          -> Json.fromInt(m.eventBufferPosition),
-//      "charBufferPosition"           -> Json.fromInt(m.charBufferPosition),
-//      "intBufferPosition"            -> Json.fromInt(m.intBufferPosition),
-//      "lineBufferPosition"           -> Json.fromInt(m.lineBufferPosition),
-//      "systemIdBufferPosition"       -> Json.fromInt(m.systemIdBufferPosition),
-//      "attributeCountBufferPosition" -> Json.fromInt(m.attributeCountBufferPosition),
-//      "stringBuilderPosition"        -> Json.fromInt(m.stringBuilderPosition)
-//    )
-//
-//    Json.obj(
-//
-//
-//      //    write(out, if (a.publicId == null) "" else a.publicId)
-//      "marks" -> Option(a.marks).map(_.asScala).getOrElse(Nil).asJson
-//    )
-//  }
-//
-//    }
+    }
 
     // TODO: Later must be optimized by sharing based on hash!
     implicit val decodeNamespaceMapping: Decoder[NamespaceMapping] = (c: HCursor) =>
@@ -759,7 +770,7 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeResource       : Decoder[Resource]        = deriveDecoder
 
-    implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysis] = (c: HCursor) =>
+    implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysisImpl] = (c: HCursor) =>
       for {
         startScope          <- c.get[Int]("startScopeRef").map(collectedScopes)
         topLevelControls    <- c.get[Iterable[ElementAnalysis]]("topLevelControls")
@@ -806,10 +817,13 @@ object XFormsStaticStateDeserializer {
         _ = {
           collectedScopes = scopes
         }
-        topLevelPart         <- c.get[TopLevelPartAnalysis]("topLevelPart")
+        topLevelPart         <- c.get[TopLevelPartAnalysisImpl]("topLevelPart")
         template             <- c.get[SAXStore]("template")
         resources            <- c.get[List[Resource]]("resources")
       } yield {
+
+        // Do this *after* the top-level template has been deserialized
+        topLevelPart.marks = collectedSAXStoreMarks
 
         val resourcesMap = resources map (r => r.key -> r.value) toMap
 
@@ -844,7 +858,12 @@ object XFormsStaticStateDeserializer {
           elem.lang  = enLangRef // XXX TODO: must deserialize
         }
 
-        XFormsStaticStateImpl(nonDefaultProperties, Int.MaxValue, topLevelPart, AnnotatedTemplate(template).some) // TODO: serialize `globalMaxSizeProperty` from server
+        XFormsStaticStateImpl(
+          nonDefaultProperties,
+          Int.MaxValue,
+          topLevelPart,
+          AnnotatedTemplate(template).some
+        ) // TODO: serialize `globalMaxSizeProperty` from server
       }
 
     decode[XFormsStaticState](jsonString) match {
@@ -914,6 +933,19 @@ object XFormsStaticStateImpl {
   }
 }
 
+abstract class TopLevelPartAnalysisImpl
+  extends TopLevelPartAnalysis
+    with PartModelAnalysis
+    with PartControlsAnalysis
+    with PartEventHandlerAnalysis {
+
+  // This is set after construction because we deserialize the template and the `TopLevelPartAnalysis` separately
+  var marks: Map[String, SAXStore#Mark] = Map.empty
+
+  def getMark(prefixedId: String): Option[SAXStore#Mark] =
+    marks.get(prefixedId)
+}
+
 object TopLevelPartAnalysisImpl {
 
   def apply(
@@ -930,13 +962,10 @@ object TopLevelPartAnalysisImpl {
     namespaces           : Map[String, NamespaceMapping],
     _functionLibrary     : FunctionLibrary)(implicit
     logger               : IndentedLogger
-  ): TopLevelPartAnalysis = {
+  ): TopLevelPartAnalysisImpl = {
 
     val partAnalysis =
-      new TopLevelPartAnalysis
-        with PartModelAnalysis
-        with PartControlsAnalysis
-        with PartEventHandlerAnalysis {
+      new TopLevelPartAnalysisImpl {
 
         def bindingIncludes: Set[String] = Set.empty // XXX TODO
 
@@ -973,8 +1002,6 @@ object TopLevelPartAnalysisImpl {
           getNamespaceMapping(prefixedId) getOrElse
             (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${element.toDebugString}`"))
         }
-
-        def getMark(prefixedId: String): Option[SAXStore#Mark] = None // XXX TODO
 
         def iterateGlobals: Iterator[Global] = Iterator.empty // XXX TODO
 

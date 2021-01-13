@@ -177,7 +177,7 @@ final class SAXStore extends ForwardingXMLReceiver {
     def saxStore: SAXStore = thisSAXStore
   }
 
-  def newMark(values: Array[Int], id: String): Unit =
+  def newMark(values: Array[Int], id: String): Mark =
     new Mark(values, id)
 
   // For debugging only
@@ -220,14 +220,15 @@ final class SAXStore extends ForwardingXMLReceiver {
 
   @throws[SAXException]
   def replay(xmlReceiver: XMLReceiver, mark: Mark): Unit = {
-    var intBufferPos = mark.intBufferPosition
-    var charBufferPos = mark.charBufferPosition
-    var stringBuilderPos = mark.stringBuilderPosition
+
+    var intBufferPos            = mark.intBufferPosition
+    var charBufferPos           = mark.charBufferPosition
+    var stringBuilderPos        = mark.stringBuilderPosition
     var attributeCountBufferPos = mark.attributeCountBufferPosition
-    val lineBufferPos = Array(mark.lineBufferPosition)
-    val systemIdBufferPos = Array(mark.systemIdBufferPosition)
-    val attributes = new AttributesImpl
-    var currentEventPosition = mark.eventBufferPosition
+    val lineBufferPos           = Array(mark.lineBufferPosition)
+    val systemIdBufferPos       = Array(mark.systemIdBufferPosition)
+    val attributes              = new AttributesImpl
+    var currentEventPosition    = mark.eventBufferPosition
 
     val outputLocator =
       if (! hasDocumentLocator)
@@ -359,9 +360,8 @@ final class SAXStore extends ForwardingXMLReceiver {
     }
   }
 
-  // Create a new mark
   // NOTE: This must be called *before* the `startElement()` event that will be the first element associated with the mark.
-  def getMark(id: String): Mark =
+  def createAndRememberMark(id: String): Mark =
     new Mark(this, id)
 
   // Return all the marks created

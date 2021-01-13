@@ -81,7 +81,7 @@ object XFormsStaticStateSerializer {
       "stringBuilder"                -> a.stringBuilder.asScala.asJson,
       "hasDocumentLocator"           -> Json.fromBoolean(a.hasDocumentLocator),
       //    write(out, if (a.publicId == null) "" else a.publicId)
-      "marks"                        -> Option(a.marks).map(_.asScala).getOrElse(Nil).asJson
+      "marks"                        -> a.getMarks.asScala.asJson
     )
   }
 

@@ -64,8 +64,11 @@
             var me = this;
             var address = ORBEON.xforms.Document.getValue(me.addressOutputID);
             me.geoCoder.geocode({ 'address': address}, function (results, status) {
-                if (status == google.maps.GeocoderStatus.OK)
-                    me.updateMarkerFromLatLng(results[0].geometry.location);
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var latLng = results[0].geometry.location;
+                    me._updateLongLat(latLng);
+                    me.updateMarkerFromLatLng(latLng);
+                }
             });
         },
 

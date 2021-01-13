@@ -47,7 +47,7 @@ object ElementAnalysisTreeBuilder {
   ): Unit = {
     parentElem.addChildren( // TODO: consider have children add themselves to the parent?
       {
-        // NOTE: Making `preceding` hold a side effect here is a bit unclear and error-prone.
+        // NOTE: Making `preceding` hold a side-effect here is a bit unclear and error-prone.
         var precedingElem: Option[ElementAnalysis] = None
 
         // Build and collect the children

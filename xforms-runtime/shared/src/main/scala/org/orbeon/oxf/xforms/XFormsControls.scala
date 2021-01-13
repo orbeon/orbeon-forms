@@ -188,7 +188,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
             // NOTE: During this process, ideally, no events are dispatched. However, at this point, the code
             // can an dispatch, upon removed repeat iterations, xforms-disabled, DOMFocusOut and possibly events
             // arising from updating the binding of nested XBL controls.
-            // This unfortunately means that side effects can take place. This should be fixed, maybe by simply
+            // This unfortunately means that side-effects can take place. This should be fixed, maybe by simply
             // detaching removed iterations first, and then dispatching events after all bindings have been
             // updated as part of dispatchRefreshEvents() below. This requires that controls are able to kind of
             // stay alive in detached mode, and then that the index is also available while these events are

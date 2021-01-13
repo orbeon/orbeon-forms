@@ -96,7 +96,7 @@ trait BindingLoader extends Logging {
           foundLibraryPaths     ++
           notFoundLibraryPaths
 
-        // Side effect!
+        // Side-effect!
         originalOrUpdatedIndexOpt = Some(newIndex)
 
         (baselineBindings, allCheckedPaths)

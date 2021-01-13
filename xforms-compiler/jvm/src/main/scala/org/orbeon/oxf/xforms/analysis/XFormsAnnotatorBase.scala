@@ -139,10 +139,10 @@ abstract class XFormsAnnotatorBase(
         attsWithNewClass
       } else if (isCase && (stackElement.parent exists (_.isFullUpdate))) {
         // Remember mark but don't produce class
-        putMark() // side effect: remember mark
+        putMark() // side-effect: remember mark
         atts
       } else if (isRepeat || stackElement.isFullUpdate) {
-        putMark() // side effect: remember mark
+        putMark() // side-effect: remember mark
         attsWithNewClass
       } else {
         atts

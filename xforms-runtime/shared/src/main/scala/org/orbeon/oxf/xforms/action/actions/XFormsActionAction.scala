@@ -69,7 +69,7 @@ class XFormsActionAction extends XFormsAction {
           )
         )
       case Some(StaticScript(_, ScriptType.XPath, _, ShareableScript(_, _, body, _))) =>
-        // Evaluate XPath expression for its side effects only
+        // Evaluate XPath expression for its side-effects only
         actionInterpreter.evaluateKeepItems(
           actionAnalysis,
           bindingContext.nodeset,

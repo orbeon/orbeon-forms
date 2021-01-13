@@ -325,10 +325,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def visited(controlId: String)(implicit xpc: XPathContext): Option[Boolean] =
     relevantControl(controlId) map (_.visited)
 
-//    Fun("focusable", classOf[XXFormsFocusable], op = 0, min = 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING,  EXACTLY_ONE),
-//      Arg(BOOLEAN, EXACTLY_ONE)
-//    )
+  @XPathFunction
+  def focusable(controlId: String, toggle: Boolean = true)(implicit xpc: XPathContext): Boolean = {
+
+    val it =
+      if (toggle)
+        relevantControl(controlId).iterator flatMap (_.directlyFocusableControlsMaybeWithToggle)
+      else
+        relevantControl(controlId).iterator flatMap (_.directlyFocusableControls)
+
+    it.nonEmpty
+  }
 
   @XPathFunction
   def absoluteId(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Option[String] =

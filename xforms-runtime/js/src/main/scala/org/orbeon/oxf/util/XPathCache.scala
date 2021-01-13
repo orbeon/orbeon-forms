@@ -1,22 +1,21 @@
 package org.orbeon.oxf.util
 
-import java.{util => ju}
-
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType, makeStringExpression}
-import org.orbeon.oxf.util.XPath.withFunctionContext
+import org.orbeon.oxf.util.XPath.{adjustContextItem, newDynamicAndMajorContexts, withFunctionContext}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{SequenceIterator, SequenceTool}
-import org.orbeon.saxon.sxpath.{IndependentContext, XPathDynamicContext, XPathExpression, XPathVariable}
+import org.orbeon.saxon.sxpath.{IndependentContext, XPathExpression, XPathVariable}
 import org.orbeon.saxon.value.{AtomicValue, ObjectValue, SequenceExtent}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
+import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -24,7 +23,7 @@ import scala.util.control.NonFatal
 
 object XPathCache extends XPathCacheTrait {
 
-  private val Explain = false
+  private val Explain             = false
 
   import Private._
 
@@ -57,11 +56,11 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next()
+        evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next()
       }
     }
   }
@@ -94,11 +93,11 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        val r = new SequenceExtent(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables))
+        val r = new SequenceExtent(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables))
         XPath.Logger.debug(s"xxx XPathCache.evaluateAsExtent for `$xpathString`, r = `${r.asIterable.asScala map (_.getStringValue) mkString ", "}`")
         r
       }
@@ -133,20 +132,21 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     if (Explain) {
-      import _root_.java.io.PrintStream
       import org.orbeon.saxon.lib.StandardLogger
+
+      import _root_.java.io.PrintStream
 
       xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
     }
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        val r = scalaIteratorToJavaList(Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)))
+        val r = scalaIteratorToJavaList(Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextItems.size, contextPos, variableToValueMap, variables)))
         XPath.Logger.debug(s"xxxx size = ${r.size} ${r.asScala map (_.toString) mkString ", "}")
         r
       }
@@ -181,11 +181,11 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        val r = Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)).toList
+        val r = Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables)).toList
 
         XPath.Logger.debug(s"xxxx ${r.size}")
 
@@ -223,20 +223,21 @@ object XPathCache extends XPathCacheTrait {
       )
 
     if (Explain) {
-      import _root_.java.io.PrintStream
       import org.orbeon.saxon.lib.StandardLogger
+
+      import _root_.java.io.PrintStream
 
       xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
     }
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r =
-          Option(singleItemToJavaKeepNodeInfoOrNull(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next())) map (_.toString)
+          Option(singleItemToJavaKeepNodeInfoOrNull(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next())) map (_.toString)
         XPath.Logger.debug(s"xxx result = $r")
 
         r
@@ -272,12 +273,12 @@ object XPathCache extends XPathCacheTrait {
         locationData
       )
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         scalaIteratorToJavaList(
-          Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables)) map
+          Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables)) map
             itemToJavaKeepNodeInfoOrNull
         )
       }
@@ -356,20 +357,21 @@ object XPathCache extends XPathCacheTrait {
       )
 
     if (Explain) {
-      import _root_.java.io.PrintStream
       import org.orbeon.saxon.lib.StandardLogger
+
+      import _root_.java.io.PrintStream
 
       xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
     }
 
-    val (contextItem, contextPos) = getContextItem(contextItems, contextPosition)
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
     XPath.Logger.debug(s"xxx  contextItem, contextPos: $contextItem, $contextPos")
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         val r =
-          evaluateImpl(xpathExpression, contextItem, contextPos, variableToValueMap, variables).next()
+          evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next()
 
         XPath.Logger.debug(s"xxx result = ${r.getStringValue}")
 
@@ -388,25 +390,18 @@ object XPathCache extends XPathCacheTrait {
     ???
   }
 
-    private def newDynamicAndMajorContexts(
-    expression      : XPathExpression,
-    contextItem     : om.Item,
-    contextPosition : Int
-  ): (XPathDynamicContext, XPathContextMajor) = {
-    val dynamicContext = expression.createDynamicContext(contextItem) // XXX TODO: `contextPosition`
-    (dynamicContext, dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor])
-  }
-
   private object Private {
 
     def evaluateImpl(
       expression         : XPathExpression,
       contextItem        : om.Item,
       contextPosition    : Int,
+      contextSize        : Int,
       variableToValueMap : ju.Map[String, ValueRepresentationType],
       variables          : List[(String, XPathVariable)]
     ): SequenceIterator = {
-      val (dynamicContext, xpathContext) = newDynamicAndMajorContexts(expression, contextItem, contextPosition)
+      val (dynamicContext, xpathContext) =
+        newDynamicAndMajorContexts(expression, contextItem, contextPosition, contextSize)
       prepareDynamicContext(xpathContext, variableToValueMap, variables)
       expression.iterate(dynamicContext)
     }
@@ -529,12 +524,6 @@ object XPathCache extends XPathCacheTrait {
         case NonFatal(t) => throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)
       }
     }
-
-    def getContextItem(contextItems: ju.List[om.Item], contextPosition: Int): (om.Item, Int) =
-      if (contextPosition > 0 && contextPosition <= contextItems.size)
-        (contextItems.get(contextPosition - 1), contextPosition)
-      else
-        (null, 0)
 
     def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
 

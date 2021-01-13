@@ -1,30 +1,31 @@
 package org.orbeon.oxf.util
 
-import java.{util => ju}
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver, compileExpression}
+import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPathCache.Explain
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.parser.{ExpressionTool, OptimizerOptions}
-import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
+import org.orbeon.saxon.expr.{Expression, XPathContextMajor, XPathContextMinor}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.saxon.style.AttributeValueTemplate
-import org.orbeon.saxon.sxpath.{XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathStaticContext}
+import org.orbeon.saxon.tree.iter.ManualIterator
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.xml.NamespaceMapping
 
+import java.{util => ju}
 import scala.util.Try
 import scala.util.control.NonFatal
 
 
 object XPath extends XPathTrait {
 
-  private val Explain = false
+  private val Explain            = false
+  private val LogAndExplainError = true
 
   val GlobalConfiguration: StaticXPath.SaxonConfiguration = new Configuration {
 
@@ -47,14 +48,10 @@ object XPath extends XPathTrait {
 
       Logger.debug(s"xxxx evaluateSingle for `${compiledExpression.string}`")
 
-      val (contextItem, position) =
-        if (contextPosition > 0 && contextPosition <= contextItems.size)
-          (contextItems.get(contextPosition - 1), contextPosition)
-        else
-          (null, 0)
+      val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
-      val dynamicContext = xpathExpression.createDynamicContext(contextItem) // XXX FIXME: `, position`?
-      val xpathContext   = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
+      val (dynamicContext, xpathContext) =
+        newDynamicAndMajorContexts(xpathExpression, contextItem, contextPos, contextItems.size())
 
       xpathContext.getController.setUserData(
         classOf[ShareableXPathStaticContext].getName,
@@ -63,8 +60,9 @@ object XPath extends XPathTrait {
       )
 
       if (Explain) {
-      import _root_.java.io.PrintStream
         import org.orbeon.saxon.lib.StandardLogger
+
+        import _root_.java.io.PrintStream
 
         xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
       }
@@ -118,6 +116,30 @@ object XPath extends XPathTrait {
     else
       ExpressionTool.make(xpathString, staticContext, 0, -1, null)
 
+  def adjustContextItem(contextItems: ju.List[om.Item], contextPosition: Int): (om.Item, Int) =
+    if (contextPosition > 0 && contextPosition <= contextItems.size)
+      (contextItems.get(contextPosition - 1), contextPosition)
+    else
+      (null, 0)
+
+  def newDynamicAndMajorContexts(
+    expression      : XPathExpression,
+    contextItem     : om.Item,
+    contextPosition : Int,
+    contextSize     : Int
+  ): (XPathDynamicContext, XPathContextMajor) = {
+
+    val dynamicContext = expression.createDynamicContext(contextItem)
+    val xpcm           = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
+
+    if (contextItem != null) {
+      xpcm.currentIterator = new ManualIterator(contextItem, contextPosition)
+      xpcm.last           = new XPathContextMinor.LastValue(contextSize)
+    }
+
+    (dynamicContext, xpcm)
+  }
+
   private def withEvaluation[T](expression: CompiledExpression)(body: XPathExpression => T)(implicit reporter: Reporter): T =
     try {
       if (reporter ne null) {
@@ -132,10 +154,24 @@ object XPath extends XPathTrait {
         body(expression.expression)
     } catch {
       case NonFatal(t) =>
+
+        if (LogAndExplainError) {
+          import org.orbeon.saxon.lib.StandardLogger
+
+          import _root_.java.io.PrintStream
+
+          expression.expression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
+        }
+
         throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
     }
 
-  private def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
+  private def handleXPathException(
+    t            : Throwable,
+    xpathString  : String,
+    description  : String,
+    locationData : LocationData
+  ): ValidationException = {
 
     val validationException =
       OrbeonLocationException.wrapException(

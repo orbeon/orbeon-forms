@@ -107,7 +107,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
               Converter.jsonStringToXmlStream(SubmissionUtils.readTextContent(connectionResult.content).get, receiver)
               receiver.getDocument
             } else {
-              XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, isHandleXInclude, true)
+              XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, isHandleXInclude, handleLexical = true)
             }
           )
         } else {
@@ -120,7 +120,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             if (isJSON)
               Converter.jsonStringToXmlDoc(SubmissionUtils.readTextContent(connectionResult.content).get)
             else
-              XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
+              XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, handleLexical = true)
           )
         }
       }
@@ -214,7 +214,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
         // Whether the destination node is the root element of an instance
         val isDestinationRootElement = instanceToUpdate.rootElement.isSameNodeInfo(destinationNodeInfo)
-        if (p2.isReadonly && !isDestinationRootElement) {
+        if (p2.isReadonly && ! isDestinationRootElement) {
           // Only support replacing the root element of an instance when using a shared instance
           throw new XFormsSubmissionException(
             submission       = submission,

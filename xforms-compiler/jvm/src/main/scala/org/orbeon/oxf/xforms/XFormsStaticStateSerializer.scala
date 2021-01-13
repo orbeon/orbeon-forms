@@ -178,7 +178,7 @@ object XFormsStaticStateSerializer {
       "debugBindingName"            -> Json.fromString(a.debugBindingName),
       "cssClasses"                  -> Json.fromString(a.cssClasses),
       "allowedExternalEvents"       -> a.allowedExternalEvents.asJson,
-      "constantInstances"           -> a.constantInstances.toIterable.asJson
+      "constantInstances"           -> a.constantInstances.toIterable.asJson // NOTE: Keep `.toIterable` to trigger right encoder.
     )
 
     val (
@@ -452,7 +452,7 @@ object XFormsStaticStateSerializer {
           }
 
         Json.obj(
-          "key"    -> Json.fromString(resource),
+          "key"   -> Json.fromString(resource),
           "value" -> Json.fromString(dataUrl)
         )
       }

@@ -1074,7 +1074,7 @@
                         <xf:var name="position"    value="position()"/>
                         <xf:var name="button-name" value="."/>
                         <xf:var name="ref"         value="$names-and-refs-if-relevant[$position * 2]"/>
-                        <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
+                        <xf:var name="primary"     value="$highlight-primary and $position = last()"/>
 
                         <xf:var
                             name="class"

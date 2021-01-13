@@ -37,11 +37,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun("repeat-current", classOf[XXFormsRepeatCurrent], op = 0, min = 0, Type.NODE_TYPE, EXACTLY_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("repeat-position", classOf[XXFormsRepeatPosition], op = 0, min = 0, INTEGER, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def repeatPosition(repeatId: String = null)(implicit xfc: XFormsFunction.Context): Int =
+    xfc.bindingContext.enclosingRepeatIterationBindingContext(Option(repeatId)).position
+
 //    Fun("context", classOf[XXFormsContext], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )

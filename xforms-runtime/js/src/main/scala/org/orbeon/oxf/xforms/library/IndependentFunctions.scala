@@ -143,12 +143,13 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //    Fun("evaluate", classOf[saxon.functions.Evaluate], op = saxon.functions.Evaluate.EVALUATE, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("serialize", classOf[saxon.functions.Serialize], op = 0, min = 2, STRING, EXACTLY_ONE,
-//      Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
-//      Arg(ITEM_TYPE, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def serialize(node: Option[om.NodeInfo], params: om.Item): String = {
+    """[TODO]: serialize xml"""
+  }
+
+  //
 //    Fun("property", classOf[Property], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )

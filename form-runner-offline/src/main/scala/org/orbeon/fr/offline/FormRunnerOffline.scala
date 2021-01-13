@@ -78,6 +78,10 @@ trait FormRunnerProcessor {
     mode         : String,
     documentId   : js.UndefOr[String]
   ): Unit
+
+  @JSExport
+  def destroyForm(container: html.Element): Unit =
+    OfflineDemo.destroyForm(container)
 }
 
 @JSExportTopLevel("FormRunnerOffline")

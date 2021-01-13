@@ -28,7 +28,7 @@ trait SingleNodeTrait extends ElementAnalysis {
   // a binding is allowed without having access to a concrete control.
   def isAllowedBoundItem(item: om.Item): Boolean = StaticDataModel.isAllowedBoundItem(item)
 
-  val explicitValidation: Boolean = Option(element.attributeValue(XXFORMS_VALIDATION_MODE_QNAME)) match {
+  var explicitValidation: Boolean = Option(element.attributeValue(XXFORMS_VALIDATION_MODE_QNAME)) match {
     case Some("explicit") => true
     case Some(_)          => false
     case None             =>

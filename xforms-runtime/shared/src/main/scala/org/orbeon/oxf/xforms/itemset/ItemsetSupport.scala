@@ -421,7 +421,7 @@ object ItemsetSupport {
   def streamAsHTML(lhhaValue: LHHAValue, locationData: LocationData)(implicit xmlReceiver: XMLReceiver): Unit =
     if (lhhaValue.label.nonAllBlank) {
       if (lhhaValue.isHTML)
-        XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, lhhaValue.label, locationData, "")
+        XFormsCrossPlatformSupport.streamHTMLFragment(lhhaValue.label, locationData, "")
       else
         text(lhhaValue.label)
     }

@@ -64,7 +64,12 @@ trait XFormsCrossPlatformSupportTrait {
 
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String
 
-  def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit
+  def streamHTMLFragment(
+    value        : String,
+    locationData : LocationData,
+    xhtmlPrefix  : String)(implicit
+    xmlReceiver  : XMLReceiver
+  ): Unit
 
   val DEFAULT_METHOD_PROPERTY_NAME = "default-method"
   val DEFAULT_METHOD               = QName("xml")

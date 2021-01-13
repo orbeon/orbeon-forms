@@ -56,7 +56,7 @@ object XMLOutput extends XMLReceiverSupport {
   def writeTextOrHTML(name: String, value: String, html: Boolean)(implicit xmlReceiver: XMLReceiver): Unit =
     if (html)
       withElement(name, atts = List("html" -> true.toString)) {
-        XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, value, null, "")
+        XFormsCrossPlatformSupport.streamHTMLFragment(value, null, "")
       }
     else
       element(name, text = value)

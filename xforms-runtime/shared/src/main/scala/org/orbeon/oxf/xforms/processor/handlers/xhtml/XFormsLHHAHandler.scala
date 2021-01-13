@@ -83,7 +83,7 @@ class XFormsLHHAHandler(
               if externalValue.nonEmpty
             } locally {
               if (staticLhha.element.attributeValueOpt("mediatype") contains "text/html") {
-                XFormsCrossPlatformSupport.streamHTMLFragment(xmlReceiver, externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
+                XFormsCrossPlatformSupport.streamHTMLFragment(externalValue, currentLHHAControl.getLocationData, handlerContext.findXHTMLPrefix)
               } else {
                 xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
               }

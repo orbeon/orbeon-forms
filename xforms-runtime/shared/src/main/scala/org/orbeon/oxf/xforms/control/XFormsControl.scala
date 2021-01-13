@@ -285,6 +285,9 @@ object XFormsControl {
     // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
     val rewriter = XFormsCrossPlatformSupport.externalContext.getResponse
     XFormsCrossPlatformSupport.streamHTMLFragment(
+      rawValue,
+      locationData,
+      "xhtml")(
       Rewrite.getRewriteXMLReceiver(
         rewriter,
         new ForwardingXMLReceiver {
@@ -329,10 +332,7 @@ object XFormsControl {
         },
         fragment = true,
         XMLConstants.XHTML_NAMESPACE_URI
-      ),
-      rawValue,
-      locationData,
-      "xhtml"
+      )
     )
 
     sb.toString

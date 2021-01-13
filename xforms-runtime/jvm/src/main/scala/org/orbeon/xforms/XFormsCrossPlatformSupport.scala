@@ -158,7 +158,12 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   //            throw new OXFException(e);
   //        }
   //    }
-  def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit = {
+  def streamHTMLFragment(
+    value        : String,
+    locationData : LocationData,
+    xhtmlPrefix  : String)(implicit
+    xmlReceiver  : XMLReceiver
+  ): Unit = {
     if (value.nonAllBlank) {
       // don't parse blank values
       val htmlDocument = htmlStringToDocumentTagSoup(value, locationData)

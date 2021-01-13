@@ -25,7 +25,11 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, StaticXPat
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
+import org.scalajs.dom.DOMParser
+import org.scalajs.dom.ext._
+import org.scalajs.dom.raw.HTMLDocument
 
 import java.io.{InputStream, OutputStream, Reader, StringReader}
 import java.net.URI
@@ -67,10 +71,35 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = ???
 
-  // XXX TODO: implement
-  def streamHTMLFragment(xmlReceiver: XMLReceiver, value: String, locationData: LocationData, xhtmlPrefix: String): Unit = {
-    val s = s"""[TODO: streamHTMLFragment] $value"""
-    xmlReceiver.characters(s.toCharArray, 0, s.length)
+  def streamHTMLFragment(
+    value        : String,
+    locationData : LocationData,
+    xhtmlPrefix  : String)(implicit
+    xmlReceiver  : XMLReceiver
+  ): Unit = {
+
+    // The Scala.js implementation uses the HTML environment's `DOMParser`, unlike on the JVM where
+    // we have to use a library like `TagSoup`.
+    val parser = new DOMParser()
+    val doc    = parser.parseFromString(value, "text/html").asInstanceOf[HTMLDocument]
+
+    def outputFragment(nodes: org.scalajs.dom.NodeList): Unit = {
+      nodes foreach {
+        case v: org.scalajs.dom.Element =>
+          withElement(
+            v.tagName,
+            atts = v.attributes.toIterable map { case (name, att) => name -> att.value }
+          ) {
+            outputFragment(v.childNodes)
+          }
+        case v: org.scalajs.dom.Text    =>
+          val s = v.nodeValue
+          xmlReceiver.characters(s.toCharArray, 0, s.length)
+        case _ =>
+      }
+    }
+
+    outputFragment(doc.body.childNodes)
   }
 
   def proxyURI(

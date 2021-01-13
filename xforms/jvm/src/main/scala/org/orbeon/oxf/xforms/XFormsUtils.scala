@@ -32,8 +32,4 @@ object XFormsUtils {
       case e: TransformerException =>
         throw new OXFException(e)
     }
-
-  //@XPathFunction
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): dom.Document =
-    XFormsCrossPlatformSupport.htmlStringToDocumentTagSoup(value, locationData)
 }

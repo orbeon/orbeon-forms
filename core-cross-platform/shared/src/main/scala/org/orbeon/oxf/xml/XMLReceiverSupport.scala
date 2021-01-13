@@ -81,7 +81,7 @@ trait XMLReceiverSupport {
       receiver.characters(chars, 0, chars.length)
     }
 
-  def addAttributes(attributesImpl: AttributesImpl, atts: Seq[(String, String)]): Unit =
+  def addAttributes(attributesImpl: AttributesImpl, atts: Iterable[(String, String)]): Unit =
     atts foreach {
       case (name, value) =>
         require(name ne null)
@@ -96,7 +96,7 @@ trait XMLReceiverSupport {
       atts map { case (name, value) => s"""$name="${value.escapeXmlForAttribute}"""" } mkString " "
     )
 
-  implicit def pairsToAttributes(atts: Seq[(String, String)]): Attributes = {
+  implicit def pairsToAttributes(atts: Iterable[(String, String)]): Attributes = {
     val saxAtts = new AttributesImpl
     addAttributes(saxAtts, atts)
     saxAtts

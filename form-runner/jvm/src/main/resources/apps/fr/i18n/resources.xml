@@ -21,47 +21,47 @@
             </formats>
         </common>
         <buttons>
-            <create>&lt;i class="fa fa-fw fa-plus"/&gt; Create</create>
-            <view>&lt;i class="fa fa-fw fa-eye"/&gt; View</view>
-            <approve>&lt;i class="fa fa-fw fa-check"/&gt; Approve</approve>
-            <reject>&lt;i class="fa fa-fw fa-close"/&gt; Reject</reject>
+            <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Create</create>
+            <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; View</view>
+            <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approve</approve>
+            <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Reject</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Delete</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Import</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; New</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicate</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Delete</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Import</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; New</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicate</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Save</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Save</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Save</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Edit</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validate</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Save</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Save</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Save</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edit</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validate</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Submit</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Review</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Edit</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Submit</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Review</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edit</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Summary</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Close</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Clear</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Summary</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Close</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Clear</clear>
             <cancel>Cancel</cancel>
             <save-locally>Save Locally</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Next</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Prev</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Content</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Next</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Prev</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Content</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Clear and close</submit-dialog-clear>
@@ -73,12 +73,12 @@
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Continue</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publish</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok>OK</ok>
             <previous>Previous</previous>
             <next>Next</next>
@@ -182,7 +182,7 @@
             </titles>
             <search>
                 <search>Search</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Search Forms</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
                 <show-options>Show Search Options</show-options>
                 <close-options>Hide Search Options</close-options>
             </search>
@@ -315,8 +315,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Make Unavailable</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Make Available</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Make Unavailable</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Make Available</publish>
                 <cancel>Cancel</cancel>
                 <connect>Connect</connect>
                 <select>Select</select>
@@ -496,47 +496,47 @@
             </formats>
         </common>
         <buttons>
-            <create>&lt;i class="fa fa-fw fa-plus"/&gt; Créer</create>
-            <view>&lt;i class="fa fa-fw fa-eye"/&gt; Visualiser</view>
-            <approve>&lt;i class="fa fa-fw fa-check"/&gt; Approuver</approve>
-            <reject>&lt;i class="fa fa-fw fa-close"/&gt; Rejeter</reject>
+            <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Créer</create>
+            <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</view>
+            <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approuver</approve>
+            <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Accueil</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Visualiser</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Supprimer</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importer</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nouveau</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliquer</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Accueil</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Supprimer</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nouveau</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliquer</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Enregistrer</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Enregistrer</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Enregistrer</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editer</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Envoyer</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valider</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editer</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valider</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Envoyer</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Valider</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editer</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Envoyer</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Valider</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editer</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommaire</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Fermer</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Effacer</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sommaire</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Fermer</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Effacer</clear>
             <cancel>Annuler</cancel>
             <save-locally>Enreg. Local</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Suivant</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Précédent</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenu</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Suivant</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Précédent</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenu</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
@@ -548,12 +548,12 @@
             <validation-dialog-review>Revoir</validation-dialog-review>
             <validation-dialog-continue>Continuer</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Tester</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publier</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Oui</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; Non</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Oui</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Non</no>
             <ok>OK</ok>
             <previous>Précédent</previous>
             <next>Suivant</next>
@@ -660,7 +660,7 @@
             </titles>
             <search>
                 <search>Recherche</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Rechercher</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
                 <show-options>Montrer les options de recherche</show-options>
                 <close-options>Cacher les options de recherche</close-options>
             </search>
@@ -794,8 +794,8 @@
         <home>
             <title>Accueil Form Runner</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Rendre non disponible</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Rendre disponible</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rendre non disponible</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Rendre disponible</publish>
                 <cancel>Annuler</cancel>
                 <connect>Connecter</connect>
                 <select>Sélectionner</select>
@@ -975,47 +975,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Inicio</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Ver</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Eliminar</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importar</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuevo</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Inicio</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Ver</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuevo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Guardar</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Enviar</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Enviar</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Ver</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Enviar</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Ver</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Resumen</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Cerrar</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Limpiar</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Resumen</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Cerrar</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Limpiar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Siguiente</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Previo</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Contenido</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previo</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenido</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
@@ -1027,12 +1027,12 @@
             <validation-dialog-review>Revisar</validation-dialog-review>
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testear</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testear</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sí</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Sí</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok>Aceptar</ok>
             <previous>Previo</previous>
             <next>Próximo</next>
@@ -1130,7 +1130,7 @@
             </titles>
             <search>
                 <search>Buscar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Buscar formulario</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
                 <show-options>Mostrar opciones de búsqueda</show-options>
                 <close-options>Cerrar opciones de búsqueda</close-options>
             </search>
@@ -1259,8 +1259,8 @@
         <home>
             <title>Inicio Form Runner</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Despublicar</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Despublicar</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Conectar</connect>
                 <select>Seleccionar</select>
@@ -1440,47 +1440,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Vis</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Slett</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importer</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nytt skjema</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Vis</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slett</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nytt skjema</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Lagre</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Lagre</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Lagre</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Epost</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Epost</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send inn</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Vis</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send inn</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Vis</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Lukk</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tøm innhold</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Summary]</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Lukk</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Tøm innhold</clear>
             <cancel>Angre</cancel>
             <save-locally>Lagre lokalt</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Neste</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Tilbake</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tilbake</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -1492,12 +1492,12 @@
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiser…</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</save-publish>
 
-            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Tilbake</previous>
             <next>Neste</next>
@@ -1596,7 +1596,7 @@
             </titles>
             <search>
                 <search>Søk</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Søk etter skjema</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
                 <show-options>Vis alternativer for søk</show-options>
                 <close-options>Lukk alternativer for søk</close-options>
             </search>
@@ -1723,8 +1723,8 @@
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
-                <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"/&gt; Unpublish]</unpublish>
-                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"/&gt; Publish]</publish>
+                <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Unpublish]</unpublish>
+                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish]</publish>
                 <cancel todo="true">[Cancel]</cancel>
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
@@ -1904,47 +1904,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; На главную</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Проверить</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Удалить</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Импорт</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Новая</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; [Duplicate]</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; На главную</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Проверить</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Удалить</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Импорт</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Новая</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; [Duplicate]</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Сохранить</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Сохранить</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Сохранить</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Править</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Отправить</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validate]</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Сохранить</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Сохранить</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Сохранить</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Править</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validate]</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Отправить</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Просмотреть</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Править</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Отправить</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Просмотреть</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Править</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; [Summary]</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Закрыть</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Очистить</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Summary]</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Закрыть</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Очистить</clear>
             <cancel>Отменить</cancel>
             <save-locally>Сохр.на диск</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Обновить"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Вперед</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Назад</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Обновить"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Вперед</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Назад</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
@@ -1956,12 +1956,12 @@
             <validation-dialog-review todo="true">[Review]</validation-dialog-review>
             <validation-dialog-continue todo="true">[Continue]</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Тестировать</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Публиковать</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Тестировать</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</save-publish>
 
-            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Назад</previous>
             <next>Вперед</next>
@@ -2059,7 +2059,7 @@
             </titles>
             <search>
                 <search>Поиск</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Поиск формы</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
                 <show-options>Показать настройки поиска</show-options>
                 <close-options>Закрыть настройки поиска</close-options>
             </search>
@@ -2185,8 +2185,8 @@
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
-                <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"/&gt; Unpublish]</unpublish>
-                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"/&gt; Publish]</publish>
+                <unpublish todo="true">[&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Unpublish]</unpublish>
+                <publish todo="true">[&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish]</publish>
                 <cancel todo="true">[Cancel]</cancel>
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
@@ -2366,47 +2366,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Recensione</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importa</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nuovo</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Copia</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Recensione</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Cancella</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importa</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nuovo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Copia</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Salva</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Salva</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Salva</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Modifica</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Invia modulo</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valida</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Salva</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Salva</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Salva</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Modifica</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Invia modulo</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valida</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Presenta</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Esamina</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Modifica</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Invia modulo</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Presenta</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Esamina</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Modifica</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Invia modulo</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sommario</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Chiudi</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Cancella</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sommario</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Chiudi</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Cancella</clear>
             <cancel>Cancella</cancel>
             <save-locally>Salva localmente</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aggiorna"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Prossimo</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Precedente</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aggiorna"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Prossimo</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Precedente</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
@@ -2418,12 +2418,12 @@
             <validation-dialog-review>Recensione</validation-dialog-review>
             <validation-dialog-continue>Continua</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Prova</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Prova</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Sì</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Sì</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Indietro</previous>
             <next>Avanti</next>
@@ -2527,7 +2527,7 @@
             </titles>
             <search>
                 <search>Cerca</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Cerca moduli</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
                 <show-options>Mostra opzioni di ricerca</show-options>
                 <close-options>Chiudi opzioni di ricerca</close-options>
             </search>
@@ -2660,8 +2660,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Nascondi</unpublish>
-                <publish todo="true">&lt;i class="fa fa-fw fa-globe"/&gt; Pubblica</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Nascondi</unpublish>
+                <publish todo="true">&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
                 <cancel>Cancella</cancel>
                 <connect>Connetti</connect>
                 <select>Seleziona</select>
@@ -2841,47 +2841,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Home</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Übersicht</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Löschen</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importieren</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Neu</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopieren</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Übersicht</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Löschen</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importieren</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Neu</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Kopieren</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Speichern</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Speichern</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Speichern</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Ändern</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Senden</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validieren</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Speichern</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Speichern</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Speichern</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Ändern</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Senden</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validieren</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Abschicken</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Überprüfen</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Ändern</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Senden</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Abschicken</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Überprüfen</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Ändern</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Senden</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Übersicht</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Schließen</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Zurücksetzen</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Übersicht</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Schließen</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Zurücksetzen</clear>
             <cancel>Abbrechen</cancel>
             <save-locally>Lokal speichern</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Nächstes</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Vorheriges</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nächstes</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorheriges</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
@@ -2893,12 +2893,12 @@
             <validation-dialog-review>Überprüfung</validation-dialog-review>
             <validation-dialog-continue>Weiter</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nein</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Ja</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nein</no>
             <ok todo="true">OK</ok>
             <previous>Zurück</previous>
             <next>Weiter</next>
@@ -3002,7 +3002,7 @@
             </titles>
             <search>
                 <search>Suchen</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Formular suchen</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
                 <show-options>Suchoptionen anzeigen</show-options>
                 <close-options>Suchoptionen schließen</close-options>
             </search>
@@ -3135,8 +3135,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Verbergen</unpublish>
-                <publish todo="true">&lt;i class="fa fa-fw fa-globe"/&gt; Veröffentlichen</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Verbergen</unpublish>
+                <publish todo="true">&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
                 <cancel>Abbrechen</cancel>
                 <connect>Verbinden</connect>
                 <select>Auswählen</select>
@@ -3316,47 +3316,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Koti</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Käy läpi</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; Näytä PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Poista</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Tuo</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Uusi</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Kopioi</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Koti</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Käy läpi</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; Näytä PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Poista</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Tuo</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Uusi</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Kopioi</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Tallenna</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Tallenna</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Tallenna</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Muokkaa</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Lähetä</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Sähköposti</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Tarkista oikeellisuus</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Muokkaa</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Lähetä</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Sähköposti</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Tarkista oikeellisuus</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Toimita</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Käy läpi</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Muokkaa</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Lähetä</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Toimita</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Käy läpi</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Muokkaa</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Lähetä</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Yhteenveto</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Sulje</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Tyhjennä</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Yhteenveto</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Sulje</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Tyhjennä</clear>
             <cancel>Peruuta</cancel>
             <save-locally>Tallenna paikallisesti</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Seuraava</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Edellinen</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
@@ -3368,12 +3368,12 @@
             <validation-dialog-review>Käy läpi</validation-dialog-review>
             <validation-dialog-continue>Jatka</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testaa</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</save-publish>
 
-            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Paluu</previous>
             <next>Seuraava</next>
@@ -3477,7 +3477,7 @@
             </titles>
             <search>
                 <search>Etsi</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Etsi lomakkeita</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
                 <show-options>Näytä hakuvaihtoehdot</show-options>
                 <close-options>Sulje hakuvaihtoehdot</close-options>
             </search>
@@ -3610,8 +3610,8 @@
         <home>
             <title>Form Runner Koti</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Poista julkaisu</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Julkaise</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Poista julkaisu</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
                 <cancel>Peruuta</cancel>
                 <connect>Yhdistä</connect>
                 <select>Valitse</select>
@@ -3791,47 +3791,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Granska</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Ta bort</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importera</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Skapa</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicera</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Granska</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Ta bort</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importera</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Skapa</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicera</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Spara</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Spara</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Spara</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Redigera</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Skicka</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Mejla</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Godkänn</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Redigera</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Mejla</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Godkänn</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Skicka</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Granska</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Redigera</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Skicka</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Granska</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Redigera</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Lista</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Stäng</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Rensa</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Lista</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Stäng</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Rensa</clear>
             <cancel>Avbryt</cancel>
             <save-locally>Spara lokalt</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Nästa</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Föreg</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föreg</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
@@ -3843,12 +3843,12 @@
             <validation-dialog-review>Granskning</validation-dialog-review>
             <validation-dialog-continue>Fortsätt</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testa</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nej</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Ja</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nej</no>
             <ok>OK</ok>
             <previous>Tillbaka</previous>
             <next>Nästa</next>
@@ -3952,7 +3952,7 @@
             </titles>
             <search>
                 <search>Sök</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Sök formulär</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
                 <show-options>Visa sökalternativ</show-options>
                 <close-options>Dölj sökalternativ</close-options>
             </search>
@@ -4085,8 +4085,8 @@
         <home>
             <title>Start av formulärmotorn</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Upphäv publicering</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicera</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Upphäv publicering</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
                 <cancel>Avbryt</cancel>
                 <connect>Anslut</connect>
                 <select>Välj</select>
@@ -4266,47 +4266,47 @@
             </formats>
         </common>
         <buttons>
-            <create>&lt;i class="fa fa-fw fa-plus"/&gt; Maken</create>
-            <view>&lt;i class="fa fa-fw fa-eye"/&gt; Tonen</view>
-            <approve>&lt;i class="fa fa-fw fa-check"/&gt; Goedkeuren</approve>
-            <reject>&lt;i class="fa fa-fw fa-close"/&gt; Weigeren</reject>
+            <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Maken</create>
+            <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Tonen</view>
+            <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Goedkeuren</approve>
+            <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Weigeren</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Start</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Review</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Verwijderen</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importeren</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Nieuw</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Dupliceren</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Verwijderen</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importeren</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nieuw</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Dupliceren</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Opslaan</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Opslaan</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Opslaan</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Bewerken</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Sturen</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; E-mail</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Valideren</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Bewerken</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Sturen</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-mail</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valideren</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Indienen</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Review</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Bewerken</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Sturen</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Indienen</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Review</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Bewerken</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Sturen</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Samenvatting</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Sluiten</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Wissen</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Samenvatting</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Sluiten</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wissen</clear>
             <cancel>Anulleren</cancel>
             <save-locally>Lokaal bewaren</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Volgende</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Vorige</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
@@ -4318,12 +4318,12 @@
             <validation-dialog-review>Review</validation-dialog-review>
             <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testen</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testen</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nee</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Ja</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nee</no>
             <ok>OK</ok>
             <previous>Vorige</previous>
             <next>Volgende</next>
@@ -4427,7 +4427,7 @@
             </titles>
             <search>
                 <search>Zoeken</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Forms zoeken</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
                 <show-options>Zoekopties tonen</show-options>
                 <close-options>Zoektopties sluiten</close-options>
             </search>
@@ -4559,8 +4559,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Publicatie verwijderen</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publiceren</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Publicatie verwijderen</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
                 <cancel>Annuleren</cancel>
                 <connect>Verbinden</connect>
                 <select>Selecteren</select>
@@ -4740,47 +4740,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; [Create]</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; [View]</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; [Approve]</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; [Reject]</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Início</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Rever</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importar</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Novo</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplicar</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Início</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Rever</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Apagar</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Novo</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Guardar</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Guardar</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Enviar</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; Validar</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Submeter</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Rever</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Editar</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Enviar</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Submeter</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Rever</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Sumário</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Fechar</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; Apagar</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sumário</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Fechar</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Apagar</clear>
             <cancel>Cancelar</cancel>
             <save-locally>Guardar Localmente</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refrescar"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Próximo</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Anterior</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"/&gt; [Content]</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refrescar"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Próximo</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</wizard-prev>
+            <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Apagar e fechar</submit-dialog-clear>
@@ -4792,12 +4792,12 @@
             <validation-dialog-review>Rever</validation-dialog-review>
             <validation-dialog-continue>Continuar</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Testar</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testar</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
-            <yes todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Yes</yes>
-            <no todo="true">&lt;i class="fa fa-fw fa-times"/&gt; No</no>
+            <yes todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Yes</yes>
+            <no todo="true">&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok todo="true">OK</ok>
             <previous>Anterior</previous>
             <next>Próximo</next>
@@ -4901,7 +4901,7 @@
             </titles>
             <search>
                 <search>Procurar</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt;  Procurar formulários</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
                 <show-options>Mostrar opções de procura</show-options>
                 <close-options>Fechar opções de procura</close-options>
             </search>
@@ -5033,8 +5033,8 @@
         <home>
             <title>Form Runner</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Não publicar</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publicar</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Não publicar</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
                 <cancel>Cancelar</cancel>
                 <connect>Ligar</connect>
                 <select>Seleccionar</select>
@@ -5214,47 +5214,47 @@
             </formats>
         </common>
         <buttons>
-            <create todo="true">&lt;i class="fa fa-fw fa-plus"/&gt; Create</create>
-            <view todo="true">&lt;i class="fa fa-fw fa-eye"/&gt; View</view>
-            <approve todo="true">&lt;i class="fa fa-fw fa-check"/&gt; Approve</approve>
-            <reject todo="true">&lt;i class="fa fa-fw fa-close"/&gt; Reject</reject>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Create</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; View</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approve</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Reject</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&gt; Hjem</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&gt; Opsummering</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&gt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&gt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove-sign"/&gt; Slet</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&gt; Importér</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&gt; Ny blanket</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&gt; Duplikér</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Opsummering</review>
+            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove-sign"&gt;&lt;/i&gt; Slet</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importér</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Ny blanket</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikér</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&gt; Gem</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"/&gt; Gem</save-draft>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</edit>
-            <send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&gt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&gt; [Validér]</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Gem</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Gem</save-final>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Gem</save-draft>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validér]</validate>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send ind</submit>
-            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Opsummering</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&gt; Rediger</workflow-edit>
-            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"/&gt; Send</workflow-send>
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send ind</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Opsummering</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&gt; Oversigt</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&gt; Luk</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&gt; slet indhold</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Oversigt</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Luk</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; slet indhold</clear>
             <cancel>Afbryd</cancel>
             <save-locally>Gem lokalt</save-locally>
-            <collapse-all>&lt;i class="fa fa-fw fa-compress"/&gt;</collapse-all>
-            <expand-all>&lt;i class="fa fa-fw fa-expand"/&gt;</expand-all>
-            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Genindlæs"/&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&gt; Næste</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&gt; Forrige</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&gt; Indhold</wizard-toc>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Genindlæs"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Næste</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Forrige</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Indhold</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Slet og luk</submit-dialog-clear>
@@ -5266,12 +5266,12 @@
             <validation-dialog-review>Validér</validation-dialog-review>
             <validation-dialog-continue>Fortsæt</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&gt; Test</test>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør...</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør</save-publish>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør...</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&gt; Ja</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&gt; Nej</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Ja</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nej</no>
             <ok>OK</ok>
             <previous>Forrige</previous>
             <next>Næste</next>
@@ -5369,7 +5369,7 @@
             </titles>
             <search>
                 <search>Søg</search>
-                <search-forms>&lt;i class="fa fa-fw fa-search"/&gt; Søg efter blanket</search-forms>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
                 <show-options>Vis alternativer for søgning</show-options>
                 <close-options>Luk alternativer for søgnng</close-options>
             </search>
@@ -5495,8 +5495,8 @@
         <home>
             <title>Blanketbehandler start</title>
             <buttons>
-                <unpublish>&lt;i class="fa fa-fw fa-close"/&gt; Afpublisér</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Offentliggør</publish>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Afpublisér</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør</publish>
                 <cancel>Afbryd</cancel>
                 <connect>Forbind</connect>
                 <select>Vælg</select>
@@ -5969,8 +5969,8 @@
         <home>
             <title>Form Runner Home</title>
             <buttons>
-                <unpublish>&lt;i class="icon-ban-circle"/&gt; Cofnij publikację</unpublish>
-                <publish>&lt;i class="fa fa-fw fa-globe"/&gt; Publikuj</publish>
+                <unpublish>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Cofnij publikację</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
                 <cancel>Anuluj</cancel>
                 <connect>Połącz</connect>
                 <select>Wybierz</select>

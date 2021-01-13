@@ -131,6 +131,17 @@ object Extensions {
       }
     }
 
+    def descendantElementIterator(includeSelf: Boolean): Iterator[Element] = {
+
+      val childrenAndDescendants =
+        e.content.iterator collect { case e: Element => e } flatMap (_.descendantElementIterator(includeSelf = true))
+
+      if (includeSelf)
+        Iterator(e) ++ childrenAndDescendants
+      else
+        childrenAndDescendants
+    }
+
     /**
      * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
      * the resolution.

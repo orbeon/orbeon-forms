@@ -5,6 +5,7 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import org.orbeon.dom
+import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -17,6 +18,7 @@ import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -140,6 +142,36 @@ object XFormsStaticStateSerializer {
       (distinct, distinct.zipWithIndex.toMap)
     }
 
+    val (
+      collectedQNamesInOrder      : Iterable[QName],
+      collectedQNamesWithPositions: Map[QName, Int]
+    ) = {
+
+      val distinct = mutable.LinkedHashSet[QName]()
+
+      staticState.topLevelPart.iterateControls foreach {
+        case e: ComponentControl =>
+          distinct += e.element.getQName
+          e.commonBinding.directName foreach (distinct +=)
+        case e: Instance =>
+          distinct += e.element.getQName
+
+          // All inline instance element QNames
+          // TODO: Consider serializing instance as plain XML?
+          e.inlineRootElemOpt.iterator flatMap (_.descendantElementIterator(includeSelf = true)) foreach { e =>
+            distinct += e.getQName
+          }
+        case e =>
+          distinct += e.element.getQName
+      }
+
+      CoreCrossPlatformSupport.properties.propertyParams foreach { c =>
+        distinct += c.typeQName
+      }
+
+      (distinct, distinct.zipWithIndex.toMap)
+    }
+
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
       "parentRef" -> a.parent.map(_.scopeId).asJson,
       "scopeId"   -> Json.fromString(a.scopeId),
@@ -157,7 +189,7 @@ object XFormsStaticStateSerializer {
     implicit val commonBindingEncoder: Encoder[CommonBinding] = (a: CommonBinding) => Json.obj(
       "bindingElemId"               -> a.bindingElemId.asJson,
       "bindingElemNamespaceMapping" -> Json.fromInt(collectedNamespacesWithPositions(a.bindingElemNamespaceMapping.mapping)),
-      "directName"                  -> a.directName.asJson,
+      "directName"                  -> (a.directName map collectedQNamesWithPositions).asJson,
       "cssName"                     -> a.cssName.asJson,
       "containerElementName"        -> Json.fromString(a.containerElementName),
       "modeBinding"                 -> Json.fromBoolean(a.modeBinding),
@@ -210,17 +242,17 @@ object XFormsStaticStateSerializer {
     )
 
     implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
-      "name"     -> a.getQName.asJson,
-      "atts"     -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson,
+      "name"     -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
+      "atts"     -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson, // TODO: collectedQNamesWithPositions
       "children" -> Json.arr(a.content collect {
-        case n: dom.Element               => n.asJson
+        case n: dom.Element               => n.asJson // recurse
         case n: dom.Text                  => Json.fromString(n.getStringValue)
       }: _*)
     )
 
     val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
-      "name" -> a.getQName.asJson,
-      "atts" -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson,
+      "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
+      "atts" -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson, // TODO: collectedQNamesWithPositions
     )
 
     implicit val encodeLHHAValue: Encoder[LHHAValue] = deriveEncoder
@@ -412,7 +444,7 @@ object XFormsStaticStateSerializer {
     implicit val encodePropertySet: Encoder[PropertyParams] = (a: PropertyParams) =>
       Json.obj(
         "name"       -> Json.fromString(a.name),
-        "type"       -> a.typeQName.asJson,
+        "type"       -> Json.fromInt(collectedQNamesWithPositions(a.typeQName)),
         "value"      -> Json.fromString(a.stringValue),
         "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces))
       )
@@ -460,6 +492,7 @@ object XFormsStaticStateSerializer {
 
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "namespaces"           -> collectedNamespacesInOrder.asJson,
+      "qnames"               -> collectedQNamesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
       "properties"           -> CoreCrossPlatformSupport.properties.propertyParams.asJson,
       "commonBindings"       -> collectedCommonBindingsInOrder.asJson,

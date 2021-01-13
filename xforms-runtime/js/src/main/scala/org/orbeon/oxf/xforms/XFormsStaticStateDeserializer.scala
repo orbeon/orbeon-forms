@@ -45,6 +45,7 @@ object XFormsStaticStateDeserializer {
   ): XFormsStaticState = {
 
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
+    var collectedQNames         = IndexedSeq[QName]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
     var collectedScopes         = IndexedSeq[Scope]()
     var collectedModelRefs      = Map[String, List[ElementAnalysis]]()
@@ -205,7 +206,7 @@ object XFormsStaticStateDeserializer {
       for {
         bindingElemId               <- c.get[Option[String]]("bindingElemId")
         bindingElemNamespaceMapping <- c.get[Int]("bindingElemNamespaceMapping")
-        directName                  <- c.get[Option[QName]]("directName")
+        directName                  <- c.get[Option[Int]]("directName")
         cssName                     <- c.get[Option[String]]("cssName")
         containerElementName        <- c.get[String]("containerElementName")
         modeBinding                 <- c.get[Boolean]("modeBinding")
@@ -231,7 +232,7 @@ object XFormsStaticStateDeserializer {
         CommonBinding(
           bindingElemId,
           NamespaceMapping(collectedNamespaces(bindingElemNamespaceMapping)),
-          directName,
+          directName map collectedQNames,
           cssName,
           containerElementName,
           modeBinding,
@@ -291,7 +292,7 @@ object XFormsStaticStateDeserializer {
 
     implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {
-        name     <- c.get[dom.QName]("name")
+        name     <- c.get[Int]("name")
         atts     <- c.get[List[(dom.QName, String)]]("atts")
         children <- {
           val childIt =
@@ -303,7 +304,7 @@ object XFormsStaticStateDeserializer {
           Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
         }
       } yield {
-        val r = dom.Element(name)
+        val r = dom.Element(collectedQNames(name))
         atts foreach { case (name, value) => r.addAttribute(name, value) }
         children foreach r.add
         r
@@ -795,17 +796,21 @@ object XFormsStaticStateDeserializer {
     implicit val decodeProperty: Decoder[PropertyParams] = (c: HCursor) =>
       for {
         name        <- c.get[String]("name")
-        typeQName   <- c.get[QName]("type")
+        typeQName   <- c.get[Int]("type")
         stringValue <- c.get[String]("value")
         namespaces  <- c.get[Int]("namespaces")
       } yield
-        PropertyParams(collectedNamespaces(namespaces), name, typeQName, stringValue)
+        PropertyParams(collectedNamespaces(namespaces), name, collectedQNames(typeQName), stringValue)
 
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
       for {
         namespaces           <- c.get[IndexedSeq[Map[String, String]]]("namespaces")
         _ = {
           collectedNamespaces = namespaces
+        }
+        qNames               <- c.get[IndexedSeq[QName]]("qnames")
+        _ = {
+          collectedQNames = qNames
         }
         nonDefaultProperties <- c.get[Map[String, (String, Boolean)]]("nonDefaultProperties")
         properties           <- c.get[Iterable[PropertyParams]]("properties")

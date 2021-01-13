@@ -185,7 +185,6 @@
                             frf:isSingleSelectionControl($element-name) or
                             $element-name = 'autocomplete'
                         )">
-                    <xf:message value="concat('Single: ', $element-name)"/>
                     <xf:action iterate="$resolved-data-holders">
                         <xf:var name="bind" value="."/>
                         <xf:setvalue

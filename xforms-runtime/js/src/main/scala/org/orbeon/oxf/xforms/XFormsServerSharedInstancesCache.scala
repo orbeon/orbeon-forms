@@ -6,18 +6,21 @@ import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.model.InstanceCaching
 
 
+// TODO: This implementation doesn't yet handle `timeToLive`.
 object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCacheTrait {
 
+  import Private._
+
+  private var cache = Map[CacheKeyType, DocumentNodeInfoType]()
+
+  // Try to find instance content in the cache but do not attempt to load it if not found
   def findContentOrNull(
       instance        : Instance,
       instanceCaching : InstanceCaching,
       readonly        : Boolean)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType = {
-    // XXX TODO
-    println(s"xxx findContentOrNull TODO for `${instanceCaching.pathOrAbsoluteURI}`")
-    null
-  }
+  ): DocumentNodeInfoType =
+    cache.get(createCacheKey(instanceCaching)).orNull
 
   def findContentOrLoad(
       instance        : Instance,
@@ -26,8 +29,14 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       loadInstance    : InstanceLoader)(implicit
       indentedLogger  : IndentedLogger
   ): DocumentNodeInfoType = {
-    // XXX TODO: cache
-    loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
+
+    val cacheKey = createCacheKey(instanceCaching)
+
+    cache.getOrElse(cacheKey, {
+      val result = loadInstance(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
+      cache += cacheKey -> result
+      result
+    })
   }
 
   def remove(
@@ -35,13 +44,21 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     requestBodyHash   : String,
     handleXInclude    : Boolean)(implicit
     indentedLogger    : IndentedLogger
-  ): Unit = {
-    // XXX TODO
-    ()
-  }
+  ): Unit =
+    cache -= createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
 
-  def removeAll(implicit indentedLogger: IndentedLogger): Unit = {
-    // XXX TODO
-    ()
+  def removeAll(implicit indentedLogger: IndentedLogger): Unit =
+    cache = Map.empty
+
+  private object Private {
+
+    type CacheKeyType = String
+
+    // Make key also depend on handleXInclude and on request body hash if present
+    def createCacheKey(instanceCaching: InstanceCaching): CacheKeyType =
+      createCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
+
+    def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): CacheKeyType =
+      sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ('|' + _) getOrElse "")
   }
 }

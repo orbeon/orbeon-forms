@@ -36,7 +36,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
       indentedLogger  : IndentedLogger
   ): DocumentNodeInfoType =
     find(instanceCaching)(indentedLogger) map
-      (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) orNull
+      (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) orNull // TODO: shouldn't need to wrap since we don't expose types on readonly instances?
 
   // Try to find instance content in the cache or load it
   def findContentOrLoad(

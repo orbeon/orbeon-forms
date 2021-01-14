@@ -182,13 +182,17 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def valid(items: Iterable[om.Item], relevant: Boolean = true, recurse: Boolean = true): Boolean = ???
 
-  // XForms 2.0
-  @XPathFunction
-  def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = // should be `om.NodeInfo`?
+  // So we can call as `bind()` and `xxf:bind()`
+  def bindImpl(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = // should be `om.NodeInfo`?
     xfc.container.searchContainedModelsInScope(xfc.sourceEffectiveId, bindId, Option(xpc.getContextItem)) match {
       case Some(bind: RuntimeBind) => bind.items.asScala
       case _                       => Nil
     }
+
+  // XForms 2.0
+  @XPathFunction
+  def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
+    bindImpl(bindId)
 
   // XForms 2.0
   @XPathFunction

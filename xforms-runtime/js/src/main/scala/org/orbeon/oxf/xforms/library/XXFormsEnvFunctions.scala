@@ -4,13 +4,13 @@ import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.{elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
+import org.orbeon.oxf.xforms.function.xxforms.{NumericValidation, ValidationFunctionNames, XXFormsLang}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
@@ -415,36 +415,140 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def required(items: Iterable[om.Item] = null)(implicit xpc: XPathContext): Boolean =
     exformsMipFunction(items, 2)
 
-//
-//    // Now available in XForms 2.0
-//    Fun("bind", classOf[Bind], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    // Validation functions
-//    Fun("max-length", classOf[MaxLengthValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
-//    )
-//
-//    Fun("min-length", classOf[MinLengthValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
-//    )
-//
-//    Fun("non-negative", classOf[NonNegativeValidation], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
-//    Fun("negative",     classOf[NegativeValidation],    op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
-//    Fun("non-positive", classOf[NonPositiveValidation], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
-//    Fun("positive",     classOf[PositiveValidation],    op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
-//
-//    Fun("fraction-digits", classOf[MaxFractionDigitsValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
-//    )
-//
-//    Fun(ValidationFunctionNames.UploadMaxSize, classOf[UploadMaxSizeValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
-//    )
-//
-//    Fun(ValidationFunctionNames.UploadMediatypes, classOf[UploadMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+  // Now available in XForms 2.0
+  @XPathFunction
+  def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
+    XFormsFunctionLibrary.bindImpl(bindId)
+
+  // Validation functions
+
+  private def evaluateAndSetConstraint[T](
+    propertyName  : String,
+    constraintOpt : Option[T],
+    evaluate      : String => Boolean)(implicit
+    xpc           : XPathContext
+  ): Boolean = {
+
+    // XXX check why "true"?
+    // For example `nonNegative` will trigger `true`
+    XFormsFunction.setProperty(propertyName, constraintOpt map (_.toString) orElse Some("true"))
+
+    Option(xpc.getContextItem) map (_.getStringValue) match {
+      case Some(itemValue) => evaluate(itemValue)
+      case None            => true
+    }
+  }
+
+  @XPathFunction
+  def maxLength(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(itemValue: String) =
+      constraintOpt match {
+        case Some(constraint) => org.orbeon.saxon.value.StringValue.getStringLength(itemValue) <= constraint
+        case None             => true
+      }
+
+    evaluateAndSetConstraint("max-length", constraintOpt, evaluate)
+  }
+
+  @XPathFunction
+  def minLength(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(itemValue: String) =
+      constraintOpt match {
+        case Some(constraint) => org.orbeon.saxon.value.StringValue.getStringLength(itemValue) >= constraint
+        case None             => true
+      }
+
+    evaluateAndSetConstraint("min-length", constraintOpt, evaluate)
+  }
+
+  @XPathFunction
+  def nonNegative()(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(value: String) =
+      NumericValidation.trySignum(value) exists (_ != -1)
+
+    evaluateAndSetConstraint("non-negative", None, evaluate)
+  }
+
+  @XPathFunction
+  def negative()(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(value: String) =
+      NumericValidation.trySignum(value) contains -1
+
+    evaluateAndSetConstraint("negative", None, evaluate)
+  }
+
+  @XPathFunction
+  def nonPositive()(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(value: String) =
+      NumericValidation.trySignum(value) exists (_ != 1)
+
+    evaluateAndSetConstraint("non-positive", None, evaluate)
+  }
+
+  @XPathFunction
+  def positive()(implicit xpc: XPathContext): Boolean = {
+
+    def evaluate(value: String) =
+      NumericValidation.trySignum(value) contains 1
+
+    evaluateAndSetConstraint("positive", None, evaluate)
+  }
+
+  @XPathFunction
+  def fractionDigits(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+
+    // Operate at the lexical level
+    def countDigitsAfterDecimalSeparator(value: String) = {
+
+      var beforeDecimalSeparator      = true
+      var digitsAfterDecimalSeparator = 0
+      var trailingZeros               = 0
+
+      for (c <- value) {
+        if (beforeDecimalSeparator) {
+          if (c == '.')
+            beforeDecimalSeparator = false
+        } else {
+          if (c == '0')
+            trailingZeros += 1
+          else
+            trailingZeros = 0
+
+          if ('0' <= c && c <= '9')
+            digitsAfterDecimalSeparator += 1
+        }
+      }
+
+      digitsAfterDecimalSeparator - trailingZeros
+    }
+
+    def evaluate(value: String) = constraintOpt match {
+      case Some(constraint) => countDigitsAfterDecimalSeparator(value) <= constraint
+      case None             => true
+    }
+
+    evaluateAndSetConstraint("fraction-digits", constraintOpt, evaluate)
+  }
+
+  @XPathFunction
+  def uploadMaxSize(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
+    // For now, don't actually validate, see #2956
+    evaluateAndSetConstraint(ValidationFunctionNames.UploadMaxSize, constraintOpt, _ => true)
+  }
+
+  @XPathFunction
+  def uploadMediatypes(constraintOpt: Option[String])(implicit xpc: XPathContext): Boolean = {
+    // For now, don't actually validate, see #2956
+    evaluateAndSetConstraint(ValidationFunctionNames.UploadMediatypes, constraintOpt, _ => true)
+  }
+
+//    Fun(ExcludedDatesValidation.PropertyName, classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+//      Arg(DATE, ALLOWS_ZERO_OR_MORE)
 //    )
 
   @XPathFunction
@@ -488,9 +592,4 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def getRequestParameter(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     xfc.containingDocument.getRequestParameters.getOrElse(name, Nil)
-
-  //
-//    Fun(ExcludedDatesValidation.PropertyName, classOf[ExcludedDatesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(DATE, ALLOWS_ZERO_OR_MORE)
-//    )
 }

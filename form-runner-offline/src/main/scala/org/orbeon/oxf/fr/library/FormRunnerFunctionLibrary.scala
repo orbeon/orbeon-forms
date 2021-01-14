@@ -7,6 +7,7 @@ import org.orbeon.dom.QName
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.VersionSupport
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
@@ -91,10 +92,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       }
     }
 
-//  @XPathFunction
-//  def runProcessByName(scope: String, name: String) =
-//    SimpleProcess.runProcessByName(scope, name).isSuccess
-//
+  @XPathFunction
+  def runProcessByName(scope: String, name: String): Boolean = {
+    println(s"TODO: `runProcessByName($scope, $name)` called")
+    SimpleProcess.runProcessByName(scope, name).isSuccess
+  }
+
 //  @XPathFunction
 //  def runProcess(scope: String, process: String) =
 //    SimpleProcess.runProcess(scope, process).isSuccess

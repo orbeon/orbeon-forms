@@ -17,10 +17,12 @@ import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.EmbeddingSupport._
 import org.orbeon.xforms._
 import org.scalajs.dom
+import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.{XMLHttpRequest, html}
 import org.xml.sax.Attributes
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -57,6 +59,16 @@ object OfflineDemo extends App {
   def destroyForm(container: html.Element): Unit =
     EmbeddingSupport.destroyForm(container)
     // TODO: Remove from `XFormsStateManager`.
+
+  @JSExport
+  def testLoadAndRenderForm(
+    container  : html.Element,
+    formName   : String
+  ): Unit =
+    fetchCompiledFormForTesting(s"$findBasePathForTesting/xforms-compiler/service/compile/$formName.xhtml") foreach { compiledForm =>
+      println(s"xxx fetched string length: ${compiledForm.size}")
+      renderDemoForm(container, compiledForm)
+    }
 
   val XFormsFunctionLibraries =
     List(
@@ -171,6 +183,26 @@ object OfflineDemo extends App {
     }
 
     uuid
+  }
+
+  def fetchCompiledFormForTesting(url: String): Future[String] = {
+    val p = Promise[String]()
+    val xhr = new XMLHttpRequest()
+    xhr.open(
+      method = "GET",
+      url    = url
+    )
+    xhr.onload = { _ =>
+      p.success(xhr.responseText)
+    }
+    xhr.send()
+
+    p.future
+  }
+
+  def findBasePathForTesting: String = {
+    val location = g.window.location.asInstanceOf[URL]
+    location.origin + "/" + location.pathname.split("/")(1) // assume only a simple context path
   }
 }
 

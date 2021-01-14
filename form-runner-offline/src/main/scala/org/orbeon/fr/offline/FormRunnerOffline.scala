@@ -8,27 +8,24 @@ import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
-import org.orbeon.xforms.{App, XFormsApp}
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
-import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
 import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
+import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
+import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom.experimental.{Headers => FetchHeaders}
-import org.scalajs.dom.{XMLHttpRequest, html}
+import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.typedarray.Uint8Array
 
-import scala.jdk.CollectionConverters._
 
 object DemoSubmissionProvider extends SubmissionProvider {
 
@@ -196,23 +193,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     configure(DemoSubmissionProvider)
 
 //    fetchCompiledForm(s"http://localhost:9090/orbeon/xforms-compiler/service/compile/date.xhtml") foreach { text =>
-    fetchCompiledForm(s"http://localhost:9090/orbeon/fr/service/$appName/$formName/compile") foreach { compiledForm =>
+    OfflineDemo.fetchCompiledFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") foreach { compiledForm =>
+      println(s"xxx fetched string length: ${compiledForm.size}")
       renderForm(container, compiledForm, appName, formName, mode, documentId)
     }
-  }
-
-  private def fetchCompiledForm(url: String): Future[String] = {
-    val p = Promise[String]()
-    val xhr = new XMLHttpRequest()
-    xhr.open(
-      method = "GET",
-      url    = url
-    )
-    xhr.onload = { _ =>
-      p.success(xhr.responseText)
-    }
-    xhr.send()
-
-    p.future
   }
 }

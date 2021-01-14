@@ -18,8 +18,10 @@ object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
   lazy val namespaces = List("java:org.orbeon.oxf.fr.FormRunner" -> "frf")
 
   @XPathFunction(name = "sendError")
-  def sendError(status: Int): Unit =
-    FormRunner.sendError(status)
+  def sendError(status: Int): Unit = {
+    println(s"TODO: `sendError($status)` called")
+//    FormRunner.sendError(status)
+  }
 
   @XPathFunction(name = "isAutosaveSupported")
   def isAutosaveSupported(app: String, form: String): Boolean =

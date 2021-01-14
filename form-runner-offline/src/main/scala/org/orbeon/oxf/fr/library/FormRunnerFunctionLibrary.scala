@@ -43,10 +43,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def isNoscript               : Boolean        = false
 //  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0
   @XPathFunction def isFormDataSaved          : Boolean        = FormRunner.isFormDataSaved
-//  @XPathFunction def isWizardTocShown         : Boolean        = Wizard.isWizardTocShown
-//  @XPathFunction def isWizardBodyShown        : Boolean        = Wizard.isWizardBodyShown
-//  @XPathFunction def isWizardFirstPage        : Boolean        = Wizard.isWizardFirstPage
-//  @XPathFunction def isWizardLastPage         : Boolean        = Wizard.isWizardLastPage
+  @XPathFunction def isWizardTocShown         : Boolean        = false // Wizard.isWizardTocShown  // XXX TODO: migrate Wizard
+  @XPathFunction def isWizardBodyShown        : Boolean        = false // Wizard.isWizardBodyShown // XXX TODO: migrate Wizard
+  @XPathFunction def isWizardFirstPage        : Boolean        = false // Wizard.isWizardFirstPage // XXX TODO: migrate Wizard
+  @XPathFunction def isWizardLastPage         : Boolean        = false // Wizard.isWizardLastPage  // XXX TODO: migrate Wizard
   @XPathFunction def canCreate                : Boolean        = FormRunner.canCreate
   @XPathFunction def canRead                  : Boolean        = FormRunner.canRead
   @XPathFunction def canUpdate                : Boolean        = FormRunner.canUpdate

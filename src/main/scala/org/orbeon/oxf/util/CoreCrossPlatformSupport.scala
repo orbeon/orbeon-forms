@@ -25,6 +25,7 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
   type FileItemType = DiskFileItem
 
   def isPE: Boolean = Version.isPE
+  def isJsEnv: Boolean = false
   def randomHexId: String = SecureUtils.randomHexId
   def getApplicationResourceVersion: Option[String] = Option(URLRewriterUtils.getApplicationResourceVersion)
   def properties: PropertySet = Properties.instance.getPropertySet

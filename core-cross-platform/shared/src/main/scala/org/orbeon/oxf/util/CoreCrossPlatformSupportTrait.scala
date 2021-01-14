@@ -23,6 +23,7 @@ trait CoreCrossPlatformSupportTrait {
   type FileItemType
 
   def isPE: Boolean
+  def isJsEnv: Boolean
   def randomHexId: String
   def getApplicationResourceVersion: Option[String]
   def properties: PropertySet

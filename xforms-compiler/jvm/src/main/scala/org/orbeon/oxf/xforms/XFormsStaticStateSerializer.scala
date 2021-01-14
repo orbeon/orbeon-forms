@@ -43,7 +43,7 @@ object XFormsStaticStateSerializer {
 
   val ResourcesToInclude = List(
     "oxf:/apps/fr/i18n/languages.xml",         // TODO: this is global, should be part of the
-    "/fr/service/i18n/fr-resources/acme/order" // resources for the current form // TODO: app/name
+    "/fr/service/i18n/fr-resources/orbeon/offline", // resources for the current form, normalized for `orbeon/offline`
   )
 
   // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.

@@ -159,6 +159,7 @@
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/section/section.css
         +/xbl/orbeon/grid/grid.css
+        +/xbl/orbeon/error-summary/error-summary.css
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js

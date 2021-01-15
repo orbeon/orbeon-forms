@@ -188,6 +188,19 @@ object XFormsModelSubmissionBase {
           relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
         )
 
+        val root = copy.getRootElement
+        attributeNamesForTokens.map(_._2.namespace).toSet.foreach { (ns: Namespace) =>
+
+          Option(root.getNamespaceForPrefix(ns.prefix)) match {
+            case None =>
+              root.add(ns)
+              println(s"xxx adding namespace to root `$ns`")
+            case Some(existingNs) if existingNs != ns =>
+              throw new IllegalArgumentException(s"incompatible namespace prefix on root element: `${ns.prefix}` maps to `${existingNs.uri}` and `${ns.uri} is expected`")
+            case _ =>
+          }
+        }
+
         annotateWithAlerts(
           xfcd             = xfcd,
           doc              = copy,

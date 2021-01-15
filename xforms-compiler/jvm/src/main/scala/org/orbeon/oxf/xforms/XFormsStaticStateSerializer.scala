@@ -42,8 +42,9 @@ object XFormsStaticStateSerializer {
   val Logger = LoggerFactory.createLogger(XFormsStaticStateSerializer.getClass)
 
   val ResourcesToInclude = List(
-    "oxf:/apps/fr/i18n/languages.xml",         // TODO: this is global, should be part of the
+    "oxf:/apps/fr/i18n/languages.xml",              // TODO: This is global, should be part of a global pool of resources.
     "/fr/service/i18n/fr-resources/orbeon/offline", // resources for the current form, normalized for `orbeon/offline`
+    "oxf:/xbl/orbeon/us-state/states.xml",          // TODO: TMP for testing.
   )
 
   // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.

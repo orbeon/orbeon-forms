@@ -4,7 +4,7 @@ import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction

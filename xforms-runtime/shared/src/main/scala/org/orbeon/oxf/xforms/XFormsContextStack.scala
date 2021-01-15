@@ -364,18 +364,14 @@ class XFormsContextStack {
           case runtimeBind: RuntimeBind =>
             bind = runtimeBind
             newNodeset = bind.items
-            hasOverriddenContext = false
             contextItem = baseBindingContext.getSingleItemOrNull
-            isNewBind = true
             newPosition = Math.min(newNodeset.size, 1)
           case null if resolutionScopeContainer.containsBind(bindId) =>
             // The bind attribute was valid for this scope, but no runtime object was found for the bind
             // This can happen e.g. if a nested bind is within a bind with an empty nodeset
             bind = null
             newNodeset = java.util.Collections.emptyList[om.Item]
-            hasOverriddenContext = false
             contextItem = null
-            isNewBind = true
             newPosition = 0
           case _ =>
             // The bind attribute did not resolve to a bind
@@ -384,11 +380,11 @@ class XFormsContextStack {
             // Default to an empty binding
             bind = null
             newNodeset = java.util.Collections.emptyList[om.Item]
-            hasOverriddenContext = false
             contextItem = null
-            isNewBind = true
             newPosition = 0
         }
+        hasOverriddenContext = false
+        isNewBind = true
       } else if (ref != null || nodeset != null) {
         bind = null
         var evaluationContextBinding: BindingContext = null

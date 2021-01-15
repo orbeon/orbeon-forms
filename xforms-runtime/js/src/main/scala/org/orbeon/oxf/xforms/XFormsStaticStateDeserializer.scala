@@ -17,12 +17,11 @@ import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItem
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.om
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -35,6 +34,7 @@ import shapeless.syntax.typeable.typeableOps
 import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+
 
 object XFormsStaticStateDeserializer {
 
@@ -574,17 +574,21 @@ object XFormsStaticStateDeserializer {
 
             case qName if LHHA.QNamesSet(qName) =>
 
+              implicit val eitherDecoder: Decoder[Either[String, String]] = {
+                Decoder.decodeEither("left", "right")
+              }
+
               val lhha =
                 for {
-                  staticValue                <- c.get[Option[String]]("staticValue")
-                  isPlaceholder              <- c.get[Boolean]("isPlaceholder")
-                  containsHTML               <- c.get[Boolean]("containsHTML")
-                  hasLocalMinimalAppearance  <- c.get[Boolean]("hasLocalMinimalAppearance")
-                  hasLocalFullAppearance     <- c.get[Boolean]("hasLocalFullAppearance")
-                  hasLocalLeftAppearance     <- c.get[Boolean]("hasLocalLeftAppearance")
+                  expressionOrConstant      <- c.get[Either[String, String]]("expressionOrConstant")
+                  isPlaceholder             <- c.get[Boolean]("isPlaceholder")
+                  containsHTML              <- c.get[Boolean]("containsHTML")
+                  hasLocalMinimalAppearance <- c.get[Boolean]("hasLocalMinimalAppearance")
+                  hasLocalFullAppearance    <- c.get[Boolean]("hasLocalFullAppearance")
+                  hasLocalLeftAppearance    <- c.get[Boolean]("hasLocalLeftAppearance")
                 } yield
                   new LHHAAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
-                    staticValue,
+                    expressionOrConstant,
                     isPlaceholder,
                     containsHTML,
                     hasLocalMinimalAppearance,

@@ -97,7 +97,10 @@ object Extensions {
     * @param visitorListener listener to call back
     * @param mutable         whether the source tree can mutate while being visited
     */
-    def visitDescendants(visitorListener: VisitorListener, mutable: Boolean): Unit = {
+    def visitDescendants(visitorListener: VisitorListener, mutable: Boolean, includeSelf: Boolean = false): Unit = {
+
+      if (includeSelf)
+        visitorListener.startElement(e)
 
       // If the source tree can mutate, copy the list first, otherwise the DOM might throw exceptions
       val immutableContent =
@@ -111,11 +114,14 @@ object Extensions {
         childNode match {
           case childElem: Element =>
             visitorListener.startElement(childElem)
-            childElem.visitDescendants(visitorListener, mutable)
+            childElem.visitDescendants(visitorListener, mutable, includeSelf = false)
             visitorListener.endElement(childElem)
           case text: Text => visitorListener.text(text)
           case _ => // Ignore as we don't need other node types for now
         }
+
+      if (includeSelf)
+        visitorListener.endElement(e)
     }
 
     def ancestorIterator(includeSelf: Boolean): Iterator[Element] = new Iterator[Element] {

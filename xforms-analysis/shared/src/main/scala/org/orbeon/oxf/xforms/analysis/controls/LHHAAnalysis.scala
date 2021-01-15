@@ -31,7 +31,7 @@ class LHHAAnalysis(
   namespaceMapping              : NamespaceMapping,
   scope                         : Scope,
   containerScope                : Scope,
-  val staticValue               : Option[String],
+  val expressionOrConstant      : Either[String, String],
   val isPlaceholder             : Boolean,
   val containsHTML              : Boolean,
   val hasLocalMinimalAppearance : Boolean,
@@ -90,8 +90,10 @@ class LHHAAnalysis(
       Set.empty
 
   def debugOut(): Unit =
-    if (staticValue.isDefined)
-      println("static value for control " + prefixedId + " => " + staticValue.get)
+    expressionOrConstant match {
+      case Left(expr)      => println(s"expression value for control `$prefixedId` => `$expr`")
+      case Right(constant) => println(s"static value for control `$prefixedId` => `$constant`")
+    }
 }
 
 object LHHAAnalysis {

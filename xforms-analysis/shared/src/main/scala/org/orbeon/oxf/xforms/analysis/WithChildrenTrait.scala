@@ -15,6 +15,11 @@ package org.orbeon.oxf.xforms.analysis
 
 import scala.collection.compat._
 
+trait ElemListener {
+  def startElement(element: ElementAnalysis): Unit
+  def endElement(element: ElementAnalysis): Unit
+}
+
 trait WithChildrenTrait extends ElementAnalysis {
 
   // This element's children (valid after build() has been called)
@@ -38,5 +43,20 @@ trait WithChildrenTrait extends ElementAnalysis {
       _children.iterator collect { case child: WithChildrenTrait => child }
 
     _children.iterator ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
+  }
+
+  final def visitDescendants(visitorListener: ElemListener): Unit = {
+
+    def visitChildren(elem: WithChildrenTrait): Unit =
+      for (childElem <- elem.children) {
+        visitorListener.startElement(childElem)
+        childElem match {
+          case c: WithChildrenTrait => visitChildren(c)
+          case _ =>
+        }
+        visitorListener.endElement(childElem)
+      }
+
+    visitChildren(this)
   }
 }

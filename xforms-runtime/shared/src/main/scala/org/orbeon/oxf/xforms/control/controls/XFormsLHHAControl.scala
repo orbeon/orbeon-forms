@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.XFormsElementValue
-import org.orbeon.oxf.xforms.analysis.controls.ValueControl
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms.XFormsContextStack
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.withBinding
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, ValueControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+
 
 //
 // Special "control" which represents an LHHA value. This is used only when the LHHA element is not
@@ -38,6 +39,8 @@ class XFormsLHHAControl(
   with XFormsValueControl
   with NoLHHATrait {
 
+  selfControl =>
+
   override type Control <: LHHAAnalysis with ValueControl // Q: How can this compile? We have a class and an abstract class!
 
   override def storeExternalValue(externalValue: String): Unit =
@@ -47,18 +50,32 @@ class XFormsLHHAControl(
   // the value.
   override def computeValue: String = {
 
-    def fromDynamicContent =
-      XFormsElementValue.getElementValue(
-        lhhaContainer,
-        getContextStack |!> (_.setBinding(bindingContext)),
-        effectiveId,
-        staticControl.element,
-        acceptHTML = true,
-        defaultHTML = staticControl.defaultToHTML,
-        Array[Boolean](false)
-      )
+    val resultOpt =
+      staticControl.expressionOrConstant match {
+        case Right(constant) =>
+          Some(constant)
+        case Left(expr) =>
 
-    staticControl.staticValue orElse fromDynamicContent getOrElse ""
+          implicit val contextStack: XFormsContextStack = selfControl.getContextStack
+          contextStack.setBinding(selfControl.bindingContext)
+
+          withBinding(staticControl.element, selfControl.effectiveId, staticControl.scope) { currentBindingContext =>
+            XPathCache.evaluateAsStringOpt(
+              contextItems       = currentBindingContext.nodeset,
+              contextPosition    = currentBindingContext.position,
+              xpathString        = expr,
+              namespaceMapping   = staticControl.namespaceMapping,
+              variableToValueMap = currentBindingContext.getInScopeVariables,
+              functionLibrary    = selfControl.lhhaContainer.getContainingDocument.functionLibrary,
+              functionContext    = contextStack.getFunctionContext(selfControl.effectiveId),
+              baseURI            = null,
+              locationData       = staticControl.locationData,
+              reporter           = selfControl.lhhaContainer.getContainingDocument.getRequestStats.getReporter
+            )
+          }
+      }
+
+    resultOpt getOrElse ""
   }
 
   override def getRelevantEscapedExternalValue: String =

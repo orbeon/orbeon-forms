@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms.analysis
 import cats.syntax.option._
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.{MapSet, XFormsStaticElementValue}
 import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysisBuilder.buildInstanceString
-import org.orbeon.oxf.xforms.{MapSet, XFormsGlobalProperties}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.valueOrSelectAttribute
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xml.ShareableXPathStaticContext
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
-import org.orbeon.oxf.xml.{ShareableXPathStaticContext, XMLUtils}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
@@ -186,85 +186,12 @@ object ElementAnalysisTreeXPathAnalyzer {
         case e: LHHAAnalysis =>
 
           val result =
-            if (e.staticValue.isEmpty) {
-              // Value is likely not static
-
-              if (e.ref.isDefined || e.value.isDefined) {
-                // 1. E.g. <xf:label model="…" context="…" value|ref="…"/>
-
-                // Don't assert because we want to support nested `fr:param` elements in Form Builder.
-                //assert(element.elements.isEmpty) // no children elements allowed in this case
-
-                val subExpression =
-                  StaticXPath.makeStringExpression(
-                    e.value getOrElse "."
-                  )
-
-                analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, subExpression).some
-              } else {
-                // 2. E.g. `<xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>`
-
-                // NOTE: We do allow `@context` and/or `@model` on LHHA element, which can change the context
-
-                // The subtree can only contain HTML elements interspersed with `xf:output`. HTML elements may have AVTs.
-                var combinedAnalysis: XPathAnalysis = StringAnalysis
-
-                e.element.visitDescendants(
-                  new VisitorListener {
-                    val hostLanguageAVTs: Boolean = XFormsGlobalProperties.isHostLanguageAVTs
-                    def startElement(element: Element): Unit = {
-                      if (element.getQName == XFORMS_OUTPUT_QNAME) {
-                        // Add dependencies
-
-                        val staticId   = element.idOrNull
-                        val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
-
-                        val outputAnalysis =
-                          new OutputControl(
-                            index                = -1,
-                            element              = element,
-                            parent               = e.some,
-                            preceding            = None,
-                            staticId             = staticId,
-                            prefixedId           = prefixedId,
-                            namespaceMapping     = partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw
-                            scope                = getChildElementScope(partAnalysisCtx, e, element),
-                            containerScope       = e.containerScope,
-                            isImageMediatype     = false,
-                            isHtmlMediatype      = false,
-                            isDownloadAppearance = false,
-                            staticValue          = None
-                          )
-
-                        ElementAnalysisTreeBuilder.setModelOnElement(partAnalysisCtx, outputAnalysis)
-                        ElementAnalysisTreeXPathAnalyzer.analyzeXPath(partAnalysisCtx, outputAnalysis)
-
-                        if (outputAnalysis.valueAnalysis.isDefined)
-                          combinedAnalysis = combineXPathAnalysis(combinedAnalysis, outputAnalysis.valueAnalysis.get)
-                      } else if (hostLanguageAVTs) {
-                        for {
-                          attribute <- element.attributes
-                          attributeValue = attribute.getValue
-                          if XMLUtils.maybeAVT(attributeValue)
-                        } locally {
-                          // not supported just yet
-                          combinedAnalysis = new NegativeAnalysis(attributeValue)
-                        }
-                      }
-                    }
-
-                    def endElement(element: Element): Unit = ()
-                    def text(text: Text): Unit = ()
-                  },
-                  mutable = false
-                )
-
-                // Result of all combined analyses
-                combinedAnalysis.some
-              }
-            } else {
-              // Value of LHHA is 100% static and analysis is constant
-              StringAnalysis.some
+            e.expressionOrConstant match {
+              case Left(expr) =>
+                analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, expr).some
+              case Right(_) =>
+                // Value of LHHA is 100% static and analysis is constant
+                StringAnalysis.some
             }
 
           // This is not ideal, but we don't need this anymore
@@ -489,7 +416,14 @@ object ElementAnalysisTreeXPathAnalyzer {
                 val staticId   = nestedElement.idOrNull
                 val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
 
-                val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! This is not an LHHA analysis.
+                val (expressionOrConstant, _) =
+                  XFormsStaticElementValue.getElementExpressionOrConstant(
+                    outerElem       = nestedElement,
+                    containerPrefix = "", // won't be used
+                    acceptHTML      = true
+                  )
+
+                val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! We have LHH, but also `value` and `copy`.
                   index                     = -1,
                   element                   = nestedElement,
                   parent                    = itemElementAnalysis.some,
@@ -499,7 +433,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                   namespaceMapping          = partAnalysisCtx.getNamespaceMapping(prefixedId).orNull, // probably should throw,
                   scope                     = getChildElementScope(partAnalysisCtx, itemElementAnalysis, nestedElement),
                   containerScope            = e.containerScope,
-                  staticValue               = None,
+                  expressionOrConstant      = expressionOrConstant,
                   isPlaceholder             = false,
                   containsHTML              = false,
                   hasLocalMinimalAppearance = false,

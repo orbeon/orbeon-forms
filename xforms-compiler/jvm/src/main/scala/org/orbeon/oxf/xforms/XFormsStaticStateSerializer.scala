@@ -281,6 +281,8 @@ object XFormsStaticStateSerializer {
       "children" -> a.children.asJson
     )
 
+    implicit val eitherEncoder: Encoder[Either[String, String]] =
+      Encoder.encodeEither("left", "right")
     def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
       a match {
         case c: Model         =>
@@ -341,7 +343,7 @@ object XFormsStaticStateSerializer {
           )
         case c: LHHAAnalysis  =>
           List(
-            "staticValue"               -> c.staticValue.asJson,
+            "expressionOrConstant"      -> c.expressionOrConstant.asJson,
             "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder),
             "containsHTML"              -> Json.fromBoolean(c.containsHTML),
             "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
@@ -373,10 +375,6 @@ object XFormsStaticStateSerializer {
         case c: RepeatControl          => Nil
         case c: RepeatIterationControl => Nil
         case c: VariableAnalysisTrait  =>
-
-          implicit val eitherEncoder: Encoder[Either[String, String]] =
-            Encoder.encodeEither("left", "right")
-
           List(
             "name"                   -> Json.fromString(c.name),
             "expressionOrConstant"   -> c.expressionOrConstant.asJson

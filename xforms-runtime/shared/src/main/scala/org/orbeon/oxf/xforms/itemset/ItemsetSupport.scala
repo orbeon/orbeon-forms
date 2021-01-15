@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
@@ -90,21 +90,6 @@ object ItemsetSupport {
 
     val staticControl = select1Control.staticControl
 
-    trait ElemListener {
-      def startElement(element: ElementAnalysis): Unit
-      def endElement(element: ElementAnalysis): Unit
-    }
-
-    def visitDescendants(elem: WithChildrenTrait, visitorListener: ElemListener): Unit =
-      for (childElem <- elem.children) {
-        visitorListener.startElement(childElem)
-        childElem match {
-          case c: WithChildrenTrait => visitDescendants(c, visitorListener)
-          case _ =>
-        }
-        visitorListener.endElement(childElem)
-      }
-
     staticControl.staticItemset match {
       case Some(staticItemset) =>
         staticItemset
@@ -120,7 +105,7 @@ object ItemsetSupport {
         contextStack.setBinding(select1Control.bindingContext)
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
-        visitDescendants(staticControl,
+        staticControl.visitDescendants(
           new ElemListener {
 
             private var position: Int = 0

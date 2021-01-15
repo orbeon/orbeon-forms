@@ -15,7 +15,6 @@ import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis.isHTML
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
@@ -77,7 +76,7 @@ object OutputControlBuilder {
 
 object LHHAAnalysisBuilder {
 
-  // TODO: Duplicatino from `XFormsProperties`
+  // TODO: Duplication from `XFormsProperties`
   val LabelAppearanceProperty = "label.appearance"
   val HintAppearanceProperty  = "hint.appearance"
   val HelpAppearanceProperty  = "help.appearance"
@@ -96,7 +95,7 @@ object LHHAAnalysisBuilder {
   ): LHHAAnalysis = {
 
     // TODO: Duplication in trait
-    val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+    val appearances: Set[QName] = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
 
     // TODO: make use of static value
     //
@@ -105,10 +104,13 @@ object LHHAAnalysisBuilder {
     // - 2017-10-17: Now using this in `XFormsLHHAControl`.
     //
     // TODO: figure out whether to allow HTML or not (could default to true?)
-    //
-    val staticValue: Option[String] =
-      ElementAnalysisTreeBuilder.hasStaticValue(element) option
-        XFormsStaticElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
+
+    val (expressionOrConstant, containsHTML) =
+      XFormsStaticElementValue.getElementExpressionOrConstant(
+        outerElem       = element,
+        containerPrefix = containerScope.fullPrefix,
+        acceptHTML      = true
+      )
 
     val lhhaType: LHHA =
       LHHA.withNameOption(element.getName) getOrElse
@@ -143,32 +145,13 @@ object LHHAAnalysisBuilder {
       namespaceMapping,
       scope,
       containerScope,
-      staticValue,
+      expressionOrConstant,
       isPlaceholder,
-      containsHTML(element),
+      containsHTML,
       hasLocalMinimalAppearance,
       hasLocalFullAppearance,
       hasLocalLeftAppearance
     )
-  }
-
-  private def containsHTML(lhhaElement: Element) = {
-
-    val lhhaElem =
-      new DocumentWrapper(
-          lhhaElement.getDocument,
-          null,
-          XPath.GlobalConfiguration
-        ).wrap(lhhaElement)
-
-    val XFOutput = URIQualifiedName(XFORMS_NAMESPACE_URI, "output")
-
-    val descendantOtherElems = lhhaElem descendant * filter (_.uriQualifiedName != XFOutput)
-    val descendantOutputs    = lhhaElem descendant XFOutput
-
-    isHTML(lhhaElement) || descendantOtherElems.nonEmpty || (descendantOutputs exists {
-      _.attValueOpt("mediatype") contains "text/html"
-    })
   }
 }
 

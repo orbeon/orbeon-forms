@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms.XFormsElementValue
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsElementValue}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
@@ -120,55 +122,38 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   // Can return null
   protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] =
     if (lhhaAnalysis.isLocal) {
-      lhhaAnalysis.staticValue match {
-        case staticValueOpt @ Some(_) =>
-          staticValueOpt
-        case None =>
-          implicit val contextStack = control.getContextStack
+      lhhaAnalysis.expressionOrConstant match {
+        case Right(constant) =>
+          Some(constant)
+        case Left(expr) =>
 
-          val lhhaElement = lhhaAnalysis.element
-
-          // LHHA is direct child of control, evaluate within context
+          implicit val contextStack: XFormsContextStack = control.getContextStack
           contextStack.setBinding(control.bindingContext)
-          withBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope) { _ =>
-            XFormsElementValue.getElementValue(
-              control.lhhaContainer,
-              contextStack,
-              control.effectiveId,
-              lhhaElement,
-              supportsHTML,
-              lhhaAnalysis.defaultToHTML,
-              Array[Boolean](false)
+
+          withBinding(lhhaAnalysis.element, control.effectiveId, lhhaAnalysis.scope) { currentBindingContext =>
+            XPathCache.evaluateAsStringOpt(
+              contextItems       = currentBindingContext.nodeset,
+              contextPosition    = currentBindingContext.position,
+              xpathString        = expr,
+              namespaceMapping   = lhhaAnalysis.namespaceMapping,
+              variableToValueMap = currentBindingContext.getInScopeVariables,
+              functionLibrary    = control.lhhaContainer.getContainingDocument.functionLibrary,
+              functionContext    = contextStack.getFunctionContext(control.effectiveId),
+              baseURI            = null,
+              locationData       = lhhaAnalysis.locationData,
+              reporter           = control.lhhaContainer.getContainingDocument.getRequestStats.getReporter
             )
           }
       }
     } else {
       // LHHA is somewhere else. We resolve the control and ask for its value.
-      Controls.resolveControlsById(control.containingDocument, control.effectiveId, lhhaAnalysis.staticId, followIndexes = true).headOption collect {
+      Controls.resolveControlsById(
+        control.containingDocument,
+        control.effectiveId,
+        lhhaAnalysis.staticId,
+        followIndexes = true
+      ).headOption collect {
         case control: XFormsLHHAControl => control.getValue
       }
     }
-
-//  private def findAncestorContextControl(contextStaticId: String, lhhaStaticId: String): XFormsControl = {
-//
-//    // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
-//    val lhhaScope = control.getResolutionScope
-//    val lhhaPrefixedId = lhhaScope.prefixedIdForStaticId(lhhaStaticId)
-//
-//    // Assume that LHHA element is within same repeat iteration as its related control
-//    val contextPrefixedId = XFormsId.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId)
-//    val contextEffectiveId = contextPrefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(control.effectiveId)
-//
-//    var ancestorObject = control.container.getContainingDocument.getObjectByEffectiveId(contextEffectiveId)
-//    while (ancestorObject.isInstanceOf[XFormsControl]) {
-//      val ancestorControl = ancestorObject.asInstanceOf[XFormsControl]
-//      if (ancestorControl.getResolutionScope == lhhaScope) {
-//        // Found ancestor in right scope
-//        return ancestorControl
-//      }
-//      ancestorObject = ancestorControl.parent
-//    }
-//
-//    null
-//  }
 }

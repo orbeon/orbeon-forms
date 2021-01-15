@@ -350,6 +350,7 @@
                                 <xsl:otherwise>
                                     <fr:databound-select1
                                             id="select1"
+                                            resource="{{xxf:component-param-value('resource')}}"
                                             appearance="minimal"
                                             ref="$binding"
                                             xbl:attr="xxf:encrypt-item-values resource">

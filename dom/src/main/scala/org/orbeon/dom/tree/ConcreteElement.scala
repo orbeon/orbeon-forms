@@ -678,13 +678,13 @@ class ConcreteElement(var qname: QName)
     val parent = getParent
     if (parent ne null) {
       val answer = parent.getNamespaceForPrefix(prefix)
-      if (answer ne null) {
+      if (answer ne null)
         return answer
-      }
     }
-    if ((prefix eq null) || (prefix.length <= 0)) {
+
+    if ((prefix eq null) || (prefix.length <= 0))
       return Namespace.EmptyNamespace
-    }
+
     null
   }
 

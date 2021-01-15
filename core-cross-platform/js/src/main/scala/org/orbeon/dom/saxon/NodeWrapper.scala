@@ -421,14 +421,4 @@ trait NodeWrapper
     }
     throw new IllegalStateException("DOM node not linked to parent node")
   }
-
-////
-////  // UNTYPED or UNTYPED_ATOMIC
-////  def getTypeAnnotation: Int =
-////    node match {
-////      case _: Attribute => StandardNames.XS_UNTYPED_ATOMIC
-////      case _            => StandardNames.XS_UNTYPED
-////    }
-////
-////
 }

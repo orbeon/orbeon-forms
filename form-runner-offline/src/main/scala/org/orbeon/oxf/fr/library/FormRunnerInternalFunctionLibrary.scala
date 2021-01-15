@@ -1,13 +1,11 @@
 package org.orbeon.oxf.fr.library
 
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.xbl.DateSupportJava
 
 import scala.jdk.CollectionConverters._
@@ -196,9 +194,9 @@ object FormRunnerSimpleDataMigrationFunctionLibrary extends OrbeonFunctionLibrar
   @XPathFunction(name = "dataMaybeWithSimpleMigration")
   def dataMaybeWithSimpleMigration(
     enclosingModelAbsoluteId : String,
-    templateInstanceRootElem : NodeInfo,
-    dataToMigrateRootElem    : NodeInfo
-  ): Option[NodeInfo] = {
+    templateInstanceRootElem : om.NodeInfo,
+    dataToMigrateRootElem    : om.NodeInfo
+  ): Option[om.NodeInfo] = {
     // XXX TODO
     None
   }
@@ -206,9 +204,58 @@ object FormRunnerSimpleDataMigrationFunctionLibrary extends OrbeonFunctionLibrar
   @XPathFunction(name = "iterateBinds")
   def iterateBinds(
     enclosingModelAbsoluteId : String,
-    dataRootElem             : NodeInfo
+    dataRootElem             : om.NodeInfo
   ): Iterator[om.Item] = {
     // XXX TODO
     Iterator.empty
   }
+}
+
+object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.xbl.NumberSupportJava" -> "NumberSupport")
+
+  @XPathFunction
+  def getDisplayValueJava(
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean
+  ): String = {
+    ???
+  }
+
+  @XPathFunction
+  def serializeExternalValueJava(
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean
+  ): String = {
+    ???
+  }
+
+  @XPathFunction
+  def deserializeExternalValueJava(
+    externalValue       : String,
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean
+  ): String = {
+    ???
+  }
+
+  @XPathFunction
+  def isZeroValidationFractionDigitsJava(binding: om.Item): Boolean =
+    ???
 }

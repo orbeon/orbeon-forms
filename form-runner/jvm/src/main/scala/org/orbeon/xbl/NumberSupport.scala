@@ -27,6 +27,7 @@ import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
 import scala.util.{Failure, Success}
 
+
 case class NumberConfig(
   decimalSeparator    : Char,
   groupingSeparator   : Option[Char],
@@ -213,7 +214,6 @@ object NumberSupportJava extends NumberSupport[Item] {
       case v: DecimalValue => Some(XMLConstants.XS_DECIMAL_QNAME)
       case _               => None
     }
-
 
   def getCustomMipOpt(binding: Item, name: String): Option[String] =
     binding match {

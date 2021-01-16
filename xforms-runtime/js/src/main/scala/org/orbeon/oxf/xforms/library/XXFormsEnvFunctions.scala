@@ -9,6 +9,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.{elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
 import org.orbeon.oxf.xforms.function.xxforms.{NumericValidation, ValidationFunctionNames, XXFormsLang}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
@@ -239,8 +240,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      .format(args map SequenceTool.convertToJava toArray)
   }
 
-  //    Fun("lang", classOf[XXFormsLang], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-//
+  @XPathFunction
+  def lang()(implicit xfc: XFormsFunction.Context): Option[String] =
+    elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(xfc.containingDocument, _))
 
   // TODO: last arg is`map(*)`
   @XPathFunction

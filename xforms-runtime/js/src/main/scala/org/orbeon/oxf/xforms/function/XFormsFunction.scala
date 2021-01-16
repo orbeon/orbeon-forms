@@ -117,9 +117,9 @@ object XFormsFunction { // extends DefaultFunctionSupport
   def getSourceEffectiveId: String =
     context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
-  def elementAnalysisForSource: Option[ElementAnalysis] = {
+  def elementAnalysisForSource(implicit xfc: XFormsFunction.Context): Option[ElementAnalysis] = {
     val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
-    context.container.partAnalysis.findControlAnalysis(prefixedId)
+    xfc.container.partAnalysis.findControlAnalysis(prefixedId)
   }
 
   def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext): Option[ElementAnalysis] = {
@@ -136,10 +136,10 @@ object XFormsFunction { // extends DefaultFunctionSupport
   def setProperty(name: String, value: Option[String]): Unit =
     context.setProperty(name, value)
 
-  def currentLangOpt(implicit xpathContext: XPathContext): Option[String] =
+  def currentLangOpt(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
 
-  def currentLocale(implicit xpathContext: XPathContext): Locale =
+  def currentLocale(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Locale =
     currentLangOpt match {
       case Some(lang) =>
         // Not sure how xml:lang should be parsed, see:

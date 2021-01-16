@@ -162,11 +162,18 @@
         +/xbl/orbeon/error-summary/error-summary.css
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
+        +/xbl/orbeon/date/date.css
+        +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css
+        +/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css
+        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.css
+        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda-themeless.min.css
+        +/xbl/orbeon/ladda-button/ladda-button.css
+
         +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js
         +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js
         +/xbl/orbeon/autosize-textarea/autosize.min.js
-        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/spin.min.js"
-        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.min.js"
+        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/spin.min.js
+        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.min.js
 
 <!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fr.js-->
 <!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/de.js-->

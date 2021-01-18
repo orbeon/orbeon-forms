@@ -12,8 +12,8 @@ val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
-val SaxonVersion                  = "10.0.0.37-SNAPSHOT"
-val XercesVersion                 = "2.11.0.5-SNAPSHOT"
+val SaxonVersion                  = "10.0.0.38-SNAPSHOT"
+val XercesVersion                 = "2.11.0.6-SNAPSHOT"
 val SaxVersion                    = "2.0.2.6-SNAPSHOT"
 val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"

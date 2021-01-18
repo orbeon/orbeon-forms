@@ -444,7 +444,7 @@ object XFormsStaticStateDeserializer {
                       scope,
                       containerScope,
                       InstanceMetadata(
-                        readonly              = readonly && false, // XXX FIXME TMP until we fix `TinyTree` support
+                        readonly              = readonly,
                         cache                 = cache,
                         timeToLive            = timeToLive,
                         handleXInclude        = false, // not serialized

@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option._
 import io.circe.generic.semiauto._
 import io.circe.parser.decode
-import io.circe.{Decoder, HCursor}
+import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
@@ -11,7 +11,7 @@ import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
@@ -179,21 +180,11 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeDocumentInfo: Decoder[StaticXPath.DocumentNodeInfoType] = (c: HCursor) => {
 
-      // XXX TODO: this is just so we have a doc and things don't crash, but we must parse!
-      val treeBuilder = om.TreeModel.TINY_TREE.makeBuilder(StaticXPath.GlobalConfiguration.makePipelineConfiguration)
+      val docOpt =
+        c.value.asString map
+          (XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, _, handleXInclude = false, handleLexical = false))
 
-      val handler = {
-        val handler = new SaxonTransformerFactory(StaticXPath.GlobalConfiguration).newTransformerHandler
-        handler.setResult(treeBuilder)
-        handler
-      }
-
-      handler.startDocument()
-      handler.startElement("", "DUMMY", "DUMMY", new AttributesImpl)
-      handler.endElement("", "DUMMY", "DUMMY")
-      handler.endDocument()
-
-      Right(treeBuilder.getCurrentRoot)
+      docOpt.toRight(DecodingFailure("missing XML", Nil))
     }
 
     implicit val decodeCommonBinding: Decoder[CommonBinding] = (c: HCursor) =>

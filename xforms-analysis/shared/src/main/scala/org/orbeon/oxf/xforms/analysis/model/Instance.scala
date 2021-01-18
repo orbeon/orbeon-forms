@@ -18,7 +18,7 @@ import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, StaticXPath}
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsNames._
@@ -70,6 +70,8 @@ class Instance(
   containerScope
 ) with Logging {
 
+  selfInstance =>
+
   // Get constant inline content from `CommonBinding` if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of a `CommonBinding` and
   // among multiple instances of a given form. This is useful in particular for component i18n resource
@@ -78,14 +80,16 @@ class Instance(
     readonly && useInlineContent option {
 
       // An instance within `xf:implementation` has a `ComponentControl` grandparent
-      val componentOpt =
-        parent flatMap (_.parent) flatMap ( _.narrowTo[ComponentControl])
+      parent flatMap (_.parent) match {
+        case Some(component: ComponentControl) =>
 
-      componentOpt match {
-        case Some(component) =>
+          val parentModel = parent.get.narrowTo[WithChildrenTrait].get // TODO: `parent` should be `Option[WithChildrenTrait]`!
 
-          val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == XFORMS_MODEL_QNAME.localName)
-          val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == XFORMS_INSTANCE_QNAME.localName)
+          val modelsIt    = component.children.iterator   collect { case m: Model    => m }
+          val instancesIt = parentModel.children.iterator collect { case i: Instance => i }
+
+          val modelIndex    = modelsIt.indexWhere(_ eq parentModel)
+          val instanceIndex = instancesIt.indexWhere(_ eq selfInstance)
 
 //          debug(
 //            "getting readonly inline instance from abstract binding",
@@ -100,7 +104,7 @@ class Instance(
 //          ) // TODO: pass a logger?
 
           component.commonBinding.constantInstances((modelIndex, instanceIndex))
-        case None =>
+        case _ =>
 
 //          debug(
 //            "getting readonly inline instance from top-level",

@@ -74,7 +74,7 @@ private object SubmitResponseEvent {
         sb.append("</header>")
       }
       sb.append("</headers>")
-      XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
+      XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, handleXInclude = false, handleLexical = false)
     }
 
   def headerElements(e: SubmitResponseEvent): Option[Seq[om.Item]] = {

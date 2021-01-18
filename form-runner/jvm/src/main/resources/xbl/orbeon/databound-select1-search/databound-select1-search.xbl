@@ -353,7 +353,7 @@
                                             resource="{{xxf:component-param-value('resource')}}"
                                             appearance="minimal"
                                             ref="$binding"
-                                            xbl:attr="xxf:encrypt-item-values resource">
+                                            xbl:attr="xxf:encrypt-item-values">
                                         <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
                                     </fr:databound-select1>
                                 </xsl:otherwise>

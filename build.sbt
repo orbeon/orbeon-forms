@@ -8,6 +8,16 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 resolvers += Resolver.githubPackages("orbeon")
 ThisBuild / githubOwner := "orbeon"
 
+// For now, keep ad-hoc list for offline client
+val TimezonesToInclude = Set(
+  "America/Los_Angeles",
+  "Asia/Kolkata",
+  "Asia/Calcutta", // deprecated
+)
+
+val includeTimezone: String => Boolean = tz =>
+  TimezonesToInclude(tz) || tz.startsWith("Australia/")
+
 val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
@@ -464,7 +474,7 @@ lazy val commonJS  = common.js
   .settings(
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-time"      % ScalaJsTimeVersion,
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % ScalaJsTimeVersion,
-    zonesFilter := { (z: String) => z == "America/Los_Angeles" } // for now, keep only one timezone
+    zonesFilter := { (z: String) => includeTimezone(z) }
   )
   .enablePlugins(JSDependenciesPlugin)
 

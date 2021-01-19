@@ -37,7 +37,7 @@ object ProcessParser  {
   // FIXME: actual parsing
   def parse(process: String): GroupNode =
     process match {
-      case "save-final" =>
+      case p if p.contains("""save""") =>
         GroupNode(ActionNode("save", Map.empty), Nil)
       case _ =>
         GroupNode(ActionNode("nop", Map.empty), Nil)

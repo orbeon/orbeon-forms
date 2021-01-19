@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.xxforms.NumericValidation
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
 import scala.util.{Failure, Success}
@@ -200,30 +200,30 @@ trait NumberSupport[Binding] {
   }
 }
 
-object NumberSupportJava extends NumberSupport[Item] {
+object NumberSupportJava extends NumberSupport[om.Item] {
 
   import io.circe.generic.auto._
 
-  def getStringValue(binding: Item): String =
+  def getStringValue(binding: om.Item): String =
     binding.getStringValue
 
-  def getDatatypeOpt(binding: Item): Option[dom.QName] =
+  def getDatatypeOpt(binding: om.Item): Option[dom.QName] =
     binding match {
-      case v: NodeInfo     => Option(InstanceData.getType(v))
+      case v: om.NodeInfo  => Option(InstanceData.getType(v))
       case v: IntegerValue => Some(XMLConstants.XS_INTEGER_QNAME)
       case v: DecimalValue => Some(XMLConstants.XS_DECIMAL_QNAME)
       case _               => None
     }
 
-  def getCustomMipOpt(binding: Item, name: String): Option[String] =
+  def getCustomMipOpt(binding: om.Item, name: String): Option[String] =
     binding match {
-      case v: NodeInfo => InstanceData.findCustomMip(v, name)
-      case _           => None
+      case v: om.NodeInfo => InstanceData.findCustomMip(v, name)
+      case _              => None
     }
 
   //@XPathFunction
   def getDisplayValueJava(
-    binding             : Item,
+    binding             : om.Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
     prefix              : String,
@@ -246,7 +246,7 @@ object NumberSupportJava extends NumberSupport[Item] {
 
   //@XPathFunction
   def serializeExternalValueJava(
-    binding             : Item,
+    binding             : om.Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
     prefix              : String,
@@ -276,7 +276,7 @@ object NumberSupportJava extends NumberSupport[Item] {
   //@XPathFunction
   def deserializeExternalValueJava(
     externalValue       : String,
-    binding             : Item,
+    binding             : om.Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
     prefix              : String,
@@ -303,6 +303,6 @@ object NumberSupportJava extends NumberSupport[Item] {
   }
 
   //@XPathFunction
-  def isZeroValidationFractionDigitsJava(binding: Item): Boolean =
+  def isZeroValidationFractionDigitsJava(binding: om.Item): Boolean =
     validationFractionDigitsOpt(binding) contains 0
 }

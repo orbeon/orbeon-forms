@@ -183,10 +183,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def getVariable(modelEffectiveId: String, variableName: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] = {
     xfc.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-      case model: XFormsModel =>
-        val v = model.getTopLevelVariables(variableName)
-        XPath.Logger.debug(s"zzz getVariable: $modelEffectiveId, $variableName, $v")
-        v.asIterable().asScala
+      case model: XFormsModel => model.getTopLevelVariables(variableName).asIterable().asScala
       case _                  => Nil
     }
   }

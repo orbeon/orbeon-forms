@@ -516,15 +516,16 @@
                     name="description"
                     value="
                         (
-                            { if (@paths) then concat(@paths, ', ') else '' }
                             xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
                             xxf:instance('fr-form-metadata')/description
-                        )[normalize-space()][1]"/>
+                        )[1]"/>
 
                 <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
                     <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
                          xf:output, which will cause an error. -->
-                    <xf:output value="$description"/>
+                    <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
+                    <xf:output ref=".[$is-html]"      value="$description" mediatype="text/html"/>
+                    <xf:output ref=".[not($is-html)]" value="$description"/>
                 </xf:group>
             </xh:div>
         </xh:div>

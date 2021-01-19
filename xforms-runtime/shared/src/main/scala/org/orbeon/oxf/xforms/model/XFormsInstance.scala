@@ -131,6 +131,7 @@ class XFormsInstance(
 
   // Update the instance upon submission with instance replacement
   def update(instanceCaching: Option[InstanceCaching], documentInfo: DocumentNodeInfoType, readonly: Boolean): Unit = {
+
     _instanceCaching = instanceCaching
     _documentInfo    = documentInfo
     _readonly        = readonly
@@ -502,6 +503,8 @@ object XFormsInstance extends Logging {
     )
 
     // NOTE: We don't honor exposeXPathTypes on readonly instances, anyway they don't support MIPs at this time
+
+    println(s"xxxx wrapping readonly = $readonly, exposeXPathTypes = $exposeXPathTypes")
 
     if (readonly)
       documentInfo // the optimal case: no copy of the cached document is needed

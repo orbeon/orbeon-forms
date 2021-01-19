@@ -56,8 +56,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def setSessionAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
 
-    println(s"xxx setSessionAttribute `$attributeName` with type `${items map (_.getClass.getName) mkString ", "}`")
-
     // NOTE: We take only the first item, even though the parameter is declared as supporting
     // multiple items. This is incorrect but it's what we've done in the past. We could fix this.
     val value =
@@ -73,10 +71,7 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def getRequestAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
-
     // TODO: Handle XML tree
-    println(s"xxx getRequestAttribute `$attributeName`")
-
     Option(CoreCrossPlatformSupport.externalContext.getRequest.getAttributesMap.get(attributeName)).toList collect {
         case v: om.Item => List(v)
     } flatten

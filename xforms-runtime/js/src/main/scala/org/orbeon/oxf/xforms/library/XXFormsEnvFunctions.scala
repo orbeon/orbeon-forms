@@ -6,7 +6,7 @@ import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction.{elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
@@ -70,12 +70,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun("type", classOf[XXFormsType], op = 0, min = 0, QNAME, ALLOWS_ZERO_OR_MORE,
 //      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
 //    )
-//
-//    Fun("custom-mip", classOf[XXFormsCustomMIP], op = 0, min = 2, STRING, ALLOWS_ZERO_OR_ONE,
-//      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
+  // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
+  // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
+  @XPathFunction
+  def customMip(binding: Iterable[om.Item], qName: om.Item)(implicit xpc: XPathContext): Option[String] =
+    InstanceData.findCustomMip(
+      binding = binding.headOption.orNull,
+      qName   = XFormsFunction.getQNameFromItem(qName)
+    )
+
 //    Fun("invalid-binds", classOf[XXFormsInvalidBinds], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE,
 //      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
 //    )
@@ -91,25 +96,25 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    )
 
   @XPathFunction
-  def bindingContext(staticOrAbsoluteId : String)(implicit xpc: XPathContext): Option[om.Item] =
+  def bindingContext(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Option[om.Item] =
     relevantControl(staticOrAbsoluteId) flatMap (_.contextForBinding)
 
-//    Fun("is-control-relevant", classOf[XXFormsIsControlRelevant], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    Fun("is-control-readonly", classOf[XXFormsIsControlReadonly], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    Fun("is-control-required", classOf[XXFormsIsControlRequired], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    Fun("is-control-valid", classOf[XXFormsIsControlValid], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+  @XPathFunction
+  def isControlRelevant(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Boolean =
+    relevantControl(staticOrAbsoluteId).nonEmpty
+
+  @XPathFunction
+  def isControlReadonly(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Boolean =
+    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isReadonly } contains true
+
+  @XPathFunction
+  def isControlRequired(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Boolean =
+    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isRequired } contains true
+
+  @XPathFunction
+  def isControlValid(staticOrAbsoluteId: String)(implicit xpc: XPathContext): Boolean =
+    relevantControl(staticOrAbsoluteId) collect { case c: XFormsSingleNodeControl => c.isValid } contains true
+
 //    Fun("value", classOf[XXFormsValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(BOOLEAN, EXACTLY_ONE)

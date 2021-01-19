@@ -205,8 +205,8 @@ object XFormsFunction { // extends DefaultFunctionSupport
 //        Locale.getDefault(Locale.Category.FORMAT) // NOTE: Using defaults is usually bad.
 //  }
 
-  def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName =
-    getQNameFromItem(qNameExpression.evaluateItem(xpathContext))
+//  def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName =
+//    getQNameFromItem(qNameExpression.evaluateItem(xpathContext))
 
   def getQNameFromItem(evaluatedExpression: om.Item)(implicit xpathContext: XPathContext): dom.QName =
     evaluatedExpression match {

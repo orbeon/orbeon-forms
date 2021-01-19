@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.xbl.DateSupportJava
+import org.orbeon.xbl.{DateSupportJava, NumberSupportJava}
 
 import scala.jdk.CollectionConverters._
 
@@ -215,7 +215,7 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
 
   lazy val namespaces = List("java:org.orbeon.xbl.NumberSupportJava" -> "NumberSupport")
 
-  @XPathFunction
+  @XPathFunction(name = "getDisplayValueJava")
   def getDisplayValueJava(
     binding             : om.Item,
     decimalSeparator    : String,
@@ -224,24 +224,38 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
-  ): String = {
-    ???
-  }
+  ): String =
+    NumberSupportJava.getDisplayValueJava(
+      binding,
+      decimalSeparator,
+      groupingSeparator,
+      prefix,
+      digitsAfterDecimal,
+      roundWhenFormatting,
+      roundWhenStoring
+    )
 
-  @XPathFunction
+  @XPathFunction(name = "serializeExternalValueJava")
   def serializeExternalValueJava(
     binding             : om.Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
-    prefix              : String,
-    digitsAfterDecimal  : String,
+    prefix              : Option[String],
+    digitsAfterDecimal  : Option[String],
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
-  ): String = {
-    ???
-  }
+  ): String =
+    NumberSupportJava.serializeExternalValueJava(
+      binding,
+      decimalSeparator,
+      groupingSeparator,
+      prefix.getOrElse(""),
+      digitsAfterDecimal.getOrElse(""),
+      roundWhenFormatting,
+      roundWhenStoring
+    )
 
-  @XPathFunction
+  @XPathFunction(name = "deserializeExternalValueJava")
   def deserializeExternalValueJava(
     externalValue       : String,
     binding             : om.Item,
@@ -251,11 +265,19 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
-  ): String = {
-    ???
-  }
+  ): String =
+    NumberSupportJava.deserializeExternalValueJava(
+      externalValue,
+      binding,
+      decimalSeparator,
+      groupingSeparator,
+      prefix,
+      digitsAfterDecimal,
+      roundWhenFormatting,
+      roundWhenStoring
+    )
 
-  @XPathFunction
+  @XPathFunction(name = "isZeroValidationFractionDigitsJava")
   def isZeroValidationFractionDigitsJava(binding: om.Item): Boolean =
-    ???
+    NumberSupportJava.isZeroValidationFractionDigitsJava(binding)
 }

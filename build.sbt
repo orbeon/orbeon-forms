@@ -31,6 +31,7 @@ val ScribeVersion                 = "2.7.13"
 val PerfolationVersion            = "1.1.7"
 val ScalaJsStubsVersion           = "1.0.0" // can be different from Scala.js version
 val ScalaJsTimeVersion            = "2.0.0"
+val ScalaJsLocalesVersion         = "1.1.0"
 
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
@@ -472,9 +473,11 @@ lazy val commonJVM = common.jvm
 lazy val commonJS  = common.js
   .enablePlugins(TzdbPlugin)
   .settings(
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time"      % ScalaJsTimeVersion,
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % ScalaJsTimeVersion,
-    zonesFilter := { (z: String) => includeTimezone(z) }
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time"       % ScalaJsTimeVersion,
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion,
+    zonesFilter := { (z: String) => includeTimezone(z) },
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-locales"    % ScalaJsLocalesVersion,
+    libraryDependencies += "io.github.cquiroz" %%% "locales-minimal-en-db" % ScalaJsLocalesVersion
   )
   .enablePlugins(JSDependenciesPlugin)
 

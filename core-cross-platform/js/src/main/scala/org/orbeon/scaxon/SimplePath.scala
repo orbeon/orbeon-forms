@@ -14,10 +14,11 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom._
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.parser.Token
-import org.orbeon.saxon.model.{SchemaType, Type, UType}
+import org.orbeon.saxon.model.Type
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.tree.iter.ListIterator
@@ -79,14 +80,24 @@ object SimplePath {
       if (! Set("", "*")(qName._1))
         throw new IllegalArgumentException("""Only local name tests of the form "*:foo" are supported.""")
 
-      nodeKind map (new LocalNameTest(pool, _, qName._2)) getOrElse new LocalNameOnlyTest(pool, qName._2)
+      nodeKind map (new LocalNameTest(pool, _, qName._2)) getOrElse
+        new CombinedNodeTest(
+          new LocalNameTest(pool, Type.ELEMENT, qName._2),
+          Token.UNION,
+          new LocalNameTest(pool, Type.ATTRIBUTE, qName._2)
+        )
     }
   }
 
   class NodeQNameTest(name: (String, String), nodeKind: Option[Int] = None) extends Test {
     override def test(nodeInfo: NodeInfo): NodeTest = {
       val pool = nodeInfo.getConfiguration.getNamePool
-      nodeKind map (new NameTest(_, name._1, name._2, pool)) getOrElse new NameOnlyTest(pool, name._1, name._2)
+      nodeKind map (new NameTest(_, name._1, name._2, pool)) getOrElse
+        new CombinedNodeTest(
+          new NameTest(Type.ELEMENT, name._1, name._2, pool),
+          Token.UNION,
+          new NameTest(Type.ATTRIBUTE, name._1, name._2, pool)
+        )
     }
   }
 
@@ -365,48 +376,6 @@ object SimplePath {
   private object Private {
 
     val ElementOrAttribute = Set(Type.ELEMENT, Type.ATTRIBUTE)
-
-    // The only method of the `NodeTest` that should be called is `test()`, which directly delegates
-    // to `matches()`. So we shouldn't need to implement the other methods for this specific purpose.
-    class LocalNameOnlyTest(namePool: NamePool, localName: String) extends NodeTest {
-
-      def matches(nodeKind: Int, name: NodeName, annotation: SchemaType): Boolean =
-        name != null                         &&
-        ElementOrAttribute(nodeKind.toShort) && // only difference with `LocalNameTest` is we check on two node types
-        localName == name.getLocalPart
-
-      // This is probably not called
-      // 2020-12-22: It *is* called.
-      def getUType: UType =
-        UType.ELEMENT.union(UType.ATTRIBUTE)
-
-      // This is probably not called
-      def getDefaultPriority: Double =
-        ???
-//        -0.25
-
-      override def toString: String =
-        s"*:$localName or @*:$localName"
-    }
-
-    class NameOnlyTest(namePool: NamePool, uri: String, localName: String) extends NodeTest {
-
-      private val fingerPrintInt: Int = namePool.allocateFingerprint(uri, localName) & NamePool.FP_MASK
-
-      override def matches(nodeKind: Int, name: NodeName, annotation: SchemaType): Boolean =
-        ElementOrAttribute(nodeKind.toShort) && (name.getFingerprint & NamePool.FP_MASK) == this.fingerPrintInt
-
-      override def getUType: UType =
-        UType.ELEMENT.union(UType.ATTRIBUTE)
-
-      // This is probably not called
-      def getDefaultPriority: Double =
-        ???
-//        -0.25
-
-      override def toString: String =
-        s"element(${namePool.getEQName(fingerPrintInt)}) or attribute(${namePool.getEQName(fingerPrintInt)})"
-    }
 
     class NodeKindTestBase(nodeKind: Short) extends Test {
       private val test = NodeKindTest.makeNodeKindTest(nodeKind)

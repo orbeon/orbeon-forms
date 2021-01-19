@@ -60,6 +60,7 @@ object StaticXPath extends StaticXPathTrait {
     super.setNamePool(GlobalNamePool)
     super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
     optimizerOptions = new OptimizerOptions("vmt") // FIXME: temporarily remove the "l" option which fails
+    setDefaultRegexEngine("J") // the "S" (Saxon) engine is broken at this time
 
     // TODO
   }

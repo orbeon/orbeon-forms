@@ -32,6 +32,7 @@ object XPath extends XPathTrait {
     super.setNamePool(StaticXPath.GlobalNamePool)
     super.setDocumentNumberAllocator(StaticXPath.GlobalDocumentNumberAllocator)
     optimizerOptions = new OptimizerOptions("vmt") // FIXME: temporarily remove the "l" option which fails
+    setDefaultRegexEngine("J") // the "S" (Saxon) engine is broken at this time
 
     // TODO
   }

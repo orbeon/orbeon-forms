@@ -160,7 +160,10 @@ object OfflineDemo extends App {
               XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
 
               // Find CSS/JS to load
-              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
+              // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to
+              //   have the list of offline CSS baseline assets and not insert the CSS if already present.
+//              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
+              val stylesheetsToLoad = Nil
               val scriptsToLoad     = findAndDetachJsToLoad (rcv.frag)
 
               // Asynchronously load styles, insert HTML, then load scripts

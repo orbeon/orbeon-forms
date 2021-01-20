@@ -76,6 +76,7 @@ trait FormRunnerProcessor {
     compiledForm : CompiledForm,
     appName      : String,
     formName     : String,
+//    formVersion  : Int,  // Q: do we need this? We are passing the form definition!
     mode         : String,
     documentId   : js.UndefOr[String]
   ): Unit
@@ -145,8 +146,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
   def renderForm(
     container    : html.Element,
     compiledForm : CompiledForm,
-    appName      : String,
-    formName     : String,
+    appName      : String, // Q: do we need this? We are passing the form definition!
+    formName     : String, // Q: do we need this? We are passing the form definition!
     mode         : String,
     documentId  : js.UndefOr[String]
   ): Unit = // TODO: js.Promise[Something]

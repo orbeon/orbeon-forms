@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.MapFunctions
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.function.ProcessTemplate
+import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.{StringValue, Value}
@@ -60,7 +60,7 @@ class XXFormsResource extends XFormsFunction {
               key.getStringValue -> javaParamOpt.orNull
           }
 
-          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
+          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
 
         case None =>
           resourceOrTemplate

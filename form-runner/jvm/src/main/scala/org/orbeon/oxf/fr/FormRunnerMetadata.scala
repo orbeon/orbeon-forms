@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.function.ProcessTemplate
+import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -77,7 +77,7 @@ object FormRunnerMetadata {
     val iterationResource = currentFormRunnerResources / "email" / "iteration" stringValue
 
     def iterationString(it: Int) =
-      ProcessTemplate.processTemplateWithNames(iterationResource, List(("iteration", it)), Configuration.getLocale(currentLang))
+      ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)), Configuration.getLocale(currentLang))
 
     val controlDetails = gatherRelevantControls(XFormsAPI.inScopeContainingDocument)
 

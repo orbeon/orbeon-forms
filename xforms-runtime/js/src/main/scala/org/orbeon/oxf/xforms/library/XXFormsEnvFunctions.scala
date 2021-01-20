@@ -4,11 +4,12 @@ import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.XFormsFunction.{elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
+import org.orbeon.oxf.xforms.function.XFormsFunction.{currentLocale, elementAnalysisForSource, relevantControl, resolveOrFindByStaticOrAbsoluteId}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
 import org.orbeon.oxf.xforms.function.xxforms.{NumericValidation, ValidationFunctionNames, XXFormsLang}
@@ -16,7 +17,10 @@ import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.function.ProcessTemplateSupport
+import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.SequenceTool
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
@@ -234,10 +238,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
 
   @XPathFunction
-  def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext): String = {
-    // TODO: `MessageFormat` is not supported by Scala.js as of now (2020-12-29).
-    //
-    s"[TODO] $template"
+  def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
+    // TODO: 2021-01-20: `MessageFormat` not (yet) supported in Scala.js.
+    s"[TODO: formatMessage] $template"
 //    new MessageFormat(template, currentLocale)
 //      .format(args map SequenceTool.convertToJava toArray)
   }
@@ -250,15 +253,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def r(
     resourceKey         : String,
-    instanceArgumentOpt : Option[String] = None,
-    templateParams      : om.Item = null)(implicit
+    instanceArgumentOpt : Option[String]  = None,
+    templateParamsOpt   : Option[om.Item] = None)(implicit // must be a `MapItem`
     xpc                 : XPathContext,
     xfc                 : XFormsFunction.Context
   ): Option[String] = {
-
-    // XXX TODO
-//    val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
-    val templateParamsOpt: Option[_]   = None
 
     def findInstance = instanceArgumentOpt match {
       case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
@@ -269,19 +268,20 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     def processResourceString(resourceOrTemplate: String): String =
       templateParamsOpt match {
-        case Some(params) =>
-//
-//          val javaNamedParamsIt = params.iterator map {
-//            case (key, value) =>
-//              val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
-//              key.getStringValue -> javaParamOpt.orNull
-//          }
-//
-//          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
+        case Some(params: MapItem) =>
 
+          val javaNamedParamsIt = params.keyValuePairs.iterator.asScala map {
+            case org.orbeon.saxon.ma.map.KeyValuePair(key, value) =>
+
+              val javaParamOpt = value.asIterable.iterator.asScala map SequenceTool.convertToJava nextOption()
+              key.getStringValue -> javaParamOpt.orNull
+          }
+
+          // TODO: 2021-01-20: `MessageFormat` not (yet) supported in Scala.js.
+//          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList, currentLocale)
           resourceOrTemplate
 
-        case None =>
+        case _ =>
           resourceOrTemplate
       }
 
@@ -295,11 +295,27 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         processResourceString(leaf.getStringValue)
   }
 
-  //    Fun("resource-elements", classOf[XXFormsResourceElem], op = 0, min = 1, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+  @XPathFunction
+  def resourceElements(
+    resourceKeyArgument : String,
+    instanceArgument    : String = "fr-form-resources")(implicit
+    xpc                 : XPathContext,
+    xfc                 : XFormsFunction.Context
+  ): Iterator[om.NodeInfo] = {
+
+    def findResourcesElement =
+      resolveOrFindByStaticOrAbsoluteId(instanceArgument) collect
+        { case instance: XFormsInstance => instance.rootElement }
+
+    for {
+      elementAnalysis <- elementAnalysisForSource.iterator
+      resources       <- findResourcesElement.iterator
+      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis).iterator
+      resourceRoot    <- findResourceElementForLang(resources, requestedLang).iterator
+      leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
+    } yield
+      leaf
+  }
 
   @XPathFunction
   def pendingUploads(): Int =

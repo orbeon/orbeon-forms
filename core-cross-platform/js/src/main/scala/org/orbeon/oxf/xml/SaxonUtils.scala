@@ -70,7 +70,7 @@ object SaxonUtils {
 
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator(e) ++
-      (e.operands.iterator.asScala flatMap (o => iterateExpressionTree(o.childExpression)))
+      (e.operands.iterator.asScala flatMap (o => iterateExpressionTree(o.getChildExpression)))
 
   // Parse the given qualified name and return the separated prefix and local name
   def parseQName(lexicalQName: String): (String, String) = {

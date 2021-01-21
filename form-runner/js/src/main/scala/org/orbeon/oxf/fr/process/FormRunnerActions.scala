@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.RelevanceHandling
 //import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -67,12 +68,12 @@ trait FormRunnerActions {
 //    "review"                 -> tryNavigateToReview,
 //    "edit"                   -> tryNavigateToEdit,
 //    "open-rendered-format"   -> tryOpenRenderedFormat,
-//    "visit-all"              -> tryShowRelevantErrors,
-//    "show-relevant-errors"   -> tryShowRelevantErrors,
-//    "unvisit-all"            -> tryUnvisitAll,
-//    "expand-all"             -> tryExpandAllSections,
-//    "expand-invalid"         -> tryExpandInvalidSections,
-//    "collapse-all"           -> tryCollapseSections,
+    "visit-all"              -> tryShowRelevantErrors,
+    "show-relevant-errors"   -> tryShowRelevantErrors,
+    "unvisit-all"            -> tryUnvisitAll,
+    "expand-all"             -> tryExpandAllSections,
+    "expand-invalid"         -> tryExpandInvalidSections,
+    "collapse-all"           -> tryCollapseSections,
     "result-dialog"          -> tryShowResultDialog,
     "captcha"                -> tryCaptcha,
     "set-data-status"        -> trySetDataStatus,
@@ -627,20 +628,20 @@ trait FormRunnerActions {
 //      )
 //
 //  // Visit/unvisit controls
-//  def tryShowRelevantErrors(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
-//  def tryUnvisitAll(params: ActionParams)        : Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
-//
-//  // Collapse/expand sections
-//  def tryCollapseSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-collapse-all",         targetId = SectionsModel))
-//  def tryExpandAllSections(params: ActionParams) : Try[Any] = Try(dispatch(name = "fr-expand-all",           targetId = SectionsModel))
+  def tryShowRelevantErrors(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-show-relevant-errors", targetId = ErrorSummaryModel))
+  def tryUnvisitAll(params: ActionParams)        : Try[Any] = Try(dispatch(name = "fr-unvisit-all",          targetId = ErrorSummaryModel))
 
-//  def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
-//    Try {
-//      ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName =>
-//        val sectionId = FormRunner.sectionId(sectionName)
-//        dispatch(name = "fr-expand", targetId = sectionId)
-//      }
-//    }
+  // Collapse/expand sections
+  def tryCollapseSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-collapse-all",         targetId = SectionsModel))
+  def tryExpandAllSections(params: ActionParams) : Try[Any] = Try(dispatch(name = "fr-expand-all",           targetId = SectionsModel))
+
+  def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
+    Try {
+      ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName =>
+        val sectionId = FormRunner.sectionId(sectionName)
+        dispatch(name = "fr-expand", targetId = sectionId)
+      }
+    }
 
   def findUrlsInstanceRootElem: Option[NodeInfo] =
     urlsInstance map (_.rootElement)

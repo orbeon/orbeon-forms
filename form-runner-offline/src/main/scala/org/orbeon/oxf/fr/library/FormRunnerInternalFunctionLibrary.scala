@@ -64,6 +64,18 @@ object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction(name = "isLeaseSupported")
   def isLeaseSupported(app: String, form: String): Boolean =
     FormRunner.isLeaseSupported(app, form)
+
+  @XPathFunction(name = "updateTemplateFromInScopeItemsetMaps")
+  def updateTemplateFromInScopeItemsetMaps(startNode: om.NodeInfo, template: om.NodeInfo): om.NodeInfo =
+    FormRunner.updateTemplateFromInScopeItemsetMaps(startNode, template)
+
+  @XPathFunction(name = "garbageCollectMetadataItemsets")
+  def garbageCollectMetadataItemsets(instance: om.NodeInfo): Unit =
+    FormRunner.garbageCollectMetadataItemsets(instance)
+
+  @XPathFunction(name = "controlNameFromId")
+  def controlNameFromId(controlOrBindId: String): String =
+    FormRunner.controlNameFromId(controlOrBindId)
 }
 
 object FormRunnerDateSupportFunctionLibrary extends OrbeonFunctionLibrary {

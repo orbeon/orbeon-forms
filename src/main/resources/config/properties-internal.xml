@@ -160,6 +160,7 @@
         +/xbl/orbeon/section/section.css
         +/xbl/orbeon/grid/grid.css
         +/xbl/orbeon/error-summary/error-summary.css
+        +/xbl/orbeon/number/number.css
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/date/date.css

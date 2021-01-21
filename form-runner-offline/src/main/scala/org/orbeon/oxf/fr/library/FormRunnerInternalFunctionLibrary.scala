@@ -261,8 +261,8 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
     binding             : om.Item,
     decimalSeparator    : String,
     groupingSeparator   : String,
-    prefix              : String,
-    digitsAfterDecimal  : String,
+    prefix              : Option[String],
+    digitsAfterDecimal  : Option[String],
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
   ): String =
@@ -271,8 +271,8 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
       binding,
       decimalSeparator,
       groupingSeparator,
-      prefix,
-      digitsAfterDecimal,
+      prefix.getOrElse(""),
+      digitsAfterDecimal.getOrElse(""),
       roundWhenFormatting,
       roundWhenStoring
     )

@@ -315,17 +315,17 @@ object XFormsStaticStateSerializer {
           )
         case c: StaticBind    =>
 
-          implicit val encodeTypeMIP: Encoder[c.TypeMIP] = (a: c.TypeMIP) => Json.obj(
+          implicit val encodeTypeMIP: Encoder[StaticBind.TypeMIP] = (a: StaticBind.TypeMIP) => Json.obj(
             "id"         -> Json.fromString(a.id),
             "datatype"   -> Json.fromString(a.datatype)
           )
 
-          implicit val encodeWhitespaceMIP: Encoder[c.WhitespaceMIP] = (a: c.WhitespaceMIP) => Json.obj(
+          implicit val encodeWhitespaceMIP: Encoder[StaticBind.WhitespaceMIP] = (a: StaticBind.WhitespaceMIP) => Json.obj(
             "id"         -> Json.fromString(a.id),
             "policy"     -> a.policy.asJson
           )
 
-          implicit val encodeXPathMIP: Encoder[c.XPathMIP] = (a: c.XPathMIP) => Json.obj(
+          implicit val encodeXPathMIP: Encoder[StaticBind.XPathMIP] = (a: StaticBind.XPathMIP) => Json.obj(
             "id"         -> Json.fromString(a.id),
             "name"       -> Json.fromString(a.name),
             "level"      -> a.level.asJson,
@@ -334,8 +334,8 @@ object XFormsStaticStateSerializer {
 
           List(
             "typeMIPOpt"                  -> c.typeMIPOpt.asJson,
-            "dataType"                    -> c.dataType.asJson,
-            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
+//            "dataType"                    -> c.dataType.asJson,
+//            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
             "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson,
             "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
 //            //allMIPNameToXPathMIP combines both above

@@ -502,63 +502,49 @@ object XFormsStaticStateDeserializer {
 
             case XFORMS_BIND_QNAME =>
 
-              val staticBind =
-                new StaticBind(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
-                  isTopLevelPart  = true,
-                  functionLibrary = functionLibrary
-                )
+              val xpathMipLocationData = ElementAnalysis.createLocationData(element)
 
-              implicit val decodeTypeMIP: Decoder[staticBind.TypeMIP] = (c: HCursor) =>
+              implicit val decodeTypeMIP: Decoder[StaticBind.TypeMIP] = (c: HCursor) =>
                 for {
                   id         <- c.get[String]("id")
                   datatype   <- c.get[String]("datatype")
                 } yield
-                  new staticBind.TypeMIP(id, datatype)
+                  new StaticBind.TypeMIP(id, datatype)
 
-              implicit val decodeXPathMIP: Decoder[staticBind.XPathMIP] = (c: HCursor) =>
+              implicit val decodeXPathMIP: Decoder[StaticBind.XPathMIP] = (c: HCursor) =>
                 for {
                   id         <- c.get[String]("id")
                   name       <- c.get[String]("name")
                   level      <- c.get[ValidationLevel]("level")
                   expression <- c.get[String]("expression")
                 } yield
-                  new staticBind.XPathMIP(id, name, level, expression)
+                  new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary)
 
-              //              implicit val encodeTypeMIP: Encoder[c.TypeMIP] = (a: c.TypeMIP) => Json.obj(
-//                "id"         -> Json.fromString(a.id),
-//                "datatype"   -> Json.fromString(a.datatype)
-//              )
-//
-//              implicit val encodeWhitespaceMIP: Encoder[c.WhitespaceMIP] = (a: c.WhitespaceMIP) => Json.obj(
-//                "id"         -> Json.fromString(a.id),
-//                "policy"     -> a.policy.asJson
-//              )
-//
-//              implicit val encodeXPathMIP: Encoder[c.XPathMIP] = (a: c.XPathMIP) => Json.obj(
-//                "id"         -> Json.fromString(a.id),
-//                "name"       -> Json.fromString(a.name),
-//                "level"      -> a.level.asJson,
-//                "expression" -> Json.fromString(a.expression)
-//              )
-
-              for {
-                typeMIPOpt                  <- c.get[Option[staticBind.TypeMIP]]("typeMIPOpt")
-//                dataType                    <- c.get[]("dataType")
-//                nonPreserveWhitespaceMIPOpt <- c.get[]("nonPreserveWhitespaceMIPOpt")
-                mipNameToXPathMIP           <- c.get[Iterable[(String, List[staticBind.XPathMIP])]]("mipNameToXPathMIP")
-                customMIPNameToXPathMIP     <- c.get[Map[String, List[staticBind.XPathMIP]]]("customMIPNameToXPathMIP")
-              } yield {
-                staticBind.typeMIPOpt              = typeMIPOpt
-                staticBind.mipNameToXPathMIP       = mipNameToXPathMIP
-                staticBind.customMIPNameToXPathMIP = customMIPNameToXPathMIP
-              }
+              val staticBind =
+                for {
+                  typeMIPOpt                  <- c.get[Option[StaticBind.TypeMIP]]("typeMIPOpt")
+                  mipNameToXPathMIP           <- c.get[Iterable[(String, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")
+                  customMIPNameToXPathMIP     <- c.get[Map[String, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")
+                } yield
+                  new StaticBind(
+                    index,
+                    element,
+                    controlStack.headOption,
+                    None,
+                    staticId,
+                    prefixedId,
+                    namespaceMapping,
+                    scope,
+                    containerScope,
+                    typeMIPOpt,
+                    mipNameToXPathMIP,
+                    customMIPNameToXPathMIP,
+                    StaticBind.getBindTree(controlStack.headOption)
+                  )
 
             //              var figuredAllBindRefAnalysis: Boolean = false
-//
-//              var recalculateOrder : Option[List[StaticBind]] = None
-//              var defaultValueOrder: Option[List[StaticBind]] = None
 
-              staticBind
+              staticBind.right.get // XXX TODO
 
             case XFORMS_OUTPUT_QNAME | XXFORMS_TEXT_QNAME =>
 

@@ -22,6 +22,7 @@ import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableRefere
 import scala.annotation.tailrec
 import scala.collection.compat._
 
+
 // Analyze a tree of binds to determine expressions dependencies based on references to MIP variables,
 // that is to binds which have a `name` attribute. The result is an evaluation order which satisfies
 // the dependencies.
@@ -43,7 +44,7 @@ object DependencyAnalyzer {
     def fromStaticBindMIP(
       validBindNames : scala.collection.Set[String],
       staticBind     : StaticBind,
-      mipOpt         : Option[StaticBind#XPathMIP]
+      mipOpt         : Option[StaticBind.XPathMIP]
     ): Option[BindDetails] =
       mipOpt map { mip =>
 

@@ -52,8 +52,8 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
   private var _readonly = ModelDefs.DEFAULT_READONLY // move to public var once all callers are Scala
   private var _required = ModelDefs.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
-  private var _invalidTypeValidation: StaticBind#MIP = null
-  private var _requiredValidation: StaticBind#MIP    = null
+  private var _invalidTypeValidation: StaticBind.MIP = null
+  private var _requiredValidation: StaticBind.MIP    = null
 
   private var _customMips = Map.empty[String, String]
 
@@ -62,7 +62,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
   var failedConstraints = EmptyValidations
 
   // Failed validations for the given level, including type/required
-  def failedValidations(level: ValidationLevel): List[StaticBind#MIP] = level match {
+  def failedValidations(level: ValidationLevel): List[StaticBind.MIP] = level match {
     case level @ ValidationLevel.ErrorLevel if ! typeValid || ! requiredValid =>
       // Add type/required if needed
       (! typeValid     list invalidTypeValidation)     :::
@@ -95,8 +95,8 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
   def setReadonly(value: Boolean) = this._readonly = value
   def setRequired(value: Boolean) = this._required = value
 
-  def setTypeValid(value: Boolean, mip: StaticBind#MIP)             = this._invalidTypeValidation = if (! value) mip else null
-  def setRequiredValid(value: Boolean, mip: Option[StaticBind#MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
+  def setTypeValid(value: Boolean, mip: StaticBind.MIP)             = this._invalidTypeValidation = if (! value) mip else null
+  def setRequiredValid(value: Boolean, mip: Option[StaticBind.MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
 
   def setCustom(name: String, value: String): Unit = _customMips += name -> value
   def clearCustom(name: String): Unit = _customMips -= name
@@ -119,7 +119,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item
 
 object BindNode {
 
-  type Validations = Map[ValidationLevel, List[StaticBind#MIP]]
+  type Validations = Map[ValidationLevel, List[StaticBind.MIP]]
 
   val EmptyValidations: Validations = Map()
 
@@ -150,7 +150,7 @@ object BindNode {
   //   would have more impact (Form Builder, Form Runner error summary) so we would need to investigate more. For
   //   now, we consider that, for a control, required error validations take precedence over other validations.
   // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
-  private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
+  private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind.MIP])) =
     mipsForLevel match {
       case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Required.name) =>
         ValidationLevel.ErrorLevel -> (mips filter (_.name == Required.name))
@@ -180,7 +180,7 @@ object BindNode {
     else {
       // This is rather inefficient but hopefully rare
       val buildersByLevel =
-        mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
+        mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind.MIP, List[StaticBind.MIP]]]()
 
       for {
         level       <- ValidationLevel.LevelsByPriority
@@ -188,7 +188,7 @@ object BindNode {
         failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
         if failed.nonEmpty
       } locally {
-        val builder = buildersByLevel.getOrElseUpdate(level, List.newBuilder[StaticBind#MIP])
+        val builder = buildersByLevel.getOrElseUpdate(level, List.newBuilder[StaticBind.MIP])
         builder ++= failed
       }
 
@@ -209,13 +209,13 @@ object BindNode {
 
   private def collectFailedValidationsForHighestLevel(
     bindNodes : Seq[BindNode]
-  ): Option[(ValidationLevel, List[StaticBind#MIP])] =
+  ): Option[(ValidationLevel, List[StaticBind.MIP])] =
     collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
 
   private def collectFailedValidationsForLevel(
     bindNodes : Seq[BindNode],
     findLevel : BindNode => Option[ValidationLevel]
-  ): Option[(ValidationLevel, List[StaticBind#MIP])] =
+  ): Option[(ValidationLevel, List[StaticBind.MIP])] =
     if (bindNodes.isEmpty)
       None
     else {

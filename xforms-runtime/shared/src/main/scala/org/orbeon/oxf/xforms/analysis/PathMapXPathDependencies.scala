@@ -149,7 +149,7 @@ class PathMapXPathDependencies(
 
     def refreshDone() = ()
 
-    def isMIPInitiallyDirty(mip: StaticBind#MIP) =
+    def isMIPInitiallyDirty(mip: StaticBind.MIP) =
       mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
   }
 
@@ -668,7 +668,7 @@ class PathMapXPathDependencies(
 
     val modelState = getOrCreateModelState(model)
 
-    def resultForMIP(mip: StaticBind#MIP): UpdateResult =
+    def resultForMIP(mip: StaticBind.MIP): UpdateResult =
       if (modelState.isMIPInitiallyDirty(mip)) {
         // We absolutely must evaluate the MIP
         MustUpdateResultOne
@@ -679,9 +679,9 @@ class PathMapXPathDependencies(
         // We don't check whether we need to update the type MIP, since it is constant, but we check whether
         // the value to type check has changed.
         val valueAnalysis = mip match {
-          case xpathMIP: StaticBind#XPathMIP => Some(xpathMIP.analysis)
-          case _: StaticBind#TypeMIP         => bind.valueAnalysis
-          case _: StaticBind#WhitespaceMIP   => bind.valueAnalysis
+          case xpathMIP: StaticBind.XPathMIP => Some(xpathMIP.analysis)
+          case _: StaticBind.TypeMIP         => bind.valueAnalysis
+          case _: StaticBind.WhitespaceMIP   => bind.valueAnalysis
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 

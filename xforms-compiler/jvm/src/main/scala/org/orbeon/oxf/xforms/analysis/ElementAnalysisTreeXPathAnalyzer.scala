@@ -288,7 +288,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       partAnalysisCtx : PartAnalysisContextAfterTree,
       bindTree        : BindTree,
       bind            : StaticBind,
-      mip             : StaticBind#XPathMIP
+      mip             : StaticBind.XPathMIP
     ): Unit = {
 
       val allBindVariablesInScope = bindTree.allBindVariables

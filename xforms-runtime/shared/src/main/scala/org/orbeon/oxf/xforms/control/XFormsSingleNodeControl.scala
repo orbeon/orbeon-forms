@@ -64,7 +64,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   final def isRequired = _required
 
   // TODO: maybe represent as case class
-  //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind#MIP])
+  //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind.MIP])
   //private var _validationStatus: Option[ValidationStatus] = None
 
   private var _valid = ModelDefs.DEFAULT_VALID
@@ -75,7 +75,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   private var _alertLevel: Option[ValidationLevel] = None
   def alertLevel = _alertLevel
 
-  private var _failedValidations: List[StaticBind#MIP] = Nil
+  private var _failedValidations: List[StaticBind.MIP] = Nil
   def failedValidations = _failedValidations
 
   // Previous values for refresh
@@ -83,7 +83,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   private var _wasRequired = false
   private var _wasValid = true
   private var _wasAlertLevel: Option[ValidationLevel] = None
-  private var _wasFailedValidations: List[StaticBind#MIP] = Nil
+  private var _wasFailedValidations: List[StaticBind.MIP] = Nil
 
   // Type
   private var _valueType: QName = null
@@ -146,19 +146,19 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
   }
 
-  def getValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind#MIP])] =
+  def getValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind.MIP])] =
     this._boundItem match {
       case _: NodeInfo => Some((_valid, _alertLevel, _failedValidations))
       case _           => None
     }
 
-  def setValidation(validation: (Boolean, Option[ValidationLevel], List[StaticBind#MIP])): Unit = {
+  def setValidation(validation: (Boolean, Option[ValidationLevel], List[StaticBind.MIP])): Unit = {
     this._valid             = validation._1
     this._alertLevel        = validation._2
     this._failedValidations = validation._3
   }
 
-  def readValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind#MIP])] =
+  def readValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind.MIP])] =
     this._boundItem match {
       case nodeInfo: NodeInfo =>
 

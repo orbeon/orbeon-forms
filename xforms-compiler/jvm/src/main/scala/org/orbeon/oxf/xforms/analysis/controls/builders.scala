@@ -15,7 +15,9 @@ import org.orbeon.oxf.xforms.XFormsStaticElementValue
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, QNameToXPathMIP, buildInternalCustomMIPName}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, XPathMIP}
+import org.orbeon.oxf.xforms.analysis.model.{BindTree, Instance, InstanceMetadata, ModelVariable, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -23,10 +25,13 @@ import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{BasicNamespaceMapping, EventNames, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
+
+import scala.util.Try
 
 
 object OutputControlBuilder {
@@ -512,6 +517,118 @@ object StaticBindBuilder {
     scope            : Scope,
     containerScope   : Scope
   ): StaticBind = {
+
+    val xpathMipLocationData = ElementAnalysis.createLocationData(element)
+    val bindTree             = StaticBind.getBindTree(parent)
+
+    // 1. Ignoring errors makes sense for Form Builder. For other dynamic components, which we don't have as of
+    //    2015-04-06, we should also fail at this point. In short, this should probably be decided by an
+    //    attribute  of `xxf:dynamic`. This should also allow providing feedback to the Form Builder user.
+    // 2. When using `Try`, we should capture errors so that `xxf:dynamic` can report them.
+    def createOrNone(
+      id         : String,
+      name       : String,
+      level      : ValidationLevel,
+      expression : String
+    ): Option[XPathMIP] =
+      if (partAnalysisCtx.isTopLevelPart)
+        Some(new XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary))
+      else
+        Try(new XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary)).toOption
+
+    val typeMIPOpt: Option[TypeMIP] = {
+
+      def fromAttribute =
+        for (value <- Option(element.attributeValue(TYPE_QNAME)))
+          yield new TypeMIP(staticId, value)
+
+      // For a while we supported <xf:validation>
+      def fromNestedElementsLegacy =
+        for {
+          e <- element.elements(XFORMS_VALIDATION_QNAME)
+          value <- Option(e.attributeValue(TYPE_QNAME))
+        } yield
+          new TypeMIP(e.idOrNull, value)
+
+      def fromNestedElement =
+        for {
+          e <- element.elements(XFORMS_TYPE_QNAME) // `<xf:type>`
+          value <- e.getText.trimAllToOpt // text literal (doesn't support `@value`)
+        } yield
+          new TypeMIP(e.idOrNull, value)
+
+      // Only support collecting one type MIP per bind (but at runtime more than one type MIP can touch a given node)
+      fromAttribute orElse fromNestedElement.headOption orElse fromNestedElementsLegacy.headOption
+    }
+
+    // Built-in XPath MIPs
+    val mipNameToXPathMIP: Iterable[(String, List[XPathMIP])] = {
+
+      def fromAttribute(name: QName) =
+        for (value <- Option(element.attributeValue(name)).toList)
+        yield (staticId, value, ValidationLevel.ErrorLevel)
+
+      // For a while we supported `<xf:validation>`
+      def fromNestedElementLegacy(name: QName) =
+        for {
+          e     <- element.elements(XFORMS_VALIDATION_QNAME).toList
+          value <- e.attributeValueOpt(name)
+        } yield
+          (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel)
+
+      def fromNestedElement(name: QName) =
+        for {
+          e     <- element.elements(name).toList
+          value <- Option(e.attributeValue(VALUE_QNAME))
+        } yield
+          (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel)
+
+      for {
+        mip              <- QNameToXPathMIP.values
+        idValuesAndLevel = fromNestedElement(mip.eName) ::: fromNestedElementLegacy(mip.aName) ::: fromAttribute(mip.aName)
+        if idValuesAndLevel.nonEmpty
+        mips             = idValuesAndLevel flatMap {
+          case (id, value, level) =>
+            // Ignore level for non-constraint MIPs as it's not supported yet
+            val overriddenLevel = if (mip.name == Constraint.name) level else ValidationLevel.ErrorLevel
+            createOrNone(id, mip.name, overriddenLevel, value)
+        }
+      } yield
+        mip.name -> mips
+    }
+
+    val customMIPNameToXPathMIP: Map[String, List[XPathMIP]] = { // Q: Why String -> List[XPathMIP] and not String -> XPathMIP?
+
+      def attributeCustomMIP =
+        for {
+          att <- element.attributes.iterator
+          if bindTree.isCustomMIP(att.getQName)
+          value = att.getValue
+          customMIPName = buildInternalCustomMIPName(att.getQName)
+        } yield
+          (staticId, customMIPName, value)
+
+      // NOTE: We don't support custom MIP elements yet as those are pruned by the annotator/extractor. The following
+      // function can be used to retrieve them once that is fixed.
+      // def elementCustomMIPs =
+      //     for {
+      //         elem          <- Dom4j.elements(element).toList
+      //         if bindTree.isCustomMIP(elem.getQName)
+      //         value         <- Option(elem.attributeValue(VALUE_QNAME))
+      //         customMIPName = buildCustomMIPName(elem.getQualifiedName)
+      //     } yield
+      //         (getElementId(elem), customMIPName, value)
+
+      for {
+        (name, idNameValue) <- attributeCustomMIP.toList groupBy (_._2)
+        mips = idNameValue flatMap {
+          case (id, _, value) =>
+            createOrNone(id, name, ValidationLevel.ErrorLevel, value)
+        }
+      } yield
+        name -> mips
+    }
+
     new StaticBind(
       index,
       element,
@@ -522,8 +639,10 @@ object StaticBindBuilder {
       namespaceMapping,
       scope,
       containerScope,
-      partAnalysisCtx.isTopLevelPart,
-      partAnalysisCtx.functionLibrary
+      typeMIPOpt,
+      mipNameToXPathMIP,
+      customMIPNameToXPathMIP,
+      bindTree
     )
   }
 }

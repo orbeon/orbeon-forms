@@ -27,6 +27,7 @@ trait BindTree {
 
   def isCustomMIP: QName => Boolean
 
+  // Field below are updated by `StaticBind`
   // All bind ids
   val bindIds = new mutable.LinkedHashSet[String]
 

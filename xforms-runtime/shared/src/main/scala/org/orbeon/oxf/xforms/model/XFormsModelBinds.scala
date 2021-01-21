@@ -104,9 +104,9 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
 object XFormsModelBinds {
 
-  type StaticMIP      = StaticBind#MIP
-  type StaticXPathMIP = StaticBind#XPathMIP
-  type StaticTypeMIP  = StaticBind#TypeMIP
+  type StaticMIP      = StaticBind.MIP
+  type StaticXPathMIP = StaticBind.XPathMIP
+  type StaticTypeMIP  = StaticBind.TypeMIP
 
   // Create an instance of XFormsModelBinds if the given model has xf:bind elements.
   def apply(model: XFormsModel): Option[XFormsModelBinds] =

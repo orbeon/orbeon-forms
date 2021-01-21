@@ -146,21 +146,21 @@ private object XFormsValueChangeEvent {
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-  def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]) =
+  def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind.MIP], current: List[StaticBind.MIP]) =
     this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
 private object XXFormsConstraintsChangedEvent {
 
-  def validationsForLevel(current: List[StaticBind#MIP], level: ValidationLevel) =
+  def validationsForLevel(current: List[StaticBind.MIP], level: ValidationLevel) =
     current filter (_.level == level) map (_.id)
 
-  def diffValidations(previous: List[StaticBind#MIP], current: List[StaticBind#MIP], level: ValidationLevel) = {
+  def diffValidations(previous: List[StaticBind.MIP], current: List[StaticBind.MIP], level: ValidationLevel) = {
     val previousIds = previous.map(_.id).toSet
     validationsForLevel(current, level) filterNot previousIds
   }
 
-  def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
+  def properties(level: Option[ValidationLevel], previous: List[StaticBind.MIP], current: List[StaticBind.MIP]): PropertyGetter = {
     case "level"            => level map (_.entryName)
     case "constraints"      => Option(current map (_.id))
     case "errors"           => Some(validationsForLevel(current, ValidationLevel.ErrorLevel))

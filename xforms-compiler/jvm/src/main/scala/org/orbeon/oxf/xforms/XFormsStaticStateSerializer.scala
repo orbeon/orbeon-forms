@@ -444,7 +444,8 @@ object XFormsStaticStateSerializer {
       "startScopeRef"       -> Json.fromInt(collectedScopesWithPositions(a.startScope)),
       "topLevelControls"    -> a.getTopLevelControls.asJson,
       "scriptsByPrefixedId" -> a.scriptsByPrefixedId.asJson,
-      "uniqueJsScripts"     -> a.uniqueJsScripts.asJson
+      "uniqueJsScripts"     -> a.uniqueJsScripts.asJson,
+      "globals"             -> a.iterateGlobals.map(_.templateTree).toList.asJson
     )
 
     implicit val encodePropertySet: Encoder[PropertyParams] = (a: PropertyParams) =>

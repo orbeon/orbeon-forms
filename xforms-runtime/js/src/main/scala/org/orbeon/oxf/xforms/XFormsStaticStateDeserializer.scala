@@ -797,12 +797,14 @@ object XFormsStaticStateDeserializer {
         topLevelControls    <- c.get[Iterable[ElementAnalysis]]("topLevelControls")
         scriptsByPrefixedId <- c.get[Map[String, StaticScript]]("scriptsByPrefixedId")
         uniqueJsScripts     <- c.get[List[ShareableScript]]("uniqueJsScripts")
+        globals             <- c.get[List[SAXStore]]("globals")
       } yield
         TopLevelPartAnalysisImpl(
           startScope,
           topLevelControls,
           scriptsByPrefixedId,
           uniqueJsScripts,
+          globals,
           Index.controlAnalysisMap,
           Index.controlTypes,
           Index.lhhas,
@@ -994,8 +996,9 @@ object TopLevelPartAnalysisImpl {
   def apply(
     _startScope          : Scope,
     _topLevelControls    : Iterable[ElementAnalysis],
-    _scriptsByPrefixedId :Map[String, StaticScript],
-    _uniqueJsScripts     :List[ShareableScript],
+    _scriptsByPrefixedId : Map[String, StaticScript],
+    _uniqueJsScripts     : List[ShareableScript],
+    _globals             : List[SAXStore],
     _controlAnalysisMap  : mutable.LinkedHashMap[String, ElementAnalysis],
     _controlTypes        : mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]],
     lhhas                : mutable.Buffer[LHHAAnalysis],
@@ -1033,7 +1036,7 @@ object TopLevelPartAnalysisImpl {
           namespaces.get(prefixedId)
 
         def hasControls: Boolean =
-          getTopLevelControls.nonEmpty || (iterateGlobals map (_.compactShadowTree.getRootElement)).nonEmpty // TODO: duplicated from `StaticPartAnalysisImpl`
+          getTopLevelControls.nonEmpty || _globals.nonEmpty
 
         override val getTopLevelControls: List[ElementAnalysis] = _topLevelControls.toList
 
@@ -1046,7 +1049,7 @@ object TopLevelPartAnalysisImpl {
             (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${element.toDebugString}`"))
         }
 
-        def iterateGlobals: Iterator[Global] = Iterator.empty // XXX TODO
+        def iterateGlobals: Iterator[Global] = _globals.map(Global(_, null)).iterator
 
         def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] = Nil
 

@@ -61,6 +61,8 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def startScope: Scope
   def isTopLevelPart: Boolean
 
+  def iterateGlobals: Iterator[Global]
+
   def functionLibrary: FunctionLibrary
 
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]

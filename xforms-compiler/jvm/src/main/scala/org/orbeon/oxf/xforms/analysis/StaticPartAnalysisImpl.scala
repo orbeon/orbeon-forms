@@ -124,7 +124,7 @@ case class StaticPartAnalysisImpl(
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] = metadata.getNamespaceMapping(prefixedId)
 
   def hasControls: Boolean =
-    getTopLevelControls.nonEmpty || (iterateGlobals map (_.compactShadowTree.getRootElement)).nonEmpty
+    getTopLevelControls.nonEmpty || iterateGlobals.nonEmpty
 
   def bindingIncludes: Set[String] =
     metadata.bindingIncludes

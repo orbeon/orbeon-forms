@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr
 import java.io.File
 import java.net.URI
 import java.{util => ju}
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.io.UriScheme
@@ -31,11 +30,15 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -446,34 +449,34 @@ trait FormRunnerPersistence {
     val migratedData = migrate(data)
 
     // Find all instance nodes containing file URLs we need to upload
-    val (uploadHolders, beforeURLs, afterURLs) =
-      collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
+    val attachments     = collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
+    val migratedHolders = attachments._1.toList
+    val beforeURLs      = attachments._2.toList
+    val afterURLs       = attachments._3.toList
 
-    def saveAllAttachments(): Unit = {
-      val holdersAfterURLs = uploadHolders.zip(afterURLs)
-      holdersAfterURLs foreach { case (holder, resource) =>
-        // Copy holder, so we're not blocked in case there are other background uploads
-        val holderCopy = TransformerUtils.extractAsMutableDocument(holder).rootElement
-        sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder" -> Some(holderCopy),
-          "resource" -> Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
-          "username" -> username,
-          "password" -> password,
-          "form-version" -> formVersion
-        )
-        )
-      }
+    def updateHolder(holder: NodeInfo, afterURL: String): Unit = {
+      setvalue(holder, afterURL)
     }
 
-    def updateAttachmentPaths() =
-      uploadHolders zip afterURLs foreach { case (holder, resource) =>
-        setvalue(holder, resource)
-      }
+    def saveAllAttachments(): Unit = {
 
-    def rollbackAttachmentPaths() =
-      uploadHolders zip beforeURLs foreach { case (holder, resource) =>
-        setvalue(holder, resource)
+      val holdersURLs = migratedHolders.zip(beforeURLs.zip(afterURLs))
+      holdersURLs foreach { case (migratedHolder, (beforeURL, afterURL)) =>
+        // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
+        val holderCopy   = TransformerUtils.extractAsMutableDocument(migratedHolder).rootElement
+        val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+        sendThrowOnError("fr-create-update-attachment-submission", Map(
+          "holder"         -> Some(holderCopy),
+          "path-to-holder" -> Some(pathToHolder),
+          "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + afterURL, commonQueryString)),
+          "username"       -> username,
+          "password"       -> password,
+          "form-version"   -> formVersion)
+        ) map { doneEvent =>
+          updateHolder(migratedHolder, afterURL)
+        } getOrElse(false)
       }
+    }
 
     def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
@@ -485,38 +488,41 @@ trait FormRunnerPersistence {
         "workflow-stage" -> workflowStage
       ))
 
-    // First process attachments
+    // First upload the attachments
     saveAllAttachments()
 
     val versionOpt =
-      try {
+      // Save and try to retrieve returned version
+      for {
+        done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
+        headers  <- done.headers
+        versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
+        version  <- versions.headOption
+      } yield
+        version
 
-        // Before saving data, update attachment paths
-        updateAttachmentPaths()
-
-        // Save and try to retrieve returned version
-        for {
-          done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
-          headers  <- done.headers
-          versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
-          version  <- versions.headOption
-        } yield
-          version
-
-      } catch {
-        case NonFatal(e) =>
-          // In our persistence implementation, we do not remove attachments if saving the data fails.
-          // However, some custom persistence implementations do. So we don't think we can assume that
-          // attachments have been saved. So we rollback attachment paths in the data in this case.
-          // This will cause attachments to be saved again even if they actually have already been saved.
-          // It is not ideal, but will not lead to data loss. See also:
-          //
-          // - https://github.com/orbeon/orbeon-forms/issues/606
-          // - https://github.com/orbeon/orbeon-forms/issues/3084
-          // - https://github.com/orbeon/orbeon-forms/issues/3301
-          rollbackAttachmentPaths()
-          throw e
-      }
+    // In our persistence implementation, we do not remove attachments if saving the data fails.
+    // However, some custom persistence implementations do. So we don't think we can assume that
+    // attachments have been saved. So we only update the attachment paths in the data after all
+    // the attachments have been successfully uploaded. This will cause attachments to be saved again
+    // even if they actually have already been saved. It is not ideal, but will not lead to data loss.
+    //
+    // See also:
+    // - https://github.com/orbeon/orbeon-forms/issues/606
+    // - https://github.com/orbeon/orbeon-forms/issues/3084
+    // - https://github.com/orbeon/orbeon-forms/issues/3301
+    beforeURLs.zip(afterURLs).foreach {
+      case (beforeURL, afterURL) =>
+        val holder = {
+          scaxon.XPath.evalOne(
+            item       = data,
+            expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
+            namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+            variables  = Map("beforeURL" -> new StringValue(beforeURL))
+          )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
+        }
+        updateHolder(holder, afterURL)
+    }
 
     (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
   }

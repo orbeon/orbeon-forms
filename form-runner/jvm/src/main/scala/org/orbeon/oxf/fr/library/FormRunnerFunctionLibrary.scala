@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -142,6 +142,7 @@ private object FormRunnerFunctions {
   )
 
   val BooleanGettersByName = List(
+    "is-browser-environment"      -> (() => CoreCrossPlatformSupport.isJsEnv),
     "is-pe"                       -> (() => Version.isPE),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
     "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),

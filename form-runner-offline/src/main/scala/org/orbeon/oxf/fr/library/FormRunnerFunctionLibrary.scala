@@ -30,6 +30,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def appName                  : String         = FormRunnerParams().app
   @XPathFunction def formName                 : String         = FormRunnerParams().form
   @XPathFunction def documentId               : Option[String] = FormRunnerParams().document
+  @XPathFunction def formVersion              : Int            = FormRunnerParams().formVersion
+
   @XPathFunction def formTitle                : Option[String] = FormRunner.formTitleFromMetadata
   @XPathFunction def lang                     : String         = FormRunner.currentLang
   @XPathFunction def workflowStageValue       : Option[String] = FormRunner.documentWorkflowStage
@@ -38,6 +40,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 //  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false)
 //  @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
 
+  @XPathFunction def isBrowserEnvironment     : Boolean        = CoreCrossPlatformSupport.isJsEnv
   @XPathFunction def isPe                     : Boolean        = CoreCrossPlatformSupport.isPE
   @XPathFunction def isDesignTime             : Boolean        = FormRunner.isDesignTime(FormRunnerParams())
   @XPathFunction def isReadonlyMode           : Boolean        = FormRunner.isReadonlyMode(FormRunnerParams())
@@ -53,8 +56,6 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def canUpdate                : Boolean        = FormRunner.canUpdate
   @XPathFunction def canDelete                : Boolean        = FormRunner.canDelete
   @XPathFunction def ownsLeaseOrNoneRequired  : Boolean        = FormRunner.userOwnsLeaseOrNoneRequired
-
-  @XPathFunction def formVersion              : Int            = FormRunnerParams().formVersion
 
   @XPathFunction(name = "created-dateTime")
   def createdDateTime                         : Option[java.time.Instant] = FormRunner.documentCreatedDate.map(java.time.Instant.ofEpochMilli)

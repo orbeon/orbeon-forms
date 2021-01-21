@@ -52,6 +52,7 @@ object XFormsStaticStateDeserializer {
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
     var collectedScopes         = IndexedSeq[Scope]()
     var collectedModelRefs      = Map[String, List[ElementAnalysis]]()
+    var collectedModelOrderings = Map[String, (Option[Iterable[String]], Option[Iterable[String]])]()
 
     var controlStack: List[ElementAnalysis] = Nil
 
@@ -380,7 +381,37 @@ object XFormsStaticStateDeserializer {
 
               componentControl.right.get // XXX TODO
 
-            case XFORMS_MODEL_QNAME            => new Model                 (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_MODEL_QNAME            =>
+
+              val model =
+                for {
+                  bindInstances                    <- c.get[Iterable[String]]("bindInstances")
+                  computedBindExpressionsInstances <- c.get[Iterable[String]]("computedBindExpressionsInstances")
+                  validationBindInstances          <- c.get[Iterable[String]]("validationBindInstances")
+                  figuredAllBindRefAnalysis        <- c.get[Boolean]("figuredAllBindRefAnalysis")
+                  recalculateOrder                 <- c.get[Option[Iterable[String]]]("recalculateOrder")
+                  defaultValueOrder                <- c.get[Option[Iterable[String]]]("defaultValueOrder")
+                } yield {
+                  val model = new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+
+                  model.bindInstances                    ++= bindInstances
+                  model.computedBindExpressionsInstances ++= computedBindExpressionsInstances
+                  model.validationBindInstances          ++= validationBindInstances
+                  model.figuredAllBindRefAnalysis        = figuredAllBindRefAnalysis
+
+                  if (recalculateOrder.isDefined || defaultValueOrder.isDefined) {
+                    collectedModelOrderings += prefixedId -> (recalculateOrder map (_.toList), defaultValueOrder map (_.toList))
+                  }
+
+                  recalculateOrder foreach { r =>
+                    println(s"xxxx recalculateOrder $r")
+                  }
+
+                  model
+                }
+
+              model.right.get // XXX TODO
+
             case XFORMS_SUBMISSION_QNAME       => new Submission            (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_INPUT_QNAME            => new InputControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_TEXTAREA_QNAME         => new TextareaControl       (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
@@ -859,6 +890,15 @@ object XFormsStaticStateDeserializer {
         } locally {
           elem.model = modelOpt
           elem.lang  = enLangRef // XXX TODO: must deserialize
+        }
+
+        // Set collected `Model` orderings
+        for {
+          (modelRef, (recalculateOrder, defaultValueOrder)) <- collectedModelOrderings
+          model <- Index.controlAnalysisMap.get(modelRef) flatMap (_.narrowTo[Model])
+        } locally {
+          model.recalculateOrder  = recalculateOrder  map (_ map model.bindsById toList)
+          model.defaultValueOrder = defaultValueOrder map (_ map model.bindsById toList)
         }
 
         XFormsStaticStateImpl(

@@ -287,7 +287,14 @@ object XFormsStaticStateSerializer {
     def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
       a match {
         case c: Model         =>
-          Nil
+          List(
+            "bindInstances"                    -> c.bindInstances.asJson,
+            "computedBindExpressionsInstances" -> c.computedBindExpressionsInstances.asJson,
+            "validationBindInstances"          -> c.validationBindInstances.asJson,
+            "figuredAllBindRefAnalysis"        -> Json.fromBoolean(c.figuredAllBindRefAnalysis),
+            "recalculateOrder"                 -> (c.recalculateOrder  filter (_.nonEmpty) map (_ map (_.staticId))).asJson,
+            "defaultValueOrder"                -> (c.defaultValueOrder filter (_.nonEmpty) map (_ map (_.staticId))).asJson
+          )
         case c: Instance      =>
           List(
             "readonly"              -> Json.fromBoolean(c.readonly),

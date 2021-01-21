@@ -1617,7 +1617,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         getHelpMessage: function (control) {
             var helpElement = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-            return helpElement == null ? "" : ORBEON.util.Dom.getStringValue(helpElement);
+            var helpMessage =
+                helpElement == null ? "" :
+                // When the help is a control (`xf:help` outside of its control), the content is markup, not escaped HTML
+                helpElement.classList.contains("xforms-control") ? helpElement.innerHTML :
+                ORBEON.util.Dom.getStringValue(helpElement);
+            return helpMessage;
         },
 
         setHelpMessage: function (control, message) {

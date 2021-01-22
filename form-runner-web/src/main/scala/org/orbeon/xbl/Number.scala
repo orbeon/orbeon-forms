@@ -44,7 +44,6 @@ object Number {
 
       companion =>
 
-      import Private._
       import io.circe.generic.auto._
       import io.circe.{Decoder, Encoder}
 
@@ -162,73 +161,71 @@ object Number {
         companion.visibleInputElemOpt foreach (_.focus())
       }
 
-      private object Private {
+      // Leave these private here, see https://github.com/orbeon/orbeon-forms/issues/4757
+      private val TestNum = 1.1
 
-        private val TestNum = 1.1
+      private val hasToLocaleString =
+        ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
 
-        private val hasToLocaleString =
-          ! js.isUndefined(TestNum.asInstanceOf[js.Dynamic].toLocaleString)
+      private def updateReadonly(readonly: Boolean): Unit =
+        visibleInputElemOpt foreach { visibleInputElem =>
+          if (readonly)
+            visibleInputElem.setAttribute("readonly", "readonly")
+          else
+            visibleInputElem.removeAttribute("readonly")
+        }
 
-        def updateReadonly(readonly: Boolean): Unit =
-          visibleInputElemOpt foreach { visibleInputElem =>
-            if (readonly)
-              visibleInputElem.setAttribute("readonly", "readonly")
-            else
-              visibleInputElem.removeAttribute("readonly")
+      private def updateStateAndSendValueToServer(): Unit =
+        visibleInputElemOpt foreach { visibleInputElem =>
+          stateOpt foreach { state =>
+
+            val visibleInputElemValue = readValue(visibleInputElem, state.decimalSeparator)
+
+            val stateUpdated =
+              updateStateAndSendValueToServerIfNeeded(
+                newState       = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue),
+                valueFromState = _.editValue
+              )
+
+            if (! stateUpdated)
+              updateVisibleValue()
           }
+        }
 
-        def updateStateAndSendValueToServer(): Unit =
-          visibleInputElemOpt foreach { visibleInputElem =>
-            stateOpt foreach { state =>
+      private def updateVisibleValue(): Unit =
+        companion.visibleInputElemOpt foreach { visibleInputElem =>
 
-              val visibleInputElemValue = readValue(visibleInputElem, state.decimalSeparator)
+          val hasFocus = visibleInputElem eq dom.document.activeElement
 
-              val stateUpdated =
-                updateStateAndSendValueToServerIfNeeded(
-                  newState       = state.copy(displayValue = visibleInputElemValue, editValue = visibleInputElemValue),
-                  valueFromState = _.editValue
-                )
-
-              if (! stateUpdated)
-                updateVisibleValue()
-            }
+          stateOpt foreach { state =>
+            val newValue =
+                if (hasFocus) state.editValue
+                else          state.displayValue
+            writeValue(visibleInputElem, state.decimalSeparator, newValue)
           }
+        }
 
-        def updateVisibleValue(): Unit =
-          companion.visibleInputElemOpt foreach { visibleInputElem =>
+      private def setInputTypeIfNeeded(typeValue: String): Unit = {
 
-            val hasFocus = visibleInputElem eq dom.document.activeElement
+        // Only switch to `type="number"` if the OS decimal separator is the same as the field decimal separator
+        // See https://github.com/orbeon/orbeon-forms/issues/2545
+        def hasNativeDecimalSeparator(separator: Char): Boolean =
+          hasToLocaleString &&
+            TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
 
-            stateOpt foreach { state =>
-              val newValue =
-                  if (hasFocus) state.editValue
-                  else          state.displayValue
-              writeValue(visibleInputElem, state.decimalSeparator, newValue)
-            }
-          }
+        val changeType =
+          dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
+            companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
 
-        def setInputTypeIfNeeded(typeValue: String): Unit = {
-
-          // Only switch to `type="number"` if the OS decimal separator is the same as the field decimal separator
-          // See https://github.com/orbeon/orbeon-forms/issues/2545
-          def hasNativeDecimalSeparator(separator: Char): Boolean =
-            hasToLocaleString &&
-              TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
-
-          val changeType =
-            dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
-              companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
-
-          if (changeType) {
-            // With Firefox, changing the type synchronously interferes with the focus
-            timers.setTimeout(0.millis) {
-              visibleInputElemOpt foreach { visibleInputElem =>
-                $(visibleInputElem).attr("type", typeValue)
-                // Set again the `input.value`, as otherwise we might loose the value (switching the type to `number`
-                // if the current value is `1,2`), or be incorrect (switching the type to `text` if the current value
-                // is `1.2` and the decimal separator `,`)
-                updateVisibleValue()
-              }
+        if (changeType) {
+          // With Firefox, changing the type synchronously interferes with the focus
+          timers.setTimeout(0.millis) {
+            visibleInputElemOpt foreach { visibleInputElem =>
+              $(visibleInputElem).attr("type", typeValue)
+              // Set again the `input.value`, as otherwise we might loose the value (switching the type to `number`
+              // if the current value is `1,2`), or be incorrect (switching the type to `text` if the current value
+              // is `1.2` and the decimal separator `,`)
+              updateVisibleValue()
             }
           }
         }

@@ -41,7 +41,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
 
-  def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress[Unit]] = ???
+  // TODO
+  def getUploadProgress(
+    request   : ExternalContext.Request,
+    uuid      : String,
+    fieldName : String
+  ): Option[UploadProgress[Unit]] =
+    None
 
   def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = ???
 

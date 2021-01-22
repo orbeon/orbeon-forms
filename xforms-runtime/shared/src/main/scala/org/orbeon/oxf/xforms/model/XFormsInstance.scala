@@ -503,9 +503,6 @@ object XFormsInstance extends Logging {
     )
 
     // NOTE: We don't honor exposeXPathTypes on readonly instances, anyway they don't support MIPs at this time
-
-    println(s"xxxx wrapping readonly = $readonly, exposeXPathTypes = $exposeXPathTypes")
-
     if (readonly)
       documentInfo // the optimal case: no copy of the cached document is needed
     else

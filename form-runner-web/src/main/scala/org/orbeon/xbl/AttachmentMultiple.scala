@@ -73,15 +73,15 @@ object AttachmentMultiple {
         else
           registerAllListeners()
 
+      // Leave these private here, see https://github.com/orbeon/orbeon-forms/issues/4757
+      private def dropElem          = containerElem.querySelector(".fr-attachment-drop")
+      private def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
+      private def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
+      private def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
+
       private object Private {
 
         object EventSupport extends EventListenerSupport
-
-        def dropElem          = containerElem.querySelector(".fr-attachment-drop")
-        def selectLabel       = containerElem.querySelector(".fr-attachment-select").asInstanceOf[html.Label]
-
-        def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
-        def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
         def browserSupportsFileDrop: Boolean =
           ! Bowser.msie.contains(true)

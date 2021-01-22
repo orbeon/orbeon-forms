@@ -13,6 +13,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
@@ -103,10 +104,9 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   def runProcess(scope: String, process: String): Boolean =
     SimpleProcess.runProcess(scope, process).isSuccess
 
-  // TODO: How to deal with the rewrite
-//    Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
+  @XPathFunction
+  def dataset(datasetName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.NodeInfo] =
+    XFormsFunctionLibrary.instanceImpl("fr-dataset-" + datasetName)
 
 //  // TODO: Handle `XFormsFunction.Context` parameter
 //  @XPathFunction
@@ -142,11 +142,13 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction
   def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] = {
 
+    // TODO: Support QName params + QName resolution? For now, all callers pass a `String`.
+    //  See `getQNameFromItem`.
     val paramName = QName(paramNameString)
 
     import XXFormsComponentParam._
 
-    findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
+    findSourceComponent flatMap { sourceComponent =>
 
       val staticControl   = sourceComponent.staticControl
       val concreteBinding = staticControl.bindingOrThrow

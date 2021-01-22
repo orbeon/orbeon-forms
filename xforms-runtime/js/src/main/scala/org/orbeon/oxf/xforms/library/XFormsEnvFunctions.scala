@@ -95,6 +95,13 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     instanceId : String = "")(implicit
     xpc        : XPathContext,
     xfc        : XFormsFunction.Context
+  ): Option[om.NodeInfo] =
+    instanceImpl(instanceId)
+
+  def instanceImpl(
+    instanceId : String = "")(implicit
+    xpc        : XPathContext,
+    xfc        : XFormsFunction.Context
   ): Option[om.NodeInfo] = {
 
     // "If the argument is omitted or is equal to the empty string, then the root element node (also called the
@@ -196,7 +203,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   // XForms 2.0
   @XPathFunction
-  def `case`(caseId: String)(implicit xpc: XPathContext): Option[String] =
+  def `case`(caseId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
     for {
       control      <- relevantControl(caseId)
       switch       <- collectByErasedType[XFormsSwitchControl](control)

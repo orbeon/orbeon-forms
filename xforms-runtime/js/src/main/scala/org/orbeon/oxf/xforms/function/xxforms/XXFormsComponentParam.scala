@@ -61,10 +61,10 @@ object XXFormsComponentParam {
 
   val XblLocalName = XFormsNames.XBL_XBL_QNAME.localName
 
-  def findSourceComponent(xformsFunctionContext: XFormsFunction.Context): Option[XFormsComponentControl] = {
+  def findSourceComponent(implicit xfc: XFormsFunction.Context): Option[XFormsComponentControl] = {
 
-    val prefixedId              = XFormsId.getPrefixedId(xformsFunctionContext.sourceEffectiveId)
-    val containerForSourceScope = xformsFunctionContext.container.findScopeRoot(prefixedId)
+    val prefixedId              = XFormsId.getPrefixedId(xfc.sourceEffectiveId)
+    val containerForSourceScope = xfc.container.findScopeRoot(prefixedId)
 
     containerForSourceScope.associatedControlOpt flatMap (_.narrowTo[XFormsComponentControl])
   }

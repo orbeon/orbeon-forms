@@ -18,6 +18,7 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.function._
 
+
 // Versions of these functions which do not look at an `XFormsContainingDocument`.
 // See also `XXFormsEnvFunctions`.
 trait IndependentRequestFunctions extends OrbeonFunctionLibrary {

@@ -4,7 +4,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.io.CharsetNames.{Iso88591, Utf8}
 
 
-object GetRequestHeader {
+object GetRequestHeaderSupport {
 
   def getAndDecodeHeader(
     name     : String,

@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.function.GetRequestHeader
+import org.orbeon.saxon.function.GetRequestHeaderSupport
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
@@ -31,7 +31,7 @@ class GetRequestParameterTryXFormsDocument extends RequestFunction {
 class GetRequestHeaderTryXFormsDocument extends RequestFunction {
 
   def fromDocument(containingDocument: XFormsContainingDocument, name: String)(implicit ctx: XPathContext): Option[List[String]] =
-    GetRequestHeader.getAndDecodeHeader(
+    GetRequestHeaderSupport.getAndDecodeHeader(
       name     = name,
       encoding = stringArgumentOpt(1),
       getter   = containingDocument.getRequestHeaders.get

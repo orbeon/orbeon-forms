@@ -46,7 +46,7 @@ class GetRequestParameter extends RequestFunction {
 
 class GetRequestHeader extends RequestFunction {
   def fromRequest(request: Request, name: String)(implicit ctx: XPathContext): Option[List[String]] =
-    GetRequestHeader.getAndDecodeHeader(
+    GetRequestHeaderSupport.getAndDecodeHeader(
       name     = name,
       encoding = stringArgumentOpt(1),
       getter   = s => Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(s)) map (_.toList)

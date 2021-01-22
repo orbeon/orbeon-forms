@@ -13,9 +13,9 @@
  */
 package org.orbeon.xbl
 
-import org.orbeon.xforms
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+
 
 object HrefButton {
 
@@ -37,5 +37,4 @@ object HrefButton {
       }
     }
   )
-
 }

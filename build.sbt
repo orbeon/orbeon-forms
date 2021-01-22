@@ -169,6 +169,9 @@ ThisBuild / orbeonEditionFromProperties := sys.props.get("orbeon.edition") getOr
 ThisBuild / historyPath                 := Some((LocalRootProject / target).value / ".history")
 ThisBuild / traceLevel                  := 0
 
+// Restrict the number of concurrent linker processes so we don't run out of memory
+Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 2)
+
 // Give a .js or .jvm project's base directory, return the shared assets directory
 def sharedAssetsDir(baseDirectory: File) =
   baseDirectory.getParentFile / "shared" / "src" / "main" / "assets"
@@ -384,7 +387,7 @@ lazy val commonScalaJsSettings = Seq(
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= { _.withSourceMap(false) },
-  scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
+//  scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
 
 //  scalaJSLinkerConfig ~= { _.withOptimizer(false) },//XXX TMP
 

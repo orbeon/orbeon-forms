@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.function.ProcessTemplateSupport
+import org.orbeon.saxon.function.{GetRequestHeader, ProcessTemplateSupport}
 import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.SequenceTool
@@ -578,36 +578,29 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     s"""[TODO: evaluateAvt] $avt""".some
   }
 
-  //
 //    Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(NODE_TYPE, EXACTLY_ONE)
 //    )
-//
-//    Fun("get-request-method", classOf[GetRequestMethodTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
-//    Fun("get-request-context-path", classOf[GetRequestContextPathTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
-//
-//    Fun("get-request-path", classOf[GetRequestPathTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
-//
-//    Fun("get-request-header", classOf[GetRequestHeaderTryXFormsDocument], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(STRING, EXACTLY_ONE)
-//    )
 
   @XPathFunction
-  def getRequestHeader(name: String, encoding: String = Iso88591): Iterable[String] = {
+  def getRequestMethod()(implicit xfc: XFormsFunction.Context): String =
+    xfc.containingDocument.getRequestMethod.entryName
 
-    import CharsetNames._
+  @XPathFunction
+  def getRequestContextPath()(implicit xfc: XFormsFunction.Context): String =
+    xfc.containingDocument.getRequestContextPath
 
-    val decode: String => String =
-      encoding.toUpperCase match {
-        case Iso88591 => identity
-        case Utf8     => (s: String) => new String(s.getBytes(Iso88591), Utf8)
-        case other    => throw new IllegalArgumentException(s"invalid `$$encoding` argument `$other`")
-      }
+  @XPathFunction
+  def getRequestPath()(implicit xfc: XFormsFunction.Context): String =
+    xfc.containingDocument.getRequestPath
 
-    Option(CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.get(name)).toList flatMap
-      (_.toList) map decode
-  }
+  @XPathFunction
+  def getRequestHeader(name: String, encoding: String = Iso88591)(implicit xfc: XFormsFunction.Context): Iterable[String] =
+    GetRequestHeader.getAndDecodeHeader(
+      name     = name,
+      encoding = encoding.some,
+      getter   = xfc.containingDocument.getRequestHeaders.get
+    ).toList.flatten
 
   @XPathFunction
   def getRequestParameter(name: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =

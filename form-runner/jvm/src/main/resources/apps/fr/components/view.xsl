@@ -574,7 +574,7 @@
 
             <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
-            <!-- FIXME: This logic is duplicated in language-choice.xbl. -->
+            <!-- FIXME: This logic is duplicated in language-choice.xbl. -->
             <xf:group
                 id="fr-language-selector"
                 model="fr-resources-model"

@@ -137,7 +137,7 @@ object XFormsAction {
             // Set context on context element
             contextStack.pushBinding(
               bindingElement    = element,
-              sourceEffectiveId = actionInterpreter.getSourceEffectiveId(actionAnalysis),
+              sourceEffectiveId = actionInterpreter.getSourceEffectiveId(property),
               scope             = property.scope,
               handleNonFatal    = false
             )
@@ -152,7 +152,7 @@ object XFormsAction {
                   namespaceMapping   = property.namespaceMapping,
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
                   functionLibrary    = actionInterpreter.containingDocument.functionLibrary,
-                  functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(actionAnalysis)),
+                  functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(property)),
                   baseURI            = null,
                   locationData       = element.getData.asInstanceOf[LocationData],
                   reporter           = actionInterpreter.containingDocument.getRequestStats.addXPathStat

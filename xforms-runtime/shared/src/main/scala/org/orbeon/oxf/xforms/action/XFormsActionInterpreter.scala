@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action
 
 import java.{util => ju}
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OrbeonLocationException
@@ -24,6 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -53,7 +53,7 @@ class XFormsActionInterpreter(
   val containingDocument: XFormsContainingDocument = container.getContainingDocument
 
   // Return the source against which id resolutions are made for the given action element.
-  def getSourceEffectiveId(actionAnalysis: ActionTrait): String =
+  def getSourceEffectiveId(actionAnalysis: ElementAnalysis): String =
     XFormsId.getRelatedEffectiveId(handlerEffectiveId, actionAnalysis.staticId)
 
   // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not

@@ -331,6 +331,34 @@ object XFormsStaticStateDeserializer {
         r
       }
 
+    implicit val decodeMapSet: Decoder[MapSet[String, String]] = (c: HCursor) => {
+      for {
+        map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[String]]]
+      } yield {
+        val ms = new MapSet[String, String]
+        ms.map ++= map
+        ms
+      }
+    }
+
+    implicit val decodeXPathAnalysis: Decoder[XPathAnalysis] = (c: HCursor) =>
+      for {
+        _xpathString            <- c.get[String]("xpathString")
+        _figuredOutDependencies <- c.get[Boolean]("figuredOutDependencies")
+        _valueDependentPaths    <- c.get[MapSet[String, String]]("valueDependentPaths")
+        _returnablePaths        <- c.get[MapSet[String, String]]("returnablePaths")
+        _dependentModels        <- c.get[Set[String]]("dependentModels")
+        _dependentInstances     <- c.get[Set[String]]("dependentInstances")
+      } yield
+        new XPathAnalysis {
+          val xpathString            = _xpathString
+          val figuredOutDependencies = _figuredOutDependencies
+          val valueDependentPaths    = _valueDependentPaths
+          val returnablePaths        = _returnablePaths
+          val dependentModels        = _dependentModels
+          val dependentInstances     = _dependentInstances
+        }
+
     implicit lazy val decodeElementAnalysis: Decoder[ElementAnalysis] = (c: HCursor) =>
       for {
         index             <- c.get[Int]("index")
@@ -342,9 +370,9 @@ object XFormsStaticStateDeserializer {
         containerScope    <- c.get[Int]("containerScopeRef").map(collectedScopes)
         modelOptRef       <- c.get[Option[String]]("modelRef")
   //      "langRef"           <- a.lang.asJson,
+        bindingAnalysis   <- c.get[Option[XPathAnalysis]]("bindingAnalysis")
+        valueAnalysis     <- c.get[Option[XPathAnalysis]]("valueAnalysis")
       } yield {
-
-//        println(s"xxx decoding element for `${element.getQualifiedName}` with id `$prefixedId`")
 
         import org.orbeon.xforms.XFormsNames._
 
@@ -752,6 +780,11 @@ object XFormsStaticStateDeserializer {
           }
 
         Index.indexNewControl(newControl)
+
+        // Set XPath analysis
+        newControl.contextAnalysis = None
+        newControl.bindingAnalysis = bindingAnalysis
+        newControl.valueAnalysis   = valueAnalysis
 
         // We can't set `Model`s immediately, so we store the mapping and do it once the whole tree has been built
         modelOptRef foreach { modelRef =>

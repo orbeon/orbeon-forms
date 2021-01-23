@@ -412,6 +412,19 @@ object XFormsStaticStateSerializer {
         case c                         => Nil
       }
 
+    implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>
+      a.map.asJson
+
+    implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) =>
+      Json.obj(
+        "xpathString"            -> Json.fromString(a.xpathString),
+        "figuredOutDependencies" -> Json.fromBoolean(a.figuredOutDependencies),
+        "valueDependentPaths"    -> a.valueDependentPaths.asJson,
+        "returnablePaths"        -> a.returnablePaths.asJson,
+        "dependentModels"        -> a.dependentModels.asJson,
+        "dependentInstances"     -> a.dependentInstances.asJson,
+      )
+
     implicit lazy val encodeElementAnalysis: Encoder[ElementAnalysis] = (a: ElementAnalysis) =>
       Json.fromFields(
         List(
@@ -424,6 +437,8 @@ object XFormsStaticStateSerializer {
           "containerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.containerScope)),
           "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
           "langRef"           -> a.lang.asJson,
+          "bindingAnalysis"   -> a.bindingAnalysis.asJson,
+          "valueAnalysis"     -> a.valueAnalysis.asJson,
         ) ++
           maybeWithSpecificElementAnalysisFields(a) ++
           maybeWithChildrenFields(a)

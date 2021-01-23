@@ -18,14 +18,14 @@ import org.orbeon.saxon.expr._
 import org.orbeon.xforms.XFormsId
 
 
-class PathMapXPathAnalysis(
-  val xpathString            : String,
-  var pathmap                : Option[PathMap], // this is used when used as variables and context and can be freed afterwards
-  val figuredOutDependencies : Boolean,
-  val valueDependentPaths    : MapSet[String, String],
-  val returnablePaths        : MapSet[String, String],
-  val dependentModels        : collection.Set[String],
-  val dependentInstances     : collection.Set[String]
+case class PathMapXPathAnalysis(
+  xpathString            : String,
+  figuredOutDependencies : Boolean,
+  valueDependentPaths    : MapSet[String, String],
+  returnablePaths        : MapSet[String, String],
+  dependentModels        : collection.Set[String],
+  dependentInstances     : collection.Set[String])(
+  var pathmap            : Option[PathMap], // this is used when used as variables and context and can be freed afterwards
 ) extends XPathAnalysis {
 
   override def freeTransientState(): Unit = pathmap = None

@@ -247,12 +247,12 @@ object PathMapXPathAnalysisBuilder {
             // Success
             new PathMapXPathAnalysis(
               xpathString,
-              Some(pathmap),
               true,
               valueDependentPaths,
               returnablePaths,
               dependentModels,
-              dependentInstances
+              dependentInstances)(
+              Some(pathmap),
             )
           else
             // Failure

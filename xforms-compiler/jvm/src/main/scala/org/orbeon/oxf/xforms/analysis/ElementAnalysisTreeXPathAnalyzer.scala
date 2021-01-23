@@ -573,16 +573,16 @@ object ElementAnalysisTreeXPathAnalyzer {
                 // Both are PathMap analysis so actually combine
                 new PathMapXPathAnalysis(
                   combineXPathStrings(pmxpa.xpathString, other.xpathString),
+                  true,
+                  pmxpa.valueDependentPaths combine other.valueDependentPaths,
+                  pmxpa.returnablePaths combine other.returnablePaths,
+                  pmxpa.dependentModels ++ other.dependentModels,
+                  pmxpa.dependentInstances ++ other.dependentInstances)(
                   {
                     val newPathmap = pmxpa.pathmap.get.clone
                     newPathmap.addRoots(other.pathmap.get.clone.getPathMapRoots)
                     Some(newPathmap)
                   },
-                  true,
-                  pmxpa.valueDependentPaths combine other.valueDependentPaths,
-                  pmxpa.returnablePaths combine other.returnablePaths,
-                  pmxpa.dependentModels ++ other.dependentModels,
-                  pmxpa.dependentInstances ++ other.dependentInstances
                 )
               case _ =>
                 throw new IllegalStateException // should not happen
@@ -596,12 +596,12 @@ object ElementAnalysisTreeXPathAnalyzer {
         case pmxpa: PathMapXPathAnalysis =>
           new PathMapXPathAnalysis(
             xpathString            = pmxpa.xpathString,
-            pathmap                = Some(pmxpa.pathmap.get.clone),
             figuredOutDependencies = true,
             valueDependentPaths    = pmxpa.valueDependentPaths combine pmxpa.returnablePaths,
             returnablePaths        = MapSet.empty[String, String],
             dependentModels        = pmxpa.dependentModels,
-            dependentInstances     = pmxpa.dependentInstances
+            dependentInstances     = pmxpa.dependentInstances)(
+            pathmap                = Some(pmxpa.pathmap.get.clone),
           )
       }
 

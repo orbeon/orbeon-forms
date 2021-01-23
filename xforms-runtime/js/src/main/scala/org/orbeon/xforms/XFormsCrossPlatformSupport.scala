@@ -21,7 +21,7 @@ import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, StaticXPath, UploadProgress}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, Exceptions, IndentedLogger, StaticXPath, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
@@ -249,8 +249,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String = ???
 
-  def getRootThrowable(t : Throwable) : Throwable = t // XXX TODO
-  def causesIterator(t : Throwable) : Iterator[Throwable] = Iterator(t) // XXX TODO
+  def getRootThrowable(t : Throwable) : Throwable = Exceptions.getRootThrowable(t).orNull
+  def causesIterator(t : Throwable) : Iterator[Throwable] = Exceptions.causesIterator(t)
 
   def tempFileSize(filePath: String): Long = ???
 

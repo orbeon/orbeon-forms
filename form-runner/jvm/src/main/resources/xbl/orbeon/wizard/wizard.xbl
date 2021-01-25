@@ -442,6 +442,19 @@
                                     value="$current-nav-case-id = $sections-with-paging-case-ids"/>
 
                                 <xf:var
+                                    name="current-repeat-id-and-index-opt"
+                                    value="
+                                        if ($current-section-uses-paging) then
+                                            let $section-id    := Wizard:sectionIdFromCaseIdOpt($current-nav-case-id),
+                                                $repeat-id     := concat($section-id, '-repeater-repeat'),
+                                                $current-index := xxf:instance('local')/current-index/data(.)
+                                            return
+                                                ($repeat-id, $current-index)
+                                        else
+                                            ()
+                                    "/>
+
+                                <xf:var
                                     name="prev-repeat-id-and-index-opt"
                                     value="
                                         if ($current-section-uses-paging) then
@@ -853,13 +866,20 @@
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
-                                            <xxf:setvisited
-                                                event="fr-wizard-visit-all-to-current"
-
-                                                iterate="$prev-nav-case-ids, $current-nav-case-id"
-                                                control="{{.}}"
-                                                visited="true"
-                                                recurse="true"/>
+                                            <xf:action event="fr-wizard-visit-all-to-current">
+                                                <xxf:setvisited
+                                                    iterate="$prev-nav-case-ids, if ($current-section-uses-paging) then () else $current-nav-case-id"
+                                                    control="{{.}}"
+                                                    visited="true"
+                                                    recurse="true"/>
+                                                <xxf:setvisited
+                                                    if="$current-section-uses-paging"
+                                                    iterate="1 to $current-repeat-id-and-index-opt[2]"
+                                                    control="{{$prev-repeat-id-and-index-opt[1]}}~iteration"
+                                                    xxf:repeat-indexes="{{.}}"
+                                                    visited="true"
+                                                    recurse="true"/>
+                                            </xf:action>
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-available" appearance="xxf:internal">
                                             <xxf:setvisited
@@ -883,6 +903,26 @@
                                                 control="{{.}}"
                                                 visited="false"
                                                 recurse="true"/>
+                                        </xf:group>
+                                        <xf:group id="fr-wizard-section-deselected" appearance="xxf:internal">
+                                            <xf:action event="fr-wizard-section-deselected">
+
+                                                <xxf:setvisited
+                                                    if="not($current-section-uses-paging)"
+
+                                                    control="{{event('control')}}"
+                                                    visited="true"
+                                                    recurse="true"/>
+
+                                                <xxf:setvisited
+                                                    if="$current-section-uses-paging"
+
+                                                    iterate="1 to $current-repeat-id-and-index-opt[2]"
+                                                    control="{{$current-repeat-id-and-index-opt[1]}}~iteration"
+                                                    xxf:repeat-indexes="{{.}}"
+                                                    visited="true"
+                                                    recurse="true"/>
+                                            </xf:action>
                                         </xf:group>
                                     </xh:div>
                                 </xh:div>
@@ -1048,12 +1088,14 @@
                                         </xsl:if>
 
                                         <!-- Visit current section when leaving it -->
-                                        <xxf:setvisited
+                                        <xf:dispatch
                                             event="xforms-deselect"
                                             target="#observer"
-                                            control="{{event('xxf:targetid')}}"
-                                            visited="true"
-                                            recurse="true"/>
+
+                                            name="fr-wizard-section-deselected"
+                                            targetid="fr-wizard-section-deselected">
+                                            <xf:property name="control" value="event('xxf:targetid')"/>
+                                        </xf:dispatch>
 
                                         <!-- Check that incoming `xforms-focus` is allowed -->
                                         <!-- TODO: See https://github.com/orbeon/orbeon-forms/issues/3323. -->

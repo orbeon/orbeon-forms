@@ -1042,8 +1042,8 @@
                                             </xh:ul>
                                         </xh:li>
                                         <xh:li>current-section-uses-paging: <xf:output value="$current-section-uses-paging"/></xh:li>
-                                        <xh:li>prev-repeat-id-and-index-opt: <xf:output value="$prev-repeat-id-and-index-opt"/></xh:li>
-                                        <xh:li>next-repeat-id-and-index-opt: <xf:output value="$next-repeat-id-and-index-opt"/></xh:li>
+                                        <xh:li>prev-repeat-id-and-index-opt: <xf:output value="string-join(for $ v in $prev-repeat-id-and-index-opt return string($v), ', ')"/></xh:li>
+                                        <xh:li>next-repeat-id-and-index-opt: <xf:output value="string-join(for $ v in $next-repeat-id-and-index-opt return string($v), ', ')"/></xh:li>
                                         <xh:li>next-nested-case-id-opt: <xf:output value="$next-nested-case-id-opt"/></xh:li>
                                         <xh:li>next-top-level-case-id-opt: <xf:output value="$next-top-level-case-id-opt"/></xh:li>
                                         <xh:li>allow-prev: <xf:output value="$allow-prev"/></xh:li>
@@ -1164,8 +1164,9 @@
 
                                         </xf:action>
 
-                                        <xf:group appearance="xxf:internal">
-                                            <xsl:copy>
+                                        <xf:group appearance="xxf:internal"><!-- Q: Why this group? -->
+                                            <!-- This is where the original section's attribute are being copied, including `id` and `bind` -->
+                                            <xsl:copy><!-- `<fr:section>` -->
                                                 <xsl:attribute name="view-appearance">wizard</xsl:attribute>
                                                 <xsl:attribute name="collapsible">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>

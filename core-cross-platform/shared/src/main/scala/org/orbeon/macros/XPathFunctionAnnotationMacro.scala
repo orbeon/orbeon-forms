@@ -50,7 +50,7 @@ import scala.reflect.macros.whitebox
 //
 // TODO:
 //
-// - [ ] support `Map` types
+// - [ ] support `Map` and `Array` types
 // - [ ] rename `FunctionSupport2`
 // - [ ] rename `XFormsFunction.Context`
 // - [ ] avoid copying the method!

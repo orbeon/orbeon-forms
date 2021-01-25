@@ -35,19 +35,20 @@ val ScalaJsLocalesVersion         = "1.1.0"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"
+val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
+val ScalaLoggingVersion           = "3.9.4"
+
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.4"
+val ScalaTestVersion              = "3.1.4"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.1"
 val EnumeratumCirceVersion        = "1.6.1"
 val ShapelessVersion              = "2.3.6"
 val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
-val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val Parboiled2Version             = "2.2.1"
 val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
-val ScalaLoggingVersion           = "3.9.4"
 val Log4sVersion                  = "1.8.3-SNAPSHOT"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
@@ -101,7 +102,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
-  "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,
+  "com.sun.activation" 		      % "javax.activation"                % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
@@ -134,8 +135,8 @@ val CoreLibraryDependencies = Seq(
   "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
-  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
-  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
+  "javax.servlet"               %  "javax.servlet-api"              % ServletApiVersion % Provided,
+  "javax.portlet"               %  "portlet-api"                    % PortletApiVersion % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
@@ -365,8 +366,8 @@ lazy val commonSettings = Seq(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalactic"           %%% "scalactic"               % ScalatTestVersion    % Test,
-    "org.scalatest"           %%% "scalatest"               % ScalatTestVersion    % Test,
+    "org.scalactic"           %%% "scalactic"               % ScalaTestVersion    % Test,
+    "org.scalatest"           %%% "scalatest"               % ScalaTestVersion    % Test,
     "org.scala-lang.modules"  %%% "scala-collection-compat" % ScalaCollectionCompatVersion
   ),
 
@@ -607,7 +608,7 @@ lazy val formRunnerJS = formRunner.js
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0",
+      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
       "org.parboiled"          %%% "parboiled"       % Parboiled2Version
     ),
 

@@ -15,8 +15,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.datamigration._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.XFormsId
 
 object GridDataMigration {
@@ -25,9 +25,9 @@ object GridDataMigration {
   def dataMaybeMigratedFromDatabaseFormat(
     app       : String,
     form      : String,
-    data      : DocumentInfo,
-    metadata  : Option[DocumentInfo]
-  ): DocumentInfo =
+    data      : DocumentNodeInfoType,
+    metadata  : Option[DocumentNodeInfoType]
+  ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
       appForm       = AppForm(app, form),
       data          = data,
@@ -43,9 +43,9 @@ object GridDataMigration {
   def dataMaybeMigratedToDatabaseFormat(
     app       : String,
     form      : String,
-    data      : DocumentInfo,
-    metadata  : Option[DocumentInfo]
-  ): DocumentInfo =
+    data      : DocumentNodeInfoType,
+    metadata  : Option[DocumentNodeInfoType]
+  ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
       appForm       = AppForm(app, form),
       data          = data,
@@ -77,11 +77,11 @@ object GridDataMigration {
   def dataMaybeMigratedFromEdge(
     app                     : String,
     form                    : String,
-    data                    : DocumentInfo,
-    metadataOpt             : Option[DocumentInfo],
+    data                    : DocumentNodeInfoType,
+    metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String,
     pruneMetadata           : Boolean
-  ): DocumentInfo =
+  ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
       appForm       = AppForm(app, form),
       data          = data,
@@ -96,8 +96,8 @@ object GridDataMigration {
   def dataMigratedToEdgeOrEmpty(
     app                     : String,
     form                    : String,
-    data                    : DocumentInfo,
-    metadataOpt             : Option[DocumentInfo],
+    data                    : DocumentNodeInfoType,
+    metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String
   ): Option[DocumentWrapper] =
     MigrationSupport.migrateDataWithFormMetadataMigrations(

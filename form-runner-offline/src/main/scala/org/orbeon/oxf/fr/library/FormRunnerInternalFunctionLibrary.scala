@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
@@ -157,10 +157,13 @@ object FormRunnerGridDataMigrationFunctionLibrary extends OrbeonFunctionLibrary 
     form      : String,
     data      : DocumentNodeInfoType,
     metadata  : Option[DocumentNodeInfoType]
-  ): DocumentNodeInfoType = {
-    // XXX TODO
-    data
-  }
+  ): DocumentNodeInfoType =
+    GridDataMigration.dataMaybeMigratedFromDatabaseFormat(
+      app,
+      form,
+      data,
+      metadata
+    )
 
   @XPathFunction(name = "dataMaybeMigratedToDatabaseFormat")
   def dataMaybeMigratedToDatabaseFormat(
@@ -168,10 +171,13 @@ object FormRunnerGridDataMigrationFunctionLibrary extends OrbeonFunctionLibrary 
     form      : String,
     data      : DocumentNodeInfoType,
     metadata  : Option[DocumentNodeInfoType]
-  ): DocumentNodeInfoType = {
-   // XXX TODO
-    data
-  }
+  ): DocumentNodeInfoType =
+    GridDataMigration.dataMaybeMigratedToDatabaseFormat(
+      app,
+      form,
+      data,
+      metadata
+    )
 
   @XPathFunction(name = "dataMaybeMigratedFromEdge")
   def dataMaybeMigratedFromEdge(
@@ -181,10 +187,15 @@ object FormRunnerGridDataMigrationFunctionLibrary extends OrbeonFunctionLibrary 
     metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String,
     pruneMetadata           : Boolean
-  ): DocumentNodeInfoType = {
-    // XXX TODO
-    data
-  }
+  ): DocumentNodeInfoType =
+    GridDataMigration.dataMaybeMigratedFromEdge(
+      app,
+      form,
+      data,
+      metadataOpt,
+      dataFormatVersionString,
+      pruneMetadata
+    )
 
   @XPathFunction(name = "dataMigratedToEdgeOrEmpty")
   def dataMigratedToEdgeOrEmpty(
@@ -193,10 +204,14 @@ object FormRunnerGridDataMigrationFunctionLibrary extends OrbeonFunctionLibrary 
     data                    : DocumentNodeInfoType,
     metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String
-  ): Option[DocumentNodeInfoType] = {
-    // XXX TODO
-    None
-  }
+  ): Option[DocumentNodeInfoType] =
+    GridDataMigration.dataMigratedToEdgeOrEmpty(
+      app,
+      form,
+      data,
+      metadataOpt,
+      dataFormatVersionString
+    )
 }
 
 object FormRunnerSimpleDataMigrationFunctionLibrary extends OrbeonFunctionLibrary {

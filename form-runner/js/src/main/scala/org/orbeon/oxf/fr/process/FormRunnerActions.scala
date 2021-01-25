@@ -139,33 +139,30 @@ trait FormRunnerActions {
 
       val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
-      // XXX FIXME
-      def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
-        originalData
-//      def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType = {
-//
-//        val providerDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
-//
-//        val databaseData =
-//          MigrationSupport.migrateDataWithFormMetadataMigrations(
-//            appForm       = AppForm(app, form),
-//            data          = originalData,
-//            metadataOpt   = metadataInstance map (_.root),
-//            srcVersion    = DataFormatVersion.Edge,
-//            dstVersion    = providerDataFormatVersion,
-//            pruneMetadata = pruneMetadata
-//          ) getOrElse
-//            originalData
-//
-//        // Add `data-format-version` attribute on the root element
-//        insert(
-//          into       = databaseData / *,
-//          origin     = NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, providerDataFormatVersion.entryName),
-//          doDispatch = false
-//        )
-//
-//        databaseData
-//      }
+      def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType = {
+
+        val providerDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+
+        val databaseData =
+          MigrationSupport.migrateDataWithFormMetadataMigrations(
+            appForm       = AppForm(app, form),
+            data          = originalData,
+            metadataOpt   = metadataInstance map (_.root),
+            srcVersion    = DataFormatVersion.Edge,
+            dstVersion    = providerDataFormatVersion,
+            pruneMetadata = pruneMetadata
+          ) getOrElse
+            originalData
+
+        // Add `data-format-version` attribute on the root element
+        insert(
+          into       = databaseData / *,
+          origin     = NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, providerDataFormatVersion.entryName),
+          doDispatch = false
+        )
+
+        databaseData
+      }
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(

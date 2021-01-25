@@ -140,7 +140,7 @@
         </xbl:handlers>
         <xbl:implementation>
             <xf:model>
-                <xf:instance id="local" xxf:expose-xpath-types="true">
+                <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <current-case-id/>
                         <current-top-level-case-id/>
@@ -161,7 +161,7 @@
                 <xf:bind ref="show-toc"      type="xs:boolean" xxf:default="true()"/>
                 <xf:bind ref="show-body"     type="xs:boolean" xxf:default="not(Wizard:isWizardSeparateToc())"/>
 
-                <xf:instance id="available-top-level-sections" xxf:expose-xpath-types="true">
+                <xf:instance id="available-top-level-sections" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                     <_/>
                 </xf:instance>
 

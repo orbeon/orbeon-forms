@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
-import org.parboiled.errors.ParsingException
+import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable.ListBuffer
@@ -100,7 +100,7 @@ class SimpleProcessTest
 
     for (p <- processes)
       it(s"must pass with `$p`") {
-        intercept[ParsingException](parse(p))
+        intercept[ParseError](parse(p))
       }
   }
 

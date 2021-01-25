@@ -33,6 +33,8 @@ val ScalaJsStubsVersion           = "1.0.0" // can be different from Scala.js ve
 val ScalaJsTimeVersion            = "2.0.0"
 val ScalaJsLocalesVersion         = "1.1.0"
 
+// Scala libraries for Scala JVM only
+val Parboiled1Version             = "1.3.1"
 // Shared Scala libraries
 val ScalatTestVersion             = "3.1.4"
 val CirceVersion                  = "0.13.0"
@@ -41,8 +43,8 @@ val EnumeratumCirceVersion        = "1.6.1"
 val ShapelessVersion              = "2.3.6"
 val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
-val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
+val Parboiled2Version             = "2.2.1"
 val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
 val ScalaLoggingVersion           = "3.9.4"
@@ -73,6 +75,7 @@ val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
   "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
+  "org.parboiled"               %% "parboiled"                      % Parboiled2Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
@@ -605,7 +608,7 @@ lazy val formRunnerJS = formRunner.js
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
       "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0",
-      "org.parboiled"          %%% "parboiled"       % "2.2.1"
+      "org.parboiled"          %%% "parboiled"       % Parboiled2Version
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",

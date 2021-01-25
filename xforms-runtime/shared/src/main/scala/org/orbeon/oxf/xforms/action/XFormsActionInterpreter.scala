@@ -328,9 +328,9 @@ class XFormsActionInterpreter(
   def resolveAVT(actionAnalysis: ActionTrait, attributeName: String): String =
     actionAnalysis.element.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionAnalysis, _)) orNull
 
-  // Find an effective object based on either the xxf:repeat-indexes attribute, or on the current repeat indexes.
+  // Find an effective object based on either the `xxf:repeat-indexes` attribute, or on the current repeat indexes.
   def resolveObject(actionAnalysis: ActionTrait, targetStaticOrAbsoluteId: String): XFormsObject = {
-    container.resolveObjectByIdInScope(getSourceEffectiveId(actionAnalysis), targetStaticOrAbsoluteId, Option.apply(null)) map { resolvedObject =>
+    container.resolveObjectByIdInScope(getSourceEffectiveId(actionAnalysis), targetStaticOrAbsoluteId, None) map { resolvedObject =>
       resolveAVT(actionAnalysis, XFormsNames.XXFORMS_REPEAT_INDEXES_QNAME).trimAllToOpt match {
         case None =>
           // Most common case

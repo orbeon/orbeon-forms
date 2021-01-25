@@ -4,6 +4,7 @@ package org.orbeon.oxf.fr.library
 import cats.syntax.option._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.dom.QName
+import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.VersionSupport
 import org.orbeon.oxf.fr._
@@ -14,10 +15,10 @@ import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndPropertie
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value.{AtomicValue, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, EmptySequence, StringValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
@@ -108,22 +109,50 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   def dataset(datasetName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.NodeInfo] =
     XFormsFunctionLibrary.instanceImpl("fr-dataset-" + datasetName)
 
-//  // TODO: Handle `XFormsFunction.Context` parameter
-//  @XPathFunction
-//  def controlStringValue(targetControlName: String, followIndexes: Boolean = false)(ctx: XFormsFunction.Context): Option[String] =
-//    FormRunner.resolveTargetRelativeToActionSourceOpt(
-//      actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(ctx.sourceEffectiveId),
-//      targetControlName      = targetControlName,
-//      followIndexes          = followIndexes
-//    ) flatMap
-//      (_.nextOption()) map
-//      (_.getStringValue)
-//
-//  // TODO: Handle `XFormsFunction.Context` parameter
-//  @XPathFunction
-//  def controlTypedValue(targetControlName: String, followIndexes: Boolean = false)(ctx: XFormsFunction.Context): Option[AtomicValue] = {
-//
-//  }
+  @XPathFunction
+  def controlStringValue(
+    targetControlName : String,
+    followIndexes     : Boolean = false)(implicit
+    ctx               : XFormsFunction.Context
+  ): Option[String] =
+    FormRunner.resolveTargetRelativeToActionSourceOpt(
+      actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(ctx.sourceEffectiveId),
+      targetControlName      = targetControlName,
+      followIndexes          = followIndexes
+    ) flatMap
+      (_.nextOption()) map
+      (_.getStringValue)
+
+  @XPathFunction
+  def controlTypedValue(
+    targetControlName : String,
+    followIndexes     : Boolean = false)(implicit
+    ctx               : XFormsFunction.Context
+  ): Option[om.Item] = { // should be `Option[ArrayItem]`
+
+    // TODO: Clarify when `resolveTargetRelativeToActionSourceOpt` returns `None`. Is it only
+    //   when the controls cannot be resolved? Any other condition?
+    val resolvedTarget: Option[Iterator[om.Item]] =
+      FormRunner.resolveTargetRelativeToActionSourceOpt(
+        actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(ctx.sourceEffectiveId),
+        targetControlName      = targetControlName,
+        followIndexes          = followIndexes
+      )
+
+    resolvedTarget map { resolvedItems =>
+
+      val allItems =
+        resolvedItems map { item =>
+          try {
+            item.atomize().head
+          } catch {
+            case _: TypedValueException => EmptySequence
+          }
+        }
+
+      SaxonUtils.newArrayItem(allItems.toList)
+    }
+  }
 
 //  Namespace(List(XMLNames.FR)) {
 

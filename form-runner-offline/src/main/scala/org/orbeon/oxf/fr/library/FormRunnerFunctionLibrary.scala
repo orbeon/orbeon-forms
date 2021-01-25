@@ -154,14 +154,6 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     }
   }
 
-//  Namespace(List(XMLNames.FR)) {
-
-//    Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE),
-//      Arg(BOOLEAN, EXACTLY_ONE)
-//    )
-//
-
   // Example: `fr:component-param-value('decimal-separator')`
   //
   // This searches bound element attributes, the `fr-form-metadata` instance, and properties.
@@ -244,107 +236,6 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     }
   }
 }
-
-/*
-private object FormRunnerFunctions {
-
-
-  class StringFunction extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): StringValue =
-      IndexedStringFunctions(operation).apply()
-  }
-
-  class BooleanFunction extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-      IndexedBooleanFunctions(operation).apply()
-  }
-
-  class IntFunction extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): IntegerValue =
-      IndexedIntFunctions(operation).apply()
-  }
-
-  class DateTimeFunction extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(xpathContext: XPathContext): DateTimeValue =
-      IndexedDateTimeFunctions(operation).apply() map
-        (new java.util.Date(_))                   map
-        DateTimeValue.fromJavaDate                orNull
-  }
-
-  class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): BooleanValue =
-      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
-  }
-
-  class FRRunProcess extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): BooleanValue =
-      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
-  }
-
-  class FRDataset extends SystemFunction {
-
-    // Rewrite `fr:dataset($arg1)` into `instance(concat('fr-dataset-', $arg1))`
-    override def simplify(visitor: ExpressionVisitor): Expression = {
-
-      simplifyArguments(visitor)
-
-      val concatFn =
-        SystemFunction.makeSystemFunction(
-          "concat",
-          Array(new StringLiteral("fr-dataset-"), getArguments()(0))
-        )
-
-      // From `Expression.java`: "The rule is that an implementation of simplify(), typeCheck(), or optimize()
-      // that returns a value other than `this` is required to set the location information and parent pointer
-      // in the new child expression."
-      concatFn.setContainer(getContainer)
-      ExpressionTool.copyLocationInfo(this, concatFn)
-
-      val instanceFn = new function.Instance
-      instanceFn.setDetails(XFormsFunctionLibrary.getEntry(XFORMS_NAMESPACE_URI, "instance", 1).get)
-      instanceFn.setFunctionName(new StructuredQName("", XFORMS_NAMESPACE_URI, "instance"))
-      instanceFn.setArguments(Array(concatFn))
-
-      instanceFn.setContainer(getContainer)
-      ExpressionTool.copyLocationInfo(this, instanceFn)
-
-      instanceFn.simplify(visitor)
-
-      instanceFn
-    }
-  }
-
-  class FRControlTypedValue extends FunctionSupport with RuntimeDependentFunction {
-
-    override def evaluateItem(context: XPathContext): Item = {
-
-      implicit val ctx = context
-
-      val resolvedItems =
-        FormRunner.resolveTargetRelativeToActionSourceOpt(
-          actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
-          targetControlName      = stringArgument(0),
-          followIndexes          = booleanArgumentOpt(1) getOrElse false
-        ) getOrElse
-          Iterator.empty
-
-      val allItems =
-        resolvedItems map { item =>
-          try {
-            // `TypedNodeWrapper.getTypedValue` *should* return a single value or throw
-            Option(item.getTypedValue.next()) getOrElse EmptySequence.getInstance
-          } catch {
-            case _: TypedValueException => EmptySequence.getInstance
-          }
-        }
-
-      ArrayFunctions.createValue(allItems.to(Vector))
-    }
-  }
-
-}
-
-*/
 
 object FRComponentParam {
 

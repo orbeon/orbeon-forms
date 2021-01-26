@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.itemset
 
 import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.{Element, Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -31,14 +31,12 @@ import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.SAXException
 
@@ -249,26 +247,7 @@ object ItemsetSupport {
                 elemOpt(elem, XFORMS_VALUE_QNAME)       map
                   (_.asInstanceOf[ItemsetValueControl]) flatMap { valueElem =>
 
-                    val rawValue =
-                      valueElem.expressionOrConstant match {
-                        case Left(expr)   =>
-                          val currentBindingContext = contextStack.getCurrentBindingContext
-                          XPathCache.evaluateAsStringOpt(
-                            contextItems       = currentBindingContext.nodeset,
-                            contextPosition    = currentBindingContext.position,
-                            xpathString        = expr,
-                            namespaceMapping   = valueElem.namespaceMapping,
-                            variableToValueMap = currentBindingContext.getInScopeVariables,
-                            functionLibrary    = container.getContainingDocument.functionLibrary,
-                            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(valueElem)),
-                            baseURI            = null,
-                            locationData       = valueElem.locationData,
-                            reporter           = container.getContainingDocument.getRequestStats.getReporter
-                          )
-
-                        case Right(constant) =>
-                          constant.some
-                      }
+                    val rawValue = evaluateExpressionOrConstant(valueElem, valueElem.expressionOrConstant)
 
                     // For multiple selection:
                     //
@@ -309,17 +288,38 @@ object ItemsetSupport {
                 }(contextStack)
               }
 
+            private def evaluateExpressionOrConstant(
+              childElem            : ElementAnalysis,
+              expressionOrConstant : Either[String, String]
+            ): Option[String] =
+              expressionOrConstant match {
+                case Left(expr)   =>
+                  val currentBindingContext = contextStack.getCurrentBindingContext
+                  XPathCache.evaluateAsStringOpt(
+                    contextItems       = currentBindingContext.nodeset,
+                    contextPosition    = currentBindingContext.position,
+                    xpathString        = expr,
+                    namespaceMapping   = childElem.namespaceMapping,
+                    variableToValueMap = currentBindingContext.getInScopeVariables,
+                    functionLibrary    = container.getContainingDocument.functionLibrary,
+                    functionContext    = contextStack.getFunctionContext(getElementEffectiveId(childElem)),
+                    baseURI            = null,
+                    locationData       = childElem.locationData,
+                    reporter           = container.getContainingDocument.getRequestStats.getReporter
+                  )
+                case Right(constant) =>
+                  constant.some
+              }
+
             private def findLhhValue(lhhaElemOpt: Option[ElementAnalysis], required: Boolean): Option[LHHAValue] =
               lhhaElemOpt match {
-                case Some(lhhaElem) =>
-                  val elemScope = lhhaElem.scope
-                  val elemEffectiveId = getElementEffectiveId(lhhaElem)
-                  val supportsHtml = select1Control.isFullAppearance // only support HTML when appearance is "full"
+                case Some(lhhaElem: LHHAAnalysis) =>
 
-                  // FIXME: Would be good to do this check statically
-                  val defaultToHTML = LHHAAnalysis.isHTML(lhhaElem.element)
-                  val (lhhaValueOpt, containsHtml) =
-                    getChildElementValue(container, elemEffectiveId, elemScope, lhhaElem.element, supportsHtml, defaultToHTML)
+                  val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, lhhaElem.expressionOrConstant)
+                  val containsHtml = lhhaElem.containsHTML
+
+                  // XXX TODO
+//                  val supportsHtml = select1Control.isFullAppearance // only support HTML when appearance is "full"
 
                   val trimmed = lhhaValueOpt flatMap (_.trimAllToOpt)
 
@@ -327,7 +327,7 @@ object ItemsetSupport {
                     LHHAValue(trimmed getOrElse "", containsHtml).some
                   else
                     trimmed map (LHHAValue(_, containsHtml))
-                case None =>
+                case _ =>
                   if (required)
                     throw new ValidationException(
                       "`xf:item` or `xf:itemset` must contain an `xf:label` element",
@@ -408,6 +408,9 @@ object ItemsetSupport {
         )
 
         contextStack.setBinding(savedBindingContext)
+
+//        println(s"xxxx itemset `${asJSON(result, None, false, false, select1Control.getLocationData)}`")
+
         result
     }
   }
@@ -606,28 +609,5 @@ object ItemsetSupport {
     }
 
     result()
-  }
-
-  private def getChildElementValue(
-    container          : XBLContainer,
-    sourceEffectiveId  : String,  // source effective id for id resolution
-    scope              : Scope,
-    childElement       : Element, // element to evaluate (`xf:label`, etc.)
-    acceptHTML         : Boolean, // whether the result may contain HTML
-    defaultHTML        : Boolean
-  ): (Option[String], Boolean) = {
-    val contextStack = container.getContextStack
-    withBinding(childElement, sourceEffectiveId, scope) { _ =>
-      val containsHTML = Array[Boolean](false)
-      XFormsElementValue.getElementValue(
-        container,
-        contextStack,
-        sourceEffectiveId,
-        childElement,
-        acceptHTML,
-        defaultHTML,
-        containsHTML
-      ) -> containsHTML.head
-    }(contextStack)
   }
 }

@@ -409,6 +409,10 @@ object XFormsStaticStateSerializer {
         case c: TriggerControl         => Nil // ok
         case c: TextareaControl        => Nil // ok
         case c: SecretControl          => Nil // ok
+        case c: ItemsetValueControl    =>
+          List(
+            "expressionOrConstant" -> c.expressionOrConstant.asJson,
+          )
         case c                         => Nil
       }
 

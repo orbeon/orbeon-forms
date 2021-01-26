@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, WithChildrenTrait}
-import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
+import org.orbeon.oxf.xforms.analysis.controls.{ItemsetValueControl, LHHAAnalysis, SelectionControlUtil}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
@@ -246,40 +246,50 @@ object ItemsetSupport {
             private def getValueOrCopyItemValue(elem: ElementAnalysis): Option[Item.Value[om.Item]] = {
 
               def fromValueElem =
-                elemOpt(elem, XFORMS_VALUE_QNAME) flatMap
-                  getValueValue                   map
+                elemOpt(elem, XFORMS_VALUE_QNAME)       map
+                  (_.asInstanceOf[ItemsetValueControl]) flatMap { valueElem =>
+
+                    val rawValue =
+                      valueElem.expressionOrConstant match {
+                        case Left(expr)   =>
+                          val currentBindingContext = contextStack.getCurrentBindingContext
+                          XPathCache.evaluateAsStringOpt(
+                            contextItems       = currentBindingContext.nodeset,
+                            contextPosition    = currentBindingContext.position,
+                            xpathString        = expr,
+                            namespaceMapping   = valueElem.namespaceMapping,
+                            variableToValueMap = currentBindingContext.getInScopeVariables,
+                            functionLibrary    = container.getContainingDocument.functionLibrary,
+                            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(valueElem)),
+                            baseURI            = null,
+                            locationData       = valueElem.locationData,
+                            reporter           = container.getContainingDocument.getRequestStats.getReporter
+                          )
+
+                        case Right(constant) =>
+                          constant.some
+                      }
+
+                    // For multiple selection:
+                    //
+                    // - trim the value
+                    // - if the value is blank, it can't be used and the item is excluded
+                    //
+                    if (select1Control.staticControl.isMultiple)
+                      rawValue flatMap (_.trimAllToOpt)
+                    else
+                      rawValue
+
+                } map
                   Left.apply
 
               def fromCopyElem =
-                elemOpt(elem, XFORMS_COPY_QNAME)            flatMap
+                elemOpt(elem, XFORMS_COPY_QNAME)             flatMap
                   getCopyValue                               filter
                   (_.nonEmpty || ! staticControl.isMultiple) map
                   Right.apply
 
               fromValueElem orElse fromCopyElem
-            }
-
-            private def getValueValue(valueElem: ElementAnalysis): Option[String] = {
-
-              val rawValue =
-                getChildElementValue(
-                  container          = container,
-                  sourceEffectiveId  = getElementEffectiveId(valueElem),
-                  scope              = valueElem.scope,
-                  childElement       = valueElem.element, // XXX TODO, for nested element/content, need a better solution!
-                  acceptHTML         = false,
-                  defaultHTML        = false
-                )._1
-
-              // For multiple selection:
-              //
-              // - trim the value
-              // - if the value is blank, it can't be used and the item is excluded
-              //
-              if (select1Control.staticControl.isMultiple)
-                rawValue flatMap (_.trimAllToOpt)
-              else
-                rawValue
             }
 
             // Return `None` if:

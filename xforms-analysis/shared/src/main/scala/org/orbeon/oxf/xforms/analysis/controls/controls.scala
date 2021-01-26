@@ -283,3 +283,18 @@ class PropertyControl(
   scope            : Scope,
   containerScope   : Scope
 ) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+
+class ItemsetValueControl(
+  index                    : Int,
+  element                  : Element,
+  parent                   : Option[ElementAnalysis],
+  preceding                : Option[ElementAnalysis],
+  staticId                 : String,
+  prefixedId               : String,
+  namespaceMapping         : NamespaceMapping,
+  scope                    : Scope,
+  containerScope           : Scope,
+  val expressionOrConstant : Either[String, String],
+) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+     with ValueTrait with OptionalSingleNode
+

@@ -91,7 +91,7 @@ object ControlAnalysisFactory {
     XFORMS_CHOICES_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
     XFORMS_ITEM_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
     XFORMS_ITEMSET_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
-    XFORMS_VALUE_QNAME            -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ValueTrait with OptionalSingleNode),
+    XFORMS_VALUE_QNAME            -> (ItemsetValueControlBuilder(_, _, _, _, _, _, _, _, _)),
     XFORMS_COPY_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with RequiredSingleNode),
     // Variable nested value
     XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),

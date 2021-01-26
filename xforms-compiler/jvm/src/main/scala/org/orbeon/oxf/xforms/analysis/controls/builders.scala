@@ -934,3 +934,38 @@ object VariableAnalysisBuilder {
       )
   }
 }
+object ItemsetValueControlBuilder {
+
+  def apply(
+    index             : Int,
+    element           : Element,
+    parent            : Option[ElementAnalysis],
+    preceding         : Option[ElementAnalysis],
+    staticId          : String,
+    prefixedId        : String,
+    namespaceMapping  : NamespaceMapping,
+    scope             : Scope,
+    containerScope    : Scope
+  ): ItemsetValueControl = {
+
+    val (expressionOrConstant, _) =
+      XFormsStaticElementValue.getElementExpressionOrConstant(
+        outerElem       = element,
+        containerPrefix = containerScope.fullPrefix,
+        acceptHTML      = false
+      )
+
+    new ItemsetValueControl(
+      index,
+      element,
+      parent,
+      preceding,
+      staticId,
+      prefixedId,
+      namespaceMapping,
+      scope,
+      containerScope,
+      expressionOrConstant
+    )
+  }
+}

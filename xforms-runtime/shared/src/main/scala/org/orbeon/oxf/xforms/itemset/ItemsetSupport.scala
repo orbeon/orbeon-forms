@@ -24,15 +24,15 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis, WithChildrenTrait}
-import org.orbeon.oxf.xforms.analysis.controls.{ItemsetValueControl, LHHAAnalysis, SelectionControlUtil}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
+import org.orbeon.oxf.xforms.analysis.{ElemListener, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil, WithExpressionOrConstantTrait}
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.{XFormsId, XFormsNames}
@@ -93,12 +93,14 @@ object ItemsetSupport {
         staticItemset
       case None =>
 
-        val container = select1Control.container
+        val container         = select1Control.container
+        val parentEffectiveId = select1Control.getEffectiveId
+
         val result = new Itemset(multiple = staticControl.isMultiple, hasCopy = staticControl.useCopy)
 
         // Set binding on this control, after saving the current context because the context stack must
         // remain unmodified.
-        val contextStack = container.getContextStack
+        implicit val contextStack = container.getContextStack
         val savedBindingContext = contextStack.getCurrentBindingContext
         contextStack.setBinding(select1Control.bindingContext)
 
@@ -109,15 +111,6 @@ object ItemsetSupport {
             private var position: Int = 0
             private var currentContainer: ItemContainer = result
 
-            private def getElementEffectiveId(elem: ElementAnalysis): String =
-              XFormsId.getRelatedEffectiveId(select1Control.getEffectiveId, elem.element.idOrNull)
-
-            private def elemOpt(elem: ElementAnalysis, name: QName): Option[ElementAnalysis] =
-              elem match {
-                case wct: WithChildrenTrait => wct.children collectFirst { case c if c.element.getQName == name => c }
-                case _                      => None
-              }
-
             def startElement(elem: ElementAnalysis): Unit = {
 
               val domElem = elem.element
@@ -125,7 +118,7 @@ object ItemsetSupport {
               domElem.getQName match {
                 case XFORMS_ITEM_QNAME =>
 
-                  contextStack.pushBinding(domElem, getElementEffectiveId(elem), elem.scope)
+                  contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
 
                   createValueNode(elem, position) foreach { newItem =>
                     currentContainer.addChildItem(newItem)
@@ -134,7 +127,7 @@ object ItemsetSupport {
 
                 case XFORMS_ITEMSET_QNAME =>
 
-                  contextStack.pushBinding(domElem, getElementEffectiveId(elem), elem.scope)
+                  contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
 
                   val currentBindingContext = contextStack.getCurrentBindingContext
 
@@ -161,9 +154,9 @@ object ItemsetSupport {
                     }(contextStack)
                 case XFORMS_CHOICES_QNAME =>
 
-                  contextStack.pushBinding(domElem, getElementEffectiveId(elem), elem.scope)
+                  contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
 
-                  if (elemOpt(elem, LABEL_QNAME).isDefined) {
+                  if (findChildElem(elem, LABEL_QNAME).isDefined) {
                     val newItem = createChoiceNode(elem, position)
                     currentContainer.addChildItem(newItem)
                     position += 1
@@ -182,7 +175,7 @@ object ItemsetSupport {
                   contextStack.popBinding()
                 case XFORMS_CHOICES_QNAME =>
                   contextStack.popBinding()
-                  if (elemOpt(elem, LABEL_QNAME).isDefined)
+                  if (findChildElem(elem, LABEL_QNAME).isDefined)
                     currentContainer = currentContainer.parent
                 case _ =>
               }
@@ -223,9 +216,9 @@ object ItemsetSupport {
             private def createValueNode(elem: ElementAnalysis, position: Int): Option[Item.ValueNode] =
               getValueOrCopyItemValue(elem) map { value =>
                 Item.ValueNode(
-                  label      = findLhhValue(elemOpt(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
-                  help       = findLhhValue(elemOpt(elem, HELP_QNAME),  required = false),
-                  hint       = findLhhValue(elemOpt(elem, HINT_QNAME),  required = false),
+                  label      = findLhhValue(findChildElem(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
+                  help       = findLhhValue(findChildElem(elem, HELP_QNAME),  required = false),
+                  hint       = findLhhValue(findChildElem(elem, HINT_QNAME),  required = false),
                   value      = value,
                   attributes = getAttributes(elem)
                 )(
@@ -235,7 +228,7 @@ object ItemsetSupport {
 
             private def createChoiceNode(elem: ElementAnalysis, position: Int): Item.ChoiceNode =
               Item.ChoiceNode(
-                label      = findLhhValue(elemOpt(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
+                label      = findLhhValue(findChildElem(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
                 attributes = getAttributes(elem)
               )(
                 position   = position
@@ -244,10 +237,10 @@ object ItemsetSupport {
             private def getValueOrCopyItemValue(elem: ElementAnalysis): Option[Item.Value[om.Item]] = {
 
               def fromValueElem =
-                elemOpt(elem, XFORMS_VALUE_QNAME)       map
-                  (_.asInstanceOf[ItemsetValueControl]) flatMap { valueElem =>
+                findChildElem(elem, XFORMS_VALUE_QNAME) map
+                  (_.asInstanceOf[WithExpressionOrConstantTrait]) flatMap { valueElem =>
 
-                    val rawValue = evaluateExpressionOrConstant(valueElem, valueElem.expressionOrConstant)
+                    val rawValue = evaluateExpressionOrConstant(valueElem, parentEffectiveId)
 
                     // For multiple selection:
                     //
@@ -263,7 +256,7 @@ object ItemsetSupport {
                   Left.apply
 
               def fromCopyElem =
-                elemOpt(elem, XFORMS_COPY_QNAME)             flatMap
+                findChildElem(elem, XFORMS_COPY_QNAME)       flatMap
                   getCopyValue                               filter
                   (_.nonEmpty || ! staticControl.isMultiple) map
                   Right.apply
@@ -280,7 +273,7 @@ object ItemsetSupport {
             private def getCopyValue(copyElem: ElementAnalysis): Option[List[om.Item]] =
               copyElem.element.attributeValueOpt(XFormsNames.REF_QNAME) flatMap { refAtt =>
 
-                val sourceEffectiveId = getElementEffectiveId(copyElem)
+                val sourceEffectiveId = getElementEffectiveId(parentEffectiveId, copyElem)
 
                 withBinding(copyElem.element, sourceEffectiveId, copyElem.scope) { currentBindingContext =>
                   val currentNodeset = currentBindingContext.nodeset.asScala.toList
@@ -288,34 +281,11 @@ object ItemsetSupport {
                 }(contextStack)
               }
 
-            private def evaluateExpressionOrConstant(
-              childElem            : ElementAnalysis,
-              expressionOrConstant : Either[String, String]
-            ): Option[String] =
-              expressionOrConstant match {
-                case Left(expr)   =>
-                  val currentBindingContext = contextStack.getCurrentBindingContext
-                  XPathCache.evaluateAsStringOpt(
-                    contextItems       = currentBindingContext.nodeset,
-                    contextPosition    = currentBindingContext.position,
-                    xpathString        = expr,
-                    namespaceMapping   = childElem.namespaceMapping,
-                    variableToValueMap = currentBindingContext.getInScopeVariables,
-                    functionLibrary    = container.getContainingDocument.functionLibrary,
-                    functionContext    = contextStack.getFunctionContext(getElementEffectiveId(childElem)),
-                    baseURI            = null,
-                    locationData       = childElem.locationData,
-                    reporter           = container.getContainingDocument.getRequestStats.getReporter
-                  )
-                case Right(constant) =>
-                  constant.some
-              }
-
             private def findLhhValue(lhhaElemOpt: Option[ElementAnalysis], required: Boolean): Option[LHHAValue] =
               lhhaElemOpt match {
                 case Some(lhhaElem: LHHAAnalysis) =>
 
-                  val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, lhhaElem.expressionOrConstant)
+                  val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, parentEffectiveId)
                   val containsHtml = lhhaElem.containsHTML
 
                   // XXX TODO
@@ -342,7 +312,7 @@ object ItemsetSupport {
                 name   <- SelectionControlUtil.AttributesToPropagate
                 value  = elem.element.attributeValue(name)
                 if value ne null
-                result <- findAttributeAVTValue(elem, name, value, getElementEffectiveId(elem))
+                result <- findAttributeAVTValue(elem, name, value, getElementEffectiveId(parentEffectiveId, elem))
               } yield
                 result
 
@@ -610,4 +580,29 @@ object ItemsetSupport {
 
     result()
   }
+
+  def evaluateExpressionOrConstant(
+    childElem         : WithExpressionOrConstantTrait,
+    parentEffectiveId : String)(implicit
+    contextStack      : XFormsContextStack
+  ): Option[String] =
+    childElem.expressionOrConstant match {
+      case Left(expr)   =>
+        withContextAndModelOnly(childElem, parentEffectiveId) { currentBindingContext =>
+          XPathCache.evaluateAsStringOpt(
+            contextItems       = currentBindingContext.nodeset,
+            contextPosition    = currentBindingContext.position,
+            xpathString        = expr,
+            namespaceMapping   = childElem.namespaceMapping,
+            variableToValueMap = currentBindingContext.getInScopeVariables,
+            functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
+            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
+            baseURI            = null,
+            locationData       = childElem.locationData,
+            reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
+          )
+        }
+      case Right(constant) =>
+        constant.some
+    }
 }

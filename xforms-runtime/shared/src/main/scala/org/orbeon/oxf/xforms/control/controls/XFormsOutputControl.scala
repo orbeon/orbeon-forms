@@ -121,7 +121,12 @@ class XFormsOutputControl(
     // TODO: pass BindingContext directly
     getContextStack.setBinding(bindingContext)
     val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
-    try SubmissionHeaders.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
+    try
+      SubmissionHeaders.evaluateHeaders(
+        getEffectiveId,
+        staticControl,
+        headersToForward
+      )(getContextStack)
     catch {
       case NonFatal(t) =>
         XFormsError.handleNonFatalXPathError(container, t)

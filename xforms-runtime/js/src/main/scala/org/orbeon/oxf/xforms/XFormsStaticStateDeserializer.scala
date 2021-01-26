@@ -765,22 +765,23 @@ object XFormsStaticStateDeserializer {
             // Itemsets
             case XFORMS_CHOICES_QNAME | XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithChildrenTrait
-            case XFORMS_VALUE_QNAME =>
+            case XFORMS_HEADER_QNAME =>
+              new HeaderControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+            case XFORMS_VALUE_QNAME | XFORMS_NAME_QNAME =>
 
               implicit val eitherStringDecoder: Decoder[Either[String, String]] = {
                 Decoder.decodeEither("left", "right")
               }
 
-              val itemsetValueControl =
+              val nestedNameOrValueControl =
                 for {
                   expressionOrConstant <- c.get[Either[String, String]]("expressionOrConstant")
-                } yield {
-                  new ItemsetValueControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, expressionOrConstant)
-                }
+                } yield
+                  new NestedNameOrValueControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, expressionOrConstant)
 
-              itemsetValueControl.right.get // XXX TODO
+              nestedNameOrValueControl.right.get // XXX TODO
 
-            case  XFORMS_COPY_QNAME =>
+            case XFORMS_COPY_QNAME =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with RequiredSingleNode
 
             // Roots

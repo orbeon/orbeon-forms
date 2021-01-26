@@ -13,125 +13,117 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsContextStackSupport.{withBinding, withIteration}
+import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
+import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
+import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, LHHAAnalysis, NestedNameOrValueControl, WithExpressionOrConstantTrait}
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport.evaluateExpressionOrConstant
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
-import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+
 
 object SubmissionHeaders {
 
   // Evaluate children <xf:header> elements.
   def evaluateHeaders(
-    xblContainer      : XBLContainer,
-    contextStack      : XFormsContextStack,         // context stack set to enclosing <xf:*> element
-    sourceEffectiveId : String,                     // effective id of the enclosing <xf:*>element
-    enclosingElement  : Element,                    // enclosing <xf:*> element
-    initialHeaders    : Map[String, List[String]]   // initial headers or empty list of headers
+    parentEffectiveId : String,                             // effective id of the enclosing `<xf:submission>` or `<xf:output>`
+    enclosingElement  : WithChildrenTrait,                  // in practice `<xf:submission>` or `<xf:output>`
+    initialHeaders    : Map[String, List[String]])(implicit // initial headers or empty list of headers
+    contextStack      : XFormsContextStack                  // context stack set to enclosing <xf:*> element
   ): Map[String, List[String]] = {
 
-    val fullPrefix = xblContainer.getFullPrefix
+    val xblContainer = contextStack.container
 
-    val headerElements = enclosingElement.jElements(XFormsNames.XFORMS_HEADER_QNAME)
-    if (headerElements.asScala.nonEmpty) {
+    enclosingElement.children collect { case e: HeaderControl => e } match {
+      case headerElems if headerElems.nonEmpty =>
 
-      val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
+        val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)
 
-      // Handle a single header element
-      def handleHeaderElement(headerElement: Element): Unit = {
+        // Process all nested <header> elements
+        for (headerElem <- headerElems) {
 
-        def getElementValue(name: QName): Option[String] = {
-          val element = headerElement.element(name)
-          if (element eq null)
-            throw new OXFException(s"Missing <${name.qualifiedName}> child element of <header> element")
+          withBinding(headerElem.element, getElementEffectiveId(parentEffectiveId, headerElem), headerElem.scope) { headerElemBindingContext =>
 
-          val scope =
-            xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + element.idOrNull)
+            // Handle a single header element
+            def handleHeaderElement(): Unit = {
 
-          withBinding(element, sourceEffectiveId, scope) { _ =>
-            XFormsElementValue.getElementValue(
-              xblContainer,
-              contextStack,
-              sourceEffectiveId,
-              element,
-              acceptHTML = false,
-              defaultHTML = false,
-              null
-            )
-          }(contextStack)
-        }
+              def getElementValue(name: QName): Option[String] = {
 
-        // Evaluate header name and value
-        val headerNameOpt  = getElementValue(XFormsNames.XFORMS_NAME_QNAME)
-        val headerValueOpt = getElementValue(XFormsNames.XFORMS_VALUE_QNAME)
+                val labelOrValueElem =
+                  findChildElem(headerElem, name) collect { case e: WithExpressionOrConstantTrait => e } getOrElse
+                    (throw new OXFException(s"Missing `<${name.qualifiedName}>` child element of `<xf:header>` element"))
 
-        // Evaluate combine attribute as AVT
-        val combine = {
-          val avtCombine = headerElement.attributeValueOpt("combine") getOrElse DefaultCombineValue
-          val result = XPathCache.evaluateAsAvt(
-            contextStack.getCurrentBindingContext.nodeset,
-            contextStack.getCurrentBindingContext.position,
-            avtCombine,
-            xblContainer.getNamespaceMappings(headerElement),
-            contextStack.getCurrentBindingContext.getInScopeVariables,
-            xblContainer.getContainingDocument.functionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
-            null,
-            headerElement.getData.asInstanceOf[LocationData],
-            xblContainer.getContainingDocument.getRequestStats.getReporter)
+                evaluateExpressionOrConstant(
+                  labelOrValueElem,
+                  parentEffectiveId
+                )
+              }
 
-          if (! AllowedCombineValues(result))
-            throw new OXFException(s"Invalid value '$result' for attribute combine.")
+              // Evaluate header name and value
+              val headerNameOpt  = getElementValue(XFormsNames.XFORMS_NAME_QNAME)
+              val headerValueOpt = getElementValue(XFormsNames.XFORMS_VALUE_QNAME)
 
-          result
-        }
+              // Evaluate combine attribute as AVT
+              val combine = {
+                val avtCombine = headerElem.element.attributeValueOpt("combine") getOrElse DefaultCombineValue
+                val result =
+                  XPathCache.evaluateAsAvt(
+                    contextStack.getCurrentBindingContext.nodeset,
+                    contextStack.getCurrentBindingContext.position,
+                    avtCombine,
+                    headerElem.namespaceMapping,
+                    contextStack.getCurrentBindingContext.getInScopeVariables,
+                    xblContainer.getContainingDocument.functionLibrary,
+                    contextStack.getFunctionContext(parentEffectiveId),
+                    null,
+                    headerElem.locationData,
+                    xblContainer.getContainingDocument.getRequestStats.getReporter
+                  )
 
-        (headerNameOpt, headerValueOpt) match {
-          case (Some(headerName), Some(headerValue)) =>
+                if (! AllowedCombineValues(result))
+                  throw new OXFException(s"Invalid value '$result' for attribute combine.")
 
-            // List of existing values (can be empty)
-            def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
+                result
+              }
 
-            // Append/prepend/replace
-            headerNameValues += headerName -> (combine match {
-              case "append"  => existingHeaderValues :+ headerValue
-              case "prepend" => headerValue +: existingHeaderValues
-              case _         => List(headerValue)
-            })
-          case _ =>
-        }
-      }
+              (headerNameOpt, headerValueOpt) match {
+                case (Some(headerName), Some(headerValue)) =>
 
-      // Process all nested <header> elements
-      for (headerElement <- headerElements.asScala) {
-        val headerScope =
-          xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + headerElement.idOrNull)
+                  // List of existing values (can be empty)
+                  def existingHeaderValues = headerNameValues.getOrElse(headerName, Nil)
 
-        contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
+                  // Append/prepend/replace
+                  headerNameValues += headerName -> (combine match {
+                    case "append"  => existingHeaderValues :+ headerValue
+                    case "prepend" => headerValue +: existingHeaderValues
+                    case _         => List(headerValue)
+                  })
+                case _ =>
+              }
+            }
 
-        if (contextStack.getCurrentBindingContext.newBind) {
-          // There is a binding so a possible iteration
-          for (position <- 1 to contextStack.getCurrentBindingContext.nodeset.size) {
-            withIteration(position) { _ =>
-              handleHeaderElement(headerElement)
-            }(contextStack)
+            if (headerElemBindingContext.newBind) {
+              // There is a binding so a possible iteration
+              for (position <- 1 to headerElemBindingContext.nodeset.size) {
+                withIteration(position) { _ =>
+                  handleHeaderElement()
+                }
+              }
+            } else {
+              // No binding, this is a single header
+              handleHeaderElement()
+            }
           }
-        } else {
-          // No binding, this is a single header
-          handleHeaderElement(headerElement)
         }
-
-        contextStack.popBinding()
-      }
-      headerNameValues.toMap
-    } else
-      initialHeaders
+        headerNameValues.toMap
+      case _ =>
+        initialHeaders
+    }
   }
 
   val DefaultCombineValue = "append"

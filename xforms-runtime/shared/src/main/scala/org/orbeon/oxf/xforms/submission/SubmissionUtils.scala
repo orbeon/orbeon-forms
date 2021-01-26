@@ -165,12 +165,10 @@ object SubmissionUtils {
         clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
 
       SubmissionHeaders.evaluateHeaders(
-        submission.container,
-        submission.model.getContextStack,
         submission.getEffectiveId,
-        submission.staticSubmission.element,
+        submission.staticSubmission,
         headersToForward
-      )
+      )(submission.model.getContextStack)
 
     } catch {
       case e: OXFException =>

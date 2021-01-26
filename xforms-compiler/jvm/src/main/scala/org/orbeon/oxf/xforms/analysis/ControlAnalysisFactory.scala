@@ -87,11 +87,13 @@ object ControlAnalysisFactory {
     // Model
     XFORMS_MODEL_QNAME            -> (new Model(_, _, _, _, _, _, _, _, _)),
     XFORMS_SUBMISSION_QNAME       -> (new Submission(_, _, _, _, _, _, _, _, _)),
+    XFORMS_HEADER_QNAME           -> (new HeaderControl(_, _, _, _, _, _, _, _, _)),
+    XFORMS_NAME_QNAME             -> (NestedNameOrValueControlBuilder(_, _, _, _, _, _, _, _, _)),
     // Itemsets
     XFORMS_CHOICES_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
     XFORMS_ITEM_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
     XFORMS_ITEMSET_QNAME          -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with WithChildrenTrait),
-    XFORMS_VALUE_QNAME            -> (ItemsetValueControlBuilder(_, _, _, _, _, _, _, _, _)),
+    XFORMS_VALUE_QNAME            -> (NestedNameOrValueControlBuilder(_, _, _, _, _, _, _, _, _)),
     XFORMS_COPY_QNAME             -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with RequiredSingleNode),
     // Variable nested value
     XXFORMS_VALUE_QNAME           -> (new ElementAnalysis(_, _, _, _, _, _, _, _, _) with OptionalSingleNode with VariableValueTrait),

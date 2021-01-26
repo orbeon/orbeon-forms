@@ -320,7 +320,7 @@ object ElementAnalysisTreeBuilder {
           }
         case _: Submission =>
           allChildren collect {
-            case (e, s) if isAction(e.getQName) => (e, s)
+            case (e, s) if isAction(e.getQName) || e.getQName == XFORMS_HEADER_QNAME => (e, s)
           }
         case _: VariableAnalysisTrait =>
           allChildren collect {

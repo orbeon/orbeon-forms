@@ -15,9 +15,12 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 object XFormsContextStackSupport {
 
@@ -62,4 +65,29 @@ object XFormsContextStackSupport {
     body(contextStack.getCurrentBindingContext.contextItem) |!>
       (_ => contextStack.popBinding())
   }
+
+  def withContextAndModelOnly[T](
+    bindingElem       : ElementAnalysis,
+    parentEffectiveId : String
+  )(body: BindingContext => T)(implicit contextStack: XFormsContextStack): T = {
+
+    contextStack.pushBinding(
+      ref                            = null,
+      context                        = bindingElem.element.attributeValue(XFormsNames.CONTEXT_QNAME),
+      nodeset                        = null,
+      modelId                        = bindingElem.element.attributeValue(XFormsNames.MODEL_QNAME),
+      bindId                         = null,
+      bindingElement                 = bindingElem.element,
+      bindingElementNamespaceMapping = bindingElem.namespaceMapping,
+      sourceEffectiveId              = getElementEffectiveId(parentEffectiveId, bindingElem),
+      scope                          = bindingElem.scope,
+      handleNonFatal                 = true
+    )
+
+    body(contextStack.getCurrentBindingContext) |!>
+      (_ => contextStack.popBinding())
+  }
+
+  def getElementEffectiveId(parentEffectiveId: String, elem: ElementAnalysis): String =
+    XFormsId.getRelatedEffectiveId(parentEffectiveId, elem.element.idOrNull)
 }

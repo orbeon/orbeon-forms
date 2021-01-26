@@ -934,7 +934,7 @@ object VariableAnalysisBuilder {
       )
   }
 }
-object ItemsetValueControlBuilder {
+object NestedNameOrValueControlBuilder {
 
   def apply(
     index             : Int,
@@ -946,7 +946,7 @@ object ItemsetValueControlBuilder {
     namespaceMapping  : NamespaceMapping,
     scope             : Scope,
     containerScope    : Scope
-  ): ItemsetValueControl = {
+  ): NestedNameOrValueControl = {
 
     val (expressionOrConstant, _) =
       XFormsStaticElementValue.getElementExpressionOrConstant(
@@ -955,7 +955,7 @@ object ItemsetValueControlBuilder {
         acceptHTML      = false
       )
 
-    new ItemsetValueControl(
+    new NestedNameOrValueControl(
       index,
       element,
       parent,

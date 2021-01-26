@@ -40,7 +40,8 @@ class LHHAAnalysis(
 ) extends ElementAnalysis(index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
    with ViewTrait
-   with AppearanceTrait {
+   with AppearanceTrait
+   with WithExpressionOrConstantTrait {
 
   self =>
 

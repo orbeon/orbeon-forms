@@ -12,6 +12,10 @@ trait VariableTrait {
   def variableAnalysis: Option[XPathAnalysis]
 }
 
+trait WithExpressionOrConstantTrait extends ElementAnalysis {
+  val expressionOrConstant: Either[String, String]
+}
+
 /**
  * Trait representing a variable element, whether in the model or in the view.
  */

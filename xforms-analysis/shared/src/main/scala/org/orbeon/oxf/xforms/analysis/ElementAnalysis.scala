@@ -372,4 +372,10 @@ object ElementAnalysis {
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
     attSet(element, qName) flatMap (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
+
+  def findChildElem(elem: ElementAnalysis, name: QName): Option[ElementAnalysis] =
+    elem match {
+      case wct: WithChildrenTrait => wct.children collectFirst { case c if c.element.getQName == name => c }
+      case _                      => None
+    }
 }

@@ -582,7 +582,11 @@
                     .[
                         not(fr:is-readonly-mode())       and
                         count($available-languages) gt 1 and
-                        xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
+                        empty(
+                            xxf:get-request-header('orbeon-liferay-language')[
+                                xxf:non-blank()
+                            ]
+                        )
                     ]">
                 <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select">
                     <xf:itemset ref="$available-languages">

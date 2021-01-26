@@ -10,6 +10,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{Base64, Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
@@ -21,6 +22,7 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
+import shapeless.syntax.typeable.typeableOps
 
 import java.net.URI
 import scala.collection.mutable
@@ -96,6 +98,24 @@ object XFormsStaticStateSerializer {
 
   def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
 
+    val namePool = StaticXPath.GlobalNamePool
+
+    def splitAnalysisPath(path: String): List[QName] =
+      path match {
+        case "" => Nil
+        case s =>
+          s.splitTo[List]("/") map { e =>
+            val isAtt = e.startsWith("@")
+            val code = (if (isAtt) e.substring(1) else e).toInt
+
+            val localName = namePool.getLocalName(code)
+            val uri       = namePool.getURI(code)
+
+            //namePool.getUnprefixedQName() // Saxon 10
+            QName(localName, "", uri)
+          }
+        }
+
     // We serialize the namespace mappings only once to save space. To give an idea, a basic Form Runner
     // form has 34 distinct namespace mappings. We should be able to reduce that by being more consistent
     // in how we declare namespaces in various files.
@@ -150,20 +170,39 @@ object XFormsStaticStateSerializer {
 
       val distinct = mutable.LinkedHashSet[QName]()
 
+      def updateDistinctCommon(e: ElementAnalysis) = {
+
+        distinct += e.element.getQName
+
+        // XPath analysis QNames
+        for {
+          analysisOpt <- List(e.bindingAnalysis, e.valueAnalysis) ::: (e.narrowTo[SelectionControlTrait].toList map (_.itemsetAnalysis))
+          analysis    <- analysisOpt
+          mapSet      <- List(analysis.valueDependentPaths, analysis.returnablePaths)
+          pathSet     <- mapSet.map.values
+          path        <- pathSet
+        } locally {
+          splitAnalysisPath(path) foreach { qName =>
+            distinct += qName
+          }
+        }
+
+        distinct += e.element.getQName
+      }
+
       staticState.topLevelPart.iterateControls foreach {
         case e: ComponentControl =>
-          distinct += e.element.getQName
+          updateDistinctCommon(e)
           e.commonBinding.directName foreach (distinct +=)
         case e: Instance =>
-          distinct += e.element.getQName
-
+          updateDistinctCommon(e)
           // All inline instance element QNames
           // TODO: Consider serializing instance as plain XML?
           e.inlineRootElemOpt.iterator flatMap (_.descendantElementIterator(includeSelf = true)) foreach { e =>
             distinct += e.getQName
           }
         case e =>
-          distinct += e.element.getQName
+          updateDistinctCommon(e)
       }
 
       CoreCrossPlatformSupport.properties.propertyParams foreach { c =>
@@ -172,6 +211,14 @@ object XFormsStaticStateSerializer {
 
       (distinct, distinct.zipWithIndex.toMap)
     }
+
+    def convertMapSet(m: MapSet[String, String]) =
+      m.map.mapValues { set =>
+        set map {
+          case "" => ""
+          case s  => splitAnalysisPath(s) map collectedQNamesWithPositions mkString "/"
+        }
+      }
 
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
       "parentRef" -> a.parent.map(_.scopeId).asJson,
@@ -362,7 +409,8 @@ object XFormsStaticStateSerializer {
           List(
             "staticItemset"    -> c.staticItemset.asJson,
             "useCopy"          -> Json.fromBoolean(c.useCopy),
-            "mustEncodeValues" -> c.mustEncodeValues.asJson
+            "mustEncodeValues" -> c.mustEncodeValues.asJson,
+            "itemsetAnalysis"  -> c.itemsetAnalysis.asJson
           )
 
         case c: UploadControl          => Nil
@@ -417,7 +465,7 @@ object XFormsStaticStateSerializer {
       }
 
     implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>
-      a.map.asJson
+      convertMapSet(a).asJson
 
     implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) =>
       Json.obj(

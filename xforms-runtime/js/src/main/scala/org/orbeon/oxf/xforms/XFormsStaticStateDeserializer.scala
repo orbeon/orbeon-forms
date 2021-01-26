@@ -11,6 +11,7 @@ import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
@@ -22,19 +23,16 @@ import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.jaxp.SaxonTransformerFactory
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
-import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable.typeableOps
 
 import java.{util => ju}
 import scala.collection.mutable
-import scala.jdk.CollectionConverters._
 
 
 object XFormsStaticStateDeserializer {
@@ -332,11 +330,27 @@ object XFormsStaticStateDeserializer {
       }
 
     implicit val decodeMapSet: Decoder[MapSet[String, String]] = (c: HCursor) => {
+
+      def splitPath(path: String): List[Int] =
+        path match {
+          case "" => Nil
+          case s  =>
+            s.splitTo[List]("/") map { e =>
+              val isAtt = e.startsWith("@")
+              val code = (if (isAtt) e.substring(1) else e).toInt
+
+              code
+            }
+          }
+
+      def convertPaths(path: String) =
+        splitPath(path) map collectedQNames mkString "/"
+
       for {
         map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[String]]]
       } yield {
         val ms = new MapSet[String, String]
-        ms.map ++= map
+        ms.map ++= map.mapValues(_ map convertPaths)
         ms
       }
     }
@@ -599,12 +613,13 @@ object XFormsStaticStateDeserializer {
                   staticItemset    <- c.get[Option[Itemset]]("staticItemset")
                   useCopy          <- c.get[Boolean]("useCopy")
                   mustEncodeValues <- c.get[Option[Boolean]]("mustEncodeValues")
+                  itemsetAnalysis  <- c.get[Option[XPathAnalysis]]("itemsetAnalysis")
                 } yield
                   new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     staticItemset,
                     useCopy,
                     mustEncodeValues
-                  )
+                  ) |!> (_.itemsetAnalysis = itemsetAnalysis)
 
               select.right.get // XXX TODO
 
@@ -993,7 +1008,7 @@ object XFormsStaticStateImpl {
       // export dynamicProperties._
       def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
-      def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis && false // XXX TODO: disable for now until we serialize/desirialize analysis
+      def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis
       def isCalculateDependencies             : Boolean          = staticProperties.isCalculateDependencies
       def isInlineResources                   : Boolean          = staticProperties.isInlineResources
       def uploadMaxSize                       : MaximumSize      = staticProperties.uploadMaxSize

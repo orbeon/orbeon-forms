@@ -25,9 +25,9 @@ import org.orbeon.saxon.expr.sort.{CodepointCollator, GenericAtomicComparer}
 import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression}
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.ma.arrays.ImmutableArrayItem
-import org.orbeon.saxon.ma.map.{DictionaryMap, HashTrieMap}
+import org.orbeon.saxon.ma.map.HashTrieMap
 import org.orbeon.saxon.ma.parray.ImmList
-import org.orbeon.saxon.model.{AtomicType, BuiltInAtomicType, BuiltInType, Converter, Type}
+import org.orbeon.saxon.model.{AtomicType, BuiltInType, Converter, Type}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
@@ -381,18 +381,28 @@ object SaxonUtils {
 
     // Fingerprint representation of the element and attribute nodes
     val pathElements =
-      if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
+      if (ancestorOrSelf.size > 1) { // first is the root element, which we skip as that corresponds to instance('...')
+
+        val namePool = node.getConfiguration.getNamePool
+
         ancestorOrSelf.tail map { node =>
-          // 2020-12-25: TODO: Fix case where there is no fingerprint.
-          // For example `foo:bar` could match two different
-          // nodes depending on namespace mappings. It's unlikely to happen but it can happen. Should we use an
-          // EQName instead? The benefit of using fingerprints was that the resulting path was quite short.
-          node.getNodeKind match {
-            case ELEMENT_NODE   => if (node.hasFingerprint) node.getFingerprint else node.getDisplayName
-            case ATTRIBUTE_NODE => "@" + (if (node.hasFingerprint) node.getFingerprint else node.getDisplayName)
-          }
+
+          val codePrefix =
+            node.getNodeKind match {
+              case ELEMENT_NODE   => ""
+              case ATTRIBUTE_NODE => "@"
+            }
+
+          // NOTE: Our `NodeWrapper` no longer supports fingerprints, so we must support them here,
+          // unless we find a better path encoding.
+          codePrefix + (
+            if (node.hasFingerprint)
+              node.getFingerprint
+            else
+              namePool.allocateFingerprint(node.getURI, node.getLocalPart)
+            )
         }
-      else
+      } else
         Nil
 
     pathElements mkString "/"

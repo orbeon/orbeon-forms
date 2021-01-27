@@ -1,11 +1,11 @@
 package org.orbeon.xforms.offline.demo
 
-import org.log4s.Info
-import org.log4s.log4sjs.LevelThreshold
+import org.log4s.{Info, Logger}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
@@ -30,6 +30,9 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("OrbeonOffline")
 object OfflineDemo extends App {
+
+  val logger: Logger = LoggerFactory.createLogger("org.orbeon.offline")
+  implicit val indentedLogger = new IndentedLogger(logger, true)
 
   type CompiledForm = String
   type RuntimeForm  = String
@@ -95,14 +98,18 @@ object OfflineDemo extends App {
     uriResolver     : Option[XFormsURIResolver]
   ): RuntimeForm = {
 
-    implicit val logger: IndentedLogger = Loggers.getIndentedLogger("offline")
-
     destroyForm(container)
 
     val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState = XFormsStaticStateDeserializer.deserialize(compiledForm, functionLibrary)
+    val staticState =
+      withDebug("form deserialization", time = true) {
+        XFormsStaticStateDeserializer.deserialize(compiledForm, functionLibrary)
+      }
 
-    val containingDocument = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
+    val containingDocument =
+      withDebug("new XFormsContainingDocument", time = true) {
+        new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
+      }
 
     val req =
       RequestInformation(
@@ -121,8 +128,10 @@ object OfflineDemo extends App {
 
     CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
 
-      containingDocument.setRequestInformation(req)
-      containingDocument.initialize(uriResolver, response = None)
+      withDebug("XFormsContainingDocument.initialize", time = true) {
+        containingDocument.setRequestInformation(req)
+        containingDocument.initialize(uriResolver, response = None)
+      }
 
       // See also `XFormsToXHTML.outputResponseDocument`
       XFormsAPI.withContainingDocument(containingDocument) {
@@ -157,7 +166,9 @@ object OfflineDemo extends App {
             case "xhtml" =>
 
               val rcv = new DomDocumentFragmentXMLReceiver
-              XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+              withDebug("generate markup", time = true) {
+                XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+              }
 
               // Find CSS/JS to load
               // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to

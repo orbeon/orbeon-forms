@@ -1,72 +1,27 @@
 package org.orbeon.fr.offline
 
-import org.log4s.Info
-import org.log4s.log4sjs.LevelThreshold
+import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
-import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod, StatusCode}
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
-import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
+import org.orbeon.xforms.embedding.SubmissionProvider
 import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
 import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
 import org.orbeon.xforms.{App, XFormsApp}
-import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.typedarray.Uint8Array
 
-
-object DemoSubmissionProvider extends SubmissionProvider {
-
-  private var store = Map[String, (Option[String], Uint8Array)]()
-
-  def submit(req: SubmissionRequest): SubmissionResponse = {
-
-    HttpMethod.withNameInsensitive(req.method) match {
-      case HttpMethod.GET =>
-        // TODO: check pathname is persistence path
-        store.get(req.url.pathname) match {
-          case Some((responseContentTypeOpt, responseBody)) =>
-            new SubmissionResponse {
-              val statusCode = StatusCode.Ok
-              val headers    = new FetchHeaders(responseContentTypeOpt.toArray.toJSArray.map(x => js.Array(Headers.ContentType, x)))
-              val body       = responseBody
-            }
-          case None =>
-            new SubmissionResponse {
-              val statusCode = StatusCode.NotFound
-              val headers    = new FetchHeaders
-              val body       = new Uint8Array(0)
-            }
-        }
-      case HttpMethod.PUT =>
-
-        // TODO: check pathname is persistence path
-        val existing = store.contains(req.url.pathname)
-        store += req.url.pathname -> (req.headers.get(Headers.ContentType).toOption -> req.body.getOrElse(throw new IllegalArgumentException))
-
-        new SubmissionResponse {
-          val statusCode = if (existing) StatusCode.Ok else StatusCode.Created
-          val headers    = new FetchHeaders
-          val body       = new Uint8Array(0)
-        }
-      case _ => ???
-    }
-  }
-
-  def submitAsync(req: SubmissionRequest): js.Promise[SubmissionResponse] = ???
-}
 
 trait FormRunnerProcessor {
 
@@ -106,7 +61,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
     // Initialize logging
     import org.log4s.log4sjs.Log4sConfig._
-    setLoggerThreshold("", LevelThreshold(Info))
+    setLoggerThreshold("", Info)
+    setLoggerThreshold("org.orbeon.oxf.xforms.processor.XFormsServer", Debug)
+    setLoggerThreshold("org.orbeon.offline", Debug)
   }
 
   def onPageContainsFormsMarkup(): Unit = {

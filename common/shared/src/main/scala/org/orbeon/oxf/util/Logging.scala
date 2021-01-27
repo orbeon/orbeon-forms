@@ -43,16 +43,22 @@ trait Logging {
       logger.log(logLevel, "", message, flattenTuples(parameters): _*)
 
   // Debug block with optional parameters
-  def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T =
+  def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil, time: Boolean = false)(body: => T)(implicit logger: IndentedLogger): T = {
+    val startTime = if (time) System.currentTimeMillis else 0
     try {
       if (logger.debugEnabled)
         logger.startHandleOperation("", message, flattenTuples(parameters): _*)
 
       body
     } finally {
-      if (logger.debugEnabled)
+      if (logger.debugEnabled) {
+        if (time)
+          logger.setDebugResults("time (ms)", (System.currentTimeMillis - startTime).toString) // TODO: will override existing parameters
+
         logger.endHandleOperation()
+      }
     }
+  }
 
   // Run the given block only in debug mode
   def ifDebug[T](body: => T)(implicit logger: IndentedLogger): Unit =

@@ -409,6 +409,11 @@
     <!-- Add Form Runner models and scripts before the main model -->
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]">
 
+        <xsl:variable
+                name="copy-custom-model"
+                select="$is-detail and normalize-space($custom-model)"
+                as="xs:boolean"/>
+
         <!-- Model receiving input parameters -->
         <xf:model
             id="fr-parameters-model"
@@ -466,7 +471,15 @@
                 :)
                 starts-with(xxf:get-request-path(), '/fr/service/')
             }}"
-            xxf:external-events="{@xxf:external-events}"
+            xxf:external-events="{
+                string-join(
+                    (
+                        @xxf:external-events,
+                        if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else ()
+                    ),
+                    ' '
+                )
+            }"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xbl-support="org.orbeon.oxf.fr.xbl.FormRunnerXblSupport"
             xxf:xforms11-switch="false"
@@ -700,7 +713,7 @@
             <xf:bind ref="instance('fr-form-instance')" readonly="fr:is-readonly-mode()"/>
 
             <!-- Custom XForms model content to include -->
-            <xsl:if test="$is-detail and normalize-space($custom-model)">
+            <xsl:if test="$copy-custom-model">
                 <xsl:copy-of select="doc($custom-model)/*/node()"/>
             </xsl:if>
 

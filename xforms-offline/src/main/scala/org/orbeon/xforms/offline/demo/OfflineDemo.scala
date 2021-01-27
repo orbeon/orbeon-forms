@@ -31,7 +31,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonOffline")
 object OfflineDemo extends App {
 
-  val logger: Logger = LoggerFactory.createLogger("org.orbeon.offline")
+  val logger: Logger = LoggerFactory.createLogger("org.orbeon.offline.OfflineDemo")
   implicit val indentedLogger = new IndentedLogger(logger, true)
 
   type CompiledForm = String
@@ -46,7 +46,7 @@ object OfflineDemo extends App {
 
     // Initialize logging
     import org.log4s.log4sjs.Log4sConfig._
-    setLoggerThreshold("", LevelThreshold(Info))
+//    setLoggerThreshold("", LevelThreshold(Info))
   }
 
   def onPageContainsFormsMarkup(): Unit =
@@ -102,12 +102,12 @@ object OfflineDemo extends App {
 
     val uuid = CoreCrossPlatformSupport.randomHexId
     val staticState =
-      withDebug("form deserialization", time = true) {
+      withDebug("form deserialization") {
         XFormsStaticStateDeserializer.deserialize(compiledForm, functionLibrary)
       }
 
     val containingDocument =
-      withDebug("new XFormsContainingDocument", time = true) {
+      withDebug("new XFormsContainingDocument") {
         new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
       }
 
@@ -128,7 +128,7 @@ object OfflineDemo extends App {
 
     CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
 
-      withDebug("XFormsContainingDocument.initialize", time = true) {
+      withDebug("XFormsContainingDocument.initialize") {
         containingDocument.setRequestInformation(req)
         containingDocument.initialize(uriResolver, response = None)
       }
@@ -166,7 +166,7 @@ object OfflineDemo extends App {
             case "xhtml" =>
 
               val rcv = new DomDocumentFragmentXMLReceiver
-              withDebug("generate markup", time = true) {
+              withDebug("generate markup") {
                 XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
               }
 

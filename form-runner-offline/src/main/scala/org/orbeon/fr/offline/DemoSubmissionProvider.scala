@@ -1,7 +1,10 @@
 package org.orbeon.fr.offline
 
+import org.log4s.Logger
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
+import org.orbeon.xforms.offline.demo.OfflineDemo
 import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 
 import scala.scalajs.js
@@ -18,18 +21,34 @@ class TextDecoder extends js.Object {
 
 object DemoSubmissionProvider extends SubmissionProvider {
 
+//  val logger: Logger = LoggerFactory.createLogger("org.orbeon.offline.DemoSubmissionProvider")
+//  val logger: Logger = LoggerFactory.createLogger("org")
+//  implicit val indentedLogger = new IndentedLogger(logger, true)
+
+  import OfflineDemo._
+  import org.orbeon.oxf.util.Logging._
+
   private var store = Map[String, (Option[String], Uint8Array)]()
 
   def submit(req: SubmissionRequest): SubmissionResponse = {
 
-    val x = req.headers.iterator map { array =>
-      val name = array(0)
-      val value = array(1)
+    def headersAsString =
+      req.headers.iterator map { array =>
+        val name = array(0)
+        val value = array(1)
 
-      s"$name=$value"
-    } mkString "&"
+        s"$name=$value"
+      } mkString "&"
 
-    println(s"xxxx DemoSubmissionProvider: ${req.method}, ${req.url.pathname}, ${req.body.map(_.length)}, ${x}")
+    debug(
+      s"handling submission",
+      List(
+        "method"      -> req.method,
+        "path"        -> req.url.pathname,
+        "body length" -> req.body.map(_.length.toString).orNull,
+        "headers"     -> headersAsString
+      )
+    )
 
     HttpMethod.withNameInsensitive(req.method) match {
       case HttpMethod.GET =>
@@ -51,16 +70,14 @@ object DemoSubmissionProvider extends SubmissionProvider {
         }
       case HttpMethod.PUT =>
 
-        if (req.headers.get(Headers.ContentType).exists(_.contains("xml"))) {
-          val x = new TextDecoder().decode(req.body.get)
-          println(s"xxxxx PUT body string: `$x`")
+        if (logger.isDebugEnabled && req.headers.get(Headers.ContentType).exists(_.contains("xml"))) {
+          val body = new TextDecoder().decode(req.body.get)
+          debug(s"PUT body", List("body" -> body))
         }
 
         // TODO: check pathname is persistence path
         val existing = store.contains(req.url.pathname)
         store += req.url.pathname -> (req.headers.get(Headers.ContentType).toOption -> req.body.getOrElse(throw new IllegalArgumentException))
-
-        println(s"xxxxx DemoSubmissionProvider: ${req.method}, ${req.url.pathname}, $existing, ${req.body.get.length}")
 
         new SubmissionResponse {
           val statusCode = if (existing) StatusCode.Ok else StatusCode.Created

@@ -45,6 +45,8 @@ object XFormsStaticStateDeserializer {
 
     require(functionLibrary ne null)
 
+    val namePool = StaticXPath.GlobalNamePool
+
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedQNames         = IndexedSeq[QName]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
@@ -331,7 +333,7 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeMapSet: Decoder[MapSet[String, String]] = (c: HCursor) => {
 
-      def splitPath(path: String): List[Int] =
+      def splitAnalysisPath(path: String): List[Int] =
         path match {
           case "" => Nil
           case s  =>
@@ -339,12 +341,13 @@ object XFormsStaticStateDeserializer {
               val isAtt = e.startsWith("@")
               val code = (if (isAtt) e.substring(1) else e).toInt
 
-              code
+              val qName = collectedQNames(code)
+              namePool.allocateFingerprint(qName.namespace.uri, qName.localName)
             }
           }
 
       def convertPaths(path: String) =
-        splitPath(path) map collectedQNames mkString "/"
+        splitAnalysisPath(path) mkString "/"
 
       for {
         map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[String]]]

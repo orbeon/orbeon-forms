@@ -22,10 +22,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary"
     xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
     <xbl:binding

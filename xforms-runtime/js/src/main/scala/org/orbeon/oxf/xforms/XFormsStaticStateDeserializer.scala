@@ -445,10 +445,6 @@ object XFormsStaticStateDeserializer {
                     collectedModelOrderings += prefixedId -> (recalculateOrder map (_.toList), defaultValueOrder map (_.toList))
                   }
 
-                  recalculateOrder foreach { r =>
-                    println(s"xxxx recalculateOrder $r")
-                  }
-
                   model
                 }
 

@@ -211,7 +211,7 @@ object InstanceMirror {
 
                 evalOne(innerInstance.documentInfo, innerPath) match {
                   case newNode: VirtualNodeType => Match(innerInstance, newNode)
-                  case _                    => throw new IllegalStateException
+                  case _                        => throw new IllegalStateException
                 }
               case _ =>
                 // May not be found if instance was just created or if the instance is readonly
@@ -255,7 +255,7 @@ object InstanceMirror {
         case instanceWrapper: VirtualNodeType if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
           // Outer xf:instance found
           innerNode match {
-            case _: DocumentNodeInfoType =>
+            case doc: om.NodeInfo if doc.isDocument =>
               // Root element replaced
               Match(outerInstance, instanceWrapper) ensuring siblingIndexOpt.isEmpty
             case _ =>

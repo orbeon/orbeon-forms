@@ -10,7 +10,8 @@ object XFormsFunctionLibrary
   extends OrbeonFunctionLibrary
     with IndependentRequestFunctions
     with XFormsEnvFunctions
-    with XFormsXXFormsEnvFunctions {
+    with XFormsXXFormsEnvFunctions
+    with CryptoFunctions {
 
   lazy val namespaces = List(
     Namespaces.XF        -> XFormsNames.XFORMS_SHORT_PREFIX,

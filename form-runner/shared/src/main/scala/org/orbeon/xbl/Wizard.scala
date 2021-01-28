@@ -23,15 +23,15 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsSwitchControl, XFormsVariab
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.MapFunctions
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator, ValueRepresentation}
-import org.orbeon.saxon.value.{AtomicValue, Value}
+import org.orbeon.saxon.om
+import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants
 import shapeless.syntax.typeable._
-
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
+
 import scala.collection.compat._
 
 object Wizard {
@@ -100,10 +100,10 @@ object Wizard {
       FormRunner.controlNameFromIdOpt
 
   //@XPathFunction
-  def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): SequenceIterator =
+  def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Array[String]): om.SequenceIterator =
     gatherTopLevelSectionStatus(relevantTopLevelSectionIds.to(List)) map { sectionStatus =>
-      MapFunctions.createValue(
-        Map[AtomicValue, ValueRepresentation](
+      SaxonUtils.newMapItem(
+        Map[AtomicValue, ValueRepresentationType](
           (SaxonUtils.fixStringValue("name")                         , sectionStatus.name),
           (SaxonUtils.fixStringValue("is-visited")                   , sectionStatus.isVisited),
           (SaxonUtils.fixStringValue("has-incomplete-fields")        , sectionStatus.hasIncompleteFields),
@@ -115,8 +115,15 @@ object Wizard {
       )
     }
 
+  // `export`
+  def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] =
+    Private.gatherTopLevelSectionStatus(relevantTopLevelSectionIds)
+
   //@XPathFunction
-  def caseIdsForTopLevelSection(topLevelSectionId: String): SequenceIterator =
+  def caseIdsForTopLevelSection(topLevelSectionId: String): om.SequenceIterator =
+  caseIdsForTopLevelSectionAsList(topLevelSectionId)
+
+  def caseIdsForTopLevelSectionAsList(topLevelSectionId: String): List[String] =
     for {
       control               <- inScopeContainingDocument.resolveObjectByIdInScope(Constants.DocumentId, s"$topLevelSectionId-switch", None).toList
       switchControl         <- control.narrowTo[XFormsSwitchControl].toList
@@ -124,17 +131,17 @@ object Wizard {
     } yield
       subsectionCaseControl.getId
 
-  private object Private {
+  case class SectionStatus(
+    name                       : String,
+    isVisited                  : Boolean,
+    hasIncompleteFields        : Boolean,
+    hasErrorFields             : Boolean,
+    hasVisibleIncompleteFields : Boolean,
+    hasVisibleErrorFields      : Boolean,
+    isAccessible               : Boolean
+  )
 
-    case class SectionStatus(
-      name                       : String,
-      isVisited                  : Boolean,
-      hasIncompleteFields        : Boolean,
-      hasErrorFields             : Boolean,
-      hasVisibleIncompleteFields : Boolean,
-      hasVisibleErrorFields      : Boolean,
-      isAccessible               : Boolean
-    )
+  private object Private {
 
     def findWizardContainer: Option[XBLContainer] =
       XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component") flatMap (_.nestedContainerOpt)
@@ -146,19 +153,19 @@ object Wizard {
       } yield
         model
 
-    def findWizardState: Option[NodeInfo] =
+    def findWizardState: Option[om.NodeInfo] =
       for {
         model     <- findWizardModel
         instance  <- model.defaultInstanceOpt
       } yield
         instance.rootElement
 
-    def findWizardVariableValue(staticOrAbsoluteId: String): Option[ValueRepresentation] =
+    def findWizardVariableValue(staticOrAbsoluteId: String): Option[ValueRepresentationType] =
       XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
 
-    def booleanValue(value: ValueRepresentation) = value match {
-      case v: Value    => v.effectiveBooleanValue
-      case _           => false
+    def booleanValue(value: ValueRepresentationType) = value match {
+      case v: AtomicValue => SaxonUtils.effectiveBooleanValue(v.iterate)
+      case _              => false
     }
 
     def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
@@ -215,5 +222,4 @@ object Wizard {
       sectionStatusesWithDummyHead.flatten
     }
   }
-
 }

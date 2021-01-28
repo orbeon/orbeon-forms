@@ -3,10 +3,11 @@ package org.orbeon.oxf.fr.library
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.om
-import org.orbeon.xbl.{DateSupportJava, NumberSupportJava}
+import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.xbl.{DateSupportJava, NumberSupportJava, Wizard}
 
 import scala.jdk.CollectionConverters._
 
@@ -14,6 +15,14 @@ import scala.jdk.CollectionConverters._
 object FormRunnerInternalFunctionLibrary extends OrbeonFunctionLibrary {
 
   lazy val namespaces = List("java:org.orbeon.oxf.fr.FormRunner" -> "frf")
+
+  @XPathFunction(name = "controlNameFromIdOpt")
+  def controlNameFromIdOpt(controlOrBindId: String): Option[String] =
+    FormRunner.controlNameFromIdOpt(controlOrBindId)
+
+  @XPathFunction(name = "bindId")
+  def bindId(controlName: String): String =
+    FormRunner.bindId(controlName)
 
   @XPathFunction(name = "sendError")
   def sendError(status: Int): Unit = {
@@ -307,4 +316,44 @@ object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction(name = "isZeroValidationFractionDigitsJava")
   def isZeroValidationFractionDigitsJava(binding: om.Item): Boolean =
     NumberSupportJava.isZeroValidationFractionDigitsJava(binding)
+}
+
+object FormRunnerWizardFunctionLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.xbl.Wizard" -> "Wizard")
+
+  @XPathFunction(name = "normalizeWizardMode")
+  def normalizeWizardMode(mode: String): String =
+    Wizard.normalizeWizardMode(mode)
+
+  @XPathFunction(name = "isWizardSeparateToc")
+  def isWizardSeparateToc: Boolean =
+    Wizard.isWizardSeparateToc
+
+  @XPathFunction(name = "sectionIdFromCaseIdOpt")
+  def sectionIdFromCaseIdOpt(id: String): Option[String] =
+    Wizard.sectionIdFromCaseIdOpt(id)
+
+  @XPathFunction(name = "gatherTopLevelSectionStatusJava")
+  def gatherTopLevelSectionStatusJava(relevantTopLevelSectionIds: Iterable[String]): Iterable[om.Item] = // TODO: should be `map()`.
+    Wizard.gatherTopLevelSectionStatus(relevantTopLevelSectionIds.toList) map { sectionStatus =>
+
+      import org.orbeon.scaxon.Implicits._
+
+      SaxonUtils.newMapItem(
+        Map[AtomicValue, ValueRepresentationType](
+          (SaxonUtils.fixStringValue("name")                         , sectionStatus.name),
+          (SaxonUtils.fixStringValue("is-visited")                   , sectionStatus.isVisited),
+          (SaxonUtils.fixStringValue("has-incomplete-fields")        , sectionStatus.hasIncompleteFields),
+          (SaxonUtils.fixStringValue("has-error-fields")             , sectionStatus.hasErrorFields),
+          (SaxonUtils.fixStringValue("has-visible-incomplete-fields"), sectionStatus.hasVisibleIncompleteFields),
+          (SaxonUtils.fixStringValue("has-visible-error-fields")     , sectionStatus.hasVisibleErrorFields),
+          (SaxonUtils.fixStringValue("is-available")                 , sectionStatus.isAccessible)
+        )
+      )
+    }
+
+  @XPathFunction(name = "caseIdsForTopLevelSection")
+  def caseIdsForTopLevelSection(topLevelSectionId: String): Iterable[String] =
+    Wizard.caseIdsForTopLevelSectionAsList(topLevelSectionId)
 }

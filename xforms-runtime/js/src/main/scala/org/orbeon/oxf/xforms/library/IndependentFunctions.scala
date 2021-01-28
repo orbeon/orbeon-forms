@@ -29,10 +29,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 //
-//    Fun("random", classOf[Random], op = 0, min = 0, NUMERIC, EXACTLY_ONE,
-//      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
-//    )
-//
 //    // TODO: Split this out into separate trait
 //    Fun("get-portlet-mode", classOf[GetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
 //

@@ -3,7 +3,7 @@ package org.orbeon.oxf.xml
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Chain, SequenceTool}
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, EmptySequence, Int64Value, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DoubleValue, EmptySequence, Int64Value, StringValue}
 import org.orbeon.scaxon.Implicits
 
 import java.time.Instant
@@ -43,6 +43,12 @@ object FunctionSupport2 {
     s.iterate().next() match {
       case v: Int64Value => v.longValue
       case _             => throw new IllegalArgumentException
+    }
+
+  implicit val DoubleDecode: Decode[Double] = (s: om.Sequence) =>
+    s.iterate().next() match {
+      case v: DoubleValue => v.getDoubleValue
+      case _              => throw new IllegalArgumentException
     }
 
   implicit val StringDecode: Decode[String] = (s: om.Sequence) =>
@@ -96,6 +102,7 @@ object FunctionSupport2 {
   implicit val UnitEncode        : Encode[Unit]        = (_: Unit)        => EmptySequence
   implicit val IntEncode         : Encode[Int]         = (v: Int)         => om.One.integer(v.toLong)
   implicit val LongEncode        : Encode[Long]        = (v: Long)        => om.One.integer(v)
+  implicit val DoubleEncode      : Encode[Double]      = (v: Double)      => om.One.dbl(v)
   implicit val StringEncode      : Encode[String]      = (v: String)      => om.One.string(v)
   implicit val BooleanEncode     : Encode[Boolean]     = (v: Boolean)     => om.One.bool(v)
   implicit val ItemEncode        : Encode[om.Item]     = (v: om.Item)     => new om.One(v)

@@ -32,6 +32,7 @@ import scala.reflect.macros.whitebox
 //
 // - `Int`
 // - `Long`
+// - `Double`
 // - `String`
 // - `Boolean`
 // - `Item`

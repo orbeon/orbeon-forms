@@ -137,21 +137,24 @@ class XFormsActionInterpreter(
 
     var whileIteration = 1
 
-    val actionBreaks = new Breaks
-    import actionBreaks._
+    // ORBEON: Optimize loop with `while` as the non-local return showed in the JavaScript profiler.
+    var exitLoop = false
+    while (! exitLoop) {
 
-    tryBreakable {
-      while (true) {
+      def conditionRequiresExitLoop(conditionOpt: Option[String], name: String): Boolean =
+        conditionOpt match {
+          case Some(condition) =>
+            ! evaluateCondition(actionAnalysis, actionQName.qualifiedName, condition, name, contextItem)
+          case None =>
+            false
+        }
 
-        def conditionOrBreak(conditionOpt: Option[String], name: String): Unit =
-          conditionOpt foreach { condition =>
-            if (! evaluateCondition(actionAnalysis, actionQName.qualifiedName, condition, name, contextItem))
-              break()
-          }
-
-        conditionOrBreak(ifConditionAttribute,    "if")
-        conditionOrBreak(whileIterationAttribute, "while")
-
+      if (
+        conditionRequiresExitLoop(ifConditionAttribute,    "if") ||
+        conditionRequiresExitLoop(whileIterationAttribute, "while")
+      ) {
+        exitLoop = true
+      } else {
         // We are executing the action
         withDebug(
           "executing",
@@ -183,12 +186,10 @@ class XFormsActionInterpreter(
 
         // Stop if there is no iteration
         if (whileIterationAttribute.isEmpty)
-          break()
-
-        whileIteration += 1
+          exitLoop = true
+        else
+          whileIteration += 1
       }
-    } catchBreak {
-
     }
   }
 

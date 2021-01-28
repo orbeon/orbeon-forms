@@ -14,7 +14,6 @@
 package org.orbeon.saxon.function
 
 
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, RuntimeDependentFunction}
@@ -23,6 +22,7 @@ import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 import scala.collection.compat._
+
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =

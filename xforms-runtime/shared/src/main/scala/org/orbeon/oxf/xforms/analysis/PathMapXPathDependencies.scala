@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -38,7 +38,7 @@ class PathMapXPathDependencies(
 
   import PathMapXPathDependencies._
 
-  private implicit val logger = containingDocument.getIndentedLogger("dependencies")
+  private implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("dependencies")
 
   // Represent the state of changes to a model
   private class ModelState(val modelKey: ModelOrInstanceKey, val model: XFormsModel) {
@@ -139,7 +139,7 @@ class PathMapXPathDependencies(
     // Return an empty changeset, trying to point to the empty right changeset if possible
     // This is so that we can try to avoid adding changes to both changesets later
     private def clearChangeset(left: MapSet[ModelOrInstanceKey, String], right: MapSet[ModelOrInstanceKey, String]) =
-      if (right isEmpty)
+      if (right.isEmpty)
         right
       else if (left ne right) {
         left.clear()
@@ -147,9 +147,9 @@ class PathMapXPathDependencies(
       } else
         new MapSet[ModelOrInstanceKey, String]
 
-    def refreshDone() = ()
+    def refreshDone(): Unit = ()
 
-    def isMIPInitiallyDirty(mip: StaticBind.MIP) =
+    def isMIPInitiallyDirty(mip: StaticBind.MIP): Boolean =
       mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
   }
 
@@ -158,7 +158,7 @@ class PathMapXPathDependencies(
 
     val modelStates = new m.HashMap[ModelOrInstanceKey, ModelState]
 
-    def getOrCreateModelState(model: XFormsModel) = {
+    def getOrCreateModelState(model: XFormsModel): ModelState = {
       val modelKey = ModelOrInstanceKey(model)
       modelStates.getOrElseUpdate(modelKey, new ModelState(modelKey, model))
     }

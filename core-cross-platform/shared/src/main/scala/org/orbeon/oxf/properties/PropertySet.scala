@@ -153,10 +153,9 @@ object PropertySet {
 
     def convertNMTOKENS(value: String, namespaces: Map[String, String]): ju.Set[String] = {
       val tokens = value.splitTo[Set]()
-      for (token <- tokens) {
+      for (token <- tokens)
         if (! SaxonUtils.isValidNmtoken(token))
           throw new ValidationException(s"Not an NMTOKENS: $value" , null)
-      }
       tokens.asJava
     }
 

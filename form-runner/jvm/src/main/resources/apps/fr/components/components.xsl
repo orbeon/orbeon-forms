@@ -176,8 +176,8 @@
         select="
             not(
                 $mode != 'import' and (
-                    not($mode = ('edit', 'new', 'test')) or
-                    $is-form-builder                     or
+                    not($mode = ('edit', 'new', 'test', 'compile')) or
+                    $is-form-builder                                or
                     $view-appearance = 'full'
                 )
             )"/>

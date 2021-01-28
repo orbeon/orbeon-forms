@@ -1,6 +1,6 @@
 package org.orbeon.xforms.offline.demo
 
-import org.log4s.{Info, Logger}
+import org.log4s.Logger
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils._
@@ -11,7 +11,7 @@ import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, X
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.{Loggers, RequestInformation, XFormsContainingDocument, XFormsStaticStateDeserializer}
+import org.orbeon.oxf.xforms.{RequestInformation, XFormsContainingDocument, XFormsStaticState, XFormsStaticStateDeserializer}
 import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.EmbeddingSupport._
@@ -26,6 +26,7 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.|
 
 
 @JSExportTopLevel("OrbeonOffline")
@@ -34,18 +35,20 @@ object OfflineDemo extends App {
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.offline.OfflineDemo")
   implicit val indentedLogger = new IndentedLogger(logger, true)
 
-  type CompiledForm = String
-  type RuntimeForm  = String
+  type SerializedForm = String
+  type CompiledForm   = XFormsStaticState
+  type RuntimeForm    = String
 
   def onOrbeonApiLoaded(): Unit = {
     XFormsApp.onOrbeonApiLoaded(LocalClientServerChannel)
+
+    info("Orbeon API loaded")
 
     // Expose the API in the usual place
     val orbeonDyn = g.window.ORBEON
     orbeonDyn.xforms.Offline = js.Dynamic.global.OrbeonOffline
 
     // Initialize logging
-    import org.log4s.log4sjs.Log4sConfig._
 //    setLoggerThreshold("", LevelThreshold(Info))
   }
 
@@ -65,10 +68,10 @@ object OfflineDemo extends App {
 
   @JSExport
   def testLoadAndRenderForm(
-    container  : html.Element,
-    formName   : String
+    container : html.Element,
+    formName  : String
   ): Unit =
-    fetchCompiledFormForTesting(s"$findBasePathForTesting/xforms-compiler/service/compile/$formName.xhtml") foreach { compiledForm =>
+    fetchSerializedFormForTesting(s"$findBasePathForTesting/xforms-compiler/service/compile/$formName.xhtml") foreach { compiledForm =>
       println(s"xxx fetched string length: ${compiledForm.size}")
       renderDemoForm(container, compiledForm)
     }
@@ -87,119 +90,131 @@ object OfflineDemo extends App {
   @JSExport
   def renderDemoForm(
     container    : html.Element,
-    compiledForm : CompiledForm,
+    serializedForm : SerializedForm,
   ): RuntimeForm =
-    renderCompiledForm(container, compiledForm, XFormsFunctionLibraryList, None)
+    renderCompiledForm(container, serializedForm, XFormsFunctionLibraryList, None)
+
+  @JSExport
+  def compileForm(
+    serializedForm  : SerializedForm,
+    functionLibrary : FunctionLibrary
+  ): CompiledForm =
+    withDebug("form deserialization") {
+      XFormsStaticStateDeserializer.deserialize(serializedForm, functionLibrary)
+    }
 
   def renderCompiledForm(
     container       : html.Element,
-    compiledForm    : CompiledForm,
+    inputForm       : SerializedForm | CompiledForm,
     functionLibrary : FunctionLibrary,
     uriResolver     : Option[XFormsURIResolver]
   ): RuntimeForm = {
 
-    destroyForm(container)
+    withDebug("form initialization and rendering") {
+      destroyForm(container)
 
-    val uuid = CoreCrossPlatformSupport.randomHexId
-    val staticState =
-      withDebug("form deserialization") {
-        XFormsStaticStateDeserializer.deserialize(compiledForm, functionLibrary)
-      }
+      val newUuid = CoreCrossPlatformSupport.randomHexId
 
-    val containingDocument =
-      withDebug("new XFormsContainingDocument") {
-        new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
-      }
+      val staticState =
+        (inputForm: Any) match {
+          case serialized: SerializedForm => compileForm(serialized, functionLibrary)
+          case compiled  : CompiledForm   => compiled
+        }
 
-    val req =
-      RequestInformation(
-        deploymentType        = DeploymentType.Standalone,
-        requestMethod         = HttpMethod.GET,
-        requestContextPath    = "/orbeon",
-        requestPath           = "/demo",
-        requestHeaders        = Map.empty,
-        requestParameters     = Map.empty,
-        containerType         = "servlet", // TODO: not really used except for `isPortletContainer`
-        containerNamespace    = "", // TODO: no prefix for now, so the CSS works
-        versionedPathMatchers = Nil,
-        isEmbedded            = true,
-        forceInlineResources  = true
-      )
+      val containingDocument =
+        new XFormsContainingDocument(staticState, newUuid, disableUpdates = false)
 
-    CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
+      val req =
+        RequestInformation(
+          deploymentType        = DeploymentType.Standalone,
+          requestMethod         = HttpMethod.GET,
+          requestContextPath    = "/orbeon",
+          requestPath           = "/demo",
+          requestHeaders        = Map.empty,
+          requestParameters     = Map.empty,
+          containerType         = "servlet", // TODO: not really used except for `isPortletContainer`
+          containerNamespace    = "", // TODO: no prefix for now, so the CSS works
+          versionedPathMatchers = Nil,
+          isEmbedded            = true,
+          forceInlineResources  = true
+        )
 
-      withDebug("XFormsContainingDocument.initialize") {
-        containingDocument.setRequestInformation(req)
-        containingDocument.initialize(uriResolver, response = None)
-      }
+      CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
 
-      // See also `XFormsToXHTML.outputResponseDocument`
-      XFormsAPI.withContainingDocument(containingDocument) {
+        withDebug("XFormsContainingDocument.initialize") {
+          containingDocument.setRequestInformation(req)
+          containingDocument.initialize(uriResolver, response = None)
+        }
 
-        val nonJavaScriptLoads =
-          containingDocument.getNonJavaScriptLoadsToRun
+        // See also `XFormsToXHTML.outputResponseDocument`
+        XFormsAPI.withContainingDocument(containingDocument) {
 
-        if (containingDocument.isGotSubmissionReplaceAll) {
-          // 1. Got a submission with replace="all"
-          // NOP: Response already sent out by a submission
-  //        indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
+          val nonJavaScriptLoads =
+            containingDocument.getNonJavaScriptLoadsToRun
 
-          println(s"xxx `isGotSubmissionReplaceAll`")
+          if (containingDocument.isGotSubmissionReplaceAll) {
+            // 1. Got a submission with replace="all"
+            // NOP: Response already sent out by a submission
+    //        indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
 
-        } else if (nonJavaScriptLoads.nonEmpty) {
-          // 2. Got at least one xf:load which is not a JavaScript call
+            println(s"xxx `isGotSubmissionReplaceAll`")
 
-          // This is the "load upon initialization in Servlet container, embedded or not" case.
-          // See `XFormsLoadAction` for details.
-//          val location = nonJavaScriptLoads.head.resource
-  //        indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
-  //        externalContext.getResponse.sendRedirect(location, isServerSide = false, isExitPortal = false)
+          } else if (nonJavaScriptLoads.nonEmpty) {
+            // 2. Got at least one xf:load which is not a JavaScript call
 
-          // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-  //        SAXUtils.streamNullDocument(xmlReceiver)
+            // This is the "load upon initialization in Servlet container, embedded or not" case.
+            // See `XFormsLoadAction` for details.
+  //          val location = nonJavaScriptLoads.head.resource
+    //        indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
+    //        externalContext.getResponse.sendRedirect(location, isServerSide = false, isExitPortal = false)
 
-          println(s"xxx `nonJavaScriptLoad s`")
+            // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+    //        SAXUtils.streamNullDocument(xmlReceiver)
 
-        } else {
-          // 3. Regular case: produce a document
-          containingDocument.hostLanguage match {
-            case "xhtml" =>
+            println(s"xxx `nonJavaScriptLoad s`")
 
-              val rcv = new DomDocumentFragmentXMLReceiver
-              withDebug("generate markup") {
-                XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
-              }
+          } else {
+            // 3. Regular case: produce a document
+            containingDocument.hostLanguage match {
+              case "xhtml" =>
 
-              // Find CSS/JS to load
-              // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to
-              //   have the list of offline CSS baseline assets and not insert the CSS if already present.
-//              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
-              val stylesheetsToLoad = Nil
-              val scriptsToLoad     = findAndDetachJsToLoad (rcv.frag)
+                val rcv = new DomDocumentFragmentXMLReceiver
+                withDebug("generate markup") {
+                  XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+                }
 
-              // Asynchronously load styles, insert HTML, then load scripts
-              for {
-                _ <- loadStylesheets(stylesheetsToLoad)
-                _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
-                _ <- loadScripts(scriptsToLoad)
-              } yield ()
+                // Find CSS/JS to load
+                // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to
+                //   have the list of offline CSS baseline assets and not insert the CSS if already present.
+  //              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
+                val stylesheetsToLoad = Nil
+                val scriptsToLoad     = findAndDetachJsToLoad (rcv.frag)
 
-              containingDocument.afterInitialResponse()
+                // Asynchronously load styles, insert HTML, then load scripts
+                for {
+  //                _ <- loadStylesheets(stylesheetsToLoad) // XXX TODO
+                  _ <- Future()
+                  _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
+                  _ <- loadScripts(scriptsToLoad)
+                } yield ()
 
-              // Notify state manager
-              XFormsStateManager.afterInitialResponse(containingDocument, disableDocumentCache = false)
+                containingDocument.afterInitialResponse()
 
-            case unknown =>
-              throw new OXFException(s"Unknown host language specified: $unknown")
+                // Notify state manager
+                XFormsStateManager.afterInitialResponse(containingDocument, disableDocumentCache = false)
+
+              case unknown =>
+                throw new OXFException(s"Unknown host language specified: $unknown")
+            }
           }
         }
       }
-    }
 
-    uuid
+      newUuid
+    }
   }
 
-  def fetchCompiledFormForTesting(url: String): Future[String] = {
+  def fetchSerializedFormForTesting(url: String): Future[String] = {
     val p = Promise[String]()
     val xhr = new XMLHttpRequest()
     xhr.open(

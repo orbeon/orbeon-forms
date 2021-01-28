@@ -12,28 +12,35 @@ import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.xforms.embedding.SubmissionProvider
-import org.orbeon.xforms.offline.demo.OfflineDemo.CompiledForm
+import org.orbeon.xforms.offline.demo.OfflineDemo.{CompiledForm, SerializedForm}
 import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
 import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.|
 
 
 trait FormRunnerProcessor {
 
   @JSExport
+  def compileForm(
+    serializedForm  : SerializedForm,
+    functionLibrary : FunctionLibrary
+  ): CompiledForm
+
+  @JSExport
   def renderForm(
-    container    : html.Element,
-    compiledForm : CompiledForm,
-    appName      : String,
-    formName     : String,
-//    formVersion  : Int,  // Q: do we need this? We are passing the form definition!
-    mode         : String,
-    documentId   : js.UndefOr[String]
+    container  : html.Element,
+    inputForm  : SerializedForm | CompiledForm,
+    appName    : String, // Q: do we need this? We are passing the form definition!
+    formName   : String, // Q: do we need this? We are passing the form definition!
+    mode       : String,
+    documentId : js.UndefOr[String]
   ): Unit
 
   @JSExport
@@ -100,17 +107,27 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
   }
 
   @JSExport
+  def compileForm(
+    serializedForm  : SerializedForm,
+    functionLibrary : FunctionLibrary
+  ): CompiledForm =
+    OfflineDemo.compileForm(
+      serializedForm,
+      functionLibrary
+    )
+
+  @JSExport
   def renderForm(
-    container    : html.Element,
-    compiledForm : CompiledForm,
-    appName      : String, // Q: do we need this? We are passing the form definition!
-    formName     : String, // Q: do we need this? We are passing the form definition!
-    mode         : String,
-    documentId  : js.UndefOr[String]
+    container  : html.Element,
+    inputForm  : SerializedForm | CompiledForm,
+    appName    : String, // Q: do we need this? We are passing the form definition!
+    formName   : String, // Q: do we need this? We are passing the form definition!
+    mode       : String,
+    documentId : js.UndefOr[String]
   ): Unit = // TODO: js.Promise[Something]
     OfflineDemo.renderCompiledForm(
       container,
-      compiledForm,
+      inputForm,
       FormRunnerFunctionLibraryList,
       Some(
         new XFormsURIResolver {
@@ -125,7 +142,6 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
                 root.addElement("form-version").addText("1") // TODO
                 val documentElem = root.addElement("document")
                 documentId foreach documentElem.addText
-//                root.addElement("document").addText(CoreCrossPlatformSupport.randomHexId) // temp as mode is not read correctly!
                 root.addElement("mode").addText(mode)
 
                 Document(root)
@@ -141,6 +157,23 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     )
 
   @JSExport
+  def testLoadAndCompileForm(
+    appName  : String,
+    formName : String // TODO: version
+  ): js.Promise[CompiledForm] = {
+
+    configure(DemoSubmissionProvider)
+
+    val future =
+      OfflineDemo.fetchSerializedFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") map { serializedForm =>
+        println(s"fetched serialized form from server for `$appName`/`$formName`, string length: ${serializedForm.size}")
+        compileForm(serializedForm, FormRunnerFunctionLibraryList)
+      }
+
+    future.toJSPromise
+  }
+
+  @JSExport
   def testLoadAndRenderForm(
     container  : html.Element,
     appName    : String,
@@ -151,10 +184,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
     configure(DemoSubmissionProvider)
 
-//    fetchCompiledForm(s"http://localhost:9090/orbeon/xforms-compiler/service/compile/date.xhtml") foreach { text =>
-    OfflineDemo.fetchCompiledFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") foreach { compiledForm =>
-      println(s"xxx fetched string length: ${compiledForm.size}")
-      renderForm(container, compiledForm, appName, formName, mode, documentId)
+    OfflineDemo.fetchSerializedFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") foreach { serializedForm =>
+      println(s"fetched serialized form from server for `$appName`/`$formName`, string length: ${serializedForm.size}")
+      renderForm(container, serializedForm, appName, formName, mode, documentId)
     }
   }
 }

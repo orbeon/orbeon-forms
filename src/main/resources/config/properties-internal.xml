@@ -162,6 +162,7 @@
         /xbl/orbeon/repeater/repeater.css
         +/xbl/orbeon/error-summary/error-summary.css
         +/xbl/orbeon/number/number.css
+        +/xbl/orbeon/wizard/wizard.css
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/date/date.css

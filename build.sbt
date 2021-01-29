@@ -609,7 +609,6 @@ lazy val formRunnerJS = formRunner.js
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
       "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
-      "org.parboiled"          %%% "parboiled"       % Parboiled2Version
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -964,6 +963,7 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
 
     libraryDependencies += "com.lihaoyi"            %%% "autowire"  % AutowireVersion,
     libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % ScalaXmlVersion,
+    libraryDependencies += "org.parboiled"          %%% "parboiled" % Parboiled2Version,
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

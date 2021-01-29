@@ -71,8 +71,8 @@ trait XFormsCrossPlatformSupportTrait {
     xmlReceiver  : XMLReceiver
   ): Unit
 
-  val DEFAULT_METHOD_PROPERTY_NAME = "default-method"
-  val DEFAULT_METHOD               = QName("xml")
+  private val DEFAULT_METHOD_PROPERTY_NAME = "default-method"
+  private val DEFAULT_METHOD               = QName("html")
 
   def createHTMLFragmentXmlReceiver(writer: Writer, skipRootElement: Boolean): XMLReceiver = {
 

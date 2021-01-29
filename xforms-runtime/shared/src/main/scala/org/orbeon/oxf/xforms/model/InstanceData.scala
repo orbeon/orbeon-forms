@@ -367,47 +367,31 @@ class InstanceData private () {
     else
       bindNodes
 
-  private def getLocalRelevant: Boolean = {
-    if ((bindNodes ne null) && bindNodes.size > 0) {
-      for (bindNode <- bindNodes.asScala) {
-        if (bindNode.relevant != ModelDefs.DEFAULT_RELEVANT)
-          return ! ModelDefs.DEFAULT_RELEVANT
-      }
-    }
-    ModelDefs.DEFAULT_RELEVANT
-  }
+  // PERFORMANCE: We used to have `for (bindNode <- bindNodes.asScala)`, but this construct
+  // used non-local returns which throw exceptions. With Scala.js, this is costly. We then
+  // tried using a `while(it.haNext(` loop, which is fine, but it turns out that
+  // `.asScala.exists()` also translates to that, which also doesn't use non-local returns.
+  // So for legibility, we now do that.
+  // We also explicitly inline the function, even though Scala.js might inline it anyway
+  // as part of the optimization process.
+  @inline
+  private def testMipForNonDefault(get: BindNode => Boolean, default: Boolean): Boolean =
+    if ((bindNodes ne null) && ! bindNodes.isEmpty && bindNodes.asScala.exists(get(_) != default))
+      ! default
+    else
+      default
 
-  private def getLocalReadonly: Boolean = {
-    if ((bindNodes ne null) && bindNodes.size > 0) {
-      for (bindNode <- bindNodes.asScala) {
-        if (bindNode.readonly != ModelDefs.DEFAULT_READONLY)
-          return ! ModelDefs.DEFAULT_READONLY
-      }
-    }
-    ModelDefs.DEFAULT_READONLY
-  }
+  private def getLocalRelevant: Boolean =
+    testMipForNonDefault(_.relevant, ModelDefs.DEFAULT_RELEVANT)
 
-  def getRequired: Boolean = {
-    if ((bindNodes ne null) && bindNodes.size > 0) {
-      for (bindNode <- bindNodes.asScala) {
-        if (bindNode.required != ModelDefs.DEFAULT_REQUIRED)
-          return ! ModelDefs.DEFAULT_REQUIRED
-      }
-    }
-    ModelDefs.DEFAULT_REQUIRED
-  }
+  private def getLocalReadonly: Boolean =
+    testMipForNonDefault(_.readonly, ModelDefs.DEFAULT_READONLY)
 
-  def getValid: Boolean = {
-    if (schemaInvalid)
-      return false
-    if ((bindNodes ne null) && bindNodes.size > 0) {
-      for (bindNode <- bindNodes.asScala) {
-        if (bindNode.valid != ModelDefs.DEFAULT_VALID)
-          return ! ModelDefs.DEFAULT_VALID
-      }
-    }
-    ModelDefs.DEFAULT_VALID
-  }
+  def getRequired: Boolean =
+    testMipForNonDefault(_.required, ModelDefs.DEFAULT_REQUIRED)
+
+  def getValid: Boolean =
+    ! schemaInvalid && testMipForNonDefault(_.valid, ModelDefs.DEFAULT_VALID)
 
   private def collectAllClientCustomMIPs: Map[String, String] =
     BindNode.collectAllClientCustomMIPs(bindNodes)
@@ -424,7 +408,9 @@ class InstanceData private () {
   def getInvalidBindIds: String = {
     var sb: jl.StringBuilder = null
     if ((bindNodes ne null) && ! bindNodes.isEmpty) {
-      for (bindNode <- bindNodes.asScala) {
+      val it = bindNodes.iterator
+      while (it.hasNext) {
+        val bindNode = it.next()
         if (bindNode.valid != ModelDefs.DEFAULT_VALID) {
           if (sb eq null)
             sb = new jl.StringBuilder

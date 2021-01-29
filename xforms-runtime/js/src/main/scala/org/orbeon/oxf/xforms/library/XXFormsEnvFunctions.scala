@@ -312,12 +312,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       }
     }
 
+  // TODO: Cache of messages.
   @XPathFunction
   def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
-    // TODO: 2021-01-20: `MessageFormat` not (yet) supported in Scala.js.
-    s"[TODO: formatMessage] $template"
-//    new MessageFormat(template, currentLocale)
-//      .format(args map SequenceTool.convertToJava toArray)
+//    println(s"xxx formatMessage for `$template`, ${args map SequenceTool.convertToJava mkString "/"}")
+    MessageFormatter.format(MessageFormatter.parse(template), args map SequenceTool.convertToJava toVector)
   }
 
   @XPathFunction

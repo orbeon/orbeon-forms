@@ -312,12 +312,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       }
     }
 
-  // TODO: Cache of messages.
   @XPathFunction
-  def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
-//    println(s"xxx formatMessage for `$template`, ${args map SequenceTool.convertToJava mkString "/"}")
-    MessageFormatter.format(MessageFormatter.parse(template), args map SequenceTool.convertToJava toVector)
-  }
+  def formatMessage(template: String, args: Iterable[om.Item])(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String =
+    MessageFormatter.format(MessageFormatCache(template), args map SequenceTool.convertToJava toVector)
 
   @XPathFunction
   def lang()(implicit xfc: XFormsFunction.Context): Option[String] =

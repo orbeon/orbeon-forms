@@ -2,8 +2,30 @@ package org.orbeon.oxf.xforms.library
 
 import org.parboiled2._
 
+import java.util.concurrent.ConcurrentHashMap
 import scala.util.{Failure, Success}
 
+
+object MessageFormatCache {
+
+  import MessageFormatter._
+
+  private val cache = new ConcurrentHashMap[String, Message]
+
+  def apply(format: String): Message = {
+    var answer = cache.get(format)
+    if (answer eq null) {
+      cache.synchronized {
+        answer = cache.get(format)
+        if (answer eq null) {
+          answer = MessageFormatter.parse(format)
+          cache.put(format, answer)
+        }
+      }
+    }
+    answer
+  }
+}
 
 // TODO: move when done
 // TODO: also what about syntax with variable names, like `$iteration`? Support natively?

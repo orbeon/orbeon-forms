@@ -4,6 +4,7 @@ import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
+import org.orbeon.oxf.xforms.control.controls.FileMetadata
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.AtomicValue
@@ -356,4 +357,13 @@ object FormRunnerWizardFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction(name = "caseIdsForTopLevelSection")
   def caseIdsForTopLevelSection(topLevelSectionId: String): Iterable[String] =
     Wizard.caseIdsForTopLevelSectionAsList(topLevelSectionId)
+}
+
+object FormRunnerFileMetadataFunctionLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.oxf.xforms.control.controls.FileMetadata" -> "filemetadata")
+
+  @XPathFunction(name = "humanReadableBytes")
+  def humanReadableBytes(size: String): String =
+    FileMetadata.humanReadableBytes(size)
 }

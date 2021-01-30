@@ -99,7 +99,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         FormRunnerGridDataMigrationFunctionLibrary,
         FormRunnerSimpleDataMigrationFunctionLibrary,
         FormRunnerNumberSupportFunctionLibrary,
-        FormRunnerWizardFunctionLibrary
+        FormRunnerWizardFunctionLibrary,
+        FormRunnerFileMetadataFunctionLibrary
       )
 
       new FunctionLibraryList |!> (fll =>

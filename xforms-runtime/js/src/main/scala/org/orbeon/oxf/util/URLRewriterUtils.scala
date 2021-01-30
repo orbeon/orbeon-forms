@@ -6,6 +6,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 
 
 object URLRewriterUtils {
+
   // TODO: placeholder, does it matter for Scala.js?
   def isResourcesVersioned = false
 
@@ -31,8 +32,8 @@ object URLRewriterUtils {
       ???
   }
 
-  def getPathMatchers: ju.List[PathMatcher] = {
-    println(s"xxx URLRewriterUtils.getPathMatchers called")
-    ???
-  }
+  // Used by `rewriteResourceURL` for `XFormsOutputControl`.
+  // Q: Does anything make sense there?
+  def getPathMatchers: ju.List[PathMatcher] =
+    ju.Collections.emptyList[PathMatcher]
 }

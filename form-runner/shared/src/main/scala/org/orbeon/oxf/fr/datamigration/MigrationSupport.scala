@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StaticXPath, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
@@ -239,8 +239,8 @@ object MigrationSupport {
     }
 
   def migrateDataWithFormDefinition(
-    data          : DocumentInfo,
-    form          : DocumentInfo,
+    data          : DocumentNodeInfoType,
+    form          : DocumentNodeInfoType,
     srcVersion    : DataFormatVersion,
     dstVersion    : DataFormatVersion,
     pruneMetadata : Boolean

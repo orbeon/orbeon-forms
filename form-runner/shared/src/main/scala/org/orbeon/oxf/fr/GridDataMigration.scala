@@ -59,10 +59,10 @@ object GridDataMigration {
   // NOTE: Exposed to some users.
   //@XPathFunction
   def dataMaybeMigratedFromFormDefinition(
-    data     : DocumentInfo,
-    form     : DocumentInfo,
+    data     : DocumentNodeInfoType,
+    form     : DocumentNodeInfoType,
     format   : String
-  ): DocumentInfo = {
+  ): DocumentNodeInfoType = {
     MigrationSupport.migrateDataWithFormDefinition(
       data          = data,
       form          = form,

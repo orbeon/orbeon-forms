@@ -4,7 +4,7 @@ Orbeon Forms
 Web Forms for the Enterprise. Done the Right Way.
 -------------------------------------------------
 
-Last updated for Orbeon Forms 2020.1 (December 2020)
+Last updated for Orbeon Forms 2020.1.1 (February 2021)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -22,6 +22,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2020.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.1)
 - [Orbeon Forms 2020.1](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1)
 - [Orbeon Forms 2019.2.2 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.2)
 - [Orbeon Forms 2019.2.1 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.1)
@@ -223,4 +224,4 @@ Forms with the full-featured [YourKit Java Profiler](https://www.yourkit.com/jav
 
 ---
 
-Copyright 1999-2020 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2021 (C) Orbeon, Inc. All rights reserved.

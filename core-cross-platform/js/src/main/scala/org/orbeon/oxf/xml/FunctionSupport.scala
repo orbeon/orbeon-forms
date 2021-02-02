@@ -71,7 +71,7 @@ import org.orbeon.saxon.value._
 object FunctionSupport {
 
   def stringArgumentOrContextOpt(s: Option[String])(implicit xpc: XPathContext): Option[String] =
-    s orElse (Option(xpc.getContextItem) map (_.getStringValue))
+    if (s eq null) Option(xpc.getContextItem) map (_.getStringValue) else s
 
   def itemArgumentOrContextOpt(i: Option[om.Item])(implicit xpc: XPathContext): Option[om.Item] =
     i orElse Option(xpc.getContextItem)

@@ -184,19 +184,19 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     classesFromAttribute(elem)
 
   @XPathFunction
-  def split(s: Option[String] = None, separator: Option[String] = None)(implicit xpc: XPathContext): Iterable[String] =
+  def split(s: Option[String] = null, separator: Option[String] = None)(implicit xpc: XPathContext): Iterable[String] =
     stringArgumentOrContextOpt(s).toList flatMap (_.splitTo[List](separator.orNull))
 
   @XPathFunction
-  def trim(s: Option[String] = None)(implicit xpc: XPathContext): Option[String] =
+  def trim(s: Option[String] = null)(implicit xpc: XPathContext): Option[String] =
     stringArgumentOrContextOpt(s) map (_.trimAllToEmpty)
 
   @XPathFunction
-  def isBlank(s: Option[String] = None)(implicit xpc: XPathContext): Boolean =
+  def isBlank(s: Option[String] = null)(implicit xpc: XPathContext): Boolean =
     ! (stringArgumentOrContextOpt(s) exists (_.trimAllToEmpty.nonEmpty))
 
   @XPathFunction
-  def nonBlank(s: Option[String] = None)(implicit xpc: XPathContext): Boolean =
+  def nonBlank(s: Option[String] = null)(implicit xpc: XPathContext): Boolean =
     stringArgumentOrContextOpt(s) exists (_.trimAllToEmpty.nonEmpty)
 
   private def classesFromAttribute(i: Option[om.Item])(implicit xpc: XPathContext): Set[String] =

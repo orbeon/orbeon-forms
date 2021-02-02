@@ -436,11 +436,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    Fun("client-id", classOf[XXFormsClientId], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )
-//
-//    Fun("control-element", classOf[XXFormsControlElement], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+
+  @XPathFunction
+  def controlElement(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.NodeInfo] =
+    relevantControl(controlId) flatMap
+      (control => control.container.partAnalysis.controlElement(control.prefixedId))
+
 //    Fun("extract-document", classOf[XXFormsExtractDocument], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
 //      Arg(Type.NODE_TYPE, EXACTLY_ONE),
 //      Arg(STRING, EXACTLY_ONE),

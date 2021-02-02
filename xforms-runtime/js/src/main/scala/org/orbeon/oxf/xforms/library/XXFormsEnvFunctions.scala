@@ -6,6 +6,7 @@ import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -639,10 +640,23 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //    )
 
   @XPathFunction
-  def evaluateAvt(avt: String): Option[String] = {
-//    val (avtExpression, newXPathContext) = prepareExpressionSaxonNoPool(xpathContext, argument(0), isAVT = true)
-//    avtExpression.iterate(newXPathContext)
-    s"""[TODO: evaluateAvt] $avt""".some
+  def evaluateAvt(avt: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
+
+    val xfcd = xfc.containingDocument
+    val elem = xfcd.staticOps.findControlAnalysis(XFormsId.getPrefixedId(xfc.sourceEffectiveId)) getOrElse
+      (throw new IllegalStateException(xfc.sourceEffectiveId))
+
+    XPathCache.evaluateAsAvt(
+      contextItem        = xpc.getContextItem,
+      xpathString        = avt,
+      namespaceMapping   = elem.namespaceMapping,
+      variableToValueMap = xfc.bindingContext.getInScopeVariables,
+      functionLibrary    = xfcd.functionLibrary,
+      functionContext    = xfc,
+      baseURI            = null,
+      locationData       = elem.locationData,
+      reporter           = null
+    )
   }
 
 //    Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,

@@ -639,6 +639,30 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 //      Arg(DATE, ALLOWS_ZERO_OR_MORE)
 //    )
 
+  def evaluateImpl(expr: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = {
+
+    val xfcd = xfc.containingDocument
+    val elem = xfcd.staticOps.findControlAnalysis(XFormsId.getPrefixedId(xfc.sourceEffectiveId)) getOrElse
+      (throw new IllegalStateException(xfc.sourceEffectiveId))
+
+    XPathCache.evaluateKeepItems(
+      contextItems       = List(xpc.getContextItem).asJava,
+      contextPosition    = 1,
+      xpathString        = expr,
+      namespaceMapping   = elem.namespaceMapping,
+      variableToValueMap = xfc.bindingContext.getInScopeVariables,
+      functionLibrary    = xfcd.functionLibrary,
+      functionContext    = xfc,
+      baseURI            = null,
+      locationData       = elem.locationData,
+      reporter           = null
+    )
+  }
+
+  @XPathFunction
+  def evaluate(expr: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
+    evaluateImpl(expr)
+
   @XPathFunction
   def evaluateAvt(avt: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): String = {
 

@@ -1,6 +1,8 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.dom.saxon.TypedNodeWrapper
+import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, VariableResolver}
 import org.orbeon.oxf.util.StringUtils._
@@ -15,6 +17,7 @@ import org.orbeon.saxon.sxpath.{XPathDynamicContext, XPathExpression, XPathStati
 import org.orbeon.saxon.tree.iter.ManualIterator
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
 import java.{util => ju}
@@ -24,8 +27,8 @@ import scala.util.control.NonFatal
 
 object XPath extends XPathTrait {
 
-  private val Explain            = false
-  private val LogAndExplainError = true
+  private val DebugExplainExpressions = false
+  private val LogAndExplainErrors     = true
 
   val GlobalConfiguration: StaticXPath.SaxonConfiguration = new Configuration {
 
@@ -60,7 +63,7 @@ object XPath extends XPathTrait {
         variableResolver
       )
 
-      if (Explain) {
+      if (DebugExplainExpressions) {
         import org.orbeon.saxon.lib.StandardLogger
 
         import _root_.java.io.PrintStream
@@ -154,13 +157,13 @@ object XPath extends XPathTrait {
       } else
         body(expression.expression)
     } catch {
+      case t if XFormsCrossPlatformSupport.getRootThrowable(t).isInstanceOf[TypedValueException] =>
+        throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
       case NonFatal(t) =>
 
-        if (LogAndExplainError) {
+        if (LogAndExplainErrors) {
           import org.orbeon.saxon.lib.StandardLogger
-
           import _root_.java.io.PrintStream
-
           expression.expression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
         }
 

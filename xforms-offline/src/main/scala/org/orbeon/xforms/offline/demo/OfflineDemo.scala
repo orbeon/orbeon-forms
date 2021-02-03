@@ -27,6 +27,7 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
+import java.{lang => jl}
 
 @JSExportTopLevel("OrbeonOffline")
 object OfflineDemo extends App {
@@ -245,8 +246,17 @@ class DomDocumentFragmentXMLReceiver extends XMLReceiverAdapter {
   val frag: dom.DocumentFragment = doc.createDocumentFragment()
 
   private var stack: List[dom.Node] = List(frag)
+  private val sb = new jl.StringBuilder
+
+  private def flushCharactersIfNeeded() =
+    if (sb.length > 0) {
+      stack.head.appendChild(doc.createTextNode(sb.toString))
+      sb.setLength(0)
+    }
 
   override def startElement(uri: String, localName: String, qName: String, atts: Attributes): Unit = {
+
+    flushCharactersIfNeeded()
 
     val newElem = doc.createElement(localName)
 
@@ -257,9 +267,11 @@ class DomDocumentFragmentXMLReceiver extends XMLReceiverAdapter {
     stack ::= newElem
   }
 
-  override def endElement(uri: String, localName: String, qName: String): Unit =
+  override def endElement(uri: String, localName: String, qName: String): Unit = {
+    flushCharactersIfNeeded()
     stack = stack.tail
+  }
 
   override def characters(ch: Array[Char], start: Int, length: Int): Unit =
-    stack.head.appendChild(doc.createTextNode(new String(ch, start, length)))
+    sb.append(new String(ch, start, length))
 }

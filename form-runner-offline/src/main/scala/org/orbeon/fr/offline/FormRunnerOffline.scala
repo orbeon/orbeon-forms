@@ -18,30 +18,29 @@ import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.scalajs.js.JSConverters._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.|
 
 
 trait FormRunnerProcessor {
 
-  @JSExport
-  def compileForm(
-    serializedForm  : SerializedForm,
-    functionLibrary : FunctionLibrary
-  ): CompiledForm
+//  @JSExport
+//  def compileForm(
+//    serializedForm  : SerializedForm,
+//    functionLibrary : FunctionLibrary
+//  ): CompiledForm
 
-  @JSExport
-  def renderForm(
-    container  : html.Element,
-    inputForm  : SerializedForm | CompiledForm,
-    appName    : String, // Q: do we need this? We are passing the form definition!
-    formName   : String, // Q: do we need this? We are passing the form definition!
-    mode       : String,
-    documentId : js.UndefOr[String]
-  ): Unit
+//  @JSExport
+//  def renderForm(
+//    container  : html.Element,
+//    inputForm  : SerializedForm | CompiledForm,
+//    appName    : String, // Q: do we need this? We are passing the form definition!
+//    formName   : String, // Q: do we need this? We are passing the form definition!
+//    mode       : String,
+//    documentId : js.UndefOr[String]
+//  ): Unit
 
   @JSExport
   def destroyForm(container: html.Element): Unit =
@@ -108,8 +107,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
       )
   }
 
-  @JSExport
-  def compileForm(
+  private def compileForm(
     serializedForm  : SerializedForm,
     functionLibrary : FunctionLibrary
   ): CompiledForm =
@@ -118,18 +116,35 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
       functionLibrary
     )
 
+  private case class CacheKey(appName: String, formName: String, formVersion: Int)
+
+  private var staticStateCache = Map[CacheKey, CompiledForm]()
+
   @JSExport
   def renderForm(
-    container  : html.Element,
-    inputForm  : SerializedForm | CompiledForm,
-    appName    : String, // Q: do we need this? We are passing the form definition!
-    formName   : String, // Q: do we need this? We are passing the form definition!
-    mode       : String,
-    documentId : js.UndefOr[String]
-  ): Unit = // TODO: js.Promise[Something]
+    container      : html.Element,
+    serializedForm : SerializedForm,
+    appName        : String, // needed for the cache!
+    formName       : String, // needed for the cache!
+    mode           : String,
+    documentId     : js.UndefOr[String]
+  ): Unit = { // TODO: js.Promise[Something]
+
+    //XXX TODO: version
+    val formVersion = 1
+
+    val cacheKey = CacheKey(appName, formName, formVersion)
+
+    val compiledForm =
+      staticStateCache.getOrElse(cacheKey, {
+        val result = compileForm(serializedForm, FormRunnerFunctionLibraryList)
+        staticStateCache += cacheKey -> result
+        result
+      })
+
     OfflineDemo.renderCompiledForm(
       container,
-      inputForm,
+      compiledForm,
       FormRunnerFunctionLibraryList,
       Some(
         new XFormsURIResolver {
@@ -141,7 +156,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
                 root.addElement("app").addText(appName)
                 root.addElement("form").addText(formName)
-                root.addElement("form-version").addText("1") // TODO
+                root.addElement("form-version").addText(formVersion.toString)
                 val documentElem = root.addElement("document")
                 documentId foreach documentElem.addText
                 root.addElement("mode").addText(mode)
@@ -157,38 +172,22 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         }
       )
     )
+  }
 
   @JSExport
-  def testLoadAndCompileForm(
-    appName  : String,
-    formName : String // TODO: version
-  ): js.Promise[CompiledForm] = {
+  def testFetchForm(
+    appName    : String,
+    formName   : String
+  ): js.Promise[SerializedForm] = {
 
     configure(DemoSubmissionProvider)
 
     val future =
       OfflineDemo.fetchSerializedFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") map { serializedForm =>
         println(s"fetched serialized form from server for `$appName`/`$formName`, string length: ${serializedForm.size}")
-        compileForm(serializedForm, FormRunnerFunctionLibraryList)
+        serializedForm
       }
 
     future.toJSPromise
-  }
-
-  @JSExport
-  def testLoadAndRenderForm(
-    container  : html.Element,
-    appName    : String,
-    formName   : String,
-    mode       : String,
-    documentId : js.UndefOr[String]
-  ): Unit = {
-
-    configure(DemoSubmissionProvider)
-
-    OfflineDemo.fetchSerializedFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") foreach { serializedForm =>
-      println(s"fetched serialized form from server for `$appName`/`$formName`, string length: ${serializedForm.size}")
-      renderForm(container, serializedForm, appName, formName, mode, documentId)
-    }
   }
 }

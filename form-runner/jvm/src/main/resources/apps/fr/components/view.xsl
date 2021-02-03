@@ -416,6 +416,9 @@
                         <fr:title/>
                         <!-- These are typically to the right -->
                         <fr:language-selector/>
+                        <xh:div>
+                            xxx: <xf:output value="fr:workflow-stage-value()"/>
+                        </xh:div>
                         <fr:status-icons/>
                         <fr:user-nav/>
                     </xsl:variable>
@@ -1039,12 +1042,12 @@
                                             ),
                                         $visible-or-empty :=
                                             if (xxf:non-blank($visible-expression)) then
-                                                boolean(xxf:instance('fr-form-instance')/saxon:evaluate($visible-expression))
+                                                boolean(xxf:instance('fr-form-instance')/xxf:evaluate($visible-expression))
                                             else
                                                 (),
                                         $enabled-or-empty :=
                                             if (xxf:non-blank($enabled-expression)) then
-                                                boolean(xxf:instance('fr-form-instance')/saxon:evaluate($enabled-expression))
+                                                boolean(xxf:instance('fr-form-instance')/xxf:evaluate($enabled-expression))
                                             else
                                                 ()
                                     return

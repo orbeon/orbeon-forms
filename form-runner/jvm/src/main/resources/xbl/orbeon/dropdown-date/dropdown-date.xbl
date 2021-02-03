@@ -17,7 +17,6 @@
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
@@ -228,7 +227,7 @@
                                     if ($r castable as xs:integer) then
                                         $r cast as xs:integer
                                     else
-                                        saxon:evaluate($r) (: for backward compatibility :)
+                                        xxf:evaluate($r) (: for backward compatibility; 2021-01-29: Mmh: default is `year-from-date(current-date())` :)
                             "/>
                     </xf:action>
 

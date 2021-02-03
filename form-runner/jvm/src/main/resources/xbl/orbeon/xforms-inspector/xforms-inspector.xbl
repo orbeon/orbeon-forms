@@ -210,7 +210,7 @@
                             <xf:insert if="instance('inspector-instance')/xpath != ''"
                                     context="instance('inspector-instance')/xpath-output"
                                     origin="xxf:instance(instance('inspector-instance')/current-instance)/
-                                        saxon:evaluate(instance('inspector-instance')/xpath)"/>
+                                        xxf:evaluate(instance('inspector-instance')/xpath)"/>
                         </xf:action>
                         <xf:input ref="." id="inspector-xpath">
                             <xf:label>XPath</xf:label>

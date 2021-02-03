@@ -19,10 +19,7 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
     <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fr.js"/>
@@ -199,11 +196,11 @@
 
                 <!-- Build JSON for Select2 -->
                 <xf:delete ref="instance('result-json')/*"/>
-                <xf:var name="items" value="instance('result-raw')/saxon:evaluate(instance('local')/itemset-ref)"/>
+                <xf:var name="items" value="instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)"/>
                 <xf:action iterate="$items">
                     <xf:var name="item" value="."/>
-                    <xf:setvalue ref="instance('item-template')/id"   value="$item/saxon:evaluate(instance('local')/value-ref)"/>
-                    <xf:setvalue ref="instance('item-template')/text" value="$item/saxon:evaluate(instance('local')/label-ref)"/>
+                    <xf:setvalue ref="instance('item-template')/id"   value="$item/xxf:evaluate(instance('local')/value-ref)"/>
+                    <xf:setvalue ref="instance('item-template')/text" value="$item/xxf:evaluate(instance('local')/label-ref)"/>
                     <xf:insert
                         context="instance('result-json')"
                         ref="*"
@@ -215,7 +212,7 @@
                     name="is-last-page"
                     value="
                         if (instance('local')/service-supports-paging = 'true')
-                        then instance('result-raw')/saxon:evaluate(instance('local')/is-last-page-ref)
+                        then instance('result-raw')/xxf:evaluate(instance('local')/is-last-page-ref)
                         else 'true'"/>
 
                 <!-- Send JSON to Scala.js, which will pass it to Select2 to update the list of suggestions -->

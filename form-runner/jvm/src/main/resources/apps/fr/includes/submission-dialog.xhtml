@@ -66,7 +66,7 @@
                     <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-go"/>
                     <xf:action ev:event="DOMActivate">
                         <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', fr:app-name(), fr:form-name()), '.'))"/>
-                        <xf:load context="xxf:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
+                        <xf:load context="xxf:instance('fr-form-instance')" resource="{xxf:evaluate($uri-xpath)}"/>
                     </xf:action>
                 </xf:trigger>
                 <!-- Close window button -->

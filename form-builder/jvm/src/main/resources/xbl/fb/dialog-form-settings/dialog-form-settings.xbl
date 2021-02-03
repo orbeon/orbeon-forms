@@ -17,7 +17,6 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
@@ -178,7 +177,7 @@
                             <!-- If it has a `ref="$resources/..."`, evaluate it -->
                             <xf:action if="starts-with($lhha/@ref, '$resources/')">
                                 <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
-                                <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
+                                <xf:setvalue ref="$lhha" value="$resources/xxf:evaluate($resource-path)"/>
                                 <xf:delete ref="$lhha/@ref"/>
                             </xf:action>
                         </xf:action>

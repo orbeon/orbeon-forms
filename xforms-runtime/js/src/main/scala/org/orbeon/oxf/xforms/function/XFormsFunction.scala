@@ -221,33 +221,6 @@ object XFormsFunction { // extends DefaultFunctionSupport
   private var staticContext: IndependentContext = null
 
   // TODO: Saxon 10
-  // The following copies all the StaticContext information into a new StaticContext
-//  def copyStaticContextIfNeeded(visitor: ExpressionVisitor): Unit = {
-//    // See same method in Saxon Evaluate.java
-//    if (staticContext eq null) { // only do this once
-//      val env = visitor.getStaticContext
-//      super.checkArguments(visitor)
-//
-//      val namespaceResolver = env.getNamespaceResolver
-//
-//      staticContext = new IndependentContext(env.getConfiguration)
-//
-//      staticContext.setBaseURI(env.getBaseURI)
-//      staticContext.setImportedSchemaNamespaces(env.getImportedSchemaNamespaces)
-//      staticContext.setDefaultFunctionNamespace(env.getDefaultFunctionNamespace)
-//      staticContext.setDefaultElementNamespace(env.getDefaultElementNamespace)
-//      staticContext.setFunctionLibrary(env.getFunctionLibrary)
-//
-//      for {
-//        prefix <- namespaceResolver.iteratePrefixes.asInstanceOf[JIterator[String]].asScala
-//        if prefix.nonEmpty
-//        uri = namespaceResolver.getURIForPrefix(prefix, true)
-//      } locally {
-//        staticContext.declareNamespace(prefix, uri)
-//      }
-//    }
-//  }
-
   // Default implementation which adds child expressions (here function arguments) to the pathmap
 //  protected def addSubExpressionsToPathMap(
 //    pathMap        : PathMap,
@@ -281,46 +254,6 @@ object XFormsFunction { // extends DefaultFunctionSupport
 //    } else {
 //      null
 //    }
-
-  // The following is inspired by saxon:evaluate()
-//  protected def prepareExpression(
-//    initialXPathContext : XPathContext,
-//    parameterExpression : Expression,
-//    isAVT               : Boolean
-//  ): (Expression, XPathContext) = {
-//
-//    // Evaluate parameter into an XPath string
-//    val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
-//
-//    // Copy static context information
-//    val staticContext = this.staticContext.copy
-//    staticContext.setFunctionLibrary(initialXPathContext.getController.getExecutable.getFunctionLibrary)
-//
-//    // Propagate in-scope variable definitions since they are not copied automatically
-//    val inScopeVariables = bindingContext.getInScopeVariables
-//    val variableDeclarations =
-//      for {
-//        (name, _) <- inScopeVariables.asScala.toList
-//        variable = staticContext.declareVariable("", name)
-//      } yield
-//        name -> variable
-//
-//    // Create expression
-//    val xpe = StaticXPath.compileExpressionWithStaticContext(staticContext, xpathString, isAVT)
-//
-//    val newXPathContext = initialXPathContext.newCleanContext
-//
-//    xpe.createDynamicContext(newXPathContext, initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
-//
-//    if (inScopeVariables ne null)
-//      for ((name, variable) <- variableDeclarations) {
-//        val value = inScopeVariables.get(name)
-//        if (value ne null) // FIXME: this should never happen, right?
-//          newXPathContext.setLocalVariable(variable.getLocalSlotNumber, value)
-//      }
-//
-//    (xpe.getInternalExpression, newXPathContext)
-//  }{
 
   case class Context(
     container         : XBLContainer,
